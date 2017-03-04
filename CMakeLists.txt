@@ -190,7 +190,7 @@ INCLUDE_ALL_ExecutionGraph_SOURCE(ExecutionGraph_SRC
 
 LIST(APPEND ExecutionGraph_INC_DIRS ${ExecutionGraph_INC_DIRS_DEP})
 SET(ExecutionGraph_LINK_LIBS ${ExecutionGraph_LIBRARIES_DEP})
-LIST(APPEND ${ExecutionGraph_DEPENDING_TARGETS} ${ExecutionGraph_DEPENDING_TARGETS_DEP})
+#LIST(APPEND ${ExecutionGraph_DEPENDING_TARGETS} ${ExecutionGraph_DEPENDING_TARGETS_DEP})
 
 IF(ExecutionGraph_BUILD_LIBRARY)
     ADD_SUBDIRECTORY(lib)

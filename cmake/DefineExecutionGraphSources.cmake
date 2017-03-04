@@ -12,9 +12,11 @@ MACRO(INCLUDE_ALL_ExecutionGraph_SOURCE
     # no external sources up to now
     
     SET(${SRC}
+        ${ExecutionGraph_ROOT_DIR}/src/DummyNode.cpp
     )
 
     SET(${INC}
+        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/Nodes/DummyNode.hpp
     )
 
     SET(${INCLUDE_DIRS}
