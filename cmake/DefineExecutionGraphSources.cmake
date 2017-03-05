@@ -21,6 +21,7 @@ MACRO(INCLUDE_ALL_ExecutionGraph_SOURCE
 
     SET(${INCLUDE_DIRS}
         ${ExecutionGraph_ROOT_DIR}/include
+        ${ExecutionGraph_BINARY_DIR}/include
     )
 
 

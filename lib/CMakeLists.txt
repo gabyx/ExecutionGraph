@@ -57,30 +57,30 @@ ENDIF()
 
 # Make target library for tests ================================================
 IF(ExecutionGraph_BUILD_TESTS)
-  #~ IF(ExecutionGraph_BUILD_LIBRARY_STATIC)
-  #~ ADD_LIBRARY(ExecutionGraphForTestsOnly STATIC ${SOURCE_FILES} ${INCLUDE_FILES})
-  #~ SET_TARGET_PROPERTIES(ExecutionGraphForTestsOnly PROPERTIES OUTPUT_NAME ExecutionGraphForTestsOnlyStatic)
-  #~ ELSE()
-  #~ ADD_LIBRARY(ExecutionGraphForTestsOnly SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
-  #~ ENDIF()
+  IF(ExecutionGraph_BUILD_LIBRARY_STATIC)
+  ADD_LIBRARY(ExecutionGraphForTestsOnly STATIC ${SOURCE_FILES} ${INCLUDE_FILES})
+  SET_TARGET_PROPERTIES(ExecutionGraphForTestsOnly PROPERTIES OUTPUT_NAME ExecutionGraphForTestsOnlyStatic)
+  ELSE()
+  ADD_LIBRARY(ExecutionGraphForTestsOnly SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
+  ENDIF()
 
-  #~ IF( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
-      #~ ADD_DEPENDENCIES(ExecutionGraphForTestsOnly ${ExecutionGraph_DEPENDING_TARGETS})
-  #~ ENDIF()
+  IF( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
+      ADD_DEPENDENCIES(ExecutionGraphForTestsOnly ${ExecutionGraph_DEPENDING_TARGETS})
+  ENDIF()
 
-  #~ TARGET_LINK_LIBRARIES(ExecutionGraphForTestsOnly ${LINK_LIBS})
-  #~ SET_TARGET_PROPERTIES(ExecutionGraphForTestsOnly PROPERTIES
-      #~ VERSION ${ExecutionGraph_VERSION_STRING} SOVERSION ${ExecutionGraph_VERSION_STRING}
-  #~ )
+  TARGET_LINK_LIBRARIES(ExecutionGraphForTestsOnly ${LINK_LIBS})
+  SET_TARGET_PROPERTIES(ExecutionGraphForTestsOnly PROPERTIES
+      VERSION ${ExecutionGraph_VERSION_STRING} SOVERSION ${ExecutionGraph_VERSION_STRING}
+  )
 
-  #~ # set build flag, for import/export specifiers in platform.hpp
-  #~ # Building a library means we only export the symbols which have ExecutionGraph_EXPORT set in the Platform.hpp file
-  #~ # We define all other symbols to be hidden by default as suggested by https://gcc.gnu.org/wiki/Visibility
-  #~ IF(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-      #~ target_compile_options(ExecutionGraphForTestsOnly PRIVATE -DExecutionGraph_BUILD_LIBRARY -DExecutionGraph_BUILD_TESTS -fvisibility=hidden)
-  #~ ELSE()
-      #~ target_compile_options(ExecutionGraphForTestsOnly PRIVATE /DExecutionGraph_BUILD_LIBRARY /DExecutionGraph_BUILD_TESTS)
-  #~ ENDIF()
+  # set build flag, for import/export specifiers in platform.hpp
+  # Building a library means we only export the symbols which have ExecutionGraph_EXPORT set in the Platform.hpp file
+  # We define all other symbols to be hidden by default as suggested by https://gcc.gnu.org/wiki/Visibility
+  IF(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+      target_compile_options(ExecutionGraphForTestsOnly PRIVATE -DExecutionGraph_BUILD_LIBRARY -DExecutionGraph_BUILD_TESTS -fvisibility=hidden)
+  ELSE()
+      target_compile_options(ExecutionGraphForTestsOnly PRIVATE /DExecutionGraph_BUILD_LIBRARY /DExecutionGraph_BUILD_TESTS)
+  ENDIF()
 ENDIF()
 # ======================================================================
 
