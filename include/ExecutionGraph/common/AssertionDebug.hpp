@@ -8,36 +8,31 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // ========================================================================================
 
-#ifndef ExecutionGraph_Common_AssertionDebug_hpp
-#define ExecutionGraph_Common_AssertionDebug_hpp
+#ifndef ExecutionGraph_common_Asserts_hpp
+#define ExecutionGraph_common_Asserts_hpp
 
 #include <iostream>
 #include <stdlib.h>
 #include <typeinfo>
 
-#include "ExecutionGraph/Config/Config.hpp"
+#include "ExecutionGraph/config/Config.hpp"
 #include ExecutionGraph_Exception_INCLUDE_FILE
 
-#ifndef NDEBUG
-// Debug!
 /**
 * @brief An Assert Macro to use within C++ code.
 * @param condition The condition which needs to be truem otherwise an assertion
 * is thrown!
 */
-#define EXEC_GRAPH_ASSERTMSG(condition, message) \
-    {                                            \
-        if (!(condition))                        \
-        {                                        \
-            ExecutionGraph_ERRORMSG(message)         \
-        }                                        \
-    }
+
+#ifdef NDEBUG
+    #define EXEC_GRAPH_ASSERTMSG(condition, message) 
 #else
-#define EXEC_GRAPH_ASSERTMSG(condition, message) \
+// Debug!
+    #define EXEC_GRAPH_ASSERTMSG(condition, message) \
     {                                            \
         if (!(condition))                        \
         {                                        \
-            ExecutionGraph_ERRORMSG(message)         \
+            ExecutionGraph_ERRORMSG(message)     \
         }                                        \
     }
 #endif

@@ -13,10 +13,7 @@
 
 #include <type_traits>
 
-namespace ExecutionGraph
-{
 #define EXEC_GRAPH_STATIC_ASSERT(B) static_assert(B, "no message");
 #define EXEC_GRAPH_STATIC_ASSERTM(B, COMMENT) static_assert(B, COMMENT);
-}
 
 #endif

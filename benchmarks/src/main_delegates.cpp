@@ -1,3 +1,12 @@
+// ========================================================================================
+//  ExecutionGraph
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+//
+//  This Source Code Form is subject to the terms of the Mozilla Public
+//  License, v. 2.0. If a copy of the MPL was not distributed with this
+//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// ========================================================================================
+
 #include "ExecutionGraph/Common/TypeDefs.hpp"
 #include "ExecutionGraph/Common/Delegates.hpp"
 
@@ -11,49 +20,42 @@
 using namespace execGraph;
 
 using Type = std::vector<int>;
-#define INIT_DATA \
-    Type vec(3); \
-    int i = 0; \
-    for(auto&v : vec) \
-    { \
-      v = ++i; \
-    } \
-    Type add(3); \
-    i = 0; \
-    for(auto&v : add) \
-    { \
-      v = ++i*2; \
-    }
+
+static const int N = 10000;
 
 template<typename T>
-int rawFunction1(T& in, T& add)
+void initData(T & a, T & b)
 {
-  for( int i=0; i<in.size();++i)
-  {
-    in[i] += add[i];
-  }
-  return in[0];
+    a.resize(3);
+    int i = 0;
+    for(auto&v : a)
+    {
+      v = ++i;
+    }
+    b.resize(3);
+    for(auto&v : b)
+    {
+      v = ++i*2;
+    }
 }
 
 struct A;
 struct B;
-struct ABase{
-  int compute();
-  int computeByDelegate()
-  {
-    return del();
+struct Base{
+  Base(){
+    initData(m_vec,m_add);
   }
+  int compute();
 
-  Delegate<int(void)> del;
+  Delegate<int(void)> computeByDelegate;
+  std::function<int(void)> computeByStdFunction;
 
   int i = 0;
+  Type m_vec, m_add;
 };
 
-struct A : ABase{
+struct A : Base{
   A(){
-    INIT_DATA
-    m_vec = vec;
-    m_add = add;
     i = 0;
   }
   int compute()
@@ -64,16 +66,10 @@ struct A : ABase{
     }
     return m_vec[0];
   }
-  Type m_vec, m_add;
-
-
 };
 
-struct B : ABase{
+struct B : Base{
   B(){
-    INIT_DATA
-    m_vec = vec;
-    m_add = add;
     i = 1;
   }
   int compute()
@@ -84,37 +80,29 @@ struct B : ABase{
     }
     return m_vec[0];
   }
-  Type m_vec, m_add;
 };
 
-int ABase::compute()
+int Base::compute()
 {
   switch(i){
   case 0:
     return static_cast<A*>(this)->compute();
-    break;
   case 1:
     return static_cast<B*>(this)->compute();
-    break;
   }
   return 0;
 }
 
-struct ABaseVirt{
-  virtual int compute(){ return 0;}
-};
-
-struct ABaseVirt2 : ABaseVirt{
-  virtual int compute(){ return 1;}
-};
-
-struct AVirt : ABaseVirt2{
-  AVirt(){
-    INIT_DATA
-    m_vec = vec;
-    m_add = add;
-    i = 0;
+struct BaseVirt{
+  BaseVirt(){
+     initData(m_vec,m_add);
   }
+  virtual int compute(){ return 0;}
+  Type m_vec, m_add;
+};
+
+
+struct AVirt : BaseVirt{
   virtual int compute() override
   {
     for( int i=0; i<m_vec.size();++i)
@@ -123,126 +111,102 @@ struct AVirt : ABaseVirt2{
     }
     return m_vec[0];
   }
-  Type m_vec, m_add;
 };
 
-
-static void BM_RawFunction1(benchmark::State &state) {
-
-    INIT_DATA
-
-    while (state.KeepRunning())
+struct BVirt : BaseVirt{
+  virtual int compute() override
+  {
+    for( int i=0; i<m_vec.size();++i)
     {
-      for(int i=1;i<100;i++){
-        benchmark::DoNotOptimize( rawFunction1(vec,add) );
-      }
+      m_vec[i] += m_add[i];
     }
-}
+    return m_vec[0];
+  }
+};
 
-static void BM_StdFunction1(benchmark::State &state) {
-    INIT_DATA
-    std::function<int(Type&,Type&)> t2 = &rawFunction1<Type>;
-    while (state.KeepRunning())
-    {
-      for(int i=1;i<100;i++){
-        t2(vec,add);
-      }
-    }
-}
+#define DO_NOT_OPTIMIZE //benchmark::DoNotOptimize
 
-static void BM_Delegate1(benchmark::State &state) {
-    INIT_DATA
-    Delegate<int(Type&,Type&)> t2 = &rawFunction1<Type>;
-    while (state.KeepRunning())
-    {
-      for(int i=1;i<100;i++){
-        t2(vec,add);
-      }
-    }
-}
-
-
-static void BM_StdFunctionMember1(benchmark::State &state) {
-    A a;
-    std::function<int(void)> t2 = std::bind(&A::compute,a);
-    while (state.KeepRunning())
-    {
-        for(int i=1;i<100;i++){
-        benchmark::DoNotOptimize(t2());
-        }
-    }
-}
-
-static void BM_DelegateMember1(benchmark::State &state) {
-    A a;
-    auto t2 = Delegate<int(void)>::from<A,&A::compute>(a);
-    while (state.KeepRunning())
-    {
-      for(int i=1;i<100;i++){
-        benchmark::DoNotOptimize(t2());
-      }
-    }
-}
-
-
-static void BM_StaticCastToDerived(benchmark::State &state) {
-    A a;
-    ABase &aBase = a;
-    while (state.KeepRunning())
-    {
-      for(int i=1;i<100;i++){
-        benchmark::DoNotOptimize(aBase.compute());
-      }
-    }
-}
 
 static void BM_ByStaticCastToDerived(benchmark::State &state) {
-    A a;
-    ABase &aBase = a;
+
+    std::vector<Base*> vec(N);
+    for(int i = 0; i<N; ++i ){
+        vec[i] =  (i%11==0 || i % 7==0)? (Base*) new A() : (Base*)new B();
+    }
+
     while (state.KeepRunning())
     {
-      for(int i=1;i<100;i++){
-        benchmark::DoNotOptimize(aBase.compute());
+      for(auto* v: vec){
+        DO_NOT_OPTIMIZE(v->compute());
       }
     }
 }
 
 static void BM_ByDelegate(benchmark::State &state) {
-    A a;
-    ABase &aBase = a;
-    aBase.del = Delegate<int(void)>::from<A,&A::compute>(a);
+    std::vector<Base*> vec(N);
+    for(int i = 0; i<N;++i){
+        if (i%11==0 || i % 7==0)
+        {
+            A * a = new A;
+            vec[i] = a;
+            a->computeByDelegate = Delegate<int(void)>::from<A,&A::compute>(a);
+        }
+        else{
+            B * b = new B;
+            vec[i] = b;
+            b->computeByDelegate = Delegate<int(void)>::from<B,&B::compute>(b);
+        }
+    }
     while (state.KeepRunning())
     {
-      for(int i=1;i<100;i++){
-        benchmark::DoNotOptimize(aBase.computeByDelegate());
+      for(auto* v: vec){
+        DO_NOT_OPTIMIZE(v->computeByDelegate());
       }
     }
 }
+
+static void BM_ByStdFunction(benchmark::State &state) {
+    std::vector<Base*> vec(N);
+    for(int i = 0; i<N;++i){
+        if (i%11==0 || i % 7==0)
+        {
+            A * a = new A;
+            vec[i] = a;
+            a->computeByStdFunction = [&](){return a->compute();};
+        }
+        else{
+            B * b = new B;
+            vec[i] = b;
+            b->computeByStdFunction = [&](){return b->compute();};
+        }
+    }
+    while (state.KeepRunning())
+    {
+      for(auto* v: vec){
+        DO_NOT_OPTIMIZE(v->computeByStdFunction());
+      }
+    }
+}
+
 
 static void BM_ByVirtual(benchmark::State &state) {
-    AVirt a;
-    ABaseVirt &aBase = a;
+    std::vector<BaseVirt*> vec(N);
+    for(int i = 0; i<N;++i){
+        vec[i] =  (i%11==0 || i % 7==0)? (BaseVirt*)new AVirt() : (BaseVirt*)new BVirt();
+    }
     while (state.KeepRunning())
     {
-      for(int i=1;i<100;i++){
-        benchmark::DoNotOptimize(aBase.compute());
+      for(auto* v: vec){
+        DO_NOT_OPTIMIZE(v->compute());
       }
     }
 }
-
-
 
 
 // Register the function as a benchmark
-BENCHMARK(BM_RawFunction1);
-BENCHMARK(BM_StdFunction1);
-BENCHMARK(BM_Delegate1);
-
-BENCHMARK(BM_StdFunctionMember1);
-BENCHMARK(BM_DelegateMember1);
-
 BENCHMARK(BM_ByStaticCastToDerived);
 BENCHMARK(BM_ByDelegate);
+BENCHMARK(BM_ByStdFunction);
 BENCHMARK(BM_ByVirtual);
 
 
