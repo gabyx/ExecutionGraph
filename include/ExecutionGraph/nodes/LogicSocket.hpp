@@ -13,214 +13,261 @@
 #include <meta/meta.hpp>
 
 #include "ExecutionGraph/common/Asserts.hpp"
+#include "ExecutionGraph/common/EnumClassHelper.hpp"
 #include "ExecutionGraph/common/StaticAssert.hpp"
 #include "ExecutionGraph/common/TypeDefs.hpp"
-#include "ExecutionGraph/common/EnumClassHelper.hpp"
 #include "ExecutionGraph/nodes/LogicCommon.hpp"
-
 
 namespace ExecutionGraph
 {
-    
-class LogicNode;
-template <typename T> class LogicSocket;
-
-/**
-    The socket base class for all input/output sockets of a logic node. 
- */
-template<typename Config>
+//! The socket base class for all input/output sockets of a logic node.
+template<typename TConfig>
 class LogicSocketBase
 {
 public:
+    EXEC_GRAPH_TYPDEF_CONFIG(TConfig);
 
-    EXEC_GRAPH_DEFINE_MATRIX_TYPES
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    
-    using SocketListType = std::vector<std::unique_ptr<SocketBaseType>>
-    
-    //! Cast to a logic socket of type \p T.
-    //! The cast fails at runtime if the type does not match!
-    template <typename T>
-    inline LogicSocket<T>* castToType()
-    {
-        EXEC_GRAPH_ASSERTMSG(this->m_type == meta::find_index<SocketTypes,T>,
-                            "Types " << LogicTypes::getTypeName(this->m_type) << " and "
-                                     << LogicTypes::getTypeName(iter::pos::value)
-                            " of logic node '" << this->m_name << "' do not match!" 
-                            );
-        return static_cast<LogicSocket<T>*>(this);
-    }
-    
-    //! Apply a visitor \p visitor on this logic socket.
-    template <typename TVisitor>
-    void applyVisitor(TVisitor&& visitor)
-    {
-        // implement switch statement in LogicTypes
-        LOGICSOCKET_APPLY_VISITOR_SWITCH;
-    }
-    
-    template<typename TTData>
-    LogicSocketBase(unsigned int type, 
-                    unsigned int id, 
-                    NodeType* parent,
-                    TTData&& defaultValue,
-                    const std::string& name = "noname")
-        : m_type(type),
-        , m_id(id)
-        , m_name(name)
-        , m_parent(parent)
-        , m_data(std::forward<TT>(defaultValue))
-    {
-    }
+    LogicSocketBase(unsigned int type, unsigned int id, NodeBaseType& parent, const std::string& name = "noname")
+        : m_type(type), m_id(id), m_parent(parent),  m_name(name)
+    {}
 
-    virtual ~LogicSocketBase() = default;
+    unsigned int getType() const { return m_type; }
+    unsigned int getId() const { return m_id; }
+    std::string getName() const { return m_name; }
 
-    void link(LogicSocketBase* fsock);
-
-    //! Get the parent logic node of this socket.
-    inline NodeType* getParent() const
-    {
-        return m_parent;
-    }
-
-    //! Check if the socket has a Get-Link to an output socket.
-    inline bool isConnectedToInput() const
-    {
-        return m_from != nullptr;
-    }
-
-    inline bool isConnected() const
-    {
-        return m_connected;
-    }
-
-    inline LogicSocketBase* getFrom() const
-    {
-        return m_from;
-    }
-
-public:
-    const unsigned int m_type;      //!< The index in the mpl sequence, which type this is!
-    const unsigned int m_id = 0;    //!< The unique id among all sockets of a LogicNode.  
-    const std::string  m_name = ""; //!< The name of the socket.
+    const NodeBaseType& getParent() const { return m_parent; }
+    NodeBaseType& getParent() { return m_parent; }
 
 protected:
-    /** from socket to 'this' (used to link an input socket with an output socket)
-    *  incoming edges: only one makes sense
-    *  only valid for input sockets
-    */
-    LogicSocketBase* m_from = nullptr;
-
-    /** from 'this' to sockets (used to link an output socket with one or more than one input socket)
-    *   outgoing edges
-    *   only valid for output sockets
-    */
-    SocketListType m_to;
-
-private:
-    NodeType* m_parent; //!< The parent logic node of of this socket.
-    bool m_connected = false;
-
+    const unsigned int m_type;     //!< The index in the mpl sequence, which type this is!
+    const unsigned int m_id;       //!< The unique id among all sockets of a LogicNode.
+    NodeBaseType&  m_parent;  //!< The parent logic node of of this socket.
+    const std::string m_name;      //!< The name of the socket.
 };
 
-template <typename TData, typename TConfig>
-class LogicSocketInput : public LogicSocketBase<TConfig>
+//! The input socket base class for all input/output sockets of a logic node.
+template<typename TConfig>
+class LogicSocketInputBase : public LogicSocketBase<TConfig>
 {
 public:
+    EXEC_GRAPH_TYPDEF_CONFIG(TConfig);
 
-    using DataType = TData;
-    /** This assert fails if the type T of the LogicSocket is 
-        not properly added to the type list SocketTypes in LogicSocketBase*/
-    EXEC_GRAPH_STATIC_ASSERT( !std::is_same< meta::find<SocketTypes,DataType>, meta::list<> >::value ,
-                              "TData is not in SocketTypes!" )
-                              
+    friend class LogicSocketOutputBase<Config>;
+
     template<typename... Args>
-    LogicSocketInput(Args&&... args)
-        : LogicSocketBase(std::forward<Args>(args)...)
+    LogicSocketInputBase(Args&&... args)
+        : LogicSocketBase<TConfig>(std::forward<Args>(args)...)
+    {}
+
+    //! Cast to a logic socket of type \p SocketInputType<T>*.
+    //! The cast fails at runtime if the data type \p T does not match!
+    template<typename T>
+    inline auto* castToType() const
     {
+        EXEC_GRAPH_ASSERTMSG((this->m_type == meta::find_index<SocketTypes, T>),
+                             "Types " << LogicTypes::getTypeName(this->m_type) << " and "
+                                      << LogicTypes::getTypeName(meta::find_index<SocketTypes, T>) " of logic node '"
+                                      << this->m_name
+                                      << "' do not match!");
+        return static_cast<SocketInputType<T> const*>(this);
     }
-    
-private:
-    TData m_data;  //!< Default value! or the output value if output socket
+
+    //! Non-const overload.
+    template<typename T>
+    inline auto* castToType()
+    {
+        return const_cast<SocketInputType<T>*>(static_cast<LogicSocketInputBase const*>(this)->castToType<T>());
+    }
+
+    void setGetLink(LogicSocketOutputBase<Config>& outputSocket);
+
+    //! Check if the socket has a Get-Link to an output socket.
+    inline bool isConnectedToOutput() const { return m_from != nullptr; }
+
+protected:
+    LogicSocketOutputBase<Config>* m_from = nullptr;  //!< The single Get-Link attached to this Socket.
 };
 
-template <typename TData, typename TConfig>
-class LogicSocketOutput: public LogicSocketBase<TConfig>
+//! The input socket base class for all input/output sockets of a logic node.
+template<typename TConfig>
+class LogicSocketOutputBase : public LogicSocketBase<TConfig>
 {
 public:
+    EXEC_GRAPH_TYPDEF_CONFIG(TConfig);
+    friend class LogicSocketInputBase<Config>;
 
-    using DataType = TData;
-    /** This assert fails if the type T of the LogicSocket is 
-        not properly added to the type list SocketTypes in LogicSocketBase*/
-    EXEC_GRAPH_STATIC_ASSERT( !std::is_same< meta::find<SocketTypes,DataType>, meta::list<> >::value ,
-                              "TData is not in SocketTypes!" )
-    
     template<typename... Args>
-    LogicSocketOutput(Args&&... args)
-        : LogicSocketBase(std::forward<Args>(args)...)
+    LogicSocketOutputBase(Args&&... args)
+        : LogicSocketBase<TConfig>(std::forward<Args>(args)...)
+    {}
+
+    //! Cast to a logic socket of type \p SocketOutputType<T>*.
+    //! The cast fails at runtime if the data type \p T does not match!
+    template<typename T>
+    inline auto* castToType() const
     {
+        EXEC_GRAPH_ASSERTMSG((this->m_type == meta::find_index<SocketTypes, T>),
+                             "Types " << LogicTypes::getTypeName(this->m_type) << " and "
+                                      << LogicTypes::getTypeName(meta::find_index<SocketTypes, T>) " of logic node '"
+                                      << this->m_name
+                                      << "' do not match!");
+        return static_cast<SocketOutputType<T>*>(this);
     }
-    
-private:
-    TData m_data;  //!< Default value! or the output value if output socket
+
+    //! Non-const overload.
+    template<typename T>
+    inline auto* castToType()
+    {
+        return const_cast<SocketOutputType<T>*>(static_cast<LogicSocketOutputBase const*>(this)->castToType<T>());
+    }
+
+    void addWriteLink(LogicSocketInputBase<Config>& inputSocket);
+
+protected:
+    std::vector<LogicSocketInputBase<Config>*> m_to;  //!< All Write-Links attached to this Socket.
 };
 
-#include "GRSF/logic/LogicNode.hpp"
-
-template <typename T>
-void LogicSocket<T>::distributeValue()
+template<typename TData>
+class LogicSocketData
 {
-    if (!m_isInput)
+public:
+    using DataType = TData;
+
+    template<typename T>
+    LogicSocketData(T&& defaultValue) : m_data(std::forward<T>(defaultValue))
     {
-        // if output node
-        // set all "to" sockets ( these are write links, because we write the value to another input socket)
-        for (auto& s : m_to)
-        {
-            GRSF_ASSERTMSG(s->m_type == m_type,
-                           "Types of node have to match: type " << m_type << "from id: " << s->getParent()->m_id
-                                                                << "to type "
-                                                                << s->m_type
-                                                                << " of id: "
-                                                                << s->getParent()->m_id)
-            LogicSocket<T>* sock = static_cast<LogicSocket<T>*>(s);
-            sock->setValue(m_data);
-        }
+    }
+
+    //! Get the data value of the socket.
+    inline const DataType& getValue() const { return m_data; }
+    //! Non-const overload.
+    inline DataType& getValue() { return m_data; }
+
+    //! Set the data value of the socket.
+    template<typename T>
+    void setValue(T&& value)
+    {
+        m_data = std::forward<T>(value);
+    }
+
+protected:
+    DataType m_data;  //!< Default value! or the output value if output socket
+};
+
+template<typename TData, typename TConfig>
+class LogicSocketInput : public LogicSocketInputBase<TConfig>, public LogicSocketData<TData>
+{
+public:
+    EXEC_GRAPH_TYPDEF_CONFIG(TConfig);
+    using DataType = TData;
+
+    /** This assert fails if the type T of the LogicSocket is
+        not properly added to the type list SocketTypes in LogicSocketBase*/
+    EXEC_GRAPH_STATIC_ASSERTM((!std::is_same<meta::find<SocketTypes, DataType>, meta::list<>>::value),
+                              "TData is not in SocketTypes!")
+
+    template<typename T, typename... Args>
+    LogicSocketInput(T&& defaultValue, Args&&... args)
+        : LogicSocketInputBase<TConfig>(meta::find_index<SocketTypes, DataType>::value, std::forward<Args>(args)...)
+        , LogicSocketData<TData>(std::forward<T>(defaultValue))
+    {
+    }
+};
+
+template<typename TData, typename TConfig>
+class LogicSocketOutput : public LogicSocketOutputBase<TConfig>, public LogicSocketData<TData>
+{
+public:
+    EXEC_GRAPH_TYPDEF_CONFIG(TConfig);
+
+    using DataType = TData;
+    /** This assert fails if the type T of the LogicSocket is
+        not properly added to the type list SocketTypes in LogicSocketBase*/
+    EXEC_GRAPH_STATIC_ASSERTM((!std::is_same<meta::find<SocketTypes, DataType>, meta::list<>>::value),
+                              "TData is not in SocketTypes!")
+
+    template<typename T, typename... Args>
+    LogicSocketOutput(T&& defaultValue, Args&&... args)
+        : LogicSocketOutputBase<TConfig>(meta::find_index<SocketTypes, DataType>::value, std::forward<Args>(args)...)
+        , LogicSocketData<TData>(std::forward<T>(defaultValue))
+    {
+    }
+    //! Set the data value of the socket.
+    template<typename T>
+    void setValue(T&& value)
+    {
+        // Set the value
+        LogicSocketData<TData>::setValue(std::forward<T>(value));
+        // Forward the value to all Write-Links
+        executeWriteLinks();
+    }
+
+    void executeWriteLinks();
+};
+
+}  // namespace
+
+namespace ExecutionGraph
+{
+template<typename TConfig>
+void LogicSocketOutputBase<TConfig>::addWriteLink(LogicSocketInputBase<TConfig>& inputSocket)
+{
+    EXEC_GRAPH_THROWEXCEPTION_IF(this->getType() != inputSocket.getType(),
+                                 "Output socket: " << this->getName() << " of logic node id: " << this->getParent().getId()
+                                                   << " has not the same type as input socket "
+                                                   << inputSocket.getName()
+                                                   << " of logic node id: "
+                                                   << inputSocket.getParent().getId());
+
+    if (std::find(m_to.begin(), m_to.end(), &inputSocket) == m_to.end())
+    {
+        m_to.push_back(&inputSocket);
+    }
+    else
+    {
+        EXEC_GRAPH_THROWEXCEPTION("Input socket: " << inputSocket.getName() << " of logic node id: "
+                                                   << inputSocket.getParent().getId()
+                                                   << " already added as Write-Link to logic node id: "
+                                                   << this->getParent().getId());
     }
 }
 
-template <typename T>
-template <typename TIn>
-void LogicSocket<T>::setValue(const TIn& value)
+template<typename TConfig>
+void LogicSocketInputBase<TConfig>::setGetLink(LogicSocketOutputBase<TConfig>& outputSocket)
 {
-    // set internal value for input node, however if output node we also set the value ( might be needed
-    m_data = value;
-    distributeValue();
-};
+    EXEC_GRAPH_THROWEXCEPTION_IF(
+        this->getType() != outputSocket.getType(),
+        "Output socket: " << outputSocket.getName() << " of logic node id: " << outputSocket.getParent().getId()
+                          << " has not the same type as input socket "
+                          << this->getName()
+                          << " of logic node id: "
+                          << this->getParent().getId());
 
-template <typename T>
-T LogicSocket<T>::getValue() const
-{
-    // if we have a "from" node (only for input sockets), we get the value from this sockets
-    if (m_from)
+    if (!isConnectedToOutput())
     {
-        return m_from->castToType<T>()->getValue();
+        m_from = &outputSocket;
     }
-    return m_data;
-};
-
-template <typename T>
-T& LogicSocket<T>::getValueRef()
-{
-    // if we have a from"
-    if (m_from)
+    else
     {
-        return m_from->castToType<T>()->getValueRef();
+        EXEC_GRAPH_THROWEXCEPTION("Output socket: " << outputSocket.getName() << " of logic node id: "
+                                                    << outputSocket.getParent().getId()
+                                                    << " already set as Get-Link of logic node id: "
+                                                    << this->getParent().getId());
     }
-
-    return m_data;
 }
 
-} // namespace
+template<typename TData, typename TConfig>
+void LogicSocketOutput<TData, TConfig>::executeWriteLinks()
+{
+    // Write out value to all connected (Write-Link) input sockets.
+    for (auto& inputSocket : this->m_to)
+    {
+        // We know that this static cast ist safe, since it has been
+        // checked when addWriteLink() is called.
+        static_cast<LogicSocketInput<TData, Config>*>(this->s)->setValue(this->m_data);  // Write data to input sockets.
+    }
+}
+}
 
 #define ADD_ISOCK(name, value)                                                                        \
     GRSF_ASSERTMSG(Inputs::name == this->m_inputs.size(), " Wrong order for Input: " << Inputs::name) \
@@ -281,18 +328,12 @@ T& LogicSocket<T>::getValueRef()
 #define GET_OSOCKET(name) GET_OSOCKET_PTR(this, name)
 
 /** SOCKET DECLARATION MACROS */
-#define DECLARE_ISOCKET_TYPE(name, type)         \
-    typedef type IType##name;                    \
-    inline LogicSocket<type>* getIn_##name()     \
-    {                                            \
-        return getISocket<type>((Inputs::name)); \
-    }
+#define DECLARE_ISOCKET_TYPE(name, type) \
+    typedef type IType##name;            \
+    inline LogicSocket<type>* getIn_##name() { return getISocket<type>((Inputs::name)); }
 
-#define DECLARE_OSOCKET_TYPE(name, type)          \
-    typedef type OType##name;                     \
-    inline LogicSocket<type>* getOut_##name()     \
-    {                                             \
-        return getOSocket<type>((Outputs::name)); \
-    }
+#define DECLARE_OSOCKET_TYPE(name, type) \
+    typedef type OType##name;            \
+    inline LogicSocket<type>* getOut_##name() { return getOSocket<type>((Outputs::name)); }
 
 #endif

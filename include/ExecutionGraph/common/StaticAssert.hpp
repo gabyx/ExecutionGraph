@@ -8,8 +8,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // ========================================================================================
 
-#ifndef ExecutionGraph_Common_StaticAssert_hpp
-#define ExecutionGraph_Common_StaticAssert_hpp
+#ifndef ExecutionGraph_common_StaticAssert_hpp
+#define ExecutionGraph_common_StaticAssert_hpp
 
 #include <type_traits>
 

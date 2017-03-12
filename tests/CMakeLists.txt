@@ -76,8 +76,8 @@ function(defineCompileDefs Target)
 endfunction()
 
 # ConvexHull
-SET(EXEC_NAME1 ${PROJECT_NAME}-Delegates)
-ADD_EXECUTABLE(${EXEC_NAME1}  ${PROJECT_SOURCE_DIR}/src/main_delegates.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+SET(EXEC_NAME1 ${PROJECT_NAME}-LogicNodes)
+ADD_EXECUTABLE(${EXEC_NAME1}  ${PROJECT_SOURCE_DIR}/src/main_LogicNode.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 TARGET_LINK_LIBRARIES(${EXEC_NAME1} ExecutionGraphForTestsOnly gtest gmock_main)
 ADD_DEPENDENCIES(build_and_test ${EXEC_NAME1})
 if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")

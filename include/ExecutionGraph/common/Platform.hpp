@@ -11,7 +11,7 @@
 #ifndef ExecutionGraph_Common_Platform_hpp
 #define ExecutionGraph_Common_Platform_hpp
 
-#include "ExecutionGraph/Config/Config.hpp"
+#include "ExecutionGraph/config/Config.hpp"
 
 #ifdef __CYGWIN__
 #include "ExecutionGraph/Common/CygwinPatch.hpp"

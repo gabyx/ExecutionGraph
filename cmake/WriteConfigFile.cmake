@@ -19,7 +19,7 @@ MACRO(ExecutionGraph_WRITE_CONFIG_FILE ExecutionGraph_CONFIG_FILE ExecutionGraph
     MESSAGE(STATUS "ExecutionGraph Version: ${ExecutionGraph_VERSION_STRING} extracted from git tags!")
 
     configure_file(
-      ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/Config/Config.hpp.in.cmake
+      ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/config/Config.hpp.in.cmake
       ${ExecutionGraph_CONFIG_FILE}
     )
 

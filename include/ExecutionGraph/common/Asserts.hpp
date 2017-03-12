@@ -1,7 +1,6 @@
 ﻿// ========================================================================================
 //  ExecutionGraph
-//  Copyright (C) 2014 by Gabriel Nützi <nuetzig (at) imes (d0t) mavt (d0t) ethz
-//  (døt) ch>
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 //
 //  This Source Code Form is subject to the terms of the Mozilla Public
 //  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,20 +14,15 @@
 #include <stdlib.h>
 #include <typeinfo>
 
+#include "ExecutionGraph/common/Exception.hpp"
 #include "ExecutionGraph/config/Config.hpp"
-#include ExecutionGraph_Exception_INCLUDE_FILE
 
-/**
-* @brief An Assert Macro to use within C++ code.
-* @param condition The condition which needs to be truem otherwise an assertion
-* is thrown!
-*/
-
+//! Some assert macro.
 #ifdef NDEBUG
-    #define EXEC_GRAPH_ASSERTMSG(condition, message) 
+#define EXEC_GRAPH_ASSERTMSG(condition, message)
 #else
 // Debug!
-    #define EXEC_GRAPH_ASSERTMSG(condition, message) \
+#define EXEC_GRAPH_ASSERTMSG(condition, message) \
     {                                            \
         if (!(condition))                        \
         {                                        \
@@ -37,6 +31,7 @@
     }
 #endif
 
+//! Some warning macro.
 #define EXEC_GRAPH_WARNINGMSG(condition, message)                                   \
     {                                                                               \
         if (!(condition))                                                           \
@@ -46,6 +41,4 @@
                       << " @ " << __FILE__ << " (" << __LINE__ << ")" << std::endl; \
         }                                                                           \
     }
-#define EXEC_GRAPH_ERRORMSG(message) EXEC_GRAPH_THROWEXCEPTION(message)
-
 #endif

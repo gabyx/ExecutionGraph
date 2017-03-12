@@ -2,13 +2,7 @@
 
 namespace execGraph
 {
-    
-DummyNode::DummyNode(unsigned int id)
-{
-}
+DummyNode::DummyNode(unsigned int id) {}
 
-DummyNode::~DummyNode()
-{
-}
-
+DummyNode::~DummyNode() {}
 }

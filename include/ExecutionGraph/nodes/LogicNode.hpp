@@ -10,92 +10,71 @@
 #ifndef ExecutionGraph_nodes_LogicNode_hpp
 #define ExecutionGraph_nodes_LogicNode_hpp
 
-#include <vector>
 #include <memory>
+#include <vector>
 #include "ExecutionGraph/common/Asserts.hpp"
-#include "ExecutionGraph/common/LogicCommon.hpp"
+#include "ExecutionGraph/common/StaticAssert.hpp"
+#include "ExecutionGraph/nodes/LogicCommon.hpp"
 
 namespace ExecutionGraph
 {
-
-class LogicSocketBase;
-template <typename T> class LogicSocket;
-
 /**
- @brief The execution node (logic node) class which is the base class 
-        for every logic node in an execution graph. 
-  
+ @brief The execution node (logic node) class which is the base class
+        for every logic node in an execution graph.
+
+        // clang-format off
         General Concept
+                               +-------------+                                       +-------------+
+                               | LogicNode A |                                       | LogicNode B |
+                               |             |                                       |             |
+                               |      +------+-----+                           +-----+-----+       |
+                               |      | Out Socket |                           | In Socket |       |
+                               |      |            |                           |           |       |
+                               |      |    m_to[0] |@------( Write-Link )----> |           |       |
+                               |      |            |                           |           |       |
+                               |      |            |                           |           |       |
+                               |      |            |                           |           |       |
+                               |      |            | <-----(  Get-Link  )-----@| m_from    |       |
+                               |      |            |                           |           |       |
+                               |      |            |                           |           |       |
+                               |      |  T m_data  |                           |  T m_data |       |
+                               |      +------+-----+                           +-----+-----+       |
+                               |             |                                       |             |
+                               +-------------+                                       +-------------+
 
-                           +-------------+                                       +-------------+
-                           | LogicNode A |                                       | LogicNode B |
-                           |             |                                       |             |
-                           |      +------+-----+                           +-----+-----+       |
-                           |      | Out Socket |                           | In Socket |       |
-                           |      |            |                           |           |       |
-                           |      |    m_to[0] |@------( Write-Link )----> |           |       |
-                           |      |            |                           |           |       |
-                           |      |            |                           |           |       |
-                           |      |            |                           |           |       |
-                           |      |            | <-----(  Get-Link  )-----@| m_from    |       |
-                           |      |            |                           |           |       |
-                           |      |            |                           |           |       |
-                           |      |  T m_data  |                           |  T m_data |       |
-                           |      +------+-----+                           +-----+-----+       |
-                           |             |                                       |             |
-                           +-------------+                                       +-------------+
-
-            Function Behavior in Out Socket:  (this =  Out)  ++      Function Behavior in In Socket:  (this = In)
-            ================================                 ||      ===============================
-                                                             ||
-            -getValue():  gets this->m_data,                 ||      -getValue(): gets the value of the Get-Link
-                                                             ||                   Out->m_data
-                                                             ||
-                                                             ||
-            -setValue():  set all Write-Links directly       ||      -setValue(): gets internal this->m_data
-                          (m_to array) and set this->m_data  ||
-                          also because this might have other ||
-                          Get-Links                          ||
-                                                             ++
+                Function Behavior in Out Socket:  (this =  Out)  ++      Function Behavior in In Socket:  (this = In)
+                ================================                 ||      ===============================
+                                                                 ||
+                -getValue():  gets this->m_data,                 ||      -getValue(): gets the value of the Get-Link
+                                                                 ||                   Out->m_data
+                                                                 ||
+                                                                 ||
+                -setValue():  set all Write-Links directly       ||      -setValue(): gets internal this->m_data
+                              (m_to array) and set this->m_data  ||
+                              also because this might have other ||
+                              Get-Links                          ||
+                                                                 ++
+        // clang-format on
 */
 
-template<typename TSocketTypes>
-struct GeneralConfig
-{
-    using SocketTypes = TSocketTypes;
-    using NodeBaseType                           = LogicNode<Config>;
-    using SocketBaseType                         = LogicSocketBase<Config>;
-    template<typename T> using SocketInputType   = LogicSocketInput<T,Config>;
-    template<typename T> using SocketOutputType  = LogicSocketOutput<T,Config>;
-}
-
-#define EXEC_GRAPH_TYPDEF_CONFIG(__CONFIG__) \
-    using Config = __CONFIG__; \
-    using SocketTypes = __CONFIG__::SocketTypes; \
-    using NodeBaseType                            = typename Config::NodeBaseType; \
-    using SocketBaseType                          = typename Config::SocketBaseType; \
-    template<typename T> using SocketInputType    = typename Config::template SocketInputType<T>; \
-    template<typename T> using SocketOutputType   = typename Config::template SocketOutputType<T>
-
-template< typename TConfig >
+template<typename TConfig>
 class LogicNode
 {
 public:
-    
     EXEC_GRAPH_TYPDEF_CONFIG(TConfig);
-    
-    using SocketListType = std::vector<std::unique_ptr<SocketBaseType>>
-    
-    const unsigned int m_id; //! The unique id of the logic node.
+
+    template<typename T>
+    using SocketPointer        = std::unique_ptr<T, void (*)(T*)>;
+    using SocketInputListType  = std::vector<SocketPointer<SocketInputBaseType>>;
+    using SocketOutputListType = std::vector<SocketPointer<SocketOutputBaseType>>;
 
 public:
-    
     //! The basic constructor of a logic node.
-    LogicNode(unsigned int id);
+    LogicNode(unsigned int id): m_id(id) {}
     LogicNode(const LogicNode&) = default;
-    LogicNode(LogicNode&&) = default;
-    
-    virtual ~LogicNode();
+    LogicNode(LogicNode&&)      = default;
+
+    virtual ~LogicNode() = default;
 
     //! The reset function.
     virtual void reset() = 0;
@@ -103,190 +82,232 @@ public:
     //! The main compute function of this execution node.
     virtual void compute() = 0;
 
-    //! Get the input socket at index \p idx.
-    SocketBaseType* getISocket(unsigned int idx);
-    //! Get the output socket at index \p index.
-    SocketBaseType* getOSocket(unsigned int idx);
+    inline unsigned int getId(){ return m_id; }
 
-    inline bool hasLinks() const
-    {
-        return m_hasLinks;
-    }
-    inline void setLinked(void)
-    {
-        m_hasLinks = true;
-    }
-    
+    inline bool hasLinks() const { return m_hasLinks; }
+    inline void setLinked(void) { m_hasLinks = true; }
+
     //! Set the priority of this node to \p p.
-    inline void setPriority(unsigned int p)
-    {
-        m_priority = p;
-    }
+    inline void setPriority(unsigned int p) { m_priority = p; }
     //! Get the priority of this node.
-    inline unsigned int getPriority(void) const
-    {
-        return m_priority;
-    }
+    inline unsigned int getPriority(void) const { return m_priority; }
     //! Get the list of input sockets.
-    const SocketListType& getInputs() const
-    {
-        return m_inputs;
-    }
+    const SocketInputListType& getInputs() const { return m_inputs; }
     //! Get the list of output sockets.
-    const SocketListType& getOutputs() const
-    {
-        return m_outputs;
-    }
-    
+    const SocketOutputListType& getOutputs() const { return m_outputs; }
+
     //! Add an input socket with default value \p defaultValue.
-    template <typename T>
+    template<typename TData, typename T>
     void addISock(T&& defaultValue, const std::string& name = "noname")
     {
-        EXEC_GRAPH_STATIC_ASSERTM(!std::is_reference<T>::value,"Wrong template argument");
-        
         unsigned int idx = m_inputs.size() + m_outputs.size();
-        auto p = std::make_unique<LogicSocketOutput<T>>(this, std::forward<T>(defaultValue), idx, name));
+        auto p           = SocketPointer<SocketInputBaseType>(
+            new SocketInputType<TData>(std::forward<T>(defaultValue), idx, *this, name),
+            [](SocketInputBaseType* p) { delete static_cast<SocketInputType<TData>*>(p); });
         m_inputs.push_back(std::move(p));
     }
-    
+
     //! Add an input socket with default value \p defaultValue.
-    template <typename T>
-    void addISock(T&& defaultValue, const std::string& name = "noname")
+    template<typename TData, typename T>
+    void addOSock(T&& defaultValue, const std::string& name = "noname")
     {
-        EXEC_GRAPH_STATIC_ASSERTM(!std::is_reference<T>::value,"Wrong template argument");
-        
         unsigned int idx = m_inputs.size() + m_outputs.size();
-        auto p = std::make_unique<LogicSocketInput<T>>(this, std::forward<T>(defaultValue), idx, name));
-        m_inputs.push_back(std::move(p));
+        auto p           = SocketPointer<SocketOutputBaseType>(
+            new SocketOutputType<TData>(std::forward<T>(defaultValue), idx, *this, name),
+            [](SocketOutputBaseType* p) { delete static_cast<SocketOutputType<TData>*>(p); });
+        m_outputs.push_back(std::move(p));
     }
-    
+
+    //! Get the input socket at index \p idx.
+    SocketInputBaseType& getISocket(unsigned int idx)
+    {
+        EXEC_GRAPH_ASSERTMSG(idx < m_inputs.size(), "Wrong index!");
+        return *m_inputs[idx];
+    }
+    //! Get the output socket at index \p index.
+    SocketOutputBaseType& getOSocket(unsigned int idx)
+    {
+        EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
+        return *m_outputs[idx];
+    }
+
     //! Get the input socket of type \p T at index \p idx .
-    template <typename T> 
-    SocketInputType<T>* getISocket(unsigned int idx);
-    template <typename T> 
-    const SocketInputType<T> * getISocket(unsigned int idx) const;
-    
+    template<typename T>
+    auto& getISocket(unsigned int idx);
+    template<typename T>
+    const auto& getISocket(unsigned int idx) const;
+
     //! Get the output socket of type \p T at index \p idx.
-    template <typename T> 
-    SocketOutputType<T>* getOSocket(unsigned int idx);
-    template <typename T> 
-    const SocketOutputType<T> * getOSocket(unsigned int idx) const;
+    template<typename T>
+    auto& getOSocket(unsigned int idx);
+    template<typename T>
+    const auto& getOSocket(unsigned int idx) const;
 
     //! Get input socket value \p T at index \p idx.
-    template <typename T> 
-    const& T getISocketValue(unsigned int idx) const;
-    //! Set the input socket value \p T at index \p idx.
-    template <typename T, typename TIn = T>
-    void setISocketValue(unsigned int idx, const TIn& data);
-    
+    template<typename T>
+    const T& getISocketValue(unsigned int idx) const;
+
     //! Get the read/write socket value \p T of the output socket at index \p idx.
-    template <typename T>
+    template<typename T>
     T& getOSocketValue(unsigned int idx);
-    template <typename T>
+    template<typename T>
     const T& getOSocketValue(unsigned int idx) const;
-    
+
     //! Set the read/write output socket value \p T at index \p idx.
-    template <typename T, typename TIn = T>
-    void setOSocketValue(unsigned int idx, const TIn& data);
-    
-    //! Writes the value of the output socket at index \p idx to all inputs 
-    //! which are accesible by write links. 
-    template <typename T>
-    void distributeOSocketValue(unsigned int idx); 
-    
-    //! Constructs a Get-Link to get the data from output socket at index \p outS  
-    //! of logic node \p outN at the input socket at index \p inS of logic node \p inN.
-    static void makeGetLink(LogicNode* outN, unsigned int outS, LogicNode* inN, unsigned int inS);
-    
-    //! Constructs a Get-Link to get the data from output socket at index \p outS  
+    template<typename T, typename TIn = T>
+    void setOSocketValue(unsigned int idx, TIn&& data);
+
+    //! Writes the value of the output socket at index \p idx to all inputs
+    //! which are accesible by write links.
+    template<typename T>
+    void distributeOSocketValue(unsigned int idx);
+
+    //! Constructs a Get-Link to get the data from output socket at index \p outS
+    //! of logic node \p outN at the input socket at index \p inS of logic node \p
+    //! inN.
+    static void setGetLink(LogicNode& outN, unsigned int outS, LogicNode& inN, unsigned int inS);
+
+
+    //! Constructs a Get-Link to get the data from output socket at index \p outS
     //! of logic node \p outN at the input socket at index \p inS.
-    inline void makeGetLink(LogicNode* outN, unsigned int outS, unsigned int inS)
+    inline void setGetLink(LogicNode& outN, unsigned int outS, unsigned int inS)
     {
-        makeGetLink(outN,outS,this,inS);
+      setGetLink(outN, outS, *this, inS);
     }
 
-    //! Constructs a Write-Link to write the data of output socket at index \p outS  
-    //! of logic node \p outN to the input socket at index \p inS of logic node \p inN.
-    static void makeWriteLink(LogicNode* outN, unsigned int outS, LogicNode* inN, unsigned int inS);
-    
-    //! Constructs a Write-Link to write the data of output socket at index \p outS  
+    //! Constructs a Write-Link to write the data of output socket at index \p
+    //! outS
+    //! of logic node \p outN to the input socket at index \p inS of logic node \p
+    //! inN.
+    static void addWriteLink(LogicNode& outN, unsigned int outS, LogicNode& inN, unsigned int inS);
+
+    //! Constructs a Write-Link to write the data of output socket at index \p
+    //! outS
     //! of logic node \p outN to the input socket at index \p inS.
-    inline void makeWriteLink(LogicNode* outN, unsigned int outS, unsigned int inS)
+    inline void addWriteLink(unsigned int outS, LogicNode& inN, unsigned int inS)
     {
-        makeWriteLink(outN,outS,this,inS);
+        addWriteLink(*this, outS, inN, inS);
     }
 
 protected:
+    const unsigned int m_id;  //! The unique id of the logic node.
     bool m_hasLinks;
-    SocketListType m_inputs;
-    SocketListType m_outputs;
+    SocketInputListType m_inputs;
+    SocketOutputListType m_outputs;
     unsigned int m_priority;
 };
 
-template <typename T>
-LogicSocket<T>* LogicNode::getISocket(unsigned int idx)
+template<typename TConfig>
+template<typename T>
+auto& LogicNode<TConfig>::getISocket(unsigned int idx)
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_inputs.size(), "Wrong index!");
-    return m_inputs[idx]->castToType<T>();
+    return *m_inputs[idx]->template castToType<T>();
 }
 
-template <typename T>
-LogicSocket<T>* LogicNode::getOSocket(unsigned int idx)
-{
-    EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
-    return m_outputs[idx]->castToType<T>();
-}
-
-template <typename T>
-const T& LogicNode::getISocketValue(unsigned int idx) const
+template<typename TConfig>
+template<typename T>
+const auto& LogicNode<TConfig>::getISocket(unsigned int idx) const
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_inputs.size(), "Wrong index!");
-    return m_inputs[idx]->castToType<T>()->getValue();
+    return *m_inputs[idx]->template castToType<T>();
 }
 
-template <typename T>
-T LogicNode::getOSocketValue(unsigned int idx)
+template<typename TConfig>
+template<typename T>
+auto& LogicNode<TConfig>::getOSocket(unsigned int idx)
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
-    return m_outputs[idx]->castToType<T>()->getValue();
+    return *m_outputs[idx]->template castToType<T>();
 }
 
-template <typename T>
-const& T LogicNode::getOSocketValue(unsigned int idx) const
+template<typename TConfig>
+template<typename T>
+const auto& LogicNode<TConfig>::getOSocket(unsigned int idx) const
 {
-    EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size() , "Wrong index!");
-    return m_outputs[idx]->castToType<T>()->getValue();
+    EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
+    return *m_outputs[idx]->template castToType<T>();
 }
 
-template <typename T, typename TIn>
-void LogicNode::setISocketValue(unsigned int idx, const TIn& data)
+template<typename TConfig>
+template<typename T>
+const T& LogicNode<TConfig>::getISocketValue(unsigned int idx) const
 {
-    EXEC_GRAPH_ASSERTMSG(idx < m_inputs.size() , "Wrong index!");
-    m_inputs[idx]->castToType<T>()->setValue(data);
-}
-template <typename T, typename TIn>
-void LogicNode::setOSocketValue(unsigned int idx, const TIn& data)
-{
-    EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size() , "Wrong index!");
-    m_outputs[idx]->castToType<T>()->setValue(data);
+    EXEC_GRAPH_ASSERTMSG(idx < m_inputs.size(), "Wrong index!");
+    return m_inputs[idx]->template castToType<T>()->getValue();
 }
 
-template <typename T>
-void LogicNode::distributeOSocketValue(unsigned int idx)
+template<typename TConfig>
+template<typename T>
+T& LogicNode<TConfig>::getOSocketValue(unsigned int idx)
 {
-    EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size() , "Wrong index!");
-    m_outputs[idx]->castToType<T>()->distributeValue();
+    EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
+    return m_outputs[idx]->template castToType<T>()->getValue();
+}
+
+template<typename TConfig>
+template<typename T>
+const T& LogicNode<TConfig>::getOSocketValue(unsigned int idx) const
+{
+    EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
+    return m_outputs[idx]->template castToType<T>()->getValue();
+}
+
+//~ template <typename T, typename TIn>
+//~ void LogicNode::setISocketValue(unsigned int idx, const TIn& data)
+//~ {
+//~ EXEC_GRAPH_ASSERTMSG(idx < m_inputs.size() , "Wrong index!");
+//~ m_inputs[idx]->castToType<T>()->setValue(data);
+//~ }
+template<typename TConfig>
+template<typename T, typename TIn>
+void LogicNode<TConfig>::setOSocketValue(unsigned int idx, TIn&& data)
+{
+    EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
+    m_outputs[idx]->template castToType<T>()->setValue(std::forward<TIn>(data));
+}
+
+template<typename TConfig>
+template<typename T>
+void LogicNode<TConfig>::distributeOSocketValue(unsigned int idx)
+{
+    EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
+    m_outputs[idx]->template castToType<T>()->distributeValue();
+}
+
+template<typename TConfig>
+void LogicNode<TConfig>::setGetLink(LogicNode& outN, unsigned int outS, LogicNode& inN, unsigned int inS)
+{
+    EXEC_GRAPH_THROWEXCEPTION_IF(
+        outS >= outN.getOutputs().size() || inS >= inN.getInputs().size(),
+        "Wrong socket indices:  outNode: " << outN.getId()<< " outSocketIdx: " << outS << " inNode: " << inN.getId()
+                                           << " inSocketIdx: "
+                                           << inS);
+
+    inN.getISocket(inS).setGetLink(outN.getOSocket(outS));
+}
+
+template<typename TConfig>
+void LogicNode<TConfig>::addWriteLink(LogicNode& outN, unsigned int outS, LogicNode& inN, unsigned int inS)
+{
+    EXEC_GRAPH_THROWEXCEPTION_IF(
+        outS >= outN.getOutputs().size() || inS >= inN.getInputs().size(),
+        "Wrong socket indices:  outNode: " << outN.getId()<< " outSocketIdx: " << outS << " inNode: " << inN.getId()
+                                           << " inSocketIdx: "
+                                           << inS << "(nOuts: " << outN.getOutputs().size() << ", nIns: " << inN.getInputs().size() << ")");
+
+    outN.getOSocket(outS).addWriteLink(inN.getISocket(inS));
 }
 
 //! Some handy macro to use when inheriting from LogicNode.
-#define GRSF_LN_DECLARE_SIZES       \
-enum class SocketInfos : uint64_t   \
-{                                   \
-    nInputs  = Inputs::InputLast,   \
-    nOutputs = Outputs::OutputLast, \
-    nSockets = nInputs + nOutputs,  \
-};
+#define GRSF_LN_DECLARE_SIZES           \
+    enum class SocketInfos : uint64_t   \
+    {                                   \
+        nInputs  = Inputs::InputLast,   \
+        nOutputs = Outputs::OutputLast, \
+        nSockets = nInputs + nOutputs,  \
+    };
 
-} // namespace
+}  // namespace
 
 #endif

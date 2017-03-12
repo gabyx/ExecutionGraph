@@ -2,9 +2,11 @@
 //  GRSFramework
 //  Copyright (C) 2016 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 //
-//  This Source Code Form is subject to the terms of the GNU General Public License as
+//  This Source Code Form is subject to the terms of the GNU General Public
+//  License as
 //  published by the Free Software Foundation; either version 3 of the License,
-//  or (at your option) any later version. If a copy of the GPL was not distributed with
+//  or (at your option) any later version. If a copy of the GPL was not
+//  distributed with
 //  this file, you can obtain one at http://www.gnu.org/licenses/gpl-3.0.html.
 // ========================================================================================
 
@@ -32,9 +34,7 @@ public:
     using GroupExecutionListT = std::unordered_map<unsigned int, NodeListT>;
     using OutputNodeMapT      = NodeSetT;
 
-    ExecutionTreeInOut()
-    {
-    }
+    ExecutionTreeInOut() {}
 
     ~ExecutionTreeInOut()
     {
@@ -44,24 +44,12 @@ public:
         }
     }
 
-    void setInputNode(unsigned int id)
-    {
-        setInOutNode<true>(id);
-    }
-    NodeSetT& getInputNode()
-    {
-        return m_inputNodes;
-    };
+    void setInputNode(unsigned int id) { setInOutNode<true>(id); }
+    NodeSetT& getInputNode() { return m_inputNodes; };
 
-    void setOutputNode(unsigned int id)
-    {
-        setInOutNode<false>(id);
-    }
+    void setOutputNode(unsigned int id) { setInOutNode<false>(id); }
 
-    OutputNodeMapT& getOutputNodes()
-    {
-        return m_outputNodes;
-    }
+    OutputNodeMapT& getOutputNodes() { return m_outputNodes; }
 
     virtual void addNode(LogicNode* node, bool isInput = false, bool isOutput = false)
     {
@@ -201,7 +189,8 @@ public:
             maxPrio = std::max(maxPrio, l.back()->getPriority());
         }
 
-        // do some manicure: invert all priorities such that lowest is now the highest
+        // do some manicure: invert all priorities such that lowest is now the
+        // highest
         for (auto& p : m_groupExecList)
         {
             for (auto& n : p.second)
@@ -257,7 +246,8 @@ protected:
         void solve(NodeListT& c, NodeListT& orderedNodes)
         {
             // Solve Execution order,
-            // start a depth first search recursion for all nodes in c which determines an execution order by setting
+            // start a depth first search recursion for all nodes in c which
+            // determines an execution order by setting
             // the priority
             for (auto& p : c)
             {
@@ -266,7 +256,8 @@ protected:
                 solveRec(p, nodesCurrDepth);
             }
 
-            // Sort all nodes according to priority (asscending) (lowest is most important)
+            // Sort all nodes according to priority (asscending) (lowest is most
+            // important)
             std::sort(orderedNodes.begin(), orderedNodes.end(), [](LogicNode* const& a, LogicNode* const& b) {
                 return a->getPriority() < b->getPriority();
             });
@@ -274,9 +265,9 @@ protected:
 
     private:
         /**
-        * Depth first search: this function returns recursively the priority
-        * lowest number has the highest priority
-        */
+         * Depth first search: this function returns recursively the priority
+         * lowest number has the highest priority
+         */
 
         unsigned int solveRec(LogicNode* node, std::unordered_set<unsigned int>& nodesCurrDepth)
         {
@@ -335,7 +326,8 @@ protected:
             std::deque<LogicNode*> currentNodes;  // Breath first search
             currentNodes.push_back(endNode);
 
-            // visit current front node, as long as currentNode list is not empty or start has not yet been found!
+            // visit current front node, as long as currentNode list is not empty or
+            // start has not yet been found!
             while (currentNodes.size() != 0 && m_reached == false)
             {
                 visit(currentNodes.front(), currentNodes);
@@ -347,8 +339,8 @@ protected:
 
     private:
         /**
-        * Breath first search:
-        */
+         * Breath first search:
+         */
         void visit(LogicNode* node, std::deque<LogicNode*>& queu)
         {
             // visit all input sockets and their node!
@@ -379,7 +371,7 @@ protected:
         LogicNode* m_start = nullptr;
     };
 
-    template <bool input>
+    template<bool input>
     void setInOutNode(unsigned int id)
     {
         // Set output node

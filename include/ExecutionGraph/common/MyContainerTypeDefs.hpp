@@ -12,38 +12,38 @@
 #include <Eigen/Dense>
 
 /** @brief
-*	These are some container definitions
-*/
+ *	These are some container definitions
+ */
 namespace ExecutionGraph
 {
 namespace MyContainers
 {
 // Sepcial STL map where the type is 16byte aligned
-template <typename Key, typename Type, typename Comp = std::less<Key>>
+template<typename Key, typename Type, typename Comp = std::less<Key>>
 using StdMapAligned = std::map<Key, Type, Comp, Eigen::aligned_allocator<std::pair<const Key, Type>>>;
 
 // Sepcial STL map where the type is 16byte aligned
-template <typename Key, typename Type, typename Hash = std::hash<Key>, typename Pred = std::equal_to<Key>>
+template<typename Key, typename Type, typename Hash = std::hash<Key>, typename Pred = std::equal_to<Key>>
 using StdUMapAligned = std::unordered_map<Key, Type, Hash, Pred, Eigen::aligned_allocator<std::pair<const Key, Type>>>;
 
 // Special STL vectors where the type is 16byte aligned
-template <typename Type>
+template<typename Type>
 using StdVecAligned = std::vector<Type, Eigen::aligned_allocator<Type>>;
 }
 }
 
 /**
-* @brief This macro is used to typedef all custom container types.
-*/
-#define EXEC_GRAPH_DEFINE_CONTAINER_TYPES                                                                      \
-                                                                                                               \
-    template <typename Key, typename Type, typename Comp = std::less<Key>>                                     \
-    using StdMapAligned = ExecutionGraph::MyContainers::StdMapAligned<Key, Type, Comp>;                            \
-                                                                                                               \
-    template <typename Key, typename Type, typename Hash = std::hash<Key>, typename Pred = std::equal_to<Key>> \
-    using StdUMapAligned = ExecutionGraph::MyContainers::StdUMapAligned<Key, Type, Hash, Pred>;                    \
-                                                                                                               \
-    template <typename Type>                                                                                   \
+ * @brief This macro is used to typedef all custom container types.
+ */
+#define EXEC_GRAPH_DEFINE_CONTAINER_TYPES                                                                     \
+                                                                                                              \
+    template<typename Key, typename Type, typename Comp = std::less<Key>>                                     \
+    using StdMapAligned = ExecutionGraph::MyContainers::StdMapAligned<Key, Type, Comp>;                       \
+                                                                                                              \
+    template<typename Key, typename Type, typename Hash = std::hash<Key>, typename Pred = std::equal_to<Key>> \
+    using StdUMapAligned = ExecutionGraph::MyContainers::StdUMapAligned<Key, Type, Hash, Pred>;               \
+                                                                                                              \
+    template<typename Type>                                                                                   \
     using StdVecAligned = ExecutionGraph::MyContainers::StdVecAligned<Type>;
 
 #endif

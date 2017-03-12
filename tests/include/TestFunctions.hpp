@@ -11,10 +11,10 @@
 
 #include <gtest/gtest.h>
 
-#include "ExecutionGraph/Config/Config.hpp"
-#include "ExecutionGraph/Common/AssertionDebug.hpp"
-#include "ExecutionGraph/Common/SfinaeMacros.hpp"
-#include ExecutionGraph_TypeDefs_INCLUDE_FILE
+#include "ExecutionGraph/config/Config.hpp"
+#include "ExecutionGraph/common/Asserts.hpp"
+#include "ExecutionGraph/common/SfinaeMacros.hpp"
+#include "ExecutionGraph/common/TypeDefs.hpp"
 
 
 #define MY_TEST(name1 , name2 ) TEST(name1, name2)

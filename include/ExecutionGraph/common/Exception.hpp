@@ -1,7 +1,6 @@
 // ========================================================================================
 //  ExecutionGraph
-//  Copyright (C) 2014 by Gabriel Nützi <nuetzig (at) imes (d0t) mavt (d0t) ethz
-//  (døt) ch>
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 //
 //  This Source Code Form is subject to the terms of the Mozilla Public
 //  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -21,19 +20,23 @@ namespace ExecutionGraph
 class Exception : public std::runtime_error
 {
 public:
-    Exception(const std::stringstream& ss) : std::runtime_error(ss.str())
-    {
-    }
+    Exception(const std::stringstream& ss) : std::runtime_error(ss.str()) {}
 
 private:
 };
 }
 
-#define EXEC_GRAPH_THROWEXCEPTION(message)                                                        \
-{                                                                                                 \
-    std::stringstream ___s___;                                                                    \
-    ___s___ << message << std::endl << " @ " << __FILE__ << " (" << __LINE__ << ")" << std::endl; \
-    throw ExecutionGraph::Exception(___s___);                                                     \
-}
+#define EXEC_GRAPH_THROWEXCEPTION(message)                                                            \
+    {                                                                                                 \
+        std::stringstream ___s___;                                                                    \
+        ___s___ << message << std::endl << " @ " << __FILE__ << " (" << __LINE__ << ")" << std::endl; \
+        throw ExecutionGraph::Exception(___s___);                                                     \
+    }
 
-#endif  // Exception_hpp
+#define EXEC_GRAPH_THROWEXCEPTION_IF(condition, message) \
+    if(condition)                                    \
+    {                                                    \
+        EXEC_GRAPH_THROWEXCEPTION(message);              \
+    }
+
+#endif

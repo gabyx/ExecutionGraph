@@ -8,10 +8,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // ========================================================================================
 
-#ifndef ExecutionGraph_Common_MyMatrixTypeDefs_hpp
-#define ExecutionGraph_Common_MyMatrixTypeDefs_hpp
+#ifndef ExecutionGraph_common_MyMatrixTypeDefs_hpp
+#define ExecutionGraph_common_MyMatrixTypeDefs_hpp
 
-#include "ExecutionGraph/Common/Platform.hpp"
+#include "ExecutionGraph/common/Platform.hpp"
 
 //#define EIGEN_DONT_VECTORIZE
 //#define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
@@ -22,101 +22,101 @@ namespace ExecutionGraph
 {
 // ================================================================================================
 /** @brief This
-*	These are some small matrix definitions.
-*/
+ *	These are some small matrix definitions.
+ */
 
 namespace MyMatrix
 {
-template <typename Scalar>
+template<typename Scalar>
 using Matrix44 = Eigen::Matrix<Scalar, 4, 4>;
-template <typename Scalar>
+template<typename Scalar>
 using Matrix43 = Eigen::Matrix<Scalar, 4, 3>;
-template <typename Scalar>
+template<typename Scalar>
 using Matrix34 = Eigen::Matrix<Scalar, 3, 4>;
-template <typename Scalar>
+template<typename Scalar>
 using Matrix33 = Eigen::Matrix<Scalar, 3, 3>;
-template <typename Scalar>
+template<typename Scalar>
 using Matrix32 = Eigen::Matrix<Scalar, 3, 2>;
-template <typename Scalar>
+template<typename Scalar>
 using Matrix23 = Eigen::Matrix<Scalar, 2, 3>;
-template <typename Scalar>
+template<typename Scalar>
 using Matrix22 = Eigen::Matrix<Scalar, 2, 2>;
-template <typename Scalar>
+template<typename Scalar>
 using Vector3 = Eigen::Matrix<Scalar, 3, 1>;
-template <typename Scalar>
+template<typename Scalar>
 using Vector2 = Eigen::Matrix<Scalar, 2, 1>;
 
-template <typename Scalar>
+template<typename Scalar>
 using Quaternion = Eigen::Quaternion<Scalar>;
-template <typename Scalar>
+template<typename Scalar>
 using AngleAxis = Eigen::AngleAxis<Scalar>;
 
-template <typename Scalar>
+template<typename Scalar>
 using Vector4 = Eigen::Matrix<Scalar, 4, 1>;
-template <typename Scalar>
+template<typename Scalar>
 using Vector6 = Eigen::Matrix<Scalar, 6, 1>;
-template <typename Scalar>
+template<typename Scalar>
 using VectorDyn = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
 
-template <typename Scalar>
+template<typename Scalar>
 using MatrixDynDyn = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
-template <typename Scalar>
+template<typename Scalar>
 using MatrixDiagDyn = Eigen::DiagonalMatrix<Scalar, Eigen::Dynamic>;
-template <typename Scalar>
+template<typename Scalar>
 using MatrixDynDynRow = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 
-template <typename Scalar, int M>
+template<typename Scalar, int M>
 using MatrixStatDyn = Eigen::Matrix<Scalar, M, Eigen::Dynamic>;
-template <typename Scalar, int N>
+template<typename Scalar, int N>
 using MatrixDynStat = Eigen::Matrix<Scalar, Eigen::Dynamic, N>;
-template <typename Scalar, int M, int N>
+template<typename Scalar, int M, int N>
 using MatrixStatStat = Eigen::Matrix<Scalar, M, N>;
-template <typename Scalar, int M>
+template<typename Scalar, int M>
 using VectorStat = Eigen::Matrix<Scalar, M, 1>;
 
-template <typename Scalar>
+template<typename Scalar>
 using AffineTrafo = Eigen::Transform<Scalar, 3, Eigen::TransformTraits::Affine>;
-template <typename Scalar>
+template<typename Scalar>
 using AffineTrafo2d = Eigen::Transform<Scalar, 2, Eigen::TransformTraits::Affine>;
 
-template <typename Scalar, int M>
+template<typename Scalar, int M>
 using ArrayStatDyn = Eigen::Array<Scalar, M, Eigen::Dynamic>;
-template <typename Scalar, int N>
+template<typename Scalar, int N>
 using ArrayDynStat = Eigen::Array<Scalar, Eigen::Dynamic, N>;
-template <typename Scalar, int M, int N>
+template<typename Scalar, int M, int N>
 using ArrayStatStat = Eigen::Array<Scalar, M, N>;
-template <typename Scalar, int M>
+template<typename Scalar, int M>
 using ArrayStat = Eigen::Array<Scalar, M, 1>;
 
-template <typename Scalar>
+template<typename Scalar>
 using Array3 = Eigen::Array<Scalar, 3, 1>;
-template <typename Scalar>
+template<typename Scalar>
 using Array2 = Eigen::Array<Scalar, 2, 1>;
 }
 
 namespace MyMatrix
 {
-template <typename Derived>
+template<typename Derived>
 using MatrixBase = Eigen::MatrixBase<Derived>;
-template <typename Derived>
+template<typename Derived>
 using ArrayBase = Eigen::ArrayBase<Derived>;
 
-template <typename Derived>
+template<typename Derived>
 using VectorBDyn = Eigen::VectorBlock<Derived, Eigen::Dynamic>;
-template <typename Derived, int M>
+template<typename Derived, int M>
 using VectorBStat = Eigen::VectorBlock<Derived, M>;
 
-template <typename Derived>
+template<typename Derived>
 using MatrixBDynDyn = Eigen::Block<Derived>;
-template <typename Derived, int M>
+template<typename Derived, int M>
 using MatrixBStatDyn = Eigen::Block<Derived, M, Eigen::Dynamic>;
-template <typename Derived, int N>
+template<typename Derived, int N>
 using MatrixBDynStat = Eigen::Block<Derived, Eigen::Dynamic, N>;
 
-template <typename EigenType>
+template<typename EigenType>
 using MatrixRef = Eigen::Ref<EigenType>;
 
-template <typename EigenType>
+template<typename EigenType>
 using MatrixMap = Eigen::Map<EigenType>;
 }
 
@@ -128,34 +128,34 @@ struct EXEC_GRAPH_EXPORT MyMatrixIOFormat
 };
 }
 
-#define EXEC_GRAPH_DEFINE_MATRIX_SPECIALTYPES                                \
-    template <typename Derived>                                                  \
+#define EXEC_GRAPH_DEFINE_MATRIX_SPECIALTYPES                                    \
+    template<typename Derived>                                                   \
     using MatrixBase = ExecutionGraph::MyMatrix::MatrixBase<Derived>;            \
-    template <typename Derived>                                                  \
+    template<typename Derived>                                                   \
     using ArrayBase = ExecutionGraph::MyMatrix::ArrayBase<Derived>;              \
                                                                                  \
-    template <typename Derived>                                                  \
+    template<typename Derived>                                                   \
     using VectorBDyn = ExecutionGraph::MyMatrix::VectorBDyn<Derived>;            \
-    template <typename Derived, int M>                                           \
+    template<typename Derived, int M>                                            \
     using VectorBStat = ExecutionGraph::MyMatrix::VectorBStat<Derived, M>;       \
                                                                                  \
-    template <typename Derived>                                                  \
+    template<typename Derived>                                                   \
     using MatrixBDynDyn = ExecutionGraph::MyMatrix::MatrixBDynDyn<Derived>;      \
-    template <typename Derived, int N>                                           \
+    template<typename Derived, int N>                                            \
     using MatrixBDynStat = ExecutionGraph::MyMatrix::MatrixBDynStat<Derived, N>; \
-    template <typename Derived, int M>                                           \
+    template<typename Derived, int M>                                            \
     using MatrixBStatDyn = ExecutionGraph::MyMatrix::MatrixBStatDyn<Derived, M>; \
                                                                                  \
-    template <typename EigenType>                                                \
+    template<typename EigenType>                                                 \
     using MatrixRef = ExecutionGraph::MyMatrix::MatrixRef<EigenType>;            \
-    template <typename EigenType>                                                \
+    template<typename EigenType>                                                 \
     using MatrixMap = ExecutionGraph::MyMatrix::MatrixMap<EigenType>;
 
 /**
-* @brief This macro is used to typedef all custom matrix types which have
-* nothing to do with the system.
-*/
-#define EXEC_GRAPH_DEFINE_MATRIX_TYPES_OF(_PREC_)                              \
+ * @brief This macro is used to typedef all custom matrix types which have
+ * nothing to do with the system.
+ */
+#define EXEC_GRAPH_DEFINE_MATRIX_TYPES_OF(_PREC_)                                  \
     using Matrix44        = ExecutionGraph::MyMatrix::Matrix44<_PREC_>;            \
     using Matrix33        = ExecutionGraph::MyMatrix::Matrix33<_PREC_>;            \
     using Matrix22        = ExecutionGraph::MyMatrix::Matrix22<_PREC_>;            \
@@ -174,25 +174,25 @@ struct EXEC_GRAPH_EXPORT MyMatrixIOFormat
     using MatrixDiagDyn   = ExecutionGraph::MyMatrix::MatrixDiagDyn<_PREC_>;       \
     using MatrixDynDynRow = ExecutionGraph::MyMatrix::MatrixDynDynRow<_PREC_>;     \
                                                                                    \
-    template <int M>                                                               \
+    template<int M>                                                                \
     using MatrixStatDyn = ExecutionGraph::MyMatrix::MatrixStatDyn<_PREC_, M>;      \
-    template <int N>                                                               \
+    template<int N>                                                                \
     using MatrixDynStat = ExecutionGraph::MyMatrix::MatrixDynStat<_PREC_, N>;      \
-    template <int M, int N>                                                        \
+    template<int M, int N>                                                         \
     using MatrixStatStat = ExecutionGraph::MyMatrix::MatrixStatStat<_PREC_, M, N>; \
-    template <int M>                                                               \
+    template<int M>                                                                \
     using VectorStat = ExecutionGraph::MyMatrix::VectorStat<_PREC_, M>;            \
                                                                                    \
     using AffineTrafo   = ExecutionGraph::MyMatrix::AffineTrafo<_PREC_>;           \
     using AffineTrafo2d = ExecutionGraph::MyMatrix::AffineTrafo2d<_PREC_>;         \
                                                                                    \
-    template <int M>                                                               \
+    template<int M>                                                                \
     using ArrayStatDyn = ExecutionGraph::MyMatrix::ArrayStatDyn<_PREC_, M>;        \
-    template <int N>                                                               \
+    template<int N>                                                                \
     using ArrayDynStat = ExecutionGraph::MyMatrix::ArrayDynStat<_PREC_, N>;        \
-    template <int M, int N>                                                        \
+    template<int M, int N>                                                         \
     using ArrayStatStat = ExecutionGraph::MyMatrix::ArrayStatStat<_PREC_, M, N>;   \
-    template <int M>                                                               \
+    template<int M>                                                                \
     using ArrayStat = ExecutionGraph::MyMatrix::ArrayStat<_PREC_, M>;              \
     using Array3    = ExecutionGraph::MyMatrix::Array3<_PREC_>;                    \
     using Array2    = ExecutionGraph::MyMatrix::Array2<_PREC_>;                    \

@@ -88,7 +88,7 @@ ENDIF()
 
 SET(ExecutionGraph_LIBRARY_NAME_REL "ExecutionGraph")                       # used for cmake config
 SET(ExecutionGraph_LIBRARY_NAME_DBG "ExecutionGraph${CMAKE_DEBUG_POSTFIX}") # used for cmake config
-SET(ExecutionGraph_INCLUDE_CHARATERISTIC_HEADER "ExecutionGraph/Config/Config.hpp")
+SET(ExecutionGraph_INCLUDE_CHARATERISTIC_HEADER ${ExecutionGraph_CONFIG_FILE})
 
 # Install stuff (default location is not some where on the system! for safty reasons
 IF(FIRST_CMAKE_RUN)
