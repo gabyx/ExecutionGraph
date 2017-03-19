@@ -212,12 +212,12 @@ namespace ExecutionGraph
 template<typename TConfig>
 void LogicSocketOutputBase<TConfig>::addWriteLink(LogicSocketInputBase<TConfig>& inputSocket)
 {
-    EXEC_GRAPH_THROWEXCEPTION_IF(this->getType() != inputSocket.getType(),
+    EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(this->getType() != inputSocket.getType(),
                                  "Output socket: " << this->getName() << " of logic node id: " << this->getParent().getId()
                                                    << " has not the same type as input socket "
                                                    << inputSocket.getName()
                                                    << " of logic node id: "
-                                                   << inputSocket.getParent().getId());
+                                                   << inputSocket.getParent().getId(), NodeConnectionException);
 
     if (std::find(m_to.begin(), m_to.end(), &inputSocket) == m_to.end())
     {
@@ -225,23 +225,23 @@ void LogicSocketOutputBase<TConfig>::addWriteLink(LogicSocketInputBase<TConfig>&
     }
     else
     {
-        EXEC_GRAPH_THROWEXCEPTION("Input socket: " << inputSocket.getName() << " of logic node id: "
+        EXEC_GRAPH_THROWEXCEPTION_TYPE("Input socket: " << inputSocket.getName() << " of logic node id: "
                                                    << inputSocket.getParent().getId()
                                                    << " already added as Write-Link to logic node id: "
-                                                   << this->getParent().getId());
+                                                   << this->getParent().getId(), NodeConnectionException);
     }
 }
 
 template<typename TConfig>
 void LogicSocketInputBase<TConfig>::setGetLink(LogicSocketOutputBase<TConfig>& outputSocket)
 {
-    EXEC_GRAPH_THROWEXCEPTION_IF(
+    EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(
         this->getType() != outputSocket.getType(),
         "Output socket: " << outputSocket.getName() << " of logic node id: " << outputSocket.getParent().getId()
                           << " has not the same type as input socket "
                           << this->getName()
                           << " of logic node id: "
-                          << this->getParent().getId());
+                          << this->getParent().getId(), NodeConnectionException);
 
     if (!isConnectedToOutput())
     {
@@ -249,10 +249,10 @@ void LogicSocketInputBase<TConfig>::setGetLink(LogicSocketOutputBase<TConfig>& o
     }
     else
     {
-        EXEC_GRAPH_THROWEXCEPTION("Output socket: " << outputSocket.getName() << " of logic node id: "
-                                                    << outputSocket.getParent().getId()
-                                                    << " already set as Get-Link of logic node id: "
-                                                    << this->getParent().getId());
+        EXEC_GRAPH_THROWEXCEPTION_TYPE("Output socket: " << outputSocket.getName() << " of logic node id: "
+                                        << outputSocket.getParent().getId()
+                                        << " already set as Get-Link of logic node id: "
+                                        << this->getParent().getId(), NodeConnectionException);
     }
 }
 
@@ -267,6 +267,37 @@ void LogicSocketOutput<TData, TConfig>::executeWriteLinks()
         static_cast<LogicSocketInput<TData, Config>*>(this->s)->setValue(this->m_data);  // Write data to input sockets.
     }
 }
+
+template<const char* Name>
+struct SocketTrait
+{
+    constexpr const char* GetName(){ return Name; };
+};
+
+template<typename... TSocketTrait >
+struct SocketListTraits{
+
+    using TypeList = meta::list<TSocketTrait...>;
+
+    template<typename T>
+    struct IsSocketTrait : meta::bool_<false>{};
+    template<const char* Name>
+    struct IsSocketTrait<SocketTrait<Name>> : meta::bool_<true>{};
+
+    static const bool allTypesCorrect = std::is_same< meta::list<>,
+                                          meta::filter<TypeList, meta::not_<meta::quote<IsSocketTrait>> >
+                                        >::value;
+
+    static_assert( allTypesCorrect ,"Not all types in TList are of type SocketTraits");
+
+    static const auto nSockets = meta::size<TypeList>::value;
+
+    template<std::size_t Index>
+    using typeAt = meta::at_c<TypeList,Index>;
+
+};
+
+
 }
 
 #define ADD_ISOCK(name, value)                                                                        \

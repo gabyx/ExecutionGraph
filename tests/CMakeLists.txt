@@ -75,7 +75,7 @@ function(defineCompileDefs Target)
     ENDIF()
 endfunction()
 
-# ConvexHull
+# NodeTests
 SET(EXEC_NAME1 ${PROJECT_NAME}-LogicNodes)
 ADD_EXECUTABLE(${EXEC_NAME1}  ${PROJECT_SOURCE_DIR}/src/main_LogicNode.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 TARGET_LINK_LIBRARIES(${EXEC_NAME1} ExecutionGraphForTestsOnly gtest gmock_main)
@@ -85,14 +85,4 @@ if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
 endif()
 defineCompileDefs(${EXEC_NAME1})
 
-
-add_custom_command(TARGET ${EXEC_NAME1} POST_BUILD
-    COMMAND 
-          ${CMAKE_COMMAND}
-          -E
-          copy_directory ${PROJECT_SOURCE_DIR}/python/ ${PROJECT_BINARY_DIR}
-)
-
-
-enable_testing()
 add_test(NAME    ${EXEC_NAME1} COMMAND ${EXEC_NAME1})

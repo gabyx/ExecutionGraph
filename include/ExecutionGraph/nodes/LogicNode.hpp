@@ -79,7 +79,7 @@ public:
     //! The reset function.
     virtual void reset() = 0;
 
-    //! The main compute function of this execution node.
+     //! The main compute function of this execution node.
     virtual void compute() = 0;
 
     inline unsigned int getId(){ return m_id; }
@@ -100,9 +100,20 @@ public:
     template<typename TData, typename T>
     void addISock(T&& defaultValue, const std::string& name = "noname")
     {
-        unsigned int idx = m_inputs.size() + m_outputs.size();
+        unsigned int id = m_inputs.size() + m_outputs.size();
         auto p           = SocketPointer<SocketInputBaseType>(
-            new SocketInputType<TData>(std::forward<T>(defaultValue), idx, *this, name),
+            new SocketInputType<TData>(std::forward<T>(defaultValue), id, *this, name),
+            [](SocketInputBaseType* p) { delete static_cast<SocketInputType<TData>*>(p); });
+        m_inputs.push_back(std::move(p));
+    }
+
+    //! Add an input socket with default value \p defaultValue.
+    template<typename Enum, typename TData, typename T>
+    void addISock(T&& defaultValue, const std::string& name = "noname")
+    {
+        unsigned int id = m_inputs.size() + m_outputs.size();
+        auto p           = SocketPointer<SocketInputBaseType>(
+            new SocketInputType<TData>(std::forward<T>(defaultValue), id, *this, name),
             [](SocketInputBaseType* p) { delete static_cast<SocketInputType<TData>*>(p); });
         m_inputs.push_back(std::move(p));
     }
@@ -176,8 +187,7 @@ public:
     }
 
     //! Constructs a Write-Link to write the data of output socket at index \p
-    //! outS
-    //! of logic node \p outN to the input socket at index \p inS of logic node \p
+    //! outS of logic node \p outN to the input socket at index \p inS of logic node \p
     //! inN.
     static void addWriteLink(LogicNode& outN, unsigned int outS, LogicNode& inN, unsigned int inS);
 
@@ -253,12 +263,6 @@ const T& LogicNode<TConfig>::getOSocketValue(unsigned int idx) const
     return m_outputs[idx]->template castToType<T>()->getValue();
 }
 
-//~ template <typename T, typename TIn>
-//~ void LogicNode::setISocketValue(unsigned int idx, const TIn& data)
-//~ {
-//~ EXEC_GRAPH_ASSERTMSG(idx < m_inputs.size() , "Wrong index!");
-//~ m_inputs[idx]->castToType<T>()->setValue(data);
-//~ }
 template<typename TConfig>
 template<typename T, typename TIn>
 void LogicNode<TConfig>::setOSocketValue(unsigned int idx, TIn&& data)
@@ -278,11 +282,11 @@ void LogicNode<TConfig>::distributeOSocketValue(unsigned int idx)
 template<typename TConfig>
 void LogicNode<TConfig>::setGetLink(LogicNode& outN, unsigned int outS, LogicNode& inN, unsigned int inS)
 {
-    EXEC_GRAPH_THROWEXCEPTION_IF(
+    EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(
         outS >= outN.getOutputs().size() || inS >= inN.getInputs().size(),
         "Wrong socket indices:  outNode: " << outN.getId()<< " outSocketIdx: " << outS << " inNode: " << inN.getId()
                                            << " inSocketIdx: "
-                                           << inS);
+                                           << inS, NodeConnectionException);
 
     inN.getISocket(inS).setGetLink(outN.getOSocket(outS));
 }
@@ -290,17 +294,19 @@ void LogicNode<TConfig>::setGetLink(LogicNode& outN, unsigned int outS, LogicNod
 template<typename TConfig>
 void LogicNode<TConfig>::addWriteLink(LogicNode& outN, unsigned int outS, LogicNode& inN, unsigned int inS)
 {
-    EXEC_GRAPH_THROWEXCEPTION_IF(
+    EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(
         outS >= outN.getOutputs().size() || inS >= inN.getInputs().size(),
         "Wrong socket indices:  outNode: " << outN.getId()<< " outSocketIdx: " << outS << " inNode: " << inN.getId()
                                            << " inSocketIdx: "
-                                           << inS << "(nOuts: " << outN.getOutputs().size() << ", nIns: " << inN.getInputs().size() << ")");
+                                           << inS << "(nOuts: " << outN.getOutputs().size() << ", nIns: " << inN.getInputs().size() << ")"
+                                      , NodeConnectionException);
 
     outN.getOSocket(outS).addWriteLink(inN.getISocket(inS));
 }
 
+
 //! Some handy macro to use when inheriting from LogicNode.
-#define GRSF_LN_DECLARE_SIZES           \
+#define EXEC_GRAPH_DEFINE_SOCKET_INFO   \
     enum class SocketInfos : uint64_t   \
     {                                   \
         nInputs  = Inputs::InputLast,   \

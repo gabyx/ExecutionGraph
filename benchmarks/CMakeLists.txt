@@ -62,7 +62,7 @@ endfunction()
 SET(EXEC_NAME1 ${PROJECT_NAME}-BenchmarkDelegates)
 ADD_EXECUTABLE(${EXEC_NAME1}  ${PROJECT_SOURCE_DIR}/src/main_delegates.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 TARGET_LINK_LIBRARIES(${EXEC_NAME1} ExecutionGraph benchmark)
-ADD_DEPENDENCIES(build_and_test ${EXEC_NAME1})
+ADD_DEPENDENCIES(build_and_benchmark ${EXEC_NAME1})
 if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
     ADD_DEPENDENCIES(${EXEC_NAME1} ${ExecutionGraph_DEPENDING_TARGETS})
 endif()
@@ -76,6 +76,4 @@ add_custom_command(TARGET ${EXEC_NAME1} POST_BUILD
           copy_directory ${PROJECT_SOURCE_DIR}/python/ ${PROJECT_BINARY_DIR}
 )
 
-
-enable_testing()
 add_test(NAME ${EXEC_NAME1} COMMAND ${EXEC_NAME1})

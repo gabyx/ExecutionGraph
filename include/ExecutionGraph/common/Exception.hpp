@@ -24,19 +24,33 @@ public:
 
 private:
 };
+
+class NodeConnectionException : public Exception
+{
+    public:
+    NodeConnectionException(const std::stringstream& ss) : Exception(ss) {}
+};
+
 }
 
-#define EXEC_GRAPH_THROWEXCEPTION(message)                                                            \
+#define EMPTY
+
+#define EXEC_GRAPH_THROWEXCEPTION_TYPE(message, type)                                                 \
     {                                                                                                 \
         std::stringstream ___s___;                                                                    \
         ___s___ << message << std::endl << " @ " << __FILE__ << " (" << __LINE__ << ")" << std::endl; \
-        throw ExecutionGraph::Exception(___s___);                                                     \
+        throw ExecutionGraph::type(___s___);                                             \
     }
 
-#define EXEC_GRAPH_THROWEXCEPTION_IF(condition, message) \
-    if(condition)                                    \
-    {                                                    \
-        EXEC_GRAPH_THROWEXCEPTION(message);              \
+#define EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(condition, message, type) \
+    if(condition)                                                   \
+    {                                                               \
+        EXEC_GRAPH_THROWEXCEPTION_TYPE(message, type);              \
     }
+
+#define EXEC_GRAPH_THROWEXCEPTION(message) EXEC_GRAPH_THROWEXCEPTION_TYPE(message,Exception)
+#define EXEC_GRAPH_THROWEXCEPTION_IF(condition, message) EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(condition,message,Exception)
+
+#undef EMPTY
 
 #endif

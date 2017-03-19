@@ -200,14 +200,16 @@ IF(ExecutionGraph_BUILD_LIBRARY)
 ENDIF()
 
 IF(ExecutionGraph_BUILD_TESTS)
+    enable_testing()
     add_custom_target(build_and_test ${CMAKE_CTEST_COMMAND} -V)
     ADD_SUBDIRECTORY(tests)
 ENDIF()
 
-IF(ExecutionGraph_BUILD_BENCHMARKS)
-    add_custom_target(build_and_benchmark ${CMAKE_CTEST_COMMAND} -V)
-    ADD_SUBDIRECTORY(benchmarks)
-ENDIF()
+#IF(ExecutionGraph_BUILD_BENCHMARKS)
+    #enable_testing()
+    #add_custom_target(build_and_benchmark ${CMAKE_CTEST_COMMAND} -V)
+    #ADD_SUBDIRECTORY(benchmarks)
+#ENDIF()
 
 
 IF(ExecutionGraph_BUILD_EXAMPLE)
