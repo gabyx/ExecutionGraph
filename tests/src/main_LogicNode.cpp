@@ -5,7 +5,7 @@
 #include "ExecutionGraph/nodes/LogicNode.hpp"
 #include "ExecutionGraph/nodes/LogicSocket.hpp"
 
-using namespace ExecutionGraph;
+using namespace executionGraph;
 
 using Config = GeneralConfig<>;
 
@@ -13,21 +13,32 @@ template<typename TConfig>
 class IntegerNode : public TConfig::NodeBaseType
 {
 public:
+    using Config = TConfig;
+    using Base = typename Config::NodeBaseType;
 
+    enum class Inputs{ Value1, Value2};
+    enum class Outputs{ Result1, Result2};
+    EXEC_GRAPH_DEFINE_SOCKET_TRAITS(Inputs,Outputs);
 
-    using SocketInputTypes  = SocketListTraits< SocketTrait<"Value1">, SocketTrait<"Value2"> >;
+    using InputSockets   = InputSocketDeclList< InputSocketDecl<Inputs::Value1, int>,
+                                                InputSocketDecl<Inputs::Value2, int> >;
 
-    using SocketOutputTypes = SocketListTraits< SocketTrait<"Result1">, SocketTrait<"Result2"> >;
+    using OutputSockets  = OutputSocketDeclList< OutputSocketDecl<Outputs::Result1, int>,
+                                                 OutputSocketDecl<Outputs::Result2, int> >;
+
 
     //EXEC_GRAPH_DEFINE_SOCKET_INFO;
 
     template<typename... Args>
-    IntegerNode(Args&&... args) : TConfig::NodeBaseType(std::forward<Args>(args)...) {
+    IntegerNode(Args&&... args) : Base(std::forward<Args>(args)...) {
         // Add all sockets
+        this->template addSockets<InputSockets>(std::make_tuple(1,2));
+        this->template addSockets<OutputSockets>(std::make_tuple(1,2));
     }
 
     void reset() override {};
-    void compute() override {}
+    void compute() override {
+    }
 
 };
 
@@ -43,7 +54,7 @@ MY_TEST(Node_Test, Int_Int)
     node2.addISock<int>(a,"integer");
 
     try{
-    node1.addWriteLink(0,node2,10);
+        node1.addWriteLink(0,node2,10);
     }
     catch( NodeConnectionException& e)
     {

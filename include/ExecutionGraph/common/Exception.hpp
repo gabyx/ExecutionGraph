@@ -1,5 +1,5 @@
 // ========================================================================================
-//  ExecutionGraph
+//  executionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 //
 //  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,7 +15,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace ExecutionGraph
+namespace executionGraph
 {
 class Exception : public std::runtime_error
 {
@@ -39,7 +39,7 @@ class NodeConnectionException : public Exception
     {                                                                                                 \
         std::stringstream ___s___;                                                                    \
         ___s___ << message << std::endl << " @ " << __FILE__ << " (" << __LINE__ << ")" << std::endl; \
-        throw ExecutionGraph::type(___s___);                                             \
+        throw executionGraph::type(___s___);                                             \
     }
 
 #define EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(condition, message, type) \

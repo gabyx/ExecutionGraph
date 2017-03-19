@@ -16,7 +16,7 @@
 #include "ExecutionGraph/common/Exception.hpp"
 #include "ExecutionGraph/common/TypeDefs.hpp"
 
-namespace ExecutionGraph
+namespace executionGraph
 {
 using SocketDefaultTypes = meta::list<double,
                                       float,

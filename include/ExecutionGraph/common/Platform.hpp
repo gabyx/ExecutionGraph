@@ -17,7 +17,7 @@
 #include "ExecutionGraph/Common/CygwinPatch.hpp"
 #endif
 
-namespace ExecutionGraph
+namespace executionGraph
 {
 #if (defined _WIN32) || (defined __CYGWIN__) || (defined WIN32)
 

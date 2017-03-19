@@ -11,6 +11,6 @@
 #include "ExecutionGraph/common/Exception.hpp"
 #include "ExecutionGraph/nodes/LogicSocket.hpp"
 
-namespace ExecutionGraph
+namespace executionGraph
 {
 }  // namespace

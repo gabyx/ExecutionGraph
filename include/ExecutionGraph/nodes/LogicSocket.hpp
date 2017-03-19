@@ -18,7 +18,7 @@
 #include "ExecutionGraph/common/TypeDefs.hpp"
 #include "ExecutionGraph/nodes/LogicCommon.hpp"
 
-namespace ExecutionGraph
+namespace executionGraph
 {
 //! The socket base class for all input/output sockets of a logic node.
 template<typename TConfig>
@@ -205,9 +205,12 @@ public:
     void executeWriteLinks();
 };
 
-}  // namespace
+} // end ExecutionGraph
 
-namespace ExecutionGraph
+// =====================================================================
+// Implementation
+// =====================================================================
+namespace executionGraph
 {
 template<typename TConfig>
 void LogicSocketOutputBase<TConfig>::addWriteLink(LogicSocketInputBase<TConfig>& inputSocket)
@@ -262,43 +265,17 @@ void LogicSocketOutput<TData, TConfig>::executeWriteLinks()
     // Write out value to all connected (Write-Link) input sockets.
     for (auto& inputSocket : this->m_to)
     {
-        // We know that this static cast ist safe, since it has been
+        // We know that this static cast is safe, since it has been
         // checked when addWriteLink() is called.
         static_cast<LogicSocketInput<TData, Config>*>(this->s)->setValue(this->m_data);  // Write data to input sockets.
     }
 }
 
-template<const char* Name>
-struct SocketTrait
-{
-    constexpr const char* GetName(){ return Name; };
-};
+} // end executionGraph
 
-template<typename... TSocketTrait >
-struct SocketListTraits{
-
-    using TypeList = meta::list<TSocketTrait...>;
-
-    template<typename T>
-    struct IsSocketTrait : meta::bool_<false>{};
-    template<const char* Name>
-    struct IsSocketTrait<SocketTrait<Name>> : meta::bool_<true>{};
-
-    static const bool allTypesCorrect = std::is_same< meta::list<>,
-                                          meta::filter<TypeList, meta::not_<meta::quote<IsSocketTrait>> >
-                                        >::value;
-
-    static_assert( allTypesCorrect ,"Not all types in TList are of type SocketTraits");
-
-    static const auto nSockets = meta::size<TypeList>::value;
-
-    template<std::size_t Index>
-    using typeAt = meta::at_c<TypeList,Index>;
-
-};
-
-
-}
+// =====================================================================
+// Macros
+// =====================================================================
 
 #define ADD_ISOCK(name, value)                                                                        \
     GRSF_ASSERTMSG(Inputs::name == this->m_inputs.size(), " Wrong order for Input: " << Inputs::name) \

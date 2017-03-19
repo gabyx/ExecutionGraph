@@ -14,7 +14,7 @@
 /** @brief
  *	These are some container definitions
  */
-namespace ExecutionGraph
+namespace executionGraph
 {
 namespace MyContainers
 {
@@ -38,12 +38,12 @@ using StdVecAligned = std::vector<Type, Eigen::aligned_allocator<Type>>;
 #define EXEC_GRAPH_DEFINE_CONTAINER_TYPES                                                                     \
                                                                                                               \
     template<typename Key, typename Type, typename Comp = std::less<Key>>                                     \
-    using StdMapAligned = ExecutionGraph::MyContainers::StdMapAligned<Key, Type, Comp>;                       \
+    using StdMapAligned = executionGraph::MyContainers::StdMapAligned<Key, Type, Comp>;                       \
                                                                                                               \
     template<typename Key, typename Type, typename Hash = std::hash<Key>, typename Pred = std::equal_to<Key>> \
-    using StdUMapAligned = ExecutionGraph::MyContainers::StdUMapAligned<Key, Type, Hash, Pred>;               \
+    using StdUMapAligned = executionGraph::MyContainers::StdUMapAligned<Key, Type, Hash, Pred>;               \
                                                                                                               \
     template<typename Type>                                                                                   \
-    using StdVecAligned = ExecutionGraph::MyContainers::StdVecAligned<Type>;
+    using StdVecAligned = executionGraph::MyContainers::StdVecAligned<Type>;
 
 #endif

@@ -15,7 +15,7 @@
 #include "ExecutionGraph/common/Platform.hpp"
 #include "ExecutionGraph/config/Config.hpp"
 
-namespace ExecutionGraph
+namespace executionGraph
 {
 struct GlobalConfigs
 {

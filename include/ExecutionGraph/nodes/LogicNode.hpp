@@ -16,7 +16,7 @@
 #include "ExecutionGraph/common/StaticAssert.hpp"
 #include "ExecutionGraph/nodes/LogicCommon.hpp"
 
-namespace ExecutionGraph
+namespace executionGraph
 {
 /**
  @brief The execution node (logic node) class which is the base class
@@ -108,17 +108,6 @@ public:
     }
 
     //! Add an input socket with default value \p defaultValue.
-    template<typename Enum, typename TData, typename T>
-    void addISock(T&& defaultValue, const std::string& name = "noname")
-    {
-        unsigned int id = m_inputs.size() + m_outputs.size();
-        auto p           = SocketPointer<SocketInputBaseType>(
-            new SocketInputType<TData>(std::forward<T>(defaultValue), id, *this, name),
-            [](SocketInputBaseType* p) { delete static_cast<SocketInputType<TData>*>(p); });
-        m_inputs.push_back(std::move(p));
-    }
-
-    //! Add an input socket with default value \p defaultValue.
     template<typename TData, typename T>
     void addOSock(T&& defaultValue, const std::string& name = "noname")
     {
@@ -127,6 +116,46 @@ public:
             new SocketOutputType<TData>(std::forward<T>(defaultValue), idx, *this, name),
             [](SocketOutputBaseType* p) { delete static_cast<SocketOutputType<TData>*>(p); });
         m_outputs.push_back(std::move(p));
+    }
+
+    //! Add
+    template<typename SocketDeclList,
+             typename... Args,
+             EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::InputSocketDeclarationList, SocketDeclList>::value))
+            >
+    void addSockets(std::tuple<Args...>&& defaultValues)
+    {
+        auto add = [&](auto p)
+        {
+            using PairIndexAndType = decltype(p);
+
+            static constexpr auto idx = meta::at_c<PairIndexAndType,0>::value;
+            using SocketType          = meta::at_c<PairIndexAndType,1>;
+
+            addISock<typename SocketType::DataType>(std::move(std::get<0>(defaultValues)));
+        };
+
+        meta::for_each( typename SocketDeclList::EnumeratedTypeList{} , add);
+    }
+
+    template<typename SocketDeclList,
+             typename... Args,
+             EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::OutputSocketDeclarationList, SocketDeclList>::value))
+            >
+    void addSockets(std::tuple<Args...>&& defaultValues)
+    {
+
+        auto add = [&](auto p)
+        {
+            using PairIndexAndType = decltype(p);
+
+            static constexpr auto idx = meta::at_c<PairIndexAndType,0>::value;
+            using SocketType          = meta::at_c<PairIndexAndType,1>;
+
+            addOSock<typename SocketType::DataType>(std::move(std::get<0>(defaultValues)));
+        };
+
+        meta::for_each( typename SocketDeclList::EnumeratedTypeList{} , add);
     }
 
     //! Get the input socket at index \p idx.
@@ -305,15 +334,6 @@ void LogicNode<TConfig>::addWriteLink(LogicNode& outN, unsigned int outS, LogicN
 }
 
 
-//! Some handy macro to use when inheriting from LogicNode.
-#define EXEC_GRAPH_DEFINE_SOCKET_INFO   \
-    enum class SocketInfos : uint64_t   \
-    {                                   \
-        nInputs  = Inputs::InputLast,   \
-        nOutputs = Outputs::OutputLast, \
-        nSockets = nInputs + nOutputs,  \
-    };
-
-}  // namespace
+}  // end ExecutionGraph
 
 #endif
