@@ -61,7 +61,7 @@ template<typename TConfig>
 class LogicNode
 {
 public:
-    EXEC_GRAPH_TYPDEF_CONFIG(TConfig);
+    EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
 
     template<typename T>
     using SocketPointer        = std::unique_ptr<T, void (*)(T*)>;
@@ -70,7 +70,7 @@ public:
 
 public:
     //! The basic constructor of a logic node.
-    LogicNode(unsigned int id): m_id(id) {}
+    LogicNode(NodeIdType id): m_id(id) {}
     LogicNode(const LogicNode&) = default;
     LogicNode(LogicNode&&)      = default;
 
@@ -82,7 +82,7 @@ public:
      //! The main compute function of this execution node.
     virtual void compute() = 0;
 
-    inline unsigned int getId(){ return m_id; }
+    inline NodeIdType getId(){ return m_id; }
 
     inline bool hasLinks() const { return m_hasLinks; }
     inline void setLinked(void) { m_hasLinks = true; }
@@ -100,8 +100,9 @@ public:
     template<typename TData, typename T>
     void addISock(T&& defaultValue, const std::string& name = "noname")
     {
-        unsigned int id = m_inputs.size() + m_outputs.size();
-        auto p           = SocketPointer<SocketInputBaseType>(
+        SocketIdType id  = m_inputs.size();
+
+        auto p = SocketPointer<SocketInputBaseType>(
             new SocketInputType<TData>(std::forward<T>(defaultValue), id, *this, name),
             [](SocketInputBaseType* p) { delete static_cast<SocketInputType<TData>*>(p); });
         m_inputs.push_back(std::move(p));
@@ -111,14 +112,16 @@ public:
     template<typename TData, typename T>
     void addOSock(T&& defaultValue, const std::string& name = "noname")
     {
-        unsigned int idx = m_inputs.size() + m_outputs.size();
-        auto p           = SocketPointer<SocketOutputBaseType>(
-            new SocketOutputType<TData>(std::forward<T>(defaultValue), idx, *this, name),
+        SocketIdType id = m_outputs.size();
+
+        auto p = SocketPointer<SocketOutputBaseType>(
+            new SocketOutputType<TData>(std::forward<T>(defaultValue), id, *this, name),
             [](SocketOutputBaseType* p) { delete static_cast<SocketOutputType<TData>*>(p); });
         m_outputs.push_back(std::move(p));
     }
 
-    //! Add
+    //! Add all input sockets defined in the type list \p SocketDeclList where each socket has
+    //! the corresponding default value in \p defaultValues.
     template<typename SocketDeclList,
              typename... Args,
              EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::InputSocketDeclarationList, SocketDeclList>::value))
@@ -138,6 +141,8 @@ public:
         meta::for_each( typename SocketDeclList::EnumeratedTypeList{} , add);
     }
 
+    //! Add all output sockets defined in the type list \p SocketDeclList where each socket has
+    //! the corresponding default value in \p defaultValues.
     template<typename SocketDeclList,
              typename... Args,
              EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::OutputSocketDeclarationList, SocketDeclList>::value))
@@ -159,13 +164,13 @@ public:
     }
 
     //! Get the input socket at index \p idx.
-    SocketInputBaseType& getISocket(unsigned int idx)
+    SocketInputBaseType& getISocket(IndexType idx)
     {
         EXEC_GRAPH_ASSERTMSG(idx < m_inputs.size(), "Wrong index!");
         return *m_inputs[idx];
     }
     //! Get the output socket at index \p index.
-    SocketOutputBaseType& getOSocket(unsigned int idx)
+    SocketOutputBaseType& getOSocket(IndexType idx)
     {
         EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
         return *m_outputs[idx];
@@ -173,44 +178,44 @@ public:
 
     //! Get the input socket of type \p T at index \p idx .
     template<typename T>
-    auto& getISocket(unsigned int idx);
+    auto& getISocket(IndexType idx);
     template<typename T>
-    const auto& getISocket(unsigned int idx) const;
+    const auto& getISocket(IndexType idx) const;
 
     //! Get the output socket of type \p T at index \p idx.
     template<typename T>
-    auto& getOSocket(unsigned int idx);
+    auto& getOSocket(IndexType idx);
     template<typename T>
-    const auto& getOSocket(unsigned int idx) const;
+    const auto& getOSocket(IndexType idx) const;
 
     //! Get input socket value \p T at index \p idx.
     template<typename T>
-    const T& getISocketValue(unsigned int idx) const;
+    const T& getISocketValue(IndexType idx) const;
 
     //! Get the read/write socket value \p T of the output socket at index \p idx.
     template<typename T>
-    T& getOSocketValue(unsigned int idx);
+    T& getOSocketValue(IndexType idx);
     template<typename T>
-    const T& getOSocketValue(unsigned int idx) const;
+    const T& getOSocketValue(IndexType idx) const;
 
     //! Set the read/write output socket value \p T at index \p idx.
     template<typename T, typename TIn = T>
-    void setOSocketValue(unsigned int idx, TIn&& data);
+    void setOSocketValue(IndexType idx, TIn&& data);
 
     //! Writes the value of the output socket at index \p idx to all inputs
     //! which are accesible by write links.
     template<typename T>
-    void distributeOSocketValue(unsigned int idx);
+    void distributeOSocketValue(IndexType idx);
 
     //! Constructs a Get-Link to get the data from output socket at index \p outS
     //! of logic node \p outN at the input socket at index \p inS of logic node \p
     //! inN.
-    static void setGetLink(LogicNode& outN, unsigned int outS, LogicNode& inN, unsigned int inS);
+    static void setGetLink(LogicNode& outN, IndexType outS, LogicNode& inN, IndexType inS);
 
 
     //! Constructs a Get-Link to get the data from output socket at index \p outS
     //! of logic node \p outN at the input socket at index \p inS.
-    inline void setGetLink(LogicNode& outN, unsigned int outS, unsigned int inS)
+    inline void setGetLink(LogicNode& outN, IndexType outS, IndexType inS)
     {
       setGetLink(outN, outS, *this, inS);
     }
@@ -218,18 +223,18 @@ public:
     //! Constructs a Write-Link to write the data of output socket at index \p
     //! outS of logic node \p outN to the input socket at index \p inS of logic node \p
     //! inN.
-    static void addWriteLink(LogicNode& outN, unsigned int outS, LogicNode& inN, unsigned int inS);
+    static void addWriteLink(LogicNode& outN, IndexType outS, LogicNode& inN, IndexType inS);
 
     //! Constructs a Write-Link to write the data of output socket at index \p
     //! outS
     //! of logic node \p outN to the input socket at index \p inS.
-    inline void addWriteLink(unsigned int outS, LogicNode& inN, unsigned int inS)
+    inline void addWriteLink(IndexType outS, LogicNode& inN, IndexType inS)
     {
         addWriteLink(*this, outS, inN, inS);
     }
 
 protected:
-    const unsigned int m_id;  //! The unique id of the logic node.
+    const NodeIdType m_id;  //! The unique id of the logic node.
     bool m_hasLinks;
     SocketInputListType m_inputs;
     SocketOutputListType m_outputs;
@@ -238,7 +243,7 @@ protected:
 
 template<typename TConfig>
 template<typename T>
-auto& LogicNode<TConfig>::getISocket(unsigned int idx)
+auto& LogicNode<TConfig>::getISocket(IndexType idx)
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_inputs.size(), "Wrong index!");
     return *m_inputs[idx]->template castToType<T>();
@@ -246,7 +251,7 @@ auto& LogicNode<TConfig>::getISocket(unsigned int idx)
 
 template<typename TConfig>
 template<typename T>
-const auto& LogicNode<TConfig>::getISocket(unsigned int idx) const
+const auto& LogicNode<TConfig>::getISocket(IndexType idx) const
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_inputs.size(), "Wrong index!");
     return *m_inputs[idx]->template castToType<T>();
@@ -254,7 +259,7 @@ const auto& LogicNode<TConfig>::getISocket(unsigned int idx) const
 
 template<typename TConfig>
 template<typename T>
-auto& LogicNode<TConfig>::getOSocket(unsigned int idx)
+auto& LogicNode<TConfig>::getOSocket(IndexType idx)
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
     return *m_outputs[idx]->template castToType<T>();
@@ -262,7 +267,7 @@ auto& LogicNode<TConfig>::getOSocket(unsigned int idx)
 
 template<typename TConfig>
 template<typename T>
-const auto& LogicNode<TConfig>::getOSocket(unsigned int idx) const
+const auto& LogicNode<TConfig>::getOSocket(IndexType idx) const
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
     return *m_outputs[idx]->template castToType<T>();
@@ -270,7 +275,7 @@ const auto& LogicNode<TConfig>::getOSocket(unsigned int idx) const
 
 template<typename TConfig>
 template<typename T>
-const T& LogicNode<TConfig>::getISocketValue(unsigned int idx) const
+const T& LogicNode<TConfig>::getISocketValue(IndexType idx) const
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_inputs.size(), "Wrong index!");
     return m_inputs[idx]->template castToType<T>()->getValue();
@@ -278,7 +283,7 @@ const T& LogicNode<TConfig>::getISocketValue(unsigned int idx) const
 
 template<typename TConfig>
 template<typename T>
-T& LogicNode<TConfig>::getOSocketValue(unsigned int idx)
+T& LogicNode<TConfig>::getOSocketValue(IndexType idx)
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
     return m_outputs[idx]->template castToType<T>()->getValue();
@@ -286,7 +291,7 @@ T& LogicNode<TConfig>::getOSocketValue(unsigned int idx)
 
 template<typename TConfig>
 template<typename T>
-const T& LogicNode<TConfig>::getOSocketValue(unsigned int idx) const
+const T& LogicNode<TConfig>::getOSocketValue(IndexType idx) const
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
     return m_outputs[idx]->template castToType<T>()->getValue();
@@ -294,7 +299,7 @@ const T& LogicNode<TConfig>::getOSocketValue(unsigned int idx) const
 
 template<typename TConfig>
 template<typename T, typename TIn>
-void LogicNode<TConfig>::setOSocketValue(unsigned int idx, TIn&& data)
+void LogicNode<TConfig>::setOSocketValue(IndexType idx, TIn&& data)
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
     m_outputs[idx]->template castToType<T>()->setValue(std::forward<TIn>(data));
@@ -302,7 +307,7 @@ void LogicNode<TConfig>::setOSocketValue(unsigned int idx, TIn&& data)
 
 template<typename TConfig>
 template<typename T>
-void LogicNode<TConfig>::distributeOSocketValue(unsigned int idx)
+void LogicNode<TConfig>::distributeOSocketValue(IndexType idx)
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
     m_outputs[idx]->template castToType<T>()->distributeValue();

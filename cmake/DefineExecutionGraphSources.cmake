@@ -12,6 +12,9 @@ MACRO(INCLUDE_ALL_ExecutionGraph_SOURCE
     # no external sources up to now
     
     SET(${SRC}
+                
+        ${ExecutionGraph_ROOT_DIR}/src/DemangleTypes.cpp
+    
         ${ExecutionGraph_ROOT_DIR}/src/LogicSocket.cpp
         ${ExecutionGraph_ROOT_DIR}/src/LogicNode.cpp
     )
@@ -19,6 +22,7 @@ MACRO(INCLUDE_ALL_ExecutionGraph_SOURCE
     SET(${INC}
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/Asserts.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/Delegates.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/DemangleTypes.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/EnumClassHelper.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/Exception.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/MyContainerTypeDefs.hpp
@@ -32,6 +36,8 @@ MACRO(INCLUDE_ALL_ExecutionGraph_SOURCE
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicSocket.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicSocketDefaultTypes.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicNode.hpp
+        
+        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/graphs/ExecutionTreeInOut.hpp
     )
 
     SET(${INCLUDE_DIRS}

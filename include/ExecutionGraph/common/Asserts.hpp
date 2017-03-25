@@ -26,7 +26,7 @@
     {                                            \
         if (!(condition))                        \
         {                                        \
-            ExecutionGraph_ERRORMSG(message)     \
+            EXEC_GRAPH_THROWEXCEPTION(message)   \
         }                                        \
     }
 #endif
