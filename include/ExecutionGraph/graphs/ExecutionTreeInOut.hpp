@@ -24,21 +24,36 @@ class ExecutionTreeInOut
 {
 public:
     EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
-private:
 
-    enum class NodeClassification {
-        InputNode  = 0,
-        OutputNode = 1,
-        NormalNode = 2
+    enum class NodeClassification : unsigned char {
+        NormalNode = 0,
+        InputNode  = 1,
+        OutputNode = 2
     };
-    static const unsigned int nNodeClasses = 3;
+
+    using GroupId = unsigned int;
+
+private:
+    static const std::underlying_type_t<NodeClassification> nNodeClasses = 3;
+
+    struct NodeData{
+        NodeBasePointerType m_node  = nullptr;
+        NodeClassification  m_class = NodeClassification::NormalNode;
+        std::size_t m_priority      = std::numeric_limits<std::size_t>::max();
+    };
 
     using NodeBasePointerType    = std::unique_ptr<NodeBaseType>
     using NodeListType           = std::vector<NodeBaseType*>;
-    using NodeStorageType        = std::unordered_map<NodeIdType, std::pair<NodeBasePointerType,NodeClassification>;
+    using NodeStorageType        = std::unordered_map<NodeId, NodeData>;
     using NodeSetType            = std::unordered_set<NodeBaseType*>;
-    using GroupNodeMapType       = std::unordered_map<NodeIdType, NodeSetType>;
-    using GroupExecutionListType = std::unordered_map<NodeIdType, NodeListType>;
+    using GroupNodeMapType       = std::unordered_map<NodeId, NodeSetType>;
+    using GroupExecutionListType = std::unordered_map<NodeId, NodeListType>;
+
+
+
+
+    using NodeDataMape = std::unordered_map<NodeId,NodeData>;
+
 public:
 
 
@@ -46,28 +61,43 @@ public:
     ExecutionTreeInOut() = default;
     ~ExecutionTreeInOut() = default;
 
-    void setNodeClass(NodeIdType id, NodeClassification newType)
+    void setNodeClass(NodeId id, NodeClassification newType)
     {
         auto it = m_nodeMap.find(id);
-        EXEC_GRAPH_THROWEXCEPTION_IF(it != m_nodeMap.end(), "Node with id: " << id << " does not exist in tree!")
+        EXEC_GRAPH_THROWEXCEPTION_IF(it == m_nodeMap.end(), "Node with id: " << id << " does not exist in tree!");
 
         NodeClassification& currType = it->second.second;
-        if(currType == type)
+        if(currType == newType)
         {
             return;
         }
 
         NodeBaseType* node = it->second.first;
 
-        m_nodes[currType].remove(node); // Remove
-        currType = newType;             // Set new classifcatin
-        m_nodes[currType].add(node);    // Add
+        m_nodeClasses[currType].remove(node); // Remove from class.
+        currType = newType;             // Set new classification
+        m_nodeClasses[currType].add(node);    // Add to class.
 
     }
 
-    const NodeSetType& getInputNodes() const { return m_inputNodes; };
-    const NodeSetType& getOutputNodes() const { return m_outputNodes; }
+    //! Get a specific node with id \p id.
+    NodeBaseType& getNode(NodeId id)
+    {
 
+    }
+
+    //! Get all nodes classified as \p type.
+    const NodeSetType& getNodes(NodeClassification type) const { return m_nodeClasses[type]; }
+
+    //! Get all nodes in the group with id \p groupId.
+    const NodeSetType& getNodes(GroupId groupId) const
+    {
+        auto it = m_nodeGroups.find(groupId);
+        EXEC_GRAPH_THROWEXCEPTION_IF(it == m_nodeGroups.end(),"Group with id: " << groupId << " is not part of tree!");
+        return it->second;
+    }
+
+    //! Adds a node to the execution tree and classifies it as \p type.
     virtual void addNode(NodeBasePointerType node,
                          NodeClassification type = NodeClassification::NormalNode)
     {
@@ -83,306 +113,299 @@ public:
                                      "Node id: " << node->getId() << " already added in tree!");
 
         // Add to group
-        m_nodes[type].emplace(node.get());
+        m_nodeClasses[type].emplace(node.get());
         // Add to storage map
         m_nodeMap.emplace(id, std::make_pair(std::move(node),type));
     }
-//
-//    virtual void addNodeToGroup(unsigned int nodeId, unsigned int groupId)
-//    {
-//        auto inNodeIt = m_nodeMap.find(nodeId);
-//        if (inNodeIt == m_nodeMap.end())
-//        {
-//            EXEC_GRAPH_ERRORMSG("Node with id: " << nodeId << " has not been added to the tree!")
-//        }
-//        // Add to group
-//        auto res = m_groupNodes[groupId].insert(inNodeIt->second);
-//        if (!res.second)
-//        {
-//            EXEC_GRAPH_ERRORMSG("Node id: " << inNodeIt->second->m_id << " already in group: " << groupId);
-//        }
-//    }
-//
-//    virtual void makeGetLink(unsigned int outN, unsigned int outS, unsigned int inN, unsigned int inS)
-//    {
-//        auto outNit = m_nodeMap.find(outN);
-//        auto inNit  = m_nodeMap.find(inN);
-//        if (outNit == m_nodeMap.end() || inNit == m_nodeMap.end())
-//        {
-//            EXEC_GRAPH_ERRORMSG("Node: " << outN << " or " << inN << " does not exist!")
-//        }
-//        NodeBaseType::makeGetLink(outNit->second, outS, inNit->second, inS);
-//    }
-//
-//    virtual void makeWriteLink(unsigned int outN, unsigned int outS, unsigned int inN, unsigned int inS)
-//    {
-//        auto outNit = m_nodeMap.find(outN);
-//        auto inNit  = m_nodeMap.find(inN);
-//        if (outNit == m_nodeMap.end() || inNit == m_nodeMap.end())
-//        {
-//            EXEC_GRAPH_ERRORMSG("Node: " << outN << " or " << inN << " does not exist!")
-//        }
-//        NodeBaseType::makeWriteLink(outNit->second, outS, inNit->second, inS);
-//    }
-//
-//    /** Init group */
-//    virtual void reset(unsigned int groupId)
-//    {
-//        for (auto& n : m_groupNodes[groupId])
-//        {
-//            // Reset in no order!
-//            n->reset();
-//        }
-//    }
-//
-//    /** Execute group */
-//    virtual void execute(unsigned int groupId)
-//    {
-//        for (auto& n : m_groupExecList[groupId])
-//        {
-//            // Execute in determined order!
-//            n->compute();
-//        }
-//    }
-//
-//    //    /** Finalize group */
-//    //    virtual void finalize(unsigned int groupId) {
-//    //        for(auto & n : m_groupExecList[groupId]) {
-//    //            // Execute in determined order!
-//    //            n->compute();
-//    //        }
-//    //    }
-//
-//    /** Execute all groups */
-//    virtual void executeAll()
-//    {
-//        for (auto& g : m_groupExecList)
-//        {
-//            for (auto& n : g.second)
-//            {
-//                n->compute();
-//            }
-//        }
-//    }
-//
-//    /** Init all groups */
-//    virtual void resetAll()
-//    {
-//        for (auto& g : m_groupExecList)
-//        {
-//            for (auto& n : g.second)
-//            {
-//                n->reset();
-//            }
-//        }
-//    }
-//
-//    virtual void setup()
-//    {
-//        if (m_outputNodes.size() == 0)
-//        {
-//            EXEC_GRAPH_ERRORMSG("No output node specified")
-//        }
-//
-//        // Solve execution order for every group list!
-//        // Each group has its own execution order!
-//        ExecutionOrderSolver s;
-//        m_groupExecList.clear();
-//        unsigned int maxPrio = 0;
-//        for (auto& p : m_groupNodes)
-//        {
-//            // fill nodes into execution list
-//            auto& l = m_groupExecList[p.first];
-//            std::for_each(
-//                p.second.begin(), p.second.end(), [&l](const typename NodeSetType::value_type& n) { l.push_back(n); });
-//
-//            s.solve(l, l);
-//
-//            maxPrio = std::max(maxPrio, l.back()->getPriority());
-//        }
-//
-//        // do some manicure: invert all priorities such that lowest is now the
-//        // highest
-//        for (auto& p : m_groupExecList)
-//        {
-//            for (auto& n : p.second)
-//            {
-//                n->setPriority(maxPrio - n->getPriority());
-//            }
-//        }
-//
-//        // Check if input is reachable from all outputs
-//        ReachNodeCheck c;
-//        for (auto& o : m_outputNodes)
-//        {
-//            bool outputReachedInput = false;
-//            // each outputnode should reach at least one input, if not print warning!
-//            for (auto& i : m_inputNodes)
-//            {
-//                if (c.check(o, i))
-//                {
-//                    outputReachedInput = true;
-//                    break;
-//                }
-//            }
-//            if (!outputReachedInput)
-//            {
-//                WARNINGMSG(false, "WARNING: Output id: " << o->m_id << " did not reach any input!")
-//            }
-//        }
-//    }
-//
-//    std::string getExecutionOrderInfo(std::string suffix = "\t\t")
-//    {
-//        // Print execution order
-//        std::stringstream s;
-//        for (auto& g : m_groupExecList)
-//        {
-//            s << "Execution order for group id: " << g.first << std::endl;
-//            s << suffix << "NodeId\t|\tPriority\t|\tType" << std::endl;
-//            for (auto n : g.second)
-//            {
-//                s << suffix
-//                  << Utilities::stringFormat("%4i \t|\t %4i \t|\t %s", n->m_id, n->getPriority(), demangle::type(n))
-//                  << std::endl;
-//            }
-//            s << suffix << "==============================" << std::endl;
-//        }
-//        return s.str();
-//    }
-//
-//protected:
-//    class ExecutionOrderSolver
-//    {
-//    public:
-//        void solve(NodeListType& c, NodeListType& orderedNodes)
-//        {
-//            // Solve Execution order,
-//            // start a depth first search recursion for all nodes in c which
-//            // determines an execution order by setting
-//            // the priority
-//            for (auto& p : c)
-//            {
-//                std::unordered_set<unsigned int> nodesCurrDepth;
-//                // start recursion from this node
-//                solveRec(p, nodesCurrDepth);
-//            }
-//
-//            // Sort all nodes according to priority (asscending) (lowest is most
-//            // important)
-//            std::sort(orderedNodes.begin(), orderedNodes.end(), [](NodeBaseType* const& a, NodeBaseType* const& b) {
-//                return a->getPriority() < b->getPriority();
-//            });
-//        }
-//
-//    private:
-//        /**
-//         * Depth first search: this function returns recursively the priority
-//         * lowest number has the highest priority
-//         */
-//
-//        unsigned int solveRec(NodeBaseType* node, std::unordered_set<unsigned int>& nodesCurrDepth)
-//        {
-//            nodesCurrDepth.insert(node->m_id);
-//
-//            // visit all input sockets and their node!
-//            auto& inSockets = node->getInputs();
-//            for (auto* s : inSockets)
-//            {
-//                if (s->isLinked())
-//                {
-//                    auto* fsock = s->getFrom();
-//
-//                    auto* adjNode = fsock->getParent();
-//                    if (nodesCurrDepth.find(adjNode->m_id) != nodesCurrDepth.end())
-//                    {
-//                        EXEC_GRAPH_ERRORMSG("Your execution logic graph contains a cylce from node: " << node->m_id
-//                                                                                                << " socket: "
-//                                                                                                << s->m_id
-//                                                                                                << " to node: "
-//                                                                                                << adjNode->m_id
-//                                                                                                << " socket: "
-//                                                                                                << fsock->m_id);
-//                    }
-//
-//                    unsigned int prioAdj = solveRec(adjNode, nodesCurrDepth);
-//
-//                    // Set the current node to the priority of the below tree +1
-//                    node->setPriority(std::max(prioAdj + 1, node->getPriority()));
-//                }
-//            }
-//
-//            nodesCurrDepth.erase(node->m_id);
-//
-//            return node->getPriority();
-//        }
-//        bool m_inputReachable  = false;
-//        NodeBaseType* m_reachNode = nullptr;
-//    };
-//
-//    // Only for directed graphs, does not detect cycles -> endless loop!
-//    class ReachNodeCheck
-//    {
-//    public:
-//        // From end to start node
-//        bool check(NodeBaseType* endNode, NodeBaseType* startNode)
-//        {
-//            if (endNode == startNode)
-//            {
-//                return true;
-//            }
-//
-//            m_start   = startNode;
-//            m_reached = false;
-//
-//            std::deque<NodeBaseType*> currentNodes;  // Breath first search
-//            currentNodes.push_back(endNode);
-//
-//            // visit current front node, as long as currentNode list is not empty or
-//            // start has not yet been found!
-//            while (currentNodes.size() != 0 && m_reached == false)
-//            {
-//                visit(currentNodes.front(), currentNodes);
-//                currentNodes.pop_front();
-//            }
-//
-//            return m_reached;
-//        }
-//
-//    private:
-//        /**
-//         * Breath first search:
-//         */
-//        void visit(NodeBaseType* node, std::deque<NodeBaseType*>& queu)
-//        {
-//            // visit all input sockets and their node!
-//            auto& inSockets = node->getInputs();
-//            for (auto* s : inSockets)
-//            {
-//                if (s->isLinked())
-//                {
-//                    auto* fsock = s->getFrom();
-//                    EXEC_GRAPH_ASSERTMSG(fsock, "linked but from ptr null");
-//
-//                    auto* adjNode = fsock->getParent();
-//                    EXEC_GRAPH_ASSERTMSG(adjNode, "Adj node null");
-//
-//                    // If we reached the start node, return!
-//                    if (m_start == adjNode)
-//                    {
-//                        m_reached = true;
-//                        return;
-//                    }
-//
-//                    queu.push_back(adjNode);
-//                }
-//            }
-//        }
-//
-//        bool m_reached     = false;
-//        NodeBaseType* m_start = nullptr;
-//    };
-//
+
+    //! Assigns the node with id \p nodeId to the group with id \p groupId.
+    virtual void addNodeToGroup(NodeId nodeId, GroupId groupId)
+    {
+        auto it = m_nodeMap.find(nodeId);
+        EXEC_GRAPH_THROWEXCEPTION_IF(it == m_nodeMap.end(), "Node with id: " << nodeId << " does not exist in tree!");
+        // Add node to the group
+        auto res = m_nodeGroups[groupId].emplace(it->second.first);
+        EXEC_GRAPH_THROWEXCEPTION_IF(!res.second, "Node with id: " << nodeId << " does not exist in tree!");
+    }
+
+    virtual void makeGetLink(NodeId outN, SocketId outS, NodeId inN, SocketId inS)
+    {
+        auto outNit = m_nodeMap.find(outN);
+        auto inNit  = m_nodeMap.find(inN);
+        EXEC_GRAPH_THROWEXCEPTION_IF( outNit == m_nodeMap.end() || inNit == m_nodeMap.end() ,
+                                     "Node: " << outN << " or " << inN << " does not exist!")
+        NodeBaseType::makeGetLink(outNit->second, outS, inNit->second, inS);
+    }
+
+    virtual void makeWriteLink(unsigned int outN, unsigned int outS, unsigned int inN, unsigned int inS)
+    {
+        auto outNit = m_nodeMap.find(outN);
+        auto inNit  = m_nodeMap.find(inN);
+        if (outNit == m_nodeMap.end() || inNit == m_nodeMap.end())
+        {
+            EXEC_GRAPH_ERRORMSG("Node: " << outN << " or " << inN << " does not exist!")
+        }
+        NodeBaseType::makeWriteLink(outNit->second, outS, inNit->second, inS);
+    }
+
+    /** Init group */
+    virtual void reset(unsigned int groupId)
+    {
+        for (auto& n : m_nodeGroups[groupId])
+        {
+            // Reset in no order!
+            n->reset();
+        }
+    }
+
+    /** Execute group */
+    virtual void execute(unsigned int groupId)
+    {
+        for (auto& n : m_groupExecList[groupId])
+        {
+            // Execute in determined order!
+            n->compute();
+        }
+    }
+
+    //    /** Finalize group */
+    //    virtual void finalize(unsigned int groupId) {
+    //        for(auto & n : m_groupExecList[groupId]) {
+    //            // Execute in determined order!
+    //            n->compute();
+    //        }
+    //    }
+
+    /** Execute all groups */
+    virtual void executeAll()
+    {
+        for (auto& g : m_groupExecList)
+        {
+            for (auto& n : g.second)
+            {
+                n->compute();
+            }
+        }
+    }
+
+    /** Init all groups */
+    virtual void resetAll()
+    {
+        for (auto& g : m_groupExecList)
+        {
+            for (auto& n : g.second)
+            {
+                n->reset();
+            }
+        }
+    }
+
+    virtual void setup()
+    {
+        if (m_outputNodes.size() == 0)
+        {
+            EXEC_GRAPH_ERRORMSG("No output node specified")
+        }
+
+        // Solve execution order for every group list!
+        // Each group has its own execution order!
+        ExecutionOrderSolver s;
+        m_groupExecList.clear();
+        unsigned int maxPrio = 0;
+        for (auto& p : m_nodeGroups)
+        {
+            // fill nodes into execution list
+            auto& l = m_groupExecList[p.first];
+            std::for_each(
+                p.second.begin(), p.second.end(), [&l](const typename NodeSetType::value_type& n) { l.push_back(n); });
+
+            s.solve(l, l);
+
+            maxPrio = std::max(maxPrio, l.back()->getPriority());
+        }
+
+        // do some manicure: invert all priorities such that lowest is now the
+        // highest
+        for (auto& p : m_groupExecList)
+        {
+            for (auto& n : p.second)
+            {
+                n->setPriority(maxPrio - n->getPriority());
+            }
+        }
+
+        // Check if input is reachable from all outputs
+        ReachNodeCheck c;
+        for (auto& o : m_outputNodes)
+        {
+            bool outputReachedInput = false;
+            // each outputnode should reach at least one input, if not print warning!
+            for (auto& i : m_inputNodes)
+            {
+                if (c.check(o, i))
+                {
+                    outputReachedInput = true;
+                    break;
+                }
+            }
+            if (!outputReachedInput)
+            {
+                WARNINGMSG(false, "WARNING: Output id: " << o->m_id << " did not reach any input!")
+            }
+        }
+    }
+
+    std::string getExecutionOrderInfo(std::string suffix = "\t\t")
+    {
+        // Print execution order
+        std::stringstream s;
+        for (auto& g : m_groupExecList)
+        {
+            s << "Execution order for group id: " << g.first << std::endl;
+            s << suffix << "NodeId\t|\tPriority\t|\tType" << std::endl;
+            for (auto n : g.second)
+            {
+                s << suffix
+                  << Utilities::stringFormat("%4i \t|\t %4i \t|\t %s", n->m_id, n->getPriority(), demangle::type(n))
+                  << std::endl;
+            }
+            s << suffix << "==============================" << std::endl;
+        }
+        return s.str();
+    }
+
+protected:
+    class ExecutionOrderSolver
+    {
+    public:
+        void solve(NodeListType& c, NodeListType& orderedNodes)
+        {
+            // Solve Execution order,
+            // start a depth first search recursion for all nodes in c which
+            // determines an execution order by setting
+            // the priority
+            for (auto& p : c)
+            {
+                std::unordered_set<unsigned int> nodesCurrDepth;
+                // start recursion from this node
+                solveRec(p, nodesCurrDepth);
+            }
+
+            // Sort all nodes according to priority (asscending) (lowest is most
+            // important)
+            std::sort(orderedNodes.begin(), orderedNodes.end(), [](NodeBaseType* const& a, NodeBaseType* const& b) {
+                return a->getPriority() < b->getPriority();
+            });
+        }
+
+    private:
+        /**
+         * Depth first search: this function returns recursively the priority
+         * lowest number has the highest priority
+         */
+
+        unsigned int solveRec(NodeBaseType* node, std::unordered_set<unsigned int>& nodesCurrDepth)
+        {
+            nodesCurrDepth.insert(node->m_id);
+
+            // visit all input sockets and their node!
+            auto& inSockets = node->getInputs();
+            for (auto* s : inSockets)
+            {
+                if (s->isLinked())
+                {
+                    auto* fsock = s->getFrom();
+
+                    auto* adjNode = fsock->getParent();
+                    if (nodesCurrDepth.find(adjNode->m_id) != nodesCurrDepth.end())
+                    {
+                        EXEC_GRAPH_ERRORMSG("Your execution logic graph contains a cylce from node: " << node->m_id
+                                                                                                << " socket: "
+                                                                                                << s->m_id
+                                                                                                << " to node: "
+                                                                                                << adjNode->m_id
+                                                                                                << " socket: "
+                                                                                                << fsock->m_id);
+                    }
+
+                    unsigned int prioAdj = solveRec(adjNode, nodesCurrDepth);
+
+                    // Set the current node to the priority of the below tree +1
+                    node->setPriority(std::max(prioAdj + 1, node->getPriority()));
+                }
+            }
+
+            nodesCurrDepth.erase(node->m_id);
+
+            return node->getPriority();
+        }
+        bool m_inputReachable  = false;
+        NodeBaseType* m_reachNode = nullptr;
+    };
+
+    // Only for directed graphs, does not detect cycles -> endless loop!
+    class ReachNodeCheck
+    {
+    public:
+        // From end to start node
+        bool check(NodeBaseType* endNode, NodeBaseType* startNode)
+        {
+            if (endNode == startNode)
+            {
+                return true;
+            }
+
+            m_start   = startNode;
+            m_reached = false;
+
+            std::deque<NodeBaseType*> currentNodes;  // Breath first search
+            currentNodes.push_back(endNode);
+
+            // visit current front node, as long as currentNode list is not empty or
+            // start has not yet been found!
+            while (currentNodes.size() != 0 && m_reached == false)
+            {
+                visit(currentNodes.front(), currentNodes);
+                currentNodes.pop_front();
+            }
+
+            return m_reached;
+        }
+
+    private:
+        /**
+         * Breath first search:
+         */
+        void visit(NodeBaseType* node, std::deque<NodeBaseType*>& queu)
+        {
+            // visit all input sockets and their node!
+            auto& inSockets = node->getInputs();
+            for (auto* s : inSockets)
+            {
+                if (s->isLinked())
+                {
+                    auto* fsock = s->getFrom();
+                    EXEC_GRAPH_ASSERTMSG(fsock, "linked but from ptr null");
+
+                    auto* adjNode = fsock->getParent();
+                    EXEC_GRAPH_ASSERTMSG(adjNode, "Adj node null");
+
+                    // If we reached the start node, return!
+                    if (m_start == adjNode)
+                    {
+                        m_reached = true;
+                        return;
+                    }
+
+                    queu.push_back(adjNode);
+                }
+            }
+        }
+
+        bool m_reached     = false;
+        NodeBaseType* m_start = nullptr;
+    };
+
 
     void setupNode(NodeBaseType& node, NodeClassification type)
     {
@@ -396,12 +419,12 @@ public:
         }
     }
 
-    NodeSetType[nNodeClasses] m_nodes;         ///< the input/ouput and normal nodes
+    NodeSetType[nNodeClasses] m_nodeClasses;         ///< the input/ouput and normal nodes
 
     NodeStorageType m_nodeMap;  ///< all nodes in the tree
 
     // Additional group list
-    GroupNodeMapType m_groupNodes;
+    GroupNodeMapType m_nodeGroups;
 
     GroupExecutionListType m_groupExecList;
 };

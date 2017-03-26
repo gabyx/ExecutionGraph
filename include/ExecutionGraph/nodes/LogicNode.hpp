@@ -70,7 +70,7 @@ public:
 
 public:
     //! The basic constructor of a logic node.
-    LogicNode(NodeIdType id): m_id(id) {}
+    LogicNode(NodeId id): m_id(id) {}
     LogicNode(const LogicNode&) = default;
     LogicNode(LogicNode&&)      = default;
 
@@ -82,15 +82,15 @@ public:
      //! The main compute function of this execution node.
     virtual void compute() = 0;
 
-    inline NodeIdType getId(){ return m_id; }
+    inline NodeId getId(){ return m_id; }
 
     inline bool hasLinks() const { return m_hasLinks; }
     inline void setLinked(void) { m_hasLinks = true; }
 
-    //! Set the priority of this node to \p p.
-    inline void setPriority(unsigned int p) { m_priority = p; }
-    //! Get the priority of this node.
-    inline unsigned int getPriority(void) const { return m_priority; }
+//    //! Set the priority of this node to \p p.
+//    inline void setPriority(unsigned int p) { m_priority = p; }
+//    //! Get the priority of this node.
+//    inline unsigned int getPriority(void) const { return m_priority; }
     //! Get the list of input sockets.
     const SocketInputListType& getInputs() const { return m_inputs; }
     //! Get the list of output sockets.
@@ -100,7 +100,7 @@ public:
     template<typename TData, typename T>
     void addISock(T&& defaultValue, const std::string& name = "noname")
     {
-        SocketIdType id  = m_inputs.size();
+        SocketId id  = m_inputs.size();
 
         auto p = SocketPointer<SocketInputBaseType>(
             new SocketInputType<TData>(std::forward<T>(defaultValue), id, *this, name),
@@ -112,7 +112,7 @@ public:
     template<typename TData, typename T>
     void addOSock(T&& defaultValue, const std::string& name = "noname")
     {
-        SocketIdType id = m_outputs.size();
+        SocketId id = m_outputs.size();
 
         auto p = SocketPointer<SocketOutputBaseType>(
             new SocketOutputType<TData>(std::forward<T>(defaultValue), id, *this, name),
@@ -234,11 +234,11 @@ public:
     }
 
 protected:
-    const NodeIdType m_id;  //! The unique id of the logic node.
+    const NodeId m_id;  //! The unique id of the logic node.
     bool m_hasLinks;
     SocketInputListType m_inputs;
     SocketOutputListType m_outputs;
-    unsigned int m_priority;
+//    unsigned int m_priority;
 };
 
 template<typename TConfig>

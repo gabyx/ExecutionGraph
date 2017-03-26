@@ -33,8 +33,8 @@ class LogicSocketInput;
 template<typename T, typename TConfig>
 class LogicSocketOutput;
 
-using NodeIdType   = unsigned int;
-using SocketIdType = NodeIdType;
+using NodeId   = unsigned int;
+using SocketId = NodeId;
 using IndexType    = unsigned int;
 
 template<typename TSocketTypes = SocketDefaultTypes>
