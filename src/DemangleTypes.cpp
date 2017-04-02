@@ -33,4 +33,11 @@ namespace details
     }
 #endif
 };
+
+template<typename T>
+std::string type(T&& t)
+{
+    return details::demangle(typeid(t).name());
+}
+
 };

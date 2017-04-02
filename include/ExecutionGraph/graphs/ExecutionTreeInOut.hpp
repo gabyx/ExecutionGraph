@@ -36,33 +36,33 @@ public:
 private:
     static const std::underlying_type_t<NodeClassification> nNodeClasses = 3;
 
+    using NodePointer = std::unique_ptr<NodeBaseType>;
     struct NodeData{
-        NodeBasePointerType m_node  = nullptr;
+
+        std::size_t getPriority(){ return m_priority;}
+        void setPriority(std::size_t p){ m_priority = p;}
+
+        private:
+        NodePointer m_node          = nullptr;
         NodeClassification  m_class = NodeClassification::NormalNode;
         std::size_t m_priority      = std::numeric_limits<std::size_t>::max();
     };
 
-    using NodeBasePointerType    = std::unique_ptr<NodeBaseType>
-    using NodeListType           = std::vector<NodeBaseType*>;
-    using NodeStorageType        = std::unordered_map<NodeId, NodeData>;
-    using NodeSetType            = std::unordered_set<NodeBaseType*>;
-    using GroupNodeMapType       = std::unordered_map<NodeId, NodeSetType>;
-    using GroupExecutionListType = std::unordered_map<NodeId, NodeListType>;
+    using NodeStorage        = std::unordered_map<NodeId, NodeData>; // Rehashing does not invalidate pointers or references to elements.
 
-
-
-
-    using NodeDataMape = std::unordered_map<NodeId,NodeData>;
+    using NodeList           = std::vector<NodeData*>;
+    using NodeSet            = std::unordered_set<NodeData*>;
+    using GroupNodeMap       = std::unordered_map<GroupId, NodeSet>;
+    using GroupExecutionList = std::unordered_map<GroupId, NodeList>;
 
 public:
-
-
-
     ExecutionTreeInOut() = default;
     ~ExecutionTreeInOut() = default;
 
     void setNodeClass(NodeId id, NodeClassification newType)
     {
+        m_executionOrderUpToDate = false;
+
         auto it = m_nodeMap.find(id);
         EXEC_GRAPH_THROWEXCEPTION_IF(it == m_nodeMap.end(), "Node with id: " << id << " does not exist in tree!");
 
@@ -74,23 +74,23 @@ public:
 
         NodeBaseType* node = it->second.first;
 
-        m_nodeClasses[currType].remove(node); // Remove from class.
-        currType = newType;             // Set new classification
-        m_nodeClasses[currType].add(node);    // Add to class.
+        m_nodeClasses[currType].remove(node);   // Remove from class.
+        currType = newType;                     // Set new classification
+        m_nodeClasses[currType].add(node);      // Add to class.
 
     }
 
     //! Get a specific node with id \p id.
     NodeBaseType& getNode(NodeId id)
     {
-
+        return *m_nodeMap[id].m_node;
     }
 
     //! Get all nodes classified as \p type.
-    const NodeSetType& getNodes(NodeClassification type) const { return m_nodeClasses[type]; }
+    const NodeSet& getNodes(NodeClassification type) const { return m_nodeClasses[type]; }
 
     //! Get all nodes in the group with id \p groupId.
-    const NodeSetType& getNodes(GroupId groupId) const
+    const NodeSet& getNodes(GroupId groupId) const
     {
         auto it = m_nodeGroups.find(groupId);
         EXEC_GRAPH_THROWEXCEPTION_IF(it == m_nodeGroups.end(),"Group with id: " << groupId << " is not part of tree!");
@@ -98,9 +98,11 @@ public:
     }
 
     //! Adds a node to the execution tree and classifies it as \p type.
-    virtual void addNode(NodeBasePointerType node,
+    virtual void addNode(NodePointer node,
                          NodeClassification type = NodeClassification::NormalNode)
     {
+        m_executionOrderUpToDate = false;
+
         if(node==nullptr)
         {
             EXEC_GRAPH_ASSERTMSG(false,"Nullptr added!")
@@ -115,28 +117,35 @@ public:
         // Add to group
         m_nodeClasses[type].emplace(node.get());
         // Add to storage map
-        m_nodeMap.emplace(id, std::make_pair(std::move(node),type));
+        m_nodeMap.emplace(id, {std::move(node),type} );
     }
 
     //! Assigns the node with id \p nodeId to the group with id \p groupId.
     virtual void addNodeToGroup(NodeId nodeId, GroupId groupId)
     {
+        m_executionOrderUpToDate = false;
+
         auto it = m_nodeMap.find(nodeId);
         EXEC_GRAPH_THROWEXCEPTION_IF(it == m_nodeMap.end(), "Node with id: " << nodeId << " does not exist in tree!");
         // Add node to the group
-        auto res = m_nodeGroups[groupId].emplace(it->second.first);
+        auto res = m_nodeGroups[groupId].emplace(it->m_node.get());
         EXEC_GRAPH_THROWEXCEPTION_IF(!res.second, "Node with id: " << nodeId << " does not exist in tree!");
     }
 
+    //! Constructs a Get-Link to get the data from output socket at index \p outS
+    //! of logic node \p outN at the input socket at index \p inS.
     virtual void makeGetLink(NodeId outN, SocketId outS, NodeId inN, SocketId inS)
     {
         auto outNit = m_nodeMap.find(outN);
         auto inNit  = m_nodeMap.find(inN);
         EXEC_GRAPH_THROWEXCEPTION_IF( outNit == m_nodeMap.end() || inNit == m_nodeMap.end() ,
                                      "Node: " << outN << " or " << inN << " does not exist!")
-        NodeBaseType::makeGetLink(outNit->second, outS, inNit->second, inS);
+        NodeBaseType::makeGetLink(*outNit->m_node, outS, *inNit->m_node, inS);
     }
 
+    //! Constructs a Write-Link to write the data of output socket at index \p
+    //! outS of logic node \p outN to the input socket at index \p inS of logic node \p
+    //! inN.
     virtual void makeWriteLink(unsigned int outN, unsigned int outS, unsigned int inN, unsigned int inS)
     {
         auto outNit = m_nodeMap.find(outN);
@@ -145,26 +154,26 @@ public:
         {
             EXEC_GRAPH_ERRORMSG("Node: " << outN << " or " << inN << " does not exist!")
         }
-        NodeBaseType::makeWriteLink(outNit->second, outS, inNit->second, inS);
+        NodeBaseType::makeWriteLink(*outNit->m_node, outS, *inNit->m_node, inS);
     }
 
-    /** Init group */
+    //! Reset all nodes in group with id: \p groupId.
     virtual void reset(unsigned int groupId)
     {
+        // Reset in no order!
         for (auto& n : m_nodeGroups[groupId])
         {
-            // Reset in no order!
             n->reset();
         }
     }
 
-    /** Execute group */
+    //! Execute all nodes in group with id: \p groupId.
     virtual void execute(unsigned int groupId)
     {
-        for (auto& n : m_groupExecList[groupId])
+        // Execute in determined order!
+        for (auto& nodeData : m_groupExecList[groupId])
         {
-            // Execute in determined order!
-            n->compute();
+            nodeData->m_node->compute();
         }
     }
 
@@ -176,14 +185,14 @@ public:
     //        }
     //    }
 
-    /** Execute all groups */
+    //! Execute all groups.
     virtual void executeAll()
     {
-        for (auto& g : m_groupExecList)
+        for (auto& group : m_groupExecList)
         {
-            for (auto& n : g.second)
+            for (auto* nodeData : group.second)
             {
-                n->compute();
+                nodeData->m_node->compute();
             }
         }
     }
@@ -191,67 +200,64 @@ public:
     /** Init all groups */
     virtual void resetAll()
     {
-        for (auto& g : m_groupExecList)
+        for (auto& group : m_groupExecList)
         {
-            for (auto& n : g.second)
+            for (auto* nodeData : group.second)
             {
-                n->reset();
+                nodeData->m_node->reset();
             }
         }
     }
 
     virtual void setup()
     {
-        if (m_outputNodes.size() == 0)
+        if (m_nodeClasses[NodeClassification::OutputNode].size() == 0)
         {
-            EXEC_GRAPH_ERRORMSG("No output node specified")
+            EXEC_GRAPH_ERRORMSG("No output nodes specified!")
         }
 
         // Solve execution order for every group list!
         // Each group has its own execution order!
         ExecutionOrderSolver s;
         m_groupExecList.clear();
-        unsigned int maxPrio = 0;
+        std::size_t maxPrio = 0;
         for (auto& p : m_nodeGroups)
         {
             // fill nodes into execution list
             auto& l = m_groupExecList[p.first];
             std::for_each(
-                p.second.begin(), p.second.end(), [&l](const typename NodeSetType::value_type& n) { l.push_back(n); });
+                p.second.begin(), p.second.end(), [&l](const auto* nodeData) { l.push_back(nodeData); });
 
             s.solve(l, l);
 
             maxPrio = std::max(maxPrio, l.back()->getPriority());
         }
 
-        // do some manicure: invert all priorities such that lowest is now the
+        // Do some manicure: invert all priorities such that lowest is now the
         // highest
         for (auto& p : m_groupExecList)
         {
-            for (auto& n : p.second)
+            for (auto* nodeData : p.second)
             {
-                n->setPriority(maxPrio - n->getPriority());
+                nodeData->setPriority(maxPrio - nodeData->getPriority());
             }
         }
 
         // Check if input is reachable from all outputs
         ReachNodeCheck c;
-        for (auto& o : m_outputNodes)
+        for (auto* outNode : m_nodeClasses[NodeClassification::OutputNode])
         {
             bool outputReachedInput = false;
             // each outputnode should reach at least one input, if not print warning!
-            for (auto& i : m_inputNodes)
+            for (auto* inNode : m_nodeClasses[NodeClassification::InputNode])
             {
-                if (c.check(o, i))
+                if (c.check(outNode, inNode))
                 {
                     outputReachedInput = true;
                     break;
                 }
             }
-            if (!outputReachedInput)
-            {
-                WARNINGMSG(false, "WARNING: Output id: " << o->m_id << " did not reach any input!")
-            }
+            EXEC_GRAPH_WARNINGMSG(outputReachedInput, "WARNING: Output id: " << outNode->m_id << " did not reach any input!")
         }
     }
 
@@ -263,8 +269,9 @@ public:
         {
             s << "Execution order for group id: " << g.first << std::endl;
             s << suffix << "NodeId\t|\tPriority\t|\tType" << std::endl;
-            for (auto n : g.second)
+            for (auto* nodeData : g.second)
             {
+                auto* n = nodeData->m_node;
                 s << suffix
                   << Utilities::stringFormat("%4i \t|\t %4i \t|\t %s", n->m_id, n->getPriority(), demangle::type(n))
                   << std::endl;
@@ -278,22 +285,22 @@ protected:
     class ExecutionOrderSolver
     {
     public:
-        void solve(NodeListType& c, NodeListType& orderedNodes)
+        void solve(NodeList& inputNodes, NodeList& orderedNodes)
         {
             // Solve Execution order,
             // start a depth first search recursion for all nodes in c which
             // determines an execution order by setting
             // the priority
-            for (auto& p : c)
+            for (auto* nodeData : inputNodes)
             {
                 std::unordered_set<unsigned int> nodesCurrDepth;
                 // start recursion from this node
-                solveRec(p, nodesCurrDepth);
+                solveRec(nodeData->m_node, nodesCurrDepth);
             }
 
             // Sort all nodes according to priority (asscending) (lowest is most
             // important)
-            std::sort(orderedNodes.begin(), orderedNodes.end(), [](NodeBaseType* const& a, NodeBaseType* const& b) {
+            std::sort(orderedNodes.begin(), orderedNodes.end(), [](auto* const& a, auto* const& b) {
                 return a->getPriority() < b->getPriority();
             });
         }
@@ -320,12 +327,8 @@ protected:
                     if (nodesCurrDepth.find(adjNode->m_id) != nodesCurrDepth.end())
                     {
                         EXEC_GRAPH_ERRORMSG("Your execution logic graph contains a cylce from node: " << node->m_id
-                                                                                                << " socket: "
-                                                                                                << s->m_id
-                                                                                                << " to node: "
-                                                                                                << adjNode->m_id
-                                                                                                << " socket: "
-                                                                                                << fsock->m_id);
+                                            << " socket: " << s->m_id << " to node: " << adjNode->m_id << " socket: "
+                                            << fsock->m_id);
                     }
 
                     unsigned int prioAdj = solveRec(adjNode, nodesCurrDepth);
@@ -419,14 +422,16 @@ protected:
         }
     }
 
-    NodeSetType[nNodeClasses] m_nodeClasses;         ///< the input/ouput and normal nodes
+    std::set<NodeBaseType*> m_nodeClasses[nNodeClasses]; ///< the input/ouput and normal nodes
 
-    NodeStorageType m_nodeMap;  ///< all nodes in the tree
+    NodeStorage m_nodeMap;  ///< all nodes in the tree
 
     // Additional group list
-    GroupNodeMapType m_nodeGroups;
+    GroupNodeMap m_nodeGroups;
 
-    GroupExecutionListType m_groupExecList;
+    GroupExecutionList m_groupExecList;
+
+    bool m_executionOrderUpToDate = false;
 };
 
 #endif  // ExecutionTreeInOut_hpp
