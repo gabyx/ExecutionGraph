@@ -77,27 +77,30 @@ namespace details
         struct isInstantiationOf<X, X<Y...>> : meta::bool_<true> {};
 
         template<typename TId, typename TData>
-        struct SocketDeclaration
+        struct SocketDeclarationBase
         {
-            using Id       = TId;
-            using DataType = TData;
+            using Id       = TId;    //! The integral identifier for this socket. (This is the converted enum defined by the user).
+            using DataType = TData;  //! The data type of the socket.
         };
 
         template<typename TId, typename TData, typename TIndex>
-        struct SocketDeclarationIdx : SocketDeclaration<TId,TData>
+        struct SocketDeclaration : SocketDeclarationBase<TId,TData>
         {
-            using Index    = TIndex;
+            using Index    = TIndex; //! The index corresponding to the storage of all input (or output) sockets in LogicNode.
         };
 
         //! Make the SocketDeclerationIndex list
-
-
-        template<template<typename...> class TMPSocketDecl, typename... TSocketDecl>
+        template<typename TEnum, template<typename...> class TMPSocketDecl, typename... TSocketDecl>
         struct SocketDeclarationList
         {
+        public:
+            //! The Enumaration type with which the sockets are accessed.
+            using EnumType = TEnum;
+
             //! How many socket declaration we have
             static const auto nSockets = meta::size<meta::list<TSocketDecl...>>::value;
 
+        private:
             // Filter out all not TMPSocketDecl<...> and compare length to TypeList
             template<typename T>
             using isCorrectType = isInstantiationOf<TMPSocketDecl, T>;
@@ -109,35 +112,69 @@ namespace details
 
             //! Build the type list
             template<typename PairIndexAndSocketDecl>
-            using makeSocketDecl = SocketDeclarationIdx<typename meta::at_c<PairIndexAndSocketDecl,1>::Id,
-                                                        typename meta::at_c<PairIndexAndSocketDecl,1>::DataType,
-                                                        typename meta::at_c<PairIndexAndSocketDecl,0>>;
+            using makeSocketDecl = SocketDeclaration<typename meta::at_c<PairIndexAndSocketDecl,1>::Id,
+                                                     typename meta::at_c<PairIndexAndSocketDecl,1>::DataType,
+                                                     typename meta::at_c<PairIndexAndSocketDecl,0>>;
 
-            using EnumeratedTypeList = meta::zip<
+            //! For generating the TypeList
+            using IndexedTypeList = meta::zip<
                                                 meta::list<
-                                                    meta::as_list<meta::make_index_sequence<nSockets>> ,
-                                                    meta::list<TSocketDecl...>
+                                                    meta::as_list<meta::make_index_sequence<nSockets>> , // range(0,nSockets) -> becomes the SocketDeclaration::Index
+                                                    meta::list<TSocketDecl...>                           // all SocketDeclerations
                                                 >
                                             >;
-            using TypeList = meta::transform<
-                                                EnumeratedTypeList,
-                                                meta::quote<makeSocketDecl>
-                                            >;
 
-            template<std::size_t Index>
-            using DataType = typename meta::at_c<TypeList,Index>::DataType;
+        public:
+            using TypeList = meta::transform<
+                                                IndexedTypeList,
+                                                meta::quote<makeSocketDecl>
+                                            >; // a list of all SocketDeclaration 'meta::list<SocketDeclaration,...>'
+
+        private:
+        //! Assert that the IdList has unique ids
+        template<typename T> using getId = T::Index;
+        using IdList = meta::transform<TypeList, meta::quote<getId> >;          //! A list with all ids: meta::list<SocketDeclaration::Id,...>
+        static_assert( meta::size<meta::unique<IdList>::value == nSockets ,
+                       "You have defined input (or output) enumeration with duplicated integral values"
+                       ", e.g: enum class Inputs { Value1 = 1, Value2 = 1 } (integrals should not be assigned to the enumeration!!)" );
+
+        template< typename TSocketDeclIdx, typename TIdSearch>
+        struct hasId{
+            static const bool value = TSocketDeclIdx::Id::value == TIdSearch::value;
+        };
+
+        private:
+
+            template<EnumType searchId>
+            struct GetSocketDeclImpl
+            {
+                using result1 = meta::find_if<TypeList, meta::bind_back< meta::quote<hasId>,               // return true if Id matches searchId
+                                                                        meta::size_t<enumToInt(searchId)> // searchId
+                                                                      >
+                                           >;
+                static_assert(! std::is_same<result1, meta::list<>>{} "The GetSocketDecl failed because the id was not found!");
+
+                using result2 = meta::front<result1>; //! return the first element of the result (find_if returns a meta::list)
+                using type  = TMPSocketDecl<typename result2::Id, typename result2::DataType>;
+            };
+
+        public:
+
+            //! Get the SocketDecleration (TMPSocketDecl) of socket with id `id`.
+            template<EnumType id>
+            using Get  =  GetSocketDeclImpl<id>::type;
         };
 
         template<typename... Args>
-        struct OutputSocketDeclaration : SocketDeclaration<Args...> {};
+        struct OutputSocketDeclaration : SocketDeclarationBase<Args...> {};
         template<typename... Args>
-        struct InputSocketDeclaration  : SocketDeclaration<Args...> {};
+        struct InputSocketDeclaration  : SocketDeclarationBase<Args...> {};
 
-        template<typename... TSocketDecl>
-        struct InputSocketDeclarationList : SocketDeclarationList<InputSocketDeclaration, TSocketDecl...>{};
+        template<typename InputEnum, typename... TSocketDecl>
+        struct InputSocketDeclarationList : SocketDeclarationList<InputEnum, InputSocketDeclaration, TSocketDecl...>{};
 
-        template<typename... TSocketDecl>
-        struct OutputSocketDeclarationList : SocketDeclarationList<OutputSocketDeclaration, TSocketDecl...>{};
+        template<typename OutputEnum, typename... TSocketDecl>
+        struct OutputSocketDeclarationList : SocketDeclarationList<OutputEnum, OutputSocketDeclaration, TSocketDecl...>{};
 
 } // end details
 

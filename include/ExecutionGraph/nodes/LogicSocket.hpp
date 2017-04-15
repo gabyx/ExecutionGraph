@@ -50,7 +50,7 @@ template<typename TConfig>
 class LogicSocketInputBase : public LogicSocketBase<TConfig>
 {
 public:
-    EXEC_GRAPH_TYPDEF_CONFIG(TConfig);
+    EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
 
     friend class LogicSocketOutputBase<Config>;
 
@@ -93,7 +93,7 @@ template<typename TConfig>
 class LogicSocketOutputBase : public LogicSocketBase<TConfig>
 {
 public:
-    EXEC_GRAPH_TYPDEF_CONFIG(TConfig);
+    EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
     friend class LogicSocketInputBase<Config>;
 
     template<typename... Args>
@@ -155,10 +155,11 @@ protected:
 };
 
 template<typename TData, typename TConfig>
-class LogicSocketInput : public LogicSocketInputBase<TConfig>, public LogicSocketData<TData>
+class LogicSocketInput : public LogicSocketInputBase<TConfig>,
+                         public LogicSocketData<TData>
 {
 public:
-    EXEC_GRAPH_TYPDEF_CONFIG(TConfig);
+    EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
     using DataType = TData;
 
     /** This assert fails if the type T of the LogicSocket is
@@ -175,10 +176,11 @@ public:
 };
 
 template<typename TData, typename TConfig>
-class LogicSocketOutput : public LogicSocketOutputBase<TConfig>, public LogicSocketData<TData>
+class LogicSocketOutput : public LogicSocketOutputBase<TConfig>,
+                          public LogicSocketData<TData>
 {
 public:
-    EXEC_GRAPH_TYPDEF_CONFIG(TConfig);
+    EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
 
     using DataType = TData;
     /** This assert fails if the type T of the LogicSocket is

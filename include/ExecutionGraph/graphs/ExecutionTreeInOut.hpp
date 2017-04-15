@@ -197,7 +197,7 @@ public:
         }
     }
 
-    /** Init all groups */
+    /** Reset all groups */
     virtual void resetAll()
     {
         for (auto& group : m_groupExecList)

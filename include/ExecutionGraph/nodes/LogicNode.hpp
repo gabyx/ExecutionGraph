@@ -190,13 +190,19 @@ public:
 
     //! Get input socket value \p T at index \p idx.
     template<typename T>
-    const T& getISocketValue(IndexType idx) const;
+    const T& getInVal(IndexType idx) const;
 
     //! Get the read/write socket value \p T of the output socket at index \p idx.
     template<typename T>
-    T& getOSocketValue(IndexType idx);
+    T& getOutVal(IndexType idx);
     template<typename T>
-    const T& getOSocketValue(IndexType idx) const;
+    const T& getOutVal(IndexType idx) const;
+
+    //! Get the read/write socket value from a SocketDeclaration.
+    template<typename TSocketDeclaration>
+    typename TSocketDeclaration::DataType& getOutVal();
+    template<typename TSocketDeclaration>
+    const typename TSocketDeclaration::DataType& getOutVal() const;
 
     //! Set the read/write output socket value \p T at index \p idx.
     template<typename T, typename TIn = T>
@@ -275,7 +281,7 @@ const auto& LogicNode<TConfig>::getOSocket(IndexType idx) const
 
 template<typename TConfig>
 template<typename T>
-const T& LogicNode<TConfig>::getISocketValue(IndexType idx) const
+const T& LogicNode<TConfig>::getInVal(IndexType idx) const
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_inputs.size(), "Wrong index!");
     return m_inputs[idx]->template castToType<T>()->getValue();
@@ -283,7 +289,7 @@ const T& LogicNode<TConfig>::getISocketValue(IndexType idx) const
 
 template<typename TConfig>
 template<typename T>
-T& LogicNode<TConfig>::getOSocketValue(IndexType idx)
+T& LogicNode<TConfig>::getOutVal(IndexType idx)
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
     return m_outputs[idx]->template castToType<T>()->getValue();
@@ -291,8 +297,28 @@ T& LogicNode<TConfig>::getOSocketValue(IndexType idx)
 
 template<typename TConfig>
 template<typename T>
-const T& LogicNode<TConfig>::getOSocketValue(IndexType idx) const
+const T& LogicNode<TConfig>::getOutVal(IndexType idx) const
 {
+    EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
+    return m_outputs[idx]->template castToType<T>()->getValue();
+}
+
+template<typename TConfig>
+template<typename TSocketDeclaration>
+typename TSocketDeclaration::DataType& LogicNode<TConfig>::getOutVal()
+{
+    static_assert(details::isInstantiationOf<details::OutputSocketDeclaration>::value, "TSocketDeclaration needs to be of type OutputSocketDeclaration!" );
+    auto idx = TSocketDeclaration::Index::value;
+    EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
+    return m_outputs[idx]->template castToType<T>()->getValue();
+}
+
+template<typename TConfig>
+template<typename TSocketDeclaration>
+const typename TSocketDeclaration::DataType& LogicNode<TConfig>::getOutVal() const
+{
+    static_assert(details::isInstantiationOf<details::OutputSocketDeclaration>::value, "TSocketDeclaration needs to be of type OutputSocketDeclaration!" );
+    auto idx = TSocketDeclaration::Index::value;
     EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
     return m_outputs[idx]->template castToType<T>()->getValue();
 }

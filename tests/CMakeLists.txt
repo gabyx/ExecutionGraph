@@ -85,4 +85,15 @@ if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
 endif()
 defineCompileDefs(${EXEC_NAME1})
 
+#ExecutionTree Test
+SET(EXEC_NAME2 ${PROJECT_NAME}-ExecutionTree)
+ADD_EXECUTABLE(${EXEC_NAME2}  ${PROJECT_SOURCE_DIR}/src/main_ExecutionTree.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+TARGET_LINK_LIBRARIES(${EXEC_NAME2} ExecutionGraphForTestsOnly gtest gmock_main)
+ADD_DEPENDENCIES(build_and_test ${EXEC_NAME2})
+if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
+    ADD_DEPENDENCIES(${EXEC_NAME2} ${ExecutionGraph_DEPENDING_TARGETS})
+endif()
+defineCompileDefs(${EXEC_NAME2})
+
 add_test(NAME    ${EXEC_NAME1} COMMAND ${EXEC_NAME1})
+add_test(NAME    ${EXEC_NAME2} COMMAND ${EXEC_NAME2})
