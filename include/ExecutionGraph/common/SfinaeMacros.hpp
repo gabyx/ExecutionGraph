@@ -24,5 +24,6 @@
  *   void foo(){}
  */
 #define EXEC_GRAPH_SFINAE_ENABLE_IF(__meta__) typename std::enable_if<(__meta__)>::type* = nullptr
+#define EXEC_GRAPH_SFINAE_ENABLE_IMPL_IF(__meta__) typename std::enable_if<(__meta__)>::type*
 
 #endif

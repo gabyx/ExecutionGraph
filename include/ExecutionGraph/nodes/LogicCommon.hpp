@@ -90,7 +90,10 @@ namespace details
         };
 
         //! Make the SocketDeclerationIndex list
-        template<typename TEnum, template<typename...> class TMPSocketDecl, typename... TSocketDecl>
+        template<typename TEnum,
+                 template<typename...> class TMPSocketDeclIn,
+                 template<typename...> class TMPSocketDeclOut,
+                 typename... TSocketDecl>
         struct SocketDeclarationList
         {
         public:
@@ -101,9 +104,9 @@ namespace details
             static const auto nSockets = meta::size<meta::list<TSocketDecl...>>::value;
 
         private:
-            // Filter out all not TMPSocketDecl<...> and compare length to TypeList
+            // Filter out all not TMPSocketDeclIn<...> and compare length to TypeList
             template<typename T>
-            using isCorrectType = isInstantiationOf<TMPSocketDecl, T>;
+            using isCorrectType = isInstantiationOf<TMPSocketDeclIn, T>;
             static_assert(meta::size< meta::filter<meta::list<TSocketDecl...>,
                                                    meta::quote_trait< isCorrectType >>
                                     >::value == nSockets ,
@@ -112,7 +115,7 @@ namespace details
 
             //! Build the type list
             template<typename PairIndexAndSocketDecl>
-            using makeSocketDecl = SocketDeclaration<typename meta::at_c<PairIndexAndSocketDecl,1>::Id,
+            using makeSocketDecl = TMPSocketDeclOut<typename meta::at_c<PairIndexAndSocketDecl,1>::Id,
                                                      typename meta::at_c<PairIndexAndSocketDecl,1>::DataType,
                                                      typename meta::at_c<PairIndexAndSocketDecl,0>>;
 
@@ -132,62 +135,71 @@ namespace details
 
         private:
         //! Assert that the IdList has unique ids
-        template<typename T> using getId = T::Index;
+        template<typename T> using getId = typename T::Index;
         using IdList = meta::transform<TypeList, meta::quote<getId> >;          //! A list with all ids: meta::list<SocketDeclaration::Id,...>
-        static_assert( meta::size<meta::unique<IdList>::value == nSockets ,
+        static_assert( meta::size<meta::unique<IdList>>::value == nSockets ,
                        "You have defined input (or output) enumeration with duplicated integral values"
                        ", e.g: enum class Inputs { Value1 = 1, Value2 = 1 } (integrals should not be assigned to the enumeration!!)" );
 
-        template< typename TSocketDeclIdx, typename TIdSearch>
-        struct hasId{
-            static const bool value = TSocketDeclIdx::Id::value == TIdSearch::value;
-        };
+
 
         private:
 
             template<EnumType searchId>
             struct GetSocketDeclImpl
             {
-                using result1 = meta::find_if<TypeList, meta::bind_back< meta::quote<hasId>,               // return true if Id matches searchId
-                                                                        meta::size_t<enumToInt(searchId)> // searchId
-                                                                      >
-                                           >;
-                static_assert(! std::is_same<result1, meta::list<>>{} "The GetSocketDecl failed because the id was not found!");
+                template< typename TSocketDeclIdx, typename TIdSearch>
+                struct hasId{
+                    using type = meta::bool_<TSocketDeclIdx::Id::value == TIdSearch::value>;
+                };
+                using result1 = meta::find_if<TypeList, meta::bind_back< meta::quote_trait<hasId>,               // return true if Id matches searchId
+                                                                         meta::size_t<enumToInt(searchId)> // searchId
+                                                                       >
+                                             >;
+                static_assert(! std::is_same<result1, meta::list<>>::value, "The GetSocketDecl failed because the searchId was not found!");
 
                 using result2 = meta::front<result1>; //! return the first element of the result (find_if returns a meta::list)
-                using type  = TMPSocketDecl<typename result2::Id, typename result2::DataType>;
+                using type  = result2 ; //TMPSocketDeclOut<typename result2::Id, typename result2::DataType>;
             };
 
         public:
 
-            //! Get the SocketDecleration (TMPSocketDecl) of socket with id `id`.
+            //! Get the SocketDecleration (TMPSocketDeclOut) of socket with id `id`.
             template<EnumType id>
-            using Get  =  GetSocketDeclImpl<id>::type;
+            using Get = typename GetSocketDeclImpl<id>::type;
         };
 
+        //! The user only defines Sockets with these templates.
         template<typename... Args>
-        struct OutputSocketDeclaration : SocketDeclarationBase<Args...> {};
+        struct OutputSocketDeclarationBase : SocketDeclarationBase<Args...> {};
         template<typename... Args>
-        struct InputSocketDeclaration  : SocketDeclarationBase<Args...> {};
+        struct InputSocketDeclarationBase  : SocketDeclarationBase<Args...> {};
+
+        //! These socket definitions are stored inside and returned from SocketDeclarationList
+        template<typename... Args>
+        struct OutputSocketDeclaration : SocketDeclaration<Args...> {};
+        template<typename... Args>
+        struct InputSocketDeclaration  : SocketDeclaration<Args...> {};
+
 
         template<typename InputEnum, typename... TSocketDecl>
-        struct InputSocketDeclarationList : SocketDeclarationList<InputEnum, InputSocketDeclaration, TSocketDecl...>{};
+        struct InputSocketDeclarationList : SocketDeclarationList<InputEnum, InputSocketDeclarationBase, InputSocketDeclaration, TSocketDecl...>{};
 
         template<typename OutputEnum, typename... TSocketDecl>
-        struct OutputSocketDeclarationList : SocketDeclarationList<OutputEnum, OutputSocketDeclaration, TSocketDecl...>{};
+        struct OutputSocketDeclarationList : SocketDeclarationList<OutputEnum, OutputSocketDeclarationBase, OutputSocketDeclaration, TSocketDecl...>{};
 
 } // end details
 
 //! Some handy macro to use when inheriting from LogicNode.
 #define EXEC_GRAPH_DEFINE_SOCKET_TRAITS(InputEnum,OutputEnum)                                           \
     template<InputEnum id,  typename TData>                                                        \
-    using InSocketDecl = executionGraph::details::InputSocketDeclaration< meta::size_t<enumToInt(id)>,TData>;                 \
+    using InSocketDecl = executionGraph::details::InputSocketDeclarationBase< meta::size_t<enumToInt(id)>,TData>;                 \
     template<OutputEnum id,  typename TData>                                                        \
-    using OutSocketDecl = executionGraph::details::OutputSocketDeclaration< meta::size_t<enumToInt(id)>,TData>; \
+    using OutSocketDecl = executionGraph::details::OutputSocketDeclarationBase< meta::size_t<enumToInt(id)>,TData>; \
     template<typename... TSockets >                                                                     \
-    using InSocketDeclList = executionGraph::details::InputSocketDeclarationList<TSockets...>;   \
+    using InSocketDeclList = executionGraph::details::InputSocketDeclarationList<InputEnum,TSockets...>;   \
     template<typename... TSockets >                                                                     \
-    using OutSocketDeclList = executionGraph::details::OutputSocketDeclarationList<TSockets...>;
+    using OutSocketDeclList = executionGraph::details::OutputSocketDeclarationList<OutputEnum,TSockets...>;
 
 }  // namespace
 

@@ -128,17 +128,13 @@ public:
             >
     void addSockets(std::tuple<Args...>&& defaultValues)
     {
-        auto add = [&](auto p)
+        auto add = [&](auto socketDeclaration)
         {
-            using PairIndexAndType = decltype(p);
-
-            static constexpr auto idx = meta::at_c<PairIndexAndType,0>::value;
-            using SocketType          = meta::at_c<PairIndexAndType,1>;
-
-            addISock<typename SocketType::DataType>(std::move(std::get<0>(defaultValues)));
+            using SocketDeclaration = decltype(socketDeclaration);
+            addISock<typename SocketDeclaration::DataType>(std::move(std::get<SocketDeclaration::Index::value>(defaultValues)));
         };
 
-        meta::for_each( typename SocketDeclList::EnumeratedTypeList{} , add);
+        meta::for_each( typename SocketDeclList::TypeList{} , add);
     }
 
     //! Add all output sockets defined in the type list \p SocketDeclList where each socket has
@@ -149,18 +145,13 @@ public:
             >
     void addSockets(std::tuple<Args...>&& defaultValues)
     {
-
-        auto add = [&](auto p)
+        auto add = [&](auto socketDeclaration)
         {
-            using PairIndexAndType = decltype(p);
-
-            static constexpr auto idx = meta::at_c<PairIndexAndType,0>::value;
-            using SocketType          = meta::at_c<PairIndexAndType,1>;
-
-            addOSock<typename SocketType::DataType>(std::move(std::get<0>(defaultValues)));
+            using SocketDeclaration = decltype(socketDeclaration);
+            addOSock<typename SocketDeclaration::DataType>(std::move(std::get<SocketDeclaration::Index::value>(defaultValues)));
         };
 
-        meta::for_each( typename SocketDeclList::EnumeratedTypeList{} , add);
+        meta::for_each( typename SocketDeclList::TypeList{} , add);
     }
 
     //! Get the input socket at index \p idx.
@@ -176,7 +167,7 @@ public:
         return *m_outputs[idx];
     }
 
-    //! Get the input socket of type \p T at index \p idx .
+    //! Get the input socket of type \p T at index \p idx.
     template<typename T>
     auto& getISocket(IndexType idx);
     template<typename T>
@@ -192,21 +183,22 @@ public:
     template<typename T>
     const T& getInVal(IndexType idx) const;
 
-    //! Get the read/write socket value \p T of the output socket at index \p idx.
+    //! Get the read/write output socket value \p T of the output socket at index \p idx.
     template<typename T>
     T& getOutVal(IndexType idx);
     template<typename T>
     const T& getOutVal(IndexType idx) const;
 
-    //! Get the read/write socket value from a SocketDeclaration.
-    template<typename TSocketDeclaration>
-    typename TSocketDeclaration::DataType& getOutVal();
-    template<typename TSocketDeclaration>
-    const typename TSocketDeclaration::DataType& getOutVal() const;
+    //! Get the output socket value from a SocketDeclaration `OutputSocketDeclaration`.
+    template<typename TSocketDeclaration, EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::OutputSocketDeclaration,TSocketDeclaration>::value)) >
+    typename TSocketDeclaration::DataType& getValue();
 
-    //! Set the read/write output socket value \p T at index \p idx.
-    template<typename T, typename TIn = T>
-    void setOSocketValue(IndexType idx, TIn&& data);
+    //! Get the output socket value from a SocketDeclaration `OutputSocketDeclaration`.
+    template<typename TSocketDeclaration, EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::OutputSocketDeclaration,TSocketDeclaration>::value)) >
+    const typename TSocketDeclaration::DataType& getValue() const;
+    //! Get the input socket value from a SocketDeclaration `InputSocketDeclaration`.
+    template<typename TSocketDeclaration, EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::InputSocketDeclaration,TSocketDeclaration>::value)) >
+    const typename TSocketDeclaration::DataType& getValue() const;
 
     //! Writes the value of the output socket at index \p idx to all inputs
     //! which are accesible by write links.
@@ -304,32 +296,39 @@ const T& LogicNode<TConfig>::getOutVal(IndexType idx) const
 }
 
 template<typename TConfig>
-template<typename TSocketDeclaration>
-typename TSocketDeclaration::DataType& LogicNode<TConfig>::getOutVal()
+template<typename TSocketDeclaration, EXEC_GRAPH_SFINAE_ENABLE_IMPL_IF((details::isInstantiationOf<details::OutputSocketDeclaration,TSocketDeclaration>::value))>
+typename TSocketDeclaration::DataType& LogicNode<TConfig>::getValue()
 {
-    static_assert(details::isInstantiationOf<details::OutputSocketDeclaration>::value, "TSocketDeclaration needs to be of type OutputSocketDeclaration!" );
     auto idx = TSocketDeclaration::Index::value;
     EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
-    return m_outputs[idx]->template castToType<T>()->getValue();
+    return m_outputs[idx]->template castToType<typename TSocketDeclaration::DataType>()->getValue();
 }
 
 template<typename TConfig>
-template<typename TSocketDeclaration>
-const typename TSocketDeclaration::DataType& LogicNode<TConfig>::getOutVal() const
+template<typename TSocketDeclaration, EXEC_GRAPH_SFINAE_ENABLE_IMPL_IF((details::isInstantiationOf<details::InputSocketDeclaration,TSocketDeclaration>::value))>
+const typename TSocketDeclaration::DataType& LogicNode<TConfig>::getValue() const
 {
-    static_assert(details::isInstantiationOf<details::OutputSocketDeclaration>::value, "TSocketDeclaration needs to be of type OutputSocketDeclaration!" );
     auto idx = TSocketDeclaration::Index::value;
-    EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
-    return m_outputs[idx]->template castToType<T>()->getValue();
+    EXEC_GRAPH_ASSERTMSG(idx < m_inputs.size(), "Wrong index!");
+    return m_inputs[idx]->template castToType<typename TSocketDeclaration::DataType>()->getValue();
 }
 
 template<typename TConfig>
-template<typename T, typename TIn>
-void LogicNode<TConfig>::setOSocketValue(IndexType idx, TIn&& data)
+template<typename TSocketDeclaration, EXEC_GRAPH_SFINAE_ENABLE_IMPL_IF((details::isInstantiationOf<details::OutputSocketDeclaration,TSocketDeclaration>::value))>
+const typename TSocketDeclaration::DataType& LogicNode<TConfig>::getValue() const
 {
+    auto idx = TSocketDeclaration::Index::value;
     EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
-    m_outputs[idx]->template castToType<T>()->setValue(std::forward<TIn>(data));
+    return m_outputs[idx]->template castToType<typename TSocketDeclaration::DataType>()->getValue();
 }
+
+//template<typename TConfig>
+//template<typename T, typename TIn>
+//void LogicNode<TConfig>::setOSocketValue(IndexType idx, TIn&& data)
+//{
+//    EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
+//    m_outputs[idx]->template castToType<T>()->setValue(std::forward<TIn>(data));
+//}
 
 template<typename TConfig>
 template<typename T>
@@ -363,6 +362,20 @@ void LogicNode<TConfig>::addWriteLink(LogicNode& outN, unsigned int outS, LogicN
 
     outN.getOSocket(outS).addWriteLink(inN.getISocket(inS));
 }
+
+
+//! Some handy macros to redefine getters to shortcut the following ugly syntax inside a derivation of LogicNode:
+//! Accessing the value in socket Result1 : this->template getValue<typename OutSockets::template Get<Result1>>();
+#define EXEC_GRAPH_DEFINE_VALUE_GETTERS(InputEnum, InSocketDeclList, OutputEnum, OutSocketDeclList)                         \
+    template<InputEnum S>                                                                                                   \
+    inline auto& getInVal() const{ return this->template getValue<typename InSocketDeclList::template Get<S>>(); }          \
+                                                                                                                            \
+    template<OutputEnum S>                                                                                                  \
+    inline auto& getOutVal(){ return this->template getValue<typename OutSocketDeclList::template Get<S>>(); }              \
+                                                                                                                            \
+    template<OutputEnum S>                                                                                                  \
+    inline auto& getInVal() const{ return this->template getValue<typename OutSocketDeclList::template Get<S>>(); }
+
 
 
 }  // end ExecutionGraph

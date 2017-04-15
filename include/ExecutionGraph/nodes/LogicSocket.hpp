@@ -102,7 +102,7 @@ public:
     {}
 
     //! Cast to a logic socket of type \p SocketOutputType<T>*.
-    //! The cast fails at runtime if the data type \p T does not match!
+    //! The cast fails at runtime (if NDEBUG defined) if the data type \p T does not match!
     template<typename T>
     inline auto* castToType() const
     {
@@ -111,7 +111,7 @@ public:
                                       << LogicTypes::getTypeName(meta::find_index<SocketTypes, T>) " of logic node '"
                                       << this->m_name
                                       << "' do not match!");
-        return static_cast<SocketOutputType<T>*>(this);
+        return static_cast<SocketOutputType<T> const*>(this);
     }
 
     //! Non-const overload.
