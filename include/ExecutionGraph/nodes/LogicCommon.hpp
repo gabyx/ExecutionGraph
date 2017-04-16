@@ -33,23 +33,27 @@ class LogicSocketInput;
 template<typename T, typename TConfig>
 class LogicSocketOutput;
 
-using NodeId   = unsigned int;
-using SocketId = NodeId;
-using IndexType    = unsigned int;
+using IndexType = uint64_t;
 
+using NodeId      = uint64_t;
+using SocketIndex = IndexType;
+
+
+//! The general config which is used to build nodes and execution trees.
+//! It defaults to the standart socket types in SocketDefaultTypes
 template<typename TSocketTypes = SocketDefaultTypes>
 struct GeneralConfig
 {
     using SocketTypes  = TSocketTypes;
     using NodeBaseType = LogicNode<GeneralConfig>;
 
-    using SocketInputBaseType  = LogicSocketInputBase<GeneralConfig>;
-    using SocketOutputBaseType = LogicSocketOutputBase<GeneralConfig>;
+    using SocketInputBaseType  = LogicSocketInputBase<GeneralConfig>;  //! This class is used as the base for input sockets.
+    using SocketOutputBaseType = LogicSocketOutputBase<GeneralConfig>; //! This class is used as the base for output sockets.
 
     template<typename T>
-    using SocketInputType = LogicSocketInput<T, GeneralConfig>;
+    using SocketInputType = LogicSocketInput<T, GeneralConfig>;   //! This is the type-templated (T needs to be in TSocketTypes) class for input sockets.
     template<typename T>
-    using SocketOutputType = LogicSocketOutput<T, GeneralConfig>;
+    using SocketOutputType = LogicSocketOutput<T, GeneralConfig>; //! This is the type-templated (T needs to be in TSocketTypes) class for output sockets.
 };
 
 #define EXEC_GRAPH_TYPEDEF_CONFIG(__CONFIG__)                              \
@@ -65,17 +69,20 @@ struct GeneralConfig
 
 
 
-
-
-//! Some type traits for input/output socket definitions in derived classes from LogicNode
+//! Some type traits for input/output socket definitions in derived classes from GeneralConfig::NodeBaseType
+//! These metaprogramming tricks here, allow to smoothly define input/output sockets.
+//! See the examples.
 namespace details
 {
+        //! Trait which tests if T is a template X.
         template <template <typename...> class X, typename T>
         struct isInstantiationOf : meta::bool_<false> {};
 
+        //! Trait which tests if T is a template X.
         template <template <typename...> class X, typename... Y>
         struct isInstantiationOf<X, X<Y...>> : meta::bool_<true> {};
 
+        //! The basis class for every socket declaration.
         template<typename TId, typename TData>
         struct SocketDeclarationBase
         {
@@ -89,7 +96,8 @@ namespace details
             using Index    = TIndex; //! The index corresponding to the storage of all input (or output) sockets in LogicNode.
         };
 
-        //! Make the SocketDeclerationIndex list
+        //! The actual socket declaration list, the order of the socket declarations in this list
+        //! corresponds to the sequence in which they are stored in LogicNode<Config>.
         template<typename TEnum,
                  template<typename...> class TMPSocketDeclIn,
                  template<typename...> class TMPSocketDeclOut,

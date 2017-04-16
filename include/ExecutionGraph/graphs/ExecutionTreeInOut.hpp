@@ -11,13 +11,19 @@
 #define ExecutionGraph_graphs_ExecutionTreeInOut_hpp
 
 #include <algorithm>
+#include <deque>
 #include <unordered_set>
 
 #include "ExecutionGraph/common/Asserts.hpp"
 #include "ExecutionGraph/common/DemangleTypes.hpp"
-
+#include "ExecutionGraph/common/StringFormat.hpp"
+#include "ExecutionGraph/nodes/LogicCommon.hpp"
 #include "ExecutionGraph/nodes/LogicNode.hpp"
 #include "ExecutionGraph/nodes/LogicSocket.hpp"
+
+namespace executionGraph
+{
+
 
 template<typename TConfig>
 class ExecutionTreeInOut
@@ -25,7 +31,7 @@ class ExecutionTreeInOut
 public:
     EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
 
-    enum class NodeClassification : unsigned char {
+    enum NodeClassification : unsigned char {
         NormalNode = 0,
         InputNode  = 1,
         OutputNode = 2
@@ -37,12 +43,8 @@ private:
     static const std::underlying_type_t<NodeClassification> nNodeClasses = 3;
 
     using NodePointer = std::unique_ptr<NodeBaseType>;
-    struct NodeData{
-
-        std::size_t getPriority(){ return m_priority;}
-        void setPriority(std::size_t p){ m_priority = p;}
-
-        private:
+    struct NodeData
+    {
         NodePointer m_node          = nullptr;
         NodeClassification  m_class = NodeClassification::NormalNode;
         std::size_t m_priority      = std::numeric_limits<std::size_t>::max();
@@ -66,13 +68,13 @@ public:
         auto it = m_nodeMap.find(id);
         EXEC_GRAPH_THROWEXCEPTION_IF(it == m_nodeMap.end(), "Node with id: " << id << " does not exist in tree!");
 
-        NodeClassification& currType = it->second.second;
+        NodeClassification& currType = it->second.m_class;
         if(currType == newType)
         {
             return;
         }
 
-        NodeBaseType* node = it->second.first;
+        NodeBaseType* node = it->second.m_node.get();
 
         m_nodeClasses[currType].remove(node);   // Remove from class.
         currType = newType;                     // Set new classification
@@ -117,7 +119,7 @@ public:
         // Add to group
         m_nodeClasses[type].emplace(node.get());
         // Add to storage map
-        m_nodeMap.emplace(id, {std::move(node),type} );
+        m_nodeMap.emplace(id, NodeData{std::move(node),type} );
     }
 
     //! Assigns the node with id \p nodeId to the group with id \p groupId.
@@ -134,7 +136,7 @@ public:
 
     //! Constructs a Get-Link to get the data from output socket at index \p outS
     //! of logic node \p outN at the input socket at index \p inS.
-    virtual void makeGetLink(NodeId outN, SocketId outS, NodeId inN, SocketId inS)
+    virtual void makeGetLink(NodeId outN, SocketIndex outS, NodeId inN, SocketIndex inS)
     {
         auto outNit = m_nodeMap.find(outN);
         auto inNit  = m_nodeMap.find(inN);
@@ -146,13 +148,13 @@ public:
     //! Constructs a Write-Link to write the data of output socket at index \p
     //! outS of logic node \p outN to the input socket at index \p inS of logic node \p
     //! inN.
-    virtual void makeWriteLink(unsigned int outN, unsigned int outS, unsigned int inN, unsigned int inS)
+    virtual void makeWriteLink(NodeId outN, SocketIndex outS, NodeId inN, SocketIndex inS)
     {
         auto outNit = m_nodeMap.find(outN);
         auto inNit  = m_nodeMap.find(inN);
         if (outNit == m_nodeMap.end() || inNit == m_nodeMap.end())
         {
-            EXEC_GRAPH_ERRORMSG("Node: " << outN << " or " << inN << " does not exist!")
+            EXEC_GRAPH_THROWEXCEPTION("Node: " << outN << " or " << inN << " does not exist!");
         }
         NodeBaseType::makeWriteLink(*outNit->m_node, outS, *inNit->m_node, inS);
     }
@@ -213,7 +215,7 @@ public:
     {
         if (m_nodeClasses[NodeClassification::OutputNode].size() == 0)
         {
-            EXEC_GRAPH_ERRORMSG("No output nodes specified!")
+            EXEC_GRAPH_THROWEXCEPTION("No output nodes specified!");
         }
 
         // Solve execution order for every group list!
@@ -226,11 +228,12 @@ public:
             // fill nodes into execution list
             auto& l = m_groupExecList[p.first];
             std::for_each(
-                p.second.begin(), p.second.end(), [&l](const auto* nodeData) { l.push_back(nodeData); });
+                p.second.begin(), p.second.end(), [&l](const auto* nodeData) { l.push_back(nodeData); }
+            );
 
             s.solve(l, l);
 
-            maxPrio = std::max(maxPrio, l.back()->getPriority());
+            maxPrio = std::max(maxPrio, l.back()->m_priority);
         }
 
         // Do some manicure: invert all priorities such that lowest is now the
@@ -239,7 +242,7 @@ public:
         {
             for (auto* nodeData : p.second)
             {
-                nodeData->setPriority(maxPrio - nodeData->getPriority());
+                nodeData->m_priority = maxPrio - nodeData->m_priority;
             }
         }
 
@@ -257,7 +260,7 @@ public:
                     break;
                 }
             }
-            EXEC_GRAPH_WARNINGMSG(outputReachedInput, "WARNING: Output id: " << outNode->m_id << " did not reach any input!")
+            EXEC_GRAPH_WARNINGMSG(outputReachedInput, "WARNING: Output id: " << outNode->getId() << " did not reach any input!")
         }
     }
 
@@ -273,7 +276,7 @@ public:
             {
                 auto* n = nodeData->m_node;
                 s << suffix
-                  << Utilities::stringFormat("%4i \t|\t %4i \t|\t %s", n->m_id, n->getPriority(), demangle::type(n))
+                  << stringFormat("%4i \t|\t %4i \t|\t %s", n->getId(), n->m_priority, demangle(n))
                   << std::endl;
             }
             s << suffix << "==============================" << std::endl;
@@ -301,7 +304,7 @@ protected:
             // Sort all nodes according to priority (asscending) (lowest is most
             // important)
             std::sort(orderedNodes.begin(), orderedNodes.end(), [](auto* const& a, auto* const& b) {
-                return a->getPriority() < b->getPriority();
+                return a->m_priority < b->m_priority;
             });
         }
 
@@ -313,7 +316,7 @@ protected:
 
         unsigned int solveRec(NodeBaseType* node, std::unordered_set<unsigned int>& nodesCurrDepth)
         {
-            nodesCurrDepth.insert(node->m_id);
+            nodesCurrDepth.insert(node->getId());
 
             // visit all input sockets and their node!
             auto& inSockets = node->getInputs();
@@ -326,21 +329,21 @@ protected:
                     auto* adjNode = fsock->getParent();
                     if (nodesCurrDepth.find(adjNode->m_id) != nodesCurrDepth.end())
                     {
-                        EXEC_GRAPH_ERRORMSG("Your execution logic graph contains a cylce from node: " << node->m_id
-                                            << " socket: " << s->m_id << " to node: " << adjNode->m_id << " socket: "
-                                            << fsock->m_id);
+                        EXEC_GRAPH_ERRORMSG("Your execution logic graph contains a cylce from node: " << node->getId()
+                                            << " socket: " << s->getIndex() << " to node: " << adjNode->getId() << " socket: "
+                                            << fsock->getIndex());
                     }
 
                     unsigned int prioAdj = solveRec(adjNode, nodesCurrDepth);
 
                     // Set the current node to the priority of the below tree +1
-                    node->setPriority(std::max(prioAdj + 1, node->getPriority()));
+                    node->m_priority = std::max(prioAdj + 1, node->m_priority);
                 }
             }
 
             nodesCurrDepth.erase(node->m_id);
 
-            return node->getPriority();
+            return node->m_priority;
         }
         bool m_inputReachable  = false;
         NodeBaseType* m_reachNode = nullptr;
@@ -409,19 +412,6 @@ protected:
         NodeBaseType* m_start = nullptr;
     };
 
-
-    void setupNode(NodeBaseType& node, NodeClassification type)
-    {
-        if (type == NodeClassification::InputNode)
-        {
-            m_inputNodes.emplace(&node);
-        }
-        else if (type == NodeClassification::OutputNode)
-        {
-            m_outputNodes.emplace(&node);
-        }
-    }
-
     std::set<NodeBaseType*> m_nodeClasses[nNodeClasses]; ///< the input/ouput and normal nodes
 
     NodeStorage m_nodeMap;  ///< all nodes in the tree
@@ -433,5 +423,7 @@ protected:
 
     bool m_executionOrderUpToDate = false;
 };
+
+}
 
 #endif  // ExecutionTreeInOut_hpp

@@ -100,7 +100,7 @@ public:
     template<typename TData, typename T>
     void addISock(T&& defaultValue, const std::string& name = "noname")
     {
-        SocketId id  = m_inputs.size();
+        SocketIndex id  = m_inputs.size();
 
         auto p = SocketPointer<SocketInputBaseType>(
             new SocketInputType<TData>(std::forward<T>(defaultValue), id, *this, name),
@@ -112,7 +112,7 @@ public:
     template<typename TData, typename T>
     void addOSock(T&& defaultValue, const std::string& name = "noname")
     {
-        SocketId id = m_outputs.size();
+        SocketIndex id = m_outputs.size();
 
         auto p = SocketPointer<SocketOutputBaseType>(
             new SocketOutputType<TData>(std::forward<T>(defaultValue), id, *this, name),
@@ -155,13 +155,13 @@ public:
     }
 
     //! Get the input socket at index \p idx.
-    SocketInputBaseType& getISocket(IndexType idx)
+    SocketInputBaseType& getISocket(SocketIndex idx)
     {
         EXEC_GRAPH_ASSERTMSG(idx < m_inputs.size(), "Wrong index!");
         return *m_inputs[idx];
     }
     //! Get the output socket at index \p index.
-    SocketOutputBaseType& getOSocket(IndexType idx)
+    SocketOutputBaseType& getOSocket(SocketIndex idx)
     {
         EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
         return *m_outputs[idx];
@@ -169,25 +169,25 @@ public:
 
     //! Get the input socket of type \p T at index \p idx.
     template<typename T>
-    auto& getISocket(IndexType idx);
+    auto& getISocket(SocketIndex idx);
     template<typename T>
-    const auto& getISocket(IndexType idx) const;
+    const auto& getISocket(SocketIndex idx) const;
 
     //! Get the output socket of type \p T at index \p idx.
     template<typename T>
-    auto& getOSocket(IndexType idx);
+    auto& getOSocket(SocketIndex idx);
     template<typename T>
-    const auto& getOSocket(IndexType idx) const;
+    const auto& getOSocket(SocketIndex idx) const;
 
     //! Get input socket value \p T at index \p idx.
     template<typename T>
-    const T& getInVal(IndexType idx) const;
+    const T& getInVal(SocketIndex idx) const;
 
     //! Get the read/write output socket value \p T of the output socket at index \p idx.
     template<typename T>
-    T& getOutVal(IndexType idx);
+    T& getOutVal(SocketIndex idx);
     template<typename T>
-    const T& getOutVal(IndexType idx) const;
+    const T& getOutVal(SocketIndex idx) const;
 
     //! Get the output socket value from a SocketDeclaration `OutputSocketDeclaration`.
     template<typename TSocketDeclaration, EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::OutputSocketDeclaration,TSocketDeclaration>::value)) >
@@ -203,17 +203,17 @@ public:
     //! Writes the value of the output socket at index \p idx to all inputs
     //! which are accesible by write links.
     template<typename T>
-    void distributeOSocketValue(IndexType idx);
+    void distributeOSocketValue(SocketIndex idx);
 
     //! Constructs a Get-Link to get the data from output socket at index \p outS
     //! of logic node \p outN at the input socket at index \p inS of logic node \p
     //! inN.
-    static void setGetLink(LogicNode& outN, IndexType outS, LogicNode& inN, IndexType inS);
+    static void setGetLink(LogicNode& outN, SocketIndex outS, LogicNode& inN, SocketIndex inS);
 
 
     //! Constructs a Get-Link to get the data from output socket at index \p outS
     //! of logic node \p outN at the input socket at index \p inS.
-    inline void setGetLink(LogicNode& outN, IndexType outS, IndexType inS)
+    inline void setGetLink(LogicNode& outN, SocketIndex outS, SocketIndex inS)
     {
       setGetLink(outN, outS, *this, inS);
     }
@@ -221,12 +221,12 @@ public:
     //! Constructs a Write-Link to write the data of output socket at index \p
     //! outS of logic node \p outN to the input socket at index \p inS of logic node \p
     //! inN.
-    static void addWriteLink(LogicNode& outN, IndexType outS, LogicNode& inN, IndexType inS);
+    static void addWriteLink(LogicNode& outN, SocketIndex outS, LogicNode& inN, SocketIndex inS);
 
     //! Constructs a Write-Link to write the data of output socket at index \p
     //! outS
     //! of logic node \p outN to the input socket at index \p inS.
-    inline void addWriteLink(IndexType outS, LogicNode& inN, IndexType inS)
+    inline void addWriteLink(IndexType outS, LogicNode& inN, SocketIndex inS)
     {
         addWriteLink(*this, outS, inN, inS);
     }
@@ -241,7 +241,7 @@ protected:
 
 template<typename TConfig>
 template<typename T>
-auto& LogicNode<TConfig>::getISocket(IndexType idx)
+auto& LogicNode<TConfig>::getISocket(SocketIndex idx)
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_inputs.size(), "Wrong index!");
     return *m_inputs[idx]->template castToType<T>();
@@ -249,7 +249,7 @@ auto& LogicNode<TConfig>::getISocket(IndexType idx)
 
 template<typename TConfig>
 template<typename T>
-const auto& LogicNode<TConfig>::getISocket(IndexType idx) const
+const auto& LogicNode<TConfig>::getISocket(SocketIndex idx) const
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_inputs.size(), "Wrong index!");
     return *m_inputs[idx]->template castToType<T>();
@@ -257,7 +257,7 @@ const auto& LogicNode<TConfig>::getISocket(IndexType idx) const
 
 template<typename TConfig>
 template<typename T>
-auto& LogicNode<TConfig>::getOSocket(IndexType idx)
+auto& LogicNode<TConfig>::getOSocket(SocketIndex idx)
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
     return *m_outputs[idx]->template castToType<T>();
@@ -265,7 +265,7 @@ auto& LogicNode<TConfig>::getOSocket(IndexType idx)
 
 template<typename TConfig>
 template<typename T>
-const auto& LogicNode<TConfig>::getOSocket(IndexType idx) const
+const auto& LogicNode<TConfig>::getOSocket(SocketIndex idx) const
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
     return *m_outputs[idx]->template castToType<T>();
@@ -273,7 +273,7 @@ const auto& LogicNode<TConfig>::getOSocket(IndexType idx) const
 
 template<typename TConfig>
 template<typename T>
-const T& LogicNode<TConfig>::getInVal(IndexType idx) const
+const T& LogicNode<TConfig>::getInVal(SocketIndex idx) const
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_inputs.size(), "Wrong index!");
     return m_inputs[idx]->template castToType<T>()->getValue();
@@ -281,7 +281,7 @@ const T& LogicNode<TConfig>::getInVal(IndexType idx) const
 
 template<typename TConfig>
 template<typename T>
-T& LogicNode<TConfig>::getOutVal(IndexType idx)
+T& LogicNode<TConfig>::getOutVal(SocketIndex idx)
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
     return m_outputs[idx]->template castToType<T>()->getValue();
@@ -289,7 +289,7 @@ T& LogicNode<TConfig>::getOutVal(IndexType idx)
 
 template<typename TConfig>
 template<typename T>
-const T& LogicNode<TConfig>::getOutVal(IndexType idx) const
+const T& LogicNode<TConfig>::getOutVal(SocketIndex idx) const
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
     return m_outputs[idx]->template castToType<T>()->getValue();
@@ -332,14 +332,14 @@ const typename TSocketDeclaration::DataType& LogicNode<TConfig>::getValue() cons
 
 template<typename TConfig>
 template<typename T>
-void LogicNode<TConfig>::distributeOSocketValue(IndexType idx)
+void LogicNode<TConfig>::distributeOSocketValue(SocketIndex idx)
 {
     EXEC_GRAPH_ASSERTMSG(idx < m_outputs.size(), "Wrong index!");
     m_outputs[idx]->template castToType<T>()->distributeValue();
 }
 
 template<typename TConfig>
-void LogicNode<TConfig>::setGetLink(LogicNode& outN, unsigned int outS, LogicNode& inN, unsigned int inS)
+void LogicNode<TConfig>::setGetLink(LogicNode& outN, SocketIndex outS, LogicNode& inN, SocketIndex inS)
 {
     EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(
         outS >= outN.getOutputs().size() || inS >= inN.getInputs().size(),
@@ -351,7 +351,7 @@ void LogicNode<TConfig>::setGetLink(LogicNode& outN, unsigned int outS, LogicNod
 }
 
 template<typename TConfig>
-void LogicNode<TConfig>::addWriteLink(LogicNode& outN, unsigned int outS, LogicNode& inN, unsigned int inS)
+void LogicNode<TConfig>::addWriteLink(LogicNode& outN, SocketIndex outS, LogicNode& inN, SocketIndex inS)
 {
     EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(
         outS >= outN.getOutputs().size() || inS >= inN.getInputs().size(),

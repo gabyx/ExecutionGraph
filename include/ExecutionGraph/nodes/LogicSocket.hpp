@@ -27,12 +27,13 @@ class LogicSocketBase
 public:
     EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
 
-    LogicSocketBase(unsigned int type, SocketId id, NodeBaseType& parent, const std::string& name = "noname")
-        : m_type(type), m_id(id), m_parent(parent),  m_name(name)
+    LogicSocketBase(unsigned int type,
+    SocketIndex index, NodeBaseType& parent, const std::string& name = "noname")
+        : m_type(type), m_index(index), m_parent(parent),  m_name(name)
     {}
 
     unsigned int getType() const { return m_type; }
-    SocketId getId() const { return m_id; }
+    SocketIndex getIndex() const { return m_index; }
     std::string getName() const { return m_name; }
 
     const NodeBaseType& getParent() const { return m_parent; }
@@ -40,7 +41,7 @@ public:
 
 protected:
     const unsigned int m_type;     //!< The index in the mpl sequence, which type this is!
-    const SocketId m_id;       //!< The unique id among all sockets of a LogicNode.
+    const SocketIndex m_index;     //!< The index of the slot at which this socket is installed in a LogicNode.
     NodeBaseType&  m_parent;       //!< The parent logic node of of this socket.
     const std::string m_name;      //!< The name of the socket.
 };

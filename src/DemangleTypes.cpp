@@ -15,8 +15,9 @@
 #include <memory>
 #endif
 
-namespace demangle
+namespace executionGraph
 {
+
 namespace details
 {
 #if defined (__GNUG__) || defined (__clang__)
@@ -32,12 +33,12 @@ namespace details
         return name;
     }
 #endif
-};
+}
 
 template<typename T>
-std::string type(T&& t)
+std::string demangle(T&& t)
 {
     return details::demangle(typeid(t).name());
 }
 
-};
+} // executionGraph
