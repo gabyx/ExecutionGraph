@@ -33,8 +33,6 @@ class NodeConnectionException : public Exception
 
 }
 
-#define EMPTY
-
 #define EXEC_GRAPH_THROWEXCEPTION_TYPE(message, type)                                                 \
     {                                                                                                 \
         std::stringstream ___s___;                                                                    \
@@ -50,7 +48,5 @@ class NodeConnectionException : public Exception
 
 #define EXEC_GRAPH_THROWEXCEPTION(message) EXEC_GRAPH_THROWEXCEPTION_TYPE(message,Exception)
 #define EXEC_GRAPH_THROWEXCEPTION_IF(condition, message) EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(condition,message,Exception)
-
-#undef EMPTY
 
 #endif

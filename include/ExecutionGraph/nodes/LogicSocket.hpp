@@ -14,7 +14,6 @@
 
 #include "ExecutionGraph/common/Asserts.hpp"
 #include "ExecutionGraph/common/EnumClassHelper.hpp"
-#include "ExecutionGraph/common/StaticAssert.hpp"
 #include "ExecutionGraph/common/TypeDefs.hpp"
 #include "ExecutionGraph/nodes/LogicCommon.hpp"
 
@@ -83,7 +82,9 @@ public:
     void setGetLink(LogicSocketOutputBase<Config>& outputSocket);
 
     //! Check if the socket has a Get-Link to an output socket.
-    inline bool isConnectedToOutput() const { return m_from != nullptr; }
+    inline bool hasGetLink() const { return m_from != nullptr; }
+
+    inline LogicSocketOutputBase<Config>* getGetLink() { return m_from; };
 
 protected:
     LogicSocketOutputBase<Config>* m_from = nullptr;  //!< The single Get-Link attached to this Socket.
@@ -165,8 +166,8 @@ public:
 
     /** This assert fails if the type T of the LogicSocket is
         not properly added to the type list SocketTypes in LogicSocketBase*/
-    EXEC_GRAPH_STATIC_ASSERTM((!std::is_same<meta::find<SocketTypes, DataType>, meta::list<>>::value),
-                              "TData is not in SocketTypes!")
+    static_assert(!std::is_same<meta::find<SocketTypes, DataType>, meta::list<>>::value,
+                  "TData is not in SocketTypes!");
 
     template<typename T, typename... Args>
     LogicSocketInput(T&& defaultValue, Args&&... args)
@@ -186,8 +187,8 @@ public:
     using DataType = TData;
     /** This assert fails if the type T of the LogicSocket is
         not properly added to the type list SocketTypes in LogicSocketBase*/
-    EXEC_GRAPH_STATIC_ASSERTM((!std::is_same<meta::find<SocketTypes, DataType>, meta::list<>>::value),
-                              "TData is not in SocketTypes!")
+    static_assert(!std::is_same<meta::find<SocketTypes, DataType>, meta::list<>>::value,
+                  "TData is not in SocketTypes!");
 
     template<typename T, typename... Args>
     LogicSocketOutput(T&& defaultValue, Args&&... args)
@@ -249,7 +250,7 @@ void LogicSocketInputBase<TConfig>::setGetLink(LogicSocketOutputBase<TConfig>& o
                           << " of logic node id: "
                           << this->getParent().getId(), NodeConnectionException);
 
-    if (!isConnectedToOutput())
+    if (!hasGetLink())
     {
         m_from = &outputSocket;
     }

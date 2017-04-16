@@ -13,7 +13,6 @@
 #include <memory>
 #include <vector>
 #include "ExecutionGraph/common/Asserts.hpp"
-#include "ExecutionGraph/common/StaticAssert.hpp"
 #include "ExecutionGraph/nodes/LogicCommon.hpp"
 
 namespace executionGraph
@@ -63,10 +62,9 @@ class LogicNode
 public:
     EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
 
-    template<typename T>
-    using SocketPointer        = std::unique_ptr<T, void (*)(T*)>;
-    using SocketInputListType  = std::vector<SocketPointer<SocketInputBaseType>>;
-    using SocketOutputListType = std::vector<SocketPointer<SocketOutputBaseType>>;
+
+    using SocketInputListType  = std::vector<SocketInputBasePointer>;
+    using SocketOutputListType = std::vector<SocketOutputBasePointer>;
 
 public:
     //! The basic constructor of a logic node.

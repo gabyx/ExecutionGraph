@@ -63,16 +63,16 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     int id = 0;
     int d = 1;
     // Integer node connection (wrong connection)
-    auto node1a = std::make_unique<IntegerNode<Config>>(id++);
-    auto node1b = std::make_unique<IntegerNode<Config>>(id++);
+    auto node1a = std::make_unique<IntegerNode<Config>>(0);
+    auto node1b = std::make_unique<IntegerNode<Config>>(1);
 
-    auto node2a = std::make_unique<IntegerNode<Config>>(id++);
-    auto node2b = std::make_unique<IntegerNode<Config>>(id++);
+    auto node2a = std::make_unique<IntegerNode<Config>>(2);
+    auto node2b = std::make_unique<IntegerNode<Config>>(3);
 
-    auto node3a = std::make_unique<IntegerNode<Config>>(id++);
-    auto node3b = std::make_unique<IntegerNode<Config>>(id++);
+    auto node3a = std::make_unique<IntegerNode<Config>>(4);
+    auto node3b = std::make_unique<IntegerNode<Config>>(5);
 
-    auto node4a = std::make_unique<IntegerNode<Config>>(id++);
+    auto node4a = std::make_unique<IntegerNode<Config>>(6);
 
 
     // Link
@@ -94,7 +94,16 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     execTree.addNode(std::move(node3b));
     execTree.addNode(std::move(node4a));
 
+    execTree.setNodeClass(0, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(1, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(2, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(3, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(6, ExecutionTreeInOut<Config>::NodeClassification::OutputNode);
+
+
     execTree.setup();
+
+    std::cout <<"ExecutionOrder:" << execTree.getExecutionOrderInfo() << std::endl;
 
     throw std::runtime_error("Not catched exception!!!");
 }

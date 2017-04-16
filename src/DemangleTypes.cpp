@@ -35,10 +35,4 @@ namespace details
 #endif
 }
 
-template<typename T>
-std::string demangle(T&& t)
-{
-    return details::demangle(typeid(t).name());
-}
-
 } // executionGraph

@@ -21,16 +21,10 @@ namespace executionGraph
         std::string demangle(const char* name);
     };
 
-    template <class T>
-    std::string getTypeString(const T& t)
+    template<typename T>
+    std::string demangle(T&& t)
     {
         return details::demangle(typeid(t).name());
-    }
-
-    template <class T>
-    std::string getTypeString()
-    {
-        return details::demangle(typeid(T).name());
     }
 };
 

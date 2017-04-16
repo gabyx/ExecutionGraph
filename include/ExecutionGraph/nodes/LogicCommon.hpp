@@ -10,7 +10,7 @@
 #ifndef ExecutionGraph_nodes_LogicCommon_hpp
 #define ExecutionGraph_nodes_LogicCommon_hpp
 
-#include <vector>
+#include <memory>
 
 #include "ExecutionGraph/common/TypeDefs.hpp"
 #include "ExecutionGraph/common/SfinaeMacros.hpp"
@@ -33,10 +33,12 @@ class LogicSocketInput;
 template<typename T, typename TConfig>
 class LogicSocketOutput;
 
-using IndexType = uint64_t;
+template<typename T>
+using SocketPointer = std::unique_ptr<T, void (*)(T*)>; //! The general socket pointer type.
 
-using NodeId      = uint64_t;
-using SocketIndex = IndexType;
+using IndexType   = uint64_t; //! A general index type.
+using NodeId      = uint64_t; //! Node Id type.
+using SocketIndex = IndexType;//! The socket index type.
 
 
 //! The general config which is used to build nodes and execution trees.
@@ -50,10 +52,13 @@ struct GeneralConfig
     using SocketInputBaseType  = LogicSocketInputBase<GeneralConfig>;  //! This class is used as the base for input sockets.
     using SocketOutputBaseType = LogicSocketOutputBase<GeneralConfig>; //! This class is used as the base for output sockets.
 
+    using SocketInputBasePointer  = SocketPointer<SocketInputBaseType>;
+    using SocketOutputBasePointer = SocketPointer<SocketOutputBaseType>;
+
     template<typename T>
-    using SocketInputType = LogicSocketInput<T, GeneralConfig>;   //! This is the type-templated (T needs to be in TSocketTypes) class for input sockets.
+    using SocketInputType = LogicSocketInput<T, GeneralConfig>;   //! This is the class template (T needs to be in TSocketTypes) for input sockets.
     template<typename T>
-    using SocketOutputType = LogicSocketOutput<T, GeneralConfig>; //! This is the type-templated (T needs to be in TSocketTypes) class for output sockets.
+    using SocketOutputType = LogicSocketOutput<T, GeneralConfig>; //! This is the class template (T needs to be in TSocketTypes) for output sockets.
 };
 
 #define EXEC_GRAPH_TYPEDEF_CONFIG(__CONFIG__)                              \
@@ -62,6 +67,8 @@ struct GeneralConfig
     using NodeBaseType         = typename Config::NodeBaseType;           \
     using SocketInputBaseType  = typename Config::SocketInputBaseType;    \
     using SocketOutputBaseType = typename Config::SocketOutputBaseType;   \
+    using SocketInputBasePointer  = typename Config::SocketInputBasePointer;    \
+    using SocketOutputBasePointer = typename Config::SocketOutputBasePointer;   \
     template<typename T>                                                  \
     using SocketInputType = typename Config::template SocketInputType<T>; \
     template<typename T>                                                  \

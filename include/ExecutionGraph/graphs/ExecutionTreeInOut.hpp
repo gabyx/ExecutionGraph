@@ -50,12 +50,12 @@ private:
         std::size_t m_priority      = std::numeric_limits<std::size_t>::max();
     };
 
-    using NodeStorage        = std::unordered_map<NodeId, NodeData>; // Rehashing does not invalidate pointers or references to elements.
+    using NodeDataStorage        = std::unordered_map<NodeId, NodeData>; // Rehashing does not invalidate pointers or references to elements.
 
-    using NodeList           = std::vector<NodeData*>;
-    using NodeSet            = std::unordered_set<NodeData*>;
-    using GroupNodeMap       = std::unordered_map<GroupId, NodeSet>;
-    using GroupExecutionList = std::unordered_map<GroupId, NodeList>;
+    using NodeDataList       = std::vector<NodeData*>;
+    using NodeDataSet        = std::unordered_set<NodeData*>;
+    using GroupNodeMap       = std::unordered_map<GroupId, NodeDataSet>;
+    using GroupExecutionList = std::unordered_map<GroupId, NodeDataList>;
 
 public:
     ExecutionTreeInOut() = default;
@@ -76,23 +76,32 @@ public:
 
         NodeBaseType* node = it->second.m_node.get();
 
-        m_nodeClasses[currType].remove(node);   // Remove from class.
+        m_nodeClasses[currType].erase(node);    // Remove from class.
         currType = newType;                     // Set new classification
-        m_nodeClasses[currType].add(node);      // Add to class.
+        m_nodeClasses[currType].emplace(node);      // Add to class.
+    }
 
+    void setNodeClass(NodeBaseType& node, NodeClassification newType)
+    {
+        setNodeClass(node.getId(),newType);
     }
 
     //! Get a specific node with id \p id.
-    NodeBaseType& getNode(NodeId id)
+    NodeBaseType* getNode(NodeId id)
     {
-        return *m_nodeMap[id].m_node;
+        auto it = m_nodeMap.find(id);
+        if(it == m_nodeMap.end())
+        {
+            return nullptr;
+        }
+        return it->m_node.get();
     }
 
     //! Get all nodes classified as \p type.
-    const NodeSet& getNodes(NodeClassification type) const { return m_nodeClasses[type]; }
+    const NodeDataSet& getNodes(NodeClassification type) const { return m_nodeClasses[type]; }
 
     //! Get all nodes in the group with id \p groupId.
-    const NodeSet& getNodes(GroupId groupId) const
+    const NodeDataSet& getNodes(GroupId groupId) const
     {
         auto it = m_nodeGroups.find(groupId);
         EXEC_GRAPH_THROWEXCEPTION_IF(it == m_nodeGroups.end(),"Group with id: " << groupId << " is not part of tree!");
@@ -130,7 +139,7 @@ public:
         auto it = m_nodeMap.find(nodeId);
         EXEC_GRAPH_THROWEXCEPTION_IF(it == m_nodeMap.end(), "Node with id: " << nodeId << " does not exist in tree!");
         // Add node to the group
-        auto res = m_nodeGroups[groupId].emplace(it->m_node.get());
+        auto res = m_nodeGroups[groupId].emplace(&it->second);
         EXEC_GRAPH_THROWEXCEPTION_IF(!res.second, "Node with id: " << nodeId << " does not exist in tree!");
     }
 
@@ -142,7 +151,7 @@ public:
         auto inNit  = m_nodeMap.find(inN);
         EXEC_GRAPH_THROWEXCEPTION_IF( outNit == m_nodeMap.end() || inNit == m_nodeMap.end() ,
                                      "Node: " << outN << " or " << inN << " does not exist!")
-        NodeBaseType::makeGetLink(*outNit->m_node, outS, *inNit->m_node, inS);
+        NodeBaseType::setGetLink(*outNit->second.m_node, outS, *inNit->second.m_node, inS);
     }
 
     //! Constructs a Write-Link to write the data of output socket at index \p
@@ -156,16 +165,16 @@ public:
         {
             EXEC_GRAPH_THROWEXCEPTION("Node: " << outN << " or " << inN << " does not exist!");
         }
-        NodeBaseType::makeWriteLink(*outNit->m_node, outS, *inNit->m_node, inS);
+        NodeBaseType::addWriteLink(*outNit->second.m_node, outS, *inNit->second.m_node, inS);
     }
 
     //! Reset all nodes in group with id: \p groupId.
     virtual void reset(unsigned int groupId)
     {
         // Reset in no order!
-        for (auto& n : m_nodeGroups[groupId])
+        for (auto* nodeData : m_nodeGroups[groupId])
         {
-            n->reset();
+            nodeData->m_node->reset();
         }
     }
 
@@ -220,18 +229,19 @@ public:
 
         // Solve execution order for every group list!
         // Each group has its own execution order!
-        ExecutionOrderSolver s;
+        ExecutionOrderSolver solver(m_nodeMap);
         m_groupExecList.clear();
         std::size_t maxPrio = 0;
         for (auto& p : m_nodeGroups)
         {
+            NodeDataSet& nodeDatas = p.second;
             // fill nodes into execution list
-            auto& l = m_groupExecList[p.first];
+            NodeDataList& l = m_groupExecList[p.first];
             std::for_each(
-                p.second.begin(), p.second.end(), [&l](const auto* nodeData) { l.push_back(nodeData); }
+                nodeDatas.begin(), nodeDatas.end(), [&l](NodeData* nodeData) { l.push_back(nodeData); }
             );
 
-            s.solve(l, l);
+            solver.solve(l, l);
 
             maxPrio = std::max(maxPrio, l.back()->m_priority);
         }
@@ -274,9 +284,9 @@ public:
             s << suffix << "NodeId\t|\tPriority\t|\tType" << std::endl;
             for (auto* nodeData : g.second)
             {
-                auto* n = nodeData->m_node;
+                auto* n = nodeData->m_node.get();
                 s << suffix
-                  << stringFormat("%4i \t|\t %4i \t|\t %s", n->getId(), n->m_priority, demangle(n))
+                  << stringFormat("%4i \t|\t %4i \t|\t %s", n->getId(), nodeData->m_priority, demangle(n).c_str())
                   << std::endl;
             }
             s << suffix << "==============================" << std::endl;
@@ -288,7 +298,11 @@ protected:
     class ExecutionOrderSolver
     {
     public:
-        void solve(NodeList& inputNodes, NodeList& orderedNodes)
+        ExecutionOrderSolver(NodeDataStorage& nodeMap)
+        : m_nodeMap(nodeMap)
+        {}
+
+        void solve(NodeDataList& inputNodes, NodeDataList& orderedNodes)
         {
             // Solve Execution order,
             // start a depth first search recursion for all nodes in c which
@@ -298,7 +312,7 @@ protected:
             {
                 std::unordered_set<unsigned int> nodesCurrDepth;
                 // start recursion from this node
-                solveRec(nodeData->m_node, nodesCurrDepth);
+                solveRec(*nodeData, nodesCurrDepth);
             }
 
             // Sort all nodes according to priority (asscending) (lowest is most
@@ -314,39 +328,46 @@ protected:
          * lowest number has the highest priority
          */
 
-        unsigned int solveRec(NodeBaseType* node, std::unordered_set<unsigned int>& nodesCurrDepth)
+        unsigned int solveRec(NodeData& nodeData, std::unordered_set<unsigned int>& nodesCurrDepth)
         {
+            NodeBaseType* node = nodeData.m_node.get();
+
             nodesCurrDepth.insert(node->getId());
 
             // visit all input sockets and their node!
             auto& inSockets = node->getInputs();
-            for (auto* s : inSockets)
+            for (auto& socket : inSockets)
             {
-                if (s->isLinked())
+                if (socket->hasGetLink())
                 {
-                    auto* fsock = s->getFrom();
+                    auto* outputSocket = socket->getGetLink();
 
-                    auto* adjNode = fsock->getParent();
-                    if (nodesCurrDepth.find(adjNode->m_id) != nodesCurrDepth.end())
+                    auto& adjNode = outputSocket->getParent();
+                    if (nodesCurrDepth.find(adjNode.getId()) != nodesCurrDepth.end())
                     {
-                        EXEC_GRAPH_ERRORMSG("Your execution logic graph contains a cylce from node: " << node->getId()
-                                            << " socket: " << s->getIndex() << " to node: " << adjNode->getId() << " socket: "
-                                            << fsock->getIndex());
+                        EXEC_GRAPH_THROWEXCEPTION("Your execution logic graph contains a cylce from node: " << node->getId()
+                                                  << " socket: " << socket->getIndex() << " to node: " << adjNode.getId() << " socket: "
+                                                  << outputSocket->getIndex());
                     }
 
-                    unsigned int prioAdj = solveRec(adjNode, nodesCurrDepth);
+                    // Get NodeData of adjNode
+                    auto itAdj = m_nodeMap.find(adjNode.getId());
+                    EXEC_GRAPH_THROWEXCEPTION_IF(itAdj == m_nodeMap.end(),
+                                                 "Node with id: " << adjNode.getId() << " has not been added to the execution tree!");
+                    std::size_t prioAdj = solveRec(itAdj->second, nodesCurrDepth);
 
                     // Set the current node to the priority of the below tree +1
-                    node->m_priority = std::max(prioAdj + 1, node->m_priority);
+                    nodeData.m_priority = std::max(prioAdj + 1, nodeData.m_priority);
                 }
             }
 
-            nodesCurrDepth.erase(node->m_id);
+            nodesCurrDepth.erase(node->getId());
 
-            return node->m_priority;
+            return nodeData.m_priority;
         }
         bool m_inputReachable  = false;
         NodeBaseType* m_reachNode = nullptr;
+        NodeDataStorage& m_nodeMap; //! All NodeDatas of the execution tree.
     };
 
     // Only for directed graphs, does not detect cycles -> endless loop!
@@ -386,24 +407,20 @@ protected:
         {
             // visit all input sockets and their node!
             auto& inSockets = node->getInputs();
-            for (auto* s : inSockets)
+            for (auto& socket : inSockets)
             {
-                if (s->isLinked())
+                if (socket->hasGetLink())
                 {
-                    auto* fsock = s->getFrom();
-                    EXEC_GRAPH_ASSERTMSG(fsock, "linked but from ptr null");
-
-                    auto* adjNode = fsock->getParent();
-                    EXEC_GRAPH_ASSERTMSG(adjNode, "Adj node null");
-
+                    auto* outputSocket = socket->getGetLink();
+                    auto& adjNode = outputSocket->getParent();
                     // If we reached the start node, return!
-                    if (m_start == adjNode)
+                    if (m_start == &adjNode)
                     {
                         m_reached = true;
                         return;
                     }
 
-                    queu.push_back(adjNode);
+                    queu.push_back(&adjNode);
                 }
             }
         }
@@ -414,7 +431,7 @@ protected:
 
     std::set<NodeBaseType*> m_nodeClasses[nNodeClasses]; ///< the input/ouput and normal nodes
 
-    NodeStorage m_nodeMap;  ///< all nodes in the tree
+    NodeDataStorage m_nodeMap;  ///< all nodes in the tree
 
     // Additional group list
     GroupNodeMap m_nodeGroups;
