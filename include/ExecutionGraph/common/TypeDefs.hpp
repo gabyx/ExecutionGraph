@@ -24,6 +24,7 @@ struct GlobalConfigs
 
 #define EXEC_GRAPH_DEFINE_MATRIX_TYPES                \
     using PREC = ExecutionGraph::GlobalConfigs::PREC; \
-    EXEC_GRAPH_DEFINE_MATRIX_TYPES_OF(PREC) EXEC_GRAPH_DEFINE_CONTAINER_TYPES
+    EXEC_GRAPH_DEFINE_MATRIX_TYPES_OF(PREC)           \
+    EXEC_GRAPH_DEFINE_CONTAINER_TYPES
 }
 #endif

@@ -20,33 +20,44 @@ namespace executionGraph
 class Exception : public std::runtime_error
 {
 public:
-    Exception(const std::stringstream& ss) : std::runtime_error(ss.str()) {}
-
+    Exception(const std::stringstream& ss)
+        : std::runtime_error(ss.str()) {}
+    // we dont need a virtual dtor, the std destroys the exception correctly.
 private:
 };
 
 class NodeConnectionException : public Exception
 {
-    public:
-    NodeConnectionException(const std::stringstream& ss) : Exception(ss) {}
+public:
+    NodeConnectionException(const std::stringstream& ss)
+        : Exception(ss) {}
+    // we dont need a virtual dtor, the std destroys the exception correctly.
 };
 
+class BadSocketCastException : public Exception
+{
+public:
+    BadSocketCastException(const std::stringstream& ss)
+        : Exception(ss) {}
+    // we dont need a virtual dtor, the std destroys the exception correctly.
+};
 }
 
-#define EXEC_GRAPH_THROWEXCEPTION_TYPE(message, type)                                                 \
-    {                                                                                                 \
-        std::stringstream ___s___;                                                                    \
-        ___s___ << message << std::endl << " @ " << __FILE__ << " (" << __LINE__ << ")" << std::endl; \
-        throw executionGraph::type(___s___);                                             \
+#define EXEC_GRAPH_THROWEXCEPTION_TYPE(message, type)                         \
+    {                                                                         \
+        std::stringstream ___s___;                                            \
+        ___s___ << message << std::endl                                       \
+                << " @ " << __FILE__ << " (" << __LINE__ << ")" << std::endl; \
+        throw executionGraph::type(___s___);                                  \
     }
 
 #define EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(condition, message, type) \
-    if(condition)                                                   \
+    if (condition)                                                  \
     {                                                               \
         EXEC_GRAPH_THROWEXCEPTION_TYPE(message, type);              \
     }
 
-#define EXEC_GRAPH_THROWEXCEPTION(message) EXEC_GRAPH_THROWEXCEPTION_TYPE(message,Exception)
-#define EXEC_GRAPH_THROWEXCEPTION_IF(condition, message) EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(condition,message,Exception)
+#define EXEC_GRAPH_THROWEXCEPTION(message) EXEC_GRAPH_THROWEXCEPTION_TYPE(message, Exception)
+#define EXEC_GRAPH_THROWEXCEPTION_IF(condition, message) EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(condition, message, Exception)
 
 #endif

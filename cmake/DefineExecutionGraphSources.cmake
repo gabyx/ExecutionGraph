@@ -29,7 +29,6 @@ MACRO(INCLUDE_ALL_ExecutionGraph_SOURCE
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/MyMatrixTypeDefs.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/Platform.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/SfinaeMacros.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/StaticAssert.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/TypeDefs.hpp
     
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicCommon.hpp

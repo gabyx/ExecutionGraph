@@ -29,7 +29,8 @@ private:
 
     //! Two Argument Constructors ============================================
 private:
-    Delegate(void* const pObject, InvokerType const functionPtr) noexcept : m_pObject(pObject), m_invoker(functionPtr)
+    Delegate(void* const pObject, InvokerType const functionPtr) noexcept
+        : m_pObject(pObject), m_invoker(functionPtr)
     {
     }
 
@@ -37,7 +38,8 @@ public:
     Delegate()                = default;
     Delegate(Delegate const&) = default;
     Delegate(Delegate&&)      = default;
-    Delegate(std::nullptr_t const) noexcept : Delegate() {}
+    Delegate(std::nullptr_t const) noexcept
+        : Delegate() {}
 
     template<typename C>
     Delegate(C* const pObject, MemFunctionType<C> const methodPtr)

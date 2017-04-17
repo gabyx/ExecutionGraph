@@ -23,15 +23,14 @@
 
 namespace executionGraph
 {
-
-
 template<typename TConfig>
 class ExecutionTreeInOut
 {
 public:
     EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
 
-    enum NodeClassification : unsigned char {
+    enum NodeClassification : unsigned char
+    {
         NormalNode = 0,
         InputNode  = 1,
         OutputNode = 2
@@ -45,12 +44,12 @@ private:
     using NodePointer = std::unique_ptr<NodeBaseType>;
     struct NodeData
     {
-        NodePointer m_node          = nullptr;
-        NodeClassification  m_class = NodeClassification::NormalNode;
-        std::size_t m_priority      = std::numeric_limits<std::size_t>::max();
+        NodePointer m_node         = nullptr;
+        NodeClassification m_class = NodeClassification::NormalNode;
+        IndexType m_priority       = 0;
     };
 
-    using NodeDataStorage        = std::unordered_map<NodeId, NodeData>; // Rehashing does not invalidate pointers or references to elements.
+    using NodeDataStorage = std::unordered_map<NodeId, NodeData>;  // Rehashing does not invalidate pointers or references to elements.
 
     using NodeDataList       = std::vector<NodeData*>;
     using NodeDataSet        = std::unordered_set<NodeData*>;
@@ -58,8 +57,8 @@ private:
     using GroupExecutionList = std::unordered_map<GroupId, NodeDataList>;
 
 public:
-    ExecutionTreeInOut() = default;
-    ~ExecutionTreeInOut() = default;
+    ExecutionTreeInOut()          = default;
+    virtual ~ExecutionTreeInOut() = default;
 
     void setNodeClass(NodeId id, NodeClassification newType)
     {
@@ -69,7 +68,7 @@ public:
         EXEC_GRAPH_THROWEXCEPTION_IF(it == m_nodeMap.end(), "Node with id: " << id << " does not exist in tree!");
 
         NodeClassification& currType = it->second.m_class;
-        if(currType == newType)
+        if (currType == newType)
         {
             return;
         }
@@ -78,19 +77,19 @@ public:
 
         m_nodeClasses[currType].erase(node);    // Remove from class.
         currType = newType;                     // Set new classification
-        m_nodeClasses[currType].emplace(node);      // Add to class.
+        m_nodeClasses[currType].emplace(node);  // Add to class.
     }
 
     void setNodeClass(NodeBaseType& node, NodeClassification newType)
     {
-        setNodeClass(node.getId(),newType);
+        setNodeClass(node.getId(), newType);
     }
 
     //! Get a specific node with id \p id.
     NodeBaseType* getNode(NodeId id)
     {
         auto it = m_nodeMap.find(id);
-        if(it == m_nodeMap.end())
+        if (it == m_nodeMap.end())
         {
             return nullptr;
         }
@@ -104,31 +103,34 @@ public:
     const NodeDataSet& getNodes(GroupId groupId) const
     {
         auto it = m_nodeGroups.find(groupId);
-        EXEC_GRAPH_THROWEXCEPTION_IF(it == m_nodeGroups.end(),"Group with id: " << groupId << " is not part of tree!");
+        EXEC_GRAPH_THROWEXCEPTION_IF(it == m_nodeGroups.end(), "Group with id: " << groupId << " is not part of tree!");
         return it->second;
     }
 
     //! Adds a node to the execution tree and classifies it as \p type.
     virtual void addNode(NodePointer node,
-                         NodeClassification type = NodeClassification::NormalNode)
+                         NodeClassification type = NodeClassification::NormalNode,
+                         GroupId groupId         = 0)
     {
         m_executionOrderUpToDate = false;
 
-        if(node==nullptr)
+        if (node == nullptr)
         {
-            EXEC_GRAPH_ASSERTMSG(false,"Nullptr added!")
+            EXEC_GRAPH_ASSERT(false, "Nullptr added!")
             return;
         }
         auto id = node->getId();
 
         // If we throw here, the node managed by the unique pointer is deleted.
-        EXEC_GRAPH_THROWEXCEPTION_IF( m_nodeMap.find(id) != m_nodeMap.end(),
+        EXEC_GRAPH_THROWEXCEPTION_IF(m_nodeMap.find(id) != m_nodeMap.end(),
                                      "Node id: " << node->getId() << " already added in tree!");
 
         // Add to group
         m_nodeClasses[type].emplace(node.get());
         // Add to storage map
-        m_nodeMap.emplace(id, NodeData{std::move(node),type} );
+        m_nodeMap.emplace(id, NodeData{std::move(node), type});
+        // Add node to group
+        addNodeToGroup(id, groupId);
     }
 
     //! Assigns the node with id \p nodeId to the group with id \p groupId.
@@ -149,7 +151,7 @@ public:
     {
         auto outNit = m_nodeMap.find(outN);
         auto inNit  = m_nodeMap.find(inN);
-        EXEC_GRAPH_THROWEXCEPTION_IF( outNit == m_nodeMap.end() || inNit == m_nodeMap.end() ,
+        EXEC_GRAPH_THROWEXCEPTION_IF(outNit == m_nodeMap.end() || inNit == m_nodeMap.end(),
                                      "Node: " << outN << " or " << inN << " does not exist!")
         NodeBaseType::setGetLink(*outNit->second.m_node, outS, *inNit->second.m_node, inS);
     }
@@ -231,15 +233,14 @@ public:
         // Each group has its own execution order!
         ExecutionOrderSolver solver(m_nodeMap);
         m_groupExecList.clear();
-        std::size_t maxPrio = 0;
+        IndexType maxPrio = 0;
         for (auto& p : m_nodeGroups)
         {
             NodeDataSet& nodeDatas = p.second;
             // fill nodes into execution list
             NodeDataList& l = m_groupExecList[p.first];
             std::for_each(
-                nodeDatas.begin(), nodeDatas.end(), [&l](NodeData* nodeData) { l.push_back(nodeData); }
-            );
+                nodeDatas.begin(), nodeDatas.end(), [&l](NodeData* nodeData) { l.push_back(nodeData); });
 
             solver.solve(l, l);
 
@@ -261,7 +262,7 @@ public:
         for (auto* outNode : m_nodeClasses[NodeClassification::OutputNode])
         {
             bool outputReachedInput = false;
-            // each outputnode should reach at least one input, if not print warning!
+            // each output node should reach at least one input, if not print warning!
             for (auto* inNode : m_nodeClasses[NodeClassification::InputNode])
             {
                 if (c.check(outNode, inNode))
@@ -281,15 +282,16 @@ public:
         for (auto& g : m_groupExecList)
         {
             s << "Execution order for group id: " << g.first << std::endl;
-            s << suffix << "NodeId\t|\tPriority\t|\tType" << std::endl;
+            s << suffix << stringFormat("%-6s  |  %-8s  |  %-20s", "NodeId", "Priority", "NodeType") << std::endl;
+            s << suffix << stringFormat("%-6s  |  %-8s  |  %-20s", "------", "--------", "--------") << std::endl;
             for (auto* nodeData : g.second)
             {
                 auto* n = nodeData->m_node.get();
                 s << suffix
-                  << stringFormat("%4i \t|\t %4i \t|\t %s", n->getId(), nodeData->m_priority, demangle(n).c_str())
+                  << stringFormat("%6i  |  %8i  |  %20s", n->getId(), nodeData->m_priority, n->getTypeName().c_str())
                   << std::endl;
             }
-            s << suffix << "==============================" << std::endl;
+            s << suffix << stringFormat("%-6s  |  %-8s  |  %-20s", "------", "--------", "--------") << std::endl;
         }
         return s.str();
     }
@@ -299,8 +301,9 @@ protected:
     {
     public:
         ExecutionOrderSolver(NodeDataStorage& nodeMap)
-        : m_nodeMap(nodeMap)
-        {}
+            : m_nodeMap(nodeMap)
+        {
+        }
 
         void solve(NodeDataList& inputNodes, NodeDataList& orderedNodes)
         {
@@ -310,7 +313,7 @@ protected:
             // the priority
             for (auto* nodeData : inputNodes)
             {
-                std::unordered_set<unsigned int> nodesCurrDepth;
+                std::unordered_set<IndexType> nodesCurrDepth;
                 // start recursion from this node
                 solveRec(*nodeData, nodesCurrDepth);
             }
@@ -328,7 +331,7 @@ protected:
          * lowest number has the highest priority
          */
 
-        unsigned int solveRec(NodeData& nodeData, std::unordered_set<unsigned int>& nodesCurrDepth)
+        IndexType solveRec(NodeData& nodeData, std::unordered_set<IndexType>& nodesCurrDepth)
         {
             NodeBaseType* node = nodeData.m_node.get();
 
@@ -346,15 +349,19 @@ protected:
                     if (nodesCurrDepth.find(adjNode.getId()) != nodesCurrDepth.end())
                     {
                         EXEC_GRAPH_THROWEXCEPTION("Your execution logic graph contains a cylce from node: " << node->getId()
-                                                  << " socket: " << socket->getIndex() << " to node: " << adjNode.getId() << " socket: "
-                                                  << outputSocket->getIndex());
+                                                                                                            << " socket: "
+                                                                                                            << socket->getIndex()
+                                                                                                            << " to node: "
+                                                                                                            << adjNode.getId()
+                                                                                                            << " socket: "
+                                                                                                            << outputSocket->getIndex());
                     }
 
                     // Get NodeData of adjNode
                     auto itAdj = m_nodeMap.find(adjNode.getId());
                     EXEC_GRAPH_THROWEXCEPTION_IF(itAdj == m_nodeMap.end(),
                                                  "Node with id: " << adjNode.getId() << " has not been added to the execution tree!");
-                    std::size_t prioAdj = solveRec(itAdj->second, nodesCurrDepth);
+                    IndexType prioAdj = solveRec(itAdj->second, nodesCurrDepth);
 
                     // Set the current node to the priority of the below tree +1
                     nodeData.m_priority = std::max(prioAdj + 1, nodeData.m_priority);
@@ -365,9 +372,9 @@ protected:
 
             return nodeData.m_priority;
         }
-        bool m_inputReachable  = false;
+        bool m_inputReachable     = false;
         NodeBaseType* m_reachNode = nullptr;
-        NodeDataStorage& m_nodeMap; //! All NodeDatas of the execution tree.
+        NodeDataStorage& m_nodeMap;  //! All NodeDatas of the execution tree.
     };
 
     // Only for directed graphs, does not detect cycles -> endless loop!
@@ -412,7 +419,7 @@ protected:
                 if (socket->hasGetLink())
                 {
                     auto* outputSocket = socket->getGetLink();
-                    auto& adjNode = outputSocket->getParent();
+                    auto& adjNode      = outputSocket->getParent();
                     // If we reached the start node, return!
                     if (m_start == &adjNode)
                     {
@@ -425,11 +432,11 @@ protected:
             }
         }
 
-        bool m_reached     = false;
+        bool m_reached        = false;
         NodeBaseType* m_start = nullptr;
     };
 
-    std::set<NodeBaseType*> m_nodeClasses[nNodeClasses]; ///< the input/ouput and normal nodes
+    std::set<NodeBaseType*> m_nodeClasses[nNodeClasses];  ///< the input/ouput and normal nodes
 
     NodeDataStorage m_nodeMap;  ///< all nodes in the tree
 
@@ -440,7 +447,6 @@ protected:
 
     bool m_executionOrderUpToDate = false;
 };
-
 }
 
 #endif  // ExecutionTreeInOut_hpp

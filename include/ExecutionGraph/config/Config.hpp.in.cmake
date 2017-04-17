@@ -29,7 +29,13 @@ namespace execGraph{
     #else
         #define ExecutionGraph_OPENMP_NUMTHREADS
     #endif
-
+    
+    #cmakedefine ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS
+    #ifdef ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS
+        #define EXEC_GRAPH_THROW_BADSOCKETCAST_IF(cond,mess) EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(cond,mess,BadSocketCastException)
+    #else
+        #define EXEC_GRAPH_THROW_BADSOCKETCAST_IF(cond,mess) EXEC_GRAPH_ASSERT_TYPE(cond,mess,BadSocketCastException)
+    #endif
 }
 
 

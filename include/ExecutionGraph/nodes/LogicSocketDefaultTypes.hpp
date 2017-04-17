@@ -67,7 +67,7 @@ using SocketDefaultTypes = meta::list<double,
         LOGICSOCKET_CASE_SWITCH(19)                                                                        \
         default:                                                                                           \
             EXEC_GRAPH_THROWEXCEPTION("TYPE: " << this->m_type << " not implemented in switch statement"); \
-    };
-};
+    }
+}
 
 #endif  // LogicTypes_hpp

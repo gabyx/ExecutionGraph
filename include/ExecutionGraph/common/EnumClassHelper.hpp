@@ -25,9 +25,8 @@ static constexpr auto enumToInt(const E e) -> typename std::underlying_type<E>::
 template<typename E>
 static constexpr auto enumToIntC(const E e) -> typename std::underlying_type<E>::type
 {
-    return std::integral_constant< typename std::underlying_type<E>::type, enumToInt(e) >{};
+    return std::integral_constant<typename std::underlying_type<E>::type, enumToInt(e)>{};
 }
-
-};
+}
 
 #endif  // EnumClassHelper_hpp

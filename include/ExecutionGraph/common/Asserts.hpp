@@ -19,15 +19,17 @@
 
 //! Some assert macro.
 #ifdef NDEBUG
-#define EXEC_GRAPH_ASSERTMSG(condition, message)
+#define EXEC_GRAPH_ASSERT(condition, message)
+#define EXEC_GRAPH_ASSERT_TYPE(condition, message, type)
 #else
 // Debug!
-#define EXEC_GRAPH_ASSERTMSG(condition, message) \
-    {                                            \
-        if (!(condition))                        \
-        {                                        \
-            EXEC_GRAPH_THROWEXCEPTION(message)   \
-        }                                        \
+#define EXEC_GRAPH_ASSERT(condition, message) EXEC_GRAPH_ASSERT_TYPE(condition, message, Exception)
+#define EXEC_GRAPH_ASSERT_TYPE(condition, message, type)  \
+    {                                                     \
+        if (!(condition))                                 \
+        {                                                 \
+            EXEC_GRAPH_THROWEXCEPTION_TYPE(message, type) \
+        }                                                 \
     }
 #endif
 

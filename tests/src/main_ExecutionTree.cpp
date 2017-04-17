@@ -33,7 +33,8 @@ public:
 
     using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, int>>;
 
-    EXEC_GRAPH_DEFINE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets);
+    EXEC_GRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME();
+    EXEC_GRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets);
 
     template<typename... Args>
     IntegerNode(Args&&... args)
@@ -41,27 +42,27 @@ public:
     {
         // Add all sockets
         this->template addSockets<InSockets>(std::make_tuple(2,2));
-        this->template addSockets<OutSockets>(std::make_tuple(1));
+        this->template addSockets<OutSockets>(std::make_tuple(0));
     }
 
     void reset() override {};
 
     void compute() override {
 
-        // ugly syntax due to template shit
-        this->template getValue<typename OutSockets::template Get<Result1>>() =
-            this->template getValue<typename InSockets::template Get<Value1>>() +
-            this->template getValue<typename InSockets::template Get<Value2>>();
 
-        // or rather
+        // ugly syntax due to template shit
+        //        this->template getValue<typename OutSockets::template Get<Result1>>() =
+        //            this->template getValue<typename InSockets::template Get<Value1>>() +
+        //            this->template getValue<typename InSockets::template Get<Value2>>();
+
         getOutVal<Result1>() = getInVal<Value1>() + getInVal<Value2>();
+        std::cout << " id: " << this->getId() << " in1: " << getInVal<Value1>()
+                  << " in2: " << getInVal<Value2>()<< " res: " << getOutVal<Result1>() << std::endl;
     }
 };
 
 MY_TEST(ExecutionTree_Test, Int_Int)
 {
-    int id = 0;
-    int d = 1;
     // Integer node connection (wrong connection)
     auto node1a = std::make_unique<IntegerNode<Config>>(0);
     auto node1b = std::make_unique<IntegerNode<Config>>(1);
@@ -73,8 +74,19 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     auto node3b = std::make_unique<IntegerNode<Config>>(5);
 
     auto node4a = std::make_unique<IntegerNode<Config>>(6);
+    auto resultNode = node4a.get();
 
-
+    try{
+        node1a->getISocket<double>(0);
+        EXEC_GRAPH_THROWEXCEPTION("Should throw exception here!");
+    }
+    catch(BadSocketCastException& e){
+        // all correct
+    }
+    catch(...)
+    {
+        EXEC_GRAPH_THROWEXCEPTION("Wrong Exception thrown!");
+    }
     // Link
     node4a->setGetLink(*node3a,0,0);
     node4a->setGetLink(*node3b,0,1);
@@ -103,13 +115,17 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 
     execTree.setup();
 
-    std::cout <<"ExecutionOrder:" << execTree.getExecutionOrderInfo() << std::endl;
+    std::cout << execTree.getExecutionOrderInfo() << std::endl;
 
-    throw std::runtime_error("Not catched exception!!!");
+    execTree.execute(0);
+
+    std::cout << "Result : "<< resultNode->getOutVal<IntegerNode<Config>::Result1>() << std::endl;
+
+    EXEC_GRAPH_THROWEXCEPTION_IF( resultNode->getOutVal<IntegerNode<Config>::Result1>() != 16 ,"wrong result");
 }
 
 int main(int argc, char** argv)
-{
+ş{
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

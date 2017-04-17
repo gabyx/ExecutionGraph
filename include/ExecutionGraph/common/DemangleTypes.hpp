@@ -7,7 +7,6 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // ========================================================================================
 
-
 #ifndef ExecutionGraph_common_DemangleTypes_hpp
 #define ExecutionGraph_common_DemangleTypes_hpp
 
@@ -16,16 +15,24 @@
 
 namespace executionGraph
 {
-    namespace details
-    {
-        std::string demangle(const char* name);
-    };
+namespace details
+{
+std::string demangle(const char* name);
+};
 
-    template<typename T>
-    std::string demangle(T&& t)
-    {
-        return details::demangle(typeid(t).name());
-    }
+template<typename T>
+std::string demangle(T&& t)
+{
+    return details::demangle(typeid(t).name());
+}
+
+template<typename T>
+std::string demangle()
+{
+    return details::demangle(typeid(T).name());
+}
+
+std::string shortenTemplateBrackets(std::string s, unsigned int fromLevel = 1);
 };
 
 #endif
