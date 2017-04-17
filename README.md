@@ -30,6 +30,20 @@ The write and read access of input and output sockets is implemented using a fas
 
 Static type dispatching avoids the use of virtual calls when using polymorphic objects in object-oriented programming languages.
 
-
+## Example 1
+This becomes the first example (to be continued)
+```c++
+Execution order for group id: 0
+    NodeId  |  Priority  |  NodeType            
+    ------  |  --------  |  --------            
+         0  |         2  |  IntegerNode<executionGraph::GeneralConfig<...> >*
+         1  |         2  |  IntegerNode<executionGraph::GeneralConfig<...> >*
+         2  |         2  |  IntegerNode<executionGraph::GeneralConfig<...> >*
+         3  |         2  |  IntegerNode<executionGraph::GeneralConfig<...> >*
+         5  |         1  |  IntegerNode<executionGraph::GeneralConfig<...> >*
+         4  |         1  |  IntegerNode<executionGraph::GeneralConfig<...> >*
+         6  |         0  |  IntegerNode<executionGraph::GeneralConfig<...> >*
+    ------  |  --------  |  --------  
+```
 
 More to come!
