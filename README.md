@@ -127,7 +127,7 @@ Next we define the actual computation which is performed when this node is execu
 ```
 Here we simply add both input values ( `getInVal<...>()` return a reference) and store the result in the output socket.
 
-Now lets now build the main ingredient of this example: the execution tree. 
+Now, let us build the main ingredient of this example: the execution tree. 
 First we allocate the 7 nodes by
 ```c++
 using namespace executionGraph; 
@@ -143,7 +143,7 @@ int main(){
     auto node4a = std::make_unique<IntegerNode<Config>>(6);
     auto resultNode = node4a.get();
 ```
-Each node is given a unique id (0...6), this is crucial for further node identification!
+Each node is given a unique id `[0,...,6]`, which enables us to identify the node easier.
 Next we create the *get* links which connect the in- and outputs. 
 ```c++
     int i0 = 0; int i1 = 1; int oO = 0;
@@ -156,7 +156,7 @@ Next we create the *get* links which connect the in- and outputs.
     node3b->setGetLink(*node1a,o0,i0);
     node3b->setGetLink(*node1b,o0,i1);
 ```
-The syntax `node4a->setGetLink(*node3a,0,0);` denotes that the output node `node4a` gets the value of its first input `i0=0` from the single output `o0` of node `node3a`. The above snipped basically builds the execution tree given at the begining.
+The syntax `node4a->setGetLink(*node3a,0,0);` denotes that the output node `node4a` gets its first input value `i0 = 0` from the single output `o0 = 0` of node `node3a`. The above snippet builds the execution tree given at the begining.
 Finally we create the ExecutionTree `ExecutionTreeInOut`, add all nodes to it, set the proper node classfication (if its an input or output node, setup the graph (which computes the execution order) and execute the default execution group `0` as
 ```c++
     // Make the execution tree and add all nodes

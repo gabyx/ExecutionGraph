@@ -375,7 +375,13 @@ void LogicNode<TConfig>::addWriteLink(LogicNode& outN, SocketIndex outS, LogicNo
     inline auto& getOutVal() { return this->template getValue<typename OutSocketDeclList::template Get<S>>(); }     \
                                                                                                                     \
     template<OutputEnum S>                                                                                          \
-    inline auto& getInVal() const { return this->template getValue<typename OutSocketDeclList::template Get<S>>(); }
+    inline auto& getInVal() const { return this->template getValue<typename OutSocketDeclList::template Get<S>>(); }\
+                                                                                                                    \
+    template<InputEnum S>                                                                                           \
+    static constexpr const SocketIndex& getInIdx() { return InSocketDeclList::template Get<S>::Index::value; }       \
+    template<OutputEnum S>                                                                                          \
+    static constexpr const SocketIndex& getOutIdx() { return OutSocketDeclList::template Get<S>::Index::value; }
+
 
 #define EXEC_GRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME() \
     virtual std::string getTypeName() { return shortenTemplateBrackets(demangle(this)); };

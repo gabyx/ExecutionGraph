@@ -32,7 +32,7 @@ using SocketTypes = meta::list<double,std::shared_ptr<A>>;
 using Config = GeneralConfig< SocketTypes >;
 
 template<typename TConfig>
-class IntegerNode : public typename TConfig::NodeBaseType
+class IntegerNode : public TConfig::NodeBaseType
 {
 public:
     using Config = TConfig;

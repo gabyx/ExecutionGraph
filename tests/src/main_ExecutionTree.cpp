@@ -60,17 +60,17 @@ public:
 
 MY_TEST(ExecutionTree_Test, Int_Int)
 {
-    // Integer node connection (wrong connection)
-    auto node1a = std::make_unique<IntegerNode<Config>>(0);
-    auto node1b = std::make_unique<IntegerNode<Config>>(1);
+    using IntNode = IntegerNode<Config>;
+    auto node1a = std::make_unique<IntNode>(0);
+    auto node1b = std::make_unique<IntNode>(1);
 
-    auto node2a = std::make_unique<IntegerNode<Config>>(2);
-    auto node2b = std::make_unique<IntegerNode<Config>>(3);
+    auto node2a = std::make_unique<IntNode>(2);
+    auto node2b = std::make_unique<IntNode>(3);
 
-    auto node3a = std::make_unique<IntegerNode<Config>>(4);
-    auto node3b = std::make_unique<IntegerNode<Config>>(5);
+    auto node3a = std::make_unique<IntNode>(4);
+    auto node3b = std::make_unique<IntNode>(5);
 
-    auto node4a = std::make_unique<IntegerNode<Config>>(6);
+    auto node4a = std::make_unique<IntNode>(6);
     auto resultNode = node4a.get();
 
     try{
@@ -85,7 +85,9 @@ MY_TEST(ExecutionTree_Test, Int_Int)
         EXEC_GRAPH_THROWEXCEPTION("Wrong Exception thrown!");
     }
     // Link
-    node4a->setGetLink(*node3a,0,0);
+    node4a->setGetLink(*node3a,
+                       node3a->getOutIdx<IntNode::Result1>(),
+                       IntNode::Value1);
     node4a->setGetLink(*node3b,0,1);
 
     node3a->setGetLink(*node2a,0,0);
