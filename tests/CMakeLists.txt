@@ -95,5 +95,16 @@ if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
 endif()
 defineCompileDefs(${EXEC_NAME2})
 
+#ExecutionTree Test
+SET(EXEC_NAME3 ${PROJECT_NAME}-CustomSocketTypes)
+ADD_EXECUTABLE(${EXEC_NAME3}  ${PROJECT_SOURCE_DIR}/src/main_CustomSocketTypes.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+TARGET_LINK_LIBRARIES(${EXEC_NAME3} ExecutionGraphForTestsOnly gtest gmock_main)
+ADD_DEPENDENCIES(build_and_test ${EXEC_NAME3})
+if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
+    ADD_DEPENDENCIES(${EXEC_NAME3} ${ExecutionGraph_DEPENDING_TARGETS})
+endif()
+defineCompileDefs(${EXEC_NAME3})
+
 add_test(NAME    ${EXEC_NAME1} COMMAND ${EXEC_NAME1})
 add_test(NAME    ${EXEC_NAME2} COMMAND ${EXEC_NAME2})
+add_test(NAME    ${EXEC_NAME3} COMMAND ${EXEC_NAME3})

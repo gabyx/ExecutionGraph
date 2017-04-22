@@ -44,7 +44,9 @@ public:
     }
 
     void reset() override {};
-    void compute() override {}
+    void compute() override {
+        getOutVal<Result1>() = getInVal<Value1>() + getInVal<Value2>();
+    }
 };
 
 MY_TEST(Node_Test, Int_Int)

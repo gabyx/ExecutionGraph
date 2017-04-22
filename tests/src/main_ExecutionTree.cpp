@@ -49,16 +49,13 @@ public:
 
     void compute() override {
 
-
         // ugly syntax due to template shit
         //        this->template getValue<typename OutSockets::template Get<Result1>>() =
         //            this->template getValue<typename InSockets::template Get<Value1>>() +
         //            this->template getValue<typename InSockets::template Get<Value2>>();
-
         getOutVal<Result1>() = getInVal<Value1>() + getInVal<Value2>();
-        std::cout << " id: " << this->getId() << " in1: " << getInVal<Value1>()
-                  << " in2: " << getInVal<Value2>()<< " res: " << getOutVal<Result1>() << std::endl;
     }
+
 };
 
 MY_TEST(ExecutionTree_Test, Int_Int)
@@ -125,7 +122,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 }
 
 int main(int argc, char** argv)
-ş{
+{
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
