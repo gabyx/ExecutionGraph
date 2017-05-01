@@ -85,9 +85,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
         EXEC_GRAPH_THROWEXCEPTION("Wrong Exception thrown!");
     }
     // Link
-    node4a->setGetLink(*node3a,
-                       node3a->getOutIdx<IntNode::Result1>(),
-                       IntNode::Value1);
+    node4a->setGetLink(*node3a,0,0);
     node4a->setGetLink(*node3b,0,1);
 
     node3a->setGetLink(*node1a,0,0);
@@ -97,7 +95,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 
     node3b->setGetLink(*node2a,0,0);
     node3b->setGetLink(*node2b,0,1);
-    node1a->setGetLink(*node1a,0,0);
+    //node1a->setGetLink(*node1a,0,0); // cycle
 
     ExecutionTreeInOut<Config> execTree;
     execTree.addNode(std::move(node1a));

@@ -61,9 +61,8 @@ private:
     //! A subgraph data structure to track the priority offset while performing a topological sort.
     struct SubGraphData
     {
-        SubGraphData(NodeData* root) : m_root(root), m_index(root->m_node->getId()) {}
+        SubGraphData(NodeData* root) : m_root(root) {}
         NodeData* m_root = nullptr;
-        const IndexType m_index;
         IndexType m_priorityOffset = 0;
     };
 
@@ -252,7 +251,6 @@ public:
         ExecutionOrderSolver solver(m_nodeMap);
         m_groupExecList.clear();
 
-        IndexType maxPrio = 0;
         for (auto& p : m_nodeGroups)
         {
             // Get the nodeDatas
@@ -262,21 +260,7 @@ public:
 
             // Sort nodes topologically
             solver.solve(nodeDatas, sortedNodeDatas);
-
-            // Save max. priority
-            maxPrio = std::max(maxPrio, sortedNodeDatas.back()->m_priority);
         }
-
-        // Do some manicure: invert all priorities such that lowest is now the
-        // highest
-        for (auto& p : m_groupExecList)
-        {
-            for (auto* nodeData : p.second)
-            {
-                nodeData->m_priority = maxPrio - nodeData->m_priority;
-            }
-        }
-
         // Check if each output node reaches at least one input, if not print warning!
         ReachNodeCheck c;
         for (auto* outNode : m_nodeClasses[NodeClassification::OutputNode])
@@ -346,15 +330,17 @@ protected:
 
                     // Allocate a subgraph data for this DFS recursion.
                     m_subGraphData.emplace_back(nodeData);
-                    nodeData->m_subGraphIdx = m_subGraphData.back().m_index;
+                    nodeData->m_subGraphIdx = m_subGraphData.size()-1;
 
                     bool backTracking = false;
                     NodeData* currentNode;
                     while(!m_dfsStack.empty())
                     {
+                        std::cout << getStackInfo() << std::endl;
+                        auto currentSize = m_dfsStack.size();
                         currentNode = m_dfsStack.back();
 
-                        std::cout << getTraversalInfo(false) << std::endl;
+                        std::cout << "curr: " << currentNode->m_node->getId() << std::endl;
 
                         // Check if node is already marked
                         if(currentNode->getFlag(NodeData::Marked))
@@ -365,6 +351,7 @@ protected:
                                 // unmark, pop and continue
                                 currentNode->unsetFlag(NodeData::Marked);
                                 m_dfsStack.pop_back();
+                                std::cout << "backtracking: remove node" << currentNode->m_node->getId() << std::endl;
                                 continue;
                             }
                             else
@@ -372,7 +359,7 @@ protected:
                                 // We are doing depth first search in the subtree,
                                 // and found another already marked node -> meaning
                                 // we have a cycle.
-                                EXEC_GRAPH_THROWEXCEPTION("Your execution logic graph contains a cylce! "
+                                EXEC_GRAPH_THROWEXCEPTION("Your execution logic graph contains a cycle! "
                                                           "Current traversal stack: "
                                                           << getTraversalInfo());
                             }
@@ -389,10 +376,11 @@ protected:
                             currentNode->setFlag(NodeData::Marked);
                         }
 
+                        std::cout << "visit: " << currentNode->m_node->getId() << std::endl;
                         visit(*currentNode); // Visits neighbors and adds them to m_dfsStack (if not visited)
 
                         // If no nodes have been added (we are at a leave -> do backtracking)
-                        if(currentNode == m_dfsStack.back())
+                        if(currentSize == m_dfsStack.size())
                         {
                             backTracking = true;
                         }
@@ -413,30 +401,43 @@ protected:
             // Sort all nodes according to priority (asscending) (lowest is most
             // important)
             std::sort(orderedNodes.begin(), orderedNodes.end(), [](auto* const& a, auto* const& b) {
-                return a->m_priority < b->m_priority;
+                return a->m_priority > b->m_priority;
             });
         }
 
     private:
 
         //! Return current DFS stack, but only nodes which are marked
-        std::string getTraversalInfo(bool onlyMarked = true)
+        std::string getTraversalInfo()
         {
             std::stringstream ss;
             auto it = m_dfsStack.begin();
-            if(it != m_dfsStack.end() && (onlyMarked && (*it)->getFlag(NodeData::Marked) || !onlyMarked))
+            if(it != m_dfsStack.end() && (*it)->getFlag(NodeData::Marked))
             {
                 ss << (*it++)->m_node->getId();
             }
             for(;it != m_dfsStack.end(); ++it)
             {
-                if((onlyMarked && (*it)->getFlag(NodeData::Marked) || !onlyMarked))
+                if((*it)->getFlag(NodeData::Marked) )
                 {
                     ss << " ---> " << (*it)->m_node->getId();
                 }
             }
             return ss.str();
         }
+
+        std::string getStackInfo()
+        {
+            std::stringstream ss;
+            ss << "[ " ;
+            for(auto* nodeData : m_dfsStack)
+            {
+                ss << nodeData->m_node->getId() << ", ";
+            }
+            ss << " ]";
+            return ss.str();
+        }
+
 
         /**
          * Depth first search: this function returns recursively the priority
@@ -458,7 +459,9 @@ protected:
                 // If we have not already visited this node, add to stack
                 if(!adjNodeData->getFlag(NodeData::Visited))
                 {
-                    adjNodeData->m_priority = nodeData.m_priority + 1;  // Increment local priority
+
+                    adjNodeData->m_priority = nodeData.m_priority + 1;   // Increment local priority
+                    std::cout << adjNodeData->m_priority << std::endl;
                     adjNodeData->m_subGraphIdx = nodeData.m_subGraphIdx; // Adjacent node has same subgraph idx!
                     m_dfsStack.push_back(adjNodeData);                   // Add to stack
                 }
@@ -471,6 +474,7 @@ protected:
                     if(getPriority(*adjNodeData) <= getPriority(nodeData))
                     {
                        // adjNodeData needs a higher priority, so increment its subgraph priority offset
+                       //std::cout << "subgraph ++:" << adjNodeData->m_subGraphIdx << std::endl;
                        m_subGraphData[adjNodeData->m_subGraphIdx].m_priorityOffset += 1;
                     }
                 }
