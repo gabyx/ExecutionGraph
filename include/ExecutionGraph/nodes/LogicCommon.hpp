@@ -171,8 +171,8 @@ private:
         using result2 = meta::front<result1>;  //! return the first element of the result (find_if returns a meta::list)
         using type    = result2;               //TMPSocketDeclOut<typename result2::Id, typename result2::DataType>;
     };
-
 public:
+
     //! Get the SocketDecleration (TMPSocketDeclOut) of socket with id `id`.
     template<EnumType id>
     using Get = typename GetSocketDeclImpl<id>::type;

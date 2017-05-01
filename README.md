@@ -33,27 +33,27 @@ Static type dispatching avoids the use of virtual calls when using polymorphic o
 ## Example 1
 Let us build this simple directed graph below:
 ```
-Node 1a
+Node 1a,0
 +-------+
 |i0     |
-|     o0+------+   Node 3a
+|     o0+------+   Node 3a,4
 |i1     |      |   +-------+
 +-------+      +--->i0     |
-Node 1b            |     o0+-----+
+Node 1b,1          |     o0+-----+
 +-------+      +--->i1     |     |
 |i0     |      |   +-------+     |
 |     o0+------+                 |
-|i1     |                        |   Node 4a
+|i1     |                        |   Node 4a,6
 +-------+                        |   +-------+
                                  +--->i0     |
                                      |     o0|
-Node 2a                          +--->i1     |
+Node 2a,2                        +--->i1     |
 +-------+                        |   +-------+
 |i0     |                        |
-|     o0+------+   Node 3b       |
+|     o0+------+   Node 3b,5     |
 |i1     |      |   +-------+     |
 +-------+      +--->i0     |     |
-Node 2b            |     o0+-----+
+Node 2b,3          |     o0+-----+
 +-------+      +--->i1     |
 |i0     |      |   +-------+
 |     o0+------+
@@ -150,11 +150,11 @@ Next we create the *get* links which connect the in- and outputs.
     node4a->setGetLink(*node3a,o0,i0);
     node4a->setGetLink(*node3b,o0,i1);
 
-    node3a->setGetLink(*node2a,o0,i0);
-    node3a->setGetLink(*node2b,o0,i1);
+    node3a->setGetLink(*node1a,o0,i0);
+    node3a->setGetLink(*node1b,o0,i1);
     
-    node3b->setGetLink(*node1a,o0,i0);
-    node3b->setGetLink(*node1b,o0,i1);
+    node3b->setGetLink(*node2a,o0,i0);
+    node3b->setGetLink(*node2b,o0,i1);
 ```
 The syntax `node4a->setGetLink(*node3a,0,0);` denotes that the output node `node4a` gets its first input value `i0 = 0` from the single output `o0 = 0` of node `node3a`. The above snippet builds the execution tree given at the begining.
 Finally we create the ExecutionTree `ExecutionTreeInOut`, add all nodes to it, set the proper node classfication (if its an input or output node, setup the graph (which computes the execution order) and execute the default execution group `0` as

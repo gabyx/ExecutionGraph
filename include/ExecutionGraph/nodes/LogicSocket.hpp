@@ -10,6 +10,7 @@
 #ifndef ExecutionGraph_nodes_LogicSocket_hpp
 #define ExecutionGraph_nodes_LogicSocket_hpp
 
+#include <unordered_set>
 #include <meta/meta.hpp>
 
 #include "ExecutionGraph/common/Asserts.hpp"
@@ -108,12 +109,15 @@ public:
     void setGetLink(LogicSocketOutputBase<Config>& outputSocket);
 
     //! Check if the socket has a Get-Link to an output socket.
-    inline bool hasGetLink() const { return m_from != nullptr; }
+    inline bool hasGetLink() const { return m_getFrom != nullptr; }
 
-    inline LogicSocketOutputBase<Config>* getGetLink() { return m_from; }
+    inline LogicSocketOutputBase<Config>* getGetLink() { return m_getFrom; }
+
+    const auto& getWritingParents(){ return m_writingParents; }
 
 protected:
-    LogicSocketOutputBase<Config>* m_from = nullptr;  //!< The single Get-Link attached to this Socket.
+    LogicSocketOutputBase<Config>* m_getFrom = nullptr;  //!< The single Get-Link attached to this Socket.
+    std::unordered_set<LogicSocketOutputBase<Config>*> m_writingParents; //!< All parent output sockets which write to this input.
 };
 
 //! The input socket base class for all input/output sockets of a logic node.
@@ -155,7 +159,7 @@ public:
     void addWriteLink(LogicSocketInputBase<Config>& inputSocket);
 
 protected:
-    std::vector<LogicSocketInputBase<Config>*> m_to;  //!< All Write-Links attached to this Socket.
+    std::vector<LogicSocketInputBase<Config>*> m_writeTo;  //!< All Write-Links attached to this Socket.
 };
 
 template<typename TData>
@@ -209,9 +213,9 @@ public:
     //! Get the data value of the socket. (follow Get-Link)
     inline const DataType& getValue() const
     {
-        if (this->m_from != nullptr)
+        if (this->m_getFrom != nullptr)
         {
-            return static_cast<LogicSocketOutput<DataType, Config>*>(this->m_from)->getValue();
+            return static_cast<LogicSocketOutput<DataType, Config>*>(this->m_getFrom)->getValue();
         }
         else
         {
@@ -275,9 +279,10 @@ void LogicSocketOutputBase<TConfig>::addWriteLink(LogicSocketInputBase<TConfig>&
                                                         << inputSocket.getParent().getId(),
                                       NodeConnectionException);
 
-    if (std::find(m_to.begin(), m_to.end(), &inputSocket) == m_to.end())
+    if (std::find(m_writeTo.begin(), m_writeTo.end(), &inputSocket) == m_writeTo.end())
     {
-        m_to.push_back(&inputSocket);
+        m_writeTo.push_back(&inputSocket);
+        inputSocket.m_writingParents.emplace(this);
     }
     else
     {
@@ -303,7 +308,7 @@ void LogicSocketInputBase<TConfig>::setGetLink(LogicSocketOutputBase<TConfig>& o
 
     if (!hasGetLink())
     {
-        m_from = &outputSocket;
+        m_getFrom = &outputSocket;
     }
     else
     {
@@ -319,7 +324,7 @@ template<typename TData, typename TConfig>
 void LogicSocketOutput<TData, TConfig>::executeWriteLinks()
 {
     // Write out value to all connected (Write-Link) input sockets.
-    for (auto& inputSocket : this->m_to)
+    for (auto& inputSocket : this->m_writeTo)
     {
         // We know that this static cast is safe, since it has been
         // checked when addWriteLink() is called.

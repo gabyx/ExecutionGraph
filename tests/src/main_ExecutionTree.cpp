@@ -61,16 +61,16 @@ public:
 MY_TEST(ExecutionTree_Test, Int_Int)
 {
     using IntNode = IntegerNode<Config>;
-    auto node1a = std::make_unique<IntNode>(0);
-    auto node1b = std::make_unique<IntNode>(1);
+    auto node1a = std::make_unique<IntNode>(0,"1a");
+    auto node1b = std::make_unique<IntNode>(1,"1b");
 
-    auto node2a = std::make_unique<IntNode>(2);
-    auto node2b = std::make_unique<IntNode>(3);
+    auto node2a = std::make_unique<IntNode>(2,"2a");
+    auto node2b = std::make_unique<IntNode>(3,"2b");
 
-    auto node3a = std::make_unique<IntNode>(4);
-    auto node3b = std::make_unique<IntNode>(5);
+    auto node3a = std::make_unique<IntNode>(4,"3a");
+    auto node3b = std::make_unique<IntNode>(5,"3b");
 
-    auto node4a = std::make_unique<IntNode>(6);
+    auto node4a = std::make_unique<IntNode>(6,"4a");
     auto resultNode = node4a.get();
 
     try{
@@ -90,11 +90,14 @@ MY_TEST(ExecutionTree_Test, Int_Int)
                        IntNode::Value1);
     node4a->setGetLink(*node3b,0,1);
 
-    node3a->setGetLink(*node2a,0,0);
-    node3a->setGetLink(*node2b,0,1);
+    node3a->setGetLink(*node1a,0,0);
+    node3a->setGetLink(*node1b,0,1);
+//    node1a->addWriteLink(0,*node3a,0);
+//    node1b->addWriteLink(0,*node3a,1);
 
-    node3b->setGetLink(*node1a,0,0);
-    node3b->setGetLink(*node1b,0,1);
+    node3b->setGetLink(*node2a,0,0);
+    node3b->setGetLink(*node2b,0,1);
+    node1a->setGetLink(*node1a,0,0);
 
     ExecutionTreeInOut<Config> execTree;
     execTree.addNode(std::move(node1a));

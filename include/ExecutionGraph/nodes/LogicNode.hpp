@@ -27,18 +27,18 @@ namespace executionGraph
                                +-------------+                                       +-------------+
                                | LogicNode A |                                       | LogicNode B |
                                |             |                                       |             |
-                               |      +------+-----+                           +-----+-----+       |
-                               |      | Out Socket |                           | In Socket |       |
-                               |      |            |                           |           |       |
-                               |      |    m_to[0] |@------( Write-Link )----> |           |       |
-                               |      |            |                           |           |       |
-                               |      |            |                           |           |       |
-                               |      |            |                           |           |       |
-                               |      |            | <-----(  Get-Link  )-----@| m_from    |       |
-                               |      |            |                           |           |       |
-                               |      |            |                           |           |       |
-                               |      |  T m_data  |                           |  T m_data |       |
-                               |      +------+-----+                           +-----+-----+       |
+                               |     +-------+-----+                           +-----+-----+       |
+                               |     |  Out Socket |                           | In Socket |       |
+                               |     |             |                           |           |       |
+                               |     | m_writeTo[0]|@------( Write-Link )----> |           |       |
+                               |     |             |                           |           |       |
+                               |     |             |                           |           |       |
+                               |     |             |                           |           |       |
+                               |     |             | <-----(  Get-Link  )-----@| m_getFrom |       |
+                               |     |             |                           |           |       |
+                               |     |             |                           |           |       |
+                               |     |   T m_data  |                           |  T m_data |       |
+                               |     +-------+-----+                           +-----+-----+       |
                                |             |                                       |             |
                                +-------------+                                       +-------------+
 
@@ -50,8 +50,9 @@ namespace executionGraph
                                                                  ||
                                                                  ||
                 -setValue():  set all Write-Links directly       ||      -setValue(): gets internal this->m_data
-                              (m_to array) and set this->m_data  ||
-                              also because this might have other ||
+                              (m_writeTo array) and set          ||
+                              this->m_data also because this     ||
+                              might have other                   ||
                               Get-Links                          ||
                                                                  ++
         // clang-format on
@@ -68,8 +69,8 @@ public:
 
 public:
     //! The basic constructor of a logic node.
-    LogicNode(NodeId id)
-        : m_id(id) {}
+    LogicNode(NodeId id, std::string name ="no-name")
+        : m_id(id), m_name(name) {}
     LogicNode(const LogicNode&) = default;
     LogicNode(LogicNode&&)      = default;
 
@@ -82,6 +83,7 @@ public:
     virtual void compute() = 0;
 
     inline NodeId getId() { return m_id; }
+    inline std::string getName() { return m_name; }
 
     inline bool hasLinks() const { return m_hasLinks; }
     inline void setLinked(void) { m_hasLinks = true; }
@@ -229,6 +231,7 @@ public:
 
 protected:
     const NodeId m_id;  //! The unique id of the logic node.
+    std::string m_name; //! The name of the logic node.
     bool m_hasLinks;
     SocketInputListType m_inputs;
     SocketOutputListType m_outputs;

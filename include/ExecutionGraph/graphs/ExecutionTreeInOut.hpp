@@ -41,12 +41,30 @@ public:
 private:
     static const std::underlying_type_t<NodeClassification> nNodeClasses = 3;
 
+    //! Internal Datastructure to store node related data.
     using NodePointer = std::unique_ptr<NodeBaseType>;
     struct NodeData
     {
         NodePointer m_node         = nullptr;
         NodeClassification m_class = NodeClassification::NormalNode;
-        IndexType m_priority       = 0;
+        IndexType m_priority       = 0;     //! The priority of this node
+
+        IndexType m_subGraphIdx    = -1;    //! The subgraph index
+
+        enum TraversalFlags : int { Visited = 1 , Marked = 2};
+        int m_flags                = 0;     //! Some flags for graph traversal
+        bool getFlag(TraversalFlags position){ return m_flags & (1<<position);}
+        void setFlag(TraversalFlags position){ m_flags |= (1<<position);}
+        void unsetFlag(TraversalFlags position) { m_flags &= ~(1<<position);}
+    };
+
+    //! A subgraph data structure to track the priority offset while performing a topological sort.
+    struct SubGraphData
+    {
+        SubGraphData(NodeData* root) : m_root(root), m_index(root->m_node->getId()) {}
+        NodeData* m_root = nullptr;
+        const IndexType m_index;
+        IndexType m_priorityOffset = 0;
     };
 
     using NodeDataStorage = std::unordered_map<NodeId, NodeData>;  // Rehashing does not invalidate pointers or references to elements.
@@ -229,22 +247,24 @@ public:
             EXEC_GRAPH_THROWEXCEPTION("No output nodes specified!");
         }
 
-        // Solve execution order for every group list!
+        // Solve execution order for every group
         // Each group has its own execution order!
         ExecutionOrderSolver solver(m_nodeMap);
         m_groupExecList.clear();
+
         IndexType maxPrio = 0;
         for (auto& p : m_nodeGroups)
         {
+            // Get the nodeDatas
             NodeDataSet& nodeDatas = p.second;
-            // fill nodes into execution list
-            NodeDataList& l = m_groupExecList[p.first];
-            std::for_each(
-                nodeDatas.begin(), nodeDatas.end(), [&l](NodeData* nodeData) { l.push_back(nodeData); });
+            // Get the eventually sorted nodeDatas
+            NodeDataList& sortedNodeDatas = m_groupExecList[p.first];
 
-            solver.solve(l, l);
+            // Sort nodes topologically
+            solver.solve(nodeDatas, sortedNodeDatas);
 
-            maxPrio = std::max(maxPrio, l.back()->m_priority);
+            // Save max. priority
+            maxPrio = std::max(maxPrio, sortedNodeDatas.back()->m_priority);
         }
 
         // Do some manicure: invert all priorities such that lowest is now the
@@ -257,12 +277,12 @@ public:
             }
         }
 
-        // Check if input is reachable from all outputs
+        // Check if each output node reaches at least one input, if not print warning!
         ReachNodeCheck c;
         for (auto* outNode : m_nodeClasses[NodeClassification::OutputNode])
         {
             bool outputReachedInput = false;
-            // each output node should reach at least one input, if not print warning!
+
             for (auto* inNode : m_nodeClasses[NodeClassification::InputNode])
             {
                 if (c.check(outNode, inNode))
@@ -279,19 +299,21 @@ public:
     {
         // Print execution order
         std::stringstream s;
+        std::string fmtH = "%-15s  |  %-6s  | %-8s   |  %-20s";
+        std::string fmt =  "%-15s  |  %-6i  | %-8i   |  %-20s";
         for (auto& g : m_groupExecList)
         {
             s << "Execution order for group id: " << g.first << std::endl;
-            s << suffix << stringFormat("%-6s  |  %-8s  |  %-20s", "NodeId", "Priority", "NodeType") << std::endl;
-            s << suffix << stringFormat("%-6s  |  %-8s  |  %-20s", "------", "--------", "--------") << std::endl;
+            s << suffix << stringFormat(fmtH, "Name" ,"NodeId", "Priority", "NodeType") << std::endl;
+            s << suffix << stringFormat(fmtH, "---------------","------", "--------", "--------") << std::endl;
             for (auto* nodeData : g.second)
             {
                 auto* n = nodeData->m_node.get();
                 s << suffix
-                  << stringFormat("%6i  |  %8i  |  %20s", n->getId(), nodeData->m_priority, n->getTypeName().c_str())
+                  << stringFormat(fmt, n->getName().c_str(),  n->getId(), nodeData->m_priority, n->getTypeName().c_str())
                   << std::endl;
             }
-            s << suffix << stringFormat("%-6s  |  %-8s  |  %-20s", "------", "--------", "--------") << std::endl;
+            s << suffix << stringFormat(fmtH, "---------------","------", "--------", "--------") << std::endl;
         }
         return s.str();
     }
@@ -305,17 +327,87 @@ protected:
         {
         }
 
-        void solve(NodeDataList& inputNodes, NodeDataList& orderedNodes)
+        void solve(NodeDataSet nodes, NodeDataList& orderedNodes)
         {
-            // Solve Execution order,
-            // start a depth first search recursion for all nodes in c which
-            // determines an execution order by setting
-            // the priority
-            for (auto* nodeData : inputNodes)
+            m_subGraphData.clear();
+            orderedNodes.clear();
+            NodeData* visitingNode = nullptr;
+
+            // Loop over all nodes and start a depth-first-search
+            for(NodeData* nodeData: nodes)
             {
-                std::unordered_set<IndexType> nodesCurrDepth;
-                // start recursion from this node
-                solveRec(*nodeData, nodesCurrDepth);
+                if(!nodeData->getFlag(NodeData::Visited))
+                {
+                    // Start a depth-first recursion from this node (exploring this subtree)
+                    m_dfsStack.clear();
+
+                    nodeData->unsetFlag(NodeData::Marked);
+                    m_dfsStack.push_back(nodeData);
+
+                    // Allocate a subgraph data for this DFS recursion.
+                    m_subGraphData.emplace_back(nodeData);
+                    nodeData->m_subGraphIdx = m_subGraphData.back().m_index;
+
+                    bool backTracking = false;
+                    NodeData* currentNode;
+                    while(!m_dfsStack.empty())
+                    {
+                        currentNode = m_dfsStack.back();
+
+                        std::cout << getTraversalInfo(false) << std::endl;
+
+                        // Check if node is already marked
+                        if(currentNode->getFlag(NodeData::Marked))
+                        {
+
+                            if(backTracking)
+                            {
+                                // unmark, pop and continue
+                                currentNode->unsetFlag(NodeData::Marked);
+                                m_dfsStack.pop_back();
+                                continue;
+                            }
+                            else
+                            {
+                                // We are doing depth first search in the subtree,
+                                // and found another already marked node -> meaning
+                                // we have a cycle.
+                                EXEC_GRAPH_THROWEXCEPTION("Your execution logic graph contains a cylce! "
+                                                          "Current traversal stack: "
+                                                          << getTraversalInfo());
+                            }
+                        }
+                        else
+                        {
+                            // Reset backtracking
+                            if(backTracking)
+                            {
+                                backTracking = false;
+                            }
+
+                            // Mark this node:
+                            currentNode->setFlag(NodeData::Marked);
+                        }
+
+                        visit(*currentNode); // Visits neighbors and adds them to m_dfsStack (if not visited)
+
+                        // If no nodes have been added (we are at a leave -> do backtracking)
+                        if(currentNode == m_dfsStack.back())
+                        {
+                            backTracking = true;
+                        }
+
+                        // Set node as visited
+                        currentNode->setFlag(NodeData::Visited);
+                    }
+                }
+            }
+
+            // Loop over all nodes and set the final priority:
+            for(NodeData* nodeData: nodes)
+            {
+                nodeData->m_priority = getPriority(*nodeData);
+                orderedNodes.emplace_back(nodeData);
             }
 
             // Sort all nodes according to priority (asscending) (lowest is most
@@ -326,55 +418,96 @@ protected:
         }
 
     private:
+
+        //! Return current DFS stack, but only nodes which are marked
+        std::string getTraversalInfo(bool onlyMarked = true)
+        {
+            std::stringstream ss;
+            auto it = m_dfsStack.begin();
+            if(it != m_dfsStack.end() && (onlyMarked && (*it)->getFlag(NodeData::Marked) || !onlyMarked))
+            {
+                ss << (*it++)->m_node->getId();
+            }
+            for(;it != m_dfsStack.end(); ++it)
+            {
+                if((onlyMarked && (*it)->getFlag(NodeData::Marked) || !onlyMarked))
+                {
+                    ss << " ---> " << (*it)->m_node->getId();
+                }
+            }
+            return ss.str();
+        }
+
         /**
          * Depth first search: this function returns recursively the priority
          * lowest number has the highest priority
          */
 
-        IndexType solveRec(NodeData& nodeData, std::unordered_set<IndexType>& nodesCurrDepth)
+        void visit(NodeData& nodeData)
         {
-            NodeBaseType* node = nodeData.m_node.get();
 
-            nodesCurrDepth.insert(node->getId());
 
-            // visit all input sockets and their node!
-            auto& inSockets = node->getInputs();
+            auto addToStack = [&](auto* socket){
+                // Get NodeData of adjNode
+                auto& adjNode = socket->getParent();
+                auto itAdj = m_nodeMap.find(adjNode.getId());
+                EXEC_GRAPH_THROWEXCEPTION_IF(itAdj == m_nodeMap.end(),
+                                             "Node with id: " << adjNode.getId() << " has not been added to the execution tree!");
+                NodeData* adjNodeData = &itAdj->second;
+
+                // If we have not already visited this node, add to stack
+                if(!adjNodeData->getFlag(NodeData::Visited))
+                {
+                    adjNodeData->m_priority = nodeData.m_priority + 1;  // Increment local priority
+                    adjNodeData->m_subGraphIdx = nodeData.m_subGraphIdx; // Adjacent node has same subgraph idx!
+                    m_dfsStack.push_back(adjNodeData);                   // Add to stack
+                }
+                else
+                {
+                    EXEC_GRAPH_THROWEXCEPTION_IF(adjNodeData->m_subGraphIdx == -1,"Error: Node with id: "
+                                                 << adjNodeData->m_node->getId() << " is visited and should have a subgraph index!");
+
+                    // Compare the global priority (local priority + subgraph offset)
+                    if(getPriority(*adjNodeData) <= getPriority(nodeData))
+                    {
+                       // adjNodeData needs a higher priority, so increment its subgraph priority offset
+                       m_subGraphData[adjNodeData->m_subGraphIdx].m_priorityOffset += 1;
+                    }
+                }
+            };
+
+            // Follow all links
+            auto& inSockets = nodeData.m_node->getInputs();
             for (auto& socket : inSockets)
             {
+                // Try adding the get link to the stack
                 if (socket->hasGetLink())
                 {
-                    auto* outputSocket = socket->getGetLink();
-
-                    auto& adjNode = outputSocket->getParent();
-                    if (nodesCurrDepth.find(adjNode.getId()) != nodesCurrDepth.end())
-                    {
-                        EXEC_GRAPH_THROWEXCEPTION("Your execution logic graph contains a cylce from node: " << node->getId()
-                                                                                                            << " socket: "
-                                                                                                            << socket->getIndex()
-                                                                                                            << " to node: "
-                                                                                                            << adjNode.getId()
-                                                                                                            << " socket: "
-                                                                                                            << outputSocket->getIndex());
-                    }
-
-                    // Get NodeData of adjNode
-                    auto itAdj = m_nodeMap.find(adjNode.getId());
-                    EXEC_GRAPH_THROWEXCEPTION_IF(itAdj == m_nodeMap.end(),
-                                                 "Node with id: " << adjNode.getId() << " has not been added to the execution tree!");
-                    IndexType prioAdj = solveRec(itAdj->second, nodesCurrDepth);
-
-                    // Set the current node to the priority of the below tree +1
-                    nodeData.m_priority = std::max(prioAdj + 1, nodeData.m_priority);
+                    addToStack(socket->getGetLink());
+                }
+                // Try adding all writing links to the stack
+                for(auto* outputSocket: socket->getWritingParents())
+                {
+                    addToStack(outputSocket);
                 }
             }
+        }
 
-            nodesCurrDepth.erase(node->getId());
-
+        IndexType getPriority(NodeData& nodeData)
+        {
+            if(nodeData.m_subGraphIdx != -1)
+            {
+                return nodeData.m_priority + m_subGraphData[nodeData.m_subGraphIdx].m_priorityOffset;
+            }
             return nodeData.m_priority;
         }
+
         bool m_inputReachable     = false;
         NodeBaseType* m_reachNode = nullptr;
         NodeDataStorage& m_nodeMap;  //! All NodeDatas of the execution tree.
+
+        std::deque<NodeData*> m_dfsStack; //! Depth-First-Search Stack
+        std::vector<SubGraphData> m_subGraphData; //! Storage for all subgraph data.
     };
 
     // Only for directed graphs, does not detect cycles -> endless loop!
