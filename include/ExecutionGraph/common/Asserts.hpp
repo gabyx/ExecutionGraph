@@ -18,11 +18,16 @@
 #include "ExecutionGraph/config/Config.hpp"
 
 //! Some assert macro.
+
+
+
 #ifdef NDEBUG
+#define EXEC_GRAPH_DEBUG_ONLY(code)
 #define EXEC_GRAPH_ASSERT(condition, message)
 #define EXEC_GRAPH_ASSERT_TYPE(condition, message, type)
 #else
 // Debug!
+#define EXEC_GRAPH_DEBUG_ONLY(code) code
 #define EXEC_GRAPH_ASSERT(condition, message) EXEC_GRAPH_ASSERT_TYPE(condition, message, Exception)
 #define EXEC_GRAPH_ASSERT_TYPE(condition, message, type)  \
     {                                                     \

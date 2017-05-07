@@ -69,8 +69,8 @@ public:
 
 public:
     //! The basic constructor of a logic node.
-    LogicNode(NodeId id, std::string name ="no-name")
-        : m_id(id), m_name(name) {}
+    LogicNode(NodeId id, std::string name = "")
+        : m_id(id), m_name((name.empty())? name : std::to_string(id)) {}
     LogicNode(const LogicNode&) = default;
     LogicNode(LogicNode&&)      = default;
 
@@ -85,17 +85,16 @@ public:
     inline NodeId getId() { return m_id; }
     inline std::string getName() { return m_name; }
 
-    inline bool hasLinks() const { return m_hasLinks; }
-    inline void setLinked(void) { m_hasLinks = true; }
-
-    //    //! Set the priority of this node to \p p.
-    //    inline void setPriority(unsigned int p) { m_priority = p; }
-    //    //! Get the priority of this node.
-    //    inline unsigned int getPriority(void) const { return m_priority; }
     //! Get the list of input sockets.
     const SocketInputListType& getInputs() const { return m_inputs; }
     //! Get the list of output sockets.
     const SocketOutputListType& getOutputs() const { return m_outputs; }
+
+    //! Get the number of input sockets which are connected to other nodes.
+    IndexType getConnectedInputCount();
+
+    //! Get the number of output sockets which are connected to other nodes.
+    IndexType getConnectedOutputCount();
 
     //! Add an input socket with default value \p defaultValue.
     template<typename TData, typename T>
@@ -232,11 +231,37 @@ public:
 protected:
     const NodeId m_id;  //! The unique id of the logic node.
     std::string m_name; //! The name of the logic node.
-    bool m_hasLinks;
     SocketInputListType m_inputs;
     SocketOutputListType m_outputs;
-    //    unsigned int m_priority;
 };
+
+template<typename TConfig>
+IndexType LogicNode<TConfig>::getConnectedInputCount()
+{
+    IndexType count = 0;
+    for(auto& socket : this->getInputs())
+    {
+        if(socket->getConnectionCount() > 0)
+        {
+            ++count;
+        }
+    }
+    return count;
+}
+
+template<typename TConfig>
+IndexType LogicNode<TConfig>::getConnectedOutputCount()
+{
+    IndexType count = 0;
+    for(auto& socket : this->getOutputs())
+    {
+        if(socket->getConnectionCount() > 0)
+        {
+            ++count;
+        }
+    }
+    return count;
+}
 
 template<typename TConfig>
 template<typename T>

@@ -124,6 +124,65 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     EXEC_GRAPH_THROWEXCEPTION_IF( resultNode->getOutVal<IntegerNode<Config>::Result1>() != 16 ,"wrong result");
 }
 
+MY_TEST(ExecutionTree_Test, IntBig)
+{
+    using IntNode = IntegerNode<Config>;
+    int nNodes = 5;
+
+    for(int seed = 0; seed<10000; ++seed)
+    {
+        //std::cout << "seed: " << seed << std::endl;
+        std::random_device rd;  //Will be used to obtain a seed for the random number engine
+        std::mt19937 gen(2); //Standard mersenne_twister_engine seeded with rd()
+        std::uniform_int_distribution<> dis(0,nNodes-1);
+
+        ExecutionTreeInOut<Config> execTree;
+
+        for(int i = 0; i<nNodes; ++i){
+            execTree.addNode(std::make_unique<IntNode>(i));
+        }
+
+        // Links
+        for(int i = 1; i<nNodes; ++i){
+            // Make link from input 1
+            int id = std::min( (int)(dis(gen) / ((double)nNodes)) * i , i);
+            std::cout << id << "-->" << i <<"[0]" << std::endl;
+            execTree.makeGetLink(id,0,i,0);
+            // Make link from input 2
+
+            id = std::min( (int)((dis(gen) / ((double)nNodes)) * i) , i);
+            std::cout << id << "-->" << i <<"[1]" << std::endl;
+            execTree.makeGetLink(id,0,i,1);
+        }
+
+
+        for(int i = 0; i<nNodes; ++i){
+            auto* node =  execTree.getNode(i);
+
+            std::cout << "id: " << i << " has " << node->getConnectedInputCount() <<" connected inputs." << std::endl;
+            std::cout << "id: " << i << " has " << node->getConnectedOutputCount() <<" connected output." << std::endl;
+
+            if(node->getConnectedInputCount() == 0)
+            {
+                std::cout << "set id: " << i << " as input." << std::endl;
+                execTree.setNodeClass(*node, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
+            }
+
+            if(node->getConnectedOutputCount() == 0)
+            {
+                execTree.setNodeClass(*node, ExecutionTreeInOut<Config>::NodeClassification::OutputNode);
+                std::cout << "set id: " << i << " as output." << std::endl;
+            }
+        }
+
+
+
+        execTree.setup(true);
+
+        std::cout << execTree.getExecutionOrderInfo() << std::endl;
+    }
+}
+
 int main(int argc, char** argv)
 {
     testing::InitGoogleTest(&argc, argv);
