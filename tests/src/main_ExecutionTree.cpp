@@ -127,51 +127,58 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 MY_TEST(ExecutionTree_Test, IntBig)
 {
     using IntNode = IntegerNode<Config>;
-    int nNodes = 50000;
+    int nNodes = 1000000;
 
     for(int seed = 0; seed<10; ++seed)
     {
-        //std::cout << "seed: " << seed << std::endl;
-        std::random_device rd;  //Will be used to obtain a seed for the random number engine
-        std::mt19937 gen(2); //Standard mersenne_twister_engine seeded with rd()
+        std::mt19937 gen(seed); //Standard mersenne_twister_engine seeded with rd()
         std::uniform_int_distribution<> dis(0,nNodes-1);
 
+        std::vector<std::unique_ptr<IntNode>> vec(nNodes);
         ExecutionTreeInOut<Config> execTree;
 
         for(int i = 0; i<nNodes; ++i){
-            execTree.addNode(std::make_unique<IntNode>(i));
+            vec[i] = std::move(std::make_unique<IntNode>(i));
+            //std::cout << vec[i]->getId() <<",";
         }
+        //std::cout << std::endl;
 
         // Links
         for(int i = 1; i<nNodes; ++i){
             // Make link from input 1
             int id = std::min( (int)(dis(gen) / ((double)nNodes)) * i , i);
             //std::cout << id << "-->" << i <<"[0]" << std::endl;
-            execTree.makeGetLink(id,0,i,0);
+            vec[i]->setGetLink(*vec[id],0,0);
             // Make link from input 2
 
             id = std::min( (int)((dis(gen) / ((double)nNodes)) * i) , i);
             //std::cout << id << "-->" << i <<"[1]" << std::endl;
-            execTree.makeGetLink(id,0,i,1);
+            vec[i]->setGetLink(*vec[id],0,1);
         }
 
+        // Make a cycle
+        //vec[25]->addWriteLink(0,*vec[2],0);
+
+        std::shuffle(vec.begin(),vec.end(), gen);
+
+        for(int i = 0; i<nNodes; ++i){
+            execTree.addNode(std::move(vec[i]));
+        }
+        vec.clear();
 
         for(int i = 0; i<nNodes; ++i){
             auto* node =  execTree.getNode(i);
 
             //std::cout << "id: " << i << " has " << node->getConnectedInputCount() <<" connected inputs." << std::endl;
             //std::cout << "id: " << i << " has " << node->getConnectedOutputCount() <<" connected output." << std::endl;
-
             if(node->getConnectedInputCount() == 0)
             {
-                //std::cout << "set id: " << i << " as input." << std::endl;
                 execTree.setNodeClass(*node, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
             }
 
             if(node->getConnectedOutputCount() == 0)
             {
                 execTree.setNodeClass(*node, ExecutionTreeInOut<Config>::NodeClassification::OutputNode);
-                //std::cout << "set id: " << i << " as output." << std::endl;
             }
         }
 

@@ -57,10 +57,14 @@ private:
         NodeClassification m_class = NodeClassification::NormalNode;
         IndexType m_priority       = 0;     //! The priority of this node
 
-        IndexType m_subGraphIdx    = -1;    //! The subgraph inde
-        bool isInSubGraph(){ return m_subGraphIdx != -1; }
+        void resetTraversalParameters(){ m_flags=0; /*m_subGraphIdx = -1;*/ }
 
-        enum TraversalFlags : int {};
+        //IndexType m_subGraphIdx    = -1;    //! The subgraph index
+        //bool isInSubGraph(){ return m_subGraphIdx != -1; }
+
+        enum TraversalFlags : int { Visited, //!< All visited nodes (globally)
+                                    OnCurrentDFRPath   //!< This mark is set for all nodes on the current depth-first recursion path.
+                                  };
         bool isFlagSet(TraversalFlags position){ return m_flags & (1<<position);}
         void setFlag(TraversalFlags position){ m_flags |= (1<<position);}
         void unsetFlag(TraversalFlags position) { m_flags &= ~(1<<position);}
@@ -69,12 +73,12 @@ private:
             int m_flags = 0;     //! Some flags for graph traversal
     };
 
-    //! A subgraph data structure to track the priority offset while performing a topological sort.
-    struct SubGraphData
-    {
-        SubGraphData(NodeData* root) : m_root(root) {}
-        NodeData* m_root = nullptr;
-    };
+//    //! A subgraph data structure to track the priority offset while performing a topological sort.
+//    struct SubGraphData
+//    {
+//        SubGraphData(NodeData* root) : m_root(root) {}
+//        NodeData* m_root = nullptr;
+//    };
 
     using NodeDataStorage    = std::unordered_map<NodeId, NodeData>;  // Rehashing does not invalidate pointers or references to elements.
 
@@ -345,91 +349,88 @@ protected:
 
             This algorithm is based on https://en.wikipedia.org/wiki/Topological_sorting#Depth-first_search.
             We visit each node once during this algorithm.
-            From each node `a` in `nodes` we start a depth-first recursion, basically exploring the whole subtree `S`
-            of each node `a`. While exploring, we assign local priorities to each node in the subtree (root = `a`)
-            , e.g. NodeData::m_priority. Each subtree we explore has a priority offset which makes it possible to increase
-            all priorities of all nodes below a subtree. Such increases happen when we start a depth-first recursion
-            from a new node `a` and we find a node `b` in its subgraph which has already been visited
-            (meaning `b` is in a subgraph which is already explored) and `getPriority(b) > getPriority(a) == false`
-            we optimaly need to increase all priorities of `b`'s subgraph. This would need another depth traversal.
-            Instead we increase the priority offset (SubGraphData.m_priorityOffset) of the subgraph to
-            which `b` is found before.
+            From each node `a` in `nodes` we start a depth-first recursion (DFR), basically exploring the whole subtree `S`
+            of each node `a`. While exploring, we set the NodeData::m_priority of each node in the subtree with root = `a`.
+
+            For each DFR, we trace the current path explored by marking each node by the flag NodeData::OnCurrentDFRPath.
+            This allows to detect cycles.
+
+            When a node is visited its NodeData::Visited flag gets set.
+            A DFR starts only from a node which has NodeData::Visited == false.
+            During a DFR, an new child node is explored (added to the m_dfrStack) only if
+            its priority is not greater than the parent.
+            When the child node is added the flag NodeData::Visited is unset!
         */
         void solve(NodeDataSet nodes, PrioritySet& orderedNodes, bool checkResults = true)
         {
-            m_subGraphData.clear();
-
             orderedNodes.clear();
-            NodeData* visitingNode = nullptr;
+
+            m_dfrStack.reserve(nodes.size());
 
             // Loop over all nodes and start a depth-first-search
             for(NodeData* nodeData: nodes)
             {
-                // If the node is already in a subgraph, we know that topological ordering (priorities)
-                // below him is correct, so skip this one
-                if(nodeData->isInSubGraph())
+                // If the node is visited we know that the node was contained in a depth-first recursion
+                // we know that the prioriteis below it are correct, so skip this one
+                if(nodeData->isFlagSet(NodeData::Visited))
                 {
                     EXEC_GRAPH_EXECTREE_SOLVER_LOG("DFS Start: Node id: " << nodeData->m_node->getId()
-                                                   << " in subGraph -> skip it." << std::endl;);
+                                                   << " already visited -> skip it." << std::endl;);
                     continue;
                 }
 
                 EXEC_GRAPH_EXECTREE_SOLVER_LOG("DFS Start: Node id: " << nodeData->m_node->getId() << std::endl;);
 
-                // Start a depth-first recursion from this node (exploring this subtree)
-                m_dfsStack.clear();
-                m_visitedNodes.clear();
-                auto visitEndIt = m_visitedNodes.end();
+                // Start a depth-first recursion from this node (exploring its subtree)
+                m_dfrStack.clear();
+
                 // Insert root node
-                m_dfsStack.push_back(nodeData);
+                m_dfrStack.push_back(nodeData);
 
-                 // Allocate a subgraph data for this DFS recursion.
-                m_subGraphData.emplace_back(nodeData);
-                nodeData->m_subGraphIdx = m_subGraphData.size()-1; // set the subgraph index
-
-                NodeData* currentNode;
-                bool backTracking = false;
-                bool visited = false;
-                std::size_t currentSize;
-
+                // Remove all nodes up the stack which are visited
+                // while doing so unmark the nodes.
                 auto doBackTracking = [&](){
-                    auto itStart = m_dfsStack.rbegin();
-                    auto itEnd = m_dfsStack.rend();
+                    auto itStart = m_dfrStack.rbegin();
+                    auto itEnd = m_dfrStack.rend();
                     auto it = itStart;
                     while(it != itEnd)
                     {
-                        if(m_visitedNodes.find(*it) == visitEndIt)
+                        if(!(*it)->isFlagSet(NodeData::Visited))
                         {
                             // Not visited, backtracking finished!
                             // Remove the range [itStart,itLast) from the stack
                             break;
                         }
+                        (*it)->unsetFlag(NodeData::OnCurrentDFRPath); // Remove Mark
                         ++it;
                     }
-                    EXEC_GRAPH_ASSERT(std::distance(itStart,it) <= m_dfsStack.size(),
-                                      "Removing: " << std::distance(itStart,it) << " from " << m_dfsStack.size());
+                    EXEC_GRAPH_ASSERT(std::distance(itStart,it) <= m_dfrStack.size(),
+                                      "Removing: " << std::distance(itStart,it) << " from " << m_dfrStack.size());
                     // Convert backward iterator to forward
-                    m_dfsStack.erase(it.base(),itStart.base());
+                    m_dfrStack.erase(it.base(),itStart.base());
                 };
 
-                while(!m_dfsStack.empty())
+                // Loop variables
+                NodeData* currentNode;
+                std::size_t currentSize;
+
+                while(!m_dfrStack.empty())
                 {
-                    EXEC_GRAPH_EXECTREE_SOLVER_LOG("DFS Stack:" << getStackInfo() << (backTracking? "<--" : " ") << std::endl);
+                    EXEC_GRAPH_EXECTREE_SOLVER_LOG("DFS Stack:" << getStackInfo() << std::endl);
 
-                    currentNode = m_dfsStack.back();
+                    currentNode = m_dfrStack.back();
+                    currentSize = m_dfrStack.size();
 
-                    // We are doing depth first search and found another already visited node
-                    // meaning we have a cycle.
-                    EXEC_GRAPH_THROWEXCEPTION_IF(m_visitedNodes.find(currentNode) != visitEndIt,
+                    // We are doing depth first search and try to visit a node which is already on the
+                    // current DFR path.
+                    EXEC_GRAPH_THROWEXCEPTION_IF(currentNode->isFlagSet(NodeData::OnCurrentDFRPath),
                                                  "Your execution logic graph contains a cycle! "
-                                                 "Current traversal stack: " << getTraversalInfo()
-                                                 << "leads to next node: " << currentNode->m_node->getId());
+                                                 "Current traversal stack: " << getTraversalInfo());
 
-                    currentSize = m_dfsStack.size();
-                    visit(*currentNode); // Visits neighbors and add them to m_dfsStack
+                    visit(*currentNode); // Visits neighbors and add them to m_dfrStack
 
                     // If no nodes have been added, down traversal is finished, we do now backtracking
-                    if(currentSize == m_dfsStack.size())
+                    if(currentSize == m_dfrStack.size())
                     {
                         //doBackTracking(); // Removing all visited nodes up the stack
                         doBackTracking();
@@ -437,13 +438,10 @@ protected:
                 }
             }
 
-            // Clean up
-            m_subGraphData.clear();
-
             // Loop over all nodes and make priority sets:
             for(NodeData* nodeData: nodes)
             {
-                nodeData->m_subGraphIdx = -1;
+                nodeData->resetTraversalParameters();
                 orderedNodes[nodeData->m_priority].emplace_back(nodeData);
             }
 
@@ -458,18 +456,18 @@ protected:
 
     private:
 
-        //! Return current DFS stack, but only nodes which are visited.
+        //! Return current DFS stack, but only nodes which are on the current DFR path.
         std::string getTraversalInfo()
         {
             std::stringstream ss;
-            auto it = m_dfsStack.begin();
-            if(it != m_dfsStack.end() && m_visitedNodes.find(*it) != m_visitedNodes.end() )
+            auto it = m_dfrStack.begin();
+            if(it != m_dfrStack.end() && (*it)->isFlagSet(NodeData::OnCurrentDFRPath) )
             {
                 ss << (*(it++))->m_node->getId();
             }
-            for(;it != m_dfsStack.end(); ++it)
+            for(;it != m_dfrStack.end(); ++it)
             {
-                if(m_visitedNodes.find(*it) != m_visitedNodes.end() )
+                if((*it)->isFlagSet(NodeData::OnCurrentDFRPath) )
                 {
                     ss << " ---> " << (*it)->m_node->getId();
                 }
@@ -482,13 +480,14 @@ protected:
         {
             std::stringstream ss;
             ss << "[ " ;
-            for(auto* nodeData : m_dfsStack)
+            for(auto* nodeData : m_dfrStack)
             {
-                ss << nodeData->m_node->getId() << ((m_visitedNodes.find(nodeData) != m_visitedNodes.end())? "*" : " ") << ", ";
+                ss << nodeData->m_node->getId() << (nodeData->isFlagSet(NodeData::Visited)? "*" : " ") << ", ";
             }
             ss << " ]";
             return ss.str();
         }
+
 
 
         /**
@@ -501,6 +500,7 @@ protected:
             EXEC_GRAPH_EXECTREE_SOLVER_LOG("visit: " << nodeData.m_node->getId() << std::endl;);
 
             auto addParentsToStack = [&](auto* socket){
+
                 // Get NodeData of parentNode
                 auto& parentNode = socket->getParent();
                 auto itParent = m_nodeMap.find(parentNode.getId());
@@ -511,12 +511,9 @@ protected:
                 if(parentNodeData->m_priority <= nodeData.m_priority)
                 {
                     // Parent needs a other priority (because its computation becomes before nodeData)
-
-                    // Force this node to our SubGraph index
-                    parentNodeData->m_subGraphIdx = nodeData.m_subGraphIdx;
-                    // Increase parents priority by 1
                     parentNodeData->m_priority = nodeData.m_priority + 1;
-                    m_dfsStack.push_back(parentNodeData); // Add to stack and explore its subgraph
+                    parentNodeData->unsetFlag(NodeData::Visited);
+                    m_dfrStack.push_back(parentNodeData); // Add to stack and explore its subgraph
                 }
             };
 
@@ -536,8 +533,11 @@ protected:
                 }
             }
 
+            // Mark this node as on the current depth-first recursion path
+            nodeData.setFlag(NodeData::OnCurrentDFRPath);
+
             // Mark this node as visited
-            m_visitedNodes.emplace(&nodeData);
+            nodeData.setFlag(NodeData::Visited);
         }
 
         void checkResults(const NodeDataSet& nodes)
@@ -581,11 +581,278 @@ protected:
         NodeBaseType* m_reachNode = nullptr;
         NodeDataStorage& m_nodeMap;  //! All NodeDatas of the execution tree.
 
-        std::deque<NodeData*> m_dfsStack; //! Depth-First-Search Stack
-        NodeDataSet m_visitedNodes;       //! Tracking the visited nodes during DFS
-        std::vector<SubGraphData> m_subGraphData; //! Storage for all subgraph data.
+        std::vector<NodeData*> m_dfrStack; //! Depth-First-Search Stack
+    };
+
+     class ExecutionOrderSolver2
+    {
+    public:
+        ExecutionOrderSolver2(NodeDataStorage& nodeMap)
+            : m_nodeMap(nodeMap)
+        {
+        }
+
+        void solve(NodeDataSet nodes, PrioritySet& orderedNodes, bool checkResults = true)
+        {
+            NodeDataList topoSortList;
+            topoSortList.reserve(nodes.size());
+
+            m_dfrStack.reserve(nodes.size());
+            orderedNodes.clear();
+
+            // Loop over all nodes and start a depth-first-search
+            for(NodeData* nodeData: nodes)
+            {
+                EXEC_GRAPH_EXECTREE_SOLVER_LOG("DFS Start: Node id: " << nodeData->m_node->getId() << std::endl;);
+                // Skip visited nodes.
+                if(nodeData->isFlagSet(NodeData::Visited))
+                {
+                    continue;
+                }
+
+                // Start a depth-first recursion from this node (exploring this subtree)
+                m_dfrStack.clear();
+                // Insert root node
+                m_dfrStack.push_back(nodeData);
+
+                auto doBackTracking = [&](){
+                    auto itStart = m_dfrStack.rbegin();
+                    auto itEnd = m_dfrStack.rend();
+                    auto it = itStart;
+                    while(it != itEnd)
+                    {
+                        if(!(*it)->isFlagSet(NodeData::Visited))
+                        {
+                            // Not visited, backtracking finished!
+                            // Remove the range [itStart,itLast) from the stack
+                            break;
+                        }
+
+                        // If the node is marked unmark and add it to the topoSortList
+                        if((*it)->isFlagSet(NodeData::OnCurrentDFRPath))
+                        {
+                            topoSortList.push_back(*it);
+                            (*it)->unsetFlag(NodeData::OnCurrentDFRPath);
+                        }
+
+                        // Goto next node
+                        ++it;
+                    }
+                    EXEC_GRAPH_ASSERT(std::distance(itStart,it) <= m_dfrStack.size(),
+                                      "Removing: " << std::distance(itStart,it) << " from " << m_dfrStack.size());
+                    // Convert backward iterator to forward
+                    m_dfrStack.erase(it.base(),itStart.base());
+                };
+
+                NodeData* currentNode;
+                std::size_t currentSize;
+
+                while(!m_dfrStack.empty())
+                {
+                    EXEC_GRAPH_EXECTREE_SOLVER_LOG("DFS Stack:" << getStackInfo()  << std::endl);
+
+                    currentNode = m_dfrStack.back();
+
+                    // We are doing depth first search and found another already visited node
+                    // meaning we have a cycle.
+                    EXEC_GRAPH_THROWEXCEPTION_IF(currentNode->isFlagSet(NodeData::OnCurrentDFRPath),
+                                                 "Your execution logic graph contains a cycle! " <<
+                                                 "Current traversal stack: " << getTraversalInfo());
+
+                    currentNode->setFlag(NodeData::OnCurrentDFRPath);
+                    currentSize = m_dfrStack.size();
+                    visit(*currentNode); // Visits neighbors and add them to m_dfrStack
+
+                    // If no nodes have been added, down traversal is finished, we do now backtracking
+                    if(currentSize == m_dfrStack.size())
+                    {
+                        //doBackTracking(); // Removing all visited nodes up the stack
+                        doBackTracking();
+                    }
+                }
+            }
+
+            // Topological sort finished
+            // Traverse the sorted list from the back and assign the priorities
+            NodeData* nodeData;
+            auto rEndIt = topoSortList.rend();
+            for(auto nodeDataIt = topoSortList.rbegin(); nodeDataIt != rEndIt; ++nodeDataIt)
+            {
+                nodeData = *nodeDataIt;
+                assignPrioritiesToChilds(*nodeData);
+            }
+
+            for(NodeData* nodeData : topoSortList)
+            {
+                orderedNodes[nodeData->m_priority].emplace_back(nodeData);
+            }
+
+            // Check execution order by checking all inputs of all nodes
+            if(checkResults)
+            {
+                this->checkResults(nodes);
+            }
+
+
+        }
+
+    private:
+
+        //! Return current DFS stack, but only nodes which are on the current DFR path.
+        std::string getTraversalInfo()
+        {
+            std::stringstream ss;
+            auto it = m_dfrStack.begin();
+            if(it != m_dfrStack.end() && (*it)->isFlagSet(NodeData::OnCurrentDFRPath) )
+            {
+                ss << (*(it++))->m_node->getId();
+            }
+            for(;it != m_dfrStack.end(); ++it)
+            {
+                if((*it)->isFlagSet(NodeData::OnCurrentDFRPath) )
+                {
+                    ss << " ---> " << (*it)->m_node->getId();
+                }
+            }
+            return ss.str();
+        }
+
+        //! Return current DFS stack, visited nodes are marked with "*".
+        std::string getStackInfo()
+        {
+            std::stringstream ss;
+            ss << "[ " ;
+            for(auto* nodeData : m_dfrStack)
+            {
+                ss << nodeData->m_node->getId() << (nodeData->isFlagSet(NodeData::Visited)? "*" : " ") << ", ";
+            }
+            ss << " ]";
+            return ss.str();
+        }
+
+
+        /**
+         * This is the visit function during Depth-First-Search,
+         * It adds nodes to the dfsStack if the priority is lower then the one of `nodeData`.
+         */
+        void visit(NodeData& nodeData)
+        {
+
+            EXEC_GRAPH_EXECTREE_SOLVER_LOG("visit: " << nodeData.m_node->getId() << std::endl;);
+
+            auto addParentsToStack = [&](auto* socket){
+                // Get NodeData of parentNode
+                auto& parentNode = socket->getParent();
+                auto itParent = m_nodeMap.find(parentNode.getId());
+                EXEC_GRAPH_THROWEXCEPTION_IF(itParent == m_nodeMap.end(),
+                                             "Node with id: " << parentNode.getId() << " has not been added to the execution tree!");
+                NodeData* parentNodeData = &itParent->second;
+
+                if(!parentNodeData->isFlagSet(NodeData::Visited))
+                {
+                    m_dfrStack.push_back(parentNodeData); // Add to stack and explore its subgraph
+                }
+            };
+
+            // Follow all links
+            auto& inSockets = nodeData.m_node->getInputs();
+            for (auto& socket : inSockets)
+            {
+                // Try adding the get link to the stack
+                if (socket->hasGetLink())
+                {
+                    addParentsToStack(socket->followGetLink());
+                }
+                // Try adding all writing links to the stack
+                for(auto* outputSocket: socket->getWritingSockets())
+                {
+                    addParentsToStack(outputSocket);
+                }
+            }
+
+            // Mark this node as visited
+            nodeData.setFlag(NodeData::Visited);
+        }
+
+        void assignPrioritiesToChilds(NodeData& nodeData)
+        {
+
+            auto assignToChild = [&](auto* socket){
+                // Get NodeData of parentNode
+                auto& parentNode = socket->getParent();
+                auto itParent = m_nodeMap.find(parentNode.getId());
+                EXEC_GRAPH_THROWEXCEPTION_IF(itParent == m_nodeMap.end(),
+                                             "Node with id: " << parentNode.getId() << " has not been added to the execution tree!");
+                NodeData* parentNodeData = &itParent->second;
+
+                if(parentNodeData->m_priority <= nodeData.m_priority)
+                {
+                   parentNodeData->m_priority = nodeData.m_priority + 1;
+                }
+            };
+
+            // Follow all links
+            auto& inSockets = nodeData.m_node->getInputs();
+            for (auto& socket : inSockets)
+            {
+                // Try adding the get link to the stack
+                if (socket->hasGetLink())
+                {
+                    assignToChild(socket->followGetLink());
+                }
+                // Try adding all writing links to the stack
+                for(auto* outputSocket: socket->getWritingSockets())
+                {
+                    assignToChild(outputSocket);
+                }
+            }
+        }
+
+        void checkResults(const NodeDataSet& nodes)
+        {
+
+            auto check = [&](auto* socket, NodeData* nodeDataWithLowerPrio){
+                // Get NodeData of parentNode
+                auto& parentNode = socket->getParent();
+                auto itParent = m_nodeMap.find(parentNode.getId());
+                EXEC_GRAPH_THROWEXCEPTION_IF(itParent == m_nodeMap.end(),
+                                             "Node with id: " << parentNode.getId() << " has not been added to the execution tree!");
+                NodeData* parentNodeData = &itParent->second;
+
+                EXEC_GRAPH_THROWEXCEPTION_IF(parentNodeData->m_priority <= nodeDataWithLowerPrio->m_priority,
+                                             "Parent node id: " << parentNodeData->m_node->getId() << "[prio: " << parentNodeData->m_priority << " ]"
+                                             << "has not a higher priority as node id: " <<  nodeDataWithLowerPrio->m_node->getId() << " which is wrong!");
+            };
+
+
+            for(auto* nodeData :  nodes)
+            {
+                // Follow all links
+                auto& inSockets = nodeData->m_node->getInputs();
+                for (auto& socket : inSockets)
+                {
+                    // Try adding the get link to the stack
+                    if (socket->hasGetLink())
+                    {
+                        check(socket->followGetLink(), nodeData);
+                    }
+                    // Try adding all writing links to the stack
+                    for(auto* outputSocket: socket->getWritingSockets())
+                    {
+                        check(outputSocket, nodeData);
+                    }
+                }
+            }
+        }
+
+        bool m_inputReachable     = false;
+        NodeBaseType* m_reachNode = nullptr;
+        NodeDataStorage& m_nodeMap;  //! All NodeDatas of the execution tree.
+
+        std::vector<NodeData*> m_dfrStack; //! Depth-First-Search Stack
 
     };
+
 
     // Only for directed graphs, does not detect cycles -> endless loop!
     class ReachNodeCheck

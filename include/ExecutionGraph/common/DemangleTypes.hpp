@@ -18,7 +18,7 @@ namespace executionGraph
 namespace details
 {
 std::string demangle(const char* name);
-};
+}
 
 template<typename T>
 std::string demangle(T&& t)
@@ -33,6 +33,6 @@ std::string demangle()
 }
 
 std::string shortenTemplateBrackets(std::string s, unsigned int fromLevel = 1);
-};
+}
 
 #endif

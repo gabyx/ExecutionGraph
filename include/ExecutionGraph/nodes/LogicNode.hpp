@@ -226,7 +226,7 @@ public:
         addWriteLink(*this, outS, inN, inS);
     }
 
-    virtual std::string getTypeName() { return shortenTemplateBrackets(demangle(this)); };
+    virtual std::string getTypeName() { return shortenTemplateBrackets(demangle(this)); }
 
 protected:
     const NodeId m_id;  //! The unique id of the logic node.
