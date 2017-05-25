@@ -255,7 +255,7 @@ public:
 
         // Solve execution order for every group
         // Each group has its own execution order!
-        ExecutionOrderSolver2 solver(m_nodeMap, m_allNodes);
+        ExecutionOrderSolver solver(m_nodeMap, m_allNodes);
         solver.solve(m_execList, m_groupExecList);
 
         // Check if each output node reaches at least one input, if not print warning!
