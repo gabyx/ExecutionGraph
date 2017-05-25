@@ -19,8 +19,6 @@
 
 //! Some assert macro.
 
-
-
 #ifdef NDEBUG
 #define EXEC_GRAPH_DEBUG_ONLY(code)
 #define EXEC_GRAPH_ASSERT(condition, message)

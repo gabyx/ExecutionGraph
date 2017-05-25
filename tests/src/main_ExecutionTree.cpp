@@ -18,7 +18,7 @@ public:
     using Base   = typename Config::NodeBaseType;
 
     enum Ins
-    {
+    { 
         Value1,
         Value2
     };

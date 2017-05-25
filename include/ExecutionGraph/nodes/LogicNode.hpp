@@ -70,7 +70,7 @@ public:
 public:
     //! The basic constructor of a logic node.
     LogicNode(NodeId id, std::string name = "")
-        : m_id(id), m_name((name.empty())? name : std::to_string(id)) {}
+        : m_id(id), m_name((name.empty()) ? name : std::to_string(id)) {}
     LogicNode(const LogicNode&) = default;
     LogicNode(LogicNode&&)      = default;
 
@@ -229,8 +229,8 @@ public:
     virtual std::string getTypeName() { return shortenTemplateBrackets(demangle(this)); }
 
 protected:
-    const NodeId m_id;  //! The unique id of the logic node.
-    std::string m_name; //! The name of the logic node.
+    const NodeId m_id;   //! The unique id of the logic node.
+    std::string m_name;  //! The name of the logic node.
     SocketInputListType m_inputs;
     SocketOutputListType m_outputs;
 };
@@ -239,9 +239,9 @@ template<typename TConfig>
 IndexType LogicNode<TConfig>::getConnectedInputCount()
 {
     IndexType count = 0;
-    for(auto& socket : this->getInputs())
+    for (auto& socket : this->getInputs())
     {
-        if(socket->getConnectionCount() > 0)
+        if (socket->getConnectionCount() > 0)
         {
             ++count;
         }
@@ -253,9 +253,9 @@ template<typename TConfig>
 IndexType LogicNode<TConfig>::getConnectedOutputCount()
 {
     IndexType count = 0;
-    for(auto& socket : this->getOutputs())
+    for (auto& socket : this->getOutputs())
     {
-        if(socket->getConnectionCount() > 0)
+        if (socket->getConnectionCount() > 0)
         {
             ++count;
         }
@@ -395,21 +395,20 @@ void LogicNode<TConfig>::addWriteLink(LogicNode& outN, SocketIndex outS, LogicNo
 
 //! Some handy macros to redefine getters to shortcut the following ugly syntax inside a derivation of LogicNode:
 //! Accessing the value in socket Result1 : this->template getValue<typename OutSockets::template Get<Result1>>();
-#define EXEC_GRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(InputEnum, InSocketDeclList, OutputEnum, OutSocketDeclList)      \
-    template<InputEnum S>                                                                                           \
-    inline auto& getInVal() const { return this->template getValue<typename InSocketDeclList::template Get<S>>(); } \
-                                                                                                                    \
-    template<OutputEnum S>                                                                                          \
-    inline auto& getOutVal() { return this->template getValue<typename OutSocketDeclList::template Get<S>>(); }     \
-                                                                                                                    \
-    template<OutputEnum S>                                                                                          \
-    inline auto& getInVal() const { return this->template getValue<typename OutSocketDeclList::template Get<S>>(); }\
-                                                                                                                    \
-    template<InputEnum S>                                                                                           \
+#define EXEC_GRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(InputEnum, InSocketDeclList, OutputEnum, OutSocketDeclList)       \
+    template<InputEnum S>                                                                                            \
+    inline auto& getInVal() const { return this->template getValue<typename InSocketDeclList::template Get<S>>(); }  \
+                                                                                                                     \
+    template<OutputEnum S>                                                                                           \
+    inline auto& getOutVal() { return this->template getValue<typename OutSocketDeclList::template Get<S>>(); }      \
+                                                                                                                     \
+    template<OutputEnum S>                                                                                           \
+    inline auto& getInVal() const { return this->template getValue<typename OutSocketDeclList::template Get<S>>(); } \
+                                                                                                                     \
+    template<InputEnum S>                                                                                            \
     static constexpr const SocketIndex& getInIdx() { return InSocketDeclList::template Get<S>::Index::value; }       \
-    template<OutputEnum S>                                                                                          \
+    template<OutputEnum S>                                                                                           \
     static constexpr const SocketIndex& getOutIdx() { return OutSocketDeclList::template Get<S>::Index::value; }
-
 
 #define EXEC_GRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME() \
     virtual std::string getTypeName() { return shortenTemplateBrackets(demangle(this)); };

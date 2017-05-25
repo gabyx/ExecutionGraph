@@ -10,8 +10,8 @@
 #ifndef ExecutionGraph_nodes_LogicSocket_hpp
 #define ExecutionGraph_nodes_LogicSocket_hpp
 
-#include <unordered_set>
 #include <meta/meta.hpp>
+#include <unordered_set>
 
 #include "ExecutionGraph/common/Asserts.hpp"
 #include "ExecutionGraph/common/DemangleTypes.hpp"
@@ -32,7 +32,7 @@ public:
                     SocketIndex index,
                     NodeBaseType& parent,
                     const std::string& name = "")
-        : m_type(type), m_index(index), m_parent(parent), m_name( (name.empty())? name : "[" + std::to_string(index) + "]")
+        : m_type(type), m_index(index), m_parent(parent), m_name((name.empty()) ? name : "[" + std::to_string(index) + "]")
     {
     }
 
@@ -113,12 +113,12 @@ public:
 
     inline LogicSocketOutputBase<Config>* followGetLink() { return m_getFrom; }
 
-    const auto& getWritingSockets(){ return m_writingParents; }
-    IndexType getConnectionCount(){ return (hasGetLink()? 1 : 0) + m_writingParents.size(); }
+    const auto& getWritingSockets() { return m_writingParents; }
+    IndexType getConnectionCount() { return (hasGetLink() ? 1 : 0) + m_writingParents.size(); }
 
 protected:
-    LogicSocketOutputBase<Config>* m_getFrom = nullptr;  //!< The single Get-Link attached to this Socket.
-    std::unordered_set<LogicSocketOutputBase<Config>*> m_writingParents; //!< All parent output sockets which write to this input.
+    LogicSocketOutputBase<Config>* m_getFrom = nullptr;                   //!< The single Get-Link attached to this Socket.
+    std::unordered_set<LogicSocketOutputBase<Config>*> m_writingParents;  //!< All parent output sockets which write to this input.
 };
 
 //! The input socket base class for all input/output sockets of a logic node.
@@ -159,12 +159,12 @@ public:
 
     void addWriteLink(LogicSocketInputBase<Config>& inputSocket);
 
-    const auto& getGetterSockets(){ return m_getterChilds; }
-    IndexType getConnectionCount(){ return m_writeTo.size() + m_getterChilds.size(); }
+    const auto& getGetterSockets() { return m_getterChilds; }
+    IndexType getConnectionCount() { return m_writeTo.size() + m_getterChilds.size(); }
 
 protected:
-    std::vector<LogicSocketInputBase<Config>*> m_writeTo;  //!< All Write-Links attached to this Socket.
-    std::unordered_set<LogicSocketInputBase<Config>*> m_getterChilds; //!< All child sockets which have a Get-Link to this socket.
+    std::vector<LogicSocketInputBase<Config>*> m_writeTo;              //!< All Write-Links attached to this Socket.
+    std::unordered_set<LogicSocketInputBase<Config>*> m_getterChilds;  //!< All child sockets which have a Get-Link to this socket.
 };
 
 template<typename TData>
@@ -276,7 +276,6 @@ namespace executionGraph
 template<typename TConfig>
 void LogicSocketOutputBase<TConfig>::addWriteLink(LogicSocketInputBase<TConfig>& inputSocket)
 {
-
     EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(inputSocket.getParent().getId() == this->getParent().getId(),
                                       "No Write-Link connection to our input slot! (node id: " << this->getParent().getId() << ")",
                                       NodeConnectionException);
@@ -291,10 +290,14 @@ void LogicSocketOutputBase<TConfig>::addWriteLink(LogicSocketInputBase<TConfig>&
 
     EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(m_getterChilds.find(&inputSocket) != m_getterChilds.end(),
                                       "Cannot add Write-Link from output socket: "
-                                      << this->getName() << " of logic node id: " << this->getParent().getId()
-                                      << " to "
-                                      << inputSocket.getName() << " of logic node id: " << inputSocket.getParent().getId()
-                                      << "because input already has a Get-Link to this output.",
+                                          << this->getName()
+                                          << " of logic node id: "
+                                          << this->getParent().getId()
+                                          << " to "
+                                          << inputSocket.getName()
+                                          << " of logic node id: "
+                                          << inputSocket.getParent().getId()
+                                          << "because input already has a Get-Link to this output.",
                                       NodeConnectionException);
 
     if (std::find(m_writeTo.begin(), m_writeTo.end(), &inputSocket) == m_writeTo.end())
@@ -315,26 +318,29 @@ void LogicSocketOutputBase<TConfig>::addWriteLink(LogicSocketInputBase<TConfig>&
 template<typename TConfig>
 void LogicSocketInputBase<TConfig>::setGetLink(LogicSocketOutputBase<TConfig>& outputSocket)
 {
-
     EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(outputSocket.getParent().getId() == this->getParent().getId(),
                                       "No Get-Link connection to our output slot! (node id: " << this->getParent().getId() << ")",
                                       NodeConnectionException);
 
     EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(this->getType() != outputSocket.getType(),
                                       "Output socket: " << outputSocket.getName() << " of logic node id: " << outputSocket.getParent().getId()
-                                      << " has not the same type as input socket "
-                                      << this->getName()
-                                      << " of logic node id: "
-                                      << this->getParent().getId(),
+                                                        << " has not the same type as input socket "
+                                                        << this->getName()
+                                                        << " of logic node id: "
+                                                        << this->getParent().getId(),
                                       NodeConnectionException);
 
     EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(m_writingParents.find(&outputSocket) != m_writingParents.end(),
-                                  "Cannot add Get-Link from input socket: "
-                                  << this->getName()<< " of logic node id: " << this->getParent().getId()
-                                  << " to "
-                                  << outputSocket.getName() << " of logic node id: " << outputSocket.getParent().getId()
-                                  << "because output already has a Write-Link to this input.",
-                                  NodeConnectionException);
+                                      "Cannot add Get-Link from input socket: "
+                                          << this->getName()
+                                          << " of logic node id: "
+                                          << this->getParent().getId()
+                                          << " to "
+                                          << outputSocket.getName()
+                                          << " of logic node id: "
+                                          << outputSocket.getParent().getId()
+                                          << "because output already has a Write-Link to this input.",
+                                      NodeConnectionException);
 
     if (!hasGetLink())
     {
@@ -345,7 +351,7 @@ void LogicSocketInputBase<TConfig>::setGetLink(LogicSocketOutputBase<TConfig>& o
     else
     {
         EXEC_GRAPH_THROWEXCEPTION_TYPE("Get-Link of logic node id: " << this->getParent().getId()
-                                       << " already set!",
+                                                                     << " already set!",
                                        NodeConnectionException);
     }
 }
