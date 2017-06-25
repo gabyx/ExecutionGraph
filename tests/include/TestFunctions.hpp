@@ -10,21 +10,21 @@
 #define TestFunctions_hpp
 
 #include <gtest/gtest.h>
+#include <random>
 
-#include "ExecutionGraph/config/Config.hpp"
 #include "ExecutionGraph/common/Asserts.hpp"
 #include "ExecutionGraph/common/SfinaeMacros.hpp"
 #include "ExecutionGraph/common/TypeDefs.hpp"
+#include "ExecutionGraph/config/Config.hpp"
 
+#define MY_TEST(name1, name2) TEST(name1, name2)
 
-#define MY_TEST(name1 , name2 ) TEST(name1, name2)
-
-#define MY_TEST_RANDOM_STUFF(name) \
-        std::string testName = #name ; \
-        auto seed = hashString(#name); \
-        std::cout << "Seed for this test: " << seed << std::endl; \
-        ExecutionGraph::RandomGenerators::DefaultRandomGen rng(seed); \
-        ExecutionGraph::RandomGenerators::DefaultUniformRealDistribution<PREC> uni(0.0,1.0); \
-        auto f = [&](PREC) { return uni(rng); };
+#define MY_TEST_RANDOM_STUFF(name)                                                        \
+    std::string testName = #name;                                                         \
+    auto seed            = hashString(#name);                                             \
+    std::cout << "Seed for this test: " << seed << std::endl;                             \
+    ExecutionGraph::RandomGenerators::DefaultRandomGen rng(seed);                         \
+    ExecutionGraph::RandomGenerators::DefaultUniformRealDistribution<PREC> uni(0.0, 1.0); \
+    auto f = [&](PREC) { return uni(rng); };
 
 #endif
