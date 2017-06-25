@@ -32,7 +32,7 @@ The write and read access of input and output sockets is implemented using a fas
 
 Static type dispatching avoids the use of virtual calls when using polymorphic objects in object-oriented programming languages.
 
-## Example 1
+## Example 1: `examples/libraryUsage`
 Let us build this simple directed graph below:
 ```
 Node 1a,0
