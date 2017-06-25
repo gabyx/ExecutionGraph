@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <deque>
+#include <set>
 #include <unordered_set>
 
 #include "ExecutionGraph/common/Asserts.hpp"
@@ -42,7 +43,7 @@ public:
     using GroupId = unsigned int;
 
 private:
-    static const std::underlying_type_t<NodeClassification> nNodeClasses = 3;
+    static const std::underlying_type_t<NodeClassification> m_nNodeClasses = 3;
 
     //! Internal Datastructure to store node related data.
     using NodePointer = std::unique_ptr<NodeBaseType>;
@@ -86,6 +87,7 @@ public:
     virtual ~ExecutionTreeInOut() = default;
 
     //! Set the node class of a specific node id \p nodeId.
+    //! Invalidates the execution order.
     void setNodeClass(NodeId nodeId, NodeClassification newType)
     {
         m_executionOrderUpToDate = false;
@@ -107,12 +109,13 @@ public:
     }
 
     //! Set the node class of a specific \p node.
+    //! Invalidates the execution order.
     void setNodeClass(NodeBaseType& node, NodeClassification newType)
     {
         setNodeClass(node.getId(), newType);
     }
 
-    //! Get a specific node with id \p nodeId.
+    //! Get a specific node with id \p nodeId if it exists, nullptr otherwise.
     //! This invalidates the execution order, since we cannot guarantee that the caller added other links.
     //! To circumvent that, use the const method.
     NodeBaseType* getNode(NodeId nodeId)
@@ -122,12 +125,16 @@ public:
         {
             return nullptr;
         }
+        m_executionOrderUpToDate = false;
         return it->second.m_node.get();
     }
-
+    //! Get a specific node with id \p nodeId if it exists, nullptr otherwise.
+    //! Does not invalidate execution order.
     const NodeBaseType* getNode(NodeId nodeId) const
     {
-        return static_cast<ExecutionTreeInOut<Config> const*>(this)->getNode(nodeId);
+        auto* p                  = static_cast<ExecutionTreeInOut<Config> const*>(this)->getNode(nodeId);
+        m_executionOrderUpToDate = true;
+        return p;
     }
 
     //! Get all nodes classified as \p type.
@@ -138,7 +145,7 @@ public:
     {
         auto it = m_nodeGroups.find(groupId);
         EXEC_GRAPH_THROWEXCEPTION_IF(it == m_nodeGroups.end(),
-                                     "Group with id: " << groupId << " is not part of tree!");
+                                     "Group with id: " << groupId << " is not part of the tree!");
         return it->second;
     }
 
@@ -185,10 +192,11 @@ public:
     //! of logic node \p outN at the input socket at index \p inS.
     virtual void makeGetLink(NodeId outN, SocketIndex outS, NodeId inN, SocketIndex inS)
     {
-        auto outNit = m_nodeMap.find(outN);
-        auto inNit  = m_nodeMap.find(inN);
+        m_executionOrderUpToDate = false;
+        auto outNit              = m_nodeMap.find(outN);
+        auto inNit               = m_nodeMap.find(inN);
         EXEC_GRAPH_THROWEXCEPTION_IF(outNit == m_nodeMap.end() || inNit == m_nodeMap.end(),
-                                     "Node: " << outN << " or " << inN << " does not exist!")
+                                     "Node with id: " << outN << " or " << inN << " does not exist!")
         NodeBaseType::setGetLink(*outNit->second.m_node, outS, *inNit->second.m_node, inS);
     }
 
@@ -197,8 +205,9 @@ public:
     //! inN.
     virtual void makeWriteLink(NodeId outN, SocketIndex outS, NodeId inN, SocketIndex inS)
     {
-        auto outNit = m_nodeMap.find(outN);
-        auto inNit  = m_nodeMap.find(inN);
+        m_executionOrderUpToDate = false;
+        auto outNit              = m_nodeMap.find(outN);
+        auto inNit               = m_nodeMap.find(inN);
         if (outNit == m_nodeMap.end() || inNit == m_nodeMap.end())
         {
             EXEC_GRAPH_THROWEXCEPTION("Node: " << outN << " or " << inN << " does not exist!");
@@ -209,6 +218,8 @@ public:
     //! Reset all nodes in group with id: \p groupId.
     virtual void reset(unsigned int groupId)
     {
+        EXEC_GRAPH_THROWEXCEPTION_IF(!m_executionOrderUpToDate,
+                                     "ExecutionTree's execution order is not up to date!");
         // Execute in determined order!
         auto it = m_groupExecList.find(groupId);
         EXEC_GRAPH_THROWEXCEPTION_IF(it == m_groupExecList.end(),
@@ -243,6 +254,7 @@ public:
         executePrioritySet(m_execList, [](NodeBaseType& node) { node.compute(); });
     }
 
+    //! Setups the execution tree by building its execution order.
     virtual void setup(bool checkResults = false)
     {
         // Allways check results in Debug mode.
@@ -253,8 +265,8 @@ public:
             EXEC_GRAPH_THROWEXCEPTION("No output nodes specified!");
         }
 
-        // Solve execution order for every group
-        // Each group has its own execution order!
+        // Solve execution order globally over all groups!
+        // Each group has its own execution order based on the the global computed one!
         ExecutionOrderSolver solver(m_nodeMap, m_allNodes);
         solver.solve(m_execList, m_groupExecList);
 
@@ -278,6 +290,7 @@ public:
         m_executionOrderUpToDate = true;
     }
 
+    //! Get execution order information.
     std::string getExecutionOrderInfo(std::string suffix = "\t\t")
     {
         // Print execution order
@@ -319,7 +332,7 @@ protected:
         }
     }
 
-    //! While computing the topological order we also assign priorities.
+    //! The solver for computing the execution order.
     class ExecutionOrderSolver
     {
     public:
@@ -328,7 +341,7 @@ protected:
         {
         }
 
-        /*! Solved the execution order for an input node set `nodes` and
+        /*! Solves the execution order for an input node set `nodes` and
             outputs the ordered execution list `orderedNodes`.
 
             This algorithm is based on https://en.wikipedia.org/wiki/Topological_sorting#Depth-first_search.
@@ -372,7 +385,7 @@ protected:
                     (*it)->unsetFlag(NodeData::OnCurrentDFRPath);  // Remove Mark
                     ++it;
                 }
-                EXEC_GRAPH_ASSERT(std::distance(itStart, it) <= m_dfrStack.size(),
+                EXEC_GRAPH_ASSERT(std::distance(itStart, it) <= static_cast<typename decltype(m_dfrStack)::difference_type>(m_dfrStack.size()),
                                   "Removing: " << std::distance(itStart, it) << " from " << m_dfrStack.size());
                 // Convert backward iterator to forward
                 m_dfrStack.erase(it.base(), itStart.base());
@@ -909,7 +922,7 @@ protected:
         NodeBaseType* m_start = nullptr;
     };
 
-    std::set<NodeBaseType*> m_nodeClasses[nNodeClasses];  //!< The classification set for each node class.
+    std::set<NodeBaseType*> m_nodeClasses[m_nNodeClasses];  //!< The classification set for each node class.
 
     NodeDataStorage m_nodeMap;  //!< All nodes in the execution tree (main storage).
     NodeDataSet m_allNodes;     //!< All nodes in the execution tree.
@@ -918,7 +931,7 @@ protected:
     PrioritySet m_execList;              //!< The global execution order.
     GroupExecutionList m_groupExecList;  //!< The execution order for each group.
 
-    bool m_executionOrderUpToDate = false;
+    bool m_executionOrderUpToDate = false;  //!< Dirty flag which denotes that the execution order is not up to date!
 };
 }
 

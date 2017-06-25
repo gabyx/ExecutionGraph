@@ -12,12 +12,13 @@
 
 #include <string>
 #include <typeinfo>
+#include "ExecutionGraph/common/TypeDefs.hpp"
 
 namespace executionGraph
 {
 namespace details
 {
-std::string demangle(const char* name);
+EXEC_GRAPH_EXPORT std::string demangle(const char* name);
 }
 
 template<typename T>
@@ -32,7 +33,7 @@ std::string demangle()
     return details::demangle(typeid(T).name());
 }
 
-std::string shortenTemplateBrackets(std::string s, unsigned int fromLevel = 1);
+EXEC_GRAPH_EXPORT std::string shortenTemplateBrackets(std::string s, unsigned int fromLevel = 1);
 }
 
 #endif

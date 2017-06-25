@@ -383,11 +383,7 @@ void LogicNode<TConfig>::addWriteLink(LogicNode& outN, SocketIndex outS, LogicNo
         "Wrong socket indices:  outNode: " << outN.getId() << " outSocketIdx: " << outS << " inNode: " << inN.getId()
                                            << " inSocketIdx: "
                                            << inS
-                                           << "(nOuts: "
-                                           << outN.getOutputs().size()
-                                           << ", nIns: "
-                                           << inN.getInputs().size()
-                                           << ")",
+                                           << " (nOuts: " << outN.getOutputs().size() << ", nIns: " << inN.getInputs().size() << ")",
         NodeConnectionException);
 
     outN.getOSocket(outS).addWriteLink(inN.getISocket(inS));
@@ -411,7 +407,7 @@ void LogicNode<TConfig>::addWriteLink(LogicNode& outN, SocketIndex outS, LogicNo
     static constexpr const SocketIndex& getOutIdx() { return OutSocketDeclList::template Get<S>::Index::value; }
 
 #define EXEC_GRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME() \
-    virtual std::string getTypeName() { return shortenTemplateBrackets(demangle(this)); };
+    virtual std::string getTypeName() override { return shortenTemplateBrackets(demangle(this)); };
 
 }  // end ExecutionGraph
 

@@ -22,7 +22,7 @@ namespace executionGraph
 #if (defined _WIN32) || (defined __CYGWIN__) || (defined WIN32)
 
 // This macro is given to the compiler when building the library!
-#ifdef EXEC_GRAPH_BUILD_LIBRARY
+#ifdef ExecutionGraph_BUILD_LIBRARY
 
 #pragma message(" Platform.hpp: Building library ...")
 
@@ -44,7 +44,7 @@ namespace executionGraph
 
 #else
 
-#ifdef EXEC_GRAPH_BUILD_LIBRARY
+#ifdef ExecutionGraph_BUILD_LIBRARY
 
 #pragma message(" Platform.hpp: Building library ...")
 

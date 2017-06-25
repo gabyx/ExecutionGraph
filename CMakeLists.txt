@@ -1,10 +1,8 @@
 #The CMake Minimum version that is required.
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-
-
-
 #Detect Build Type if Debug appears in CMAKE_BINARY_DIR path
+MESSAGE(STATUS "Binary dir:" ${CMAKE_BINARY_DIR})
 STRING(REGEX MATCH ".*(Debug|debug).*" DEBUG_MATCH ${CMAKE_BINARY_DIR} )
 IF(DEBUG_MATCH)
     SET(CMAKE_BUILD_TYPE Debug CACHE STRING "The build type for makefile based generators")
@@ -14,10 +12,10 @@ ELSE()
     SET(PROJECTNAMEPREFIX Release)
 ENDIF()
 
-SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/;${CMAKE_MODULE_PATH}")
+SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_SOURCE_DIR}/additional/sanitizers-cmake/cmake" ${CMAKE_MODULE_PATH})
 MESSAGE(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
 
-# Load important modules
+# Load important modulesyy
 INCLUDE(FirstCMakeRun)
 
 
@@ -41,7 +39,9 @@ IF(NOT MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL)
 		MESSAGE(STATUS "Setting Values for GNU")
 		SET(CMAKE_C_FLAGS "-fmessage-length=0 -fmax-errors=50" CACHE STRING "Flags for C Compiler" FORCE)
 		SET(CMAKE_CXX_FLAGS "-std=c++14 -fmax-errors=50 -Werror=return-type" CACHE STRING "Flags for CXX Compiler" FORCE)
-		SET(CMAKE_CXX_FLAGS_DEBUG          "-g -fsanitize=address -Wall -Wpedantic -Wno-char-subscripts" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
+		SET(CMAKE_CXX_FLAGS_DEBUG          "-g -fsanitize=leak -Wall -Wpedantic -Wno-char-subscripts" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
+
+    SET(ExecutionGraph_ASAN_OPTIONS_DBG "-fsanitize=leak")
 
 	ELSEIF ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" )
 
@@ -58,6 +58,8 @@ IF(NOT MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL)
 		SET(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release minsize builds" FORCE)
 		SET(CMAKE_CXX_FLAGS_RELEASE        "-O3 -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release builds" FORCE)
 		SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g" CACHE STRING "Flags for CXX Compiler for release builds with debug info" FORCE)
+
+    SET(ExecutionGraph_ASAN_OPTIONS_DBG "-fsanitize=leak" "-fsanitize=address")
 
 	ELSEIF ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel" )
 
@@ -78,6 +80,7 @@ IF(NOT MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL)
   ELSEIF ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC" )
     MESSAGE(ERROR "MSVC is not yet supported!")
   ENDIF()
+
 ENDIF()
 
 
@@ -158,15 +161,15 @@ ENDIF()
   #~ IF(OpenMP_FOUND)
     #~ SET(MYPROJECT_CXX_FLAGS "${MYPROJECT_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
     #~ SET(ExecutionGraph_OPENMP_SUPPORT ON)
-    
+
     #~ MARK_AS_ADVANCED( ExecutionGraph_OPENMP_USE_NTHREADS)
     #~ SET(ExecutionGraph_OPENMP_USE_NTHREADS OFF CACHE BOOL "If the number of threads should be fixed, otherwise determined at runtime!")
-    
+
     #~ IF(ExecutionGraph_OPENMP_USE_NTHREADS)
         #~ SET(ExecutionGraph_OPENMP_NTHREADS ${NPROCESSES} CACHE STRING "The number of threads to use.")
         #~ MARK_AS_ADVANCED( ExecutionGraph_OPENMP_NTHREADS )
     #~ ENDIF()
-    
+
   #~ ELSE()
     #~ SET(ExecutionGraph_OPENMP_SUPPORT ON)
   #~ ENDIF()
@@ -216,5 +219,5 @@ ENDIF()
 
 
 IF(ExecutionGraph_BUILD_EXAMPLE)
-#~ ADD_SUBDIRECTORY(example)
+    ADD_SUBDIRECTORY(examples)
 ENDIF()
