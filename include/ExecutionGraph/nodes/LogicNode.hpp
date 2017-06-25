@@ -129,7 +129,7 @@ public:
     {
         auto add = [&](auto socketDeclaration) {
             using SocketDeclaration = decltype(socketDeclaration);
-            addISock<typename SocketDeclaration::DataType>(std::move(std::get<SocketDeclaration::Index::value>(defaultValues)));
+            this->template addISock<typename SocketDeclaration::DataType>(std::move(std::get<SocketDeclaration::Index::value>(defaultValues)));
         };
 
         meta::for_each(typename SocketDeclList::TypeList{}, add);
@@ -144,7 +144,7 @@ public:
     {
         auto add = [&](auto socketDeclaration) {
             using SocketDeclaration = decltype(socketDeclaration);
-            addOSock<typename SocketDeclaration::DataType>(std::move(std::get<SocketDeclaration::Index::value>(defaultValues)));
+            this->template addOSock<typename SocketDeclaration::DataType>(std::move(std::get<SocketDeclaration::Index::value>(defaultValues)));
         };
 
         meta::for_each(typename SocketDeclList::TypeList{}, add);
