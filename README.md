@@ -32,8 +32,9 @@ The write and read access of input and output sockets is implemented using a fas
 
 Static type dispatching avoids the use of virtual calls when using polymorphic objects in object-oriented programming languages.
 
-## Example 1: `examples/libraryUsage`
-Let us build this simple directed graph below:
+## Example 1: 
+Source: `examples/libraryUsage`   
+Let us build the simple directed graph below:
 ```
 Node 1a,0
 +-------+
@@ -64,8 +65,8 @@ Node 2b,3          |     o0+-----+
 ```
 This execution tree consists of 4 input nodes, e.g. Node `1a`, `1b`, `2a`, `2b`, and 1 output node `4a`.
 Each node has 2 input sockets, e.g. denoted as `i0` and `i1`, and one output socket `o0`.
-The type of the input and output sockets in this example is `int`.
-Each node computes the sum of both input sockets `i0` and `i1` and stores it in the output socket `i1` (of course this is kind of stupid, it is only an example =)
+The type of the input and output sockets in this example is simply `int`.
+Each node computes the sum of both input sockets `i0` and `i1` and stores it in the output socket `i1` (of course this is kind of stupid, it is only an example =).
 
 First, we define our node type called `IntegerNode<...>`:
 ```c++
@@ -87,7 +88,7 @@ public:
 ```
 We start of by deriving our `IntegralNode` from `TConfig::NodeBaseType`. The template parameter `TConfig` lets us configure our execution graph (especially the socket type list).
 The type `TConfig::NodeBaseType` is the basis class for all logic nodes (it will basically be `LogicNode<Config>`).
-The two enumerations `Ins` and `Outs` lets us define some handy abreviations for our input sockets (`Value1`,`Value2`) and our output socket (`Result1`). The sequential ordering of your enum does not matter at all! So far so good. Now we use some macro for letting us specify the input/output ordering:
+The two enumerations `Ins` and `Outs` let us define some handy abbreviations for our input sockets (`Value1` and `Value2`) and our output socket (`Result1`). The sequential ordering of the enumerations in `Ins` and `Outs` does not matter at all! So far so good. Now we use some macro for letting us specify the input/output ordering:
 ```c++
 private:
     EXEC_GRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
@@ -99,15 +100,15 @@ private:
 ```
 What we are specifiny here is the following:
 The type `InSockets` is a *socket declaration list* which says that the input socket with enumeration value `Value1` is of type `int` and is the first input `i0`. The second entry defines the second input socket with enumeration value `Value2` which is of type `int` too.
-The same we do for our output by defining `OutSockets`.
+The same is done for our output by defining `OutSockets`.
 
-Now we define two other handy macros
+Now we define two other handy macros:
 ```c++
     EXEC_GRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME();
     EXEC_GRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets);
 ```
-The first one is not so important. It only defines some `virtual std::string getTypeName()` function which demangles the type of this node at runtime.
-The second one defines some handy value getters and setters for easy access (by means of the enumeration) to the sockets values (more later).
+The first one is not so important. It only defines some `virtual std::string getTypeName()` function which demangles the type of this node at runtime (for debugging purposes).
+The second one defines some handy value-getters and setters for easy access (by means of the enumerations `Ins` and `Outs`) to the sockets values (more later).
 
 Let us define the constructor of our `IntegerNode<...>`:
 ```c++
@@ -119,7 +120,7 @@ template<typename... Args>
         this->template addSockets<OutSockets>(std::make_tuple(0));
     }
 ```
-In the constructor, we create (add) the input and output sockets to the logic node. The parameter `std::tuple<...>` contains the default (constructor) values for the value stored in the socket. So in the above snippet we set the input sockets both to the value `2` and the output socket to the value `0`.
+In the constructor, we create (add) the input and output sockets to the logic node. The parameter `std::tuple<...>` contains the default (constructor) values for the values stored in the sockets. So in the above snippet, we set the input sockets both to the value `2` and the output socket to the value `0`.
 Next we define the actual computation which is performed when this node is executed:
 ```c++
     void compute() override {
@@ -145,10 +146,10 @@ int main(){
     auto node4a = std::make_unique<IntegerNode<Config>>(6);
     auto resultNode = node4a.get();
 ```
-Each node is given a unique id `[0,...,6]`, which enables us to identify the node easier.
+Each node is given a unique id `[0,...,6]`, which enables us to identify the nodes easier.
 Next we create the *get* links which connect the in- and outputs. 
 ```c++
-    int i0 = 0; int i1 = 1; int oO = 0;
+    int i0 = 0; int i1 = 1; int o0 = 0;
     node4a->setGetLink(*node3a,o0,i0);
     node4a->setGetLink(*node3b,o0,i1);
 
@@ -158,7 +159,7 @@ Next we create the *get* links which connect the in- and outputs.
     node3b->setGetLink(*node2a,o0,i0);
     node3b->setGetLink(*node2b,o0,i1);
 ```
-The syntax `node4a->setGetLink(*node3a,0,0);` denotes that the output node `node4a` gets its first input value `i0 = 0` from the single output `o0 = 0` of node `node3a`. The above snippet builds the execution tree given at the begining.
+The syntax `node4a->setGetLink(*node3a,o0,i0);` denotes that the output node `node4a` gets its first input value `i0 = 0` from the single output `o0 = 0` of node `node3a`. The above snippet builds the execution tree given at the begining.
 Finally we create the ExecutionTree `ExecutionTreeInOut`, add all nodes to it, set the proper node classfication (if its an input or output node, setup the graph (which computes the execution order) and execute the default execution group `0` as
 ```c++
     // Make the execution tree and add all nodes
