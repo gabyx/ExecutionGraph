@@ -56,8 +56,6 @@ macro(findpkg_finish PREFIX)
     if (${PREFIX}_LIBRARIES_DEP)
         list(APPEND ${PREFIX}_LIBRARIES ${${PREFIX}_LIBRARIES_DEP})
     endif()
-
-    mark_as_advanced(${PREFIX}_INCLUDE_DIR ${PREFIX}_LIBRARY ${PREFIX}_LIBRARY_REL ${PREFIX}_LIBRARY_DBG ${PREFIX}_LIBRARY_FWK)
   endif ()
 endmacro(findpkg_finish)
 
@@ -95,21 +93,16 @@ FIND_PACKAGE(PugiXML REQUIRED )
 LIST(APPEND ExecutionGraph_INCLUDE_DIR   ${PUGIXML_INCLUDE_DIR} )
 LIST(APPEND ExecutionGraph_LIBRARIES_DEP ${PUGIXML_LIBRARIES})
 
-
-
-set(ExecutionGraph_COMPILE_OPTIONS "-std=c++14" CACHE STRING "Compile options when using ExecutionGraph library")
+set(ExecutionGraph_COMPILE_OPTIONS "-std=c++14")
 # Sanitizer (add to compile and linker dependencies)
-LIST(APPEND ExecutionGraph_COMPILE_OPTIONS_DBG "@ExecutionGraph_ASAN_OPTIONS_DBG@" CACHE STRING "Compile debug options when using ExecutionGraph library")
-IF("@ExecutionGraph_ASAN_OPTIONS_DBG@")
-  LIST(APPEND ExecutionGraph_LIBRARIES_DEP "debug" "@ExecutionGraph_ASAN_OPTIONS_DBG@")
+set(ExecutionGraph_ASAN_OPTIONS_DBG "@ExecutionGraph_ASAN_OPTIONS_DBG@")
+IF(ExecutionGraph_ASAN_OPTIONS_DBG)
+  LIST(APPEND ExecutionGraph_LIBRARIES_DEP "debug" ${ExecutionGraph_ASAN_OPTIONS_DBG})
 ENDIF()
 
-IF(ExecutionGraph_COMPILE_DEFINITIONS)
-  message(STATUS "ExecutionGraph: add compile definitions '\${ExecutionGraph_COMPILE_DEFINITIONS}' = '${ExecutionGraph_COMPILE_DEFINITIONS}' to your target.")
-ENDIF()
-IF(ExecutionGraph_COMPILE_OPTIONS_DBG)
-  message(STATUS "ExecutionGraph: add debug compile options '\${ExecutionGraph_COMPILE_OPTIONS_DBG}' = '${ExecutionGraph_COMPILE_OPTIONS_DBG}' to your target.")
-ENDIF()
+message(STATUS "ExecutionGraph: add compile definitions '\${ExecutionGraph_COMPILE_DEFINITIONS}' = '${ExecutionGraph_COMPILE_DEFINITIONS}' to your target.")
+message(STATUS "ExecutionGraph: add compile options '\${ExecutionGraph_COMPILE_OPTIONS}' = '${ExecutionGraph_COMPILE_OPTIONS}' to your target.")
+message(STATUS "ExecutionGraph: add debug compile options '\${ExecutionGraph_COMPILE_OPTIONS_DBG}' = '${ExecutionGraph_COMPILE_OPTIONS_DBG}' to your target.")
 # ========================================================================================================================================
 
 SET(CMAKE_MODULE_PATH ${OLD_PATH})
@@ -129,5 +122,7 @@ MARK_AS_ADVANCED(
     ExecutionGraph_LIBRARY_DBG
     ExecutionGraph_LIBRARIES
     ExecutionGraph_DEPENDING_TARGETS
+    ExecutionGraph_COMPILE_OPTIONS
+    ExecutionGraph_COMPILE_OPTIONS_DBG
     ExecutionGraph_COMPILE_DEFINITIONS
 )
