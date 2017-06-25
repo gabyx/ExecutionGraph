@@ -22,7 +22,7 @@ mkdir $ROOT_PATH/buildLibUsage
 cd $ROOT_PATH/buildLibUsage
 INSTALL=$(find $ROOT_PATH/build/install/lib/cmake/* -type d)
 echo "Install dir= $INSTALL"
-cmake $CHECKOUT_PATH/example/libraryUsage -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DExecutionGraph_DIR=$INSTALL
+cmake $CHECKOUT_PATH/examples/libraryUsage -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DExecutionGraph_DIR=$INSTALL
 make VERBOSE=1
 cd $ROOT_PATH
 
