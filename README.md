@@ -1,6 +1,6 @@
 This library is in alpha and still under development. First usable version will be `v1.0.1`.
 
-# ExecutionGraph
+# ExecutionGraph [![Build Status](https://travis-ci.org/gabyx/ExecutionGraph.svg?branch=master)](https://travis-ci.org/gabyx/ExecutionGraph)
 Fast Execution Graph consisting of Execution Nodes
 
 
