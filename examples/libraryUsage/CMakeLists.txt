@@ -10,21 +10,17 @@ SET(PROJECT_NAME libraryUsage)
 find_package(ExecutionGraph REQUIRED)
 
 # add CXX flags from library
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ExecutionGraph_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ExecutionGraph_CXX_FLAGS}")
 
 # add include directory
 include_directories(${ExecutionGraph_INCLUDE_DIR})
 
 # add simple executable
-ADD_EXECUTABLE(libraryUsage ./main.cpp)
+add_executable(libraryUsage ./main.cpp)
 
 # link with ExecutionGraph
-MESSAGE(STATUS "Linking with: " "${ExecutionGraph_LIBRARIES}")
+message(STATUS "Linking with: " "${ExecutionGraph_LIBRARIES}")
 target_link_libraries(libraryUsage ${ExecutionGraph_LIBRARIES})
 target_compile_definitions(libraryUsage PRIVATE ${ExecutionGraph_COMPILE_DEFINITIONS})
 target_compile_options(libraryUsage PRIVATE $<$<CONFIG:Debug>:${ExecutionGraph_COMPILE_OPTIONS_DBG}>)
-
-# add dependecies (if any)
-if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
-    ADD_DEPENDENCIES(libraryUsage ${ExecutionGraph_DEPENDING_TARGETS})
-endif()
+add_dependencies(libraryUsage ${ExecutionGraph_DEPENDING_TARGETS})
