@@ -61,8 +61,6 @@ macro(findpkg_finish PREFIX)
   endif ()
 endmacro(findpkg_finish)
 
-set( ExecutionGraph_CXX_FLAGS "-std=c++14" CACHE STRING "Build flags when linking with ExecutionGraph")
-
 #Find Include Headers
 find_path(ExecutionGraph_INCLUDE_DIR NAMES "@ExecutionGraph_INCLUDE_CHARATERISTIC_HEADER@" HINTS @ExecutionGraph_INC_INSTALL_DIR@ ${ExecutionGraph_DIR})
 message(STATUS "ExecutionGraph include dir:  " ${ExecutionGraph_INCLUDE_DIR})
@@ -97,9 +95,14 @@ FIND_PACKAGE(PugiXML REQUIRED )
 LIST(APPEND ExecutionGraph_INCLUDE_DIR   ${PUGIXML_INCLUDE_DIR} )
 LIST(APPEND ExecutionGraph_LIBRARIES_DEP ${PUGIXML_LIBRARIES})
 
+
+
+set(ExecutionGraph_COMPILE_OPTIONS "-std=c++14" CACHE STRING "Compile options when using ExecutionGraph library")
 # Sanitizer (add to compile and linker dependencies)
-LIST(APPEND ExecutionGraph_COMPILE_OPTIONS_DBG "@ExecutionGraph_ASAN_OPTIONS_DBG@")
-LIST(APPEND ExecutionGraph_LIBRARIES_DEP "debug" "@ExecutionGraph_ASAN_OPTIONS_DBG@")
+LIST(APPEND ExecutionGraph_COMPILE_OPTIONS_DBG "@ExecutionGraph_ASAN_OPTIONS_DBG@" CACHE STRING "Compile debug options when using ExecutionGraph library")
+IF("@ExecutionGraph_ASAN_OPTIONS_DBG@")
+  LIST(APPEND ExecutionGraph_LIBRARIES_DEP "debug" "@ExecutionGraph_ASAN_OPTIONS_DBG@")
+ENDIF()
 
 IF(ExecutionGraph_COMPILE_DEFINITIONS)
   message(STATUS "ExecutionGraph: add compile definitions '\${ExecutionGraph_COMPILE_DEFINITIONS}' = '${ExecutionGraph_COMPILE_DEFINITIONS}' to your target.")
