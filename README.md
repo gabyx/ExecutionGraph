@@ -86,8 +86,8 @@ public:
         Result1,
     };
 ```
-We start of by deriving our `IntegralNode` from `TConfig::NodeBaseType`. The template parameter `TConfig` lets us configure our execution graph (especially the socket type list).
-The type `TConfig::NodeBaseType` is the basis class for all logic nodes (it will basically be `LogicNode<Config>`).
+We start of by deriving our `IntegerNode` from `TConfig::NodeBaseType`. The template parameter `TConfig` lets us configure our execution graph (especially the socket type list).
+The type `TConfig::NodeBaseType` is the basis class for all logic nodes (resulting in `LogicNode<Config>`).
 The two enumerations `Ins` and `Outs` let us define some handy abbreviations for our input sockets (`Value1` and `Value2`) and our output socket (`Result1`). The sequential ordering of the enumerations in `Ins` and `Outs` does not matter at all! So far so good. Now we use some macro for letting us specify the input/output ordering:
 ```c++
 private:
@@ -98,7 +98,7 @@ private:
     // Define the input socket decleration list:
     using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, int>>;
 ```
-What we are specifiny here is the following:
+What we are specifying here is the following:
 The type `InSockets` is a *socket declaration list* which says that the input socket with enumeration value `Value1` is of type `int` and is the first input `i0`. The second entry defines the second input socket with enumeration value `Value2` which is of type `int` too.
 The same is done for our output by defining `OutSockets`.
 
