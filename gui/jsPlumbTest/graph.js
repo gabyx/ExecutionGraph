@@ -51,7 +51,6 @@ function initializeJSPlumb() {
     var radius = 6
     var sourceEndpoint = {
         endpoint: "Dot",
-        cssClass: "sourceEndpointStyle",
         paintStyle: {
             stroke: "#61B7CF",
             fill: "transparent",
@@ -104,6 +103,7 @@ function initializeJSPlumb() {
 
         var node = document.getElementById(nodeId);
         var groupId = "group-" + nodeId; // only for jsPlumb 
+        var groupId = "group-" + nodeId; // only for jsPlumb 
 
         instance.draggable(node);
 
@@ -117,13 +117,9 @@ function initializeJSPlumb() {
                 socket.setAttribute("id", id);
 
                 console.log("adding socket: " , id);
-
-                jtkNode = $(socket).find(".jtkk-node")
                 instance.addEndpoint(socket, targetEndpoint, {
                     anchor: pair[1], uuid: id
                 });
-                // Add to group
-                // instance.addToGroup(groupId, socket);
             });
         }
     };
