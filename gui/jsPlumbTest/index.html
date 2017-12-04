@@ -1,10 +1,8 @@
 <!doctype html>
-<html ng-app>
+<html>
 
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.6/angular.min.js"></script>
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
   <script src="node_modules/jsplumb/dist/js/jsplumb.js"></script>
   <link rel="stylesheet" href="node_modules/jsplumb/dist/css/jsplumbtoolkit-defaults.css">
@@ -18,15 +16,28 @@
     <div class="node" group="group-n1" id="n1">
       <div class="title">Node B</div>
       <div class="sockets">
-        <div class="inputSockets">
-          <div class="inputSocket " socketId="1">Position</div>
-          <div class="inputSocket " socketId="2">Variance</div>
-          <div class="inputSocket " socketId="3">Position</div>
-          <div class="inputSocket " socketId="4">Variance</div>
+        <div class="inputs">
+          <div class="socket" socketId="1">
+            <div class="socketTitle">Position</div>
+          </div>
+          <div class="socket" socketId="2">
+            <div class="socketTitle">Position</div>
+          </div>
+          <div class="socket" socketId="3">
+            <div class="socketTitle">Position</div>
+          </div>
+          <div class="socket" socketId="4">
+            <div class="socketTitle">Position</div>
+          </div>
         </div>
-        <div class="outputSockets">
-          <div class="outputSocket " socketId="1">Radius</div>
-          <div class="outputSocket " socketId="2">Length</div>
+        <div class="separator"></div>
+        <div class="outputs">
+          <div class="socket" socketId="1">
+            <div class="socketTitle">Position</div>
+          </div>
+          <div class="socket" socketId="2">
+            <div class="socketTitle">Position</div>
+          </div>
         </div>
       </div>
     </div>

@@ -60,7 +60,7 @@ function initializeJSPlumb() {
         },
         isSource: true,
         isTarget: true,
-        connector: ["Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true }],
+        connector: ["Bezier", { curviness: 150 /*stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true*/ }],
         connectorStyle: connectorPaintStyle,
         hoverPaintStyle: endpointHoverStyle,
         connectorHoverStyle: connectorHoverStyle,
@@ -83,7 +83,7 @@ function initializeJSPlumb() {
         maxConnections: -1,
         isSource: true,
         isTarget: true,
-        connector: ["Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true }],
+        connector: ["Bezier", { curviness: 150 }],
         connectorStyle: connectorPaintStyle,
         hoverPaintStyle: endpointHoverStyle,
         connectorHoverStyle: connectorHoverStyle,
@@ -102,58 +102,30 @@ function initializeJSPlumb() {
         var sockets = null;
         console.log("adding execution node: " , nodeId);
 
-        var groupNode = document.getElementById(nodeId);
+        var node = document.getElementById(nodeId);
         var groupId = "group-" + nodeId; // only for jsPlumb 
 
-        instance.draggable(groupNode);
+        instance.draggable(node);
 
         // Inputs
-        var sockets = $(groupNode).find(".inputSocket");
-        sockets.each(function (index, socket) {
-            id = nodeId + "-in" + socket.getAttribute("socketId")
-            socket.setAttribute("id", id);
-            console.log("adding socket: " , id);
-            targetEndpoint["container"] = socket;
-            instance.addEndpoint(socket, targetEndpoint, {
-                anchor: "LeftMiddle", uuid: id
+        for(let pair of [["in", "LeftMiddle"], ["out", "RightMiddle"]])
+        {
+            var sockets = $(node).find("."+pair[0]+"puts" + " .socket");
+            sockets.each(function (index, socket) {
+
+                id = nodeId + "-" + pair[0] + socket.getAttribute("socketId")
+                socket.setAttribute("id", id);
+
+                console.log("adding socket: " , id);
+
+                jtkNode = $(socket).find(".jtkk-node")
+                instance.addEndpoint(socket, targetEndpoint, {
+                    anchor: pair[1], uuid: id
+                });
+                // Add to group
+                // instance.addToGroup(groupId, socket);
             });
-            // Add to group
-            // instance.addToGroup(groupId, socket);
-
-            // Set position
-            var top = index * $(socket).outerHeight() + 15;
-            var left = 5;
-            $(socket).css({ top: top, left: left});
-
-        });
-
-        // Outputs
-        sockets = $(groupNode).find(".outputSocket");
-        sockets.each(function (index, socket) {
-            id = nodeId + "-out" + socket.getAttribute("socketId")
-            socket.setAttribute("id", id);
-            console.log("adding socket: " , id);
-            sourceEndpoint["container"] = socket;
-            instance.addEndpoint(socket, sourceEndpoint, {
-                anchor: "RightMiddle", uuid: id
-            });
-
-            // Add to group
-            // instance.addToGroup(groupId, socket);
-            //jsPlumb.draggable(socket);
-             // Set position
-             var top = index * $(socket).outerHeight() + 15;
-             var right = 5;
-             $(socket).css({ top: top, right: right , left:""});
-        });
-
-        // Adjust group
-        var totalHeight = 0;
-        $(groupNode).children().each(function () {
-            totalHeight = totalHeight + $(this).outerHeight(true);
-        });
-        $(groupNode).css({ height: totalHeight });
-
+        }
     };
 
     // suspend drawing and initialise.
