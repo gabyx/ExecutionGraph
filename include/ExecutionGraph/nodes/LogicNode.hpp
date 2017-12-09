@@ -188,10 +188,10 @@ public:
     //! Get the output socket value from a SocketDeclaration `OutputSocketDeclaration`.
     template<typename TSocketDeclaration, EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::OutputSocketDeclaration, TSocketDeclaration>::value))>
     typename TSocketDeclaration::DataType& getValue();
-
     //! Get the output socket value from a SocketDeclaration `OutputSocketDeclaration`.
     template<typename TSocketDeclaration, EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::OutputSocketDeclaration, TSocketDeclaration>::value))>
     const typename TSocketDeclaration::DataType& getValue() const;
+
     //! Get the input socket value from a SocketDeclaration `InputSocketDeclaration`.
     template<typename TSocketDeclaration, EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::InputSocketDeclaration, TSocketDeclaration>::value))>
     const typename TSocketDeclaration::DataType& getValue() const;
@@ -345,14 +345,6 @@ const typename TSocketDeclaration::DataType& LogicNode<TConfig>::getValue() cons
     EXEC_GRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
     return m_outputs[idx]->template castToType<typename TSocketDeclaration::DataType>()->getValue();
 }
-
-//template<typename TConfig>
-//template<typename T, typename TIn>
-//void LogicNode<TConfig>::setOSocketValue(IndexType idx, TIn&& data)
-//{
-//    EXEC_GRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
-//    m_outputs[idx]->template castToType<T>()->setValue(std::forward<TIn>(data));
-//}
 
 template<typename TConfig>
 template<typename T>
