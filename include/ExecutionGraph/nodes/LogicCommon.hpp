@@ -78,6 +78,16 @@ struct GeneralConfig
 //! See the examples.
 namespace details
 {
+
+template<typename T>
+struct makeVoidPtr{ 
+    using type = void*; 
+};
+template<typename T>
+struct makeVoidPtr<T*> {
+    using type = makeVoidPtr<T>::type*; 
+};
+
 //! Trait which tests if T is a template X.
 template<template<typename...> class X, typename T>
 struct isInstantiationOf : meta::bool_<false>

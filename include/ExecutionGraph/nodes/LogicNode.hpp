@@ -37,7 +37,7 @@ namespace executionGraph
                                |     |             | <-----(  Get-Link  )-----@| m_getFrom |       |
                                |     |             |                           |           |       |
                                |     |             |                           |           |       |
-                               |     |   T m_data  |                           |  T m_data |       |
+                               |     |   T m_data  |                           | T* m_data |       |
                                |     +-------+-----+                           +-----+-----+       |
                                |             |                                       |             |
                                +-------------+                                       +-------------+
@@ -45,11 +45,11 @@ namespace executionGraph
                 Function Behavior in Out Socket:  (this =  Out)  ++      Function Behavior in In Socket:  (this = In)
                 ================================                 ||      ===============================
                                                                  ||
-                -getValue():  gets this->m_data,                 ||      -getValue(): gets the value of the Get-Link
-                                                                 ||                   Out->m_data
+                -getValue():  gets this->m_data,                 ||      -getValue(): gets the value *this->m_data
+                                                                 ||                   Exception if nullptr
                                                                  ||
                                                                  ||
-                -setValue():  set all Write-Links directly       ||      -setValue(): gets internal this->m_data
+                -setValue():  set all Write-Links directly       ||      -setValue(): sets internal this->m_data
                               (m_writeTo array) and set          ||
                               this->m_data also because this     ||
                               might have other                   ||

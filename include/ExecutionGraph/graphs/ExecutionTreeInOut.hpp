@@ -20,7 +20,9 @@
 #include "ExecutionGraph/common/StringFormat.hpp"
 #include "ExecutionGraph/nodes/LogicCommon.hpp"
 #include "ExecutionGraph/nodes/LogicNode.hpp"
+#include "ExecutionGraph/nodes/LogicNodeDefaultPool.hpp"
 #include "ExecutionGraph/nodes/LogicSocket.hpp"
+
 
 #define EXEC_GRAPH_EXECTREE_SOLVER_LOG(message) EXEC_GRAPH_DEBUG_ONLY(std::cout << message);
 #define EXEC_GRAPH_EXECTREE_SOLVER_LOG_ON(message) std::cout << message;
@@ -83,7 +85,13 @@ private:
     using GroupExecutionList = std::unordered_map<GroupId, PrioritySet>;
 
 public:
-    ExecutionTreeInOut()          = default;
+    ExecutionTreeInOut()
+    {
+        // Make a default pool of output sockets.
+        auto p = std::make_unique<LogicNodeDefaultPool<TConfig>>(std::numeric_limits<NodeId>::max());
+        m_nodeDefaultOutputs = p.get()
+        addNode(p);
+    };
     virtual ~ExecutionTreeInOut() = default;
 
     //! Set the node class of a specific node id \p nodeId.
@@ -450,6 +458,9 @@ protected:
                 {
                     prioritiesPerGroup[groupId][nodeData->m_priority].emplace_back(nodeData);
                 }
+
+                // Connect all dangling input sockets.
+                connectAllDanglingInputs(*nodeData);
             }
 
             // Check execution order by checking all inputs of all nodes
@@ -539,6 +550,12 @@ protected:
 
             // Mark this node as visited
             nodeData.setFlag(NodeData::Visited);
+        }
+
+        //! Connects all dangling input sockets to the default output socket.
+        void connectAllDanglingInputs(NodeData& nodeData)
+        {
+            EXEC_GRAPH_THROWEXCEPTION("Needs implementation!");
         }
 
         void checkResults(const NodeDataSet& nodes)
@@ -689,6 +706,7 @@ protected:
             {
                 NodeData* nodeData = *nodeDataIt;
                 assignPrioritiesToChilds(*nodeData);
+                connectAllDanglingInputs(*nodeData);
             }
 
             for (NodeData* nodeData : topoSortList)
@@ -816,6 +834,12 @@ protected:
             }
         }
 
+        //! Connect all dangling input sockets to the default output sockets.
+        void connectAllDanglingInputs(NodeData& nodeData)
+        {
+            EXEC_GRAPH_THROWEXCEPTION("Needs implementation!")
+        }
+
         void checkResults(const NodeDataSet& nodes)
         {
             auto check = [&](auto* socket, NodeData* nodeDataWithLowerPrio) {
@@ -932,6 +956,8 @@ protected:
     GroupExecutionList m_groupExecList;  //!< The execution order for each group.
 
     bool m_executionOrderUpToDate = false;  //!< Dirty flag which denotes that the execution order is not up to date!
+
+    LogicNodeDefaultPool<TConfig>* m_logicNodeDefaultPool; //!< Default Pool with output sockets, to which all not connected input sockets are connected!
 };
 }
 
