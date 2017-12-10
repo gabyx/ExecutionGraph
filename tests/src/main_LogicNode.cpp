@@ -40,7 +40,7 @@ public:
         : Base(std::forward<Args>(args)...)
     {
         // Add all sockets
-        this->template addSockets<InSockets>(std::make_tuple(2, 2));
+        this->template addSockets<InSockets>();
         this->template addSockets<OutSockets>(std::make_tuple(0));
     }
 

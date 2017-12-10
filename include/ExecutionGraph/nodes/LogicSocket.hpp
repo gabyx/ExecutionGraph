@@ -35,8 +35,7 @@ public:
         : m_type(type)
         , m_index(index)
         , m_parent(parent)
-        , m_name((name.empty()) ? name : "[" + std::to_string(index) + "]")
-        , m_defaultValueId(type)
+        , m_name(name.empty() ? name : "[" + std::to_string(index) + "]")
     {
     }
 
@@ -62,12 +61,14 @@ class LogicSocketInputBase : public LogicSocketBase<TConfig>
 {
 public:
     EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
+    friend SocketOutputBaseType;
 
-    friend class LogicSocketOutputBase<Config>;
+    static_assert(std::is_same<LogicSocketInputBase, SocketInputBaseType>::value,
+                  "SocketInputBaseType not the same as this base!");
 
     template<typename... Args>
-    LogicSocketInputBase(Args&&... args)
-        : LogicSocketBase<TConfig>(std::forward<Args>(args)...)
+    LogicSocketInputBase(IndexType type, IndexType defaultOutputSocketId, Args&&... args)
+        : LogicSocketBase<TConfig>(type, std::forward<Args>(args)...), m_defaultOutputSocketId(defaultOutputSocketId)
     {
     }
 
@@ -94,11 +95,21 @@ public:
     }
 
     //! Set the Get-Link to an output socket.
-    void setGetLink(LogicSocketOutputBase<Config>& outputSocket);
+    void setGetLink(SocketOutputBaseType& outputSocket);
+    //! Remove the Get-Link to an output socket.
+    void removeGetLink()
+    {
+        if (hasGetLink())
+        {
+            m_getFrom->m_getterChilds.erase(this);
+            m_data = nullptr;
+        }
+    }
+
     //! Check if the socket has a Get-Link to an output socket.
     bool hasGetLink() const { return m_getFrom != nullptr; }
     //! Get the output socket to which the Get-Link points.
-    LogicSocketOutputBase<Config>* followGetLink() { return m_getFrom; }
+    SocketOutputBaseType* followGetLink() { return m_getFrom; }
 
     //! Get all sockets writing to this input socket.
     const auto& getWritingSockets() const { return m_writingParents; }
@@ -108,11 +119,11 @@ public:
 protected:
     //! The default output socket id. This defaults to `m_type` since for every type
     //! in SocketTypes there needs to be a default socket which is used as default.
-    const IndexType m_defaultOutputSocketId; 
+    const IndexType m_defaultOutputSocketId;
 
-    LogicSocketOutputBase<Config>* m_getFrom = nullptr;                   //!< The single Get-Link attached to this Socket.
-    void const* m_data = nullptr;                                         //!< The pointer to the actual data of this input node.
-    std::unordered_set<LogicSocketOutputBase<Config>*> m_writingParents;  //!< All parent output sockets which write to this input.
+    SocketOutputBaseType* m_getFrom = nullptr;                   //!< The single Get-Link attached to this Socket.
+    void const* m_data              = nullptr;                   //!< The pointer to the actual data of this input node.
+    std::unordered_set<SocketOutputBaseType*> m_writingParents;  //!< All parent output sockets which write to this input.
 };
 
 //! The input socket base class for all input/output sockets of a logic node.
@@ -121,17 +132,21 @@ class LogicSocketOutputBase : public LogicSocketBase<TConfig>
 {
 public:
     EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
-    friend class LogicSocketInputBase<Config>;
+    friend SocketInputBaseType;
+
+    static_assert(std::is_same<LogicSocketOutputBase, SocketOutputBaseType>::value,
+                  "SocketOutputBaseType not the same as this base!");
 
     template<typename T, typename... Args>
     LogicSocketOutputBase(const T& data, Args&&... args)
         : LogicSocketBase<TConfig>(std::forward<Args>(args)...), m_data(static_cast<const void*>(&data))
-    {  
+    {
     }
 
-    ~LogicSocketOutputBase(){
+    ~LogicSocketOutputBase()
+    {
         // Reset data address in all input sockets.
-        for(auto* inSocket : m_getterChilds)
+        for (auto* inSocket : m_getterChilds)
         {
             inSocket->m_data = nullptr;
         }
@@ -159,15 +174,15 @@ public:
         return const_cast<SocketOutputType<T>*>(static_cast<LogicSocketOutputBase const*>(this)->castToType<T>());
     }
 
-    void addWriteLink(LogicSocketInputBase<Config>& inputSocket);
+    void addWriteLink(SocketInputBaseType& inputSocket);
 
     const auto& getGetterSockets() { return m_getterChilds; }
     IndexType getConnectionCount() { return m_writeTo.size() + m_getterChilds.size(); }
 
 protected:
+    //! Write out value to all connected (Write-Link) input sockets.
     void executeWriteLinks()
     {
-        // Write out value to all connected (Write-Link) input sockets.
         for (auto* inputSocket : this->m_writeTo)
         {
             inputSocket->m_data = m_data;  // Set data pointer in input socket.
@@ -175,15 +190,19 @@ protected:
     }
 
 protected:
-    std::vector<LogicSocketInputBase<Config>*> m_writeTo;              //!< All Write-Links attached to this Socket.
-    std::unordered_set<LogicSocketInputBase<Config>*> m_getterChilds;  //!< All child sockets which have a Get-Link to this socket.
-    void const * const m_data = nullptr;                               //!< The raw pointer to the actual data of this output socket.
+    std::vector<SocketInputBaseType*> m_writeTo;              //!< All Write-Links attached to this Socket.
+    std::unordered_set<SocketInputBaseType*> m_getterChilds;  //!< All child sockets which have a Get-Link to this socket.
+
+private:
+    void const* const m_data = nullptr;  //!< The raw pointer to the actual data of this output socket.
 };
 
-
 template<typename TData, typename TConfig>
-class LogicSocketInput final  public LogicSocketInputBase<TConfig>
+class LogicSocketInput final : public LogicSocketInputBase<TConfig>
 {
+private:
+    using LogicSocketInputBase<TConfig>::m_data;
+
 public:
     EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
     using DataType = TData;
@@ -195,18 +214,18 @@ public:
 
     template<typename... Args>
     LogicSocketInput(Args&&... args)
-        LogicSocketInputBase<TConfig>(meta::find_index<SocketTypes, DataType>::value, std::forward<Args>(args)...)
+        : LogicSocketInputBase<TConfig>(meta::find_index<SocketTypes, DataType>::value,
+                                        std::forward<Args>(args)...)
     {
     }
 
-    //! Get the data value of the socket. (follow Get-Link). 
+    //! Get the data value of the socket. (follow Get-Link).
     //! If this input socket has not been connected, this results in an access violation!
     //! The graph checks that all input nodes ar connected when solving the execution order!
     const DataType& getValue() const
     {
-        EXEC_GRAPH_ASSERT(m_data, "Input socket: " << this->getName() << 
-                                  " of logic node id: " << this->getParent()->getId() " not connected");
-        return *static_cast<DataType*>(m_data);
+        EXEC_GRAPH_ASSERT(m_data, "Input socket: " << this->getName() << " of logic node id: " << this->getParent().getId() << " not connected");
+        return *static_cast<const DataType*>(m_data);
     }
     //! Non-const overload.
     DataType& getValue()
@@ -215,14 +234,29 @@ public:
     }
 };
 
+//! Data wrapper for the output socket.
+template<typename DataType>
+class LogicSocketData
+{
+protected:
+    template<typename T>
+    LogicSocketData(T&& value)
+        : m_data(std::forward<T>(value)) {}
+
+protected:
+    DataType m_data;
+};
+
 template<typename TData, typename TConfig>
 class LogicSocketOutput final : public LogicSocketData<TData>,
+                                /* order is important, since CTOR hands over the 
+                                data reference to the base class: */
                                 public LogicSocketOutputBase<TConfig>
 {
 public:
     EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
-
     using DataType = TData;
+
     /** This assert fails if the type T of the LogicSocket is
         not properly added to the type list SocketTypes in LogicSocketBase*/
     static_assert(!std::is_same<meta::find<SocketTypes, DataType>, meta::list<>>::value,
@@ -230,8 +264,10 @@ public:
 
     template<typename T, typename... Args>
     LogicSocketOutput(T&& initValue, Args&&... args)
-        : m_data(std::forward<T>(initValue))
-        , LogicSocketOutputBase<TConfig>(getValue(), meta::find_index<SocketTypes, DataType>::value, std::forward<Args>(args)...)
+        : LogicSocketData<TData>(std::forward<T>(initValue))
+        , LogicSocketOutputBase<TConfig>(m_data,
+                                         meta::find_index<SocketTypes, DataType>::value,
+                                         std::forward<Args>(args)...)
     {
     }
 
@@ -242,7 +278,7 @@ public:
         // Set the value
         m_data = std::forward<T>(value);
         // Forward the value to all Write-Links
-        executeWriteLinks();
+        this->executeWriteLinks();
     }
 
     //! Get the data value of the socket.
@@ -261,7 +297,6 @@ private:
 // =====================================================================
 namespace executionGraph
 {
-
 template<typename TConfig>
 std::string LogicSocketBase<TConfig>::getNameOfType() const
 {
@@ -280,7 +315,7 @@ std::string LogicSocketBase<TConfig>::getNameOfType() const
 }
 
 template<typename TConfig>
-void LogicSocketOutputBase<TConfig>::addWriteLink(LogicSocketInputBase<TConfig>& inputSocket)
+void LogicSocketOutputBase<TConfig>::addWriteLink(SocketInputBaseType& inputSocket)
 {
     EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(inputSocket.getParent().getId() == this->getParent().getId(),
                                       "No Write-Link connection to our input slot! (node id: " << this->getParent().getId() << ")",
@@ -311,18 +346,10 @@ void LogicSocketOutputBase<TConfig>::addWriteLink(LogicSocketInputBase<TConfig>&
         m_writeTo.push_back(&inputSocket);
         inputSocket.m_writingParents.emplace(this);
     }
-    else
-    {
-        EXEC_GRAPH_THROWEXCEPTION_TYPE("Input socket: " << inputSocket.getName() << " of logic node id: "
-                                                        << inputSocket.getParent().getId()
-                                                        << " already added as Write-Link to logic node id: "
-                                                        << this->getParent().getId(),
-                                       NodeConnectionException);
-    }
 }
 
 template<typename TConfig>
-void LogicSocketInputBase<TConfig>::setGetLink(LogicSocketOutputBase<TConfig>& outputSocket)
+void LogicSocketInputBase<TConfig>::setGetLink(SocketOutputBaseType& outputSocket)
 {
     EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(outputSocket.getParent().getId() == this->getParent().getId(),
                                       "No Get-Link connection to our output slot! (node id: " << this->getParent().getId() << ")",
@@ -348,14 +375,12 @@ void LogicSocketInputBase<TConfig>::setGetLink(LogicSocketOutputBase<TConfig>& o
                                           << "because output already has a Write-Link to this input.",
                                       NodeConnectionException);
 
-    EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(hasGetLink(), 
-    "Get-Link of logic node id: " << this->getParent().getId()
-                                                                     << " already set!",
-                                       NodeConnectionException);
+    // Remove Get-Link (if existing)
+    removeGetLink();
 
     //std::cout << "Add Get-Link: " << outputSocket.getParent().getId() << outputSocket.getName() << " --> " << this->getParent().getId() << this->getName() << std::endl;
     m_getFrom = &outputSocket;
-    m_data = &outputSocket.getValue(); // Set data pointer of this input socket. 
+    m_data    = outputSocket.m_data;  // Set data pointer of this input socket.
     outputSocket.m_getterChilds.emplace(this);
 }
 

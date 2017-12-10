@@ -10,6 +10,7 @@
 #ifndef ExecutionGraph_nodes_LogicNodeDefaultPool_hpp
 #define ExecutionGraph_nodes_LogicNodeDefaultPool_hpp
 
+#include <type_traits>
 #include "ExecutionGraph/nodes/LogicNode.hpp"
 #include "ExecutionGraph/nodes/LogicSocket.hpp"
 
@@ -21,16 +22,21 @@ namespace executionGraph
     {
         public:
         EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
-        
-        LogicNodeDefaultPool()
+        using Base = typename TConfig::NodeBaseType;
+
+        template<typename... Args>
+        LogicNodeDefaultPool(Args&&... args) : TConfig::NodeBaseType(std::forward<Args>(args)...)
         {
             // Add a ouput socket with a default-initialized value.
             auto add = [&](auto&& type) {
-                using DataType = decltype(type);
-                this->template addISock<DataType>(DataType{});
+                using DataType = std::remove_cv_t<std::remove_reference_t<decltype(type)>>;
+                this->template addOSock<DataType>(DataType{});
             };
             meta::for_each(SocketTypes{}, add);
         }
+
+        void reset(){}
+        void compute(){}
     };
 };
 

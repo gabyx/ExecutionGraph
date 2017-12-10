@@ -71,7 +71,7 @@ public:
         : Base(std::forward<Args>(args)...)
     {
         // Add all sockets
-        this->template addSockets<InSockets>(std::make_tuple(std::make_shared<A>(), std::make_shared<A>()));
+        this->template addSockets<InSockets>();
         this->template addSockets<OutSockets>(std::make_tuple(std::make_shared<A>()));
     }
 

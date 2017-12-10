@@ -89,8 +89,8 @@ public:
     {
         // Make a default pool of output sockets.
         auto p = std::make_unique<LogicNodeDefaultPool<TConfig>>(std::numeric_limits<NodeId>::max());
-        m_nodeDefaultOutputs = p.get()
-        addNode(p);
+        m_nodeDefaultOutputPool = p.get();
+        addNode(std::move(p));
     };
     virtual ~ExecutionTreeInOut() = default;
 
@@ -957,7 +957,7 @@ protected:
 
     bool m_executionOrderUpToDate = false;  //!< Dirty flag which denotes that the execution order is not up to date!
 
-    LogicNodeDefaultPool<TConfig>* m_logicNodeDefaultPool; //!< Default Pool with output sockets, to which all not connected input sockets are connected!
+    LogicNodeDefaultPool<TConfig>* m_nodeDefaultOutputPool; //!< Default Pool with output sockets, to which all not connected input sockets are connected!
 };
 }
 

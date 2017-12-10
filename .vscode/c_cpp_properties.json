@@ -3,23 +3,24 @@
         {
             "name": "Mac",
             "includePath": [
-                "/Library/Developer/CommandLineTools/usr/bin/../include/c++/v1",
+                "${workspaceRoot}/include",
+                "${workspaceRoot}/build/include",
                 "/usr/local/include",
-                "/Library/Developer/CommandLineTools/usr/bin/../lib/clang/8.0.0/include",
-                "/Library/Developer/CommandLineTools/usr/include",
-                "/usr/include",
-                "${workspaceRoot}/include"
+                "/usr/local/include/eigen3",
+                "/usr/local/opt/llvm/include",
+                "/usr/local/opt/llvm/include/c++/v1/"
             ],
             "defines": [],
             "intelliSenseMode": "clang-x64",
             "browse": {
                 "path": [
-                    "/Library/Developer/CommandLineTools/usr/bin/../include/c++/v1",
+                    "${workspaceRoot}/include",
+                    "${workspaceRoot}/build/include",
                     "/usr/local/include",
-                    "/Library/Developer/CommandLineTools/usr/bin/../lib/clang/8.0.0/include",
-                    "/Library/Developer/CommandLineTools/usr/include",
                     "/usr/include",
-                    "${workspaceRoot}/include"
+                    "/usr/local/include/eigen3",
+                    "/usr/local/opt/llvm/include",
+                    "/usr/local/opt/llvm/include/c++/v1/"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
@@ -52,7 +53,7 @@
             "name": "Win32",
             "includePath": [
                 "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include",
-                "${workspaceRoot}/include"
+                "${workspaceFolder}/include"
             ],
             "defines": [
                 "_DEBUG",
@@ -62,7 +63,7 @@
             "browse": {
                 "path": [
                     "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include/*",
-                    "${workspaceRoot}/include"
+                    "${workspaceFolder}/include"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""

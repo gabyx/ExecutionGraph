@@ -82,8 +82,8 @@ public:
     //! The main compute function of this execution node.
     virtual void compute() = 0;
 
-    inline NodeId getId() { return m_id; }
-    inline std::string getName() { return m_name; }
+    inline NodeId getId() const { return m_id; }
+    inline std::string getName() const { return m_name; }
 
     //! Get the list of input sockets.
     const SocketInputListType& getInputs() const { return m_inputs; }
@@ -91,26 +91,28 @@ public:
     const SocketOutputListType& getOutputs() const { return m_outputs; }
 
     //! Get the number of input sockets which are connected to other nodes.
-    IndexType getConnectedInputCount();
+    IndexType getConnectedInputCount() const;
 
     //! Get the number of output sockets which are connected to other nodes.
-    IndexType getConnectedOutputCount();
+    IndexType getConnectedOutputCount() const;
 
-    //! Add an input socket with default value \p defaultValue.
-    template<typename TData, typename T>
-    void addISock(T&& defaultValue, const std::string& name = "noname")
+    //! Add an input socket with default value from the default output socket \p defaultOutputSocketId.
+    template<typename TData>
+    void addISock(IndexType defaultOutputSocketId = meta::find_index<SocketTypes, TData>::value,
+                  const std::string& name         = "noname")
     {
         SocketIndex id = m_inputs.size();
 
         auto p = SocketPointer<SocketInputBaseType>(
-            new SocketInputType<TData>(std::forward<T>(defaultValue), id, *this, name),
+            new SocketInputType<TData>(defaultOutputSocketId, id, *this, name),
             [](SocketInputBaseType* s) { delete static_cast<SocketInputType<TData>*>(s); });
         m_inputs.push_back(std::move(p));
     }
 
     //! Add an input socket with default value \p defaultValue.
     template<typename TData, typename T>
-    void addOSock(T&& defaultValue, const std::string& name = "noname")
+    void addOSock(T&& defaultValue,
+                  const std::string& name = "noname")
     {
         SocketIndex id = m_outputs.size();
 
@@ -123,13 +125,12 @@ public:
     //! Add all input sockets defined in the type list \p SocketDeclList where each socket has
     //! the corresponding default value in \p defaultValues.
     template<typename SocketDeclList,
-             typename... Args,
              EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::InputSocketDeclarationList, SocketDeclList>::value))>
-    void addSockets(std::tuple<Args...>&& defaultValues)
+    void addSockets()
     {
         auto add = [&](auto socketDeclaration) {
             using SocketDeclaration = decltype(socketDeclaration);
-            this->template addISock<typename SocketDeclaration::DataType>(std::move(std::get<SocketDeclaration::Index::value>(defaultValues)));
+            this->template addISock<typename SocketDeclaration::DataType>();
         };
 
         meta::for_each(typename SocketDeclList::TypeList{}, add);
@@ -236,7 +237,7 @@ protected:
 };
 
 template<typename TConfig>
-IndexType LogicNode<TConfig>::getConnectedInputCount()
+IndexType LogicNode<TConfig>::getConnectedInputCount() const
 {
     IndexType count = 0;
     for (auto& socket : this->getInputs())
@@ -250,7 +251,7 @@ IndexType LogicNode<TConfig>::getConnectedInputCount()
 }
 
 template<typename TConfig>
-IndexType LogicNode<TConfig>::getConnectedOutputCount()
+IndexType LogicNode<TConfig>::getConnectedOutputCount() const
 {
     IndexType count = 0;
     for (auto& socket : this->getOutputs())
