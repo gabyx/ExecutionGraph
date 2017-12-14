@@ -26,20 +26,18 @@ public:
 private:
 };
 
-class NodeConnectionException : public Exception
+class NodeConnectionException final : public Exception
 {
 public:
     NodeConnectionException(const std::stringstream& ss)
         : Exception(ss) {}
-    // we dont need a virtual dtor, the std destroys the exception correctly.
 };
 
-class BadSocketCastException : public Exception
+class BadSocketCastException final : public Exception
 {
 public:
     BadSocketCastException(const std::stringstream& ss)
         : Exception(ss) {}
-    // we dont need a virtual dtor, the std destroys the exception correctly.
 };
 }
 
@@ -52,7 +50,7 @@ public:
     }
 
 #define EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(condition, message, type) \
-    if (condition)                                                  \
+    if(condition)                                                   \
     {                                                               \
         EXEC_GRAPH_THROWEXCEPTION_TYPE(message, type);              \
     }

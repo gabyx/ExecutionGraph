@@ -80,6 +80,21 @@ MY_TEST(Node_Test, Int_Int)
     throw std::runtime_error("Exception not catched!!!");
 }
 
+MY_TEST(Node_Test, Int_Int2)
+{
+    // Integer node connection (wrong connection)
+    IntegerNode<Config> node1(1);
+    IntegerNode<Config> node2(2);
+
+    node1.addWriteLink(0, node2, 0);
+    node1.addWriteLink(0, node2, 1);
+
+    ASSERT_EQ(node1.getConnectedInputCount(), 0) << "Connected input count wrong";
+    ASSERT_EQ(node1.getConnectedOutputCount(), 1) << "Connected input count wrong";
+    ASSERT_EQ(node2.getConnectedInputCount(), 2) << "Connected input count wrong";
+    ASSERT_EQ(node2.getConnectedOutputCount(), 0) << "Connected input count wrong";
+}
+
 int main(int argc, char** argv)
 {
     testing::InitGoogleTest(&argc, argv);

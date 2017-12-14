@@ -105,6 +105,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     //node1a->setGetLink(*node1a,0,0); // cycle
 
     ExecutionTreeInOut<Config> execTree;
+    execTree.getDefaultOuputPool().setDefaultValue<int>(2);
     execTree.addNode(std::move(node1a));
     execTree.addNode(std::move(node1b));
     execTree.addNode(std::move(node2a));

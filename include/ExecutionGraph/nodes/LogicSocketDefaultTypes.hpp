@@ -43,7 +43,7 @@ using SocketDefaultTypes = meta::list<double,
 
 #define LOGICSOCKET_APPLY_VISITOR_SWITCH                                                                   \
                                                                                                            \
-    switch (this->m_type)                                                                                  \
+    switch(this->m_type)                                                                                   \
     {                                                                                                      \
         LOGICSOCKET_CASE_SWITCH(0)                                                                         \
         LOGICSOCKET_CASE_SWITCH(1)                                                                         \

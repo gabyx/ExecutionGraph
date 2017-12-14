@@ -87,8 +87,10 @@ public:
 
     //! Get the list of input sockets.
     const SocketInputListType& getInputs() const { return m_inputs; }
+    SocketInputListType& getInputs() { return m_inputs; }
     //! Get the list of output sockets.
     const SocketOutputListType& getOutputs() const { return m_outputs; }
+    SocketOutputListType& getOutputs() { return m_outputs; }
 
     //! Get the number of input sockets which are connected to other nodes.
     IndexType getConnectedInputCount() const;
@@ -122,8 +124,7 @@ public:
         m_outputs.push_back(std::move(p));
     }
 
-    //! Add all input sockets defined in the type list \p SocketDeclList where each socket has
-    //! the corresponding default value in \p defaultValues.
+    //! Add all input sockets defined in the type list \p SocketDeclList.
     template<typename SocketDeclList,
              EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::InputSocketDeclarationList, SocketDeclList>::value))>
     void addSockets()
@@ -150,6 +151,9 @@ public:
 
         meta::for_each(typename SocketDeclList::TypeList{}, add);
     }
+
+    bool hasISocket(SocketIndex idx) { return idx < m_inputs.size(); }
+    bool hasOSocket(SocketIndex idx) { return idx < m_outputs.size(); }
 
     //! Get the input socket at index \p idx.
     SocketInputBaseType& getISocket(SocketIndex idx)
@@ -240,9 +244,9 @@ template<typename TConfig>
 IndexType LogicNode<TConfig>::getConnectedInputCount() const
 {
     IndexType count = 0;
-    for (auto& socket : this->getInputs())
+    for(auto& socket : this->getInputs())
     {
-        if (socket->getConnectionCount() > 0)
+        if(socket->getConnectionCount() > 0)
         {
             ++count;
         }
@@ -254,9 +258,9 @@ template<typename TConfig>
 IndexType LogicNode<TConfig>::getConnectedOutputCount() const
 {
     IndexType count = 0;
-    for (auto& socket : this->getOutputs())
+    for(auto& socket : this->getOutputs())
     {
-        if (socket->getConnectionCount() > 0)
+        if(socket->getConnectionCount() > 0)
         {
             ++count;
         }

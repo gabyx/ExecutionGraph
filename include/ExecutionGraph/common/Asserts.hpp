@@ -29,7 +29,7 @@
 #define EXEC_GRAPH_ASSERT(condition, message) EXEC_GRAPH_ASSERT_TYPE(condition, message, Exception)
 #define EXEC_GRAPH_ASSERT_TYPE(condition, message, type)  \
     {                                                     \
-        if (!(condition))                                 \
+        if(!(condition))                                  \
         {                                                 \
             EXEC_GRAPH_THROWEXCEPTION_TYPE(message, type) \
         }                                                 \
@@ -39,7 +39,7 @@
 //! Some warning macro.
 #define EXEC_GRAPH_WARNINGMSG(condition, message)                                   \
     {                                                                               \
-        if (!(condition))                                                           \
+        if(!(condition))                                                            \
         {                                                                           \
             std::cerr << "WARNING: " << #condition << " : " << std::endl            \
                       << message << std::endl                                       \

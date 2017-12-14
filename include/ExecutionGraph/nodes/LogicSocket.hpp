@@ -67,8 +67,8 @@ public:
                   "SocketInputBaseType not the same as this base!");
 
     template<typename... Args>
-    LogicSocketInputBase(IndexType type, IndexType defaultOutputSocketId, Args&&... args)
-        : LogicSocketBase<TConfig>(type, std::forward<Args>(args)...), m_defaultOutputSocketId(defaultOutputSocketId)
+    LogicSocketInputBase(IndexType type, IndexType defaultOutputSocketIndex, Args&&... args)
+        : LogicSocketBase<TConfig>(type, std::forward<Args>(args)...), m_defaultOutputSocketIndex(defaultOutputSocketIndex)
     {
     }
 
@@ -99,7 +99,7 @@ public:
     //! Remove the Get-Link to an output socket.
     void removeGetLink()
     {
-        if (hasGetLink())
+        if(hasGetLink())
         {
             m_getFrom->m_getterChilds.erase(this);
             m_data = nullptr;
@@ -116,10 +116,15 @@ public:
     //! Get the connection count of this input socket.
     IndexType getConnectionCount() const { return (hasGetLink() ? 1 : 0) + m_writingParents.size(); }
 
+    //! Get the default output socket id.
+    //! This can be used by the execution graph, to automatically connect dangling input sockets
+    //! to a pool of default output sockets.
+    IndexType getDefaultOutputSocketIndex() { return m_defaultOutputSocketIndex; }
+
 protected:
     //! The default output socket id. This defaults to `m_type` since for every type
     //! in SocketTypes there needs to be a default socket which is used as default.
-    const IndexType m_defaultOutputSocketId;
+    const IndexType m_defaultOutputSocketIndex;
 
     SocketOutputBaseType* m_getFrom = nullptr;                   //!< The single Get-Link attached to this Socket.
     void const* m_data              = nullptr;                   //!< The pointer to the actual data of this input node.
@@ -146,7 +151,7 @@ public:
     ~LogicSocketOutputBase()
     {
         // Reset data address in all input sockets.
-        for (auto* inSocket : m_getterChilds)
+        for(auto* inSocket : m_getterChilds)
         {
             inSocket->m_data = nullptr;
         }
@@ -183,7 +188,7 @@ protected:
     //! Write out value to all connected (Write-Link) input sockets.
     void executeWriteLinks()
     {
-        for (auto* inputSocket : this->m_writeTo)
+        for(auto* inputSocket : this->m_writeTo)
         {
             inputSocket->m_data = m_data;  // Set data pointer in input socket.
         }
@@ -303,7 +308,7 @@ std::string LogicSocketBase<TConfig>::getNameOfType() const
     std::string s = "'type-not-found'";
     IndexType i   = 0;
     auto f        = [&](auto type) {
-        if (i == m_type)
+        if(i == m_type)
         {
             s = demangle(type);
         }
@@ -341,7 +346,7 @@ void LogicSocketOutputBase<TConfig>::addWriteLink(SocketInputBaseType& inputSock
                                           << "because input already has a Get-Link to this output.",
                                       NodeConnectionException);
 
-    if (std::find(m_writeTo.begin(), m_writeTo.end(), &inputSocket) == m_writeTo.end())
+    if(std::find(m_writeTo.begin(), m_writeTo.end(), &inputSocket) == m_writeTo.end())
     {
         m_writeTo.push_back(&inputSocket);
         inputSocket.m_writingParents.emplace(this);

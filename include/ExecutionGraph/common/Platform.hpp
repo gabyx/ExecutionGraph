@@ -1,7 +1,6 @@
 // ========================================================================================
 //  ExecutionGraph
-//  Copyright (C) 2014 by Gabriel Nützi <nuetzig (at) imes (d0t) mavt (d0t) ethz
-//  (døt) ch>
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (d0t) com>
 //
 //  This Source Code Form is subject to the terms of the Mozilla Public
 //  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -19,7 +18,7 @@
 
 namespace executionGraph
 {
-#if (defined _WIN32) || (defined __CYGWIN__) || (defined WIN32)
+#if(defined _WIN32) || (defined __CYGWIN__) || (defined WIN32)
 
 // This macro is given to the compiler when building the library!
 #ifdef ExecutionGraph_BUILD_LIBRARY
