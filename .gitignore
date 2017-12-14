@@ -5,3 +5,4 @@ build/
 html
 latex
 build
+.vscode/.cmaketools.json

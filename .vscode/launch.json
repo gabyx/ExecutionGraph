@@ -9,7 +9,7 @@
             "name": "(lldb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "enter program name, for example ${workspaceFolder}/a.out",
+            "program": "${workspaceFolder}/build/tests/ExecutionGraphTests-ExecutionTree",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

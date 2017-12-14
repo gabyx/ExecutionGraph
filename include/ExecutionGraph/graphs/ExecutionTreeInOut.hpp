@@ -40,12 +40,13 @@ public:
         InputNode    = 1,
         OutputNode   = 2,
         ConstantNode = 3
+        //! If you changes this -> adjust m_nNodeClasses!
     };
 
     using GroupId = unsigned int;
 
 private:
-    static const std::underlying_type_t<NodeClassification> m_nNodeClasses = 3;
+    static const std::underlying_type_t<NodeClassification> m_nNodeClasses = 4;
 
     //! Internal Datastructure to store node related data.
     using NodePointer = std::unique_ptr<NodeBaseType>;
