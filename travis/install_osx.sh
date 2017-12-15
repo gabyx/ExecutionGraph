@@ -1,7 +1,4 @@
 #!/bin/bash
-
-set -e # exit on errors
-
 # "DEPENDECIES ========================================================================"
 cd $ROOT_PATH
 
@@ -28,9 +25,6 @@ echo "CC set to ${CC}"
 ${CXX} --version
 
 chmod +x $CHECKOUT_PATH/travis/install_dep.sh
-. $CHECKOUT_PATH/travis/install_dep.sh
+$CHECKOUT_PATH/travis/install_dep.sh
 
 # "DEPENDECIES COMPLETE ================================================================="
-
-# Workaround for https://github.com/travis-ci/travis-ci/issues/6522
-set +e

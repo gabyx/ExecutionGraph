@@ -26,5 +26,5 @@ cmake --version
 
 chmod +x $CHECKOUT_PATH/travis/install_dep.sh
 # run the command in this process -> env varibales!
-. $CHECKOUT_PATH/travis/install_dep.sh
+$CHECKOUT_PATH/travis/install_dep.sh
 # "DEPENDECIES COMPLETE ================================================================="
