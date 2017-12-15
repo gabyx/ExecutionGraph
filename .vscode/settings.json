@@ -33,5 +33,6 @@
         "unordered_map": "cpp",
         "unordered_set": "cpp",
         "typeinfo": "cpp"
-    }
+    },
+    "cmake.useCMakeServer": true
 }

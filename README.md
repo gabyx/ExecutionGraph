@@ -33,6 +33,7 @@ Install the following extensions for VS Code:
 - [C++ Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
 - [CMake Language Ext.](https://marketplace.visualstudio.com/items?itemName=twxs.cmake)
 - [CMake Build Ext.](https://marketplace.visualstudio.com/items?itemName=vector-of-bool.cmake-tools)
+- [CMake Tool Helper Ext.](https://marketplace.visualstudio.com/items?itemName=vector-of-bool.cmake-tools)
 
 **Note:** Dont use the [multi-root workspaces](https://code.visualstudio.com/docs/editor/multi-root-workspaces) feature in VS Code since the C++ Extension does not yet support this and code completion won't work properly.
 

@@ -4,3 +4,5 @@ __pycache__
 build/
 html
 latex
+.vscode/.*
+.vscode/c_cpp_properties*
