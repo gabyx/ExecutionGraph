@@ -43,11 +43,9 @@ install:
   - export CHECKOUT_PATH=`pwd`;
   - echo "ROOT_PATH= $ROOT_PATH"
   - echo "CHECKOUT_PATH= $CHECKOUT_PATH"
-  - if [ -n "${GCC_VERSION}" ];  export GCC_VERSION=${GCC_VERSION}
-  - if [ -n "${CLANG_VERSION}" ];  export CLANG_VERSION=${CLANG_VERSION}
+
   - chmod +x $CHECKOUT_PATH/travis/install_${TRAVIS_OS_NAME}.sh
   - $CHECKOUT_PATH/travis/install_${TRAVIS_OS_NAME}.sh
-
 
 script:
   - chmod +x $CHECKOUT_PATH/travis/build.sh
@@ -57,9 +55,6 @@ after_success:
   - cd $CHECKOUT_PATH
   - git reset --hard HEAD # Discard build artifacts
   - git clean -df # Discard build artifacts
-  #- bii init -l
-  #- bii user $BIICODE_USER -p $BIICODE_PASSWORD
-  #- if [ -n "$BIICODE_PASSWORD" ]; then bii publish -r; fi
 
 notifications:
   email: false
