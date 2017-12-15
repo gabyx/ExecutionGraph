@@ -43,7 +43,8 @@ install:
   - export CHECKOUT_PATH=`pwd`;
   - echo "ROOT_PATH= $ROOT_PATH"
   - echo "CHECKOUT_PATH= $CHECKOUT_PATH"
-
+  - if [ -n "${GCC_VERSION}" ];  export GCC_VERSION=${GCC_VERSION}
+  - if [ -n "${CLANG_VERSION}" ];  export CLANG_VERSION=${CLANG_VERSION}
   - chmod +x $CHECKOUT_PATH/travis/install_${TRAVIS_OS_NAME}.sh
   - $CHECKOUT_PATH/travis/install_${TRAVIS_OS_NAME}.sh
 

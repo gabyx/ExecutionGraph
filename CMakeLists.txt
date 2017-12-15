@@ -39,7 +39,7 @@ IF(NOT MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL)
 		MESSAGE(STATUS "Setting Values for GNU")
 		SET(CMAKE_C_FLAGS "-fmessage-length=0 -fmax-errors=50" CACHE STRING "Flags for C Compiler" FORCE)
 		SET(CMAKE_CXX_FLAGS "-std=c++14 -fmax-errors=50 -Werror=return-type" CACHE STRING "Flags for CXX Compiler" FORCE)
-		SET(CMAKE_CXX_FLAGS_DEBUG          "-g -fsanitize=leak -Wall -Wpedantic -Wno-char-subscripts" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
+		SET(CMAKE_CXX_FLAGS_DEBUG "-g -fsanitize=leak -Wall -Wpedantic -Wno-char-subscripts" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
 
     SET(ExecutionGraph_ASAN_OPTIONS_DBG "-fsanitize=leak")
 
