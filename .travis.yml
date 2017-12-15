@@ -45,11 +45,11 @@ install:
   - echo "CHECKOUT_PATH= $CHECKOUT_PATH"
 
   - chmod +x $CHECKOUT_PATH/travis/install_${TRAVIS_OS_NAME}.sh
-  - $CHECKOUT_PATH/travis/install_${TRAVIS_OS_NAME}.sh
+  - . $CHECKOUT_PATH/travis/install_${TRAVIS_OS_NAME}.sh
 
 script:
   - chmod +x $CHECKOUT_PATH/travis/build.sh
-  - $CHECKOUT_PATH/travis/build.sh
+  - . $CHECKOUT_PATH/travis/build.sh
 
 after_success:
   - cd $CHECKOUT_PATH

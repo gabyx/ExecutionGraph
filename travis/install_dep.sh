@@ -16,3 +16,5 @@ sudo make VERBOSE=1 install
 git clone https://github.com/ericniebler/meta.git ${ROOT_PATH}/meta
 sudo cp -r ${ROOT_PATH}/meta/include/* $INSTALL_PREFIX/include/
 #ls -a /usr/local/include/meta
+
+set +e
