@@ -39,7 +39,7 @@ IF(NOT MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL)
 		MESSAGE(STATUS "Setting Values for GNU")
 		SET(CMAKE_C_FLAGS "-fmessage-length=0 -fmax-errors=50" CACHE STRING "Flags for C Compiler" FORCE)
 		SET(CMAKE_CXX_FLAGS "-std=c++14 -fmax-errors=50 -Werror=return-type" CACHE STRING "Flags for CXX Compiler" FORCE)
-		SET(CMAKE_CXX_FLAGS_DEBUG          "-g -fsanitize=leak -Wall -Wpedantic -Wno-char-subscripts" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
+		SET(CMAKE_CXX_FLAGS_DEBUG "-g -fsanitize=leak -Wall -Wpedantic -Wno-char-subscripts" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
 
     SET(ExecutionGraph_ASAN_OPTIONS_DBG "-fsanitize=leak")
 
@@ -136,21 +136,17 @@ FIND_PACKAGE(Eigen3 REQUIRED)
 SET(EIGEN_INCLUDE_DIR ${EIGEN3_INCLUDE_DIR})
 LIST(APPEND ExecutionGraph_INC_DIRS_DEP ${EIGEN_INCLUDE_DIR})
 
-
-# Try to find Meta and PugiXML if possible
-FIND_PACKAGE(Meta)
+# Try to find Meta 
+FIND_PACKAGE(Meta REQUIRED)
 LIST(APPEND ExecutionGraph_INC_DIRS_DEP ${Meta_INCLUDE_DIR})
 SET(ExecutionGraph_DEPENDING_TARGETS_DEP ${Meta_TARGET})
-IF(META_FOUND)
-  SET(ExecutionGraph_SUPPORT_KDTREE ON)
-ENDIF()
 
-# FIND_PACKAGE(PugiXML)
-# LIST(APPEND ExecutionGraph_INC_DIRS_DEP ${PUGIXML_INCLUDE_DIR} )
-# LIST(APPEND ExecutionGraph_LIBRARIES_DEP ${PUGIXML_LIBRARIES})
-# IF(PUGIXML_FOUND)
-#   SET(ExecutionGraph_SUPPORT_XML ON)
-# ENDIF()
+FIND_PACKAGE(PugiXML)
+IF(PUGIXML_FOUND)
+    LIST(APPEND ExecutionGraph_INC_DIRS_DEP ${PUGIXML_INCLUDE_DIR} )
+    LIST(APPEND ExecutionGraph_LIBRARIES_DEP ${PUGIXML_LIBRARIES})
+    SET(ExecutionGraph_SUPPORT_XML ON)
+ENDIF()
 
 #~ IF(ExecutionGraph_USE_OPENMP)
 

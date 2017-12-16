@@ -1,8 +1,9 @@
 CMakeFiles
+.DS_Store
+.AppleDouble
+.LSOverride
 __pycache__
 .ipynb_checkpoints
-build/
-html
-latex
 build
-.vscode/.cmaketools.json
+.vscode/.*
+.vscode/c_cpp_properties.json
