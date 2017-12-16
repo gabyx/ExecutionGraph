@@ -32,3 +32,5 @@ chmod +x $CHECKOUT_PATH/travis/install_dep.sh
 . $CHECKOUT_PATH/travis/install_dep.sh
 
 # "DEPENDECIES COMPLETE ================================================================="
+
+set +e
