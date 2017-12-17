@@ -17,11 +17,17 @@ This library has these dependencies:
 - [googletest](https://github.com/google/googletest)
 
 The library `Eigen` needs to be installed, `meta` and `googletest` are installed as external projects when configuring this library!
+
+### OS X
 ```bash
     brew install eigen
 ```
 
-### Setting up VS Code for C++
+### Development Setup
+If you start developing, install the pre-commit hook with:
+```bash
+    cp tools/pre-commit .git/hooks/
+```
 #### On OS X
 Install XCode and the CommandLine Tools from [Apple](https://developer.apple.com/download/more/)  
 Install [Visual Studio Code](https://code.visualstudio.com/)  
