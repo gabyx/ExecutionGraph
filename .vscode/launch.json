@@ -6,10 +6,22 @@
     "configurations": [
         
         {
-            "name": "(lldb) Launch",
+            "name": "(lldb) ExecutionGraphTests-ExecutionTree",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/tests/ExecutionGraphTests-ExecutionTree",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
+            "name": "(lldb) ExecutionGraphTests-CustomSocketTypes",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/tests/ExecutionGraphTests-CustomSocketTypes",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

@@ -22,7 +22,7 @@ template<typename TConfig>
 class LogicNodeDefaultPool final : public TConfig::NodeBaseType
 {
 public:
-    EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
+    EXECGRAPH_TYPEDEF_CONFIG(TConfig);
     using Base = typename TConfig::NodeBaseType;
 
     template<typename... Args>
@@ -52,7 +52,7 @@ public:
             }
             else
             {
-                EXEC_GRAPH_THROWEXCEPTION_TYPE("Default output socket id: " << defaultOutSocketID
+                EXECGRAPH_THROW_EXCEPTION_TYPE("Default output socket id: " << defaultOutSocketID
                                                                             << "does not exist in default output socket pool!",
                                                NodeConnectionException);
             }
@@ -75,7 +75,7 @@ public:
     template<typename T>
     IndexType addNewDefaultValue(T&& defaultValue)
     {
-        EXEC_GRAPH_THROWEXCEPTION("Needs implementation!");
+        EXECGRAPH_THROW_EXCEPTION("Needs implementation!");
     }
 
     void reset() {}

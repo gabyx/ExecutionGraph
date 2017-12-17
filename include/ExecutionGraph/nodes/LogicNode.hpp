@@ -62,7 +62,7 @@ template<typename TConfig>
 class LogicNode
 {
 public:
-    EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
+    EXECGRAPH_TYPEDEF_CONFIG(TConfig);
 
     using SocketInputListType  = std::vector<SocketInputBasePointer>;
     using SocketOutputListType = std::vector<SocketOutputBasePointer>;
@@ -70,11 +70,14 @@ public:
 public:
     //! The basic constructor of a logic node.
     LogicNode(NodeId id, std::string name = "")
-        : m_id(id), m_name((name.empty()) ? name : std::to_string(id)) {}
+        : m_id(id), m_name(name.empty() ? std::to_string(id) : name) {}
     LogicNode(const LogicNode&) = default;
     LogicNode(LogicNode&&)      = default;
 
-    virtual ~LogicNode() = default;
+    virtual ~LogicNode()
+    {
+        EXECGRAPH_LOG_TRACE("Destructor: LogicNode: " << m_name);
+    }
 
     //! The reset function.
     virtual void reset() = 0;
@@ -126,7 +129,7 @@ public:
 
     //! Add all input sockets defined in the type list \p SocketDeclList.
     template<typename SocketDeclList,
-             EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::InputSocketDeclarationList, SocketDeclList>::value))>
+             EXECGRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::InputSocketDeclarationList, SocketDeclList>::value))>
     void addSockets()
     {
         auto add = [&](auto socketDeclaration) {
@@ -141,7 +144,7 @@ public:
     //! the corresponding default value in \p defaultValues.
     template<typename SocketDeclList,
              typename... Args,
-             EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::OutputSocketDeclarationList, SocketDeclList>::value))>
+             EXECGRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::OutputSocketDeclarationList, SocketDeclList>::value))>
     void addSockets(std::tuple<Args...>&& defaultValues)
     {
         auto add = [&](auto socketDeclaration) {
@@ -158,13 +161,13 @@ public:
     //! Get the input socket at index \p idx.
     SocketInputBaseType& getISocket(SocketIndex idx)
     {
-        EXEC_GRAPH_ASSERT(idx < m_inputs.size(), "Wrong index!");
+        EXECGRAPH_ASSERT(idx < m_inputs.size(), "Wrong index!");
         return *m_inputs[idx];
     }
     //! Get the output socket at index \p index.
     SocketOutputBaseType& getOSocket(SocketIndex idx)
     {
-        EXEC_GRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
+        EXECGRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
         return *m_outputs[idx];
     }
 
@@ -191,14 +194,14 @@ public:
     const T& getOutVal(SocketIndex idx) const;
 
     //! Get the output socket value from a SocketDeclaration `OutputSocketDeclaration`.
-    template<typename TSocketDeclaration, EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::OutputSocketDeclaration, TSocketDeclaration>::value))>
+    template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::OutputSocketDeclaration, TSocketDeclaration>::value))>
     typename TSocketDeclaration::DataType& getValue();
     //! Get the output socket value from a SocketDeclaration `OutputSocketDeclaration`.
-    template<typename TSocketDeclaration, EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::OutputSocketDeclaration, TSocketDeclaration>::value))>
+    template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::OutputSocketDeclaration, TSocketDeclaration>::value))>
     const typename TSocketDeclaration::DataType& getValue() const;
 
     //! Get the input socket value from a SocketDeclaration `InputSocketDeclaration`.
-    template<typename TSocketDeclaration, EXEC_GRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::InputSocketDeclaration, TSocketDeclaration>::value))>
+    template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::InputSocketDeclaration, TSocketDeclaration>::value))>
     const typename TSocketDeclaration::DataType& getValue() const;
 
     //! Writes the value of the output socket at index \p idx to all inputs
@@ -272,7 +275,7 @@ template<typename TConfig>
 template<typename T>
 auto& LogicNode<TConfig>::getISocket(SocketIndex idx)
 {
-    EXEC_GRAPH_ASSERT(idx < m_inputs.size(), "Wrong index!");
+    EXECGRAPH_ASSERT(idx < m_inputs.size(), "Wrong index!");
     return *m_inputs[idx]->template castToType<T>();
 }
 
@@ -280,7 +283,7 @@ template<typename TConfig>
 template<typename T>
 const auto& LogicNode<TConfig>::getISocket(SocketIndex idx) const
 {
-    EXEC_GRAPH_ASSERT(idx < m_inputs.size(), "Wrong index!");
+    EXECGRAPH_ASSERT(idx < m_inputs.size(), "Wrong index!");
     return *m_inputs[idx]->template castToType<T>();
 }
 
@@ -288,7 +291,7 @@ template<typename TConfig>
 template<typename T>
 auto& LogicNode<TConfig>::getOSocket(SocketIndex idx)
 {
-    EXEC_GRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
+    EXECGRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
     return *m_outputs[idx]->template castToType<T>();
 }
 
@@ -296,7 +299,7 @@ template<typename TConfig>
 template<typename T>
 const auto& LogicNode<TConfig>::getOSocket(SocketIndex idx) const
 {
-    EXEC_GRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
+    EXECGRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
     return *m_outputs[idx]->template castToType<T>();
 }
 
@@ -304,7 +307,7 @@ template<typename TConfig>
 template<typename T>
 const T& LogicNode<TConfig>::getInVal(SocketIndex idx) const
 {
-    EXEC_GRAPH_ASSERT(idx < m_inputs.size(), "Wrong index!");
+    EXECGRAPH_ASSERT(idx < m_inputs.size(), "Wrong index!");
     return m_inputs[idx]->template castToType<T>()->getValue();
 }
 
@@ -312,7 +315,7 @@ template<typename TConfig>
 template<typename T>
 T& LogicNode<TConfig>::getOutVal(SocketIndex idx)
 {
-    EXEC_GRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
+    EXECGRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
     return m_outputs[idx]->template castToType<T>()->getValue();
 }
 
@@ -320,34 +323,34 @@ template<typename TConfig>
 template<typename T>
 const T& LogicNode<TConfig>::getOutVal(SocketIndex idx) const
 {
-    EXEC_GRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
+    EXECGRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
     return m_outputs[idx]->template castToType<T>()->getValue();
 }
 
 template<typename TConfig>
-template<typename TSocketDeclaration, EXEC_GRAPH_SFINAE_ENABLE_IMPL_IF((details::isInstantiationOf<details::OutputSocketDeclaration, TSocketDeclaration>::value))>
+template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IMPL_IF((details::isInstantiationOf<details::OutputSocketDeclaration, TSocketDeclaration>::value))>
 typename TSocketDeclaration::DataType& LogicNode<TConfig>::getValue()
 {
     auto idx = TSocketDeclaration::Index::value;
-    EXEC_GRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
+    EXECGRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
     return m_outputs[idx]->template castToType<typename TSocketDeclaration::DataType>()->getValue();
 }
 
 template<typename TConfig>
-template<typename TSocketDeclaration, EXEC_GRAPH_SFINAE_ENABLE_IMPL_IF((details::isInstantiationOf<details::InputSocketDeclaration, TSocketDeclaration>::value))>
+template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IMPL_IF((details::isInstantiationOf<details::InputSocketDeclaration, TSocketDeclaration>::value))>
 const typename TSocketDeclaration::DataType& LogicNode<TConfig>::getValue() const
 {
     auto idx = TSocketDeclaration::Index::value;
-    EXEC_GRAPH_ASSERT(idx < m_inputs.size(), "Wrong index!");
+    EXECGRAPH_ASSERT(idx < m_inputs.size(), "Wrong index!");
     return m_inputs[idx]->template castToType<typename TSocketDeclaration::DataType>()->getValue();
 }
 
 template<typename TConfig>
-template<typename TSocketDeclaration, EXEC_GRAPH_SFINAE_ENABLE_IMPL_IF((details::isInstantiationOf<details::OutputSocketDeclaration, TSocketDeclaration>::value))>
+template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IMPL_IF((details::isInstantiationOf<details::OutputSocketDeclaration, TSocketDeclaration>::value))>
 const typename TSocketDeclaration::DataType& LogicNode<TConfig>::getValue() const
 {
     auto idx = TSocketDeclaration::Index::value;
-    EXEC_GRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
+    EXECGRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
     return m_outputs[idx]->template castToType<typename TSocketDeclaration::DataType>()->getValue();
 }
 
@@ -355,14 +358,14 @@ template<typename TConfig>
 template<typename T>
 void LogicNode<TConfig>::distributeOSocketValue(SocketIndex idx)
 {
-    EXEC_GRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
+    EXECGRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
     m_outputs[idx]->template castToType<T>()->distributeValue();
 }
 
 template<typename TConfig>
 void LogicNode<TConfig>::setGetLink(LogicNode& outN, SocketIndex outS, LogicNode& inN, SocketIndex inS)
 {
-    EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(
+    EXECGRAPH_THROW_EXCEPTION_TYPE_IF(
         outS >= outN.getOutputs().size() || inS >= inN.getInputs().size(),
         "Wrong socket indices:  outNode: " << outN.getId() << " outSocketIdx: " << outS << " inNode: " << inN.getId()
                                            << " inSocketIdx: "
@@ -375,7 +378,7 @@ void LogicNode<TConfig>::setGetLink(LogicNode& outN, SocketIndex outS, LogicNode
 template<typename TConfig>
 void LogicNode<TConfig>::addWriteLink(LogicNode& outN, SocketIndex outS, LogicNode& inN, SocketIndex inS)
 {
-    EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(
+    EXECGRAPH_THROW_EXCEPTION_TYPE_IF(
         outS >= outN.getOutputs().size() || inS >= inN.getInputs().size(),
         "Wrong socket indices:  outNode: " << outN.getId() << " outSocketIdx: " << outS << " inNode: " << inN.getId()
                                            << " inSocketIdx: "
@@ -388,7 +391,7 @@ void LogicNode<TConfig>::addWriteLink(LogicNode& outN, SocketIndex outS, LogicNo
 
 //! Some handy macros to redefine getters to shortcut the following ugly syntax inside a derivation of LogicNode:
 //! Accessing the value in socket Result1 : this->template getValue<typename OutSockets::template Get<Result1>>();
-#define EXEC_GRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(InputEnum, InSocketDeclList, OutputEnum, OutSocketDeclList)       \
+#define EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(InputEnum, InSocketDeclList, OutputEnum, OutSocketDeclList)        \
     template<InputEnum S>                                                                                            \
     inline auto& getInVal() const { return this->template getValue<typename InSocketDeclList::template Get<S>>(); }  \
                                                                                                                      \
@@ -403,7 +406,7 @@ void LogicNode<TConfig>::addWriteLink(LogicNode& outN, SocketIndex outS, LogicNo
     template<OutputEnum S>                                                                                           \
     static constexpr const SocketIndex& getOutIdx() { return OutSocketDeclList::template Get<S>::Index::value; }
 
-#define EXEC_GRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME() \
+#define EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME() \
     virtual std::string getTypeName() override { return shortenTemplateBrackets(demangle(this)); };
 
 }  // end ExecutionGraph

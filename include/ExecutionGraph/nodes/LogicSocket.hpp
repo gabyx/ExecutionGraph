@@ -26,7 +26,7 @@ template<typename TConfig>
 class LogicSocketBase
 {
 public:
-    EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
+    EXECGRAPH_TYPEDEF_CONFIG(TConfig);
 
     LogicSocketBase(IndexType type,
                     SocketIndex index,
@@ -60,7 +60,7 @@ template<typename TConfig>
 class LogicSocketInputBase : public LogicSocketBase<TConfig>
 {
 public:
-    EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
+    EXECGRAPH_TYPEDEF_CONFIG(TConfig);
     friend SocketOutputBaseType;
 
     static_assert(std::is_same<LogicSocketInputBase, SocketInputBaseType>::value,
@@ -72,17 +72,31 @@ public:
     {
     }
 
+    ~LogicSocketInputBase()
+    {
+        EXECGRAPH_LOG_TRACE("Destructor: LogicSocketInputBase: index: " << this->getIndex() << " parent:" << this->getParent().getName());
+
+        // Reset Get-Link
+        removeGetLink();
+
+        // Reset all Write-Links
+        for(auto* outputSocket : m_writingParents)
+        {
+            outputSocket->template removeWriteLink<false>(*this);
+        }
+    }
+
     //! Cast to a logic socket of type \p SocketInputType<T>*.
     //! The cast fails at runtime if the data type \p T does not match!
     template<typename T>
     auto* castToType() const
     {
-        EXEC_GRAPH_THROW_BADSOCKETCAST_IF((this->m_type != meta::find_index<SocketTypes, T>::value),
-                                          "Casting socket index '" << this->m_index << "' with type '" << this->getNameOfType() << "' into '"
-                                                                   << demangle<T>()
-                                                                   << "' of logic node id: '"
-                                                                   << this->m_parent.getId()
-                                                                   << "' which is wrong!");
+        EXECGRAPH_THROW_BADSOCKETCAST_IF((this->m_type != meta::find_index<SocketTypes, T>::value),
+                                         "Casting socket index '" << this->m_index << "' with type '" << this->getNameOfType() << "' into '"
+                                                                  << demangle<T>()
+                                                                  << "' of logic node id: '"
+                                                                  << this->m_parent.getId()
+                                                                  << "' which is wrong!");
 
         return static_cast<SocketInputType<T> const*>(this);
     }
@@ -96,14 +110,11 @@ public:
 
     //! Set the Get-Link to an output socket.
     void setGetLink(SocketOutputBaseType& outputSocket);
+
     //! Remove the Get-Link to an output socket.
     void removeGetLink()
     {
-        if(hasGetLink())
-        {
-            m_getFrom->m_getterChilds.erase(this);
-            m_data = nullptr;
-        }
+        removeGetLink<true>();
     }
 
     //! Check if the socket has a Get-Link to an output socket.
@@ -122,6 +133,41 @@ public:
     IndexType getDefaultOutputSocketIndex() { return m_defaultOutputSocketIndex; }
 
 protected:
+    //! Remove the Get-Link and optionally notify output.
+    template<bool notifyOutput = true>
+    void removeGetLink()
+    {
+        if(hasGetLink())
+        {
+            // Set the data pointer to nullptr only if it points to
+            // the getter at the moment, otherwise leave it as is.
+            if(m_getFrom->m_data == m_data)
+            {
+                m_data = nullptr;
+            }
+
+            if(notifyOutput)
+            {
+                m_getFrom->onRemoveGetter(*this);
+            }
+            m_getFrom = nullptr;
+        }
+    }
+
+    //! Callback when the output socket has remove its Write-Link
+    //! to this input socket.
+    void onRemoveWritter(SocketOutputBaseType& outputSocket)
+    {
+        m_writingParents.erase(&outputSocket);
+
+        // If the data pointer points to this output socket try
+        // to reroute to the Get-Link if possible.
+        if(m_data == outputSocket.m_data)
+        {
+            m_data = hasGetLink() ? m_getFrom->m_data : nullptr;
+        }
+    }
+
     //! The default output socket id. This defaults to `m_type` since for every type
     //! in SocketTypes there needs to be a default socket which is used as default.
     const IndexType m_defaultOutputSocketIndex;
@@ -136,7 +182,7 @@ template<typename TConfig>
 class LogicSocketOutputBase : public LogicSocketBase<TConfig>
 {
 public:
-    EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
+    EXECGRAPH_TYPEDEF_CONFIG(TConfig);
     friend SocketInputBaseType;
 
     static_assert(std::is_same<LogicSocketOutputBase, SocketOutputBaseType>::value,
@@ -150,10 +196,14 @@ public:
 
     ~LogicSocketOutputBase()
     {
+        EXECGRAPH_LOG_TRACE("Destructor: LogicSocketOutputBase: index: " << this->getIndex() << " parent:" << this->getParent().getName());
+
+        removeWriteLinks();
+
         // Reset data address in all input sockets.
         for(auto* inSocket : m_getterChilds)
         {
-            inSocket->m_data = nullptr;
+            inSocket->template removeGetLink<false>();
         }
     }
 
@@ -162,12 +212,12 @@ public:
     template<typename T>
     auto* castToType() const
     {
-        EXEC_GRAPH_THROW_BADSOCKETCAST_IF((this->m_type != meta::find_index<SocketTypes, T>::value),
-                                          "Casting socket index '" << this->m_index << "' with type '" << this->getNameOfType() << "' into '"
-                                                                   << demangle<T>()
-                                                                   << "' of logic node id: '"
-                                                                   << this->m_parent.getId()
-                                                                   << "' which is wrong!");
+        EXECGRAPH_THROW_BADSOCKETCAST_IF((this->m_type != meta::find_index<SocketTypes, T>::value),
+                                         "Casting socket index '" << this->m_index << "' with type '" << this->getNameOfType() << "' into '"
+                                                                  << demangle<T>()
+                                                                  << "' of logic node id: '"
+                                                                  << this->m_parent.getId()
+                                                                  << "' which is wrong!");
 
         return static_cast<SocketOutputType<T> const*>(this);
     }
@@ -181,10 +231,46 @@ public:
 
     void addWriteLink(SocketInputBaseType& inputSocket);
 
+    //! Remove Write-Link to the input socket `inputSocket`.
+    void removeWriteLink(SocketInputBaseType& inputSocket)
+    {
+        removeWriteLink<true>(inputSocket);
+    }
+
+    //! Remove all Write-Links to input sockets.
+    void removeWriteLinks()
+    {
+        for(auto* inputSocket : m_writeTo)
+        {
+            inputSocket->onRemoveWritter(*this);
+        }
+        m_writeTo.clear();
+    }
+
     const auto& getGetterSockets() { return m_getterChilds; }
     IndexType getConnectionCount() { return m_writeTo.size() + m_getterChilds.size(); }
 
 protected:
+    //! Remove Write-Link to input socket `inputSocket` and optionaly notify the input socket.
+    template<bool notifyInput = true>
+    void removeWriteLink(SocketInputBaseType& inputSocket)
+    {
+        auto it = std::find(m_writeTo.begin(), m_writeTo.end(), &inputSocket);
+        if(it != m_writeTo.end())
+        {
+            m_writeTo.erase(it);
+        }
+        if(notifyInput)
+        {
+            inputSocket.onRemoveWritter(*this);
+        }
+    }
+    //! Callback when input socket `child` has removed its Get-Link.
+    void onRemoveGetter(SocketInputBaseType& inputSocket)
+    {
+        m_getterChilds.erase(&inputSocket);
+    }
+
     //! Write out value to all connected (Write-Link) input sockets.
     void executeWriteLinks()
     {
@@ -209,7 +295,7 @@ private:
     using LogicSocketInputBase<TConfig>::m_data;
 
 public:
-    EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
+    EXECGRAPH_TYPEDEF_CONFIG(TConfig);
     using DataType = TData;
 
     /** This assert fails if the type T of the LogicSocket is
@@ -229,7 +315,7 @@ public:
     //! The graph checks that all input nodes ar connected when solving the execution order!
     const DataType& getValue() const
     {
-        EXEC_GRAPH_ASSERT(m_data, "Input socket: " << this->getName() << " of logic node id: " << this->getParent().getId() << " not connected");
+        EXECGRAPH_ASSERT(m_data, "Input socket: " << this->getName() << " of logic node id: " << this->getParent().getId() << " not connected");
         return *static_cast<const DataType*>(m_data);
     }
     //! Non-const overload.
@@ -259,7 +345,8 @@ class LogicSocketOutput final : public LogicSocketData<TData>,
                                 public LogicSocketOutputBase<TConfig>
 {
 public:
-    EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
+    EXECGRAPH_TYPEDEF_CONFIG(TConfig);
+    using DataStorage = LogicSocketData<TData>;
     using DataType = TData;
 
     /** This assert fails if the type T of the LogicSocket is
@@ -270,7 +357,7 @@ public:
     template<typename T, typename... Args>
     LogicSocketOutput(T&& initValue, Args&&... args)
         : LogicSocketData<TData>(std::forward<T>(initValue))
-        , LogicSocketOutputBase<TConfig>(m_data,
+        , LogicSocketOutputBase<TConfig>(LogicSocketData<TData>::m_data,
                                          meta::find_index<SocketTypes, DataType>::value,
                                          std::forward<Args>(args)...)
     {
@@ -281,18 +368,15 @@ public:
     void setValue(T&& value)
     {
         // Set the value
-        m_data = std::forward<T>(value);
+        DataStorage::m_data = std::forward<T>(value);
         // Forward the value to all Write-Links
         this->executeWriteLinks();
     }
 
     //! Get the data value of the socket.
-    const DataType& getValue() const { return m_data; }
+    const DataType& getValue() const { return DataStorage::m_data; }
     //! Non-const overload.
-    DataType& getValue() { return m_data; }
-
-private:
-    DataType m_data;  //!< The output value
+    DataType& getValue() { return DataStorage::m_data; }
 };
 
 }  // end ExecutionGraph
@@ -322,11 +406,11 @@ std::string LogicSocketBase<TConfig>::getNameOfType() const
 template<typename TConfig>
 void LogicSocketOutputBase<TConfig>::addWriteLink(SocketInputBaseType& inputSocket)
 {
-    EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(inputSocket.getParent().getId() == this->getParent().getId(),
+    EXECGRAPH_THROW_EXCEPTION_TYPE_IF(inputSocket.getParent().getId() == this->getParent().getId(),
                                       "No Write-Link connection to our input slot! (node id: " << this->getParent().getId() << ")",
                                       NodeConnectionException);
 
-    EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(this->getType() != inputSocket.getType(),
+    EXECGRAPH_THROW_EXCEPTION_TYPE_IF(this->getType() != inputSocket.getType(),
                                       "Output socket: " << this->getName() << " of logic node id: " << this->getParent().getId()
                                                         << " has not the same type as input socket "
                                                         << inputSocket.getName()
@@ -334,7 +418,7 @@ void LogicSocketOutputBase<TConfig>::addWriteLink(SocketInputBaseType& inputSock
                                                         << inputSocket.getParent().getId(),
                                       NodeConnectionException);
 
-    EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(m_getterChilds.find(&inputSocket) != m_getterChilds.end(),
+    EXECGRAPH_THROW_EXCEPTION_TYPE_IF(m_getterChilds.find(&inputSocket) != m_getterChilds.end(),
                                       "Cannot add Write-Link from output socket: "
                                           << this->getName()
                                           << " of logic node id: "
@@ -356,11 +440,11 @@ void LogicSocketOutputBase<TConfig>::addWriteLink(SocketInputBaseType& inputSock
 template<typename TConfig>
 void LogicSocketInputBase<TConfig>::setGetLink(SocketOutputBaseType& outputSocket)
 {
-    EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(outputSocket.getParent().getId() == this->getParent().getId(),
+    EXECGRAPH_THROW_EXCEPTION_TYPE_IF(outputSocket.getParent().getId() == this->getParent().getId(),
                                       "No Get-Link connection to our output slot! (node id: " << this->getParent().getId() << ")",
                                       NodeConnectionException);
 
-    EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(this->getType() != outputSocket.getType(),
+    EXECGRAPH_THROW_EXCEPTION_TYPE_IF(this->getType() != outputSocket.getType(),
                                       "Output socket: " << outputSocket.getName() << " of logic node id: " << outputSocket.getParent().getId()
                                                         << " has not the same type as input socket "
                                                         << this->getName()
@@ -368,7 +452,7 @@ void LogicSocketInputBase<TConfig>::setGetLink(SocketOutputBaseType& outputSocke
                                                         << this->getParent().getId(),
                                       NodeConnectionException);
 
-    EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(m_writingParents.find(&outputSocket) != m_writingParents.end(),
+    EXECGRAPH_THROW_EXCEPTION_TYPE_IF(m_writingParents.find(&outputSocket) != m_writingParents.end(),
                                       "Cannot add Get-Link from input socket: "
                                           << this->getName()
                                           << " of logic node id: "
@@ -383,7 +467,7 @@ void LogicSocketInputBase<TConfig>::setGetLink(SocketOutputBaseType& outputSocke
     // Remove Get-Link (if existing)
     removeGetLink();
 
-    //std::cout << "Add Get-Link: " << outputSocket.getParent().getId() << outputSocket.getName() << " --> " << this->getParent().getId() << this->getName() << std::endl;
+    // EXECGRAPH_LOG_TRACE("Add Get-Link: " << outputSocket.getParent().getId() << outputSocket.getName() << " --> " << this->getParent().getId() << this->getName());
     m_getFrom = &outputSocket;
     m_data    = outputSocket.m_data;  // Set data pointer of this input socket.
     outputSocket.m_getterChilds.emplace(this);

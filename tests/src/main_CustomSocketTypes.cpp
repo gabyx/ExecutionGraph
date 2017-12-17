@@ -27,7 +27,7 @@ struct A
 
     A& operator+=(const A& b)
     {
-        for (int i = 0; i < N; ++i)
+        for(int i = 0; i < N; ++i)
         {
             memory[i] += b.memory[i];
         }
@@ -56,15 +56,15 @@ public:
     {
         Result1,
     };
-    EXEC_GRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
+    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
 
     using InSockets = InSocketDeclList<InSocketDecl<Value1, std::shared_ptr<A>>,
                                        InSocketDecl<Value2, std::shared_ptr<A>>>;
 
     using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, std::shared_ptr<A>>>;
 
-    EXEC_GRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME()
-    EXEC_GRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
+    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME();
+    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets);
 
     template<typename... Args>
     IntegerNode(Args&&... args)
@@ -81,8 +81,11 @@ public:
     {
         // add the the two inputs (SocketType = shared_ptr<A>)
         // to the output.
-        *getOutVal<Result1>() += *getInVal<Value1>();
-        *getOutVal<Result1>() += *getInVal<Value2>();
+        auto sp1 = getInVal<Value1>();
+        auto sp2 = getInVal<Value2>();
+        auto spOut = getOutVal<Result1>();
+        *spOut += *sp1;
+        *spOut += *sp2;
     }
 };
 
@@ -104,15 +107,15 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     try
     {
         node1a->getISocket<double>(0);
-        EXEC_GRAPH_THROWEXCEPTION("Should throw exception here!");
+        EXECGRAPH_THROW_EXCEPTION("Should throw exception here!");
     }
-    catch (BadSocketCastException& e)
+    catch(BadSocketCastException& e)
     {
         // all correct
     }
-    catch (...)
+    catch(...)
     {
-        EXEC_GRAPH_THROWEXCEPTION("Wrong Exception thrown!");
+        EXECGRAPH_THROW_EXCEPTION("Wrong Exception thrown!");
     }
     // Link
     node4a->setGetLink(*node3a, 0, 0);
@@ -125,6 +128,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     node3b->setGetLink(*node1b, 0, 1);
 
     ExecutionTreeInOut<Config> execTree;
+    execTree.getDefaultOuputPool().setDefaultValue<std::shared_ptr<A>>(std::make_shared<A>());
     execTree.addNode(std::move(node1a));
     execTree.addNode(std::move(node1b));
     execTree.addNode(std::move(node2a));
@@ -141,12 +145,12 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 
     execTree.setup();
 
-    std::cout << execTree.getExecutionOrderInfo() << std::endl;
+    EXECGRAPH_LOG_TRACE(execTree.getExecutionOrderInfo());
 
     execTree.execute(0);
 
-    std::cout << "Result : " << resultNode->getOutVal<IntegerNode<Config>::Result1>()->memory[1] << std::endl;
-    EXEC_GRAPH_THROWEXCEPTION_IF(resultNode->getOutVal<IntegerNode<Config>::Result1>()->memory[1] != 30, "wrong result");
+    EXECGRAPH_LOG_TRACE("Result : " << resultNode->getOutVal<IntegerNode<Config>::Result1>()->memory[1]);
+    EXECGRAPH_THROW_EXCEPTION_IF(resultNode->getOutVal<IntegerNode<Config>::Result1>()->memory[1] != 30, "wrong result");
 }
 
 int main(int argc, char** argv)

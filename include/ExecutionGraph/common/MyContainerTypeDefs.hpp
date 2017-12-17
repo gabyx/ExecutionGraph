@@ -44,7 +44,7 @@ using StdVecAligned = std::vector<Type, Eigen::aligned_allocator<Type>>;
 /**
  * @brief This macro is used to typedef all custom container types.
  */
-#define EXEC_GRAPH_DEFINE_CONTAINER_TYPES                                                                     \
+#define EXECGRAPH_DEFINE_CONTAINER_TYPES                                                                      \
                                                                                                               \
     template<typename Key, typename Type, typename Comp = std::less<Key>>                                     \
     using StdMapAligned = executionGraph::MyContainers::StdMapAligned<Key, Type, Comp>;                       \

@@ -26,17 +26,17 @@ namespace executionGraph
 #pragma message(" Platform.hpp: Building library ...")
 
 #ifdef __GNUC__
-#define EXEC_GRAPH_EXPORT __attribute__((dllexport))
+#define EXECGRAPH_EXPORT __attribute__((dllexport))
 #else
-#define EXEC_GRAPH_EXPORT __declspec(dllexport)  // Note: actually gcc seems to also supports this syntax.
+#define EXECGRAPH_EXPORT __declspec(dllexport)  // Note: actually gcc seems to also supports this syntax.
 #endif
 
 #else
 
 #ifdef __GNUC__
-#define EXEC_GRAPH_EXPORT __attribute__((dllimport))
+#define EXECGRAPH_EXPORT __attribute__((dllimport))
 #else
-#define EXEC_GRAPH_EXPORT __declspec(dllimport)  // Note: actually gcc seems to also supports this syntax.
+#define EXECGRAPH_EXPORT __declspec(dllimport)  // Note: actually gcc seems to also supports this syntax.
 #endif
 
 #endif
@@ -48,14 +48,14 @@ namespace executionGraph
 #pragma message(" Platform.hpp: Building library ...")
 
 #if __GNUC__ >= 4 || __clang__
-#define EXEC_GRAPH_EXPORT __attribute__((visibility("default")))
+#define EXECGRAPH_EXPORT __attribute__((visibility("default")))
 #else
-#define EXEC_GRAPH_EXPORT
+#define EXECGRAPH_EXPORT
 #warning "Unknown compiler: Exporting everything into library!"
 #endif
 
 #else
-#define EXEC_GRAPH_EXPORT
+#define EXECGRAPH_EXPORT
 #endif
 
 #endif

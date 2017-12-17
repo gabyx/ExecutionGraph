@@ -23,8 +23,7 @@
 #include "ExecutionGraph/nodes/LogicNodeDefaultPool.hpp"
 #include "ExecutionGraph/nodes/LogicSocket.hpp"
 
-#define EXEC_GRAPH_EXECTREE_SOLVER_LOG(message) EXEC_GRAPH_DEBUG_ONLY(std::cout << message);
-#define EXEC_GRAPH_EXECTREE_SOLVER_LOG_ON(message) std::cout << message;
+#define EXECGRAPH_EXECTREE_SOLVER_LOG(message) EXECGRAPH_DEBUG_ONLY(EXECGRAPH_LOG_TRACE(message));
 
 namespace executionGraph
 {
@@ -32,7 +31,7 @@ template<typename TConfig>
 class ExecutionTreeInOut
 {
 public:
-    EXEC_GRAPH_TYPEDEF_CONFIG(TConfig);
+    EXECGRAPH_TYPEDEF_CONFIG(TConfig);
 
     enum NodeClassification : unsigned char
     {
@@ -92,7 +91,7 @@ public:
     ExecutionTreeInOut()
     {
         // Make a default pool of output sockets.
-        auto p = std::make_unique<LogicNodeDefaultOutputs>(std::numeric_limits<NodeId>::max());
+        auto p                  = std::make_unique<LogicNodeDefaultOutputs>(std::numeric_limits<NodeId>::max(), "DefaultOutputPool");
         m_nodeDefaultOutputPool = p.get();
         addNode(std::move(p), NodeClassification::ConstantNode);
     }
@@ -105,7 +104,7 @@ public:
         m_executionOrderUpToDate = false;
 
         auto it = m_nodeMap.find(nodeId);
-        EXEC_GRAPH_THROWEXCEPTION_IF(it == m_nodeMap.end(), "Node with id: " << nodeId << " does not exist in tree!");
+        EXECGRAPH_THROW_EXCEPTION_IF(it == m_nodeMap.end(), "Node with id: " << nodeId << " does not exist in tree!");
 
         NodeClassification& currType = it->second.m_class;
         if(currType == newType)
@@ -160,7 +159,7 @@ public:
     const NodeDataSet& getNodes(GroupId groupId) const
     {
         auto it = m_nodeGroups.find(groupId);
-        EXEC_GRAPH_THROWEXCEPTION_IF(it == m_nodeGroups.end(),
+        EXECGRAPH_THROW_EXCEPTION_IF(it == m_nodeGroups.end(),
                                      "Group with id: " << groupId << " is not part of the tree!");
         return it->second;
     }
@@ -174,7 +173,7 @@ public:
         {
             m_executionOrderUpToDate = false;
         }
-        EXEC_GRAPH_THROWEXCEPTION_IF(node == nullptr, "Nullptr added!");
+        EXECGRAPH_THROW_EXCEPTION_IF(node == nullptr, "Nullptr added!");
 
         auto id             = node->getId();
         NodeBaseType* pNode = nullptr;
@@ -184,7 +183,7 @@ public:
             // Constant node
             if(m_constantNodes.find(id) != m_constantNodes.end())
             {
-                EXEC_GRAPH_WARNINGMSG(0, "Constant node id: " << node->getId() << " already added in tree!");
+                EXECGRAPH_WARNINGMSG(0, "Constant node id: " << node->getId() << " already added in tree!");
                 return nullptr;
             }
             pNode = node.get();
@@ -197,7 +196,7 @@ public:
             // Any other node
             if(m_nodeMap.find(id) != m_nodeMap.end())
             {
-                EXEC_GRAPH_WARNINGMSG(0, "Node id: " << node->getId() << " already added in tree!");
+                EXECGRAPH_WARNINGMSG(0, "Node id: " << node->getId() << " already added in tree!");
                 return nullptr;
             }
 
@@ -220,7 +219,7 @@ public:
         m_executionOrderUpToDate = false;
 
         auto it = m_nodeMap.find(nodeId);
-        EXEC_GRAPH_THROWEXCEPTION_IF(it == m_nodeMap.end(), "Node with id: " << nodeId << " does not exist in tree!");
+        EXECGRAPH_THROW_EXCEPTION_IF(it == m_nodeMap.end(), "Node with id: " << nodeId << " does not exist in tree!");
         // Add node to the group
         it->second.m_groups.emplace(groupId);
         m_nodeGroups[groupId].emplace(&it->second);
@@ -233,7 +232,7 @@ public:
         m_executionOrderUpToDate = false;
         auto outNit              = m_nodeMap.find(outN);
         auto inNit               = m_nodeMap.find(inN);
-        EXEC_GRAPH_THROWEXCEPTION_IF(outNit == m_nodeMap.end() || inNit == m_nodeMap.end(),
+        EXECGRAPH_THROW_EXCEPTION_IF(outNit == m_nodeMap.end() || inNit == m_nodeMap.end(),
                                      "Node with id: " << outN << " or " << inN << " does not exist!")
         NodeBaseType::setGetLink(*outNit->second.m_node, outS, *inNit->second.m_node, inS);
     }
@@ -248,7 +247,7 @@ public:
         auto inNit               = m_nodeMap.find(inN);
         if(outNit == m_nodeMap.end() || inNit == m_nodeMap.end())
         {
-            EXEC_GRAPH_THROWEXCEPTION("Node: " << outN << " or " << inN << " does not exist!");
+            EXECGRAPH_THROW_EXCEPTION("Node: " << outN << " or " << inN << " does not exist!");
         }
         NodeBaseType::addWriteLink(*outNit->second.m_node, outS, *inNit->second.m_node, inS);
     }
@@ -256,11 +255,11 @@ public:
     //! Reset all nodes in group with id: \p groupId.
     virtual void reset(unsigned int groupId)
     {
-        EXEC_GRAPH_THROWEXCEPTION_IF(!m_executionOrderUpToDate,
+        EXECGRAPH_THROW_EXCEPTION_IF(!m_executionOrderUpToDate,
                                      "ExecutionTree's execution order is not up to date!");
         // Execute in determined order!
         auto it = m_groupExecList.find(groupId);
-        EXEC_GRAPH_THROWEXCEPTION_IF(it == m_groupExecList.end(),
+        EXECGRAPH_THROW_EXCEPTION_IF(it == m_groupExecList.end(),
                                      "ExecutionTree does not contain a group with id: " << groupId);
         executePrioritySet(it->second, [](NodeBaseType& node) { node.reset(); });
     }
@@ -274,11 +273,11 @@ public:
     //! Execute all nodes in group with id: \p groupId in their determined order.
     virtual void execute(unsigned int groupId)
     {
-        EXEC_GRAPH_THROWEXCEPTION_IF(!m_executionOrderUpToDate,
+        EXECGRAPH_THROW_EXCEPTION_IF(!m_executionOrderUpToDate,
                                      "ExecutionTree's execution order is not up to date!");
         // Execute in determined order!
         auto it = m_groupExecList.find(groupId);
-        EXEC_GRAPH_THROWEXCEPTION_IF(it == m_groupExecList.end(),
+        EXECGRAPH_THROW_EXCEPTION_IF(it == m_groupExecList.end(),
                                      "ExecutionTree does not contain a group with id: " << groupId);
         executePrioritySet(it->second, [](NodeBaseType& node) { node.compute(); });
     }
@@ -286,7 +285,7 @@ public:
     //! Execute the whole graph.
     virtual void execute()
     {
-        EXEC_GRAPH_THROWEXCEPTION_IF(!m_executionOrderUpToDate,
+        EXECGRAPH_THROW_EXCEPTION_IF(!m_executionOrderUpToDate,
                                      "ExecutionTree's execution order is not up to date!")
 
         executePrioritySet(m_execList, [](NodeBaseType& node) { node.compute(); });
@@ -296,16 +295,19 @@ public:
     virtual void setup(bool connectAllDanglingInputs = true, bool checkResults = false)
     {
         // Allways check results in Debug mode.
-        EXEC_GRAPH_DEBUG_ONLY(checkResults = true;)
+        EXECGRAPH_DEBUG_ONLY(checkResults = true;)
 
         if(m_nodeClasses[NodeClassification::OutputNode].size() == 0)
         {
-            EXEC_GRAPH_THROWEXCEPTION("No output nodes specified!");
+            EXECGRAPH_THROW_EXCEPTION("No output nodes specified!");
         }
 
         // Solve execution order globally over all groups!
         // Each group has its own execution order based on the the global computed one!
-        ExecutionOrderSolver solver(m_nodeMap, m_allNodes, (connectAllDanglingInputs) ? m_nodeDefaultOutputPool : nullptr);
+        ExecutionOrderSolver solver(m_nodeMap,
+                                    m_allNodes,
+                                    m_constantNodes,
+                                    (connectAllDanglingInputs) ? m_nodeDefaultOutputPool : nullptr);
         solver.solve(m_execList, m_groupExecList);
 
         // Check if each output node reaches at least one input, if not print warning!
@@ -322,7 +324,7 @@ public:
                     break;
                 }
             }
-            EXEC_GRAPH_WARNINGMSG(outputReachedInput, "WARNING: Output id: " << outNode->getId() << " did not reach any input!")
+            EXECGRAPH_WARNINGMSG(outputReachedInput, "WARNING: Output id: " << outNode->getId() << " did not reach any input!")
         }
 
         m_executionOrderUpToDate = true;
@@ -373,8 +375,8 @@ protected:
     class ExecutionSolverBase
     {
     public:
-        ExecutionSolverBase(LogicNodeDefaultOutputs* defaultOutputSockets = nullptr)
-            : m_defaultOutputSockets(defaultOutputSockets) {}
+        ExecutionSolverBase(ConstantNodeStorage& constantNodes, LogicNodeDefaultOutputs* defaultOutputSockets = nullptr)
+            : m_constantNodes(constantNodes), m_defaultOutputSockets(defaultOutputSockets) {}
 
         //! Connects all dangling input sockets to the default output socket.
         void connectAllDanglingInputs(NodeData& nodeData)
@@ -388,16 +390,64 @@ protected:
                 }
                 else
                 {
-                    EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(inSocket->getConnectionCount() == 0,
+                    EXECGRAPH_THROW_EXCEPTION_TYPE_IF(inSocket->getConnectionCount() == 0,
                                                       "Input socket index: " << inSocket->getIndex()
-                                                                          << "of node: " << nodeData.m_node->getId() << " is not connected!",
+                                                                             << "of node: " << nodeData.m_node->getId() << " is not connected!",
                                                       NodeConnectionException);
+                }
+            }
+        }
+
+        void checkResults(const NodeDataStorage& nodes)
+        {
+            auto check = [&](auto* socket, const NodeData& nodeDataWithLowerPrio) {
+                // Get NodeData of parentNode
+                auto& parentNode = socket->getParent();
+
+                // Check first if it is a constant node.
+                auto itConstant = m_constantNodes.find(parentNode.getId());
+                if(itConstant != m_constantNodes.end())
+                {
+                    // nothing to check for constant nodes
+                    return;
+                }
+
+                auto itParent = nodes.find(parentNode.getId());
+                EXECGRAPH_THROW_EXCEPTION_IF(itParent == nodes.end(),
+                                             "Node with id: " << parentNode.getId() << " has not been added to the execution tree!");
+                const NodeData& parentNodeData = itParent->second;
+
+                EXECGRAPH_THROW_EXCEPTION_IF(parentNodeData.m_priority <= nodeDataWithLowerPrio.m_priority,
+                                             "Parent node id: " << parentNodeData.m_node->getId() << "[prio: " << parentNodeData.m_priority << " ]"
+                                                                << "has not a higher priority as node id: "
+                                                                << nodeDataWithLowerPrio.m_node->getId()
+                                                                << " which is wrong!");
+            };
+
+            for(auto& pair : nodes)
+            {
+                const NodeData& nodeData = pair.second;
+                // Follow all links
+                auto& inSockets = nodeData.m_node->getInputs();
+                for(auto& socket : inSockets)
+                {
+                    // Try adding the get link to the stack
+                    if(socket->hasGetLink())
+                    {
+                        check(socket->followGetLink(), nodeData);
+                    }
+                    // Try adding all writing links to the stack
+                    for(auto* outputSocket : socket->getWritingSockets())
+                    {
+                        check(outputSocket, nodeData);
+                    }
                 }
             }
         }
 
     private:
         LogicNodeDefaultOutputs* m_defaultOutputSockets;  //!< Default output sockets which are used for all dangling input sockets.
+        ConstantNodeStorage& m_constantNodes;             //!< Constant nodes which do not need evalualtion.
     };
 
     //! The solver for computing the execution order.
@@ -406,8 +456,9 @@ protected:
     public:
         ExecutionOrderSolver(NodeDataStorage& nodeMap,
                              NodeDataSet& nodes,
+                             ConstantNodeStorage& constantNodes,
                              LogicNodeDefaultOutputs* defaultOutputSockets = nullptr)
-            : ExecutionSolverBase(defaultOutputSockets), m_nodeMap(nodeMap), m_nodes(nodes)
+            : ExecutionSolverBase(constantNodes, defaultOutputSockets), m_nodeMap(nodeMap), m_nodes(nodes)
         {
         }
 
@@ -455,8 +506,8 @@ protected:
                     (*it)->unsetFlag(NodeData::OnCurrentDFRPath);  // Remove Mark
                     ++it;
                 }
-                EXEC_GRAPH_ASSERT(std::distance(itStart, it) <= static_cast<typename decltype(m_dfrStack)::difference_type>(m_dfrStack.size()),
-                                  "Removing: " << std::distance(itStart, it) << " from " << m_dfrStack.size());
+                EXECGRAPH_ASSERT(std::distance(itStart, it) <= static_cast<typename decltype(m_dfrStack)::difference_type>(m_dfrStack.size()),
+                                 "Removing: " << std::distance(itStart, it) << " from " << m_dfrStack.size());
                 // Convert backward iterator to forward
                 m_dfrStack.erase(it.base(), itStart.base());
             };
@@ -468,13 +519,13 @@ protected:
                 // we know that the prioriteis below it are correct, so skip this one
                 if(nodeData->isFlagSet(NodeData::Visited))
                 {
-                    EXEC_GRAPH_EXECTREE_SOLVER_LOG("DFS Start: Node id: " << nodeData->m_node->getId()
-                                                                          << " already visited -> skip it."
-                                                                          << std::endl;);
+                    EXECGRAPH_EXECTREE_SOLVER_LOG("DFS Start: Node id: " << nodeData->m_node->getId()
+                                                                         << " already visited -> skip it."
+                                                                         << std::endl;);
                     continue;
                 }
 
-                EXEC_GRAPH_EXECTREE_SOLVER_LOG("DFS Start: Node id: " << nodeData->m_node->getId() << std::endl;);
+                EXECGRAPH_EXECTREE_SOLVER_LOG("DFS Start: Node id: " << nodeData->m_node->getId());
 
                 // Start a depth-first recursion from this node (exploring its subtree)
                 m_dfrStack.clear();
@@ -487,17 +538,18 @@ protected:
 
                 while(!m_dfrStack.empty())
                 {
-                    EXEC_GRAPH_EXECTREE_SOLVER_LOG("DFS Stack:" << getStackInfo() << std::endl);
+                    EXECGRAPH_EXECTREE_SOLVER_LOG("DFS Stack:" << getStackInfo() << std::endl);
 
                     currentNode = m_dfrStack.back();
                     currentSize = m_dfrStack.size();
 
                     // We are doing depth first search and try to visit a node which is already on the
                     // current DFR path.
-                    EXEC_GRAPH_THROWEXCEPTION_IF(currentNode->isFlagSet(NodeData::OnCurrentDFRPath),
-                                                 "Your execution logic graph contains a cycle! "
-                                                 "Current traversal stack: "
-                                                     << getTraversalInfo());
+                    EXECGRAPH_THROW_EXCEPTION_TYPE_IF(currentNode->isFlagSet(NodeData::OnCurrentDFRPath),
+                                                      "Your execution logic graph contains a cycle! "
+                                                      "Current traversal stack: "
+                                                          << getTraversalInfo(),
+                                                      ExecutionGraphCycleException);
 
                     visit(*currentNode);  // Visits neighbors and add them to m_dfrStack
 
@@ -528,7 +580,7 @@ protected:
             // Check execution order by checking all inputs of all nodes
             if(checkResults)
             {
-                this->checkResults(m_nodes);
+                this->checkResults(m_nodeMap);
             }
         }
 
@@ -571,14 +623,14 @@ protected:
          */
         void visit(NodeData& nodeData)
         {
-            EXEC_GRAPH_EXECTREE_SOLVER_LOG("visit: " << nodeData.m_node->getId() << std::endl;);
+            EXECGRAPH_EXECTREE_SOLVER_LOG("visit: " << nodeData.m_node->getId());
 
             auto addParentsToStack = [&](auto* socket) {
 
                 // Get NodeData of parentNode
                 auto& parentNode = socket->getParent();
                 auto itParent    = m_nodeMap.find(parentNode.getId());
-                EXEC_GRAPH_THROWEXCEPTION_IF(itParent == m_nodeMap.end(),
+                EXECGRAPH_THROW_EXCEPTION_IF(itParent == m_nodeMap.end(),
                                              "Node with id: " << parentNode.getId() << " has not been added to the execution tree!");
                 NodeData* parentNodeData = &itParent->second;
 
@@ -614,43 +666,6 @@ protected:
             nodeData.setFlag(NodeData::Visited);
         }
 
-        void checkResults(const NodeDataSet& nodes)
-        {
-            auto check = [&](auto* socket, NodeData* nodeDataWithLowerPrio) {
-                // Get NodeData of parentNode
-                auto& parentNode = socket->getParent();
-                auto itParent    = m_nodeMap.find(parentNode.getId());
-                EXEC_GRAPH_THROWEXCEPTION_IF(itParent == m_nodeMap.end(),
-                                             "Node with id: " << parentNode.getId() << " has not been added to the execution tree!");
-                NodeData* parentNodeData = &itParent->second;
-
-                EXEC_GRAPH_THROWEXCEPTION_IF(parentNodeData->m_priority <= nodeDataWithLowerPrio->m_priority,
-                                             "Parent node id: " << parentNodeData->m_node->getId() << "[prio: " << parentNodeData->m_priority << " ]"
-                                                                << "has not a higher priority as node id: "
-                                                                << nodeDataWithLowerPrio->m_node->getId()
-                                                                << " which is wrong!");
-            };
-
-            for(auto* nodeData : nodes)
-            {
-                // Follow all links
-                auto& inSockets = nodeData->m_node->getInputs();
-                for(auto& socket : inSockets)
-                {
-                    // Try adding the get link to the stack
-                    if(socket->hasGetLink())
-                    {
-                        check(socket->followGetLink(), nodeData);
-                    }
-                    // Try adding all writing links to the stack
-                    for(auto* outputSocket : socket->getWritingSockets())
-                    {
-                        check(outputSocket, nodeData);
-                    }
-                }
-            }
-        }
-
         bool m_inputReachable     = false;
         NodeBaseType* m_reachNode = nullptr;
         NodeDataStorage& m_nodeMap;  //!< All NodeDatas of the execution tree.
@@ -663,8 +678,11 @@ protected:
     class ExecutionOrderSolver2 : public ExecutionSolverBase
     {
     public:
-        ExecutionOrderSolver2(NodeDataStorage& nodeMap, NodeDataSet& nodes, LogicNodeDefaultOutputs* defaultOutputSockets = nullptr)
-            : ExecutionSolverBase(defaultOutputSockets), m_nodeMap(nodeMap), m_nodes(nodes)
+        ExecutionOrderSolver2(NodeDataStorage& nodeMap,
+                              NodeDataSet& nodes,
+                              ConstantNodeStorage& constantNodes,
+                              LogicNodeDefaultOutputs* defaultOutputSockets = nullptr)
+            : ExecutionSolverBase(constantNodes, defaultOutputSockets), m_nodeMap(nodeMap), m_nodes(nodes)
         {
         }
 
@@ -705,8 +723,8 @@ protected:
                     // Goto next node
                     ++it;
                 }
-                EXEC_GRAPH_ASSERT(std::distance(itStart, it) <= m_dfrStack.size(),
-                                  "Removing: " << std::distance(itStart, it) << " from " << m_dfrStack.size());
+                EXECGRAPH_ASSERT(std::distance(itStart, it) <= m_dfrStack.size(),
+                                 "Removing: " << std::distance(itStart, it) << " from " << m_dfrStack.size());
                 // Convert backward iterator to forward
                 m_dfrStack.erase(it.base(), itStart.base());
             };
@@ -714,7 +732,7 @@ protected:
             // Loop over all nodes and start a depth-first-search
             for(NodeData* nodeData : m_nodes)
             {
-                EXEC_GRAPH_EXECTREE_SOLVER_LOG("DFS Start: Node id: " << nodeData->m_node->getId() << std::endl;);
+                EXECGRAPH_EXECTREE_SOLVER_LOG("DFS Start: Node id: " << nodeData->m_node->getId());
                 // Skip visited nodes.
                 if(nodeData->isFlagSet(NodeData::Visited))
                 {
@@ -731,16 +749,17 @@ protected:
 
                 while(!m_dfrStack.empty())
                 {
-                    EXEC_GRAPH_EXECTREE_SOLVER_LOG("DFS Stack:" << getStackInfo() << std::endl);
+                    EXECGRAPH_EXECTREE_SOLVER_LOG("DFS Stack:" << getStackInfo() << std::endl);
 
                     currentNode = m_dfrStack.back();
 
                     // We are doing depth first search and found another already visited node
                     // meaning we have a cycle.
-                    EXEC_GRAPH_THROWEXCEPTION_IF(currentNode->isFlagSet(NodeData::OnCurrentDFRPath),
-                                                 "Your execution logic graph contains a cycle! "
-                                                     << "Current traversal stack: "
-                                                     << getTraversalInfo());
+                    EXECGRAPH_THROW_EXCEPTION_TYPE_IF(currentNode->isFlagSet(NodeData::OnCurrentDFRPath),
+                                                      "Your execution logic graph contains a cycle! "
+                                                          << "Current traversal stack: "
+                                                          << getTraversalInfo(),
+                                                      ExecutionGraphCycleException);
 
                     currentNode->setFlag(NodeData::OnCurrentDFRPath);
                     currentSize = m_dfrStack.size();
@@ -778,7 +797,7 @@ protected:
             // Check execution order by checking all inputs of all nodes
             if(checkResults)
             {
-                this->checkResults(m_nodes);
+                this->checkResults(m_nodeMap);
             }
         }
 
@@ -821,13 +840,13 @@ protected:
          */
         void visit(NodeData& nodeData)
         {
-            EXEC_GRAPH_EXECTREE_SOLVER_LOG("visit: " << nodeData.m_node->getId() << std::endl;);
+            EXECGRAPH_EXECTREE_SOLVER_LOG("visit: " << nodeData.m_node->getId());
 
             auto addParentsToStack = [&](auto* socket) {
                 // Get NodeData of parentNode
                 auto& parentNode = socket->getParent();
                 auto itParent    = m_nodeMap.find(parentNode.getId());
-                EXEC_GRAPH_THROWEXCEPTION_IF(itParent == m_nodeMap.end(),
+                EXECGRAPH_THROW_EXCEPTION_IF(itParent == m_nodeMap.end(),
                                              "Node with id: " << parentNode.getId() << " has not been added to the execution tree!");
                 NodeData* parentNodeData = &itParent->second;
 
@@ -863,7 +882,7 @@ protected:
                 // Get NodeData of parentNode
                 auto& parentNode = socket->getParent();
                 auto itParent    = m_nodeMap.find(parentNode.getId());
-                EXEC_GRAPH_THROWEXCEPTION_IF(itParent == m_nodeMap.end(),
+                EXECGRAPH_THROW_EXCEPTION_IF(itParent == m_nodeMap.end(),
                                              "Node with id: " << parentNode.getId() << " has not been added to the execution tree!");
                 NodeData* parentNodeData = &itParent->second;
 
@@ -886,45 +905,6 @@ protected:
                 for(auto* outputSocket : socket->getWritingSockets())
                 {
                     assignToChild(outputSocket);
-                }
-            }
-        }
-
-        void checkResults(const NodeDataSet& nodes)
-        {
-            auto check = [&](auto* socket, NodeData* nodeDataWithLowerPrio) {
-                // Get NodeData of parentNode
-                auto& parentNode = socket->getParent();
-                auto itParent    = m_nodeMap.find(parentNode.getId());
-                EXEC_GRAPH_THROWEXCEPTION_IF(itParent == m_nodeMap.end(),
-                                             "Node with id: " << parentNode.getId() << " has not been added to the execution tree!");
-                NodeData* parentNodeData = &itParent->second;
-
-                EXEC_GRAPH_THROWEXCEPTION_IF(parentNodeData->m_priority <= nodeDataWithLowerPrio->m_priority,
-                                             "Parent node id: " << parentNodeData->m_node->getId() << "[prio: "
-                                                                << parentNodeData->m_priority
-                                                                << " ]"
-                                                                << "has not a higher priority as node id: "
-                                                                << nodeDataWithLowerPrio->m_node->getId()
-                                                                << " which is wrong!");
-            };
-
-            for(auto* nodeData : nodes)
-            {
-                // Follow all links
-                auto& inSockets = nodeData->m_node->getInputs();
-                for(auto& socket : inSockets)
-                {
-                    // Try adding the get link to the stack
-                    if(socket->hasGetLink())
-                    {
-                        check(socket->followGetLink(), nodeData);
-                    }
-                    // Try adding all writing links to the stack
-                    for(auto* outputSocket : socket->getWritingSockets())
-                    {
-                        check(outputSocket, nodeData);
-                    }
                 }
             }
         }
@@ -999,8 +979,8 @@ protected:
     std::set<NodeBaseType*> m_nodeClasses[m_nNodeClasses];  //!< The classification set for each node class.
 
     NodeDataStorage m_nodeMap;            //!< All nodes in the execution tree (main storage) except for constant nodes.
-    ConstantNodeStorage m_constantNodes;  //!< All constant nodes which do not need evaluation and are also not part of the execution order.
     NodeDataSet m_allNodes;               //!< All nodes in the execution tree.
+    ConstantNodeStorage m_constantNodes;  //!< All constant nodes which do not need evaluation and are also not part of the execution order.
 
     GroupNodeMap m_nodeGroups;           //!< The map of nodes in each group.
     PrioritySet m_execList;              //!< The global execution order.
@@ -1012,5 +992,5 @@ protected:
 };
 }
 
-#undef EXEC_GRAPH_EXECTREE_SOLVER_LOG
+#undef EXECGRAPH_EXECTREE_SOLVER_LOG
 #endif  // ExecutionTreeInOut_hpp

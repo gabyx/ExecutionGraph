@@ -15,35 +15,36 @@
 #include <typeinfo>
 
 #include "ExecutionGraph/common/Exception.hpp"
+#include "ExecutionGraph/common/Log.hpp"
 #include "ExecutionGraph/config/Config.hpp"
 
 //! Some assert macro.
 
 #ifdef NDEBUG
-#define EXEC_GRAPH_DEBUG_ONLY(code)
-#define EXEC_GRAPH_ASSERT(condition, message)
-#define EXEC_GRAPH_ASSERT_TYPE(condition, message, type)
+#define EXECGRAPH_DEBUG_ONLY(code)
+#define EXECGRAPH_ASSERT(condition, message)
+#define EXECGRAPH_ASSERT_TYPE(condition, message, type)
 #else
 // Debug!
-#define EXEC_GRAPH_DEBUG_ONLY(code) code
-#define EXEC_GRAPH_ASSERT(condition, message) EXEC_GRAPH_ASSERT_TYPE(condition, message, Exception)
-#define EXEC_GRAPH_ASSERT_TYPE(condition, message, type)  \
+#define EXECGRAPH_DEBUG_ONLY(code) code
+#define EXECGRAPH_ASSERT(condition, message) EXECGRAPH_ASSERT_TYPE(condition, message, Exception)
+#define EXECGRAPH_ASSERT_TYPE(condition, message, type)   \
     {                                                     \
         if(!(condition))                                  \
         {                                                 \
-            EXEC_GRAPH_THROWEXCEPTION_TYPE(message, type) \
+            EXECGRAPH_THROW_EXCEPTION_TYPE(message, type) \
         }                                                 \
     }
 #endif
 
 //! Some warning macro.
-#define EXEC_GRAPH_WARNINGMSG(condition, message)                                   \
-    {                                                                               \
-        if(!(condition))                                                            \
-        {                                                                           \
-            std::cerr << "WARNING: " << #condition << " : " << std::endl            \
-                      << message << std::endl                                       \
-                      << " @ " << __FILE__ << " (" << __LINE__ << ")" << std::endl; \
-        }                                                                           \
+#define EXECGRAPH_WARNINGMSG(condition, message)                                            \
+    {                                                                                       \
+        if(!(condition))                                                                    \
+        {                                                                                   \
+            EXECGRAPH_LOG_WARN(#condition << " : " << std::endl                             \
+                                          << message << std::endl                           \
+                                          << " @ " << __FILE__ << " (" << __LINE__ << ")"); \
+        }                                                                                   \
     }
 #endif

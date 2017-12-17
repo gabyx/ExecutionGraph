@@ -119,7 +119,7 @@ template<typename EigenType>
 using MatrixMap = Eigen::Map<EigenType>;
 }
 
-struct EXEC_GRAPH_EXPORT MyMatrixIOFormat
+struct EXECGRAPH_EXPORT MyMatrixIOFormat
 {
     static const Eigen::IOFormat Matlab;
     static const Eigen::IOFormat CommaSep;
@@ -127,7 +127,7 @@ struct EXEC_GRAPH_EXPORT MyMatrixIOFormat
 };
 }
 
-#define EXEC_GRAPH_DEFINE_MATRIX_SPECIALTYPES                                    \
+#define EXECGRAPH_DEFINE_MATRIX_SPECIALTYPES                                     \
     template<typename Derived>                                                   \
     using MatrixBase = executionGraph::MyMatrix::MatrixBase<Derived>;            \
     template<typename Derived>                                                   \
@@ -154,7 +154,7 @@ struct EXEC_GRAPH_EXPORT MyMatrixIOFormat
  * @brief This macro is used to typedef all custom matrix types which have
  * nothing to do with the system.
  */
-#define EXEC_GRAPH_DEFINE_MATRIX_TYPES_OF(_PREC_)                                  \
+#define EXECGRAPH_DEFINE_MATRIX_TYPES_OF(_PREC_)                                   \
     using Matrix44        = executionGraph::MyMatrix::Matrix44<_PREC_>;            \
     using Matrix33        = executionGraph::MyMatrix::Matrix33<_PREC_>;            \
     using Matrix22        = executionGraph::MyMatrix::Matrix22<_PREC_>;            \
@@ -196,6 +196,6 @@ struct EXEC_GRAPH_EXPORT MyMatrixIOFormat
     using Array3    = executionGraph::MyMatrix::Array3<_PREC_>;                    \
     using Array2    = executionGraph::MyMatrix::Array2<_PREC_>;                    \
                                                                                    \
-    EXEC_GRAPH_DEFINE_MATRIX_SPECIALTYPES
+    EXECGRAPH_DEFINE_MATRIX_SPECIALTYPES
 
 #endif

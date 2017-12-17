@@ -33,6 +33,13 @@ public:
         : Exception(ss) {}
 };
 
+class ExecutionGraphCycleException final : public Exception
+{
+public:
+    ExecutionGraphCycleException(const std::stringstream& ss)
+        : Exception(ss) {}
+};
+
 class BadSocketCastException final : public Exception
 {
 public:
@@ -41,7 +48,7 @@ public:
 };
 }
 
-#define EXEC_GRAPH_THROWEXCEPTION_TYPE(message, type)                         \
+#define EXECGRAPH_THROW_EXCEPTION_TYPE(message, type)                         \
     {                                                                         \
         std::stringstream ___s___;                                            \
         ___s___ << message << std::endl                                       \
@@ -49,13 +56,13 @@ public:
         throw executionGraph::type(___s___);                                  \
     }
 
-#define EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(condition, message, type) \
+#define EXECGRAPH_THROW_EXCEPTION_TYPE_IF(condition, message, type) \
     if(condition)                                                   \
     {                                                               \
-        EXEC_GRAPH_THROWEXCEPTION_TYPE(message, type);              \
+        EXECGRAPH_THROW_EXCEPTION_TYPE(message, type);              \
     }
 
-#define EXEC_GRAPH_THROWEXCEPTION(message) EXEC_GRAPH_THROWEXCEPTION_TYPE(message, Exception)
-#define EXEC_GRAPH_THROWEXCEPTION_IF(condition, message) EXEC_GRAPH_THROWEXCEPTION_TYPE_IF(condition, message, Exception)
+#define EXECGRAPH_THROW_EXCEPTION(message) EXECGRAPH_THROW_EXCEPTION_TYPE(message, Exception)
+#define EXECGRAPH_THROW_EXCEPTION_IF(condition, message) EXECGRAPH_THROW_EXCEPTION_TYPE_IF(condition, message, Exception)
 
 #endif

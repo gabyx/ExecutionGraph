@@ -22,7 +22,7 @@
 #define MY_TEST_RANDOM_STUFF(name)                                                        \
     std::string testName = #name;                                                         \
     auto seed            = hashString(#name);                                             \
-    std::cout << "Seed for this test: " << seed << std::endl;                             \
+    EXECGRAPH_LOG_TRACE("Seed for this test: " << seed);                                  \
     ExecutionGraph::RandomGenerators::DefaultRandomGen rng(seed);                         \
     ExecutionGraph::RandomGenerators::DefaultUniformRealDistribution<PREC> uni(0.0, 1.0); \
     auto f = [&](PREC) { return uni(rng); };

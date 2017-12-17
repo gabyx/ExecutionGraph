@@ -124,7 +124,7 @@ The type `TConfig::NodeBaseType` is the basis class for all logic nodes (resulti
 The two enumerations `Ins` and `Outs` let us define some handy abbreviations for our input sockets (`Value1` and `Value2`) and our output socket (`Result1`). The sequential ordering of the enumerations in `Ins` and `Outs` does not matter at all! So far so good. Now we use some macro for letting us specify the input/output ordering:
 ```c++
 private:
-    EXEC_GRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
+    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
     // Define the input socket decleration list:
     using InSockets  = InSocketDeclList<InSocketDecl<Value1, int>,
                                         InSocketDecl<Value2, int>>;
@@ -137,8 +137,8 @@ The same is done for our output by defining `OutSockets`.
 
 Now we define two other handy macros:
 ```c++
-    EXEC_GRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME();
-    EXEC_GRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets);
+    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME();
+    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets);
 ```
 The first one is not so important. It only defines some `virtual std::string getTypeName()` function which demangles the type of this node at runtime (for debugging purposes).
 The second one defines some handy value-getters and setters for easy access (by means of the enumerations `Ins` and `Outs`) to the sockets values (more later).
@@ -214,9 +214,9 @@ Finally we create the ExecutionTree `ExecutionTreeInOut`, add all nodes to it, s
     
     // Setup the execution tree
     execTree.setup();
-    std::cout << execTree.getExecutionOrderInfo() << std::endl;
+    EXECGRAPH_LOG_INFO(execTree.getExecutionOrderInfo());
     execTree.execute(0); // execute the default execution group (=0)
-    std::cout << "Result : "<< resultNode->getOutVal<IntegerNode<Config>::Result1>() << std::endl;
+    EXECGRAPH_LOG_INFO("Result : "<< resultNode->getOutVal<IntegerNode<Config>::Result1>());
 ```
 This outputs the following execution order:
 ```c++

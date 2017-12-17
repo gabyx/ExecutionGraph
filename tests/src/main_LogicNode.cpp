@@ -25,15 +25,15 @@ public:
     {
         Result1,
     };
-    EXEC_GRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
+    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
 
     using InSockets = InSocketDeclList<InSocketDecl<Value1, int>,
                                        InSocketDecl<Value2, int>>;
 
     using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, int>>;
 
-    EXEC_GRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME()
-    EXEC_GRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
+    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME();
+    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets);
 
     template<typename... Args>
     IntegerNode(Args&&... args)
@@ -53,7 +53,7 @@ public:
         //      this->template getValue<typename InSockets::template Get<Value1>>() +
         //      this->template getValue<typename InSockets::template Get<Value2>>();
         //
-        // The macro: EXEC_GRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS defines some useful
+        // The macro: EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS defines some useful
         // nicer syntax!
         getOutVal<Result1>() = getInVal<Value1>() + getInVal<Value2>();
     }
@@ -71,9 +71,9 @@ MY_TEST(Node_Test, Int_Int)
     {
         node1.addWriteLink(0, node2, 2);  // Wrong connection!
     }
-    catch (NodeConnectionException& e)
+    catch(NodeConnectionException& e)
     {
-        std::cout << "Correct Exception: " << e.what() << std::endl;
+        EXECGRAPH_LOG_TRACE("Correct Exception: " << e.what());
         return;
     }
 

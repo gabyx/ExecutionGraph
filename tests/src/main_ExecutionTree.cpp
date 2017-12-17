@@ -32,15 +32,15 @@ public:
     {
         Result1,
     };
-    EXEC_GRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
+    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
 
     using InSockets = InSocketDeclList<InSocketDecl<Value1, int>,
                                        InSocketDecl<Value2, int>>;
 
     using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, int>>;
 
-    EXEC_GRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME()
-    EXEC_GRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
+    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME();
+    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets);
 
     template<typename... Args>
     IntegerNode(Args&&... args)
@@ -81,16 +81,17 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     try
     {
         node1a->getISocket<double>(0);
-        EXEC_GRAPH_THROWEXCEPTION("Should throw exception here!");
+        EXECGRAPH_THROW_EXCEPTION("Should throw exception here!");
     }
-    catch (BadSocketCastException& e)
+    catch(BadSocketCastException& e)
     {
         // all correct
     }
-    catch (...)
+    catch(...)
     {
-        EXEC_GRAPH_THROWEXCEPTION("Wrong Exception thrown!");
+        EXECGRAPH_THROW_EXCEPTION("Wrong Exception thrown!");
     }
+
     // Link
     node4a->setGetLink(*node3a, 0, 0);
     node4a->setGetLink(*node3b, 0, 1);
@@ -102,7 +103,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 
     node3b->setGetLink(*node2a, 0, 0);
     node3b->setGetLink(*node2b, 0, 1);
-    //node1a->setGetLink(*node1a,0,0); // cycle
+    //node1a->setGetLink(*node3a, 0, 0);  // cycle
 
     ExecutionTreeInOut<Config> execTree;
     execTree.getDefaultOuputPool().setDefaultValue<int>(2);
@@ -122,79 +123,120 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 
     execTree.setup();
 
-    std::cout << execTree.getExecutionOrderInfo() << std::endl;
+    EXECGRAPH_LOG_TRACE(execTree.getExecutionOrderInfo());
 
     execTree.execute(0);
 
-    std::cout << "Result : " << resultNode->getOutVal<IntegerNode<Config>::Result1>() << std::endl;
+    EXECGRAPH_LOG_TRACE("Result : " << resultNode->getOutVal<IntegerNode<Config>::Result1>());
 
-    EXEC_GRAPH_THROWEXCEPTION_IF(resultNode->getOutVal<IntegerNode<Config>::Result1>() != 16, "wrong result");
+    EXECGRAPH_THROW_EXCEPTION_IF(resultNode->getOutVal<IntegerNode<Config>::Result1>() != 16, "wrong result");
 }
 
 MY_TEST(ExecutionTree_Test, IntBig)
 {
     using IntNode = IntegerNode<Config>;
-    int nNodes    = 1000000;
+    int nNodes    = 500;
 
-    for (int seed = 0; seed < 10; ++seed)
+    for(int seed = 0; seed < 10; ++seed)
     {
         std::mt19937 gen(seed);  //Standard mersenne_twister_engine seeded with rd()
         std::uniform_int_distribution<> dis(0, nNodes - 1);
 
-        std::vector<std::unique_ptr<IntNode>> vec(nNodes);
-        ExecutionTreeInOut<Config> execTree;
+        auto buildTree = [&](ExecutionTreeInOut<Config>& execTree, bool makeCycle) {
 
-        for (int i = 0; i < nNodes; ++i)
-        {
-            vec[i] = std::move(std::make_unique<IntNode>(i));
-            //std::cout << vec[i]->getId() <<",";
-        }
-        //std::cout << std::endl;
+            std::vector<std::unique_ptr<IntNode>> vec(nNodes);
 
-        // Links
-        for (int i = 1; i < nNodes; ++i)
-        {
-            // Make link from input 1
-            int id = std::min((int)(dis(gen) / ((double)nNodes)) * i, i);
-            //std::cout << id << "-->" << i <<"[0]" << std::endl;
-            vec[i]->setGetLink(*vec[id], 0, 0);
-            // Make link from input 2
-
-            id = std::min((int)((dis(gen) / ((double)nNodes)) * i), i);
-            //std::cout << id << "-->" << i <<"[1]" << std::endl;
-            vec[i]->setGetLink(*vec[id], 0, 1);
-        }
-
-        // Make a cycle
-        //vec[25]->addWriteLink(0,*vec[2],0);
-
-        std::shuffle(vec.begin(), vec.end(), gen);
-
-        for (int i = 0; i < nNodes; ++i)
-        {
-            execTree.addNode(std::move(vec[i]));
-        }
-        vec.clear();
-
-        for (int i = 0; i < nNodes; ++i)
-        {
-            auto* node = execTree.getNode(i);
-
-            //std::cout << "id: " << i << " has " << node->getConnectedInputCount() <<" connected inputs." << std::endl;
-            //std::cout << "id: " << i << " has " << node->getConnectedOutputCount() <<" connected output." << std::endl;
-            if (node->getConnectedInputCount() == 0)
+            execTree.getDefaultOuputPool().setDefaultValue<int>(2);
+            for(int i = 0; i < nNodes; ++i)
             {
-                execTree.setNodeClass(*node, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
+                vec[i] = std::move(std::make_unique<IntNode>(i));
+                // EXECGRAPH_LOG_TRACE_NE(vec[i]->getId() <<",");
+            }
+            // EXECGRAPH_LOG_TRACE("")
+
+            // Links
+            std::vector<int> idWithConnectionToZero;
+            idWithConnectionToZero.assign(nNodes,false);
+            idWithConnectionToZero[0] = true;
+            for(int i = 1; i < nNodes; ++i)
+            {
+                // Make link from input 1
+                int id = (dis(gen) / ((double)nNodes)) * (i-1);
+                //EXECGRAPH_LOG_TRACE(id << "-->" << i <<"[0]");
+                vec[i]->setGetLink(*vec[id], 0, 0);
+                
+                if(idWithConnectionToZero[id])
+                {
+                    idWithConnectionToZero[i] = true;
+                } 
+
+                // Make link from input 2
+
+                id = (dis(gen) / ((double)nNodes)) * (i-1);
+                //EXECGRAPH_LOG_TRACE(id << "-->" << i <<"[1]");
+                vec[i]->setGetLink(*vec[id], 0, 1);
+
+                if(idWithConnectionToZero[id])
+                {
+                    idWithConnectionToZero[i] = true;
+                } 
             }
 
-            if (node->getConnectedOutputCount() == 0)
+            if(makeCycle)
             {
-                execTree.setNodeClass(*node, ExecutionTreeInOut<Config>::NodeClassification::OutputNode);
+                auto it = std::find(idWithConnectionToZero.rbegin()++ , idWithConnectionToZero.rend(), true);
+                // Make a cycle
+                vec[*it]->addWriteLink(0, *vec[0], 0);
             }
-        }
 
-        execTree.setup(true);
-        //std::cout << execTree.getExecutionOrderInfo() << std::endl;
+            std::shuffle(vec.begin(), vec.end(), gen);
+
+            for(int i = 0; i < nNodes; ++i)
+            {
+                execTree.addNode(std::move(vec[i]));
+            }
+
+            for(int i = 0; i < nNodes; ++i)
+            {
+                auto* node = execTree.getNode(i);
+
+                // EXECGRAPH_LOG_TRACE("id: " << i << " has " << node->getConnectedInputCount() <<" connected inputs.");
+                // EXECGRAPH_LOG_TRACE("id: " << i << " has " << node->getConnectedOutputCount() <<" connected output.");
+                if(node->getConnectedInputCount() == 0)
+                {
+                    execTree.setNodeClass(*node, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
+                }
+
+                if(node->getConnectedOutputCount() == 0)
+                {
+                    execTree.setNodeClass(*node, ExecutionTreeInOut<Config>::NodeClassification::OutputNode);
+                }
+            }
+        };
+
+        {
+            ExecutionTreeInOut<Config> execTree;
+            buildTree(execTree, false);
+            execTree.setup(true);
+        }
+        {
+            ExecutionTreeInOut<Config> execTree;
+            buildTree(execTree, true);
+            try
+            {
+                execTree.setup(true);
+            }
+            catch(ExecutionGraphCycleException& e)
+            {
+                // Everything fine
+                return;
+            }
+            catch(...)
+            {
+                EXECGRAPH_THROW_EXCEPTION("Wrong Exception thrown!");
+            }
+            EXECGRAPH_THROW_EXCEPTION("Added a Cycle but no exception has been thrown!");
+        }
     }
 }
 
