@@ -81,8 +81,8 @@ public:
     {
         // add the the two inputs (SocketType = shared_ptr<A>)
         // to the output.
-        auto sp1 = getInVal<Value1>();
-        auto sp2 = getInVal<Value2>();
+        auto sp1   = getInVal<Value1>();
+        auto sp2   = getInVal<Value2>();
         auto spOut = getOutVal<Result1>();
         *spOut += *sp1;
         *spOut += *sp2;

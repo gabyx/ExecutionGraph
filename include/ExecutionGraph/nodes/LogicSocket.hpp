@@ -347,7 +347,7 @@ class LogicSocketOutput final : public LogicSocketData<TData>,
 public:
     EXECGRAPH_TYPEDEF_CONFIG(TConfig);
     using DataStorage = LogicSocketData<TData>;
-    using DataType = TData;
+    using DataType    = TData;
 
     /** This assert fails if the type T of the LogicSocket is
         not properly added to the type list SocketTypes in LogicSocketBase*/

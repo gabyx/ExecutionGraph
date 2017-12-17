@@ -156,35 +156,35 @@ MY_TEST(ExecutionTree_Test, IntBig)
 
             // Links
             std::vector<int> idWithConnectionToZero;
-            idWithConnectionToZero.assign(nNodes,false);
+            idWithConnectionToZero.assign(nNodes, false);
             idWithConnectionToZero[0] = true;
             for(int i = 1; i < nNodes; ++i)
             {
                 // Make link from input 1
-                int id = (dis(gen) / ((double)nNodes)) * (i-1);
+                int id = (dis(gen) / ((double)nNodes)) * (i - 1);
                 //EXECGRAPH_LOG_TRACE(id << "-->" << i <<"[0]");
                 vec[i]->setGetLink(*vec[id], 0, 0);
-                
+
                 if(idWithConnectionToZero[id])
                 {
                     idWithConnectionToZero[i] = true;
-                } 
+                }
 
                 // Make link from input 2
 
-                id = (dis(gen) / ((double)nNodes)) * (i-1);
+                id = (dis(gen) / ((double)nNodes)) * (i - 1);
                 //EXECGRAPH_LOG_TRACE(id << "-->" << i <<"[1]");
                 vec[i]->setGetLink(*vec[id], 0, 1);
 
                 if(idWithConnectionToZero[id])
                 {
                     idWithConnectionToZero[i] = true;
-                } 
+                }
             }
 
             if(makeCycle)
             {
-                auto it = std::find(idWithConnectionToZero.rbegin()++ , idWithConnectionToZero.rend(), true);
+                auto it = std::find(idWithConnectionToZero.rbegin()++, idWithConnectionToZero.rend(), true);
                 // Make a cycle
                 vec[*it]->addWriteLink(0, *vec[0], 0);
             }
