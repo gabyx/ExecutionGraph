@@ -34,8 +34,8 @@ matrix:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise
 
-  - os: osx
-    compiler: clang
+  # - os: osx
+  #   compiler: clang
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm get stable; fi
