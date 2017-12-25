@@ -1,16 +1,23 @@
 #The CMake Minimum version that is required.
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-#Detect Build Type if Debug appears in CMAKE_BINARY_DIR path
 MESSAGE(STATUS "Binary dir:" ${CMAKE_BINARY_DIR})
-STRING(REGEX MATCH ".*(Debug|debug).*" DEBUG_MATCH ${CMAKE_BINARY_DIR} )
-IF(DEBUG_MATCH)
-    SET(CMAKE_BUILD_TYPE Debug CACHE STRING "The build type for makefile based generators")
-    SET(PROJECTNAMEPREFIX Debug)
+
+IF("${CMAKE_BUILD_TYPE}" STREQUAL "")
+    MESSAGE(STATUS "Detect build type from folder")
+    #Detect Build Type if Debug appears in CMAKE_BINARY_DIR path
+    STRING(REGEX MATCH ".*(Debug|debug).*" DEBUG_MATCH ${CMAKE_BINARY_DIR})
+    IF(DEBUG_MATCH)
+        SET(CMAKE_BUILD_TYPE Debug CACHE STRING "The build type for makefile based generators")
+        SET(PROJECTNAMEPREFIX Debug)
+    ELSE()
+        SET(CMAKE_BUILD_TYPE Release CACHE STRING "The build type for makefile based generators")
+        SET(PROJECTNAMEPREFIX Release)
+    ENDIF()
 ELSE()
-    SET(CMAKE_BUILD_TYPE Release CACHE STRING "The build type for makefile based generators")
-    SET(PROJECTNAMEPREFIX Release)
+    SET(PROJECTNAMEPREFIX ${CMAKE_BUILD_TYPE})
 ENDIF()
+
 
 SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_SOURCE_DIR}/additional/sanitizers-cmake/cmake" ${CMAKE_MODULE_PATH})
 MESSAGE(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
@@ -218,3 +225,5 @@ ENDIF()
 IF(ExecutionGraph_BUILD_EXAMPLE)
     ADD_SUBDIRECTORY(examples)
 ENDIF()
+
+ADD_SUBDIRECTORY(gui)

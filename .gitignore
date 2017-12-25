@@ -7,3 +7,4 @@ __pycache__
 build
 .vscode/.*
 .vscode/c_cpp_properties.json
+*/extern
