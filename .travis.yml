@@ -34,8 +34,11 @@ matrix:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise
 
-  - os: osx
-    compiler: clang
+  # - os: osx
+  #   compiler: clang
+
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm get stable; fi
 
 # Install dependencies
 install:
@@ -47,7 +50,6 @@ install:
   - chmod +x $CHECKOUT_PATH/travis/install_${TRAVIS_OS_NAME}.sh
   - . $CHECKOUT_PATH/travis/install_${TRAVIS_OS_NAME}.sh
 
-
 script:
   - chmod +x $CHECKOUT_PATH/travis/build.sh
   - . $CHECKOUT_PATH/travis/build.sh
@@ -56,9 +58,6 @@ after_success:
   - cd $CHECKOUT_PATH
   - git reset --hard HEAD # Discard build artifacts
   - git clean -df # Discard build artifacts
-  #- bii init -l
-  #- bii user $BIICODE_USER -p $BIICODE_PASSWORD
-  #- if [ -n "$BIICODE_PASSWORD" ]; then bii publish -r; fi
 
 notifications:
   email: false

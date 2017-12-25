@@ -22,9 +22,9 @@ struct GlobalConfigs
     using PREC = double;
 };
 
-#define EXEC_GRAPH_DEFINE_MATRIX_TYPES                \
+#define EXECGRAPH_DEFINE_MATRIX_TYPES                 \
     using PREC = ExecutionGraph::GlobalConfigs::PREC; \
-    EXEC_GRAPH_DEFINE_MATRIX_TYPES_OF(PREC)           \
-    EXEC_GRAPH_DEFINE_CONTAINER_TYPES
+    EXECGRAPH_DEFINE_MATRIX_TYPES_OF(PREC)            \
+    EXECGRAPH_DEFINE_CONTAINER_TYPES
 }
 #endif

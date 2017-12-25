@@ -25,22 +25,22 @@ public:
     {
         Result1,
     };
-    EXEC_GRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
+    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
 
     using InSockets = InSocketDeclList<InSocketDecl<Value1, int>,
                                        InSocketDecl<Value2, int>>;
 
     using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, int>>;
 
-    EXEC_GRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME()
-    EXEC_GRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
+    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME();
+    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets);
 
     template<typename... Args>
     IntegerNode(Args&&... args)
         : Base(std::forward<Args>(args)...)
     {
         // Add all sockets
-        this->template addSockets<InSockets>(std::make_tuple(2, 2));
+        this->template addSockets<InSockets>();
         this->template addSockets<OutSockets>(std::make_tuple(0));
     }
 
@@ -53,7 +53,7 @@ public:
         //      this->template getValue<typename InSockets::template Get<Value1>>() +
         //      this->template getValue<typename InSockets::template Get<Value2>>();
         //
-        // The macro: EXEC_GRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS defines some useful
+        // The macro: EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS defines some useful
         // nicer syntax!
         getOutVal<Result1>() = getInVal<Value1>() + getInVal<Value2>();
     }
@@ -71,13 +71,28 @@ MY_TEST(Node_Test, Int_Int)
     {
         node1.addWriteLink(0, node2, 2);  // Wrong connection!
     }
-    catch (NodeConnectionException& e)
+    catch(NodeConnectionException& e)
     {
-        std::cout << "Correct Exception: " << e.what() << std::endl;
+        EXECGRAPH_LOG_TRACE("Correct Exception: " << e.what());
         return;
     }
 
     throw std::runtime_error("Exception not catched!!!");
+}
+
+MY_TEST(Node_Test, Int_Int2)
+{
+    // Integer node connection (wrong connection)
+    IntegerNode<Config> node1(1);
+    IntegerNode<Config> node2(2);
+
+    node1.addWriteLink(0, node2, 0);
+    node1.addWriteLink(0, node2, 1);
+
+    ASSERT_EQ(node1.getConnectedInputCount(), 0) << "Connected input count wrong";
+    ASSERT_EQ(node1.getConnectedOutputCount(), 1) << "Connected input count wrong";
+    ASSERT_EQ(node2.getConnectedInputCount(), 2) << "Connected input count wrong";
+    ASSERT_EQ(node2.getConnectedOutputCount(), 0) << "Connected input count wrong";
 }
 
 int main(int argc, char** argv)

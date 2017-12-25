@@ -42,30 +42,30 @@ std::string shortenTemplateBrackets(std::string s, unsigned int fromLevel)
     std::size_t bracketLevel = 0;
     bool pushedEllipsis      = false;
 
-    for (std::size_t i = 0; i < s.length(); ++i)
+    for(std::size_t i = 0; i < s.length(); ++i)
     {
         char& c = s[i];
 
-        if (bracketLevel <= fromLevel)
+        if(bracketLevel <= fromLevel)
         {
             ss << c;  // Push the char
         }
 
-        switch (c)
+        switch(c)
         {
             case '<':
                 ++bracketLevel;
-                if (bracketLevel > fromLevel && !pushedEllipsis)
+                if(bracketLevel > fromLevel && !pushedEllipsis)
                 {
                     ss << "...";
                     pushedEllipsis = true;
                 }
                 break;
             case '>':
-                if (bracketLevel > 0)
+                if(bracketLevel > 0)
                 {
                     --bracketLevel;
-                    if (bracketLevel <= fromLevel && pushedEllipsis)
+                    if(bracketLevel <= fromLevel && pushedEllipsis)
                     {
                         pushedEllipsis = false;
                         ss << c;

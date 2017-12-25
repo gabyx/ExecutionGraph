@@ -60,7 +60,7 @@ struct GeneralConfig
     using SocketOutputType = LogicSocketOutput<T, GeneralConfig>;  //! This is the class template (T needs to be in TSocketTypes) for output sockets.
 };
 
-#define EXEC_GRAPH_TYPEDEF_CONFIG(__CONFIG__)                                 \
+#define EXECGRAPH_TYPEDEF_CONFIG(__CONFIG__)                                  \
     using Config                  = __CONFIG__;                               \
     using SocketTypes             = typename Config::SocketTypes;             \
     using NodeBaseType            = typename Config::NodeBaseType;            \
@@ -211,7 +211,7 @@ struct OutputSocketDeclarationList : SocketDeclarationList<OutputEnum, OutputSoc
 }  // end details
 
 //! Some handy macro to use when inheriting from LogicNode.
-#define EXEC_GRAPH_DEFINE_SOCKET_TRAITS(InputEnum, OutputEnum)                                                      \
+#define EXECGRAPH_DEFINE_SOCKET_TRAITS(InputEnum, OutputEnum)                                                       \
     template<InputEnum id, typename TData>                                                                          \
     using InSocketDecl = executionGraph::details::InputSocketDeclarationBase<meta::size_t<enumToInt(id)>, TData>;   \
     template<OutputEnum id, typename TData>                                                                         \

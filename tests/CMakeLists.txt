@@ -84,6 +84,7 @@ if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
     ADD_DEPENDENCIES(${EXEC_NAME1} ${ExecutionGraph_DEPENDING_TARGETS})
 endif()
 defineCompileDefs(${EXEC_NAME1})
+cotire(${EXEC_NAME1})
 
 #ExecutionTree Test
 SET(EXEC_NAME2 ${PROJECT_NAME}-ExecutionTree)
@@ -94,6 +95,7 @@ if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
     ADD_DEPENDENCIES(${EXEC_NAME2} ${ExecutionGraph_DEPENDING_TARGETS})
 endif()
 defineCompileDefs(${EXEC_NAME2})
+cotire(${EXEC_NAME2})
 
 #ExecutionTree Test
 SET(EXEC_NAME3 ${PROJECT_NAME}-CustomSocketTypes)
@@ -104,6 +106,7 @@ if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
     ADD_DEPENDENCIES(${EXEC_NAME3} ${ExecutionGraph_DEPENDING_TARGETS})
 endif()
 defineCompileDefs(${EXEC_NAME3})
+cotire(${EXEC_NAME3})
 
 add_test(NAME    ${EXEC_NAME1} COMMAND ${EXEC_NAME1})
 add_test(NAME    ${EXEC_NAME2} COMMAND ${EXEC_NAME2})

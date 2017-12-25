@@ -1,4 +1,12 @@
 
+// ========================================================================================
+//  executionGraph
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+//
+//  This Source Code Form is subject to the terms of the Mozilla Public
+//  License, v. 2.0. If a copy of the MPL was not distributed with this
+//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// ========================================================================================
 
 #ifndef ExecutionGraph_Common_Delegates_HPP
 #define ExecutionGraph_Common_Delegates_HPP
@@ -66,13 +74,13 @@ public:
     }
 
     //! One Argument Constructor ==============================================
-    template<typename T, EXEC_GRAPH_SFINAE_ENABLE_IF((!std::is_same<Delegate, std::decay<T>>::value))>
+    template<typename T, EXECGRAPH_SFINAE_ENABLE_IF((!std::is_same<Delegate, std::decay<T>>::value))>
     Delegate(T&& f)
         : m_functorStorage(operator new(sizeof(std::decay_t<T>)), functorDeleter<std::decay_t<T>>)
         , m_functorStorage_size(sizeof(std::decay_t<T>))
     {
         using FunctorType = std::decay_t<T>;
-        new (m_functorStorage.get()) FunctorType(std::forward<T>(f));
+        new(m_functorStorage.get()) FunctorType(std::forward<T>(f));
         m_pObject = m_functorStorage.get();
         m_invoker = functorStub<FunctorType>;
         m_deleter = deleterStub<FunctorType>;
@@ -93,12 +101,12 @@ public:
         return *this = from(static_cast<C const*>(m_pObject), rhs);
     }
 
-    template<typename T, EXEC_GRAPH_SFINAE_ENABLE_IF((!std::is_same<Delegate, typename std::decay_t<T>>::value))>
+    template<typename T, EXECGRAPH_SFINAE_ENABLE_IF((!std::is_same<Delegate, typename std::decay_t<T>>::value))>
     Delegate& operator=(T&& f)
     {
         using FunctorType = typename std::decay_t<T>;
 
-        if ((sizeof(FunctorType) > m_functorStorage_size) || !m_functorStorage.unique())
+        if((sizeof(FunctorType) > m_functorStorage_size) || !m_functorStorage.unique())
         {
             m_functorStorage.reset(operator new(sizeof(FunctorType)), functorDeleter<FunctorType>);
 
@@ -108,7 +116,7 @@ public:
         {
             m_deleter(m_functorStorage.get());
         }
-        new (m_functorStorage.get()) FunctorType(std::forward<T>(f));
+        new(m_functorStorage.get()) FunctorType(std::forward<T>(f));
         m_pObject = m_functorStorage.get();
         m_invoker = functorStub<FunctorType>;
         m_deleter = deleterStub<FunctorType>;
