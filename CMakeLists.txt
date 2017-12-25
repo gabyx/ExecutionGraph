@@ -1,5 +1,5 @@
 #The CMake Minimum version that is required.
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.4)
 
 MESSAGE(STATUS "Binary dir:" ${CMAKE_BINARY_DIR})
 
@@ -83,13 +83,20 @@ IF(NOT MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL)
 		SET(CMAKE_CXX_FLAGS_DEBUG          "-g -Wall" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
 		SET(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release minsize builds" FORCE)
 		SET(CMAKE_CXX_FLAGS_RELEASE        "-O3 -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release builds" FORCE)
-		SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g" CACHE STRING "Flags for CXX Compiler for release builds with debug info" FORCE)
+        SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g" CACHE STRING "Flags for CXX Compiler for release builds with debug info" FORCE)
 
-  ELSEIF ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC" )
-    MESSAGE(ERROR "MSVC is not yet supported!")
-  ENDIF()
+    ELSEIF ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC" )
+        MESSAGE(ERROR "MSVC is not yet supported!")
+    ENDIF()
+
+    # use CCACHE if possible
+    FIND_PROGRAM(CCACHE_FOUND ccache)
+    IF(CCACHE_FOUND)
+        SET(CMAKE_CXX_COMPILER_LAUNCHER ccache)
+    ENDIF(CCACHE_FOUND)
 
 ENDIF()
+
 
 
 #Add some multithreaded build support ==================================
