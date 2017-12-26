@@ -8,3 +8,4 @@ find $REPO_DIR/include -type f \( -name "*.hpp" -or  -name "*.cpp" \) | xargs cl
 find $REPO_DIR/src -type f \( -name "*.hpp" -or  -name "*.cpp" \) | xargs clang-format -i 
 find $REPO_DIR/examples -type f \( -name "*.hpp" -or  -name "*.cpp" \)  | xargs clang-format -i 
 find $REPO_DIR/tests -type f \( -name "*.hpp" -or  -name "*.cpp" \)  | xargs clang-format -i 
+find $REPO_DIR/gui -type f \( -name "*.hpp" -or  -name "*.cpp" \)  | xargs clang-format -i 

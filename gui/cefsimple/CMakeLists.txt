@@ -52,9 +52,9 @@ add_subdirectory(${CEF_LIBCEF_DLL_WRAPPER_PATH} libcef_dll_wrapper)
 # cefsimple sources.
 set(CEFSIMPLE_SRCS
   simple_app.cpp
-  simple_app.h
+  simple_app.hpp
   simple_handler.cpp
-  simple_handler.h
+  simple_handler.hpp
   )
 set(CEFSIMPLE_SRCS_LINUX
   cefsimple_linux.cpp
@@ -68,7 +68,7 @@ set(CEFSIMPLE_SRCS_WINDOWS
   cefsimple.exe.manifest
   cefsimple.rc
   cefsimple_win.cpp
-  resource.h
+  resource.hpp
   simple_handler_win.cpp
   )
 APPEND_PLATFORM_SOURCES(CEFSIMPLE_SRCS)
