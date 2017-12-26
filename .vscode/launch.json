@@ -33,7 +33,7 @@
             "name": "(lldb) ExecutionGraphTests-CEFSimple",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/gui/cefsimple/cefsimple",
+            "program": "${workspaceFolder}/build/gui/cefsimple/Debug/cefsimple.app/Contents/MacOS/cefsimple",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
