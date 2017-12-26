@@ -51,14 +51,14 @@ add_subdirectory(${CEF_LIBCEF_DLL_WRAPPER_PATH} libcef_dll_wrapper)
 
 # cefsimple sources.
 set(CEFSIMPLE_SRCS
-  simple_app.cc
+  simple_app.cpp
   simple_app.h
-  simple_handler.cc
+  simple_handler.cpp
   simple_handler.h
   )
 set(CEFSIMPLE_SRCS_LINUX
-  cefsimple_linux.cc
-  simple_handler_linux.cc
+  cefsimple_linux.cpp
+  simple_handler_linux.cpp
   )
 set(CEFSIMPLE_SRCS_MACOSX
   cefsimple_mac.mm
@@ -67,9 +67,9 @@ set(CEFSIMPLE_SRCS_MACOSX
 set(CEFSIMPLE_SRCS_WINDOWS
   cefsimple.exe.manifest
   cefsimple.rc
-  cefsimple_win.cc
+  cefsimple_win.cpp
   resource.h
-  simple_handler_win.cc
+  simple_handler_win.cpp
   )
 APPEND_PLATFORM_SOURCES(CEFSIMPLE_SRCS)
 source_group(cefsimple FILES ${CEFSIMPLE_SRCS})
@@ -88,7 +88,7 @@ set(CEFSIMPLE_SRCS
 
 # cefsimple helper sources.
 set(CEFSIMPLE_HELPER_SRCS_MACOSX
-  process_helper_mac.cc
+  process_helper_mac.cpp
   )
 APPEND_PLATFORM_SOURCES(CEFSIMPLE_HELPER_SRCS)
 source_group(cefsimple FILES ${CEFSIMPLE_HELPER_SRCS})
@@ -121,7 +121,7 @@ set(CEFSIMPLE_RESOURCES_SRCS
 # Target executable names.
 set(CEF_TARGET "cefsimple")
 if(OS_MACOSX)
-  set(CEF_HELPER_TARGET "cefsimple Helper")
+  set(CEF_HELPER_TARGET "cefsimpleHelper")
 endif()
 
 # Logical target used to link the libcef library.
