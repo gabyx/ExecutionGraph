@@ -2,7 +2,7 @@
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 
-#include "simple_app.h"
+#include "simple_app.hpp"
 
 #include <string>
 

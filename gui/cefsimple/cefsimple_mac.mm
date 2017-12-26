@@ -7,8 +7,8 @@
 
 #include "include/cef_application_mac.h"
 #include "include/wrapper/cef_helpers.h"
-#include "simple_app.h"
-#include "simple_handler.h"
+#include "simple_app.hpp"
+#include "simple_handler.hpp"
 
 // Receives notifications from the application.
 @interface SimpleAppDelegate : NSObject<NSApplicationDelegate>
