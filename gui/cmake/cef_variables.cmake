@@ -52,7 +52,7 @@ endif()
 
 
 # Path to the include directory.
-set(CEF_INCLUDE_PATH "${_CEF_ROOT}")
+set(CEF_INCLUDE_PATH "${_CEF_ROOT}" "${_CEF_ROOT}/include")
 
 # Path to the libcef_dll_wrapper target.
 set(CEF_LIBCEF_DLL_WRAPPER_PATH "${_CEF_ROOT}/libcef_dll")

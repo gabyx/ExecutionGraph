@@ -362,8 +362,11 @@ macro(SET_LIBRARY_TARGET_PROPERTIES target)
 endmacro()
 
 # Set executable-specific properties.
-macro(SET_EXECUTABLE_TARGET_PROPERTIES target)
+macro(SET_EXECUTABLE_TARGET_PROPERTIES target additionalIncDirs)
   SET_COMMON_TARGET_PROPERTIES(${target})
+
+  # Additional Include Directories
+  target_include_directories(${target} PRIVATE ${additionalIncDirs})
 
   # Executable linker flags.
   if(CEF_EXE_LINKER_FLAGS)

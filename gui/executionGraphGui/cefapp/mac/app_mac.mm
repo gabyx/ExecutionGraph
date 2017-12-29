@@ -5,10 +5,10 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "include/cef_application_mac.h"
-#include "include/wrapper/cef_helpers.h"
-#include "simple_app.hpp"
-#include "simple_handler.hpp"
+#include <cef_application_mac.h>
+#include <wrapper/cef_helpers.h>
+#include "cefapp/app.hpp"
+#include "cefapp/handler.hpp"
 
 // Receives notifications from the application.
 @interface SimpleAppDelegate : NSObject<NSApplicationDelegate>

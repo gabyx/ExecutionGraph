@@ -2,16 +2,16 @@
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 
-#include "simple_app.hpp"
+#include "app.hpp"
 
 #include <string>
 
-#include "include/cef_browser.h"
-#include "include/cef_command_line.h"
-#include "include/views/cef_browser_view.h"
-#include "include/views/cef_window.h"
-#include "include/wrapper/cef_helpers.h"
-#include "simple_handler.hpp"
+#include <cef_browser.h>
+#include <cef_command_line.h>
+#include <views/cef_browser_view.h>
+#include <views/cef_window.h>
+#include <wrapper/cef_helpers.h>
+#include "handler.hpp"
 
 namespace
 {
@@ -102,7 +102,7 @@ void SimpleApp::OnContextInitialized()
 #if defined(OS_WIN)
         // On Windows we need to specify certain flags that will be passed to
         // CreateWindowEx().
-        window_info.SetAsPopup(NULL, "cefsimple");
+        window_info.SetAsPopup(NULL, "executionGraphGui");
 #endif
 
         // Create the first browser window.
