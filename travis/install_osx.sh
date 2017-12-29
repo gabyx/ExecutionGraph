@@ -17,9 +17,17 @@ brew tap homebrew/versions || echo "suppress failures in order to ignore warning
 
 # eigen3 needs gfortran
 brew install gcc || echo "suppress failures in order to ignore warnings"
+brew link --overwrite --dry-run gcc
+brew link --overwrite gcc
+
+brew install llvm || echo "suppress failures in order to ignore warnings"
+brew link --overwrite --dry-run llvm
+brew link --overwrite llvm
+export PATH="/usr/local/opt/llvm/bin:$PATH"
 
 # Cmake
 brew install cmake || echo "suppress failures in order to ignore warnings"
+brew upgrade cmake
 
 echo "Path set to ${PATH}"
 echo "CXX set to ${CXX}"
