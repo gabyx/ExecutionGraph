@@ -217,7 +217,7 @@ macro(COPY_MACOSX_RESOURCES resource_list prefix_list target source_dir app_path
     else()
       set(SOURCE_PATH "${source_dir}/${FILENAME}")
     endif()
-    message(STATUS "Adding File:" ${FILENAME})
+
     if(${FILENAME} MATCHES ".xib$")
       # Change the target file extension.
       string(REGEX REPLACE ".xib$" ".nib" TARGET_PATH ${TARGET_PATH})
