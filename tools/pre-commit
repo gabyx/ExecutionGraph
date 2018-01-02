@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo "Pre-Commit Hook: clang-format ..."
+./tools/clang-formatAll.sh
+echo "Pre-Commit Hook [done]"
+

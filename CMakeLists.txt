@@ -1,23 +1,31 @@
 #The CMake Minimum version that is required.
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.4)
 
-#Detect Build Type if Debug appears in CMAKE_BINARY_DIR path
 MESSAGE(STATUS "Binary dir:" ${CMAKE_BINARY_DIR})
-STRING(REGEX MATCH ".*(Debug|debug).*" DEBUG_MATCH ${CMAKE_BINARY_DIR} )
-IF(DEBUG_MATCH)
-    SET(CMAKE_BUILD_TYPE Debug CACHE STRING "The build type for makefile based generators")
-    SET(PROJECTNAMEPREFIX Debug)
+
+IF("${CMAKE_BUILD_TYPE}" STREQUAL "")
+    MESSAGE(STATUS "Detect build type from folder")
+    #Detect Build Type if Debug appears in CMAKE_BINARY_DIR path
+    STRING(REGEX MATCH ".*(Debug|debug).*" DEBUG_MATCH ${CMAKE_BINARY_DIR})
+    IF(DEBUG_MATCH)
+        SET(CMAKE_BUILD_TYPE Debug CACHE STRING "The build type for makefile based generators")
+        SET(PROJECTNAMEPREFIX Debug)
+    ELSE()
+        SET(CMAKE_BUILD_TYPE Release CACHE STRING "The build type for makefile based generators")
+        SET(PROJECTNAMEPREFIX Release)
+    ENDIF()
 ELSE()
-    SET(CMAKE_BUILD_TYPE Release CACHE STRING "The build type for makefile based generators")
-    SET(PROJECTNAMEPREFIX Release)
+    SET(PROJECTNAMEPREFIX ${CMAKE_BUILD_TYPE})
 ENDIF()
+
 
 SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_SOURCE_DIR}/additional/sanitizers-cmake/cmake" ${CMAKE_MODULE_PATH})
 MESSAGE(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
 
-# Load important modulesyy
+# Load important modules
 INCLUDE(FirstCMakeRun)
-
+# Speed up the build
+INCLUDE(cotire) 
 
 #The name of the project ===============================================
 SET(ExecutionGraphProjectName "ExecutionGraph")
@@ -39,7 +47,7 @@ IF(NOT MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL)
 		MESSAGE(STATUS "Setting Values for GNU")
 		SET(CMAKE_C_FLAGS "-fmessage-length=0 -fmax-errors=50" CACHE STRING "Flags for C Compiler" FORCE)
 		SET(CMAKE_CXX_FLAGS "-std=c++14 -fmax-errors=50 -Werror=return-type" CACHE STRING "Flags for CXX Compiler" FORCE)
-		SET(CMAKE_CXX_FLAGS_DEBUG          "-g -fsanitize=leak -Wall -Wpedantic -Wno-char-subscripts" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
+		SET(CMAKE_CXX_FLAGS_DEBUG "-g -fno-omit-frame-pointer -fsanitize=leak -Wall -Wpedantic -Wno-char-subscripts" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
 
     SET(ExecutionGraph_ASAN_OPTIONS_DBG "-fsanitize=leak")
 
@@ -54,10 +62,10 @@ IF(NOT MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL)
 		SET(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g" CACHE STRING "Flags for C Compiler for release builds with debug info" FORCE)
 
 		SET(CMAKE_CXX_FLAGS                "-std=c++14 -ferror-limit=50 -Werror=return-type" CACHE STRING "Flags for CXX Compiler" FORCE)
-		SET(CMAKE_CXX_FLAGS_DEBUG          "-g -fsanitize=leak -fsanitize=address -Weverything -Wpedantic -Wno-deprecated-register -Wno-documentation -Wno-old-style-cast -Wno-comment -Wno-float-equal -Wno-deprecated -Wno-c++98-compat-pedantic -Wno-undef -Wno-unused-macros" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
+		SET(CMAKE_CXX_FLAGS_DEBUG          "-g3 -fno-omit-frame-pointer -fsanitize=leak -fsanitize=address -Weverything -Wpedantic -Wno-deprecated-register -Wno-documentation -Wno-old-style-cast -Wno-comment -Wno-float-equal -Wno-deprecated -Wno-c++98-compat-pedantic -Wno-undef -Wno-unused-macros" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
 		SET(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release minsize builds" FORCE)
 		SET(CMAKE_CXX_FLAGS_RELEASE        "-O3 -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release builds" FORCE)
-		SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g" CACHE STRING "Flags for CXX Compiler for release builds with debug info" FORCE)
+		SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g3" CACHE STRING "Flags for CXX Compiler for release builds with debug info" FORCE)
 
     SET(ExecutionGraph_ASAN_OPTIONS_DBG "-fsanitize=leak" "-fsanitize=address")
 
@@ -75,13 +83,20 @@ IF(NOT MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL)
 		SET(CMAKE_CXX_FLAGS_DEBUG          "-g -Wall" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
 		SET(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release minsize builds" FORCE)
 		SET(CMAKE_CXX_FLAGS_RELEASE        "-O3 -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release builds" FORCE)
-		SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g" CACHE STRING "Flags for CXX Compiler for release builds with debug info" FORCE)
+        SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g" CACHE STRING "Flags for CXX Compiler for release builds with debug info" FORCE)
 
-  ELSEIF ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC" )
-    MESSAGE(ERROR "MSVC is not yet supported!")
-  ENDIF()
+    ELSEIF ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC" )
+        MESSAGE(ERROR "MSVC is not yet supported!")
+    ENDIF()
+
+    # use CCACHE if possible
+    FIND_PROGRAM(CCACHE_FOUND ccache)
+    IF(CCACHE_FOUND)
+        SET(CMAKE_CXX_COMPILER_LAUNCHER ccache)
+    ENDIF(CCACHE_FOUND)
 
 ENDIF()
+
 
 
 #Add some multithreaded build support ==================================
@@ -121,7 +136,7 @@ MARK_AS_ADVANCED( ExecutionGraph_BUILD_EXAMPLE )
 SET(ExecutionGraph_BUILD_EXAMPLE ON CACHE BOOL "Build the example, the library is automatically built if this is true")
 
 MARK_AS_ADVANCED( ExecutionGraph_FORCE_MSGLOG_LEVEL)
-SET(ExecutionGraph_FORCE_MSGLOG_LEVEL "0" CACHE STRING "Force the message log level (0-3), 0 = use deubg/release settings in LogDefines.hpp!")
+SET(ExecutionGraph_FORCE_MSGLOG_LEVEL "DEBUG" CACHE STRING "Force the message log level (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)")
 
 MARK_AS_ADVANCED( ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS)
 SET(ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS ON CACHE BOOL "Force an exception if a bad socket cast happens! (if false, the exception is thrown only in Debug mode!)")
@@ -136,20 +151,16 @@ FIND_PACKAGE(Eigen3 REQUIRED)
 SET(EIGEN_INCLUDE_DIR ${EIGEN3_INCLUDE_DIR})
 LIST(APPEND ExecutionGraph_INC_DIRS_DEP ${EIGEN_INCLUDE_DIR})
 
-
-# Try to find Meta and PugiXML if possible
-FIND_PACKAGE(Meta)
+# Try to find Meta 
+FIND_PACKAGE(Meta REQUIRED)
 LIST(APPEND ExecutionGraph_INC_DIRS_DEP ${Meta_INCLUDE_DIR})
 SET(ExecutionGraph_DEPENDING_TARGETS_DEP ${Meta_TARGET})
-IF(META_FOUND)
-  SET(ExecutionGraph_SUPPORT_KDTREE ON)
-ENDIF()
 
 FIND_PACKAGE(PugiXML)
-LIST(APPEND ExecutionGraph_INC_DIRS_DEP ${PUGIXML_INCLUDE_DIR} )
-LIST(APPEND ExecutionGraph_LIBRARIES_DEP ${PUGIXML_LIBRARIES})
 IF(PUGIXML_FOUND)
-  SET(ExecutionGraph_SUPPORT_XML ON)
+    LIST(APPEND ExecutionGraph_INC_DIRS_DEP ${PUGIXML_INCLUDE_DIR} )
+    LIST(APPEND ExecutionGraph_LIBRARIES_DEP ${PUGIXML_LIBRARIES})
+    SET(ExecutionGraph_SUPPORT_XML ON)
 ENDIF()
 
 #~ IF(ExecutionGraph_USE_OPENMP)
@@ -221,3 +232,5 @@ ENDIF()
 IF(ExecutionGraph_BUILD_EXAMPLE)
     ADD_SUBDIRECTORY(examples)
 ENDIF()
+
+ADD_SUBDIRECTORY(gui)

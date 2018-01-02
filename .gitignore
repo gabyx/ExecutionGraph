@@ -1,6 +1,11 @@
 CMakeFiles
+.DS_Store
+.AppleDouble
+.LSOverride
 __pycache__
 .ipynb_checkpoints
-build/
-html
-latex
+build
+.vscode/.*
+.vscode/c_cpp_properties.json
+*/extern
+GPUCache

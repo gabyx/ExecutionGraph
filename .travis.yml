@@ -37,6 +37,15 @@ matrix:
   - os: osx
     compiler: clang
 
+before_install:
+   # Workaround for Travis CI macOS bug (https://github.com/travis-ci/travis-ci/issues/6307)
+   # See https://github.com/searchivarius/nmslib/pull/259
+  - |
+    if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
+        command curl -sSL https://rvm.io/mpapis.asc | gpg --import -;
+        rvm get head || true
+    fi
+
 # Install dependencies
 install:
   - export ROOT_PATH=`pwd`/../;
@@ -47,7 +56,6 @@ install:
   - chmod +x $CHECKOUT_PATH/travis/install_${TRAVIS_OS_NAME}.sh
   - . $CHECKOUT_PATH/travis/install_${TRAVIS_OS_NAME}.sh
 
-
 script:
   - chmod +x $CHECKOUT_PATH/travis/build.sh
   - . $CHECKOUT_PATH/travis/build.sh
@@ -56,9 +64,6 @@ after_success:
   - cd $CHECKOUT_PATH
   - git reset --hard HEAD # Discard build artifacts
   - git clean -df # Discard build artifacts
-  #- bii init -l
-  #- bii user $BIICODE_USER -p $BIICODE_PASSWORD
-  #- if [ -n "$BIICODE_PASSWORD" ]; then bii publish -r; fi
 
 notifications:
   email: false

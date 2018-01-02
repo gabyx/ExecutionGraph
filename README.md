@@ -5,7 +5,45 @@ Fast Execution Graph consisting of Execution Nodes
 
 
 Be able to design and run such input/output graphs, such as this one used in [http://gabyx.github.io/GRSFramework/#videos] :
-![Stuff like this](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)
+![Execution Graphs like this](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)
+
+## Installing and Dependencies
+To build the library, the tests and the example you need the build tool [cmake](
+http://www.cmake.org).
+This library has these dependencies:
+
+- [Eigen](http://eigen.tuxfamily.org) at least version 3, 
+- [meta](https://github.com/ericniebler/meta)
+- [googletest](https://github.com/google/googletest)
+
+The library `Eigen` needs to be installed, `meta` and `googletest` are installed as external projects when configuring this library!
+
+### OS X
+```bash
+    brew install eigen
+```
+
+### Development Setup
+If you start developing, install the pre-commit hook with:
+```bash
+    cp tools/pre-commit .git/hooks/
+```
+#### On OS X
+Install XCode and the CommandLine Tools from [Apple](https://developer.apple.com/download/more/)  
+Install [Visual Studio Code](https://code.visualstudio.com/)  
+Install `clang` with [homebrew](https://brew.sh) by
+```bash
+    brew install clang
+```
+Install the following extensions for VS Code:
+- [C++ Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
+- [CMake Language Ext.](https://marketplace.visualstudio.com/items?itemName=twxs.cmake)
+- [CMake Build Ext.](https://marketplace.visualstudio.com/items?itemName=vector-of-bool.cmake-tools)
+- [CMake Tool Helper Ext.](https://marketplace.visualstudio.com/items?itemName=vector-of-bool.cmake-tools)
+
+**Note:** Dont use the [multi-root workspaces](https://code.visualstudio.com/docs/editor/multi-root-workspaces) feature in VS Code since the C++ Extension does not yet support this and code completion won't work properly.
+
+## Introduction
 
 The execution graph implemented in `ExecutionTree` is a directed acyclic graph consisting of several connected logic nodes derived from `LogicNode` which define a simple input/output control flow.
 Each logic node in the execution graph contains several input/output sockets (`LogicSocket`) with a certain type out of the predefined types defined in `LogicSocketTypes`. 
@@ -27,8 +65,9 @@ A *get* link is the exact opposite and is a link from an input socket `j` of a n
 A *get* link basically forwards any read access on the input socket `j` of `B` to a read access on the input socket `i` of `A`.
 
 Most of the time only *get* links are necessary but as soon as the execution graph becomes more complex and certain switching behavior should be reproduced, the additional *write* links are a convenient tool to realize this. 
+
 Cyclic paths between logic nodes are detected and result in an error when building the execution network.
-The write and read access of input and output sockets is implemented using a fast static type dispatch system in `LogicSocket`.
+The write and read access to input and output sockets is implemented using a fast static type dispatch system in `LogicSocket`.
 
 Static type dispatching avoids the use of virtual calls when using polymorphic objects in object-oriented programming languages.
 
@@ -91,7 +130,7 @@ The type `TConfig::NodeBaseType` is the basis class for all logic nodes (resulti
 The two enumerations `Ins` and `Outs` let us define some handy abbreviations for our input sockets (`Value1` and `Value2`) and our output socket (`Result1`). The sequential ordering of the enumerations in `Ins` and `Outs` does not matter at all! So far so good. Now we use some macro for letting us specify the input/output ordering:
 ```c++
 private:
-    EXEC_GRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
+    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
     // Define the input socket decleration list:
     using InSockets  = InSocketDeclList<InSocketDecl<Value1, int>,
                                         InSocketDecl<Value2, int>>;
@@ -104,8 +143,8 @@ The same is done for our output by defining `OutSockets`.
 
 Now we define two other handy macros:
 ```c++
-    EXEC_GRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME();
-    EXEC_GRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets);
+    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME();
+    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets);
 ```
 The first one is not so important. It only defines some `virtual std::string getTypeName()` function which demangles the type of this node at runtime (for debugging purposes).
 The second one defines some handy value-getters and setters for easy access (by means of the enumerations `Ins` and `Outs`) to the sockets values (more later).
@@ -181,9 +220,9 @@ Finally we create the ExecutionTree `ExecutionTreeInOut`, add all nodes to it, s
     
     // Setup the execution tree
     execTree.setup();
-    std::cout << execTree.getExecutionOrderInfo() << std::endl;
+    EXECGRAPH_LOG_INFO(execTree.getExecutionOrderInfo());
     execTree.execute(0); // execute the default execution group (=0)
-    std::cout << "Result : "<< resultNode->getOutVal<IntegerNode<Config>::Result1>() << std::endl;
+    EXECGRAPH_LOG_INFO("Result : "<< resultNode->getOutVal<IntegerNode<Config>::Result1>());
 ```
 This outputs the following execution order:
 ```c++

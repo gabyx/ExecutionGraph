@@ -1,3 +1,12 @@
+// ========================================================================================
+//  executionGraph
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+//
+//  This Source Code Form is subject to the terms of the Mozilla Public
+//  License, v. 2.0. If a copy of the MPL was not distributed with this
+//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// ========================================================================================
+
 #ifndef ExecutionGraph_Common_MyContainerTypeDefs_hpp
 #define ExecutionGraph_Common_MyContainerTypeDefs_hpp
 
@@ -35,7 +44,7 @@ using StdVecAligned = std::vector<Type, Eigen::aligned_allocator<Type>>;
 /**
  * @brief This macro is used to typedef all custom container types.
  */
-#define EXEC_GRAPH_DEFINE_CONTAINER_TYPES                                                                     \
+#define EXECGRAPH_DEFINE_CONTAINER_TYPES                                                                      \
                                                                                                               \
     template<typename Key, typename Type, typename Comp = std::less<Key>>                                     \
     using StdMapAligned = executionGraph::MyContainers::StdMapAligned<Key, Type, Comp>;                       \
