@@ -10,6 +10,8 @@ set(EXECUTIONGRAPHGUI_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/App.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/Handler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/Handler.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/FileSchemeHandlerFactory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/FileSchemeHandlerFactory.hpp
 )
 set(EXECUTIONGRAPHGUI_SRCS_LINUX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/linux/AppLinux.cpp
