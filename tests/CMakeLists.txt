@@ -1,6 +1,3 @@
-#The name of the project ====================================================================
-PROJECT("ExecutionGraphTests")
-
 
 # Add GoogleTests ===========================================================================
 if (CMAKE_VERSION VERSION_LESS 3.2)
@@ -34,13 +31,13 @@ add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_
 # ==============================================================================================
 
 SET(ExecutionGraph_TESTS_OUTPUT_FILES_DIR "${PROJECT_BINARY_DIR}")
-SET(ExecutionGraph_TESTS_INPUT_FILES_DIR "${PROJECT_SOURCE_DIR}/files")
+SET(ExecutionGraph_TESTS_INPUT_FILES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/files")
 SET(ExecutionGraph_TESTS_INPUT_FILES_ADD_DIR "${ExecutionGraph_ROOT_DIR}/additional/tests/files")
 SET(ExecutionGraph_TESTS_VALIDATION_FILES_DIR "${ExecutionGraph_ROOT_DIR}/additional/tests/files/validation")
 
 # WRITE CONFIGURATION FILE
 configure_file (
-  "${PROJECT_SOURCE_DIR}/include/TestConfig.hpp.in.cmake"
+  "${CMAKE_CURRENT_SOURCE_DIR}/include/TestConfig.hpp.in.cmake"
   ${PROJECT_BINARY_DIR}/include/TestConfig.hpp
 )
 #=========================
@@ -48,23 +45,21 @@ configure_file (
 
 SET(SOURCE_FILES
     ${ExecutionGraph_SRC}
-    ${PROJECT_SOURCE_DIR}/include/TestFunctions.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/TestFunctions.hpp
 )
 
 SET(INCLUDE_FILES
     ${ExecutionGraph_INC}
-    ${PROJECT_SOURCE_DIR}/src/TestFunctions.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/TestFunctions.cpp
 )
 
 
 #include directories
 set(INCLUDE_DIRS
     ${ExecutionGraph_INC_DIRS}
-    ${PROJECT_SOURCE_DIR}/include/
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/
     ${PROJECT_BINARY_DIR}/include/
 )
-
-include_directories(${INCLUDE_DIRS})
 
 # Define function to define compile definitions for all tests
 function(defineCompileDefs Target)
@@ -77,7 +72,8 @@ endfunction()
 
 # NodeTests
 SET(EXEC_NAME1 ${PROJECT_NAME}-LogicNodes)
-ADD_EXECUTABLE(${EXEC_NAME1}  ${PROJECT_SOURCE_DIR}/src/main_LogicNode.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+ADD_EXECUTABLE(${EXEC_NAME1}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_LogicNode.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+target_include_directories(${EXEC_NAME1} ${INCLUDE_DIRS})
 TARGET_LINK_LIBRARIES(${EXEC_NAME1} ExecutionGraphForTestsOnly gtest gmock_main)
 ADD_DEPENDENCIES(build_and_test ${EXEC_NAME1})
 if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
@@ -88,7 +84,8 @@ cotire(${EXEC_NAME1})
 
 #ExecutionTree Test
 SET(EXEC_NAME2 ${PROJECT_NAME}-ExecutionTree)
-ADD_EXECUTABLE(${EXEC_NAME2}  ${PROJECT_SOURCE_DIR}/src/main_ExecutionTree.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+ADD_EXECUTABLE(${EXEC_NAME2}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_ExecutionTree.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+target_include_directories(${EXEC_NAME2} ${INCLUDE_DIRS})
 TARGET_LINK_LIBRARIES(${EXEC_NAME2} ExecutionGraphForTestsOnly gtest gmock_main)
 ADD_DEPENDENCIES(build_and_test ${EXEC_NAME2})
 if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
@@ -99,7 +96,8 @@ cotire(${EXEC_NAME2})
 
 #ExecutionTree Test
 SET(EXEC_NAME3 ${PROJECT_NAME}-CustomSocketTypes)
-ADD_EXECUTABLE(${EXEC_NAME3}  ${PROJECT_SOURCE_DIR}/src/main_CustomSocketTypes.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+ADD_EXECUTABLE(${EXEC_NAME3}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_CustomSocketTypes.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+target_include_directories(${EXEC_NAME3} ${INCLUDE_DIRS})
 TARGET_LINK_LIBRARIES(${EXEC_NAME3} ExecutionGraphForTestsOnly gtest gmock_main)
 ADD_DEPENDENCIES(build_and_test ${EXEC_NAME3})
 if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")

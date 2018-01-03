@@ -1,4 +1,3 @@
-project(ExecutionGraphGUI)
 
 ######################
 # Source files.

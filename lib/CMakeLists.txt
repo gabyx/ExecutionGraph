@@ -1,8 +1,4 @@
 
-
-#The name of the library project ====================================================================
-PROJECT("ExecutionGraphLib")
-
 # Options ==============================================================
 MARK_AS_ADVANCED( ExecutionGraph_BUILD_LIBRARY_STATIC  )
 SET(ExecutionGraph_BUILD_LIBRARY_STATIC OFF CACHE BOOL "Build a static library")
@@ -23,8 +19,6 @@ SET(INCLUDE_DIRS
     ${EIGEN_INCLUDE_DIR}
     ${ExecutionGraph_INC_DIRS}
 )
-MESSAGE(STATUS "${INCLUDE_DIRS}")
-INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 
 SET(LINK_LIBS ${ExecutionGraph_LINK_LIBS})
 
@@ -32,6 +26,7 @@ SET(LINK_LIBS ${ExecutionGraph_LINK_LIBS})
 IF(ExecutionGraph_BUILD_LIBRARY_STATIC)
 ADD_LIBRARY(ExecutionGraph STATIC ${SOURCE_FILES} ${INCLUDE_FILES})
 SET_TARGET_PROPERTIES(ExecutionGraph PROPERTIES OUTPUT_NAME ExecutionGraphStatic)
+TARGET_INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 ELSE()
 ADD_LIBRARY(ExecutionGraph SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
 ENDIF()
@@ -146,7 +141,7 @@ SET(CMAKE_CONFIG_FOLDER ${ExecutionGraph_LIB_INSTALL_DIR}/cmake/ExecutionGraph-$
 SET(ExecutionGraph_LIBRARY_NAME $<TARGET_FILE_NAME:ExecutionGraph>)
 SET(ExecutionGraph_CMAKE_CONFIG_FILE "${PROJECT_BINARY_DIR}/executiongraph-config.cmake")
 CONFIGURE_FILE(
-  ${PROJECT_SOURCE_DIR}/executiongraph-config.cmake.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/executiongraph-config.cmake.in
   ${ExecutionGraph_CMAKE_CONFIG_FILE} @ONLY
 )
 #=========================
@@ -154,7 +149,7 @@ CONFIGURE_FILE(
 SET(ExecutionGraph_LIBRARY_NAME $<TARGET_FILE_NAME:ExecutionGraph>)
 SET(ExecutionGraph_CMAKE_CONFIG_VERSION_FILE "${PROJECT_BINARY_DIR}/executiongraph-config-version.cmake")
 CONFIGURE_FILE(
-  ${PROJECT_SOURCE_DIR}/executiongraph-config-version.cmake.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/executiongraph-config-version.cmake.in
   ${ExecutionGraph_CMAKE_CONFIG_VERSION_FILE} @ONLY
 )
 #=========================
