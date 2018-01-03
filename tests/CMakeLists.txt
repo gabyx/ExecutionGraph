@@ -58,8 +58,11 @@ set(INCLUDE_FILES
 #include directories
 set(INCLUDE_DIRS
     ${ExecutionGraph_INC_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/
-    ${PROJECT_BINARY_DIR}/include/
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${PROJECT_BINARY_DIR}/include
+
+    ${googletest_SOURCE_DIR}/googletest/include 
+    ${googletest_SOURCE_DIR}/googlemock/include 
 )
 
 # Define function to define compile definitions for all tests
@@ -69,7 +72,7 @@ function(defineCompileDefs target)
     message(STATUS "Configuring target: ${target}")
 
     target_include_directories(${target} PRIVATE ${INCLUDE_DIRS})
-    target_link_libraries(${target} ExecutionGraphForTestsOnly gtest gmock_main)
+    target_link_libraries(${target} ExecutionGraph-LibForTestsOnly gtest gmock_main)
 
     if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
         target_compile_options(${target} PRIVATE -DExecutionGraph_BUILD_TESTS )

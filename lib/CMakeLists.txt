@@ -25,29 +25,28 @@ set(LINK_LIBS ${ExecutionGraph_LINK_LIBS})
 # Make Target: Library 
 ################################
 
-set(LIB_TARGET "${PROJECT_NAME}-Lib")
 message(STATUS "====================================================")
-message(STATUS "Configuring target: ${LIB_TARGET}")
+message(STATUS "Configuring target: ExecutionGraph-Lib")
 
 if(ExecutionGraph_BUILD_LIBRARY_STATIC)
-    add_library(${LIB_TARGET} STATIC ${SOURCE_FILES} ${INCLUDE_FILES})
-    set_target_properties(${LIB_TARGET} PROPERTIES OUTPUT_NAME ExecutionGraphStatic)
+    add_library(ExecutionGraph-Lib STATIC ${SOURCE_FILES} ${INCLUDE_FILES})
+    set_target_properties(ExecutionGraph-Lib PROPERTIES OUTPUT_NAME ExecutionGraphStatic)
 
 else()
-    add_library(${LIB_TARGET} SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
+    add_library(ExecutionGraph-Lib SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
 endif()
 
 if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
-    add_dependencies(${LIB_TARGET} ${ExecutionGraph_DEPENDING_TARGETS})
+    add_dependencies(ExecutionGraph-Lib ${ExecutionGraph_DEPENDING_TARGETS})
 endif()
 
-target_include_directories(${LIB_TARGET} PUBLIC ${INCLUDE_DIRS})
-target_link_libraries(${LIB_TARGET} ${LINK_LIBS})
+target_include_directories(ExecutionGraph-Lib PUBLIC ${INCLUDE_DIRS})
+target_link_libraries(ExecutionGraph-Lib ${LINK_LIBS})
 
 set(ExecutionGraph_LIBRARY_NAME_REL "ExecutionGraph")                       # used for cmake config
 set(ExecutionGraph_LIBRARY_NAME_DBG "ExecutionGraph${CMAKE_DEBUG_POSTFIX}") # used for cmake config
 
-set_target_properties(${LIB_TARGET} PROPERTIES
+set_target_properties(ExecutionGraph-Lib PROPERTIES
     VERSION ${ExecutionGraph_VERSION_STRING} SOVERSION ${ExecutionGraph_VERSION_STRING}
     OUTPUT_NAME ${ExecutionGraph_LIBRARY_NAME_REL}
 )
@@ -56,12 +55,12 @@ set_target_properties(${LIB_TARGET} PROPERTIES
 # Building a library means we only export the symbols which have ExecutionGraph_EXPORT set in the Platform.hpp file
 # We define all other symbols to be hidden by default as suggested by https://gcc.gnu.org/wiki/Visibility
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-    target_compile_options(${LIB_TARGET} PRIVATE -DExecutionGraph_BUILD_LIBRARY -fvisibility=hidden)
+    target_compile_options(ExecutionGraph-Lib PRIVATE -DExecutionGraph_BUILD_LIBRARY -fvisibility=hidden)
 else()
-    target_compile_options(${LIB_TARGET} PRIVATE /DExecutionGraph_BUILD_LIBRARY)
+    target_compile_options(ExecutionGraph-Lib PRIVATE /DExecutionGraph_BUILD_LIBRARY)
 endif()
 
-print_target_properties(${LIB_TARGET})
+print_target_properties(ExecutionGraph-Lib)
 
 # Configuring Installstep
 #########################
@@ -90,7 +89,7 @@ endif()
 # Installing files
 ##################
 message( STATUS "Installing library to " "${ExecutionGraph_LIB_INSTALL_DIR}")
-install(TARGETS ${LIB_TARGET}
+install(TARGETS ExecutionGraph-Lib
         LIBRARY DESTINATION ${ExecutionGraph_LIB_INSTALL_DIR}
         ARCHIVE DESTINATION ${ExecutionGraph_LIB_INSTALL_DIR})
 
@@ -155,25 +154,24 @@ install(FILES  ${ExecutionGraph_ROOT_DIR}/cmake/FindEigen3.cmake
 
 if(ExecutionGraph_BUILD_TESTS)
     
-    set(LIB_TARGET_TEST "${PROJECT_NAME}-LibForTestsOnly")
     message(STATUS "====================================================")
-    message(STATUS "Configuring target: ${LIB_TARGET_TEST}")
+    message(STATUS "Configuring target: ExecutionGraph-LibForTestsOnly")
     
     if(ExecutionGraph_BUILD_LIBRARY_STATIC)
-        add_library(${LIB_TARGET_TEST}  STATIC ${SOURCE_FILES} ${INCLUDE_FILES})
-        set_target_properties(${LIB_TARGET_TEST}  PROPERTIES OUTPUT_NAME ${LIB_TARGET_TEST} Static)
+        add_library(ExecutionGraph-LibForTestsOnly  STATIC ${SOURCE_FILES} ${INCLUDE_FILES})
+        set_target_properties(ExecutionGraph-LibForTestsOnly  PROPERTIES OUTPUT_NAME ExecutionGraph-LibForTestsOnly Static)
     else()
-        add_library(${LIB_TARGET_TEST}  SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
+        add_library(ExecutionGraph-LibForTestsOnly  SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
     endif()
 
     if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
         message(STATUS "Adding target dependecy: ${ExecutionGraph_DEPENDING_TARGETS}")
-        add_dependencies(${LIB_TARGET_TEST}  ${ExecutionGraph_DEPENDING_TARGETS})
+        add_dependencies(ExecutionGraph-LibForTestsOnly  ${ExecutionGraph_DEPENDING_TARGETS})
     endif()
 
-    target_include_directories(${LIB_TARGET_TEST} PUBLIC ${INCLUDE_DIRS})
-    target_link_libraries(${LIB_TARGET_TEST}  ${LINK_LIBS})
-    set_target_properties(${LIB_TARGET_TEST}  PROPERTIES
+    target_include_directories(ExecutionGraph-LibForTestsOnly PUBLIC ${INCLUDE_DIRS})
+    target_link_libraries(ExecutionGraph-LibForTestsOnly  ${LINK_LIBS})
+    set_target_properties(ExecutionGraph-LibForTestsOnly  PROPERTIES
         VERSION ${ExecutionGraph_VERSION_STRING} SOVERSION ${ExecutionGraph_VERSION_STRING}
     )
 
@@ -181,10 +179,10 @@ if(ExecutionGraph_BUILD_TESTS)
     # Building a library means we only export the symbols which have ExecutionGraph_EXPORT set in the Platform.hpp file
     # We define all other symbols to be hidden by default as suggested by https://gcc.gnu.org/wiki/Visibility
     if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-        target_compile_options(${LIB_TARGET_TEST}  PRIVATE -DExecutionGraph_BUILD_LIBRARY -DExecutionGraph_BUILD_TESTS -fvisibility=hidden)
+        target_compile_options(ExecutionGraph-LibForTestsOnly  PRIVATE -DExecutionGraph_BUILD_LIBRARY -DExecutionGraph_BUILD_TESTS -fvisibility=hidden)
     else()
-        target_compile_options(${LIB_TARGET_TEST}  PRIVATE /DExecutionGraph_BUILD_LIBRARY /DExecutionGraph_BUILD_TESTS)
+        target_compile_options(ExecutionGraph-LibForTestsOnly  PRIVATE /DExecutionGraph_BUILD_LIBRARY /DExecutionGraph_BUILD_TESTS)
     endif()
 
-    print_target_properties(${LIB_TARGET_TEST})
+    print_target_properties(ExecutionGraph-LibForTestsOnly)
 endif()

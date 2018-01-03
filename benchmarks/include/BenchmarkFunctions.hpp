@@ -9,7 +9,7 @@
 #ifndef BenchmarkFunctions_hpp
 #define BenchmarkFunctions_hpp
 
-#include "benchmark/benchmark_api.h"
+#include <benchmark/benchmark.h>
 
 #include "ExecutionGraph/config/Config.hpp"
 

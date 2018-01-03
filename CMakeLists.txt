@@ -18,6 +18,7 @@ else()
     set(PROJECTNAMEPREFIX ${CMAKE_BUILD_TYPE})
 endif()
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" ${CMAKE_MODULE_PATH})
 message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
@@ -129,13 +130,16 @@ mark_as_advanced( ExecutionGraph_BUILD_LIBRARY )
 set(ExecutionGraph_BUILD_LIBRARY ON CACHE BOOL "Build a shared library")
 
 mark_as_advanced( ExecutionGraph_BUILD_TESTS)
-set(ExecutionGraph_BUILD_TESTS ON CACHE BOOL "Build the tests")
+set(ExecutionGraph_BUILD_TESTS OFF CACHE BOOL "Build the tests")
 
 mark_as_advanced( ExecutionGraph_BUILD_BENCHMARKS)
-set(ExecutionGraph_BUILD_BENCHMARKS ON CACHE BOOL "Build the benchmarks")
+set(ExecutionGraph_BUILD_BENCHMARKS OFF CACHE BOOL "Build the benchmarks")
 
 mark_as_advanced( ExecutionGraph_BUILD_EXAMPLE )
-set(ExecutionGraph_BUILD_EXAMPLE ON CACHE BOOL "Build the example, the library is automatically built if this is true")
+set(ExecutionGraph_BUILD_EXAMPLE OFF CACHE BOOL "Build the example, the library is automatically built if this is true")
+
+mark_as_advanced( ExecutionGraph_BUILD_GUI )
+set(ExecutionGraph_BUILD_GUI ON CACHE BOOL "Build Graphical User Interface for the Execution Graph")
 
 mark_as_advanced( ExecutionGraph_FORCE_MSGLOG_LEVEL)
 set(ExecutionGraph_FORCE_MSGLOG_LEVEL "DEBUG" CACHE STRING "Force the message log level (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)")
@@ -224,15 +228,16 @@ if(ExecutionGraph_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
-#if(ExecutionGraph_BUILD_BENCHMARKS)
-    #enable_testing()
-    #add_custom_target(build_and_benchmark ${CMAKE_CTEST_COMMAND} -V)
-    #add_subdirectory(benchmarks)
-#endif()
+if(ExecutionGraph_BUILD_BENCHMARKS)
+    enable_testing()
+    add_custom_target(build_and_benchmark ${CMAKE_CTEST_COMMAND} -V)
+    add_subdirectory(benchmarks)
+endif()
 
+if(ExecutionGraph_BUILD_EXAMPLE)
+    add_subdirectory(examples)
+endif()
 
-# if(ExecutionGraph_BUILD_EXAMPLE)
-#     add_subdirectory(examples)
-# endif()
-
-# add_subdirectory(gui)
+if(ExecutionGraph_BUILD_GUI)
+    add_subdirectory(gui)
+endif()

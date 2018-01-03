@@ -10,7 +10,7 @@ find_package(ExecutionGraph REQUIRED)
 add_executable(libraryUsage ./main.cpp)
 
 # add include directory
-target_include_directories(libraryUsage ${ExecutionGraph_INCLUDE_DIR})
+target_include_directories(libraryUsage PRIVATE ${ExecutionGraph_INCLUDE_DIR})
 
 # link with ExecutionGraph
 message(STATUS "Linking with: " "${ExecutionGraph_LIBRARIES}")
