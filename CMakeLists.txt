@@ -19,9 +19,11 @@ else()
 endif()
 
 
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_SOURCE_DIR}/additional/sanitizers-cmake/cmake" ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" ${CMAKE_MODULE_PATH})
 message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
 
+# Load print macros
+include(PrintMacros)
 # Load important modules
 include(FirstCMakeRun)
 # Speed up the build
@@ -29,9 +31,9 @@ include(cotire)
 
 #The name of the project ===============================================
 set(ExecutionGraphProjectName "ExecutionGraph")
-if(${CMAKE_GENERATOR} MATCHES "Unix Makefiles")
-        set(ExecutionGraphProjectName  "${ExecutionGraphProjectName}-${PROJECTNAMEPREFIX}")
-endif()
+# if(${CMAKE_GENERATOR} MATCHES "Unix Makefiles")
+#         set(ExecutionGraphProjectName  "${ExecutionGraphProjectName}-${PROJECTNAMEPREFIX}")
+# endif()
 message(STATUS "Project name is: " ${ExecutionGraphProjectName})
 project(${ExecutionGraphProjectName})
 
@@ -210,7 +212,7 @@ INCLUDE_ALL_ExecutionGraph_source(ExecutionGraph_SRC
 
 list(APPEND ExecutionGraph_INC_DIRS ${ExecutionGraph_INC_DIRS_DEP})
 set(ExecutionGraph_LINK_LIBS ${ExecutionGraph_LIBRARIES_DEP})
-#list(APPEND ${ExecutionGraph_DEPENDING_TARGETS} ${ExecutionGraph_DEPENDING_TARGETS_DEP})
+list(APPEND ExecutionGraph_DEPENDING_TARGETS ${ExecutionGraph_DEPENDING_TARGETS_DEP})
 
 if(ExecutionGraph_BUILD_LIBRARY)
     add_subdirectory(lib)
@@ -229,8 +231,8 @@ endif()
 #endif()
 
 
-if(ExecutionGraph_BUILD_EXAMPLE)
-    add_subdirectory(examples)
-endif()
+# if(ExecutionGraph_BUILD_EXAMPLE)
+#     add_subdirectory(examples)
+# endif()
 
-add_subdirectory(gui)
+# add_subdirectory(gui)

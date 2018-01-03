@@ -8,6 +8,7 @@ endif()
 
 include(DownloadProject)
 download_project(PROJ                googletest
+                 PREFIX              ${CMAKE_BINARY_DIR}/external
                  GIT_REPOSITORY      https://github.com/google/googletest.git
                  GIT_TAG             master
                  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
@@ -62,50 +63,39 @@ set(INCLUDE_DIRS
 )
 
 # Define function to define compile definitions for all tests
-function(defineCompileDefs Target)
+function(defineCompileDefs target)
+
+    message(STATUS "====================================================")
+    message(STATUS "Configuring target: ${target}")
+
+    target_include_directories(${target} PRIVATE ${INCLUDE_DIRS})
+    target_link_libraries(${target} ExecutionGraphForTestsOnly gtest gmock_main)
+
     if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-        target_compile_options(${Target} PRIVATE -DExecutionGraph_BUILD_TESTS )
+        target_compile_options(${target} PRIVATE -DExecutionGraph_BUILD_TESTS )
     else()
-        target_compile_options(${Target} PRIVATE /DExecutionGraph_BUILD_TESTS )
+        target_compile_options(${target} PRIVATE /DExecutionGraph_BUILD_TESTS )
     endif()
+
+    cotire(${target})
+
+    print_target_properties(${target})
+
+    add_test(NAME ${target} COMMAND ${target})
+
 endfunction()
 
 # NodeTests
-set(EXEC_NAME1 ${PROJECT_NAME}-LogicNodes)
+set(EXEC_NAME1 ${PROJECT_NAME}Test-LogicNodes)
 add_executable(${EXEC_NAME1}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_LogicNode.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-target_include_directories(${EXEC_NAME1} ${INCLUDE_DIRS})
-target_link_libraries(${EXEC_NAME1} ExecutionGraphForTestsOnly gtest gmock_main)
-add_dependencies(build_and_test ${EXEC_NAME1})
-if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
-    add_dependencies(${EXEC_NAME1} ${ExecutionGraph_DEPENDING_TARGETS})
-endif()
 defineCompileDefs(${EXEC_NAME1})
-cotire(${EXEC_NAME1})
 
 #ExecutionTree Test
-set(EXEC_NAME2 ${PROJECT_NAME}-ExecutionTree)
+set(EXEC_NAME2 ${PROJECT_NAME}Test-ExecutionTree)
 add_executable(${EXEC_NAME2}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_ExecutionTree.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-target_include_directories(${EXEC_NAME2} ${INCLUDE_DIRS})
-target_link_libraries(${EXEC_NAME2} ExecutionGraphForTestsOnly gtest gmock_main)
-add_dependencies(build_and_test ${EXEC_NAME2})
-if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
-    add_dependencies(${EXEC_NAME2} ${ExecutionGraph_DEPENDING_TARGETS})
-endif()
 defineCompileDefs(${EXEC_NAME2})
-cotire(${EXEC_NAME2})
 
 #ExecutionTree Test
-set(EXEC_NAME3 ${PROJECT_NAME}-CustomSocketTypes)
+set(EXEC_NAME3 ${PROJECT_NAME}Test-CustomSocketTypes)
 add_executable(${EXEC_NAME3}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_CustomSocketTypes.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-target_include_directories(${EXEC_NAME3} ${INCLUDE_DIRS})
-target_link_libraries(${EXEC_NAME3} ExecutionGraphForTestsOnly gtest gmock_main)
-add_dependencies(build_and_test ${EXEC_NAME3})
-if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
-    add_dependencies(${EXEC_NAME3} ${ExecutionGraph_DEPENDING_TARGETS})
-endif()
 defineCompileDefs(${EXEC_NAME3})
-cotire(${EXEC_NAME3})
-
-add_test(NAME    ${EXEC_NAME1} COMMAND ${EXEC_NAME1})
-add_test(NAME    ${EXEC_NAME2} COMMAND ${EXEC_NAME2})
-add_test(NAME    ${EXEC_NAME3} COMMAND ${EXEC_NAME3})
