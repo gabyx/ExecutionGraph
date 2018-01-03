@@ -35,6 +35,13 @@ Install `clang` with [homebrew](https://brew.sh) by
 ```bash
     brew install clang
 ```
+Set the `CXX` and `CC` variables in your `~/.bash_profile` or similar to 
+```bash
+export PATH="/usr/local/opt/llvm/bin:$PATH"
+export CC="/usr/local/opt/llvm/bin/clang"
+export CXX="$CC++"
+```
+
 Install the following extensions for VS Code:
 - [C++ Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
 - [CMake Language Ext.](https://marketplace.visualstudio.com/items?itemName=twxs.cmake)

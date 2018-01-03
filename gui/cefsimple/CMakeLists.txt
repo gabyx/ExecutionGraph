@@ -2,6 +2,8 @@
 # reserved. Use of this source code is governed by a BSD-style license that
 # can be found in the LICENSE file.
 
+project(CEFSimple)
+
 # #
 # Source files.
 #
@@ -76,10 +78,10 @@ set(CEFSIMPLE_RESOURCES_SRCS
 #
 
 # Target executable names.
-set(CEF_TARGET "cefsimple")
+set(CEF_TARGET "CEFSimple")
 if(OS_MACOSX)
-  set(CEF_HELPER_TARGET "cefsimpleHelper")
-  set(CEF_HELPER_TARGET_OUTPUTNAME "cefsimple Helper")
+  set(CEF_HELPER_TARGET "CEFSimpleHelper")
+  set(CEF_HELPER_TARGET_OUTPUTNAME "CEFSimple Helper")
 endif()
 
 # Logical target used to link the libcef library.

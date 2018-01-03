@@ -1,3 +1,5 @@
+project(ExecutionGraphGUI)
+
 ######################
 # Source files.
 ######################
@@ -66,10 +68,10 @@ set(EXECUTIONGRAPHGUI_RESOURCES_SRCS ${EXECUTIONGRAPHGUI_RESOURCES_MAC_SRCS} ${E
 ######################
 
 # Target executable names.
-set(CEF_TARGET "executionGraphGui")
+set(CEF_TARGET "ExecutionGraphGUI")
 if(OS_MACOSX)
-  set(CEF_HELPER_TARGET "executionGraphGuiHelper")
-  set(CEF_HELPER_TARGET_OUTPUTNAME "executionGraphGui Helper") # This is hardcoded as described in <cef_types.h> browser_subprocess_path.
+  set(CEF_HELPER_TARGET "ExecutionGraphGUIHelper")
+  set(CEF_HELPER_TARGET_OUTPUTNAME "ExecutionGraphGUI Helper") # This is hardcoded as described in <cef_types.h> browser_subprocess_path.
 endif()
 
 # Logical target used to link the libcef library.
