@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "ExecutionGraph/Common/SfinaeMacros.hpp"
+#include "ExecutionGraph/common/SfinaeMacros.hpp"
 
 namespace execGraph
 {

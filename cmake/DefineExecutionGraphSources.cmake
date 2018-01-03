@@ -1,4 +1,4 @@
-MACRO(INCLUDE_ALL_ExecutionGraph_SOURCE 
+macro(INCLUDE_ALL_ExecutionGraph_SOURCE 
       SRC 
       INC 
       INCLUDE_DIRS 
@@ -8,10 +8,10 @@ MACRO(INCLUDE_ALL_ExecutionGraph_SOURCE
 
 
     # Add all external sources/headers
-    # INCLUDE(${ExecutionGraph_ROOT_DIR}/cmake/DefineExecutionGraphExternalSources.cmake)
+    # include(${ExecutionGraph_ROOT_DIR}/cmake/DefineExecutionGraphExternalSources.cmake)
     # no external sources up to now
     
-    SET(${SRC}
+    set(${SRC}
                 
         ${ExecutionGraph_ROOT_DIR}/src/DemangleTypes.cpp
     
@@ -19,7 +19,7 @@ MACRO(INCLUDE_ALL_ExecutionGraph_SOURCE
         ${ExecutionGraph_ROOT_DIR}/src/LogicNode.cpp
     )
 
-    SET(${INC}
+    set(${INC}
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/Asserts.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/Delegates.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/DemangleTypes.hpp
@@ -39,7 +39,7 @@ MACRO(INCLUDE_ALL_ExecutionGraph_SOURCE
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/graphs/ExecutionTreeInOut.hpp
     )
 
-    SET(${INCLUDE_DIRS}
+    set(${INCLUDE_DIRS}
         ${ExecutionGraph_ROOT_DIR}/include
         ${ExecutionGraph_BINARY_DIR}/include
     )
@@ -47,12 +47,12 @@ MACRO(INCLUDE_ALL_ExecutionGraph_SOURCE
 
     # WRITE CONFIGURATION FILE
     
-    INCLUDE(${ExecutionGraph_ROOT_DIR}/cmake/WriteConfigFile.cmake)
-    SET(ExecutionGraph_CONFIG_FILE ${ExecutionGraph_BINARY_DIR}/include/ExecutionGraph/config/Config.hpp)
-    MESSAGE(STATUS "ExecutionGraph: Write config file ${ExecutionGraph_CONFIG_FILE}, ${ExecutionGraph_OPENMP_NTHREADS}")
-    ExecutionGraph_WRITE_CONFIG_FILE( ${ExecutionGraph_CONFIG_FILE} ${ExecutionGraph_ROOT_DIR})
+    include(${ExecutionGraph_ROOT_DIR}/cmake/WriteConfigFile.cmake)
+    set(ExecutionGraph_CONFIG_FILE ${ExecutionGraph_BINARY_DIR}/include/ExecutionGraph/config/Config.hpp)
+    message(STATUS "ExecutionGraph: Write config file ${ExecutionGraph_CONFIG_FILE}, ${ExecutionGraph_OPENMP_NTHREADS}")
+    ExecutionGraph_write_config_file( ${ExecutionGraph_CONFIG_FILE} ${ExecutionGraph_ROOT_DIR})
     #=========================
     
     
     
-ENDMACRO()
+endmacro()

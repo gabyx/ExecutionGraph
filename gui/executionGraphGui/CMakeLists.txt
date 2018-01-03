@@ -1,4 +1,3 @@
-project(ExecutionGraphGUI)
 
 ######################
 # Source files.
@@ -27,13 +26,13 @@ set(EXECUTIONGRAPHGUI_SRCS_WINDOWS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/resource.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/handler_win.cpp
 )
-APPEND_PLATFORM_SOURCES(EXECUTIONGRAPHGUI_SRCS)
+append_platform_sources(EXECUTIONGRAPHGUI_SRCS)
 
 set(EXECUTIONGRAPHGUI_RES_SRCS_WINDOWS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/resources/cefapp.ico
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/resources/small.ico
 )
-APPEND_PLATFORM_SOURCES(EXECUTIONGRAPHGUI_RES_SRCS)
+append_platform_sources(EXECUTIONGRAPHGUI_RES_SRCS)
 
 set(EXECUTIONGRAPHGUI_SRCS ${EXECUTIONGRAPHGUI_SRCS} ${EXECUTIONGRAPHGUI_RES_SRCS})
 # -------------
@@ -43,7 +42,7 @@ set(EXECUTIONGRAPHGUI_SRCS ${EXECUTIONGRAPHGUI_SRCS} ${EXECUTIONGRAPHGUI_RES_SRC
 set(EXECUTIONGRAPHGUI_HELPER_SRCS_MACOSX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/process_helper_mac.cpp
 )
-APPEND_PLATFORM_SOURCES(EXECUTIONGRAPHGUI_HELPER_SRCS)
+append_platform_sources(EXECUTIONGRAPHGUI_HELPER_SRCS)
 # -------------
 
 # App Resources.
@@ -52,12 +51,12 @@ set(EXECUTIONGRAPHGUI_RESOURCES_MAC_SRCS_MACOSX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/Info.plist
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/app.icns
 )
-APPEND_PLATFORM_SOURCES(EXECUTIONGRAPHGUI_RESOURCES_MAC_SRCS)
+append_platform_sources(EXECUTIONGRAPHGUI_RESOURCES_MAC_SRCS)
 set(EXECUTIONGRAPHGUI_RESOURCES_MAC_ENGLISH_LPROJ_SRCS_MACOSX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/English.lproj/InfoPlist.strings
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/English.lproj/MainMenu.xib
 )
-APPEND_PLATFORM_SOURCES(EXECUTIONGRAPHGUI_RESOURCES_MAC_ENGLISH_LPROJ_SRCS)
+append_platform_sources(EXECUTIONGRAPHGUI_RESOURCES_MAC_ENGLISH_LPROJ_SRCS)
 
 set(EXECUTIONGRAPHGUI_RESOURCES_SRCS ${EXECUTIONGRAPHGUI_RESOURCES_MAC_SRCS} ${EXECUTIONGRAPHGUI_RESOURCES_MAC_ENGLISH_LPROJ_SRCS})
 # -------------
@@ -75,10 +74,10 @@ if(OS_MACOSX)
 endif()
 
 # Logical target used to link the libcef library.
-ADD_LOGICAL_TARGET("libcef_lib" "${CEF_LIB_DEBUG}" "${CEF_LIB_RELEASE}")
+add_logical_target("libcef_lib" "${CEF_LIB_DEBUG}" "${CEF_LIB_RELEASE}")
 
 # Determine the target output directory.
-SET_CEF_TARGET_OUT_DIR()
+set_cef_target_out_dir()
 
 
 set(EXECUTIONGRAPHGUI_INC_DIRS
@@ -92,7 +91,7 @@ set(EXECUTIONGRAPHGUI_INC_DIRS
 if(OS_LINUX)
   # Executable target.
   add_executable(${CEF_TARGET} ${EXECUTIONGRAPHGUI_SRCS})
-  SET_EXECUTABLE_TARGET_PROPERTIES(${CEF_TARGET} ${EXECUTIONGRAPHGUI_INC_DIRS})
+  set_executable_target_properties(${CEF_TARGET} ${EXECUTIONGRAPHGUI_INC_DIRS})
   add_dependencies(${CEF_TARGET} libcef_dll_wrapper)
   target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
 
@@ -102,11 +101,11 @@ if(OS_LINUX)
   set_target_properties(${CEF_TARGET} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CEF_TARGET_OUT_DIR})
 
   # Copy binary and resource files to the target output directory.
-  COPY_FILES("${CEF_TARGET}" "${CEF_BINARY_FILES}" "${CEF_BINARY_DIR}" "${CEF_TARGET_OUT_DIR}")
-  COPY_FILES("${CEF_TARGET}" "${CEF_RESOURCE_FILES}" "${CEF_RESOURCE_DIR}" "${CEF_TARGET_OUT_DIR}")
+  copy_files("${CEF_TARGET}" "${CEF_BINARY_FILES}" "${CEF_BINARY_DIR}" "${CEF_TARGET_OUT_DIR}")
+  copy_files("${CEF_TARGET}" "${CEF_RESOURCE_FILES}" "${CEF_RESOURCE_DIR}" "${CEF_TARGET_OUT_DIR}")
 
   # Set SUID permissions on the chrome-sandbox target.
-  SET_LINUX_SUID_PERMISSIONS("${CEF_TARGET}" "${CEF_TARGET_OUT_DIR}/chrome-sandbox")
+  set_linux_suid_permissions("${CEF_TARGET}" "${CEF_TARGET_OUT_DIR}/chrome-sandbox")
 endif()
 
 
@@ -128,16 +127,16 @@ if(OS_MACOSX)
       MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/helper-Info.plist
       OUTPUT_NAME ${CEF_HELPER_TARGET_OUTPUTNAME}
   )
-  SET_EXECUTABLE_TARGET_PROPERTIES(${CEF_HELPER_TARGET} ${EXECUTIONGRAPHGUI_INC_DIRS})
+  set_executable_target_properties(${CEF_HELPER_TARGET} ${EXECUTIONGRAPHGUI_INC_DIRS})
   add_dependencies(${CEF_HELPER_TARGET} libcef_dll_wrapper)
   target_link_libraries(${CEF_HELPER_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
   
   # Fix the framework rpath in the helper executable.
-  FIX_MACOSX_HELPER_FRAMEWORK_RPATH(${CEF_HELPER_TARGET})
+  fix_macosx_helper_framework_rpath(${CEF_HELPER_TARGET})
 
   # Main executable target.
   add_executable(${CEF_TARGET} MACOSX_BUNDLE ${EXECUTIONGRAPHGUI_RESOURCES_SRCS} ${EXECUTIONGRAPHGUI_SRCS})
-  SET_EXECUTABLE_TARGET_PROPERTIES(${CEF_TARGET} ${EXECUTIONGRAPHGUI_INC_DIRS})
+  set_executable_target_properties(${CEF_TARGET} ${EXECUTIONGRAPHGUI_INC_DIRS})
   add_dependencies(${CEF_TARGET} libcef_dll_wrapper "${CEF_HELPER_TARGET}")
   target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
   set_target_properties(${CEF_TARGET} PROPERTIES
@@ -160,14 +159,14 @@ if(OS_MACOSX)
     )
 
   # Fix the framework rpath in the main executable.
-  FIX_MACOSX_MAIN_FRAMEWORK_RPATH(${CEF_TARGET})
+  fix_macosx_main_framework_rpath(${CEF_TARGET})
 
   # Manually process and copy over resource files.
   # The Xcode generator can support this via the set_target_properties RESOURCE
   # directive but that doesn't properly handle nested resource directories.
   # Remove these prefixes from input file paths.
   set(PREFIXES "${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/")
-  COPY_MACOSX_RESOURCES("${EXECUTIONGRAPHGUI_RESOURCES_SRCS}" "${PREFIXES}" "${CEF_TARGET}" "${CMAKE_CURRENT_SOURCE_DIR}" "${CEF_APP}")
+  copy_macosx_resources("${EXECUTIONGRAPHGUI_RESOURCES_SRCS}" "${PREFIXES}" "${CEF_TARGET}" "${CMAKE_CURRENT_SOURCE_DIR}" "${CEF_APP}")
 endif()
 
 
@@ -179,19 +178,19 @@ if(OS_WINDOWS)
   # Executable target.
   add_executable(${CEF_TARGET} WIN32 ${EXECUTIONGRAPHGUI_SRCS})
   add_dependencies(${CEF_TARGET} libcef_dll_wrapper)
-  SET_EXECUTABLE_TARGET_PROPERTIES(${CEF_TARGET} ${EXECUTIONGRAPHGUI_INC_DIRS})
+  set_executable_target_properties(${CEF_TARGET} ${EXECUTIONGRAPHGUI_INC_DIRS})
   target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
 
   if(USE_SANDBOX)
     # Logical target used to link the cef_sandbox library.
-    ADD_LOGICAL_TARGET("cef_sandbox_lib" "${CEF_SANDBOX_LIB_DEBUG}" "${CEF_SANDBOX_LIB_RELEASE}")
+    add_logical_target("cef_sandbox_lib" "${CEF_SANDBOX_LIB_DEBUG}" "${CEF_SANDBOX_LIB_RELEASE}")
     target_link_libraries(${CEF_TARGET} cef_sandbox_lib ${CEF_SANDBOX_STANDARD_LIBS})
   endif()
 
   # Add the custom manifest files to the executable.
-  ADD_WINDOWS_MANIFEST("${CMAKE_CURRENT_SOURCE_DIR}" "${CEF_TARGET}" "exe")
+  add_windows_manifest("${CMAKE_CURRENT_SOURCE_DIR}" "${CEF_TARGET}" "exe")
 
   # Copy binary and resource files to the target output directory.
-  COPY_FILES("${CEF_TARGET}" "${CEF_BINARY_FILES}" "${CEF_BINARY_DIR}" "${CEF_TARGET_OUT_DIR}")
-  COPY_FILES("${CEF_TARGET}" "${CEF_RESOURCE_FILES}" "${CEF_RESOURCE_DIR}" "${CEF_TARGET_OUT_DIR}")
+  copy_files("${CEF_TARGET}" "${CEF_BINARY_FILES}" "${CEF_BINARY_DIR}" "${CEF_TARGET_OUT_DIR}")
+  copy_files("${CEF_TARGET}" "${CEF_RESOURCE_FILES}" "${CEF_RESOURCE_DIR}" "${CEF_TARGET_OUT_DIR}")
 endif()
