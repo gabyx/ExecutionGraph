@@ -11,6 +11,8 @@
 #include <views/cef_browser_view.h>
 #include <views/cef_window.h>
 #include <wrapper/cef_helpers.h>
+
+#include "FileSchemeHandlerFactory.hpp"
 #include "handler.hpp"
 
 namespace
@@ -74,6 +76,8 @@ void SimpleApp::OnContextInitialized()
     const bool use_views = false;
 #endif
 
+    CefRegisterSchemeHandlerFactory("client", "executionGraph", new FileSchemeHandlerFactory("./client", ""));
+
     // SimpleHandler implements browser-level callbacks.
     CefRefPtr<SimpleHandler> handler(new SimpleHandler(use_views));
 
@@ -84,7 +88,8 @@ void SimpleApp::OnContextInitialized()
     // that instead of the default URL.
     std::string url = command_line->GetSwitchValue("url");
     if(url.empty())
-        url = "http://www.google.com";
+        url = "client://executionGraph/index.html";
+        //url = "http://www.google.com";
 
     if(use_views)
     {

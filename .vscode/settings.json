@@ -32,7 +32,11 @@
         "cstdint": "cpp",
         "unordered_map": "cpp",
         "unordered_set": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "__config": "cpp",
+        "__nullptr": "cpp",
+        "initializer_list": "cpp",
+        "algorithm": "cpp"
     },
     "cmake.useCMakeServer": true ,
     "cmake.preferredGenerators": [
