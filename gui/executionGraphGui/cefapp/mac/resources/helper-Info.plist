@@ -5,15 +5,15 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>executionGraphGui Helper</string>
+	<string>ExecutionGraphGUI-Helper</string>
 	<key>CFBundleExecutable</key>
-	<string>executionGraphGui Helper</string>
+	<string>ExecutionGraphGUI-Helper</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.cef.executionGraphGui.Helper</string>
+	<string>org.executionGraph.ExecutionGraphGUI-Helper</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>executionGraphGui</string>
+	<string>ExecutionGraphGUI-Helper</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
