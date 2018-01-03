@@ -30,5 +30,5 @@ set(ExecutionGraph_CMAKE_DIR  "${ExecutionGraph_ROOT_DIR}/cmake" CACHE STRING "E
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args("ExecutionGraphSource" DEFAULT_MSG ExecutionGraph_INC_DIR ExecutionGraph_SRC_DIR ExecutionGraph_CMAKE_DIR)
 
-MARK_AS_ADVANCED( ExecutionGraph_FORCE_MSGLOG_LEVEL)
-SET(ExecutionGraph_FORCE_MSGLOG_LEVEL "0" CACHE STRING "Force the message log level (0-3), 0 = use deubg/release settings in LogDefines.hpp!")
+mark_as_advanced( ExecutionGraph_FORCE_MSGLOG_LEVEL)
+set(ExecutionGraph_FORCE_MSGLOG_LEVEL "0" CACHE STRING "Force the message log level (0-3), 0 = use deubg/release settings in LogDefines.hpp!")
