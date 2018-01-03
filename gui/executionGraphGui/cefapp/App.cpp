@@ -89,7 +89,7 @@ void SimpleApp::OnContextInitialized()
     std::string url = command_line->GetSwitchValue("url");
     if(url.empty())
         url = "client://executionGraph/index.html";
-        //url = "http://www.google.com";
+    //url = "http://www.google.com";
 
     if(use_views)
     {
