@@ -30,10 +30,10 @@ add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_
 #endif()
 # ==============================================================================================
 
-SET(ExecutionGraph_TESTS_OUTPUT_FILES_DIR "${PROJECT_BINARY_DIR}")
-SET(ExecutionGraph_TESTS_INPUT_FILES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/files")
-SET(ExecutionGraph_TESTS_INPUT_FILES_ADD_DIR "${ExecutionGraph_ROOT_DIR}/additional/tests/files")
-SET(ExecutionGraph_TESTS_VALIDATION_FILES_DIR "${ExecutionGraph_ROOT_DIR}/additional/tests/files/validation")
+set(ExecutionGraph_TESTS_OUTPUT_FILES_DIR "${PROJECT_BINARY_DIR}")
+set(ExecutionGraph_TESTS_INPUT_FILES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/files")
+set(ExecutionGraph_TESTS_INPUT_FILES_ADD_DIR "${ExecutionGraph_ROOT_DIR}/additional/tests/files")
+set(ExecutionGraph_TESTS_VALIDATION_FILES_DIR "${ExecutionGraph_ROOT_DIR}/additional/tests/files/validation")
 
 # WRITE CONFIGURATION FILE
 configure_file (
@@ -43,12 +43,12 @@ configure_file (
 #=========================
 
 
-SET(SOURCE_FILES
+set(SOURCE_FILES
     ${ExecutionGraph_SRC}
     ${CMAKE_CURRENT_SOURCE_DIR}/include/TestFunctions.hpp
 )
 
-SET(INCLUDE_FILES
+set(INCLUDE_FILES
     ${ExecutionGraph_INC}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/TestFunctions.cpp
 )
@@ -63,45 +63,45 @@ set(INCLUDE_DIRS
 
 # Define function to define compile definitions for all tests
 function(defineCompileDefs Target)
-    IF(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+    if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
         target_compile_options(${Target} PRIVATE -DExecutionGraph_BUILD_TESTS )
-    ELSE()
+    else()
         target_compile_options(${Target} PRIVATE /DExecutionGraph_BUILD_TESTS )
-    ENDIF()
+    endif()
 endfunction()
 
 # NodeTests
-SET(EXEC_NAME1 ${PROJECT_NAME}-LogicNodes)
-ADD_EXECUTABLE(${EXEC_NAME1}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_LogicNode.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+set(EXEC_NAME1 ${PROJECT_NAME}-LogicNodes)
+add_executable(${EXEC_NAME1}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_LogicNode.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 target_include_directories(${EXEC_NAME1} ${INCLUDE_DIRS})
-TARGET_LINK_LIBRARIES(${EXEC_NAME1} ExecutionGraphForTestsOnly gtest gmock_main)
-ADD_DEPENDENCIES(build_and_test ${EXEC_NAME1})
+target_link_libraries(${EXEC_NAME1} ExecutionGraphForTestsOnly gtest gmock_main)
+add_dependencies(build_and_test ${EXEC_NAME1})
 if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
-    ADD_DEPENDENCIES(${EXEC_NAME1} ${ExecutionGraph_DEPENDING_TARGETS})
+    add_dependencies(${EXEC_NAME1} ${ExecutionGraph_DEPENDING_TARGETS})
 endif()
 defineCompileDefs(${EXEC_NAME1})
 cotire(${EXEC_NAME1})
 
 #ExecutionTree Test
-SET(EXEC_NAME2 ${PROJECT_NAME}-ExecutionTree)
-ADD_EXECUTABLE(${EXEC_NAME2}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_ExecutionTree.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+set(EXEC_NAME2 ${PROJECT_NAME}-ExecutionTree)
+add_executable(${EXEC_NAME2}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_ExecutionTree.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 target_include_directories(${EXEC_NAME2} ${INCLUDE_DIRS})
-TARGET_LINK_LIBRARIES(${EXEC_NAME2} ExecutionGraphForTestsOnly gtest gmock_main)
-ADD_DEPENDENCIES(build_and_test ${EXEC_NAME2})
+target_link_libraries(${EXEC_NAME2} ExecutionGraphForTestsOnly gtest gmock_main)
+add_dependencies(build_and_test ${EXEC_NAME2})
 if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
-    ADD_DEPENDENCIES(${EXEC_NAME2} ${ExecutionGraph_DEPENDING_TARGETS})
+    add_dependencies(${EXEC_NAME2} ${ExecutionGraph_DEPENDING_TARGETS})
 endif()
 defineCompileDefs(${EXEC_NAME2})
 cotire(${EXEC_NAME2})
 
 #ExecutionTree Test
-SET(EXEC_NAME3 ${PROJECT_NAME}-CustomSocketTypes)
-ADD_EXECUTABLE(${EXEC_NAME3}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_CustomSocketTypes.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+set(EXEC_NAME3 ${PROJECT_NAME}-CustomSocketTypes)
+add_executable(${EXEC_NAME3}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_CustomSocketTypes.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 target_include_directories(${EXEC_NAME3} ${INCLUDE_DIRS})
-TARGET_LINK_LIBRARIES(${EXEC_NAME3} ExecutionGraphForTestsOnly gtest gmock_main)
-ADD_DEPENDENCIES(build_and_test ${EXEC_NAME3})
+target_link_libraries(${EXEC_NAME3} ExecutionGraphForTestsOnly gtest gmock_main)
+add_dependencies(build_and_test ${EXEC_NAME3})
 if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
-    ADD_DEPENDENCIES(${EXEC_NAME3} ${ExecutionGraph_DEPENDING_TARGETS})
+    add_dependencies(${EXEC_NAME3} ${ExecutionGraph_DEPENDING_TARGETS})
 endif()
 defineCompileDefs(${EXEC_NAME3})
 cotire(${EXEC_NAME3})

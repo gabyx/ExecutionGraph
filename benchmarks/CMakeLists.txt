@@ -26,12 +26,12 @@ configure_file (
 #=========================
 
 
-SET(SOURCE_FILES
+set(SOURCE_FILES
     ${ExecutionGraph_SRC}   
     ${CMAKE_CURRENT_SOURCE_DIR}/include/BenchmarkFunctions.hpp
 )
 
-SET(INCLUDE_FILES
+set(INCLUDE_FILES
     ${ExecutionGraph_INC}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/BenchmarkFunctions.cpp
 )
@@ -48,20 +48,20 @@ include_directories(${INCLUDE_DIRS})
 
 # Define function to define compile definitions for all tests
 function(defineCompileDefs Target)
-    IF(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+    if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
         target_compile_options(${Target} PRIVATE -DExecutionGraph_BUILD_TESTS )
-    ELSE()
+    else()
         target_compile_options(${Target} PRIVATE /DExecutionGraph_BUILD_TESTS )
-    ENDIF()
+    endif()
 endfunction()
 
 # Delegates
-SET(EXEC_NAME1 ${PROJECT_NAME}-BenchmarkDelegates)
-ADD_EXECUTABLE(${EXEC_NAME1}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_delegates.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-TARGET_LINK_LIBRARIES(${EXEC_NAME1} ExecutionGraph benchmark)
-ADD_DEPENDENCIES(build_and_benchmark ${EXEC_NAME1})
+set(EXEC_NAME1 ${PROJECT_NAME}-BenchmarkDelegates)
+add_executable(${EXEC_NAME1}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_delegates.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+target_link_libraries(${EXEC_NAME1} ExecutionGraph benchmark)
+add_dependencies(build_and_benchmark ${EXEC_NAME1})
 if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
-    ADD_DEPENDENCIES(${EXEC_NAME1} ${ExecutionGraph_DEPENDING_TARGETS})
+    add_dependencies(${EXEC_NAME1} ${ExecutionGraph_DEPENDING_TARGETS})
 endif()
 defineCompileDefs(${EXEC_NAME1})
 

@@ -33,7 +33,7 @@ download_project(PROJ "cefbinaries"
 # compile flags since it will not compile otherwise...?
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(CEF_ROOT "${cefbinaries_SOURCE_DIR}")
-FIND_PACKAGE(CEF REQUIRED)
+find_package(CEF REQUIRED)
 
 # Include the libcef_dll_wrapper target.
 # Comes from the libcef_dll/CMakeLists.txt file in the binary distribution
