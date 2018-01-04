@@ -42,11 +42,15 @@ CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrow
             }
             CefString sFilePath(m_FolderPath + "/" + resourceName);
             CefString sFileExtension(sFilePath.ToString().substr(sFilePath.ToString().find_last_of(".") + 1));
-            CefString sMimeType(CefGetMimeType(sFileExtension));
 
             CefRefPtr<CefStreamReader> fileStream = CefStreamReader::CreateForFile(sFilePath);
             if(fileStream != nullptr)
             {
+                CefString sMimeType(CefGetMimeType(sFileExtension));
+                //todo: Complete known mime times with web-font extensions
+                if(sMimeType.empty()) {
+                    sMimeType = "font/" + sFileExtension.ToString();
+                }
                 return CefRefPtr<CefStreamResourceHandler>(new CefStreamResourceHandler(sMimeType, fileStream));
             }
         }
