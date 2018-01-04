@@ -2,7 +2,7 @@
 #ifndef FILE_SCHEME_HANDLER_FACTORY_H_
 #define FILE_SCHEME_HANDLER_FACTORY_H_
 
-#include <cef_client.h>
+#include <cef_scheme.h>
 #include <string>
 
 // Implementation of the factory for creating client request handlers.

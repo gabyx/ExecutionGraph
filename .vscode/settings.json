@@ -36,7 +36,13 @@
         "__config": "cpp",
         "__nullptr": "cpp",
         "initializer_list": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "__locale": "cpp",
+        "ios": "cpp",
+        "__string": "cpp",
+        "regex": "cpp",
+        "string": "cpp",
+        "string_view": "cpp"
     },
     "cmake.useCMakeServer": true ,
     "cmake.preferredGenerators": [

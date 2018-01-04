@@ -1,4 +1,7 @@
 #include "FileSchemeHandlerFactory.hpp"
+#include <cef_parser.h>
+#include <wrapper/cef_stream_resource_handler.h>
+
 
 FileSchemeHandlerFactory::FileSchemeHandlerFactory(std::string folderPath, std::string urlPrefix)
     : m_FolderPath(folderPath)
