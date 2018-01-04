@@ -77,7 +77,7 @@ void SimpleApp::OnContextInitialized()
 #endif
 
     //todo: This path is relative to the execution directory, which is normally set to the workspace when debugging. How to deploy these files to the app and reference them here?
-    CefRegisterSchemeHandlerFactory("client", "executionGraph", new FileSchemeHandlerFactory("./gui/client/", "executionGraph"));
+    CefRegisterSchemeHandlerFactory("client", "executionGraph", new FileSchemeHandlerFactory("./gui/client/dist/", "executionGraph"));
 
     // SimpleHandler implements browser-level callbacks.
     CefRefPtr<SimpleHandler> handler(new SimpleHandler(use_views));
