@@ -1,0 +1,18 @@
+import { Injectable } from '@angular/core';
+
+import { ExecutionService } from './ExecutionService';
+
+@Injectable()
+export class DummyExecutionService extends ExecutionService {
+
+    constructor() {
+        super();
+    }
+
+    public execute(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            console.log(`[DummyExecutionService] execute()`);
+            resolve();
+        })
+    }
+}

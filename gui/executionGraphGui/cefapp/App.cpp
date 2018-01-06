@@ -2,7 +2,7 @@
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 
-#include "app.hpp"
+#include "App.hpp"
 
 #include <string>
 
@@ -11,7 +11,9 @@
 #include <views/cef_browser_view.h>
 #include <views/cef_window.h>
 #include <wrapper/cef_helpers.h>
-#include "handler.hpp"
+
+#include "FileSchemeHandlerFactory.hpp"
+#include "Handler.hpp"
 
 namespace
 {
@@ -74,6 +76,9 @@ void SimpleApp::OnContextInitialized()
     const bool use_views = false;
 #endif
 
+    //todo: This path is relative to the execution directory, which is normally set to the workspace when debugging. How to deploy these files to the app and reference them here?
+    CefRegisterSchemeHandlerFactory("client", "executionGraph", new FileSchemeHandlerFactory("./gui/client/dist/", "executionGraph"));
+
     // SimpleHandler implements browser-level callbacks.
     CefRefPtr<SimpleHandler> handler(new SimpleHandler(use_views));
 
@@ -84,7 +89,8 @@ void SimpleApp::OnContextInitialized()
     // that instead of the default URL.
     std::string url = command_line->GetSwitchValue("url");
     if(url.empty())
-        url = "http://www.google.com";
+        url = "client://executionGraph/index.html";
+    //url = "http://www.google.com";
 
     if(use_views)
     {

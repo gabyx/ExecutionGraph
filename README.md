@@ -50,6 +50,17 @@ Install the following extensions for VS Code:
 
 **Note:** Dont use the [multi-root workspaces](https://code.visualstudio.com/docs/editor/multi-root-workspaces) feature in VS Code since the C++ Extension does not yet support this and code completion won't work properly.
 
+## HTML development setup
+The UI is made up of an [Angular](https://angular.io) application that uses the [Angular CLI](https://cli.angular.io) to create the web assets that are ultimately displayed in a [CEF](https://bitbucket.org/chromiumembedded/cef) browser.
+Please visit the Angular CLI website for its prerequisites (node.js and npm respectively, also a globally installed Angular CLI aka `ng` ).
+Once you installed the prerequisites build the client application by navigating to the client directory and starting the build process. Please make sure you do this before compiling the C++ GUI application.
+```
+cd gui/client
+npm run build
+```
+
+For more information about the development of the client application please refer to the dedicated [client documentation](gui/client/README.md)
+
 ## Introduction
 
 The execution graph implemented in `ExecutionTree` is a directed acyclic graph consisting of several connected logic nodes derived from `LogicNode` which define a simple input/output control flow.

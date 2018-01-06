@@ -10,6 +10,10 @@ set(EXECUTIONGRAPHGUI_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/App.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/Handler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/Handler.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/MessageHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/MessageHandler.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/FileSchemeHandlerFactory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/FileSchemeHandlerFactory.hpp
 )
 set(EXECUTIONGRAPHGUI_SRCS_LINUX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/linux/AppLinux.cpp
@@ -40,6 +44,8 @@ set(EXECUTIONGRAPHGUI_SRCS ${EXECUTIONGRAPHGUI_SRCS} ${EXECUTIONGRAPHGUI_RES_SRC
 # App Helper Sources
 # -------------
 set(EXECUTIONGRAPHGUI_HELPER_SRCS_MACOSX
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/ProcessHelperMac.cpp
 )
 append_platform_sources(EXECUTIONGRAPHGUI_HELPER_SRCS)
