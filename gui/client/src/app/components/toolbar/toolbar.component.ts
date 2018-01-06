@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { CefMessageRouterService } from '../services/CefMessageRouterService'
+import { ExecutionService } from '../../services/ExecutionService';
 
 @Component({
   selector: 'eg-toolbar',
@@ -9,20 +9,20 @@ import { CefMessageRouterService } from '../services/CefMessageRouterService'
 })
 export class ToolbarComponent implements OnInit {
 
-  public testResult: any;
+  public testResponse: any;
 
-  constructor(private readonly messageRouter: CefMessageRouterService) { }
+  constructor(private readonly executionService: ExecutionService) { }
 
   ngOnInit() {
   }
 
   public test() {
     console.log("Testing");
-    this.messageRouter.execute<string>('test', {id: 123})
+    this.executionService.execute()
       .then(result => {
-        this.testResult = result;
+        this.testResponse = result;
       }, error => {
-        this.testResult = error;
+        this.testResponse = error;
       })
   }
 }
