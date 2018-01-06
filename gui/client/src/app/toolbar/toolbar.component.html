@@ -38,6 +38,11 @@
     <button mat-button [matMenuTriggerFor]="executionMenu">
       <mat-icon>play_arrow</mat-icon> Execution
     </button>
+    <button mat-button (click)="test()">
+      <mat-icon>play_arrow</mat-icon> Test
+    </button>
 
+    <p>Test response: {{ testResponse }}</p>
+    
   </mat-toolbar-row>
 </mat-toolbar>

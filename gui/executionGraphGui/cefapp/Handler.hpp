@@ -6,6 +6,7 @@
 #define CEF_TESTS_CEFSIMPLE_SIMPLE_HANDLER_H_
 
 #include <cef_client.h>
+#include <wrapper/cef_message_router.h>
 
 #include <list>
 
@@ -32,6 +33,9 @@ public:
     }
     virtual CefRefPtr<CefLoadHandler> GetLoadHandler() OVERRIDE { return this; }
 
+    virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
+                                            CefProcessId source_process,
+                                            CefRefPtr<CefProcessMessage> message) override;
     // CefDisplayHandler methods:
     virtual void OnTitleChange(CefRefPtr<CefBrowser> browser,
                                const CefString& title) OVERRIDE;
@@ -66,6 +70,9 @@ private:
     BrowserList browser_list_;
 
     bool is_closing_;
+
+
+    CefRefPtr<CefMessageRouterBrowserSide> router;
 
     // Include the default reference counting implementation.
     IMPLEMENT_REFCOUNTING(SimpleHandler);

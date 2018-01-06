@@ -7,8 +7,8 @@
 
 #include <cef_application_mac.h>
 #include <wrapper/cef_helpers.h>
-#include "cefapp/app.hpp"
-#include "cefapp/handler.hpp"
+#include "cefapp/App.hpp"
+#include "cefapp/Handler.hpp"
 
 // Receives notifications from the application.
 @interface SimpleAppDelegate : NSObject<NSApplicationDelegate>
@@ -119,6 +119,7 @@ int main(int argc, char* argv[]) {
 
   // Specify CEF global settings here.
   CefSettings settings;
+  settings.remote_debugging_port = 8088;
 
   // SimpleApp implements application-level callbacks for the browser process.
   // It will create the first browser instance in OnContextInitialized() after

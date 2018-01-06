@@ -65,9 +65,21 @@ void SimpleHandler::OnTitleChange(CefRefPtr<CefBrowser> browser,
 void SimpleHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 {
     CEF_REQUIRE_UI_THREAD();
-
+    if(!router) 
+    {
+        CefMessageRouterConfig config;
+        router = CefMessageRouterBrowserSide::Create(config);
+    }
     // Add to the list of existing browsers.
     browser_list_.push_back(browser);
+}
+
+bool SimpleHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
+                                            CefProcessId source_process,
+                                            CefRefPtr<CefProcessMessage> message)
+{
+    CEF_REQUIRE_UI_THREAD();
+    return router->OnProcessMessageReceived(browser, source_process, message);
 }
 
 bool SimpleHandler::DoClose(CefRefPtr<CefBrowser> browser)
