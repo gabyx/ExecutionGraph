@@ -7,8 +7,9 @@
 
 #include <cef_client.h>
 #include <wrapper/cef_message_router.h>
-
 #include <list>
+#include "MessageHandler.hpp"
+
 
 class SimpleHandler : public CefClient,
                       public CefDisplayHandler,
@@ -73,6 +74,8 @@ private:
 
 
     CefRefPtr<CefMessageRouterBrowserSide> router;
+    MessageHandler messageHandler;
+
 
     // Include the default reference counting implementation.
     IMPLEMENT_REFCOUNTING(SimpleHandler);

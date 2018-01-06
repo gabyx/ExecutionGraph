@@ -42,7 +42,21 @@
         "__string": "cpp",
         "regex": "cpp",
         "string": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "__bit_reference": "cpp",
+        "__hash_table": "cpp",
+        "__split_buffer": "cpp",
+        "__tree": "cpp",
+        "array": "cpp",
+        "deque": "cpp",
+        "hash_map": "cpp",
+        "hash_set": "cpp",
+        "forward_list": "cpp",
+        "iterator": "cpp",
+        "list": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "vector": "cpp"
     },
     "cmake.useCMakeServer": true ,
     "cmake.preferredGenerators": [

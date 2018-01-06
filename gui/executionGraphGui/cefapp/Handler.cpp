@@ -69,6 +69,7 @@ void SimpleHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
     {
         CefMessageRouterConfig config;
         router = CefMessageRouterBrowserSide::Create(config);
+        router->AddHandler(&messageHandler, true);
     }
     // Add to the list of existing browsers.
     browser_list_.push_back(browser);
@@ -103,6 +104,10 @@ bool SimpleHandler::DoClose(CefRefPtr<CefBrowser> browser)
 void SimpleHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 {
     CEF_REQUIRE_UI_THREAD();
+    if(router)
+    {
+        router->RemoveHandler(&messageHandler);
+    }
 
     // Remove from the list of existing browsers.
     BrowserList::iterator bit = browser_list_.begin();
