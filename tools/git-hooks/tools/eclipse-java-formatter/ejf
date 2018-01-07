@@ -1,0 +1,32 @@
+#!/bin/sh
+
+set -o noclobber
+set -o errexit
+set -o nounset
+
+[ "$#" -lt 1 ] && { echo >&2 'usage: ejf <file1.java> <file2.java> ...'; exit 3; }
+
+d="$(cd "$(dirname "$0")"; pwd -P)"
+
+cat "$d/lib/sources.list" | grep -Ev '^\s*(#|$)' | while IFS= read -r url ; do
+  file="$d/lib/$(echo "$url" | sed -Ee 's/^.*\/([^\/]+)$/\1/')"
+  if [ ! -f "$file" ] ; then
+    echo "$url"
+    curl -f -L -# -o "$file" "$url" || { rm "$file"; exit 1; }
+  fi
+done
+
+lib_classpath="$(find "$d/lib/" -name '*.jar' | tr '\n' ':')"
+
+src="$d/src/ejf/Main.java"
+bin="$d/bin"
+cls="$d/bin/ejf/Main.class"
+if [ "$src" -nt "$cls" ] ; then
+  echo "Recompiling $src ..."
+  javac -cp "$lib_classpath" -d "$bin" "$src"
+  touch -r "$src" "$cls"
+fi
+
+style="$(find "$d/lib/" -name '*.xml' | head -n 1)"
+
+java -cp "$lib_classpath:$bin" ejf.Main "$style" "$@"

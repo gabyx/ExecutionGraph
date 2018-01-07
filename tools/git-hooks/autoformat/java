@@ -1,0 +1,8 @@
+#!/bin/sh
+
+d="$(cd "$(dirname "$0")"; pwd -P)/../tools/eclipse-java-formatter"
+
+"$d/ejf" "$1" || {
+  echo 'fatal: `ejf` failed for:' "$1" >&2
+  exit 1
+}

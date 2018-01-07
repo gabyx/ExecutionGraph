@@ -1,0 +1,55 @@
+#!/bin/sh
+
+root="$(git rev-parse --show-toplevel)"
+[ -d "$root" ] || exit 1
+
+owndir="$(cd "$(dirname "$0")"; pwd -P)"
+
+OS_NAME=$(uname)
+
+if [ "$OS_NAME" = "Darwin" ]; then
+  FIND_ARGS="-perm +0111"
+else
+  FIND_ARGS="-executable"
+fi
+
+find "$owndir"/autoformat -type f $FIND_ARGS | {
+  abort=0
+
+  while read formatter ; do
+    magic="$formatter".magic
+    patterns="$formatter".patterns
+    [ -f "$patterns" -o -f "$magic" ] || continue
+
+    git diff --name-only --cached | {
+      labort=0
+
+      while IFS= read -r orig ; do
+        orig="${root}/${orig}"
+
+        # file is getting deleted, ignore
+        [ -f "$orig" ] || continue
+
+        # file matches one of the patterns
+        match_pattern=''
+        [ -f "$patterns" ] && echo "$orig" | grep -Eqif "$patterns" && match_pattern='1'
+
+        # file’s libmagic output matches
+        match_magic=''
+        [ $match_pattern ] || {
+          [ -f "$magic" ] && file "$orig" | grep -Eqif "$magic" && match_magic='1'
+        }
+
+        # if none, ignore
+        [ "$match_pattern" -o "$match_magic" ] ||  continue
+
+        "$formatter" "$orig" || labort=1
+        git add "$orig"
+      done
+
+      exit $labort
+    } || abort=1
+  done
+
+  exit $abort
+}
