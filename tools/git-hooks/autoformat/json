@@ -1,0 +1,11 @@
+#!/bin/bash
+# format all JSON files in the repository
+# to use this tool install: npm install -g json-fmt
+
+REPO_DIR="$(git rev-parse --show-toplevel)"
+
+function formatCpp() {
+    find "$1" \( -ipath "$2*" \) | xargs json-fmt "{}" -p -o "{}"
+}
+
+formatJSON "$1" "$REPO_DIR/gui"

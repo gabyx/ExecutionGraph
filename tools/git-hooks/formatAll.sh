@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-echo "Pre-Commit Hook: autoformat"
+echo "Format All:"
 
 root="$(git rev-parse --show-toplevel)"
 [ -d "$root" ] || exit 1
@@ -23,14 +23,16 @@ find "$owndir"/autoformat -type f $FIND_ARGS | {
     patterns="$formatter".patterns
     [ -f "$patterns" -o -f "$magic" ] || continue
 
-    git diff --name-only --cached | {
+    echo "$patterns, $magic" 
+
+    find "$root" -type f -not \( -ipath "$root/.git*" -or -ipath "$root/.vscode*" -or \
+                                 -ipath "$root/build*" -or -ipath "$root/install*" -or \
+                                 -ipath "$root/tools*" \) | {
       labort=0
 
       while IFS= read -r orig ; do
         orig="${root}/${orig}"
-
-        # file is getting deleted, ignore
-        [ -f "$orig" ] || continue
+        echo "testing file: $orig"
 
         # file matches one of the patterns
         match_pattern=''
@@ -45,7 +47,7 @@ find "$owndir"/autoformat -type f $FIND_ARGS | {
         # if none, ignore
         [ "$match_pattern" -o "$match_magic" ] ||  continue
 
-        echo "Pre-Commit Hook: formatting file: $orig"
+        echo "formatting file: $orig"
         "$formatter" "$orig" || labort=1
         git add "$orig"
       done
@@ -57,4 +59,4 @@ find "$owndir"/autoformat -type f $FIND_ARGS | {
   exit $abort
 }
 
-echo "Pre-Commit Hook: autoformat [DONE]"
+echo "Format All: [DONE]"

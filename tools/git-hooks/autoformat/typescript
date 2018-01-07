@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/bash
+# format all TypeScript .ts files in the repository
+# to use this tool install: npm install -g typescript-formatter
 
-tmp="$(mktemp)"
+REPO_DIR="$(git rev-parse --show-toplevel)"
 
-tsfmt "$1" >"$tmp" 2>/dev/null || {
-  echo 'fatal: `tsfmt` failed for:' "$1" >&2
-  exit 1
+function formatTS() {
+    find "$1" \( -ipath "$2*" \)  | xargs tsfmt --replace --baseDir "$REPO_DIR"
 }
 
-cat "$tmp" > "$1"
-rm "$tmp"
+formatTS "$1" "$REPO_DIR/gui"

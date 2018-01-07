@@ -1,0 +1,15 @@
+#!/bin/bash
+# format all .cpp|.hpp files in the repository
+
+REPO_DIR="$(git rev-parse --show-toplevel)"
+
+function formatCpp() {
+    find "$1" \( -ipath "$2*" \) | xargs clang-format -i 
+}
+
+formatCpp "$1" "$REPO_DIR/include"  
+formatCpp "$1" "$REPO_DIR/src" 
+formatCpp "$1" "$REPO_DIR/examples" 
+formatCpp "$1" "$REPO_DIR/tests" 
+formatCpp "$1" "$REPO_DIR/gui"
+formatCpp "$1" "$REPO_DIR/benchmarks"
