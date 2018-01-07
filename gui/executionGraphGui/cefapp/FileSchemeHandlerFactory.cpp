@@ -8,7 +8,10 @@ FileSchemeHandlerFactory::FileSchemeHandlerFactory(std::string folderPath, std::
 {
 }
 
-CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& scheme_name, CefRefPtr<CefRequest> request)
+CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrowser> browser,
+                                                               CefRefPtr<CefFrame> frame,
+                                                               const CefString& scheme_name,
+                                                               CefRefPtr<CefRequest> request)
 {
     std::string requestUrl = request->GetURL().ToString();
     CefURLParts urlParts;
