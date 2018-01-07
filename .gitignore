@@ -12,3 +12,5 @@ GPUCache
 install
 gui/client/dist
 gui/client/node_modules
+
+*.log
