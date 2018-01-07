@@ -17,35 +17,35 @@
 
 namespace executionGraph
 {
-class Exception : public std::runtime_error
-{
-public:
-    Exception(const std::stringstream& ss)
-        : std::runtime_error(ss.str()) {}
-    // we dont need a virtual dtor, the std destroys the exception correctly.
-private:
-};
+    class Exception : public std::runtime_error
+    {
+    public:
+        Exception(const std::stringstream& ss)
+            : std::runtime_error(ss.str()) {}
+        // we dont need a virtual dtor, the std destroys the exception correctly.
+    private:
+    };
 
-class NodeConnectionException final : public Exception
-{
-public:
-    NodeConnectionException(const std::stringstream& ss)
-        : Exception(ss) {}
-};
+    class NodeConnectionException final : public Exception
+    {
+    public:
+        NodeConnectionException(const std::stringstream& ss)
+            : Exception(ss) {}
+    };
 
-class ExecutionGraphCycleException final : public Exception
-{
-public:
-    ExecutionGraphCycleException(const std::stringstream& ss)
-        : Exception(ss) {}
-};
+    class ExecutionGraphCycleException final : public Exception
+    {
+    public:
+        ExecutionGraphCycleException(const std::stringstream& ss)
+            : Exception(ss) {}
+    };
 
-class BadSocketCastException final : public Exception
-{
-public:
-    BadSocketCastException(const std::stringstream& ss)
-        : Exception(ss) {}
-};
+    class BadSocketCastException final : public Exception
+    {
+    public:
+        BadSocketCastException(const std::stringstream& ss)
+            : Exception(ss) {}
+    };
 }
 
 #define EXECGRAPH_THROW_EXCEPTION_TYPE(message, type)                         \

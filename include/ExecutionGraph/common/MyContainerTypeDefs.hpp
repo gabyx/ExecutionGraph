@@ -25,20 +25,20 @@
  */
 namespace executionGraph
 {
-namespace MyContainers
-{
-// Sepcial STL map where the type is 16byte aligned
-template<typename Key, typename Type, typename Comp = std::less<Key>>
-using StdMapAligned = std::map<Key, Type, Comp, Eigen::aligned_allocator<std::pair<const Key, Type>>>;
+    namespace MyContainers
+    {
+        // Sepcial STL map where the type is 16byte aligned
+        template<typename Key, typename Type, typename Comp = std::less<Key>>
+        using StdMapAligned = std::map<Key, Type, Comp, Eigen::aligned_allocator<std::pair<const Key, Type>>>;
 
-// Sepcial STL map where the type is 16byte aligned
-template<typename Key, typename Type, typename Hash = std::hash<Key>, typename Pred = std::equal_to<Key>>
-using StdUMapAligned = std::unordered_map<Key, Type, Hash, Pred, Eigen::aligned_allocator<std::pair<const Key, Type>>>;
+        // Sepcial STL map where the type is 16byte aligned
+        template<typename Key, typename Type, typename Hash = std::hash<Key>, typename Pred = std::equal_to<Key>>
+        using StdUMapAligned = std::unordered_map<Key, Type, Hash, Pred, Eigen::aligned_allocator<std::pair<const Key, Type>>>;
 
-// Special STL vectors where the type is 16byte aligned
-template<typename Type>
-using StdVecAligned = std::vector<Type, Eigen::aligned_allocator<Type>>;
-}
+        // Special STL vectors where the type is 16byte aligned
+        template<typename Type>
+        using StdVecAligned = std::vector<Type, Eigen::aligned_allocator<Type>>;
+    }
 }
 
 /**

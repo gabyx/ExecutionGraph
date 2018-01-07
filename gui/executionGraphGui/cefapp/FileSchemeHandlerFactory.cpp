@@ -3,7 +3,7 @@
 #include <wrapper/cef_stream_resource_handler.h>
 
 FileSchemeHandlerFactory::FileSchemeHandlerFactory(std::string folderPath, std::string urlPrefix)
-    : m_FolderPath(folderPath)
+    : m_folderPath(folderPath)
     , m_urlPrefix(urlPrefix)
 {
 }
@@ -42,7 +42,7 @@ CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrow
                     resourceName = resourceName.substr(1);
                 }
             }
-            CefString sFilePath(m_FolderPath + "/" + resourceName);
+            CefString sFilePath(m_folderPath + "/" + resourceName);
             CefString sFileExtension(sFilePath.ToString().substr(sFilePath.ToString().find_last_of(".") + 1));
 
             CefRefPtr<CefStreamReader> fileStream = CefStreamReader::CreateForFile(sFilePath);

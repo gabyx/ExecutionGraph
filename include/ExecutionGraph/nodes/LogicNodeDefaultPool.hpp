@@ -17,70 +17,70 @@
 
 namespace executionGraph
 {
-//! Provides a pool of default output sockets for the configuration `TConfig`.
-template<typename TConfig>
-class LogicNodeDefaultPool final : public TConfig::NodeBaseType
-{
-public:
-    EXECGRAPH_TYPEDEF_CONFIG(TConfig);
-    using Base = typename TConfig::NodeBaseType;
-
-    template<typename... Args>
-    LogicNodeDefaultPool(Args&&... args)
-        : TConfig::NodeBaseType(std::forward<Args>(args)...)
+    //! Provides a pool of default output sockets for the configuration `TConfig`.
+    template<typename TConfig>
+    class LogicNodeDefaultPool final : public TConfig::NodeBaseType
     {
-        // Add a ouput socket with a default-initialized value.
-        auto add = [&](auto&& type) {
-            using DataType = std::remove_cv_t<std::remove_reference_t<decltype(type)>>;
-            this->template addOSock<DataType>(DataType{});
-        };
-        // Add output socket with default values for all types!
-        meta::for_each(SocketTypes{}, add);
-    }
+    public:
+        EXECGRAPH_TYPEDEF_CONFIG(TConfig);
+        using Base = typename TConfig::NodeBaseType;
 
-    //! Connects the input socket `inSocket` to this default output socket which is
-    //! specified by `inSocket.getDefaultOutputSocketIndex()` which cooresponds
-    //! by default to the type-matching output socket id of this class.
-    void connectIfDangling(SocketInputBaseType& inSocket)
-    {
-        if(inSocket.getConnectionCount() == 0)
+        template<typename... Args>
+        LogicNodeDefaultPool(Args&&... args)
+            : TConfig::NodeBaseType(std::forward<Args>(args)...)
         {
-            IndexType defaultOutSocketID = inSocket.getDefaultOutputSocketIndex();
-            if(this->hasOSocket(defaultOutSocketID))
+            // Add a ouput socket with a default-initialized value.
+            auto add = [&](auto&& type) {
+                using DataType = std::remove_cv_t<std::remove_reference_t<decltype(type)>>;
+                this->template addOSock<DataType>(DataType{});
+            };
+            // Add output socket with default values for all types!
+            meta::for_each(SocketTypes{}, add);
+        }
+
+        //! Connects the input socket `inSocket` to this default output socket which is
+        //! specified by `inSocket.getDefaultOutputSocketIndex()` which cooresponds
+        //! by default to the type-matching output socket id of this class.
+        void connectIfDangling(SocketInputBaseType& inSocket)
+        {
+            if(inSocket.getConnectionCount() == 0)
             {
-                inSocket.setGetLink(this->getOSocket(defaultOutSocketID));
-            }
-            else
-            {
-                EXECGRAPH_THROW_EXCEPTION_TYPE("Default output socket id: " << defaultOutSocketID
-                                                                            << "does not exist in default output socket pool!",
-                                               NodeConnectionException);
+                IndexType defaultOutSocketID = inSocket.getDefaultOutputSocketIndex();
+                if(this->hasOSocket(defaultOutSocketID))
+                {
+                    inSocket.setGetLink(this->getOSocket(defaultOutSocketID));
+                }
+                else
+                {
+                    EXECGRAPH_THROW_EXCEPTION_TYPE("Default output socket id: " << defaultOutSocketID
+                                                                                << "does not exist in default output socket pool!",
+                                                   NodeConnectionException);
+                }
             }
         }
-    }
 
-    //! Sets the global default value with type `T` which needs to be in the list `SocketTypes`.
-    template<typename T>
-    void setDefaultValue(T&& defaultValue)
-    {
-        using DataType = std::remove_cv_t<std::remove_reference_t<T>>;
-        static_assert(!std::is_same<meta::find<SocketTypes, DataType>, meta::list<>>::value,
-                      "Data type T is not in SocketTypes!");
-        // Set the global default value
-        this->template getOutVal<DataType>(meta::find_index<SocketTypes, DataType>::value) = std::forward<T>(defaultValue);
-    }
+        //! Sets the global default value with type `T` which needs to be in the list `SocketTypes`.
+        template<typename T>
+        void setDefaultValue(T&& defaultValue)
+        {
+            using DataType = std::remove_cv_t<std::remove_reference_t<T>>;
+            static_assert(!std::is_same<meta::find<SocketTypes, DataType>, meta::list<>>::value,
+                          "Data type T is not in SocketTypes!");
+            // Set the global default value
+            this->template getOutVal<DataType>(meta::find_index<SocketTypes, DataType>::value) = std::forward<T>(defaultValue);
+        }
 
-    //! Add a new default value with type `T` (needs to be in the list `SocketTypes`)
-    //! @return the socket index of the new output socket.
-    template<typename T>
-    IndexType addNewDefaultValue(T&& defaultValue)
-    {
-        EXECGRAPH_THROW_EXCEPTION("Needs implementation!");
-    }
+        //! Add a new default value with type `T` (needs to be in the list `SocketTypes`)
+        //! @return the socket index of the new output socket.
+        template<typename T>
+        IndexType addNewDefaultValue(T&& defaultValue)
+        {
+            EXECGRAPH_THROW_EXCEPTION("Needs implementation!");
+        }
 
-    void reset() {}
-    void compute() {}
-};
+        void reset() {}
+        void compute() {}
+    };
 };
 
 #endif

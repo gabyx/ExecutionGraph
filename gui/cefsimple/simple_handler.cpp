@@ -16,7 +16,7 @@
 
 namespace
 {
-SimpleHandler* g_instance = NULL;
+    SimpleHandler* g_instance = NULL;
 
 }  // namespace
 

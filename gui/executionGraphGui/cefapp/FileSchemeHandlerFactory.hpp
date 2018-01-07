@@ -14,7 +14,7 @@ public:
     virtual CefRefPtr<CefResourceHandler> Create(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& scheme_name, CefRefPtr<CefRequest> request) override;
 
 private:
-    std::string m_FolderPath;
+    std::string m_folderPath;
     std::string m_urlPrefix;
 
     IMPLEMENT_REFCOUNTING(FileSchemeHandlerFactory);

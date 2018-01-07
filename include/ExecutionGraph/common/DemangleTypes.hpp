@@ -16,24 +16,24 @@
 
 namespace executionGraph
 {
-namespace details
-{
-EXECGRAPH_EXPORT std::string demangle(const char* name);
-}
+    namespace details
+    {
+        EXECGRAPH_EXPORT std::string demangle(const char* name);
+    }
 
-template<typename T>
-std::string demangle(T&& t)
-{
-    return details::demangle(typeid(t).name());
-}
+    template<typename T>
+    std::string demangle(T&& t)
+    {
+        return details::demangle(typeid(t).name());
+    }
 
-template<typename T>
-std::string demangle()
-{
-    return details::demangle(typeid(T).name());
-}
+    template<typename T>
+    std::string demangle()
+    {
+        return details::demangle(typeid(T).name());
+    }
 
-EXECGRAPH_EXPORT std::string shortenTemplateBrackets(std::string s, unsigned int fromLevel = 1);
+    EXECGRAPH_EXPORT std::string shortenTemplateBrackets(std::string s, unsigned int fromLevel = 1);
 }
 
 #endif

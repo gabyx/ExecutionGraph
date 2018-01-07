@@ -1,5 +1,5 @@
 // ========================================================================================
-//  executionGraph
+// Execution Graph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (d0t) com>
 //
 //  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,112 +19,112 @@
 
 namespace executionGraph
 {
-// ================================================================================================
-/** @brief This
+    // ================================================================================================
+    /** @brief This
  *	These are some small matrix definitions.
  */
 
-namespace MyMatrix
-{
-template<typename Scalar>
-using Matrix44 = Eigen::Matrix<Scalar, 4, 4>;
-template<typename Scalar>
-using Matrix43 = Eigen::Matrix<Scalar, 4, 3>;
-template<typename Scalar>
-using Matrix34 = Eigen::Matrix<Scalar, 3, 4>;
-template<typename Scalar>
-using Matrix33 = Eigen::Matrix<Scalar, 3, 3>;
-template<typename Scalar>
-using Matrix32 = Eigen::Matrix<Scalar, 3, 2>;
-template<typename Scalar>
-using Matrix23 = Eigen::Matrix<Scalar, 2, 3>;
-template<typename Scalar>
-using Matrix22 = Eigen::Matrix<Scalar, 2, 2>;
-template<typename Scalar>
-using Vector3 = Eigen::Matrix<Scalar, 3, 1>;
-template<typename Scalar>
-using Vector2 = Eigen::Matrix<Scalar, 2, 1>;
+    namespace MyMatrix
+    {
+        template<typename Scalar>
+        using Matrix44 = Eigen::Matrix<Scalar, 4, 4>;
+        template<typename Scalar>
+        using Matrix43 = Eigen::Matrix<Scalar, 4, 3>;
+        template<typename Scalar>
+        using Matrix34 = Eigen::Matrix<Scalar, 3, 4>;
+        template<typename Scalar>
+        using Matrix33 = Eigen::Matrix<Scalar, 3, 3>;
+        template<typename Scalar>
+        using Matrix32 = Eigen::Matrix<Scalar, 3, 2>;
+        template<typename Scalar>
+        using Matrix23 = Eigen::Matrix<Scalar, 2, 3>;
+        template<typename Scalar>
+        using Matrix22 = Eigen::Matrix<Scalar, 2, 2>;
+        template<typename Scalar>
+        using Vector3 = Eigen::Matrix<Scalar, 3, 1>;
+        template<typename Scalar>
+        using Vector2 = Eigen::Matrix<Scalar, 2, 1>;
 
-template<typename Scalar>
-using Quaternion = Eigen::Quaternion<Scalar>;
-template<typename Scalar>
-using AngleAxis = Eigen::AngleAxis<Scalar>;
+        template<typename Scalar>
+        using Quaternion = Eigen::Quaternion<Scalar>;
+        template<typename Scalar>
+        using AngleAxis = Eigen::AngleAxis<Scalar>;
 
-template<typename Scalar>
-using Vector4 = Eigen::Matrix<Scalar, 4, 1>;
-template<typename Scalar>
-using Vector6 = Eigen::Matrix<Scalar, 6, 1>;
-template<typename Scalar>
-using VectorDyn = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
+        template<typename Scalar>
+        using Vector4 = Eigen::Matrix<Scalar, 4, 1>;
+        template<typename Scalar>
+        using Vector6 = Eigen::Matrix<Scalar, 6, 1>;
+        template<typename Scalar>
+        using VectorDyn = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
 
-template<typename Scalar>
-using MatrixDynDyn = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
-template<typename Scalar>
-using MatrixDiagDyn = Eigen::DiagonalMatrix<Scalar, Eigen::Dynamic>;
-template<typename Scalar>
-using MatrixDynDynRow = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+        template<typename Scalar>
+        using MatrixDynDyn = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
+        template<typename Scalar>
+        using MatrixDiagDyn = Eigen::DiagonalMatrix<Scalar, Eigen::Dynamic>;
+        template<typename Scalar>
+        using MatrixDynDynRow = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 
-template<typename Scalar, int M>
-using MatrixStatDyn = Eigen::Matrix<Scalar, M, Eigen::Dynamic>;
-template<typename Scalar, int N>
-using MatrixDynStat = Eigen::Matrix<Scalar, Eigen::Dynamic, N>;
-template<typename Scalar, int M, int N>
-using MatrixStatStat = Eigen::Matrix<Scalar, M, N>;
-template<typename Scalar, int M>
-using VectorStat = Eigen::Matrix<Scalar, M, 1>;
+        template<typename Scalar, int M>
+        using MatrixStatDyn = Eigen::Matrix<Scalar, M, Eigen::Dynamic>;
+        template<typename Scalar, int N>
+        using MatrixDynStat = Eigen::Matrix<Scalar, Eigen::Dynamic, N>;
+        template<typename Scalar, int M, int N>
+        using MatrixStatStat = Eigen::Matrix<Scalar, M, N>;
+        template<typename Scalar, int M>
+        using VectorStat = Eigen::Matrix<Scalar, M, 1>;
 
-template<typename Scalar>
-using AffineTrafo = Eigen::Transform<Scalar, 3, Eigen::TransformTraits::Affine>;
-template<typename Scalar>
-using AffineTrafo2d = Eigen::Transform<Scalar, 2, Eigen::TransformTraits::Affine>;
+        template<typename Scalar>
+        using AffineTrafo = Eigen::Transform<Scalar, 3, Eigen::TransformTraits::Affine>;
+        template<typename Scalar>
+        using AffineTrafo2d = Eigen::Transform<Scalar, 2, Eigen::TransformTraits::Affine>;
 
-template<typename Scalar, int M>
-using ArrayStatDyn = Eigen::Array<Scalar, M, Eigen::Dynamic>;
-template<typename Scalar, int N>
-using ArrayDynStat = Eigen::Array<Scalar, Eigen::Dynamic, N>;
-template<typename Scalar, int M, int N>
-using ArrayStatStat = Eigen::Array<Scalar, M, N>;
-template<typename Scalar, int M>
-using ArrayStat = Eigen::Array<Scalar, M, 1>;
+        template<typename Scalar, int M>
+        using ArrayStatDyn = Eigen::Array<Scalar, M, Eigen::Dynamic>;
+        template<typename Scalar, int N>
+        using ArrayDynStat = Eigen::Array<Scalar, Eigen::Dynamic, N>;
+        template<typename Scalar, int M, int N>
+        using ArrayStatStat = Eigen::Array<Scalar, M, N>;
+        template<typename Scalar, int M>
+        using ArrayStat = Eigen::Array<Scalar, M, 1>;
 
-template<typename Scalar>
-using Array3 = Eigen::Array<Scalar, 3, 1>;
-template<typename Scalar>
-using Array2 = Eigen::Array<Scalar, 2, 1>;
-}
+        template<typename Scalar>
+        using Array3 = Eigen::Array<Scalar, 3, 1>;
+        template<typename Scalar>
+        using Array2 = Eigen::Array<Scalar, 2, 1>;
+    }
 
-namespace MyMatrix
-{
-template<typename Derived>
-using MatrixBase = Eigen::MatrixBase<Derived>;
-template<typename Derived>
-using ArrayBase = Eigen::ArrayBase<Derived>;
+    namespace MyMatrix
+    {
+        template<typename Derived>
+        using MatrixBase = Eigen::MatrixBase<Derived>;
+        template<typename Derived>
+        using ArrayBase = Eigen::ArrayBase<Derived>;
 
-template<typename Derived>
-using VectorBDyn = Eigen::VectorBlock<Derived, Eigen::Dynamic>;
-template<typename Derived, int M>
-using VectorBStat = Eigen::VectorBlock<Derived, M>;
+        template<typename Derived>
+        using VectorBDyn = Eigen::VectorBlock<Derived, Eigen::Dynamic>;
+        template<typename Derived, int M>
+        using VectorBStat = Eigen::VectorBlock<Derived, M>;
 
-template<typename Derived>
-using MatrixBDynDyn = Eigen::Block<Derived>;
-template<typename Derived, int M>
-using MatrixBStatDyn = Eigen::Block<Derived, M, Eigen::Dynamic>;
-template<typename Derived, int N>
-using MatrixBDynStat = Eigen::Block<Derived, Eigen::Dynamic, N>;
+        template<typename Derived>
+        using MatrixBDynDyn = Eigen::Block<Derived>;
+        template<typename Derived, int M>
+        using MatrixBStatDyn = Eigen::Block<Derived, M, Eigen::Dynamic>;
+        template<typename Derived, int N>
+        using MatrixBDynStat = Eigen::Block<Derived, Eigen::Dynamic, N>;
 
-template<typename EigenType>
-using MatrixRef = Eigen::Ref<EigenType>;
+        template<typename EigenType>
+        using MatrixRef = Eigen::Ref<EigenType>;
 
-template<typename EigenType>
-using MatrixMap = Eigen::Map<EigenType>;
-}
+        template<typename EigenType>
+        using MatrixMap = Eigen::Map<EigenType>;
+    }
 
-struct EXECGRAPH_EXPORT MyMatrixIOFormat
-{
-    static const Eigen::IOFormat Matlab;
-    static const Eigen::IOFormat CommaSep;
-    static const Eigen::IOFormat SpaceSep;
-};
+    struct EXECGRAPH_EXPORT MyMatrixIOFormat
+    {
+        static const Eigen::IOFormat Matlab;
+        static const Eigen::IOFormat CommaSep;
+        static const Eigen::IOFormat SpaceSep;
+    };
 }
 
 #define EXECGRAPH_DEFINE_MATRIX_SPECIALTYPES                                     \

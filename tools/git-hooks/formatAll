@@ -15,6 +15,9 @@ else
   FIND_ARGS="-executable"
 fi
 
+# We cannot store \0 in variables!
+allFiles=$(git ls-tree -r HEAD --name-only | tr '\n' '\0' | base64 )
+
 find "$owndir"/autoformat -type f $FIND_ARGS | {
   abort=0
 
@@ -23,13 +26,11 @@ find "$owndir"/autoformat -type f $FIND_ARGS | {
     patterns="$formatter".patterns
     [ -f "$patterns" -o -f "$magic" ] || continue
 
-    find "$root" -type f -not \( -ipath "$root/.git*" -or -ipath "$root/.vscode*" -or \
-                                 -ipath "$root/build*" -or -ipath "$root/install*" -or \
-                                 -ipath "$root/tools*" \) | {
+    echo -ne "$allFiles" | base64 -D | {
       labort=0
 
-      while IFS= read -r orig ; do
-
+      while IFS=; read -r -d $'\0' orig ; do
+        orig="${root}/${orig}"
         # file matches one of the patterns
         match_pattern=''
         [ -f "$patterns" ] && echo "$orig" | grep -Eqif "$patterns" && match_pattern='1'

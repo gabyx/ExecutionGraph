@@ -14,18 +14,18 @@
 
 namespace executionGraph
 {
-/** This function casts any enum class to the underlying type */
-template<typename E>
-static constexpr auto enumToInt(const E e) -> typename std::underlying_type<E>::type
-{
-    return static_cast<typename std::underlying_type<E>::type>(e);
-}
+    /** This function casts any enum class to the underlying type */
+    template<typename E>
+    static constexpr auto enumToInt(const E e) -> typename std::underlying_type<E>::type
+    {
+        return static_cast<typename std::underlying_type<E>::type>(e);
+    }
 
-template<typename E>
-static constexpr auto enumToIntC(const E e) -> typename std::underlying_type<E>::type
-{
-    return std::integral_constant<typename std::underlying_type<E>::type, enumToInt(e)>{};
-}
+    template<typename E>
+    static constexpr auto enumToIntC(const E e) -> typename std::underlying_type<E>::type
+    {
+        return std::integral_constant<typename std::underlying_type<E>::type, enumToInt(e)>{};
+    }
 }
 
 #endif  // EnumClassHelper_hpp

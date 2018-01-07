@@ -1,6 +1,11 @@
-// Copyright (c) 2013 The Chromium Embedded Framework Authors. All rights
-// reserved. Use of this source code is governed by a BSD-style license that
-// can be found in the LICENSE file.
+// ========================================================================================
+//  ExecutionGraph
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+//
+//  This Source Code Form is subject to the terms of the Mozilla Public
+//  License, v. 2.0. If a copy of the MPL was not distributed with this
+//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// ========================================================================================
 
 #include "Handler.hpp"
 
@@ -16,12 +21,11 @@
 
 namespace
 {
-SimpleHandler* g_instance = NULL;
-
+    SimpleHandler* g_instance = NULL;
 }  // namespace
 
 SimpleHandler::SimpleHandler(bool use_views)
-    : use_views_(use_views), is_closing_(false)
+    : m_useViews(use_views), m_isClosing(false)
 {
     DCHECK(!g_instance);
     g_instance = this;
@@ -43,7 +47,7 @@ void SimpleHandler::OnTitleChange(CefRefPtr<CefBrowser> browser,
 {
     CEF_REQUIRE_UI_THREAD();
 
-    if(use_views_)
+    if(m_useViews)
     {
         // Set the title of the window using the Views framework.
         CefRefPtr<CefBrowserView> browser_view =
@@ -65,14 +69,14 @@ void SimpleHandler::OnTitleChange(CefRefPtr<CefBrowser> browser,
 void SimpleHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 {
     CEF_REQUIRE_UI_THREAD();
-    if(!router)
+    if(!m_router)
     {
         CefMessageRouterConfig config;
-        router = CefMessageRouterBrowserSide::Create(config);
-        router->AddHandler(&messageHandler, true);
+        m_router = CefMessageRouterBrowserSide::Create(config);
+        m_router->AddHandler(&m_messageHandler, true);
     }
     // Add to the list of existing browsers.
-    browser_list_.push_back(browser);
+    m_browserList.push_back(browser);
 }
 
 bool SimpleHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
@@ -80,7 +84,7 @@ bool SimpleHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
                                              CefRefPtr<CefProcessMessage> message)
 {
     CEF_REQUIRE_UI_THREAD();
-    return router->OnProcessMessageReceived(browser, source_process, message);
+    return m_router->OnProcessMessageReceived(browser, source_process, message);
 }
 
 bool SimpleHandler::DoClose(CefRefPtr<CefBrowser> browser)
@@ -90,10 +94,10 @@ bool SimpleHandler::DoClose(CefRefPtr<CefBrowser> browser)
     // Closing the main window requires special handling. See the DoClose()
     // documentation in the CEF header for a detailed destription of this
     // process.
-    if(browser_list_.size() == 1)
+    if(m_browserList.size() == 1)
     {
         // Set a flag to indicate that the window close should be allowed.
-        is_closing_ = true;
+        m_isClosing = true;
     }
 
     // Allow the close. For windowed browsers this will result in the OS close
@@ -104,23 +108,23 @@ bool SimpleHandler::DoClose(CefRefPtr<CefBrowser> browser)
 void SimpleHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 {
     CEF_REQUIRE_UI_THREAD();
-    if(router)
+    if(m_router)
     {
-        router->RemoveHandler(&messageHandler);
+        m_router->RemoveHandler(&m_messageHandler);
     }
 
     // Remove from the list of existing browsers.
-    BrowserList::iterator bit = browser_list_.begin();
-    for(; bit != browser_list_.end(); ++bit)
+    BrowserList::iterator bit = m_browserList.begin();
+    for(; bit != m_browserList.end(); ++bit)
     {
         if((*bit)->IsSame(browser))
         {
-            browser_list_.erase(bit);
+            m_browserList.erase(bit);
             break;
         }
     }
 
-    if(browser_list_.empty())
+    if(m_browserList.empty())
     {
         // All browser windows have closed. Quit the application message loop.
         CefQuitMessageLoop();
@@ -157,10 +161,10 @@ void SimpleHandler::CloseAllBrowsers(bool force_close)
         return;
     }
 
-    if(browser_list_.empty())
+    if(m_browserList.empty())
         return;
 
-    BrowserList::const_iterator it = browser_list_.begin();
-    for(; it != browser_list_.end(); ++it)
+    BrowserList::const_iterator it = m_browserList.begin();
+    for(; it != m_browserList.end(); ++it)
         (*it)->GetHost()->CloseBrowser(force_close);
 }

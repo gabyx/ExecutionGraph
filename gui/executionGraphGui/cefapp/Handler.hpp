@@ -1,6 +1,11 @@
-// Copyright (c) 2013 The Chromium Embedded Framework Authors. All rights
-// reserved. Use of this source code is governed by a BSD-style license that
-// can be found in the LICENSE file.
+// ========================================================================================
+//  ExecutionGraph
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+//
+//  This Source Code Form is subject to the terms of the Mozilla Public
+//  License, v. 2.0. If a copy of the MPL was not distributed with this
+//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// ========================================================================================
 
 #ifndef CEF_TESTS_CEFSIMPLE_SIMPLE_HANDLER_H_
 #define CEF_TESTS_CEFSIMPLE_SIMPLE_HANDLER_H_
@@ -55,7 +60,7 @@ public:
     // Request that all existing browser windows close.
     void CloseAllBrowsers(bool force_close);
 
-    bool IsClosing() const { return is_closing_; }
+    bool IsClosing() const { return m_isClosing; }
 
 private:
     // Platform-specific implementation.
@@ -63,16 +68,16 @@ private:
                              const CefString& title);
 
     // True if the application is using the Views framework.
-    const bool use_views_;
+    const bool m_useViews;
 
     // List of existing browser windows. Only accessed on the CEF UI thread.
     typedef std::list<CefRefPtr<CefBrowser>> BrowserList;
-    BrowserList browser_list_;
+    BrowserList m_browserList;
 
-    bool is_closing_;
+    bool m_isClosing;
 
-    CefRefPtr<CefMessageRouterBrowserSide> router;
-    MessageHandler messageHandler;
+    CefRefPtr<CefMessageRouterBrowserSide> m_router;
+    MessageHandler m_messageHandler;
 
     // Include the default reference counting implementation.
     IMPLEMENT_REFCOUNTING(SimpleHandler);

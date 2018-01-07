@@ -18,20 +18,20 @@
 
 namespace executionGraph
 {
-using SocketDefaultTypes = meta::list<double,
-                                      float,
-                                      bool,
-                                      char,
-                                      short,
-                                      int,
-                                      long int,
-                                      long long int,
-                                      unsigned char,
-                                      unsigned short,
-                                      unsigned int,
-                                      unsigned long int,
-                                      unsigned long long int,
-                                      std::string>;
+    using SocketDefaultTypes = meta::list<double,
+                                          float,
+                                          bool,
+                                          char,
+                                          short,
+                                          int,
+                                          long int,
+                                          long long int,
+                                          unsigned char,
+                                          unsigned short,
+                                          unsigned int,
+                                          unsigned long int,
+                                          unsigned long long int,
+                                          std::string>;
 
 #define LOGICSOCKET_CASE_SWITCH(SOCKET_TYPES, N) \
     case N:                                      \

@@ -17,10 +17,10 @@
 
 namespace executionGraph
 {
-struct GlobalConfigs
-{
-    using PREC = double;
-};
+    struct GlobalConfigs
+    {
+        using PREC = double;
+    };
 
 #define EXECGRAPH_DEFINE_MATRIX_TYPES                 \
     using PREC = ExecutionGraph::GlobalConfigs::PREC; \
