@@ -31,6 +31,10 @@ find "$owndir"/autoformat -type f $FIND_ARGS | {
 
       while IFS=; read -r -d $'\0' orig ; do
         orig="${root}/${orig}"
+
+        # file is getting deleted, ignore
+        [ -f "$orig" ] || continue
+
         # file matches one of the patterns
         match_pattern=''
         [ -f "$patterns" ] && echo "$orig" | grep -Eqif "$patterns" && match_pattern='1'

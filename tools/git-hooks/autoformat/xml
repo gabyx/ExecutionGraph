@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # format all XML (HTML) files in the repository
 # to use this tool install: npm install -g xmllint
 

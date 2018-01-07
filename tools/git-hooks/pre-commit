@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "Pre-Commit Hook: autoformat"
 
@@ -28,9 +28,9 @@ find "$owndir"/autoformat -type f $FIND_ARGS | {
     echo -ne "$allFiles" | base64 -D | {
       labort=0
 
-      while IFS= read -r orig ; do
+      while IFS=; read -r -d $'\0' orig ; do
         orig="${root}/${orig}"
-
+        #echo "$orig"
         # file is getting deleted, ignore
         [ -f "$orig" ] || continue
 

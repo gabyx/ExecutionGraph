@@ -1,5 +1,5 @@
 // ========================================================================================
-//  executionGraph
+// Execution Graph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 //
 //  This Source Code Form is subject to the terms of the Mozilla Public
