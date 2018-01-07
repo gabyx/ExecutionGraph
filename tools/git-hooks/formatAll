@@ -44,7 +44,6 @@ find "$owndir"/autoformat -type f $FIND_ARGS | {
         [ "$match_pattern" -o "$match_magic" ] ||  continue
 
         "$formatter" "$orig" || labort=1
-        git add "$orig"
       done
 
       exit $labort

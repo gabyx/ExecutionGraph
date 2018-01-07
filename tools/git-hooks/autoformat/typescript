@@ -7,7 +7,7 @@ REPO_DIR="$(git rev-parse --show-toplevel)"
 function formatFile() {
     file=$1
     echo "formatting file: $file"
-    tsfmt --replace --baseDir "$REPO_DIR" "${file}"
+    tsfmt --replace --baseDir "$REPO_DIR" "${file}" || echo 'fatal: `tsfmt` failed for:' "$file" >&2 && exit 1
 }
 export -f formatFile
 

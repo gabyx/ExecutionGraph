@@ -43,8 +43,7 @@ Now you should be ready to configure with cmake:
 ## General Development Setup
 If you start developing, install the pre-commit hook with:
 ```bash
-    npm install -g typescript-formatter
-    npm install -g json-fmt
+    npm install -g typescript-formatter json-fmt xmllint
     cd .git && mv hooks hooks.old && ln -s ../tools/git-hooks hooks
 ```
 
