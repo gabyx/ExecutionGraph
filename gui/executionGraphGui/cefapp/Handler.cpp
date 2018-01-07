@@ -65,7 +65,7 @@ void SimpleHandler::OnTitleChange(CefRefPtr<CefBrowser> browser,
 void SimpleHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 {
     CEF_REQUIRE_UI_THREAD();
-    if(!router) 
+    if(!router)
     {
         CefMessageRouterConfig config;
         router = CefMessageRouterBrowserSide::Create(config);
@@ -76,8 +76,8 @@ void SimpleHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 }
 
 bool SimpleHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
-                                            CefProcessId source_process,
-                                            CefRefPtr<CefProcessMessage> message)
+                                             CefProcessId source_process,
+                                             CefRefPtr<CefProcessMessage> message)
 {
     CEF_REQUIRE_UI_THREAD();
     return router->OnProcessMessageReceived(browser, source_process, message);

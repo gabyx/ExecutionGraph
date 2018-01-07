@@ -2,7 +2,6 @@
 #include <cef_parser.h>
 #include <wrapper/cef_stream_resource_handler.h>
 
-
 FileSchemeHandlerFactory::FileSchemeHandlerFactory(std::string folderPath, std::string urlPrefix)
     : m_FolderPath(folderPath)
     , m_urlPrefix(urlPrefix)
@@ -48,7 +47,8 @@ CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrow
             {
                 CefString sMimeType(CefGetMimeType(sFileExtension));
                 //todo: Complete known mime times with web-font extensions
-                if(sMimeType.empty()) {
+                if(sMimeType.empty())
+                {
                     sMimeType = "font/" + sFileExtension.ToString();
                 }
                 return CefRefPtr<CefStreamResourceHandler>(new CefStreamResourceHandler(sMimeType, fileStream));

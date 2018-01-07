@@ -9,9 +9,9 @@
 class RendererApp : public CefApp, public CefRenderProcessHandler
 {
 public:
-
     // CefApp methods:
-    virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler() override {
+    virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler() override
+    {
         return this;
     }
 
@@ -19,16 +19,17 @@ public:
     virtual void OnWebKitInitialized() override;
 
     virtual void OnContextCreated(CefRefPtr<CefBrowser> browser,
-                            CefRefPtr<CefFrame> frame,
-                            CefRefPtr<CefV8Context> context) override;
+                                  CefRefPtr<CefFrame> frame,
+                                  CefRefPtr<CefV8Context> context) override;
 
     virtual void OnContextReleased(CefRefPtr<CefBrowser> browser,
-                            CefRefPtr<CefFrame> frame,
-                            CefRefPtr<CefV8Context> context) override;
+                                   CefRefPtr<CefFrame> frame,
+                                   CefRefPtr<CefV8Context> context) override;
 
     virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
-                                    CefProcessId source_process,
-                                    CefRefPtr<CefProcessMessage> message) override;
+                                          CefProcessId source_process,
+                                          CefRefPtr<CefProcessMessage> message) override;
+
 private:
     CefRefPtr<CefMessageRouterRendererSide> router;
 
@@ -37,4 +38,4 @@ private:
     IMPLEMENT_REFCOUNTING(RendererApp);
 };
 
-#endif //RENDERER_APP_H_
+#endif  //RENDERER_APP_H_
