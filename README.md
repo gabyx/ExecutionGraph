@@ -26,6 +26,8 @@ The library `Eigen` needs to be installed, `meta` and `googletest` are installed
 ### Development Setup
 If you start developing, install the pre-commit hook with:
 ```bash
+    npm install -g typescript-formatter
+    npm install -g json-fmt
     cp tools/pre-commit .git/hooks/
 ```
 #### On OS X
