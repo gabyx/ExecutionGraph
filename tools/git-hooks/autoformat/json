@@ -4,8 +4,19 @@
 
 REPO_DIR="$(git rev-parse --show-toplevel)"
 
-function formatCpp() {
-    find "$1" \( -ipath "$2*" \) | xargs json-fmt "{}" -p -o "{}"
+
+function formatFile() {
+    file=$1
+    echo "formatting file: $file"
+    fileTmp=$(mktemp)
+    json-fmt $file -p -o $fileTmp
+    mv $fileTmp $file
+}
+export -f formatFile
+
+function formatJSON() {
+
+    find "$1" \( -ipath "$2*" \) | xargs -I {} bash -c 'formatFile "${@}"' _ {}
 }
 
 formatJSON "$1" "$REPO_DIR/gui"

@@ -3,7 +3,6 @@ This library is in alpha and still under development. First usable version will 
 # ExecutionGraph [![Build Status](https://travis-ci.org/gabyx/ExecutionGraph.svg?branch=master)](https://travis-ci.org/gabyx/ExecutionGraph)
 Fast Execution Graph consisting of Execution Nodes
 
-
 Be able to design and run such input/output graphs, such as this one used in [http://gabyx.github.io/GRSFramework/#videos] :
 ![Execution Graphs like this](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)
 
@@ -15,27 +14,15 @@ This library has these dependencies:
 - [Eigen](http://eigen.tuxfamily.org) at least version 3, 
 - [meta](https://github.com/ericniebler/meta)
 - [googletest](https://github.com/google/googletest)
+- [benchmark](https://github.com/google/benchmark)
 
-The library `Eigen` needs to be installed, `meta` and `googletest` are installed as external projects when configuring this library!
+The library `Eigen` needs to be installed, `meta`, `googletest`, `benchmark` are installed as external projects when configuring this library!
 
 ### OS X
-```bash
-    brew install eigen
-```
-
-### Development Setup
-If you start developing, install the pre-commit hook with:
-```bash
-    npm install -g typescript-formatter
-    npm install -g json-fmt
-    cd .git && mv hooks hooks.old && ln -s ../tools/git-hooks hooks
-```
-#### On OS X
-Install XCode and the CommandLine Tools from [Apple](https://developer.apple.com/download/more/)  
-Install [Visual Studio Code](https://code.visualstudio.com/)  
 Install `clang` with [homebrew](https://brew.sh) by
 ```bash
     brew install clang
+    brew install eigen
 ```
 Set the `CXX` and `CC` variables in your `~/.bash_profile` or similar to 
 ```bash
@@ -43,7 +30,32 @@ export PATH="/usr/local/opt/llvm/bin:$PATH"
 export CC="/usr/local/opt/llvm/bin/clang"
 export CXX="$CC++"
 ```
+Now you should be ready to configure with cmake:
 
+```bash
+    cd <pathToRepo>
+    mkdir build
+    cd build
+    cmake ../
+    make -j
+```
+
+## General Development Setup
+If you start developing, install the pre-commit hook with:
+```bash
+    npm install -g typescript-formatter
+    npm install -g json-fmt
+    cd .git && mv hooks hooks.old && ln -s ../tools/git-hooks hooks
+```
+
+### Codeformatting
+``` 
+    tools/formatAll.sh
+```
+
+### On OS X
+Install XCode and the CommandLine Tools from [Apple](https://developer.apple.com/download/more/)  
+Install [Visual Studio Code](https://code.visualstudio.com/)  
 Install the following extensions for VS Code:
 - [C++ Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
 - [CMake Language Ext.](https://marketplace.visualstudio.com/items?itemName=twxs.cmake)
@@ -52,11 +64,12 @@ Install the following extensions for VS Code:
 
 **Note:** Dont use the [multi-root workspaces](https://code.visualstudio.com/docs/editor/multi-root-workspaces) feature in VS Code since the C++ Extension does not yet support this and code completion won't work properly.
 
-## HTML development setup
+## GUI Development Setup
 The UI is made up of an [Angular](https://angular.io) application that uses the [Angular CLI](https://cli.angular.io) to create the web assets that are ultimately displayed in a [CEF](https://bitbucket.org/chromiumembedded/cef) browser.
 Please visit the Angular CLI website for its prerequisites (node.js and npm respectively, also a globally installed Angular CLI aka `ng` ).
 Once you installed the prerequisites build the client application by navigating to the client directory and starting the build process. Please make sure you do this before compiling the C++ GUI application.
-```
+
+```bash
 cd gui/client
 npm run build
 ```

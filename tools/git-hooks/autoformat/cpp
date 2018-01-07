@@ -3,8 +3,15 @@
 
 REPO_DIR="$(git rev-parse --show-toplevel)"
 
+function formatFile() {
+    file=$1
+    echo "formatting file: $file"
+    clang-format -i ${file}
+}
+export -f formatFile
+
 function formatCpp() {
-    find "$1" \( -ipath "$2*" \) | xargs clang-format -i 
+    find "$1" -ipath "$2*" | xargs -I {} bash -c 'formatFile "${@}"' _ {}
 }
 
 formatCpp "$1" "$REPO_DIR/include"  

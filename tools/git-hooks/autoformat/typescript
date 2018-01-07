@@ -4,8 +4,15 @@
 
 REPO_DIR="$(git rev-parse --show-toplevel)"
 
+function formatFile() {
+    file=$1
+    echo "formatting file: $file"
+    tsfmt --replace --baseDir "$REPO_DIR" "${file}"
+}
+export -f formatFile
+
 function formatTS() {
-    find "$1" \( -ipath "$2*" \)  | xargs tsfmt --replace --baseDir "$REPO_DIR"
+    find "$1" -ipath "$2*" | xargs -I {} bash -c 'formatFile "${@}"' _ {}
 }
 
 formatTS "$1" "$REPO_DIR/gui"
