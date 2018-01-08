@@ -17,14 +17,19 @@
 
 class RendererApp : public CefApp, public CefRenderProcessHandler
 {
+    IMPLEMENT_REFCOUNTING(RendererApp);
+
 public:
-    // CefApp methods:
+    //! @name CefApp Methods
+    //@{
     virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler() override
     {
         return this;
     }
+    //@}
 
-    // CefRenderProcessHandler methods:
+    ///! @name CefRenderProcessHandler Methods
+    //@{
     virtual void OnWebKitInitialized() override;
 
     virtual void OnContextCreated(CefRefPtr<CefBrowser> browser,
@@ -38,13 +43,10 @@ public:
     virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
                                           CefProcessId source_process,
                                           CefRefPtr<CefProcessMessage> message) override;
+    //@}
 
 private:
-    CefRefPtr<CefMessageRouterRendererSide> router;
-
-private:
-    // Include the default reference counting implementation.
-    IMPLEMENT_REFCOUNTING(RendererApp);
+    CefRefPtr<CefMessageRouterRendererSide> m_router;
 };
 
-#endif  //RENDERER_APP_H_
+#endif

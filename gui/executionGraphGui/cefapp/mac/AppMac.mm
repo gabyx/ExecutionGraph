@@ -99,7 +99,7 @@
   }
 
   - (void)tryToTerminateApplication:(NSApplication*)app {
-    SimpleHandler* handler = SimpleHandler::GetInstance();
+    AppHandler* handler = AppHandler::GetInstance();
     if (handler && !handler->IsClosing())
       handler->CloseAllBrowsers(false);
   }
@@ -125,10 +125,10 @@ int main(int argc, char* argv[]) {
   CefSettings settings;
   settings.remote_debugging_port = 8088;
 
-  // SimpleApp implements application-level callbacks for the browser process.
+  // App implements application-level callbacks for the browser process.
   // It will create the first browser instance in OnContextInitialized() after
   // CEF has initialized.
-  CefRefPtr<SimpleApp> app(new SimpleApp);
+  CefRefPtr<App> app(new App);
 
   // Initialize CEF for the browser process.
   CefInitialize(main_args, settings, app.get(), NULL);

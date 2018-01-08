@@ -1,31 +1,40 @@
-// Copyright (c) 2013 The Chromium Embedded Framework Authors. All rights
-// reserved. Use of this source code is governed by a BSD-style license that
-// can be found in the LICENSE file.
+// ========================================================================================
+//  ExecutionGraph
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+//
+//  Created by Gabriel Nützi, Mon Jan 08 2018
+//
+//  This Source Code Form is subject to the terms of the Mozilla Public
+//  License, v. 2.0. If a copy of the MPL was not distributed with this
+//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// ========================================================================================
 
-#ifndef CEF_TESTS_CEFSIMPLE_SIMPLE_APP_H_
-#define CEF_TESTS_CEFSIMPLE_SIMPLE_APP_H_
+#ifndef APP_H
+#define APP_H
 
 #include <cef_app.h>
 
 // Implement application-level callbacks for the browser process.
-class SimpleApp : public CefApp, public CefBrowserProcessHandler
+class App : public CefApp,
+            public CefBrowserProcessHandler
 {
-public:
-    SimpleApp();
+    IMPLEMENT_REFCOUNTING(App);
 
-    // CefApp methods:
-    virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler()
-        OVERRIDE
+public:
+    App() {}
+
+    //! @name CefApp Methods
+    //@{
+    virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() OVERRIDE
     {
         return this;
     }
+    //@}
 
-    // CefBrowserProcessHandler methods:
+    //! @name CefBrowserProcessHandler Methods
+    //@{
     virtual void OnContextInitialized() OVERRIDE;
-
-private:
-    // Include the default reference counting implementation.
-    IMPLEMENT_REFCOUNTING(SimpleApp);
+    //@}
 };
 
-#endif  // CEF_TESTS_CEFSIMPLE_SIMPLE_APP_H_
+#endif

@@ -2,6 +2,8 @@
 //  ExecutionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 //
+//  Created by Gabriel Nützi, Mon Jan 08 2018
+//
 //  This Source Code Form is subject to the terms of the Mozilla Public
 //  License, v. 2.0. If a copy of the MPL was not distributed with this
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -21,29 +23,29 @@
 
 namespace
 {
-    SimpleHandler* g_instance = NULL;
-}  // namespace
+    AppHandler* g_instance = nullptr;
+}
 
-SimpleHandler::SimpleHandler(bool use_views)
+AppHandler::AppHandler(bool use_views)
     : m_useViews(use_views), m_isClosing(false)
 {
     DCHECK(!g_instance);
     g_instance = this;
 }
 
-SimpleHandler::~SimpleHandler()
+AppHandler::~AppHandler()
 {
-    g_instance = NULL;
+    g_instance = nullptr;
 }
 
 // static
-SimpleHandler* SimpleHandler::GetInstance()
+AppHandler* AppHandler::GetInstance()
 {
     return g_instance;
 }
 
-void SimpleHandler::OnTitleChange(CefRefPtr<CefBrowser> browser,
-                                  const CefString& title)
+void AppHandler::OnTitleChange(CefRefPtr<CefBrowser> browser,
+                               const CefString& title)
 {
     CEF_REQUIRE_UI_THREAD();
 
@@ -66,7 +68,7 @@ void SimpleHandler::OnTitleChange(CefRefPtr<CefBrowser> browser,
     }
 }
 
-void SimpleHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
+void AppHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 {
     CEF_REQUIRE_UI_THREAD();
     if(!m_router)
@@ -79,15 +81,16 @@ void SimpleHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
     m_browserList.push_back(browser);
 }
 
-bool SimpleHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
-                                             CefProcessId source_process,
-                                             CefRefPtr<CefProcessMessage> message)
+bool AppHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
+                                          CefProcessId source_process,
+                                          CefRefPtr<CefProcessMessage> message)
 {
     CEF_REQUIRE_UI_THREAD();
+    DCHECK(!m_router);
     return m_router->OnProcessMessageReceived(browser, source_process, message);
 }
 
-bool SimpleHandler::DoClose(CefRefPtr<CefBrowser> browser)
+bool AppHandler::DoClose(CefRefPtr<CefBrowser> browser)
 {
     CEF_REQUIRE_UI_THREAD();
 
@@ -105,9 +108,10 @@ bool SimpleHandler::DoClose(CefRefPtr<CefBrowser> browser)
     return false;
 }
 
-void SimpleHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
+void AppHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 {
     CEF_REQUIRE_UI_THREAD();
+
     if(m_router)
     {
         m_router->RemoveHandler(&m_messageHandler);
@@ -131,11 +135,11 @@ void SimpleHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
     }
 }
 
-void SimpleHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
-                                CefRefPtr<CefFrame> frame,
-                                ErrorCode errorCode,
-                                const CefString& errorText,
-                                const CefString& failedUrl)
+void AppHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
+                             CefRefPtr<CefFrame> frame,
+                             ErrorCode errorCode,
+                             const CefString& errorText,
+                             const CefString& failedUrl)
 {
     CEF_REQUIRE_UI_THREAD();
 
@@ -152,12 +156,12 @@ void SimpleHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
     frame->LoadString(ss.str(), failedUrl);
 }
 
-void SimpleHandler::CloseAllBrowsers(bool force_close)
+void AppHandler::CloseAllBrowsers(bool force_close)
 {
     if(!CefCurrentlyOn(TID_UI))
     {
         // Execute on the UI thread.
-        CefPostTask(TID_UI, base::Bind(&SimpleHandler::CloseAllBrowsers, this, force_close));
+        CefPostTask(TID_UI, base::Bind(&AppHandler::CloseAllBrowsers, this, force_close));
         return;
     }
 

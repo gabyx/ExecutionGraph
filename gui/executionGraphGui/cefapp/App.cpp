@@ -2,6 +2,8 @@
 //  ExecutionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 //
+//  Created by Gabriel Nützi, Mon Jan 08 2018
+//
 //  This Source Code Form is subject to the terms of the Mozilla Public
 //  License, v. 2.0. If a copy of the MPL was not distributed with this
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -17,8 +19,8 @@
 #include <views/cef_window.h>
 #include <wrapper/cef_helpers.h>
 
+#include "AppHandler.hpp"
 #include "FileSchemeHandlerFactory.hpp"
-#include "Handler.hpp"
 
 namespace
 {
@@ -63,9 +65,7 @@ namespace
 
 }  // namespace
 
-SimpleApp::SimpleApp() {}
-
-void SimpleApp::OnContextInitialized()
+void App::OnContextInitialized()
 {
     CEF_REQUIRE_UI_THREAD();
 
@@ -87,8 +87,8 @@ void SimpleApp::OnContextInitialized()
                                     "executionGraph",
                                     new FileSchemeHandlerFactory("./gui/client/dist/", "executionGraph"));
 
-    // SimpleHandler implements browser-level callbacks.
-    CefRefPtr<SimpleHandler> handler(new SimpleHandler(use_views));
+    // AppHandler implements browser-level callbacks.
+    CefRefPtr<AppHandler> handler(new AppHandler(use_views));
 
     // Specify CEF browser settings here.
     CefBrowserSettings browser_settings;

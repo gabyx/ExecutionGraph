@@ -12,7 +12,7 @@
 
 #include <wrapper/cef_message_router.h>
 
-// Handle messages in the browser process.
+//! Handle messages in the browser process.
 class MessageHandler : public CefMessageRouterBrowserSide::Handler
 {
 public:
@@ -32,4 +32,4 @@ private:
     DISALLOW_COPY_AND_ASSIGN(MessageHandler);
 };
 
-#endif  // MESSAGE_HANDLER_H_
+#endif

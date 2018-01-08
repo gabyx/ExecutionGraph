@@ -2,6 +2,8 @@
 //  ExecutionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 //
+//  Created by Gabriel Nützi, Mon Jan 08 2018
+//
 //  This Source Code Form is subject to the terms of the Mozilla Public
 //  License, v. 2.0. If a copy of the MPL was not distributed with this
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -15,17 +17,19 @@
 #include <wrapper/cef_message_router.h>
 #include "MessageHandler.hpp"
 
-class SimpleHandler : public CefClient,
-                      public CefDisplayHandler,
-                      public CefLifeSpanHandler,
-                      public CefLoadHandler
+class AppHandler : public CefClient,
+                   public CefDisplayHandler,
+                   public CefLifeSpanHandler,
+                   public CefLoadHandler
 {
+    IMPLEMENT_REFCOUNTING(AppHandler);
+
 public:
-    explicit SimpleHandler(bool use_views);
-    ~SimpleHandler();
+    explicit AppHandler(bool use_views);
+    ~AppHandler();
 
     // Provide access to the single global instance of this object.
-    static SimpleHandler* GetInstance();
+    static AppHandler* GetInstance();
 
     // CefClient methods:
     virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() OVERRIDE
@@ -69,18 +73,14 @@ private:
 
     // True if the application is using the Views framework.
     const bool m_useViews;
+    bool m_isClosing;
 
     // List of existing browser windows. Only accessed on the CEF UI thread.
     typedef std::list<CefRefPtr<CefBrowser>> BrowserList;
     BrowserList m_browserList;
 
-    bool m_isClosing;
-
     CefRefPtr<CefMessageRouterBrowserSide> m_router;
     MessageHandler m_messageHandler;
-
-    // Include the default reference counting implementation.
-    IMPLEMENT_REFCOUNTING(SimpleHandler);
 };
 
 #endif  // CEF_TESTS_CEFSIMPLE_SIMPLE_HANDLER_H_
