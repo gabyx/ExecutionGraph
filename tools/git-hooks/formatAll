@@ -16,22 +16,22 @@ else
 fi
 
 # We cannot store \0 in variables!
-allFiles=$(git ls-tree -r HEAD --name-only | tr '\n' '\0' | base64 )
+allFiles=$(git ls-tree -r HEAD --name-only --full-name ${root} | tr '\n' '\0' | base64 )
 
 find "$owndir"/autoformat -type f $FIND_ARGS | {
   abort=0
 
   while read formatter ; do
+    echo "formatting for: $formatter"
     magic="$formatter".magic
     patterns="$formatter".patterns
     [ -f "$patterns" -o -f "$magic" ] || continue
 
     echo -ne "$allFiles" | base64 -D | {
       labort=0
-
       while IFS=; read -r -d $'\0' orig ; do
-        orig="${root}/${orig}"
-
+        orig="$root/$orig"
+        
         # file is getting deleted, ignore
         [ -f "$orig" ] || continue
 
