@@ -87,7 +87,7 @@ bool AppHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
                                           CefRefPtr<CefProcessMessage> message)
 {
     CEF_REQUIRE_UI_THREAD();
-    DCHECK(!m_router);
+    DCHECK(m_router);
     return m_router->OnProcessMessageReceived(browser, source_process, message);
 }
 
