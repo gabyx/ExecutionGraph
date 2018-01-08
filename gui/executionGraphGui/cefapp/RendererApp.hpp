@@ -10,19 +10,21 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef RENDERER_APP_H_
-#define RENDERER_APP_H_
+#ifndef RENDERER_APP_H
+#define RENDERER_APP_H
 
 #include <cef_app.h>
 
 #include <cef_render_process_handler.h>
 #include <wrapper/cef_message_router.h>
 
-class RendererApp : public CefApp, public CefRenderProcessHandler
+class RendererApp : public CefApp,
+                    public CefRenderProcessHandler
 {
-    IMPLEMENT_REFCOUNTING(RendererApp);
-
 public:
+    RendererApp()          = default;
+    virtual ~RendererApp() = default;
+
     //! @name CefApp Methods
     //@{
     virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler() override
@@ -50,6 +52,9 @@ public:
 
 private:
     CefRefPtr<CefMessageRouterRendererSide> m_router;
+
+private:
+    IMPLEMENT_REFCOUNTING(RendererApp);
 };
 
 #endif

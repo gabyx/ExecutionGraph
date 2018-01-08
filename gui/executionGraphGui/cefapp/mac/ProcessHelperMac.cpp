@@ -11,7 +11,7 @@
 //! ========================================================================================
 
 #include <cef_app.h>
-#include "cefapp/mac/RendererApp.hpp"
+#include "cefapp/RendererApp.hpp"
 
 namespace
 {
