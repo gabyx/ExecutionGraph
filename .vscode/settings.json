@@ -58,9 +58,81 @@
         "set": "cpp",
         "vector": "cpp"
     },
-    "cmake.useCMakeServer": true ,
+    "cmake.useCMakeServer": true,
     "cmake.preferredGenerators": [
         "Unix Makefiles",
         "Ninja"
-    ]
+    ],
+    "C_Cpp.clang_format_fallbackStyle": "none",
+    "C_Cpp.clang_format_style": "file",
+    "editor.formatOnSave": true,
+    "fileHeaderComment.parameter": {
+        "*": {
+            "commentbegin": "//! ",
+            "commentprefix": "//! ",
+            "commentend": "//! ",
+            "bar": "========================================================================================",
+            "header": [
+                " ExecutionGraph",
+                " Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>"
+            ],
+            "license": [
+                " This Source Code Form is subject to the terms of the Mozilla Public",
+                " License, v. 2.0. If a copy of the MPL was not distributed with this",
+                " file, You can obtain one at http://mozilla.org/MPL/2.0/."
+            ]
+        }
+    },
+    "fileHeaderComment.template": {
+        "*": [
+            "${commentbegin}${bar}",
+            "${commentbegin}${header}",
+            "${commentbegin}",
+            "${commentbegin} @date ${date}"
+            "${commentbegin} @author ${authorName}, ${authorEmail}",
+            "${commentbegin}",
+            "${commentbegin}${license}",
+            "${commentbegin}${bar}"
+        ],
+        "cpp&tsHeader": [
+            "${commentbegin}${bar}",
+            "${commentbegin}${header}",
+            "${commentbegin}",
+            "${commentbegin} @date ${date}"
+            "${commentbegin} @author ${authorName}, ${authorEmail}",
+            "${commentbegin}",
+            "${commentbegin}${license}",
+            "${commentbegin}${bar}"
+        ],
+        ".cpp": [
+            "${commentbegin}${bar}",
+            "${commentbegin}${header}",
+            "${commentbegin}",
+            "${commentbegin} @date ${date}"
+            "${commentbegin} @author ${authorName}, ${authorEmail}",
+            "${commentbegin}",
+            "${commentbegin}${license}",
+            "${commentbegin}${bar}"
+        ],
+        ".hpp": [
+            "${commentbegin}${bar}",
+            "${commentbegin}${header}",
+            "${commentbegin}",
+            "${commentbegin} @date ${date}"
+            "${commentbegin} @author ${authorName}, ${authorEmail}",
+            "${commentbegin}",
+            "${commentbegin}${license}",
+            "${commentbegin}${bar}"
+        ],
+        ".ts": [
+            "${commentbegin}${bar}",
+            "${commentbegin}${header}",
+            "${commentbegin}",
+            "${commentbegin} @date ${date}"
+            "${commentbegin} @author ${authorName}, ${authorEmail}",
+            "${commentbegin}",
+            "${commentbegin}${license}",
+            "${commentbegin}${bar}"
+        ]
+    },
 }
