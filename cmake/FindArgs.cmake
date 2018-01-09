@@ -22,15 +22,15 @@ if(NOT EXISTS "${args_INCLUDE_DIR}")
     endif()
 
     include(DownloadProject)
-    download_project(PROJ                args
+    download_project(PROJ               args
                     PREFIX              ${CMAKE_BINARY_DIR}/external
                     GIT_REPOSITORY      https://github.com/Taywee/args 
                     GIT_TAG             master
                     ${UPDATE_DISCONNECTED_IF_AVAILABLE}
     )
 
-    set(args_INCLUDE_DIR args_SOURCE_DIR)
+    set(args_INCLUDE_DIR ${args_SOURCE_DIR} CACHE STRING "args library (https://github.com/Taywee/args) include directory" FORCE)
 endif()
 
-find_package_handle_standard_args(Meta DEFAULT_MSG args_INCLUDE_DIR)
+find_package_handle_standard_args(Args DEFAULT_MSG args_INCLUDE_DIR)
 mark_as_advanced(args_INCLUDE_DIR)

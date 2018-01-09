@@ -19,7 +19,7 @@
 class App : public CefApp,
             public CefBrowserProcessHandler
 {
-    IMPLEMENT_REFCOUNTING(App);
+    IMPLEMENT_REFCOUNTING(App)
 
 public:
     App(const CefString& clientSourcePath)
@@ -41,7 +41,7 @@ public:
     //@}
 
 private:
-    CefString m_clientSourcePath;  //! Application main arguments.
+    CefString m_clientSourcePath;  //! Client source path.
 };
 
 #endif

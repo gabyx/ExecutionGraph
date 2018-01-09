@@ -12,9 +12,9 @@ macro(INCLUDE_ALL_ExecutionGraph_SOURCE
     # no external sources up to now
     
     set(${SRC}
-                
         ${ExecutionGraph_ROOT_DIR}/src/DemangleTypes.cpp
-    
+        ${ExecutionGraph_ROOT_DIR}/src/CommandLineArguments.cpp
+
         ${ExecutionGraph_ROOT_DIR}/src/LogicSocket.cpp
         ${ExecutionGraph_ROOT_DIR}/src/LogicNode.cpp
     )
@@ -30,7 +30,8 @@ macro(INCLUDE_ALL_ExecutionGraph_SOURCE
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/Platform.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/SfinaeMacros.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/TypeDefs.hpp
-    
+        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/CommandLineArguments.hpp
+
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicCommon.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicSocket.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicSocketDefaultTypes.hpp

@@ -5,9 +5,11 @@
 
 # App Sources
 # -------------
-set(EXECUTIONGRAPHGUI_SRCS
+set(ExecutionGraphGUI_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/App.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/App.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/AppCLArgs.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/AppCLArgs.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/AppHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/AppHandler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/MessageHandler.cpp
@@ -17,56 +19,56 @@ set(EXECUTIONGRAPHGUI_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.hpp
 )
-set(EXECUTIONGRAPHGUI_SRCS_LINUX
+set(ExecutionGraphGUI_SRCS_LINUX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/linux/AppLinux.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/linux/Handlerlinux.cpp
 )
-set(EXECUTIONGRAPHGUI_SRCS_MACOSX
+set(ExecutionGraphGUI_SRCS_MACOSX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/AppMac.mm
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/HandlerMac.mm
 )
-set(EXECUTIONGRAPHGUI_SRCS_WINDOWS
+set(ExecutionGraphGUI_SRCS_WINDOWS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/App.exe.manifest
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/App.rc
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/AppWin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/resource.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/HandlerWin.cpp
 )
-append_platform_sources(EXECUTIONGRAPHGUI_SRCS)
+append_platform_sources(ExecutionGraphGUI_SRCS)
 
-set(EXECUTIONGRAPHGUI_RES_SRCS_WINDOWS
+set(ExecutionGraphGUI_RES_SRCS_WINDOWS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/resources/cefApp.ico
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/resources/small.ico
 )
-append_platform_sources(EXECUTIONGRAPHGUI_RES_SRCS)
+append_platform_sources(ExecutionGraphGUI_RES_SRCS)
 
-set(EXECUTIONGRAPHGUI_SRCS ${EXECUTIONGRAPHGUI_SRCS} ${EXECUTIONGRAPHGUI_RES_SRCS})
+set(ExecutionGraphGUI_SRCS ${ExecutionGraphGUI_SRCS} ${ExecutionGraphGUI_RES_SRCS})
 # -------------
 
 # App Helper Sources
 # -------------
-set(EXECUTIONGRAPHGUI_HELPER_SRCS_MACOSX
+set(ExecutionGraphGUI_HELPER_SRCS_MACOSX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/ProcessHelperMac.cpp
 )
-append_platform_sources(EXECUTIONGRAPHGUI_HELPER_SRCS)
+append_platform_sources(ExecutionGraphGUI_HELPER_SRCS)
 # -------------
 
 # App Resources.
 # -------------
-set(EXECUTIONGRAPHGUI_RESOURCES_MAC_SRCS_MACOSX
+set(ExecutionGraphGUI_RESOURCES_MAC_SRCS_MACOSX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/Info.plist
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/App.icns
 )
-append_platform_sources(EXECUTIONGRAPHGUI_RESOURCES_MAC_SRCS)
-set(EXECUTIONGRAPHGUI_RESOURCES_MAC_ENGLISH_LPROJ_SRCS_MACOSX
+append_platform_sources(ExecutionGraphGUI_RESOURCES_MAC_SRCS)
+set(ExecutionGraphGUI_RESOURCES_MAC_ENGLISH_LPROJ_SRCS_MACOSX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/English.lproj/InfoPlist.strings
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/English.lproj/MainMenu.xib
 )
-append_platform_sources(EXECUTIONGRAPHGUI_RESOURCES_MAC_ENGLISH_LPROJ_SRCS)
+append_platform_sources(ExecutionGraphGUI_RESOURCES_MAC_ENGLISH_LPROJ_SRCS)
 
-set(EXECUTIONGRAPHGUI_RESOURCES_SRCS ${EXECUTIONGRAPHGUI_RESOURCES_MAC_SRCS} ${EXECUTIONGRAPHGUI_RESOURCES_MAC_ENGLISH_LPROJ_SRCS})
+set(ExecutionGraphGUI_RESOURCES_SRCS ${ExecutionGraphGUI_RESOURCES_MAC_SRCS} ${ExecutionGraphGUI_RESOURCES_MAC_ENGLISH_LPROJ_SRCS})
 # -------------
 
 
@@ -87,9 +89,9 @@ add_logical_target("libcef_lib" "${CEF_LIB_DEBUG}" "${CEF_LIB_RELEASE}")
 # Determine the target output directory.
 set_cef_target_out_dir()
 
-
-set(EXECUTIONGRAPHGUI_INC_DIRS
+set(ExecutionGraphGUI_INC_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${ExecutionGraph_INC_DIRS}
 )
 
 # Configure the client application
@@ -103,8 +105,8 @@ add_subdirectory(client)
 if(OS_LINUX)
     message(STATUS "Configuring target: ${CEF_TARGET} ...")
     # Executable target.
-    add_executable(${CEF_TARGET} ${EXECUTIONGRAPHGUI_SRCS})
-    set_executable_target_properties(${CEF_TARGET} ${EXECUTIONGRAPHGUI_INC_DIRS})
+    add_executable(${CEF_TARGET} ${ExecutionGraphGUI_SRCS})
+    set_executable_target_properties(${CEF_TARGET} "${ExecutionGraphGUI_INC_DIRS}")
     add_dependencies(${CEF_TARGET} libcef_dll_wrapper)
     target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
 
@@ -140,12 +142,12 @@ if(OS_MACOSX)
 
     message(STATUS "Configuring target: ${CEF_HELPER_TARGET} ...")
     # Helper executable target.
-    add_executable(${CEF_HELPER_TARGET} MACOSX_BUNDLE ${EXECUTIONGRAPHGUI_HELPER_SRCS})
+    add_executable(${CEF_HELPER_TARGET} MACOSX_BUNDLE ${ExecutionGraphGUI_HELPER_SRCS})
     set_target_properties(${CEF_HELPER_TARGET} PROPERTIES
         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/helper-Info.plist
         OUTPUT_NAME ${CEF_HELPER_TARGET_OUTPUTNAME}
     )
-    set_executable_target_properties(${CEF_HELPER_TARGET} ${EXECUTIONGRAPHGUI_INC_DIRS})
+    set_executable_target_properties(${CEF_HELPER_TARGET} "${ExecutionGraphGUI_INC_DIRS}")
     add_dependencies(${CEF_HELPER_TARGET} libcef_dll_wrapper)
     target_link_libraries(${CEF_HELPER_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
     
@@ -156,9 +158,9 @@ if(OS_MACOSX)
 
     message(STATUS "Configuring target: ${CEF_TARGET} ...")
     # Main executable target.
-    add_executable(${CEF_TARGET} MACOSX_BUNDLE ${EXECUTIONGRAPHGUI_RESOURCES_SRCS} ${EXECUTIONGRAPHGUI_SRCS})
-    set_executable_target_properties(${CEF_TARGET} ${EXECUTIONGRAPHGUI_INC_DIRS} ${ExecutionGraph_INC_DIRS_DEP})
-    add_dependencies(${CEF_TARGET} libcef_dll_wrapper "${CEF_HELPER_TARGET}" "${EXECUTIONGRAPHGUI_CLIENT_TARGET}")
+    add_executable(${CEF_TARGET} MACOSX_BUNDLE ${ExecutionGraphGUI_RESOURCES_SRCS} ${ExecutionGraphGUI_SRCS})
+    set_executable_target_properties(${CEF_TARGET} "${ExecutionGraphGUI_INC_DIRS}")
+    add_dependencies(${CEF_TARGET} libcef_dll_wrapper "${CEF_HELPER_TARGET}" "${ExecutionGraphGUI_CLIENT_TARGET}")
     target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
     set_target_properties(${CEF_TARGET} PROPERTIES
         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/Info.plist
@@ -178,7 +180,7 @@ if(OS_MACOSX)
                 "${CEF_APP}/Contents/Frameworks/Chromium Embedded Framework.framework"
         # Copy the Client Application into the Frameworks directory.
          COMMAND ${CMAKE_COMMAND} -E copy_directory
-         "${EXECUTIONGRAPHGUI_CLIENT_TARGET_OUT_DIR}"
+         "${ExecutionGraphGUI_CLIENT_TARGET_OUT_DIR}"
          "${CEF_APP}/Contents"
         VERBATIM
         )
@@ -191,7 +193,7 @@ if(OS_MACOSX)
     # directive but that doesn't properly handle nested resource directories.
     # Remove these prefixes from input file paths.
     set(PREFIXES "${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/")
-    copy_macosx_resources("${EXECUTIONGRAPHGUI_RESOURCES_SRCS}" "${PREFIXES}" "${CEF_TARGET}" "${CMAKE_CURRENT_SOURCE_DIR}" "${CEF_APP}")
+    copy_macosx_resources("${ExecutionGraphGUI_RESOURCES_SRCS}" "${PREFIXES}" "${CEF_TARGET}" "${CMAKE_CURRENT_SOURCE_DIR}" "${CEF_APP}")
 
     print_target_properties(${CEF_TARGET})
 endif()
@@ -205,9 +207,9 @@ if(OS_WINDOWS)
     message(STATUS "Configuring target: ${CEF_TARGET} ...")
 
     # Executable target.
-    add_executable(${CEF_TARGET} WIN32 ${EXECUTIONGRAPHGUI_SRCS})
+    add_executable(${CEF_TARGET} WIN32 ${ExecutionGraphGUI_SRCS})
     add_dependencies(${CEF_TARGET} libcef_dll_wrapper)
-    set_executable_target_properties(${CEF_TARGET} ${EXECUTIONGRAPHGUI_INC_DIRS})
+    set_executable_target_properties(${CEF_TARGET} "${ExecutionGraphGUI_INC_DIRS}")
     target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
 
     if(USE_SANDBOX)
