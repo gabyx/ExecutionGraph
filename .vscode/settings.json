@@ -88,7 +88,7 @@
             "${commentbegin}${bar}",
             "${commentbegin}${header}",
             "${commentbegin}",
-            "${commentbegin} @date ${date}"
+            "${commentbegin} @date ${date}",
             "${commentbegin} @author ${authorName}, ${authorEmail}",
             "${commentbegin}",
             "${commentbegin}${license}",
@@ -98,7 +98,7 @@
             "${commentbegin}${bar}",
             "${commentbegin}${header}",
             "${commentbegin}",
-            "${commentbegin} @date ${date}"
+            "${commentbegin} @date ${date}",
             "${commentbegin} @author ${authorName}, ${authorEmail}",
             "${commentbegin}",
             "${commentbegin}${license}",
@@ -108,7 +108,7 @@
             "${commentbegin}${bar}",
             "${commentbegin}${header}",
             "${commentbegin}",
-            "${commentbegin} @date ${date}"
+            "${commentbegin} @date ${date}",
             "${commentbegin} @author ${authorName}, ${authorEmail}",
             "${commentbegin}",
             "${commentbegin}${license}",
@@ -118,7 +118,7 @@
             "${commentbegin}${bar}",
             "${commentbegin}${header}",
             "${commentbegin}",
-            "${commentbegin} @date ${date}"
+            "${commentbegin} @date ${date}",
             "${commentbegin} @author ${authorName}, ${authorEmail}",
             "${commentbegin}",
             "${commentbegin}${license}",
@@ -128,7 +128,7 @@
             "${commentbegin}${bar}",
             "${commentbegin}${header}",
             "${commentbegin}",
-            "${commentbegin} @date ${date}"
+            "${commentbegin} @date ${date}",
             "${commentbegin} @author ${authorName}, ${authorEmail}",
             "${commentbegin}",
             "${commentbegin}${license}",

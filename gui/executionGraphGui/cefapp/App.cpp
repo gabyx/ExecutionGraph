@@ -86,7 +86,7 @@ void App::OnContextInitialized()
     // How to deploy these files to the app and reference them here?
     CefRegisterSchemeHandlerFactory("client",
                                     "executionGraph",
-                                    new FileSchemeHandlerFactory("./client/dist", "executionGraph"));
+                                    new FileSchemeHandlerFactory(m_clientSourcePath, "executionGraph"));
 
     // AppHandler implements browser-level callbacks.
     CefRefPtr<AppHandler> handler(new AppHandler(use_views));

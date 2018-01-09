@@ -22,7 +22,10 @@ class App : public CefApp,
     IMPLEMENT_REFCOUNTING(App);
 
 public:
-    App() {}
+    App(const CefString& clientSourcePath)
+        : m_clientSourcePath(clientSourcePath)
+    {
+    }
 
     //! @name CefApp Methods
     //@{
@@ -36,6 +39,9 @@ public:
     //@{
     virtual void OnContextInitialized() OVERRIDE;
     //@}
+
+private:
+    CefString m_clientSourcePath;  //! Application main arguments.
 };
 
 #endif

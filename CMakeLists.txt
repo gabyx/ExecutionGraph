@@ -162,6 +162,10 @@ find_package(Meta REQUIRED)
 list(APPEND ExecutionGraph_INC_DIRS_DEP ${Meta_INCLUDE_DIR})
 set(ExecutionGraph_DEPENDING_TARGETS_DEP ${Meta_TARGET})
 
+# Try to find the Argumentparser
+find_package(Args REQUIRED)
+list(APPEND ExecutionGraph_INC_DIRS_DEP ${args_INCLUDE_DIR})
+
 find_package(PugiXML)
 if(PUGIXML_FOUND)
     list(APPEND ExecutionGraph_INC_DIRS_DEP ${PUGIXML_INCLUDE_DIR} )

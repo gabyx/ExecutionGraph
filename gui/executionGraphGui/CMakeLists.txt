@@ -157,7 +157,7 @@ if(OS_MACOSX)
     message(STATUS "Configuring target: ${CEF_TARGET} ...")
     # Main executable target.
     add_executable(${CEF_TARGET} MACOSX_BUNDLE ${EXECUTIONGRAPHGUI_RESOURCES_SRCS} ${EXECUTIONGRAPHGUI_SRCS})
-    set_executable_target_properties(${CEF_TARGET} ${EXECUTIONGRAPHGUI_INC_DIRS})
+    set_executable_target_properties(${CEF_TARGET} ${EXECUTIONGRAPHGUI_INC_DIRS} ${ExecutionGraph_INC_DIRS_DEP})
     add_dependencies(${CEF_TARGET} libcef_dll_wrapper "${CEF_HELPER_TARGET}" "${EXECUTIONGRAPHGUI_CLIENT_TARGET}")
     target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
     set_target_properties(${CEF_TARGET} PROPERTIES
