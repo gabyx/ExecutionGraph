@@ -92,6 +92,10 @@ set(EXECUTIONGRAPHGUI_INC_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+# Configure the client application
+add_subdirectory(client)
+
+
 ######################
 # Linux configuration.
 ######################
@@ -154,7 +158,7 @@ if(OS_MACOSX)
     # Main executable target.
     add_executable(${CEF_TARGET} MACOSX_BUNDLE ${EXECUTIONGRAPHGUI_RESOURCES_SRCS} ${EXECUTIONGRAPHGUI_SRCS})
     set_executable_target_properties(${CEF_TARGET} ${EXECUTIONGRAPHGUI_INC_DIRS})
-    add_dependencies(${CEF_TARGET} libcef_dll_wrapper "${CEF_HELPER_TARGET}")
+    add_dependencies(${CEF_TARGET} libcef_dll_wrapper "${CEF_HELPER_TARGET}" "${EXECUTIONGRAPH_CLIENT_TARGET}")
     target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
     set_target_properties(${CEF_TARGET} PROPERTIES
         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/Info.plist
@@ -172,6 +176,10 @@ if(OS_MACOSX)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
                 "${CEF_BINARY_DIR}/Chromium Embedded Framework.framework"
                 "${CEF_APP}/Contents/Frameworks/Chromium Embedded Framework.framework"
+        # Copy the Client Application into the Frameworks directory.
+         COMMAND ${CMAKE_COMMAND} -E copy_directory
+         "${EXECUTIONGRAPH_CLIENT_TARGET_OUT_DIR}"
+         "${CEF_APP}/Contents/Client"
         VERBATIM
         )
 

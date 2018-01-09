@@ -8,7 +8,7 @@
     <key>CFBundleExecutable</key>
     <string>ExecutionGraphGUI</string>
     <key>CFBundleIconFile</key>
-    <string>app.icns</string>
+    <string>App.icns</string>
     <key>CFBundleIdentifier</key>
     <string>org.executionGraph.ExecutionGraphGUI</string>
     <key>CFBundleInfoDictionaryVersion</key>
