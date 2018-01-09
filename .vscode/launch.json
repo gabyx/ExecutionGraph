@@ -48,7 +48,7 @@
             "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/executionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/build/gui/executionGraphGui/client/build",
             "environment": [],
             "externalConsole": false,
             "MIMode": "lldb"

@@ -1,4 +1,4 @@
-# Find various components of the Angular Framework 
+# Find various components of the Angular Framework
 # The following variables are set if Meta is found.
 #  Angular_CLI_EXECUTABLE        - The path to the Angular CLI executable, otherwise Angular_CLI_EXECUTABLE-NOTFOUND
 
