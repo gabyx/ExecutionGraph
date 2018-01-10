@@ -14,7 +14,7 @@
 
 AppCLArgs::AppCLArgs(int argc, char* argv[])
     : executionGraph::CommandLineArguments(argc, argv, "ExecutionGUI Application", "No detailed Description")
-    , m_clientSourcePath(m_parser, "client", "Source path to the client application.", {'c', "clientSourcePath"}, this->getApplicationPath())
+    , m_clientSourcePath(m_parser, "client", "Source path to the client application.", {'c', "clientSourcePath"}, HIER PARENT PATH NEHMEN this->getApplicationPath() + "/client")
 {
     m_parser.LongSeparator("=");
     args::HelpFlag help(m_parser, "help", "Display this help menu.", {'h', "help"});
