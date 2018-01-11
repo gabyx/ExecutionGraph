@@ -11,10 +11,10 @@
 //! ========================================================================================
 
 #import <Cocoa/Cocoa.h>
-
 #include <cef_application_mac.h>
 #include <wrapper/cef_helpers.h>
 #include "cefapp/App.hpp"
+#include "cefapp/AppCLArgs.hpp"
 #include "cefapp/AppHandler.hpp"
 
 // Receives notifications from the application.
@@ -115,8 +115,10 @@
 
 // Entry point function for the browser process.
 int main(int argc, char* argv[]) {
+  
   // Provide CEF with command-line arguments.
-  CefMainArgs main_args(argc, argv);
+  CefMainArgs mainArgs(argc, argv);
+  EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(AppCLArgs, appCLArgs, (argc,argv));
 
   // Initialize the AutoRelease pool.
   NSAutoreleasePool* autopool = [[NSAutoreleasePool alloc] init];
@@ -131,10 +133,10 @@ int main(int argc, char* argv[]) {
   // App implements application-level callbacks for the browser process.
   // It will create the first browser instance in OnContextInitialized() after
   // CEF has initialized.
-  CefRefPtr<App> app(new App);
+  CefRefPtr<App> app(new App(appCLArgs->getClientSourcePath()));
 
   // Initialize CEF for the browser process.
-  CefInitialize(main_args, settings, app.get(), NULL);
+  CefInitialize(mainArgs, settings, app.get(), NULL);
 
   // Create the application delegate.
   NSObject* delegate = [[SimpleAppDelegate alloc] init];

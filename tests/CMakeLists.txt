@@ -71,6 +71,7 @@ function(defineCompileDefs target)
     message(STATUS "====================================================")
     message(STATUS "Configuring target: ${target}")
 
+    set_target_compile_options_ExecutionGraph(${target})
     target_include_directories(${target} PRIVATE ${INCLUDE_DIRS})
     target_link_libraries(${target} ExecutionGraph-LibForTestsOnly gtest gmock_main)
 

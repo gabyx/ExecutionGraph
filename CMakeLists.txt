@@ -18,7 +18,7 @@ else()
     set(PROJECTNAMEPREFIX ${CMAKE_BUILD_TYPE})
 endif()
 
-set(CMAKE_VERBOSE_MAKEFILE OFF)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" ${CMAKE_MODULE_PATH})
 message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
@@ -43,63 +43,15 @@ set(ExecutionGraph_ROOT_DIR   ${PROJECT_SOURCE_DIR})
 
 
 message(STATUS "Compiler ID is: " ${CMAKE_CXX_COMPILER_ID})
-if(NOT MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL)
-	if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 
-		set(MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL TRUE CACHE INTERNAL "x" FORCE)
-		message(STATUS "Setting Values for GNU")
-		set(CMAKE_C_FLAGS "-fmessage-length=0 -fmax-errors=50" CACHE STRING "Flags for C Compiler" FORCE)
-		set(CMAKE_CXX_FLAGS "-std=c++14 -fmax-errors=50 -Werror=return-type" CACHE STRING "Flags for CXX Compiler" FORCE)
-		set(CMAKE_CXX_FLAGS_DEBUG "-g -fno-omit-frame-pointer -fsanitize=leak -Wall -Wpedantic -Wno-char-subscripts" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
+# use CCACHE if possible
+find_program(CCACHE_FOUND ccache)
+if(CCACHE_FOUND)
+    set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
+endif(CCACHE_FOUND)
 
-    set(ExecutionGraph_ASAN_OPTIONS_DBG "-fsanitize=leak")
-
-	ELSEIF ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" )
-
-		message(STATUS "Setting Values for Clang")
-		set(MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL TRUE CACHE INTERNAL "x" FORCE)
-		set(CMAKE_C_FLAGS                "" CACHE STRING "Flags for C Compiler" FORCE)
-		set(CMAKE_C_FLAGS_DEBUG          "-g" CACHE STRING "Flags for C Compiler for debug builds" FORCE)
-		set(CMAKE_C_FLAGS_MINSIZEREL     "-Os -DNDEBUG" CACHE STRING "Flags for C Compiler for release minsize builds" FORCE)
-		set(CMAKE_C_FLAGS_RELEASE        "-O3 -DNDEBUG" CACHE STRING "Flags for C Compiler for release builds" FORCE)
-		set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g" CACHE STRING "Flags for C Compiler for release builds with debug info" FORCE)
-
-		set(CMAKE_CXX_FLAGS                "-std=c++14 -ferror-limit=50 -Werror=return-type" CACHE STRING "Flags for CXX Compiler" FORCE)
-		set(CMAKE_CXX_FLAGS_DEBUG          "-g3 -D_GLIBCXX_DEBUG -fno-omit-frame-pointer -fsanitize=leak -fsanitize=address -Weverything -Wpedantic -Wno-deprecated-register -Wno-documentation -Wno-old-style-cast -Wno-comment -Wno-float-equal -Wno-deprecated -Wno-c++98-compat-pedantic -Wno-undef -Wno-unused-macros" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
-		set(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release minsize builds" FORCE)
-		set(CMAKE_CXX_FLAGS_RELEASE        "-O3 -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release builds" FORCE)
-		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g3" CACHE STRING "Flags for CXX Compiler for release builds with debug info" FORCE)
-
-    set(ExecutionGraph_ASAN_OPTIONS_DBG "-fsanitize=leak" "-fsanitize=address")
-
-	ELSEIF ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel" )
-
-        message(STATUS "Setting Values for Intel")
-		set(MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL TRUE CACHE INTERNAL "x" FORCE)
-		set(CMAKE_C_FLAGS                "" CACHE STRING "Flags for C Compiler" FORCE)
-		set(CMAKE_C_FLAGS_DEBUG          "-g -Wall" CACHE STRING "Flags for C Compiler for debug builds" FORCE)
-		set(CMAKE_C_FLAGS_MINSIZEREL     "-Os -DNDEBUG" CACHE STRING "Flags for C Compiler for release minsize builds" FORCE)
-		set(CMAKE_C_FLAGS_RELEASE        "-O3 -DNDEBUG" CACHE STRING "Flags for C Compiler for release builds" FORCE)
-		set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g" CACHE STRING "Flags for C Compiler for release builds with debug info" FORCE)
-
-		set(CMAKE_CXX_FLAGS                "-std=c++14 " CACHE STRING "Flags for CXX Compiler" FORCE)
-		set(CMAKE_CXX_FLAGS_DEBUG          "-g -Wall" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
-		set(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release minsize builds" FORCE)
-		set(CMAKE_CXX_FLAGS_RELEASE        "-O3 -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release builds" FORCE)
-        set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g" CACHE STRING "Flags for CXX Compiler for release builds with debug info" FORCE)
-
-    ELSEIF ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC" )
-        message(ERROR "MSVC is not yet supported!")
-    endif()
-
-    # use CCACHE if possible
-    find_program(CCACHE_FOUND ccache)
-    if(CCACHE_FOUND)
-        set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
-    endif(CCACHE_FOUND)
-
-endif()
-
+message("Default Compiler Flags: '${CMAKE_CXX_FLAGS}' | '${CMAKE_CXX_FLAGS_DEBUG}' | '${CMAKE_CXX_FLAGS_RELEASE}'")
+message("Default Linker Flags: '${CMAKE_EXE_LINKER_FLAGS}' | '${CMAKE_SHARED_LINKER_FLAGS}' | '${CMAKE_STATIC_LINKER_FLAGS}'")
 
 
 #Add some multithreaded build support ==================================
@@ -162,6 +114,10 @@ find_package(Meta REQUIRED)
 list(APPEND ExecutionGraph_INC_DIRS_DEP ${Meta_INCLUDE_DIR})
 set(ExecutionGraph_DEPENDING_TARGETS_DEP ${Meta_TARGET})
 
+# Try to find the Argumentparser
+find_package(Args REQUIRED)
+list(APPEND ExecutionGraph_INC_DIRS_DEP ${args_INCLUDE_DIR})
+
 find_package(PugiXML)
 if(PUGIXML_FOUND)
     list(APPEND ExecutionGraph_INC_DIRS_DEP ${PUGIXML_INCLUDE_DIR} )
@@ -197,10 +153,6 @@ if(ExecutionGraph_BUILD_EXAMPLE)
   set(ExecutionGraph_BUILD_LIBRARY On CACHE BOOL "Build a shared library" FORCE)
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MYPROJECT_CXX_FLAGS}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MYPROJECT_CXX_FLAGS}")
-message(STATUS "Added '${MYPROJECT_CXX_FLAGS}' to CMAKE_CXX and CMAKE_C_FLAGS: ${CMAKE_CXX_FLAGS} and ${CMAKE_C_FLAGS}")
-
 # Define all MVBB Source files
 include(DefineExecutionGraphSources)
 
@@ -208,7 +160,7 @@ set(ExecutionGraph_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include/ExecutionGraph")
 set(ExecutionGraph_EXTERNAL_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/external/")
 
 #Include all relevant sources
-INCLUDE_ALL_ExecutionGraph_source(ExecutionGraph_SRC
+include_all_source_ExecutionGraph(ExecutionGraph_SRC
                                   ExecutionGraph_INC
                                   ExecutionGraph_INC_DIRS
                                   ExecutionGraph_DEPENDING_TARGETS

@@ -1,4 +1,4 @@
-macro(INCLUDE_ALL_ExecutionGraph_SOURCE 
+macro(include_all_source_ExecutionGraph 
       SRC 
       INC 
       INCLUDE_DIRS 
@@ -12,9 +12,9 @@ macro(INCLUDE_ALL_ExecutionGraph_SOURCE
     # no external sources up to now
     
     set(${SRC}
-                
         ${ExecutionGraph_ROOT_DIR}/src/DemangleTypes.cpp
-    
+        ${ExecutionGraph_ROOT_DIR}/src/CommandLineArguments.cpp
+
         ${ExecutionGraph_ROOT_DIR}/src/LogicSocket.cpp
         ${ExecutionGraph_ROOT_DIR}/src/LogicNode.cpp
     )
@@ -30,7 +30,8 @@ macro(INCLUDE_ALL_ExecutionGraph_SOURCE
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/Platform.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/SfinaeMacros.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/TypeDefs.hpp
-    
+        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/CommandLineArguments.hpp
+
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicCommon.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicSocket.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicSocketDefaultTypes.hpp
@@ -53,6 +54,58 @@ macro(INCLUDE_ALL_ExecutionGraph_SOURCE
     ExecutionGraph_write_config_file( ${ExecutionGraph_CONFIG_FILE} ${ExecutionGraph_ROOT_DIR})
     #=========================
     
-    
-    
+endmacro()
+
+
+macro(set_target_compile_options_ExecutionGraph target)
+
+	if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+        message(STATUS "Setting Compile/Linker Options for Clang")
+        set(CXX_FLAGS ${CMAKE_CXX_FLAGS})
+        list(APPEND CXX_FLAGS "-std=c++17" 
+                              "-lc++experimental" 
+                              "-ferror-limit=50" 
+                              "-Werror=return-type")
+        set(CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+        list(APPEND CXX_FLAGS_DEBUG "-g3"
+                                    "-fno-omit-frame-pointer"
+                                    "-fsanitize=leak"
+                                    "-fsanitize=address" 
+                                    "-Weverything"
+                                    "-Wpedantic" 
+                                    "-Wno-deprecated-register" 
+                                    "-Wno-documentation" 
+                                    "-Wno-old-style-cast" 
+                                    "-Wno-comment" 
+                                    "-Wno-float-equal" 
+                                    "-Wno-deprecated" 
+                                    "-Wno-c++98-compat-pedantic" 
+                                    "-Wno-undef" 
+                                    "-Wno-unused-macros")
+        set(CXX_FLAGS_MINSIZEREL ${CMAKE_CXX_FLAGS_MINSIZEREL})
+        list(APPEND CXX_FLAGS_MINSIZEREL "-Os" 
+                                         "-DNDEBUG")
+        set(CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+        list(APPEND CXX_FLAGS_RELEASE "-O3" 
+                                      "-DNDEBUG")
+        set(CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
+        list(APPEND CXX_FLAGS_RELWITHDEBINFO "-O2"
+                                             "-g3")
+
+        set(LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lc++experimental -fsanitize=leak -fsanitize=address")
+
+    elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+        message(ERROR "MSVC is not yet supported!")
+    endif()
+
+    # Compile flags.
+    target_compile_options(${target} PRIVATE ${CXX_FLAGS})
+    target_compile_options(${target} PRIVATE $<$<CONFIG:Debug>:${CXX_FLAGS_DEBUG}>)
+    target_compile_options(${target} PRIVATE $<$<CONFIG:Release>:${CXX_FLAGS_RELEASE}>)
+    target_compile_options(${target} PRIVATE $<$<CONFIG:MinSizeRel>:${CXX_FLAGS_MINSIZEREL}>)
+    target_compile_options(${target} PRIVATE $<$<CONFIG:RelWithDebInfo>:${CXX_FLAGS_RELWITHDEBINFO}>)
+
+    # Linker flags.
+    set_property(TARGET ${target} PROPERTY LINK_FLAGS ${LINKER_FLAGS})
+
 endmacro()

@@ -14,15 +14,19 @@
 #define APP_H
 
 #include <cef_app.h>
+#include "ExecutionGraph/common/FileSystem.hpp"
 
 // Implement application-level callbacks for the browser process.
 class App : public CefApp,
             public CefBrowserProcessHandler
 {
-    IMPLEMENT_REFCOUNTING(App);
+    IMPLEMENT_REFCOUNTING(App)
 
 public:
-    App() {}
+    App(const std::path& clientSourcePath)
+        : m_clientSourcePath(clientSourcePath)
+    {
+    }
 
     //! @name CefApp Methods
     //@{
@@ -36,6 +40,9 @@ public:
     //@{
     virtual void OnContextInitialized() OVERRIDE;
     //@}
+
+private:
+    std::path m_clientSourcePath;  //! Client source path.
 };
 
 #endif
