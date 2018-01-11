@@ -11,6 +11,9 @@
 //! ========================================================================================
 
 #include "cefapp/AppCLArgs.hpp"
+#include <cstdlib>
+#include <iostream>
+#include "ExecutionGraph/common/Exception.hpp"
 
 AppCLArgs::AppCLArgs(int argc, char* argv[])
     : executionGraph::CommandLineArguments(argc, argv, "ExecutionGUI Application", "No detailed Description")
@@ -20,8 +23,20 @@ AppCLArgs::AppCLArgs(int argc, char* argv[])
                          {'c', "clientSourcePath"},
                          this->getApplicationPath().parent_path().append("/../client"))
 {
-    m_parser.LongSeparator("=");
     args::HelpFlag help(m_parser, "help", "Display this help menu.", {'h', "help"});
 
-    m_parser.ParseCLI(argc, argv);
+    try
+    {
+        m_parser.ParseCLI(argc, argv);
+    }
+    catch(args::Help)
+    {
+        std::cout << m_parser;
+        std::exit(EXIT_SUCCESS);
+    }
+    catch(args::ParseError e)
+    {
+        EXECGRAPH_THROW_EXCEPTION("Parser Error: " << e.what() << std::endl
+                                                   << m_parser)
+    }
 }
