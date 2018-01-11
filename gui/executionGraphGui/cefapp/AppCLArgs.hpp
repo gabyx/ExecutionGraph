@@ -13,10 +13,9 @@
 #ifndef cefapp_AppCLArgs_hpp
 #define cefapp_AppCLArgs_hpp
 
-#define ARGS_NOEXCEPT
 #include <ExecutionGraph/common/CommandLineArguments.hpp>
-#define EXECGRAPH_SINGLETON_NOEXCEPT
 #include <ExecutionGraph/common/Singleton.hpp>
+#include "ExecutionGraph/common/FileSystem.hpp"
 
 class AppCLArgs final : public executionGraph::CommandLineArguments,
                         public executionGraph::Singleton<AppCLArgs>
@@ -28,7 +27,7 @@ public:
     //! @name Client Application Arguments
     //@{
 public:
-    const std::string& getClientSourcePath() { return args::get(m_clientSourcePath); }
+    std::path getClientSourcePath() { return args::get(m_clientSourcePath); }
 
 private:
     args::ValueFlag<std::string> m_clientSourcePath;

@@ -133,7 +133,7 @@ int main(int argc, char* argv[]) {
   // App implements application-level callbacks for the browser process.
   // It will create the first browser instance in OnContextInitialized() after
   // CEF has initialized.
-  CefRefPtr<App> app(new App(appCLArgs->getClientSourcePath() + "/.."));
+  CefRefPtr<App> app(new App(appCLArgs->getClientSourcePath()));
 
   // Initialize CEF for the browser process.
   CefInitialize(mainArgs, settings, app.get(), NULL);

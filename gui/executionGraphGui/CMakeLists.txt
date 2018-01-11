@@ -83,15 +83,13 @@ if(OS_MACOSX)
   set(CEF_HELPER_TARGET_OUTPUTNAME "ExecutionGraphGUI Helper") # This is hardcoded as described in <cef_types.h> browser_subprocess_path.
 endif()
 
-# Logical target used to link the libcef library.
-add_logical_target("libcef_lib" "${CEF_LIB_DEBUG}" "${CEF_LIB_RELEASE}")
-
 # Determine the target output directory.
 set_cef_target_out_dir()
 
 set(ExecutionGraphGUI_INC_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${ExecutionGraph_INC_DIRS}
+    ${CEF_INCLUDE_PATH}
 )
 
 # Configure the client application
@@ -106,7 +104,10 @@ if(OS_LINUX)
     message(STATUS "Configuring target: ${CEF_TARGET} ...")
     # Executable target.
     add_executable(${CEF_TARGET} ${ExecutionGraphGUI_SRCS})
-    set_executable_target_properties(${CEF_TARGET} "${ExecutionGraphGUI_INC_DIRS}")
+    # Compile Options
+    set_target_compile_options_ExecutionGraph(${CEF_TARGET})
+    # Additional Include Directories
+    target_include_directories(${CEF_TARGET} PRIVATE ${ExecutionGraphGUI_INC_DIRS})
     add_dependencies(${CEF_TARGET} libcef_dll_wrapper)
     target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
 
@@ -143,11 +144,14 @@ if(OS_MACOSX)
     message(STATUS "Configuring target: ${CEF_HELPER_TARGET} ...")
     # Helper executable target.
     add_executable(${CEF_HELPER_TARGET} MACOSX_BUNDLE ${ExecutionGraphGUI_HELPER_SRCS})
+    # Compile Options
+    set_target_compile_options_ExecutionGraph(${CEF_HELPER_TARGET})
+    # Additional Include Directories
+    target_include_directories(${CEF_HELPER_TARGET} PRIVATE ${ExecutionGraphGUI_INC_DIRS})
     set_target_properties(${CEF_HELPER_TARGET} PROPERTIES
         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/helper-Info.plist
         OUTPUT_NAME ${CEF_HELPER_TARGET_OUTPUTNAME}
     )
-    set_executable_target_properties(${CEF_HELPER_TARGET} "${ExecutionGraphGUI_INC_DIRS}")
     add_dependencies(${CEF_HELPER_TARGET} libcef_dll_wrapper)
     target_link_libraries(${CEF_HELPER_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
     
@@ -159,12 +163,15 @@ if(OS_MACOSX)
     message(STATUS "Configuring target: ${CEF_TARGET} ...")
     # Main executable target.
     add_executable(${CEF_TARGET} MACOSX_BUNDLE ${ExecutionGraphGUI_RESOURCES_SRCS} ${ExecutionGraphGUI_SRCS})
-    set_executable_target_properties(${CEF_TARGET} "${ExecutionGraphGUI_INC_DIRS}")
+    # Compile Options
+    set_target_compile_options_ExecutionGraph(${CEF_TARGET})
+    # Additional Include Directories
+    target_include_directories(${CEF_TARGET} PRIVATE ${ExecutionGraphGUI_INC_DIRS})
     add_dependencies(${CEF_TARGET} libcef_dll_wrapper "${CEF_HELPER_TARGET}" "${ExecutionGraphGUI_CLIENT_TARGET}")
     target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
     set_target_properties(${CEF_TARGET} PROPERTIES
         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/Info.plist
-        )
+    )
 
     # Copy files into the main app bundle.
     add_custom_command(
@@ -208,8 +215,9 @@ if(OS_WINDOWS)
 
     # Executable target.
     add_executable(${CEF_TARGET} WIN32 ${ExecutionGraphGUI_SRCS})
+    # Compile Options
+    set_target_compile_options_ExecutionGraph(${CEF_TARGET})
     add_dependencies(${CEF_TARGET} libcef_dll_wrapper)
-    set_executable_target_properties(${CEF_TARGET} "${ExecutionGraphGUI_INC_DIRS}")
     target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
 
     if(USE_SANDBOX)

@@ -56,7 +56,8 @@
         "list": "cpp",
         "map": "cpp",
         "set": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "filesystem": "cpp"
     },
     "cmake.useCMakeServer": true,
     "cmake.preferredGenerators": [

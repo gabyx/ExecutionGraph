@@ -82,7 +82,7 @@ if(OS_LINUX)
     --param=ssp-buffer-size=4       # Set the minimum buffer size protected by SSP (security feature, related to stack-protector)
     -pipe                           # Use pipes rather than temporary files for communication between build stages
     -pthread                        # Use the pthread library
-    -Wall                           # Enable all warnings
+    -w                              # Disable warnings -> -Wall Enable all warnings
     #-Werror                         # Treat warnings as errors
     -Wno-missing-field-initializers # Don't warn about missing field initializers
     -Wno-unused-parameter           # Don't warn about unused parameters
@@ -228,7 +228,7 @@ if(OS_MACOSX)
     -fstack-protector               # Protect some vulnerable functions from stack-smashing (security feature)
     -funwind-tables                 # Support stack unwinding for backtrace()
     -fvisibility=hidden             # Give hidden visibility to declarations that are not explicitly marked as visible
-    -Wall                           # Enable all warnings
+    -w                              # Disable all warnings -> -Wall Enable all warnings
     #-Werror                         # Treat warnings as errors
     -Wextra                         # Enable additional warnings
     -Wendif-labels                  # Warn whenever an #else or an #endif is followed by text

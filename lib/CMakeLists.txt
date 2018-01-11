@@ -30,11 +30,11 @@ message(STATUS "Configuring target: ExecutionGraph-Lib")
 
 if(ExecutionGraph_BUILD_LIBRARY_STATIC)
     add_library(ExecutionGraph-Lib STATIC ${SOURCE_FILES} ${INCLUDE_FILES})
-    set_target_properties(ExecutionGraph-Lib PROPERTIES OUTPUT_NAME ExecutionGraphStatic)
-
 else()
     add_library(ExecutionGraph-Lib SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
 endif()
+
+set_target_compile_options_ExecutionGraph(ExecutionGraph-Lib)
 
 if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
     add_dependencies(ExecutionGraph-Lib ${ExecutionGraph_DEPENDING_TARGETS})

@@ -14,6 +14,7 @@
 #define APP_H
 
 #include <cef_app.h>
+#include "ExecutionGraph/common/FileSystem.hpp"
 
 // Implement application-level callbacks for the browser process.
 class App : public CefApp,
@@ -22,7 +23,7 @@ class App : public CefApp,
     IMPLEMENT_REFCOUNTING(App)
 
 public:
-    App(const CefString& clientSourcePath)
+    App(const std::path& clientSourcePath)
         : m_clientSourcePath(clientSourcePath)
     {
     }
@@ -41,7 +42,7 @@ public:
     //@}
 
 private:
-    CefString m_clientSourcePath;  //! Client source path.
+    std::path m_clientSourcePath;  //! Client source path.
 };
 
 #endif

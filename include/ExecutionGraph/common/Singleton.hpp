@@ -14,6 +14,7 @@
 #define ExecutionGraph_common_Singelton_hpp
 
 #include <memory>
+#include "ExecutionGraph/common/Asserts.hpp"
 
 namespace executionGraph
 {
@@ -35,9 +36,7 @@ namespace executionGraph
     public:
         Singleton(void)
         {
-#ifndef EXECGRAPH_SINGLETON_NOEXCEPT
             EXECGRAPH_ASSERT(!m_instance, "m_instance != nullptr : " << typeid(*m_instance).name());
-#endif
             m_instance = static_cast<T*>(this);
         }
         ~Singleton(void)
@@ -47,9 +46,7 @@ namespace executionGraph
 
         static T& getInstance(void)
         {
-#ifndef EXECGRAPH_SINGLETON_NOEXCEPT
             EXECGRAPH_ASSERT(m_instance, "m_instance != nullptr : " << typeid(*m_instance).name());
-#endif
             return (*m_instance);
         }
     };
