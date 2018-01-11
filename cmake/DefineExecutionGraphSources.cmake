@@ -59,7 +59,7 @@ endmacro()
 
 macro(set_target_compile_options_ExecutionGraph target)
 
-	if( ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+	if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
         message(STATUS "Setting Compile/Linker Options for Clang")
         set(CXX_FLAGS ${CMAKE_CXX_FLAGS})
         list(APPEND CXX_FLAGS "-std=c++17" 
@@ -94,7 +94,7 @@ macro(set_target_compile_options_ExecutionGraph target)
 
         set(LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lc++experimental -fsanitize=leak -fsanitize=address")
 
-    elseif ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC" )
+    elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
         message(ERROR "MSVC is not yet supported!")
     endif()
 
