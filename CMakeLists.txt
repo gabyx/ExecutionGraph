@@ -50,8 +50,9 @@ if(CCACHE_FOUND)
     set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
 endif(CCACHE_FOUND)
 
-message("Default Compiler Flags: ${CMAKE_CXX_FLAGS} | ${CMAKE_CXX_FLAGS_DEBUG}  | CMAKE_CXX_FLAGS_RELEASE")
-message("Default Linker Flags: ${CMAKE_EXE_LINKER_FLAGS} | ${CMAKE_SHARED_LINKER_FLAGS} | ${CMAKE_STATIC_LINKER_FLAGS}")
+message("Default Compiler Flags: '${CMAKE_CXX_FLAGS}' | '${CMAKE_CXX_FLAGS_DEBUG}' | '${CMAKE_CXX_FLAGS_RELEASE}'")
+message("Default Linker Flags: '${CMAKE_EXE_LINKER_FLAGS}' | '${CMAKE_SHARED_LINKER_FLAGS}' | '${CMAKE_STATIC_LINKER_FLAGS}'")
+
 
 #Add some multithreaded build support ==================================
 mark_as_advanced(MULTITHREADED_BUILD)
@@ -151,10 +152,6 @@ endif()
 if(ExecutionGraph_BUILD_EXAMPLE)
   set(ExecutionGraph_BUILD_LIBRARY On CACHE BOOL "Build a shared library" FORCE)
 endif()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MYPROJECT_CXX_FLAGS}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MYPROJECT_CXX_FLAGS}")
-message(STATUS "Added '${MYPROJECT_CXX_FLAGS}' to CMAKE_CXX and CMAKE_C_FLAGS: ${CMAKE_CXX_FLAGS} and ${CMAKE_C_FLAGS}")
 
 # Define all MVBB Source files
 include(DefineExecutionGraphSources)

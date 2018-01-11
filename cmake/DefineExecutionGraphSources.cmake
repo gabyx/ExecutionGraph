@@ -59,25 +59,40 @@ endmacro()
 
 macro(set_target_compile_options_ExecutionGraph target)
 
-	if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-
-		set(MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL TRUE CACHE INTERNAL "x" FORCE)
-		message(STATUS "Setting Compile/Linker Options for GNU")
-		set(CXX_FLAGS         "${CMAKE_CXX_FLAGS} -std=c++17 -fmax-errors=50 -Werror=return-type" CACHE STRING "Flags for CXX Compiler" FORCE)
-		set(CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG} -g -fno-omit-frame-pointer -fsanitize=leak -Wall -Wpedantic -Wno-char-subscripts" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
-
-	elseif( ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" )
-
+	if( ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
         message(STATUS "Setting Compile/Linker Options for Clang")
-        set(MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL TRUE CACHE INTERNAL "x" FORCE)
-        
-		set(CXX_FLAGS                "${CMAKE_CXX_FLAGS} -std=c++17 -lc++experimental -ferror-limit=50 -Werror=return-type " CACHE STRING "Flags for CXX Compiler" FORCE)
-		set(CXX_FLAGS_DEBUG          "${CMAKE_CXX_FLAGS_DEBUG} -g3 -fno-omit-frame-pointer -fsanitize=leak -fsanitize=address -Weverything -Wpedantic -Wno-deprecated-register -Wno-documentation -Wno-old-style-cast -Wno-comment -Wno-float-equal -Wno-deprecated -Wno-c++98-compat-pedantic -Wno-undef -Wno-unused-macros" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
-		set(CXX_FLAGS_MINSIZEREL     "${CMAKE_CXX_FLAGS_MINSIZEREL} -Os -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release minsize builds" FORCE)
-		set(CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release builds" FORCE)
-		set(CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O2 -g3" CACHE STRING "Flags for CXX Compiler for release builds with debug info" FORCE)
+        set(CXX_FLAGS ${CMAKE_CXX_FLAGS})
+        list(APPEND CXX_FLAGS "-std=c++17" 
+                              "-lc++experimental" 
+                              "-ferror-limit=50" 
+                              "-Werror=return-type")
+        set(CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+        list(APPEND CXX_FLAGS_DEBUG "-g3"
+                                    "-fno-omit-frame-pointer"
+                                    "-fsanitize=leak"
+                                    "-fsanitize=address" 
+                                    "-Weverything"
+                                    "-Wpedantic" 
+                                    "-Wno-deprecated-register" 
+                                    "-Wno-documentation" 
+                                    "-Wno-old-style-cast" 
+                                    "-Wno-comment" 
+                                    "-Wno-float-equal" 
+                                    "-Wno-deprecated" 
+                                    "-Wno-c++98-compat-pedantic" 
+                                    "-Wno-undef" 
+                                    "-Wno-unused-macros")
+        set(CXX_FLAGS_MINSIZEREL ${CMAKE_CXX_FLAGS_MINSIZEREL})
+        list(APPEND CXX_FLAGS_MINSIZEREL "-Os" 
+                                         "-DNDEBUG")
+        set(CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+        list(APPEND CXX_FLAGS_RELEASE "-O3" 
+                                      "-DNDEBUG")
+        set(CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
+        list(APPEND CXX_FLAGS_RELWITHDEBINFO "-O2"
+                                             "-g3")
 
-        set(LINKER_FLAGS    "${CMAKE_EXE_LINKER_FLAGS} -lc++experimental")
+        set(LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lc++experimental -fsanitize=leak -fsanitize=address")
 
     elseif ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC" )
         message(ERROR "MSVC is not yet supported!")
