@@ -23,7 +23,11 @@ CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrow
     CefURLParts urlParts;
     if(CefParseURL(request->GetURL(), urlParts))
     {
-        // e.g. "/asd/abc/abc/abcs.ext"
+        //! todo: why do we get here a urlParts.path.str as "//host/folderA/folderB"
+        //! Shouldnt it be : "folderA/folderB".
+        //! the host is somehow not parsed?: http://www.magpcss.org/ceforum/viewtopic.php?f=6&t=6048
+
+        // e.g. "////host/folderA/folderB/file.ext"
         std::string temp = CefString(urlParts.path.str).ToString();
         auto itC         = temp.begin();
         while(itC != temp.end() && *itC == '/')
@@ -31,10 +35,9 @@ CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrow
             ++itC;
         }
         std::path url(itC, temp.end());
-        std::cout << "FileSchemeHandlerFactory::Create " << url << std::endl;
-        // e.g. url : "asd/abc/abc/abcs.ext"
+        // e.g. url : "host/folderA/folderB/file.ext""
 
-        // Split urlPrefix from front (e.g "asd/abc/abc.ext")
+        // Split urlPrefix from front (e.g "host/folderA")
         auto it        = url.begin();
         auto itEnd     = url.end();
         auto itPref    = m_urlPrefix.begin();
@@ -62,8 +65,7 @@ CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrow
         {
             return nullptr;
         }
-        filePath = m_folderPath / filePath;
-        std::cout << "filePath: '" << filePath << "'" << std::endl;
+        filePath                              = m_folderPath / filePath;
         CefRefPtr<CefStreamReader> fileStream = CefStreamReader::CreateForFile(filePath.string());
         if(fileStream != nullptr)
         {
