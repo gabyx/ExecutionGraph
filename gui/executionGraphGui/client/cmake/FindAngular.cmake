@@ -5,6 +5,7 @@
 include(FindPackageHandleStandardArgs)
 
 find_program(ANGULAR_CLI_EXECUTABLE "ng")
+find_program(NODE_PACKAGE_MANAGER_EXECUTABLE "npm")
 
-find_package_handle_standard_args(Angular DEFAULT_MSG ANGULAR_CLI_EXECUTABLE)
-mark_as_advanced(ANGULAR_CLI_EXECUTABLE)
+find_package_handle_standard_args(Angular DEFAULT_MSG ANGULAR_CLI_EXECUTABLE NODE_PACKAGE_MANAGER_EXECUTABLE)
+mark_as_advanced(ANGULAR_CLI_EXECUTABLE NODE_PACKAGE_MANAGER_EXECUTABLE)

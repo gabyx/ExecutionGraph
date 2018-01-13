@@ -10,9 +10,9 @@ message(STATUS "Configuring target: ${ExecutionGraphGUI_CLIENT_TARGET} ...")
 
 find_package(Angular REQUIRED)
 add_custom_target(${ExecutionGraphGUI_CLIENT_TARGET} ALL
-                  COMMAND "${ANGULAR_CLI_EXECUTABLE}" "build" "--output-path" "${ExecutionGraphGUI_CLIENT_TARGET_OUT_DIR}/client"
+                  COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/cmake/RunAngularBuild.sh" "${NODE_PACKAGE_MANAGER_EXECUTABLE}" "${ExecutionGraphGUI_CLIENT_TARGET_OUT_DIR}/client" "build"
                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
-# add_custom_target(${ExecutionGraphGUI_CLIENT_TARGET} ALL
-#                 COMMAND "echo" "Start Angular 'ng build --watch'"
-#                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+add_custom_target("${ExecutionGraphGUI_CLIENT_TARGET}-Clean"
+                  COMMAND "rm" "-r" "${ExecutionGraphGUI_CLIENT_TARGET_OUT_DIR}/client/"
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})

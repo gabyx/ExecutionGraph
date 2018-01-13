@@ -16,7 +16,7 @@
 #include "ExecutionGraph/common/Exception.hpp"
 
 AppCLArgs::AppCLArgs(int argc, char* argv[])
-    : executionGraph::CommandLineArguments(argc, argv, "ExecutionGUI Application", "No detailed Description")
+    : executionGraph::CommandLineArguments(argc, argv, "ExecutionGUI Application", "No detailed description")
     , m_clientSourcePath(m_parser,
                          "client",
                          "Source path to the client application.",

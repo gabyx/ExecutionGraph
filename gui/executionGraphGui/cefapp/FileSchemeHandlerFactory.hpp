@@ -23,7 +23,7 @@ class FileSchemeHandlerFactory : public CefSchemeHandlerFactory
 public:
     FileSchemeHandlerFactory(std::path folderPath, std::path urlPrefix)
         : m_folderPath(folderPath)
-        , m_urlPrefix(urlPrefix.root_directory())
+        , m_urlPrefix(urlPrefix)
     {
     }
 

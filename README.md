@@ -21,7 +21,7 @@ The library `Eigen` needs to be installed, `meta`, `googletest`, `benchmark` are
 ### OS X
 Install `clang` with [homebrew](https://brew.sh) by
 ```bash
-    brew install clang
+    brew install llvm --with-toolchain --with-lldb
     brew install eigen
 ```
 Set the `CXX` and `CC` variables in your `~/.bash_profile` or similar to 

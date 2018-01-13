@@ -54,7 +54,8 @@ set_target_properties(ExecutionGraph-Lib PROPERTIES
 # set build flag, for import/export specifiers in platform.hpp
 # Building a library means we only export the symbols which have ExecutionGraph_EXPORT set in the Platform.hpp file
 # We define all other symbols to be hidden by default as suggested by https://gcc.gnu.org/wiki/Visibility
-if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR 
+   ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
     target_compile_options(ExecutionGraph-Lib PRIVATE -DExecutionGraph_BUILD_LIBRARY -fvisibility=hidden)
 else()
     target_compile_options(ExecutionGraph-Lib PRIVATE /DExecutionGraph_BUILD_LIBRARY)

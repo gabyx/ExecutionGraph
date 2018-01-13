@@ -20,39 +20,39 @@ namespace executionGraph
 {
     //! A singelton class which does not construct the type on the fly like most implementations
     //! The Singelton needs to be explicity instanciated somewhere, best in the main(...) function!
+    //! See the makros below!
     template<typename T>
     class Singleton
     {
     private:
-        //! Explicit private copy constructor. This is a forbidden operation.
-        Singleton(const Singleton<T>&);
-
-        //! Private operator= . This is a forbidden operation.
-        Singleton& operator=(const Singleton<T>&);
-
-    private:
-        static T* m_instance;  //!< The single instance of type T.
+        struct Creator
+        {
+            Creator(T* p) { instance = p; }
+            static T* instance;  //! Gets initialized by a static class of Creator.
+        };
 
     public:
-        Singleton(void)
+        Singleton()
         {
-            EXECGRAPH_ASSERT(!m_instance, "m_instance != nullptr : " << typeid(*m_instance).name());
-            m_instance = static_cast<T*>(this);
+            static Creator s(static_cast<T*>(this));  //! First thread initializes the pointer! (Thread-Safe -> "magic statics")
         }
-        ~Singleton(void)
-        {
-            m_instance = nullptr;
-        }
+        ~Singleton() = default;
 
+        //! deleted copy constructor. This is a forbidden operation.
+        Singleton(const Singleton<T>&) = delete;
+
+        //! deleted operator= . This is a forbidden operation.
+        Singleton& operator=(const Singleton<T>&) = delete;
+
+    public:
         static T& getInstance(void)
         {
-            EXECGRAPH_ASSERT(m_instance, "m_instance != nullptr : " << typeid(*m_instance).name());
-            return (*m_instance);
+            return *Creator::instance;
         }
     };
 
     template<typename T>
-    T* Singleton<T>::m_instance = nullptr;
+    T* Singleton<T>::Creator::instance = nullptr;
 
 //! Instanciate a singelton `name` with type `type` and ctor arguments `ctor_args`.
 #define EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(type, name, ctor_args) \

@@ -59,18 +59,19 @@ endmacro()
 
 macro(set_target_compile_options_ExecutionGraph target)
 
-	if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+    if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR
+       ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR 
+       ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
+
         message(STATUS "Setting Compile/Linker Options for Clang")
         set(CXX_FLAGS ${CMAKE_CXX_FLAGS})
-        list(APPEND CXX_FLAGS "-std=c++17" 
+        list(APPEND CXX_FLAGS "-std=c++14" 
                               "-lc++experimental" 
                               "-ferror-limit=50" 
                               "-Werror=return-type")
         set(CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
         list(APPEND CXX_FLAGS_DEBUG "-g3"
                                     "-fno-omit-frame-pointer"
-                                    "-fsanitize=leak"
-                                    "-fsanitize=address" 
                                     "-Weverything"
                                     "-Wpedantic" 
                                     "-Wno-deprecated-register" 
@@ -92,11 +93,18 @@ macro(set_target_compile_options_ExecutionGraph target)
         list(APPEND CXX_FLAGS_RELWITHDEBINFO "-O2"
                                              "-g3")
 
-        set(LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lc++experimental -fsanitize=leak -fsanitize=address")
+        set(LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lc++experimental")
 
     elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
         message(ERROR "MSVC is not yet supported!")
     endif()
+
+
+    if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+        list(APPEND CXX_FLAGS_DEBUG "-fsanitize=leak" "-fsanitize=address")
+        set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=leak -fsanitize=address")
+    endif()
+
 
     # Compile flags.
     target_compile_options(${target} PRIVATE ${CXX_FLAGS})

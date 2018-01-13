@@ -9,9 +9,9 @@
 //!  License, v. 2.0. If a copy of the MPL was not distributed with this
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
-
 #include "FileSchemeHandlerFactory.hpp"
 #include <cef_parser.h>
+#include <iostream>
 #include <wrapper/cef_stream_resource_handler.h>
 
 CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrowser> browser,
@@ -25,7 +25,13 @@ CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrow
     {
         // e.g. "/asd/abc/abc/abcs.ext"
         std::string temp = CefString(urlParts.path.str).ToString();
-        std::path url    = std::path(temp).root_directory();
+        auto itC         = temp.begin();
+        while(itC != temp.end() && *itC == '/')
+        {
+            ++itC;
+        }
+        std::path url(itC, temp.end());
+        std::cout << "FileSchemeHandlerFactory::Create " << url << std::endl;
         // e.g. url : "asd/abc/abc/abcs.ext"
 
         // Split urlPrefix from front (e.g "asd/abc/abc.ext")
@@ -46,16 +52,18 @@ CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrow
             return nullptr;
         }
 
-        // Make new filePath from "m_folderPath + the rest"
-        std::path filePath = m_folderPath;
+        // Make new filePath from "m_folderPath + rest"
+        std::path filePath;
         while(it != itEnd)
         {
-            filePath /= *it;
+            filePath /= *it++;
         }
         if(filePath.empty())
         {
             return nullptr;
         }
+        filePath = m_folderPath / filePath;
+        std::cout << "filePath: '" << filePath << "'" << std::endl;
         CefRefPtr<CefStreamReader> fileStream = CefStreamReader::CreateForFile(filePath.string());
         if(fileStream != nullptr)
         {
