@@ -42,8 +42,7 @@ function join_by { local d=$1; shift; echo -n "$1"; shift; printf "%s" "${@/#/$d
 
 function replaceInFileAll(){
     file=$1
-    info "replaceInFileAll: ==============="
-    echo -e "${INFOFMT}Process file $file$CLEARFMT with perl regexes:"
+    echo -e "${INFOFMT}Process file $file ..."
     
     allRegexes=$(join_by "; " "${regex[@]}")
     
@@ -163,7 +162,7 @@ fi
 # Print all files
 if [[ $Verbose == 'true' ]]; then
     files=$(find "${searchFolder}" -type f "${fileNameRegex[@]}" "${excludeDirs[@]}")
-    s=$(echo $files | wc -l)
+    s=$(echo "$files" | wc -l)
     info "Replacing $s files"
 fi
 
