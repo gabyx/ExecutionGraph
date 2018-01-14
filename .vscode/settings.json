@@ -57,7 +57,10 @@
         "map": "cpp",
         "set": "cpp",
         "vector": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "valarray": "cpp",
+        "*.ipp": "cpp",
+        "*.icc": "cpp"
     },
     "cmake.useCMakeServer": true,
     "cmake.preferredGenerators": [
