@@ -8,8 +8,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // ========================================================================================
 
-#ifndef ExecutionGraph_Common_Delegates_HPP
-#define ExecutionGraph_Common_Delegates_HPP
+#ifndef executionGraph_Common_Delegates_HPP
+#define executionGraph_Common_Delegates_HPP
 
 #include <cassert>
 #include <memory>
@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "ExecutionGraph/common/SfinaeMacros.hpp"
+#include "executionGraph/common/SfinaeMacros.hpp"
 
 namespace execGraph
 {

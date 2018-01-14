@@ -49,8 +49,8 @@ macro(include_all_source_ExecutionGraph
     # WRITE CONFIGURATION FILE
     
     include(${ExecutionGraph_ROOT_DIR}/cmake/WriteConfigFile.cmake)
-    set(ExecutionGraph_CONFIG_FILE ${ExecutionGraph_BINARY_DIR}/include/ExecutionGraph/config/Config.hpp)
-    message(STATUS "ExecutionGraph: Write config file ${ExecutionGraph_CONFIG_FILE}, ${ExecutionGraph_OPENMP_NTHREADS}")
+    set(ExecutionGraph_CONFIG_FILE ${ExecutionGraph_BINARY_DIR}/include/executionGraph/config/Config.hpp)
+    message(STATUS "ExecutionGraph: Write config file ${ExecutionGraph_CONFIG_FILE}")
     ExecutionGraph_write_config_file( ${ExecutionGraph_CONFIG_FILE} ${ExecutionGraph_ROOT_DIR})
     #=========================
     

@@ -10,13 +10,13 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef ExecutionGraph_common_TypeDefs_hpp
-#define ExecutionGraph_common_TypeDefs_hpp
+#ifndef executionGraph_common_TypeDefs_hpp
+#define executionGraph_common_TypeDefs_hpp
 
-#include "ExecutionGraph/common/MyContainerTypeDefs.hpp"
-#include "ExecutionGraph/common/MyMatrixTypeDefs.hpp"
-#include "ExecutionGraph/common/Platform.hpp"
-#include "ExecutionGraph/config/Config.hpp"
+#include "executionGraph/common/MyContainerTypeDefs.hpp"
+#include "executionGraph/common/MyMatrixTypeDefs.hpp"
+#include "executionGraph/common/Platform.hpp"
+#include "executionGraph/config/Config.hpp"
 
 namespace executionGraph
 {

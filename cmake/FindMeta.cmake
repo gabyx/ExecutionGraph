@@ -28,7 +28,8 @@ else()
     GIT_REPOSITORY https://github.com/ericniebler/meta.git
     TIMEOUT 10
     CMAKE_ARGS -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
-    PREFIX "${CMAKE_CURRENT_BINARY_DIR}"
+    SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/external/meta-src"
+    BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/external/meta-build"
     BUILD_COMMAND "" # disable build step
     INSTALL_COMMAND "" # Disable install step
     )

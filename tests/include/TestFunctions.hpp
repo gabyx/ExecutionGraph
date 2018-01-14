@@ -15,10 +15,10 @@
 #include <gtest/gtest.h>
 #include <random>
 
-#include "ExecutionGraph/common/Asserts.hpp"
-#include "ExecutionGraph/common/SfinaeMacros.hpp"
-#include "ExecutionGraph/common/TypeDefs.hpp"
-#include "ExecutionGraph/config/Config.hpp"
+#include "executionGraph/common/Asserts.hpp"
+#include "executionGraph/common/SfinaeMacros.hpp"
+#include "executionGraph/common/TypeDefs.hpp"
+#include "executionGraph/config/Config.hpp"
 
 #define MY_TEST(name1, name2) TEST(name1, name2)
 

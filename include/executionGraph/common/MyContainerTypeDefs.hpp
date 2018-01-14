@@ -7,8 +7,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // ========================================================================================
 
-#ifndef ExecutionGraph_Common_MyContainerTypeDefs_hpp
-#define ExecutionGraph_Common_MyContainerTypeDefs_hpp
+#ifndef executionGraph_Common_MyContainerTypeDefs_hpp
+#define executionGraph_Common_MyContainerTypeDefs_hpp
 
 //#define EIGEN_DONT_VECTORIZE
 //#define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT

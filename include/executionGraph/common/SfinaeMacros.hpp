@@ -8,8 +8,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // ========================================================================================
 
-#ifndef ExecutionGraph_Common_SfinaeMacros_hpp
-#define ExecutionGraph_Common_SfinaeMacros_hpp
+#ifndef executionGraph_Common_SfinaeMacros_hpp
+#define executionGraph_Common_SfinaeMacros_hpp
 
 #include <type_traits>
 

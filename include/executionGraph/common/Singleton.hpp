@@ -10,11 +10,11 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef ExecutionGraph_common_Singelton_hpp
-#define ExecutionGraph_common_Singelton_hpp
+#ifndef executionGraph_common_Singelton_hpp
+#define executionGraph_common_Singelton_hpp
 
 #include <memory>
-#include "ExecutionGraph/common/Asserts.hpp"
+#include "executionGraph/common/Asserts.hpp"
 
 namespace executionGraph
 {

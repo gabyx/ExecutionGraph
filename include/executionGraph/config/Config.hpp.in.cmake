@@ -10,11 +10,11 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef ExecutionGraph_Config_Config_hpp_in_cmake
-#define ExecutionGraph_Config_Config_hpp_in_cmake
+#ifndef executionGraph_Config_Config_hpp_in_cmake
+#define executionGraph_Config_Config_hpp_in_cmake
 
 //! Settings for the ExecutionGraph Library
-namespace execGraph{
+namespace executionGraph{
 
     //! Library Version
     static const unsigned int VersionMajor =  @ExecutionGraph_VERSION_MAJOR@ ;
@@ -22,7 +22,7 @@ namespace execGraph{
     static const unsigned int VersionPatch =  @ExecutionGraph_VERSION_PATCH@ ;
     
     //! Force log level
-    #define ExecutionGraph_FORCE_MSGLOG_LEVEL @ExecutionGraph_FORCE_MSGLOG_LEVEL@
+    #define EXECGRAPH_FORCE_MSGLOG_LEVEL @ExecutionGraph_FORCE_MSGLOG_LEVEL@
     
     #cmakedefine ExecutionGraph_OPENMP_SUPPORT 
     #cmakedefine ExecutionGraph_OPENMP_USE_NTHREADS

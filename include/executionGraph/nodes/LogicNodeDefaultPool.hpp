@@ -10,13 +10,13 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef ExecutionGraph_nodes_LogicNodeDefaultPool_hpp
-#define ExecutionGraph_nodes_LogicNodeDefaultPool_hpp
+#ifndef executionGraph_nodes_LogicNodeDefaultPool_hpp
+#define executionGraph_nodes_LogicNodeDefaultPool_hpp
 
 #include <type_traits>
-#include "ExecutionGraph/common/Exception.hpp"
-#include "ExecutionGraph/nodes/LogicNode.hpp"
-#include "ExecutionGraph/nodes/LogicSocket.hpp"
+#include "executionGraph/common/Exception.hpp"
+#include "executionGraph/nodes/LogicNode.hpp"
+#include "executionGraph/nodes/LogicSocket.hpp"
 
 namespace executionGraph
 {

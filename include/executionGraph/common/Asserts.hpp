@@ -10,16 +10,16 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef ExecutionGraph_common_Asserts_hpp
-#define ExecutionGraph_common_Asserts_hpp
+#ifndef executionGraph_common_Asserts_hpp
+#define executionGraph_common_Asserts_hpp
 
 #include <iostream>
 #include <stdlib.h>
 #include <typeinfo>
 
-#include "ExecutionGraph/common/Exception.hpp"
-#include "ExecutionGraph/common/Log.hpp"
-#include "ExecutionGraph/config/Config.hpp"
+#include "executionGraph/common/Exception.hpp"
+#include "executionGraph/common/Log.hpp"
+#include "executionGraph/config/Config.hpp"
 
 //! Some assert macro.
 

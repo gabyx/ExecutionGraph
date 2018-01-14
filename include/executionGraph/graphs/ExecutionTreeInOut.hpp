@@ -10,21 +10,21 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef ExecutionGraph_graphs_ExecutionTreeInOut_hpp
-#define ExecutionGraph_graphs_ExecutionTreeInOut_hpp
+#ifndef executionGraph_graphs_ExecutionTreeInOut_hpp
+#define executionGraph_graphs_ExecutionTreeInOut_hpp
 
 #include <algorithm>
 #include <deque>
 #include <set>
 #include <unordered_set>
 
-#include "ExecutionGraph/common/Asserts.hpp"
-#include "ExecutionGraph/common/DemangleTypes.hpp"
-#include "ExecutionGraph/common/StringFormat.hpp"
-#include "ExecutionGraph/nodes/LogicCommon.hpp"
-#include "ExecutionGraph/nodes/LogicNode.hpp"
-#include "ExecutionGraph/nodes/LogicNodeDefaultPool.hpp"
-#include "ExecutionGraph/nodes/LogicSocket.hpp"
+#include "executionGraph/common/Asserts.hpp"
+#include "executionGraph/common/DemangleTypes.hpp"
+#include "executionGraph/common/StringFormat.hpp"
+#include "executionGraph/nodes/LogicCommon.hpp"
+#include "executionGraph/nodes/LogicNode.hpp"
+#include "executionGraph/nodes/LogicNodeDefaultPool.hpp"
+#include "executionGraph/nodes/LogicSocket.hpp"
 
 #define EXECGRAPH_EXECTREE_SOLVER_LOG(message) EXECGRAPH_DEBUG_ONLY(EXECGRAPH_LOG_TRACE(message));
 

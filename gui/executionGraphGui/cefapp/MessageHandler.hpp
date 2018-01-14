@@ -19,9 +19,7 @@
 class MessageHandler : public CefMessageRouterBrowserSide::Handler
 {
 public:
-    explicit MessageHandler()
-    {
-    }
+    MessageHandler() = default;
 
     // Called due to cefQuery execution in message_router.html.
     virtual bool OnQuery(CefRefPtr<CefBrowser> browser,

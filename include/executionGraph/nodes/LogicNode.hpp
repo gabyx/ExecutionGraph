@@ -10,14 +10,14 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef ExecutionGraph_nodes_LogicNode_hpp
-#define ExecutionGraph_nodes_LogicNode_hpp
+#ifndef executionGraph_nodes_LogicNode_hpp
+#define executionGraph_nodes_LogicNode_hpp
 
 #include <memory>
 #include <vector>
-#include "ExecutionGraph/common/Asserts.hpp"
-#include "ExecutionGraph/common/DemangleTypes.hpp"
-#include "ExecutionGraph/nodes/LogicCommon.hpp"
+#include "executionGraph/common/Asserts.hpp"
+#include "executionGraph/common/DemangleTypes.hpp"
+#include "executionGraph/nodes/LogicCommon.hpp"
 
 namespace executionGraph
 {

@@ -10,7 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "ExecutionGraph/common/DemangleTypes.hpp"
+#include "executionGraph/common/DemangleTypes.hpp"
 
 #if defined(__GNUG__) || defined(__clang__)
 #include <cstdlib>

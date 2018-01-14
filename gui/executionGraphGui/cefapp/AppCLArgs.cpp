@@ -13,7 +13,7 @@
 #include "cefapp/AppCLArgs.hpp"
 #include <cstdlib>
 #include <iostream>
-#include "ExecutionGraph/common/Exception.hpp"
+#include "executionGraph/common/Exception.hpp"
 
 AppCLArgs::AppCLArgs(int argc, char* argv[])
     : executionGraph::CommandLineArguments(argc, argv, "ExecutionGUI Application", "No detailed description")

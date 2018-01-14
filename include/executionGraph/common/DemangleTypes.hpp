@@ -10,12 +10,12 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef ExecutionGraph_common_DemangleTypes_hpp
-#define ExecutionGraph_common_DemangleTypes_hpp
+#ifndef executionGraph_common_DemangleTypes_hpp
+#define executionGraph_common_DemangleTypes_hpp
 
 #include <string>
 #include <typeinfo>
-#include "ExecutionGraph/common/TypeDefs.hpp"
+#include "executionGraph/common/TypeDefs.hpp"
 
 namespace executionGraph
 {

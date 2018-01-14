@@ -10,11 +10,12 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef ExecutionGraph_common_CommandLineArguments_hpp
-#define ExecutionGraph_common_CommandLineArguments_hpp
+#ifndef executionGraph_common_CommandLineArguments_hpp
+#define executionGraph_common_CommandLineArguments_hpp
 
 #include <args.hxx>
-#include "ExecutionGraph/common/FileSystem.hpp"
+#include "executionGraph/config/Config.hpp"
+#include "executionGraph/common/FileSystem.hpp"
 
 namespace executionGraph
 {

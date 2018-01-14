@@ -10,14 +10,14 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef ExecutionGraph_logic_LogicTypes_hpp
-#define ExecutionGraph_logic_LogicTypes_hpp
+#ifndef executionGraph_logic_LogicTypes_hpp
+#define executionGraph_logic_LogicTypes_hpp
 
 #include <meta/meta.hpp>
 #include <string>
 
-#include "ExecutionGraph/common/Exception.hpp"
-#include "ExecutionGraph/common/TypeDefs.hpp"
+#include "executionGraph/common/Exception.hpp"
+#include "executionGraph/common/TypeDefs.hpp"
 
 namespace executionGraph
 {

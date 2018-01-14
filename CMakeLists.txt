@@ -18,7 +18,7 @@ else()
     set(PROJECTNAMEPREFIX ${CMAKE_BUILD_TYPE})
 endif()
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" ${CMAKE_MODULE_PATH})
 message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
@@ -117,6 +117,17 @@ set(ExecutionGraph_DEPENDING_TARGETS_DEP ${Meta_TARGET})
 # Try to find the Argumentparser
 find_package(Args REQUIRED)
 list(APPEND ExecutionGraph_INC_DIRS_DEP ${args_INCLUDE_DIR})
+
+# Try to find the RTTR Library (use our own script)
+find_package(RTTRLib REQUIRED)
+list(APPEND ExecutionGraph_INC_DIRS_DEP ${rttr_INCLUDE_DIR})
+
+# Try to find the crossguid Library (use our own script)
+find_package(CrossGUID REQUIRED)
+list(APPEND ExecutionGraph_INC_DIRS_DEP ${crossguid_INCLUDE_DIR})
+# build the library
+set(XG_TESTS OFF)
+add_subdirectory(${crossguid_SOURCE_DIR})
 
 find_package(PugiXML)
 if(PUGIXML_FOUND)

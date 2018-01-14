@@ -10,13 +10,13 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef ExecutionGraph_common_Log_hpp
-#define ExecutionGraph_common_Log_hpp
+#ifndef executionGraph_common_Log_hpp
+#define executionGraph_common_Log_hpp
 
-#include "ExecutionGraph/config/Config.hpp"
+#include "executionGraph/config/Config.hpp"
 
-#ifndef ExecutionGraph_FORCE_MSGLOG_LEVEL
-#error "ExecutionGraph_FORCE_MSGLOG_LEVEL needs to be defined!"
+#ifndef EXECGRAPH_FORCE_MSGLOG_LEVEL
+#error "EXECGRAPH_FORCE_MSGLOG_LEVEL needs to be defined!"
 #endif
 
 #define EXECGRAPH_LOGLEVEL_TRACE 0
@@ -26,10 +26,10 @@
 #define EXECGRAPH_LOGLEVEL_ERROR 4
 #define EXECGRAPH_LOGLEVEL_FATAL 5
 
-// To Concat EXECGRAPH_LOGLEVEL_ and ExecutionGraph_FORCE_MSGLOG_LEVEL
+// To Concat EXECGRAPH_LOGLEVEL_ and EXECGRAPH_FORCE_MSGLOG_LEVEL
 #define CONCATT(L) EXECGRAPH_LOGLEVEL_##L  // x and y will not be expanded, just pasted
 #define CONCAT(L) CONCATT(L)               // x and y will be expanded before the call to STEP2
-#define EXECGRAPH_LOGLEVEL_CURRENT CONCAT(ExecutionGraph_FORCE_MSGLOG_LEVEL)
+#define EXECGRAPH_LOGLEVEL_CURRENT CONCAT(EXECGRAPH_FORCE_MSGLOG_LEVEL)
 
 #define EXECGRAPH_LOGMSG_LEVEL(LEVEL, MSG, END)     \
     if(CONCAT(LEVEL) <= EXECGRAPH_LOGLEVEL_CURRENT) \

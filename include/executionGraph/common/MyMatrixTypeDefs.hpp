@@ -7,10 +7,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // ========================================================================================
 
-#ifndef ExecutionGraph_common_MyMatrixTypeDefs_hpp
-#define ExecutionGraph_common_MyMatrixTypeDefs_hpp
+#ifndef executionGraph_common_MyMatrixTypeDefs_hpp
+#define executionGraph_common_MyMatrixTypeDefs_hpp
 
-#include "ExecutionGraph/common/Platform.hpp"
+#include "executionGraph/common/Platform.hpp"
 
 //#define EIGEN_DONT_VECTORIZE
 //#define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT

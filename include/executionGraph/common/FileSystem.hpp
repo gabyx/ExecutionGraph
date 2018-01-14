@@ -10,9 +10,10 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef ExecutionGraph_common_FileSystem_hpp
-#define ExecutionGraph_common_FileSystem_hpp
+#ifndef executionGraph_common_FileSystem_hpp
+#define executionGraph_common_FileSystem_hpp
 
+#include "executionGraph/config/Config.hpp"
 #include <experimental/filesystem>
 
 namespace std

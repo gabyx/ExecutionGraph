@@ -10,17 +10,17 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef ExecutionGraph_nodes_LogicSocket_hpp
-#define ExecutionGraph_nodes_LogicSocket_hpp
+#ifndef executionGraph_nodes_LogicSocket_hpp
+#define executionGraph_nodes_LogicSocket_hpp
 
 #include <meta/meta.hpp>
 #include <unordered_set>
 
-#include "ExecutionGraph/common/Asserts.hpp"
-#include "ExecutionGraph/common/DemangleTypes.hpp"
-#include "ExecutionGraph/common/EnumClassHelper.hpp"
-#include "ExecutionGraph/common/TypeDefs.hpp"
-#include "ExecutionGraph/nodes/LogicCommon.hpp"
+#include "executionGraph/common/Asserts.hpp"
+#include "executionGraph/common/DemangleTypes.hpp"
+#include "executionGraph/common/EnumClassHelper.hpp"
+#include "executionGraph/common/TypeDefs.hpp"
+#include "executionGraph/nodes/LogicCommon.hpp"
 
 namespace executionGraph
 {

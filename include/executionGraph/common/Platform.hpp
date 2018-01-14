@@ -10,13 +10,13 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef ExecutionGraph_Common_Platform_hpp
-#define ExecutionGraph_Common_Platform_hpp
+#ifndef executionGraph_Common_Platform_hpp
+#define executionGraph_Common_Platform_hpp
 
-#include "ExecutionGraph/config/Config.hpp"
+#include "executionGraph/config/Config.hpp"
 
 #ifdef __CYGWIN__
-#include "ExecutionGraph/Common/CygwinPatch.hpp"
+#include "executionGraph/Common/CygwinPatch.hpp"
 #endif
 
 namespace executionGraph

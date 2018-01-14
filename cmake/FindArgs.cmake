@@ -1,7 +1,5 @@
 # Try to find the Argument Parser Library https://github.com/Taywee/args 
-# defines Meta_INCLUDE_DIR
-find_package(PkgConfig)
-
+# defines args_INCLUDE_DIR
 include(FindPackageHandleStandardArgs)
 
 if(NOT EXISTS "${args_INCLUDE_DIR}")

@@ -10,15 +10,15 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef ExecutionGraph_nodes_LogicCommon_hpp
-#define ExecutionGraph_nodes_LogicCommon_hpp
+#ifndef executionGraph_nodes_LogicCommon_hpp
+#define executionGraph_nodes_LogicCommon_hpp
 
 #include <memory>
 
-#include "ExecutionGraph/common/EnumClassHelper.hpp"
-#include "ExecutionGraph/common/SfinaeMacros.hpp"
-#include "ExecutionGraph/common/TypeDefs.hpp"
-#include "ExecutionGraph/nodes/LogicSocketDefaultTypes.hpp"
+#include "executionGraph/common/EnumClassHelper.hpp"
+#include "executionGraph/common/SfinaeMacros.hpp"
+#include "executionGraph/common/TypeDefs.hpp"
+#include "executionGraph/nodes/LogicSocketDefaultTypes.hpp"
 
 namespace executionGraph
 {

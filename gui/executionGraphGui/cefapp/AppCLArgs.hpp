@@ -15,7 +15,7 @@
 
 #include <ExecutionGraph/common/CommandLineArguments.hpp>
 #include <ExecutionGraph/common/Singleton.hpp>
-#include "ExecutionGraph/common/FileSystem.hpp"
+#include "executionGraph/common/FileSystem.hpp"
 
 //! Commandline Arguments for the Application
 //! No need to make it thread-safe, since everything is read only!
