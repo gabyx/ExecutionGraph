@@ -1,11 +1,37 @@
 {
     "configurations": [
         {
-            "name": "null",
-            "includePath": [],
+            "name": "Mac",
+            "includePath": [
+                "${workspaceRoot}/include",
+                "${workspaceRoot}/gui/executionGraphGui",
+                "${workspaceRoot}/gui/executionGraphGui/client",
+                "${workspaceRoot}/build/include",
+                "${workspaceRoot}/build/external/cefbinaries-src",
+                "${workspaceRoot}/build/external/cefbinaries-src/include",
+                "${workspaceRoot}/build/external/args-src/include",
+                "${workspaceRoot}/build/src/meta/include",
+                "/usr/local/include",
+                "/usr/local/include/eigen3",
+                "/usr/local/opt/llvm/include",
+                "/usr/local/opt/llvm/include/c++/v1/"
+            ],
             "defines": [],
             "browse": {
-                "path": [],
+                "path": [
+                    "${workspaceRoot}/include",
+                    "${workspaceRoot}/gui/executionGraphGui",
+                    "${workspaceRoot}/gui/executionGraphGui/client",
+                    "${workspaceRoot}/build/include",
+                    "${workspaceRoot}/build/external/cefbinaries-src",
+                    "${workspaceRoot}/build/external/cefbinaries-src/include",
+                    "${workspaceRoot}/build/external/args-src/include",
+                    "${workspaceRoot}/build/src/meta/include",
+                    "/usr/local/include",
+                    "/usr/local/include/eigen3",
+                    "/usr/local/opt/llvm/include",
+                    "/usr/local/opt/llvm/include/c++/v1/"
+                ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
             },
