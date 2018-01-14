@@ -71,6 +71,7 @@ macro(set_target_compile_options_ExecutionGraph target)
                               "-Werror=return-type")
         set(CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
         list(APPEND CXX_FLAGS_DEBUG "-g3"
+                                    "-glldb"
                                     "-fno-omit-frame-pointer"
                                     "-Weverything"
                                     "-Wpedantic" 
@@ -101,10 +102,10 @@ macro(set_target_compile_options_ExecutionGraph target)
 
 
     if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-        list(APPEND CXX_FLAGS_DEBUG "-fsanitize=leak" "-fsanitize=address")
+        # with clang 5.0.1: -fsanitize=address produces weird output in lldb for std::string ...
+        list(APPEND CXX_FLAGS_DEBUG "-fsanitize=leak" "-fno-omit-frame-pointer")
         set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=leak -fsanitize=address")
     endif()
-
 
     # Compile flags.
     target_compile_options(${target} PRIVATE ${CXX_FLAGS})
