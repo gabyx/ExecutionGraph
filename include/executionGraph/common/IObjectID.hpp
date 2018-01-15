@@ -15,35 +15,27 @@
 
 #include "executionGraph/common/Identifier.hpp"
 
-namespace executionGraph{
-
+namespace executionGraph
+{
     //! Interface which provides an ID.
     class IObjectID
     {
-    public:
-        using Id = executionGraph::Id;
     protected:
+        IObjectID()          = default;
         virtual ~IObjectID() = default;
 
     public:
         virtual const Id& getId() const = 0;
     };
 
-    //! Class which provides an ID.
-    class ObjectID : public IObjectID
-    {
-    public:
-        using Id = executionGraph::Id; 
-    protected:
-        ObjectID(const Id& id) : m_id(id){}
-        virtual ~ObjectID() override = default;
+#define EXECGRAPH_OBJECT_ID_DECLARATION                     \
+public:                                                     \
+    using Id = executionGraph::Id;                          \
+    const Id& getId() const override final { return m_id; } \
+                                                            \
+private:                                                    \
+    const Id m_id;
 
-    public:
-        const Id& getId() const override final { return m_id; }
-    private:
-        const Id m_id;
-    };
-
-}
+}  // namespace executionGraph
 
 #endif

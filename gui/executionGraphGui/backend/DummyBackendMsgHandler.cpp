@@ -2,7 +2,7 @@
 //!  ExecutionGraph
 //!  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 //!
-//!  @date Sun Jan 14 2018
+//!  @date Mon Jan 15 2018
 //!  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
 //!
 //!  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,17 +10,24 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "backend/BackendMessageHandler.hpp"
+#include "backend/DummyBackendMsgHandler.cpp"
 
-bool BackendMessageHandler::OnQuery(CefRefPtr<CefBrowser> browser,
-                                    CefRefPtr<CefFrame> frame,
-                                    int64 query_id,
-                                    const CefString& request,
-                                    bool persistent,
-                                    CefRefPtr<Callback> callback)
+const DummyBackendMsgHandler::Id DummyBackendMsgHandler::defaultId("DummyBackendMsgHandler");
+
+RTTR_REGISTRATION
 {
-    std::string result = request;
-    result             = "received: " + result;
+    registration::class_<ExecutionGraphBackend>("DummyBackendMsgHandler")
+        .constructor()
+}
+
+bool OnQuery(CefRefPtr<CefBrowser> browser,
+             CefRefPtr<CefFrame> frame,
+             int64 query_id,
+             const CefString& request,
+             bool persistent,
+             CefRefPtr<Callback> callback) override
+{
+    result = "received: " + request.ToString();
     callback->Success(result);
     return true;
 }

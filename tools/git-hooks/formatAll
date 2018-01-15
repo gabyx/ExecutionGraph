@@ -9,17 +9,19 @@ owndir="$(cd "$(dirname "$0")"; pwd -P)"
 
 OS_NAME=$(uname)
 
+
+# We cannot store \0 in variables!
+allFiles=$(git ls-tree -r HEAD --name-only --full-name ${root} | tr '\n' '\0' | base64 )
+
+
 function findExecutables(){
-  find "$owndir/autoformat" -type f -perm +0111 > /dev/null
-  if [ $? == 0 ] ; then
-      find "$owndir/autoformat" -type f -perm +0111
+  find "$owndir/autoformat" -type f -perm +0111 > /dev/null 2>&1
+  if [ $? -eq 0 ] ; then
+    find "$owndir/autoformat" -type f -perm +0111
   else
     find "$owndir/autoformat" -type f -executable
   fi
 }
-
-# We cannot store \0 in variables!
-allFiles=$(git ls-tree -r HEAD --name-only --full-name ${root} | tr '\n' '\0' | base64 )
 
 findExecutables | {
   abort=0

@@ -18,9 +18,9 @@
 #include <views/cef_browser_view.h>
 #include <views/cef_window.h>
 #include <wrapper/cef_helpers.h>
-#include "cefapp/FileSchemeHandlerFactory.hpp"
 #include "backend/ExecutionGraphBackend.hpp"
 #include "cefapp/AppHandler.hpp"
+#include "cefapp/FileSchemeHandlerFactory.hpp"
 
 namespace
 {
@@ -90,9 +90,7 @@ void App::OnContextInitialized()
     // AppHandler implements browser-level callbacks.
     m_handler = CefRefPtr<AppHandler>(new AppHandler(use_views));
 
-    // Install the ExecutionGraph Backend
-    auto executionGraphBackend = std::make_shared<ExecutionGraphBackend>();
-    m_handler->RegisterBackend(executionGraphBackend);
+    installBackends();
 
     // Specify CEF browser settings here.
     CefBrowserSettings browser_settings;
@@ -121,4 +119,13 @@ void App::OnContextInitialized()
         // Create the first browser window.
         CefBrowserHost::CreateBrowser(window_info, m_handler, url, browser_settings, NULL);
     }
+}
+
+//! Install various backends and setup all of them.
+void App::installBackends()
+{
+    // Install the ExecutionGraph Backend =================================
+    auto execGraphBackend = std::make_shared<ExecutionGraphBackend>();
+    m_backends.emplace_back(execGraphBackend);
+    m_handler->RegisterBackend(execGraphBackend);
 }

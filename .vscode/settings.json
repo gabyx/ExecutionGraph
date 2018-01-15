@@ -60,15 +60,17 @@
         "filesystem": "cpp",
         "valarray": "cpp",
         "*.ipp": "cpp",
-        "*.icc": "cpp"
+        "*.icc": "cpp",
+        "*.hpp": "cpp",
+        "*.cpp": "cpp"
     },
     "cmake.useCMakeServer": true,
     "cmake.preferredGenerators": [
         "Unix Makefiles",
         "Ninja"
     ],
-    "C_Cpp.clang_format_fallbackStyle": "none",
-    "C_Cpp.clang_format_style": "file",
+    // "C_Cpp.clang_format_fallbackStyle": "none",
+    // "C_Cpp.clang_format_style": "file",
     "editor.formatOnSave": false,
     "fileHeaderComment.parameter": {
         "*": {
@@ -139,4 +141,14 @@
             "${commentbegin}${bar}"
         ]
     },
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+        "**/bower_components": true,
+        "**/jspm_packages": true,
+        "**/node_modules": true,
+        "**/build":true
+    }
 }
