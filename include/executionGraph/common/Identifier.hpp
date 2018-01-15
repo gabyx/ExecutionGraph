@@ -63,8 +63,8 @@ namespace std
         {
             // Hash all bytes...
             const std::array<unsigned char, 16>& bytes = id.m_guid.bytes();
-            size_t h                                   = *reinterpret_cast<uint64_t*>(bytes[0]);  // 8 bytes
-            return h ^ (*reinterpret_cast<char32_t*>(bytes[8]) << 1);
+            size_t h                                   = *reinterpret_cast<const uint64_t*>(&bytes[0]);  // 8 bytes
+            return h ^ (*reinterpret_cast<const uint64_t*>(&bytes[8]) << 1);
         }
     };
 

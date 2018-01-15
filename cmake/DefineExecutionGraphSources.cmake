@@ -33,7 +33,7 @@ macro(include_all_source_ExecutionGraph
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/CommandLineArguments.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/Identifier.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/ObjectID.hpp
-        
+
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicCommon.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicSocket.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicSocketDefaultTypes.hpp
@@ -105,7 +105,7 @@ macro(set_target_compile_options_ExecutionGraph target)
 
     if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
         # with clang 5.0.1: -fsanitize=address produces weird output in lldb for std::string ...
-        list(APPEND CXX_FLAGS_DEBUG "-fsanitize=leak" "-fno-omit-frame-pointer")
+        list(APPEND CXX_FLAGS_DEBUG "-fsanitize=leak" "-fsanitize=address" "-fno-omit-frame-pointer")
         set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=leak -fsanitize=address")
     endif()
 
