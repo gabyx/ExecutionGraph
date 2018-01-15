@@ -37,7 +37,7 @@ namespace executionGraph
             return name;
         }
 #endif
-    }
+    }  // namespace details
 
     std::string shortenTemplateBrackets(std::string s, unsigned int fromLevel)
     {
@@ -80,4 +80,4 @@ namespace executionGraph
         return ss.str();
     }
 
-}  // executionGraph
+}  // namespace executionGraph

@@ -91,7 +91,7 @@ namespace executionGraph
         using Array3 = Eigen::Array<Scalar, 3, 1>;
         template<typename Scalar>
         using Array2 = Eigen::Array<Scalar, 2, 1>;
-    }
+    }  // namespace MyMatrix
 
     namespace MyMatrix
     {
@@ -117,7 +117,7 @@ namespace executionGraph
 
         template<typename EigenType>
         using MatrixMap = Eigen::Map<EigenType>;
-    }
+    }  // namespace MyMatrix
 
     struct EXECGRAPH_EXPORT MyMatrixIOFormat
     {
@@ -125,7 +125,7 @@ namespace executionGraph
         static const Eigen::IOFormat CommaSep;
         static const Eigen::IOFormat SpaceSep;
     };
-}
+}  // namespace executionGraph
 
 #define EXECGRAPH_DEFINE_MATRIX_SPECIALTYPES                                     \
     template<typename Derived>                                                   \

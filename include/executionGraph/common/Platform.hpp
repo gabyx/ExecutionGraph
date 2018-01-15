@@ -62,6 +62,6 @@ namespace executionGraph
 #endif
 
 #endif
-}
+}  // namespace executionGraph
 
 #endif

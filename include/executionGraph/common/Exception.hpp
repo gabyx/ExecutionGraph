@@ -46,7 +46,7 @@ namespace executionGraph
         BadSocketCastException(const std::stringstream& ss)
             : Exception(ss) {}
     };
-}
+}  // namespace executionGraph
 
 #define EXECGRAPH_THROW_EXCEPTION_TYPE(message, type)                         \
     {                                                                         \

@@ -14,8 +14,8 @@
 #define executionGraph_common_CommandLineArguments_hpp
 
 #include <args.hxx>
-#include "executionGraph/config/Config.hpp"
 #include "executionGraph/common/FileSystem.hpp"
+#include "executionGraph/config/Config.hpp"
 
 namespace executionGraph
 {
@@ -35,13 +35,13 @@ namespace executionGraph
     public:
         //! Get the application path. (can be relative)
         const std::path& getApplicationPath() { return m_applicationPath; }
+        
+    protected:
+        args::ArgumentParser m_parser;
 
     private:
         std::path m_applicationPath;  //!< Application path: argv[0]
-
-    protected:
-        args::ArgumentParser m_parser;
     };
-}
+}  // namespace executionGraph
 
 #endif

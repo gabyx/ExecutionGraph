@@ -29,5 +29,5 @@ namespace executionGraph
     using PREC = ExecutionGraph::GlobalConfigs::PREC; \
     EXECGRAPH_DEFINE_MATRIX_TYPES_OF(PREC)            \
     EXECGRAPH_DEFINE_CONTAINER_TYPES
-}
+}  // namespace executionGraph
 #endif

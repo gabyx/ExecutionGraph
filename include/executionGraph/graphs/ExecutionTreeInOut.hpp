@@ -629,7 +629,6 @@ namespace executionGraph
                 EXECGRAPH_EXECTREE_SOLVER_LOG("visit: " << nodeData.m_node->getId());
 
                 auto addParentsToStack = [&](auto* socket) {
-
                     // Get NodeData of parentNode
                     auto& parentNode = socket->getParent();
                     auto itParent    = m_nodeMap.find(parentNode.getId());
@@ -993,7 +992,7 @@ namespace executionGraph
 
         LogicNodeDefaultOutputs* m_nodeDefaultOutputPool;  //!< Default Pool with output sockets, to which all not connected input sockets are connected!
     };
-}
+}  // namespace executionGraph
 
 #undef EXECGRAPH_EXECTREE_SOLVER_LOG
 #endif  // ExecutionTreeInOut_hpp

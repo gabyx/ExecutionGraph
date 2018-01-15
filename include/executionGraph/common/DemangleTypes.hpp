@@ -37,6 +37,6 @@ namespace executionGraph
     }
 
     EXECGRAPH_EXPORT std::string shortenTemplateBrackets(std::string s, unsigned int fromLevel = 1);
-}
+}  // namespace executionGraph
 
 #endif

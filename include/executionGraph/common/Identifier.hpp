@@ -13,43 +13,61 @@
 #ifndef executionGraph_common_Identifier_hpp
 #define executionGraph_common_Identifier_hpp
 
-#include "executionGraph/config/Config.hpp"
 #include <Guid.hpp>
+#include <functional>
+#include <string>
+#include "executionGraph/config/Config.hpp"
 
 namespace executionGraph
 {
+    class Identifier final
+    {
+        template<typename T>
+        friend struct std::hash;
 
-class Identifier final
-{
     public:
-        Identifier(std::string name) 
-        : m_name(name) {};
-        Identifier(std::string name, const xg:Guid& guid) 
-        : m_name(name), m_guid(guid) {}
+        Identifier(const std::string& name)
+            : m_name(name) 
+        {}
+        Identifier(const std::string& name, const xg::Guid& guid)
+            : m_name(name), m_guid(guid) 
+        {}
 
         //! Get the name of this identifier
         const std::string& getName();
 
         //! Get full name of this identifier: "<name>-<guid>".
-        std::string getFullName() {return m_name + "-" + std::string(m_guid); } 
+        std::string getFullName() { return m_name + "-" + std::string(m_guid); }
 
         //! Comparison operators.
-        bool operator==(const Indentifier& id) const { return m_guid == id.m_guid; }
-        bool operator!=(const Indentifier& id) const { return !(m_guid == id.m_guid); }
+        bool operator==(const Identifier& id) const { return m_guid == id.m_guid; }
+        bool operator!=(const Identifier& id) const { return !(m_guid == id.m_guid); }
 
     private:
-        std::string m_name //!< The nickname of this identifier.
-        xg::Guid m_guid;   //!< The unique guid of this identifier.
-};
- 
+        std::string m_name;  //!< The nickname of this identifier.
+        xg::Guid m_guid;     //!< The unique guid of this identifier.
+    };
 
-class IIdentifier final
+    using Id = Identifier;
+
+}  // namespace executionGraph
+
+//! Sepcialize std::hash
+namespace std
 {
+    template<>
+    class hash<executionGraph::Id>
+    {
     public:
-    const Identifier& getID() = 0;
-}
+        size_t operator()(const executionGraph::Id& id) const
+        {
+            // Hash all bytes...
+            const std::array<unsigned char, 16>& bytes = id.m_guid.bytes();
+            size_t h                                   = *reinterpret_cast<uint64_t*>(bytes[0]);  // 8 bytes
+            return h ^ (*reinterpret_cast<char32_t*>(bytes[8]) << 1);
+        }
+    };
 
-
-}
+}  // namespace std
 
 #endif

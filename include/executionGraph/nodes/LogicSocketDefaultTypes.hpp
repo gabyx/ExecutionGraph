@@ -71,6 +71,6 @@ namespace executionGraph
         default:                                                                                           \
             EXEC_GRAPH_THROWEXCEPTION("TYPE: " << this->m_type << " not implemented in switch statement"); \
     }
-}
+}  // namespace executionGraph
 
 #endif  // LogicTypes_hpp

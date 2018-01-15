@@ -84,6 +84,6 @@ namespace executionGraph
         void reset() {}
         void compute() {}
     };
-};
+};  // namespace executionGraph
 
 #endif

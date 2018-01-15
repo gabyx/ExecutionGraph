@@ -54,7 +54,7 @@ namespace
 
         return PROCESS_TYPE_OTHER;
     }
-}
+}  // namespace
 
 // Entry point function for sub-processes.
 int main(int argc, char* argv[])

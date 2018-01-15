@@ -297,7 +297,7 @@ namespace execGraph
             return (static_cast<T*>(pObject)->first->*static_cast<T*>(pObject)->second)(std::forward<Args>(args)...);
         }
     };
-}
+}  // namespace execGraph
 
 namespace std
 {
@@ -312,5 +312,5 @@ namespace std
                    (seed >> 2);
         }
     };
-}
+}  // namespace std
 #endif

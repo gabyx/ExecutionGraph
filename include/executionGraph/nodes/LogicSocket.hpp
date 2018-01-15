@@ -382,7 +382,7 @@ namespace executionGraph
         DataType& getValue() { return DataStorage::m_data; }
     };
 
-}  // end ExecutionGraph
+}  // namespace executionGraph
 
 // =====================================================================
 // Implementation
@@ -476,5 +476,5 @@ namespace executionGraph
         outputSocket.m_getterChilds.emplace(this);
     }
 
-}  // end executionGraph
+}  // namespace executionGraph
 #endif

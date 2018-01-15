@@ -12,16 +12,15 @@
 
 #include "App.hpp"
 
-#include <string>
-
 #include <cef_browser.h>
 #include <cef_command_line.h>
+#include <string>
 #include <views/cef_browser_view.h>
 #include <views/cef_window.h>
 #include <wrapper/cef_helpers.h>
-
-#include "AppHandler.hpp"
-#include "FileSchemeHandlerFactory.hpp"
+#include "cefapp/FileSchemeHandlerFactory.hpp"
+#include "backend/ExecutionGraphBackend.hpp"
+#include "cefapp/AppHandler.hpp"
 
 namespace
 {
@@ -89,21 +88,21 @@ void App::OnContextInitialized()
                                     new FileSchemeHandlerFactory(m_clientSourcePath, "executionGraph"));
 
     // AppHandler implements browser-level callbacks.
-    CefRefPtr<AppHandler> handler(new AppHandler(use_views));
+    m_handler = CefRefPtr<AppHandler>(new AppHandler(use_views));
+
+    // Install the ExecutionGraph Backend
+    auto executionGraphBackend = std::make_shared<ExecutionGraphBackend>();
+    m_handler->RegisterBackend(executionGraphBackend);
 
     // Specify CEF browser settings here.
     CefBrowserSettings browser_settings;
 
-    // Check if a "--url=" value was provided via the command-line. If so, use
-    // that instead of the default URL.
-    std::string url = command_line->GetSwitchValue("url");
-    if(url.empty())
-        url = "client://executionGraph/index.html";
+    CefString url = "client://executionGraph/index.html";
 
     if(use_views)
     {
         // Create the BrowserView.
-        CefRefPtr<CefBrowserView> browser_view = CefBrowserView::CreateBrowserView(handler, url, browser_settings, NULL, NULL);
+        CefRefPtr<CefBrowserView> browser_view = CefBrowserView::CreateBrowserView(m_handler, url, browser_settings, NULL, NULL);
 
         // Create the Window. It will show itself after creation.
         CefWindow::CreateTopLevelWindow(new SimpleWindowDelegate(browser_view));
@@ -120,6 +119,6 @@ void App::OnContextInitialized()
 #endif
 
         // Create the first browser window.
-        CefBrowserHost::CreateBrowser(window_info, handler, url, browser_settings, NULL);
+        CefBrowserHost::CreateBrowser(window_info, m_handler, url, browser_settings, NULL);
     }
 }

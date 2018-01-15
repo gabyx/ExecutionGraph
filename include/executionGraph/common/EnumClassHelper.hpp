@@ -29,6 +29,6 @@ namespace executionGraph
     {
         return std::integral_constant<typename std::underlying_type<E>::type, enumToInt(e)>{};
     }
-}
+}  // namespace executionGraph
 
 #endif  // EnumClassHelper_hpp

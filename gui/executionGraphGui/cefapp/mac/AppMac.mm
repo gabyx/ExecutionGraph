@@ -118,6 +118,7 @@ int main(int argc, char* argv[]) {
   
   // Provide CEF with command-line arguments.
   CefMainArgs mainArgs(argc, argv);
+  
   EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(AppCLArgs, appCLArgs, (argc,argv));
 
   // Initialize the AutoRelease pool.

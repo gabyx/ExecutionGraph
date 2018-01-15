@@ -1,25 +1,26 @@
 //! ========================================================================================
 //!  ExecutionGraph
 //!  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
-//!
-//!  @date Wed Jan 10 2018
+//! 
+//!  @date Sun Jan 14 2018
 //!  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
-//!
+//! 
 //!  This Source Code Form is subject to the terms of the Mozilla Public
 //!  License, v. 2.0. If a copy of the MPL was not distributed with this
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_common_FileSystem_hpp
-#define executionGraph_common_FileSystem_hpp
+#include "backend/BackendMessageHandler.hpp"
 
-#include <experimental/filesystem>
-#include "executionGraph/config/Config.hpp"
-
-namespace std
+bool BackendMessageHandler::OnQuery(CefRefPtr<CefBrowser> browser,
+                             CefRefPtr<CefFrame> frame,
+                             int64 query_id,
+                             const CefString& request,
+                             bool persistent,
+                             CefRefPtr<Callback> callback)
 {
-    namespace filesystem = std::experimental::filesystem;
-    using path           = std::filesystem::path;
-}  // namespace std
-
-#endif
+    std::string result = request;
+    result             = "received: " + result;
+    callback->Success(result);
+    return true;
+}

@@ -14,10 +14,8 @@
 #define APP_H
 
 #include <cef_app.h>
-#include <unordered_map>
-#include <memory>
 #include "executionGraph/common/FileSystem.hpp"
-#include "backend/IBackend.hpp"
+class AppHandler;
 
 // Implement application-level callbacks for the browser process.
 class App : public CefApp,
@@ -47,10 +45,8 @@ public:
 private:
     std::path m_clientSourcePath;  //! Client source path.
 
-public:
-    IBackend& getBackend(const IBackend::Identifier& id);
 private:
-    std::unordered_map<IBackend::Identifier, std::unique_ptr<IBackend>> m_backends;
+    CefRefPtr<AppHandler> m_handler;  // The main app handler.
 };
 
 #endif

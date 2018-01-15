@@ -18,6 +18,14 @@ set(ExecutionGraphGUI_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/FileSchemeHandlerFactory.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.hpp
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendMessageHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendMessageHandler.hpp
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/ExecutionGraphBackend.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/ExecutionGraphBackend.cpp
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/Backend.hpp
 )
 set(ExecutionGraphGUI_SRCS_LINUX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/linux/AppLinux.cpp
@@ -119,8 +127,8 @@ if(OS_LINUX)
     set_target_compile_options_ExecutionGraph(${ExecutionGraphGUI_TARGET})
     # Additional Include Directories
     target_include_directories(${ExecutionGraphGUI_TARGET} PRIVATE ${ExecutionGraphGUI_INC_DIRS})
-    add_dependencies(${ExecutionGraphGUI_TARGET} libcef_dll_wrapper)
-    target_link_libraries(${ExecutionGraphGUI_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
+    add_dependencies(${ExecutionGraphGUI_TARGET} libcef_dll_wrapper ${crossguid_TARGET} ${crossguid_TARGET})
+    target_link_libraries(${ExecutionGraphGUI_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ${crossguid_TARGET})
 
     # Set rpath so that libraries can be placed next to the executable.
     set_target_properties(${ExecutionGraphGUI_TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN")
@@ -163,8 +171,8 @@ if(OS_MACOSX)
         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/helper-Info.plist
         OUTPUT_NAME ${ExecutionGraphGUI_HELPER_TARGET_OUTPUTNAME}
     )
-    add_dependencies(${ExecutionGraphGUI_HELPER_TARGET} libcef_dll_wrapper)
-    target_link_libraries(${ExecutionGraphGUI_HELPER_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
+    add_dependencies(${ExecutionGraphGUI_HELPER_TARGET} libcef_dll_wrapper ${crossguid_TARGET})
+    target_link_libraries(${ExecutionGraphGUI_HELPER_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ${crossguid_TARGET})
     
     # Fix the framework rpath in the helper executable.
     fix_macosx_helper_framework_rpath(${ExecutionGraphGUI_HELPER_TARGET})
@@ -178,8 +186,8 @@ if(OS_MACOSX)
     set_target_compile_options_ExecutionGraph(${ExecutionGraphGUI_TARGET})
     # Additional Include Directories
     target_include_directories(${ExecutionGraphGUI_TARGET} PRIVATE ${ExecutionGraphGUI_INC_DIRS})
-    add_dependencies(${ExecutionGraphGUI_TARGET} libcef_dll_wrapper "${ExecutionGraphGUI_HELPER_TARGET}" "${ExecutionGraphGUI_CLIENT_TARGET}")
-    target_link_libraries(${ExecutionGraphGUI_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
+    add_dependencies(${ExecutionGraphGUI_TARGET} libcef_dll_wrapper ${ExecutionGraphGUI_HELPER_TARGET} ${ExecutionGraphGUI_CLIENT_TARGET} ${crossguid_TARGET})
+    target_link_libraries(${ExecutionGraphGUI_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ${crossguid_TARGET})
     set_target_properties(${ExecutionGraphGUI_TARGET} PROPERTIES
         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/Info.plist
     )

@@ -31,7 +31,9 @@ macro(include_all_source_ExecutionGraph
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/SfinaeMacros.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/TypeDefs.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/CommandLineArguments.hpp
-
+        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/Identifier.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/ObjectID.hpp
+        
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicCommon.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicSocket.hpp
         ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicSocketDefaultTypes.hpp

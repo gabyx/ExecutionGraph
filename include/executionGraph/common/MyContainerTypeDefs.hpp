@@ -38,8 +38,8 @@ namespace executionGraph
         // Special STL vectors where the type is 16byte aligned
         template<typename Type>
         using StdVecAligned = std::vector<Type, Eigen::aligned_allocator<Type>>;
-    }
-}
+    }  // namespace MyContainers
+}  // namespace executionGraph
 
 /**
  * @brief This macro is used to typedef all custom container types.

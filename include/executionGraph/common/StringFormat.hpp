@@ -33,6 +33,6 @@ namespace executionGraph
 
 #pragma clang diagnostic pop
     }
-}
+}  // namespace executionGraph
 
 #endif

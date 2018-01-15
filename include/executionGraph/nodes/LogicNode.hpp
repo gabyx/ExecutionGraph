@@ -412,6 +412,6 @@ namespace executionGraph
 #define EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME() \
     virtual std::string getTypeName() override { return shortenTemplateBrackets(demangle(this)); };
 
-}  // end ExecutionGraph
+}  // namespace executionGraph
 
 #endif

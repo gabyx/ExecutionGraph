@@ -60,6 +60,6 @@ namespace executionGraph
 
 //! Instanciate a singelton `name` with type `type`.
 #define EXECGRAPH_INSTANCIATE_SINGLETON(type, name) INSTANCIATE_UNIQUE_SINGELTON_CTOR(type, name, ())
-}
+}  // namespace executionGraph
 
 #endif

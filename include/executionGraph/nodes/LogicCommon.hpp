@@ -211,7 +211,7 @@ namespace executionGraph
         {
         };
 
-    }  // end details
+    }  // namespace details
 
 //! Some handy macro to use when inheriting from LogicNode.
 #define EXECGRAPH_DEFINE_SOCKET_TRAITS(InputEnum, OutputEnum)                                                       \
@@ -224,6 +224,6 @@ namespace executionGraph
     template<typename... TSockets>                                                                                  \
     using OutSocketDeclList = executionGraph::details::OutputSocketDeclarationList<OutputEnum, TSockets...>;
 
-}  // namespace
+}  // namespace executionGraph
 
 #endif

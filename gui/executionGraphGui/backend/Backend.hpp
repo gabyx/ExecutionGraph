@@ -10,33 +10,25 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_backend_ExecutionGraphBackend_hpp
-#define executionGraphGui_backend_ExecutionGraphBackend_hpp
+#ifndef executionGraphGui_backend_Backend_hpp
+#define executionGraphGui_backend_Backend_hpp
 
-#include "backend/Backend.hpp"
+#include "backend/BackendMessageHandler.hpp"
 #include <executionGraph/common/ObjectID.hpp>
 
-class ExecutionGraphBackend : public Backend
+class Backend : public executionGraph::ObjectID
 {
+public:    
+    using Id = executionGraph::ObjectID::Id;
+    using Handler = BackendMessageHandler;
+    using HandlerList = std::vector<Handler*>;
 public:
-    using Backend::Id;
-    using Backend::Handler;
-    using Backend::HandlerList;
-    static const Id defaultId;
-
-public:
-    ExecutionGraphBackend(const Id& id = defaultId)
-        : Backend(id), m_dummyHandler(Id("DummyHandler"))
-    {}
-    virtual ~ExecutionGraphBackend() override = default;
+    Backend(const Id& id) : executionGraph::ObjectID(id) {}
+    virtual ~Backend() override = default;
 
 public:
     //! Get the Messagehandlers
-    virtual HandlerList getMessageHandlers() override { return std::initializer_list<Handler*>{ &m_dummyHandler }; } 
-
-private:
-    Handler m_dummyHandler; //! A single dummy test handler.
-
+    virtual HandlerList getMessageHandlers() = 0; 
 };
 
 #endif
