@@ -21,9 +21,11 @@ The library `Eigen` needs to be installed, `meta`, `googletest`, `benchmark` are
 ### OS X
 Install `clang` with [homebrew](https://brew.sh) by
 ```bash
-    brew install llvm --with-toolchain --with-lldb
+    brew install --HEAD llvm --with-toolchain --with-lldb
     brew install eigen
 ```
+We install the latest llvm build, since clang5.0.1 has problems showing `std::string` correctly while using `-fsanitize=address`.
+Clang Verions 7.0 has no problems.
 Set the `CXX` and `CC` variables in your `~/.bash_profile` or similar to 
 ```bash
 export PATH="/usr/local/opt/llvm/bin:$PATH"
