@@ -14,9 +14,9 @@ if(NOT "${crossguid_FOUND}")
 
     include(DownloadProject)
     download_project(PROJ               crossguid
-                    PREFIX              ${CMAKE_BINARY_DIR}/external
+                    PREFIX              ${CMAKE_BINARY_DIR}/external/crossguid
                     GIT_REPOSITORY      https://github.com/graeme-hill/crossguid.git
-                    GIT_TAG             master
+                    GIT_TAG             e6c8514
                     ${UPDATE_DISCONNECTED_IF_AVAILABLE}
     )
 

@@ -8,7 +8,7 @@ endif()
 
 include(DownloadProject)
 download_project(PROJ                googletest
-                 PREFIX              ${CMAKE_BINARY_DIR}/external
+                 PREFIX              ${CMAKE_BINARY_DIR}/external/googletest
                  GIT_REPOSITORY      https://github.com/google/googletest.git
                  GIT_TAG             master
                  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
@@ -73,7 +73,7 @@ function(defineCompileDefs target)
 
     set_target_compile_options_ExecutionGraph(${target})
     target_include_directories(${target} PRIVATE ${INCLUDE_DIRS})
-    target_link_libraries(${target} ExecutionGraph-LibForTestsOnly gtest gmock_main)
+    target_link_libraries(${target} ExecutionGraph-LibForTestsOnly gtest gmock_main ${ExecutionGraph_DEPENDING_TARGETS_DEP})
 
     if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
         target_compile_options(${target} PRIVATE -DExecutionGraph_BUILD_TESTS )
@@ -103,3 +103,8 @@ defineCompileDefs(${EXEC_NAME2})
 set(EXEC_NAME3 ${PROJECT_NAME}Test-CustomSocketTypes)
 add_executable(${EXEC_NAME3}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_CustomSocketTypes.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 defineCompileDefs(${EXEC_NAME3})
+
+#Factory Test
+set(EXEC_NAME4 ${PROJECT_NAME}Test-Factory)
+add_executable(${EXEC_NAME4}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Factory.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME4})

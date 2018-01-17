@@ -14,42 +14,80 @@
 #define executionGraph_common_Factory_hpp
 
 #include <meta/meta.hpp>
+#include <rttr/type.h>
+#include <type_traits>
+
 #include "executionGraph/config/Config.hpp"
 
 namespace executionGraph
 {
+    namespace detailsStaticFactory
+    {
+        template<typename CreatorList>
+        struct Types
+        {
+            using FirstCreator    = meta::at_c<CreatorList, 0>;
+            using Key             = typename FirstCreator::Key;
+            using CreatorFunction = decltype(&FirstCreator::create);
+            using CreatorType     = typename std::result_of<CreatorFunction>::type;
+            using DynamicMap      = typename std::unordered_map<rttr::type, CreatorFunction>;
+
+            template<typename Creator, typename SearchKey>
+            using isCreator = std::is_same<typename Creator::Key, SearchKey>> ;
+
+            // extract all Key types and check if unique -> otherwise warning
+            template<typename T>
+            using extractKey = typename T::Key;
+            using allKeys    = meta::transform<CreatorList, meta::quote<extractKey>>;
+            using uniqueKeys = meta::unique<allKeys>;
+            static_assert(meta::size<uniqueKeys>::value == meta::size<allKeys>::value, "Your input CreatorList contains duplicated `Key` types!") template<typename SearchKey>
+            using getCreator = meta::at_c<meta::find<CreatorList,
+                                                     meta::bind_back<meta::quote<isCreator>, SearchKey>>,
+                                          0>;
+        };
+
+        template<typename Map, typename T>
+        struct MapStorage;
+        template<typename Map, typename... Creator>
+        struct MapStorage<Map, std::meta::list<Creator...>>
+        {
+            using Map static Map map;  //!< Map with CreatorFunctions for the Factory.
+        };
+        //! Static initialization of the factory map with all key,function pointer pairs.
+        template<typename Map, typename... Creator>
+        typename Map MapStorage<Map, std::meta::list<Creator...>>::map = {{rttr::type::get<Creator::Key>, &Creator::create}...};
+    }  // namespace detailsStaticFactory
+
     //! A factory class which creates types `CreatorType`.
-    template<typename Key, typename CreatorList>
-    class Factory
+    template<typename CreatorList>
+    class StaticFactory
     {
     public:
-        using CreatorFunction = CreatorType (*)();
+        using Key         = typename details::StaticFactoryDetails<CreatorList>::Key;
+        using CreatorType = typename details::StaticFactoryDetails<CreatorList>::CreatorType;
+        using DynamicMap  = details::StaticFactoryDetails<CreatorList>::DynamicMap;
 
-        //! Register the creation of a type `CreatorType` by a Key `key`
-        //! executed by functor `Creator::create`.
-        template<typename Creator>
-        static void register(const Key& key)
+        //! Create the type
+        template<typename Key>
+        static CreatorType create()
         {
-            // If this does not compile your type `Creator` does not have a static
-            // create function of type `CreatorFunction`.
-            creatorMap.emplace(type, static_cast<CreatorFunction>(&Creator::create));
+            using Creator = getCreator<Key>;
+            return Creator::create();
         }
 
         //! Create the type registered with Key `key`.
-        static CreatorType create(const Key& key)
+        static CreatorType create(const rttr::type& key)
         {
-            auto it = creatorMap.find(key);
+            auto it = MapStorage<DynamicMap, CreatorList>::map.find(key);
 
-            if(it != creatorMap.end())
+            if(it == creatorMap.end())
             {
-                return it->second();  // Will move automatically
+                EXEC_GRAPH_THROWEXCEPTION("No such type in Factory!");
             }
-
-            return CreatorType{};
+            return it->second();  // Will move automatically
         }
-
-    private:
-        static std::unordered_map<Key, CreatorFunction> creatorMap;  //!< Map with CreatorFunctions for the Factory.
     };
 
 }  // namespace executionGraph
+
+#endif

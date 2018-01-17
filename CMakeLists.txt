@@ -119,15 +119,16 @@ find_package(Args REQUIRED)
 list(APPEND ExecutionGraph_INC_DIRS_DEP ${args_INCLUDE_DIR})
 
 # Try to find the RTTR Library (use our own script)
-find_package(RTTRLib REQUIRED)
-list(APPEND ExecutionGraph_INC_DIRS_DEP ${rttr_INCLUDE_DIR})
+find_package(RTTR CONFIG REQUIRED CORE)
+list(APPEND ExecutionGraph_DEPENDING_TARGETS_DEP "RTTR::Core")
+#list(APPEND ExecutionGraph_INC_DIRS_DEP ${RTTR_INCLUDE_DIR})
 
 # Try to find the crossguid Library (use our own script)
 find_package(CrossGUID REQUIRED)
 list(APPEND ExecutionGraph_INC_DIRS_DEP ${crossguid_INCLUDE_DIR})
 # build the library
 set(XG_TESTS OFF)
-add_subdirectory(${crossguid_SOURCE_DIR})
+add_subdirectory(${crossguid_SOURCE_DIR} ${crossguid_BINARY_DIR} EXCLUDE_FROM_ALL)
 
 find_package(PugiXML)
 if(PUGIXML_FOUND)

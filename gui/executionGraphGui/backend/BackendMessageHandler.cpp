@@ -11,16 +11,3 @@
 //! ========================================================================================
 
 #include "backend/BackendMessageHandler.hpp"
-
-bool BackendMessageHandler::OnQuery(CefRefPtr<CefBrowser> browser,
-                                    CefRefPtr<CefFrame> frame,
-                                    int64 query_id,
-                                    const CefString& request,
-                                    bool persistent,
-                                    CefRefPtr<Callback> callback)
-{
-    std::string result = request;
-    result             = "received: " + result;
-    callback->Success(result);
-    return true;
-}

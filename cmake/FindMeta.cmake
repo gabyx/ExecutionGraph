@@ -27,12 +27,11 @@ else()
   ExternalProject_Add(meta
     GIT_REPOSITORY https://github.com/ericniebler/meta.git
     TIMEOUT 10
+    PREFIX "${CMAKE_BINARY_DIR}/external/meta"
     CMAKE_ARGS -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
-    SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/external/meta-src"
-    BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/external/meta-build"
     BUILD_COMMAND "" # disable build step
     INSTALL_COMMAND "" # Disable install step
-    )
+  )
   
   # Specify include dir
   ExternalProject_Get_Property(meta source_dir)

@@ -9,7 +9,6 @@ owndir="$(cd "$(dirname "$0")"; pwd -P)"
 
 OS_NAME=$(uname)
 
-
 # We cannot store \0 in variables!
 allFiles=$(git ls-tree -r HEAD --name-only --full-name ${root} | tr '\n' '\0' | base64 )
 

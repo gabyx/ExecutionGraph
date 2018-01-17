@@ -21,9 +21,9 @@ if(NOT EXISTS "${args_INCLUDE_DIR}")
 
     include(DownloadProject)
     download_project(PROJ               args
-                    PREFIX              ${CMAKE_BINARY_DIR}/external
+                    PREFIX              ${CMAKE_BINARY_DIR}/external/args
                     GIT_REPOSITORY      https://github.com/Taywee/args 
-                    GIT_TAG             master
+                    GIT_TAG             d8905de2
                     ${UPDATE_DISCONNECTED_IF_AVAILABLE}
     )
 

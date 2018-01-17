@@ -25,7 +25,7 @@ else()
 endif()
 
 download_project(PROJ "cefbinaries"
-                 PREFIX     ${CMAKE_BINARY_DIR}/external
+                 PREFIX     ${CMAKE_BINARY_DIR}/external/cefbinaries
                  URL        ${CEF_URL}
                  ${UPDATE_DISCONNECTED_IF_AVAILABLE})
 

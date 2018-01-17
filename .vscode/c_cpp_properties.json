@@ -6,26 +6,14 @@
                 "${workspaceRoot}/include",
                 "${workspaceRoot}/gui/executionGraphGui",
                 "${workspaceRoot}/gui/executionGraphGui/client",
-                "${workspaceRoot}/build/include",
-                "${workspaceRoot}/build/external/cefbinaries-src",
-                "${workspaceRoot}/build/external/cefbinaries-src/include",
-                "${workspaceRoot}/build/external/args-src/include",
-                "${workspaceRoot}/build/external/meta-src/include",
-                "/usr/local/include",
-                "/usr/local/include/eigen3",
-                "/usr/local/opt/llvm/include",
-                "/usr/local/opt/llvm/include/c++/v1/"
+                "${workspaceRoot}/build/include"
             ],
             "defines": [],
             "browse": {
                 "path": [
                     "${workspaceRoot}/include",
                     "${workspaceRoot}/gui/executionGraphGui",
-                    "${workspaceRoot}/build/include",
-                    "${workspaceRoot}/build/external/cefbinaries-src/include",
-                    "${workspaceRoot}/build/external/args-src/include",
-                    "${workspaceRoot}/build/external/meta-src/include",
-                    "/usr/local/include/eigen3"
+                    "${workspaceRoot}/build/include"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
