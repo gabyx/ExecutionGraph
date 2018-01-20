@@ -8,7 +8,12 @@ set(EXTRA_CMAKE_ARGS)
 
 include(FindEigen3Lib)
 include(FindMetaLib)
-include(FindArgsLib)
+
+if(${ExecutionGraph_BUILD_GUI})
+    include(FindArgsLib)
+    include(FindCrossGUIDLib)
+    include(FindCEFLib)
+endif()
 
 list (APPEND DEPENDENCIES rttr)
 include(FindRTTRLib)

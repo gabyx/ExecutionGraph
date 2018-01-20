@@ -4,89 +4,7 @@ cmake_minimum_required(VERSION 3.4)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" ${CMAKE_MODULE_PATH})
 message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
 
-# Handle superbuild first
-option (USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)
-
-if (USE_SUPERBUILD)
-  project (SUPERBUILD NONE)
-  # execute the superbuild (this script will be invoked again without the
-  # USE_SUPERBUILD option this time)
-  include (SuperBuild)
-  return()                      # stop processing this file further
-endif()
-
-set(CMAKE_PREFIX_PATH "")
-
-message(STATUS "Binary dir:" ${CMAKE_BINARY_DIR})
-
-if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-    message(STATUS "Detect build type from folder")
-    #Detect Build Type if Debug appears in CMAKE_BINARY_DIR path
-    string(REGEX MATCH ".*(Debug|debug).*" DEBUG_MATCH ${CMAKE_BINARY_DIR})
-    if(DEBUG_MATCH)
-        set(CMAKE_BUILD_TYPE Debug CACHE STRING "The build type for makefile based generators")
-        set(PROJECTNAMEPREFIX Debug)
-    else()
-        set(CMAKE_BUILD_TYPE Release CACHE STRING "The build type for makefile based generators")
-        set(PROJECTNAMEPREFIX Release)
-    endif()
-else()
-    set(PROJECTNAMEPREFIX ${CMAKE_BUILD_TYPE})
-endif()
-
-set(CMAKE_VERBOSE_MAKEFILE OFF)
-
-# Load print macros
-include(PrintMacros)
-# Load important modules
-include(FirstCMakeRun)
-# Speed up the build
-include(cotire) 
-
-#The name of the project ===============================================
-set(ExecutionGraphProjectName "ExecutionGraph")
-# if(${CMAKE_GENERATOR} MATCHES "Unix Makefiles")
-#         set(ExecutionGraphProjectName  "${ExecutionGraphProjectName}-${PROJECTNAMEPREFIX}")
-# endif()
-message(STATUS "Project name is: " ${ExecutionGraphProjectName})
-project(${ExecutionGraphProjectName})
-
-set(ExecutionGraph_BINARY_DIR ${PROJECT_BINARY_DIR})
-set(ExecutionGraph_ROOT_DIR   ${PROJECT_SOURCE_DIR})
-
-message(STATUS "Compiler ID is: " ${CMAKE_CXX_COMPILER_ID})
-
-# use CCACHE if possible
-find_program(CCACHE_FOUND ccache)
-if(CCACHE_FOUND)
-    set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
-endif(CCACHE_FOUND)
-
-message("Default Compiler Flags: '${CMAKE_CXX_FLAGS}' | '${CMAKE_CXX_FLAGS_DEBUG}' | '${CMAKE_CXX_FLAGS_RELEASE}'")
-message("Default Linker Flags: '${CMAKE_EXE_LINKER_FLAGS}' | '${CMAKE_SHARED_LINKER_FLAGS}' | '${CMAKE_STATIC_LINKER_FLAGS}'")
-
-
-#Add some multithreaded build support ==================================
-mark_as_advanced(MULTITHREADED_BUILD)
-set(MULTITHREADED_BUILD ON CACHE BOOL "Parallel build with as many threads as possible!")
-if(MULTITHREADED_BUILD)
-	if(${CMAKE_GENERATOR} MATCHES "Unix Makefiles")
-            file(COPY ${ExecutionGraph_ROOT_DIR}/cmake/parallelmake.sh DESTINATION ${PROJECT_BINARY_DIR}
-                FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-                NO_SOURCE_PERMISSIONS
-            )
-            set(CMAKE_MAKE_PROGRAM "${PROJECT_BINARY_DIR}/parallelmake.sh")
-            message(STATUS "Set make program to ${PROJECT_BINARY_DIR}/parallelmake.sh")
-    elseif(MSVC)
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" "/MP")
-      message(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-    endif()
-endif()
-# ======================================================================
-
-
 #Optional Stuff ========================================================
-
 mark_as_advanced( CMAKE_DEBUG_POSTFIX )
 set(CMAKE_DEBUG_POSTFIX "-dbg" CACHE STRING "Debug postfix for library/executable")
 
@@ -115,6 +33,83 @@ set(ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS ON CACHE BOOL "Force an exception i
 #~ set(ExecutionGraph_USE_OPENMP ON CACHE BOOL "Try to use OpenMp for parallel speedup")
 #=======================================================================
 
+# Handle superbuild first
+option (USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)
+
+if (USE_SUPERBUILD)
+  project (SUPERBUILD NONE)
+  # execute the superbuild (this script will be invoked again without the
+  # USE_SUPERBUILD option this time)
+  include (SuperBuild)
+  message("SuperBuild configured! -> exit...")
+  return()                      # stop processing this file further
+endif()
+
+message(STATUS "Binary dir:" ${CMAKE_BINARY_DIR})
+
+set(CMAKE_VERBOSE_MAKEFILE OFF)
+
+# Load print macros
+include(PrintMacros)
+# Load important modules
+include(FirstCMakeRun)
+# Speed up the build
+include(cotire) 
+
+#The name of the project ===============================================
+set(ExecutionGraphProjectName "ExecutionGraph")
+message(STATUS "Project name is: " ${ExecutionGraphProjectName})
+project(${ExecutionGraphProjectName})
+
+set(ExecutionGraph_BINARY_DIR ${PROJECT_BINARY_DIR})
+set(ExecutionGraph_ROOT_DIR   ${PROJECT_SOURCE_DIR})
+
+if("${CMAKE_BUILD_TYPE}" STREQUAL "")
+    message(STATUS "Detect build type from folder")
+    #Detect Build Type if Debug appears in CMAKE_BINARY_DIR path
+    string(REGEX MATCH ".*(Debug|debug).*" DEBUG_MATCH ${CMAKE_BINARY_DIR})
+    if(DEBUG_MATCH)
+        set(CMAKE_BUILD_TYPE Debug CACHE STRING "The build type for makefile based generators")
+        set(PROJECTNAMEPREFIX Debug)
+    else()
+        set(CMAKE_BUILD_TYPE Release CACHE STRING "The build type for makefile based generators")
+        set(PROJECTNAMEPREFIX Release)
+    endif()
+else()
+    set(PROJECTNAMEPREFIX ${CMAKE_BUILD_TYPE})
+endif()
+
+
+message(STATUS "Compiler ID is: " ${CMAKE_CXX_COMPILER_ID})
+
+# use CCACHE if possible
+find_program(CCACHE_FOUND ccache)
+if(CCACHE_FOUND)
+    set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
+endif(CCACHE_FOUND)
+
+message("Default Compiler Flags: '${CMAKE_CXX_FLAGS}' | '${CMAKE_CXX_FLAGS_DEBUG}' | '${CMAKE_CXX_FLAGS_RELEASE}'")
+message("Default Linker Flags: '${CMAKE_EXE_LINKER_FLAGS}' | '${CMAKE_SHARED_LINKER_FLAGS}' | '${CMAKE_STATIC_LINKER_FLAGS}'")
+
+#Add some multithreaded build support ==================================
+mark_as_advanced(MULTITHREADED_BUILD)
+set(MULTITHREADED_BUILD ON CACHE BOOL "Parallel build with as many threads as possible!")
+if(MULTITHREADED_BUILD)
+	if(${CMAKE_GENERATOR} MATCHES "Unix Makefiles")
+            file(COPY ${ExecutionGraph_ROOT_DIR}/cmake/parallelmake.sh DESTINATION ${PROJECT_BINARY_DIR}
+                FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+                NO_SOURCE_PERMISSIONS
+            )
+            set(CMAKE_MAKE_PROGRAM "${PROJECT_BINARY_DIR}/parallelmake.sh")
+            message(STATUS "Set make program to ${PROJECT_BINARY_DIR}/parallelmake.sh")
+    elseif(MSVC)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" "/MP")
+      message(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+    endif()
+endif()
+# ======================================================================
+
+
 # Dependencies =========================================================
 # Define Eigen
 find_package(Eigen3Lib REQUIRED)
@@ -131,8 +126,7 @@ find_package(ArgsLib REQUIRED)
 list(APPEND ExecutionGraph_INC_DIRS_DEP ${args_INCLUDE_DIR})
 
 # Try to find the RTTR Library (use our own script)
-message(STATUS "rttr library: finding...: RTTR_DIR: ${RTTR_DIR}")
-find_package(RTTR CONFIG REQUIRED CORE)
+find_package(RTTRLib REQUIRED)
 list(APPEND ExecutionGraph_DEPENDING_TARGETS_DEP "RTTR::Core")
 #list(APPEND ExecutionGraph_INC_DIRS_DEP ${RTTR_INCLUDE_DIR})
 
@@ -178,7 +172,7 @@ if(ExecutionGraph_BUILD_EXAMPLE)
   set(ExecutionGraph_BUILD_LIBRARY On CACHE BOOL "Build a shared library" FORCE)
 endif()
 
-# Define all MVBB Source files
+# Define all ExecutionGraph Source files
 include(DefineExecutionGraphSources)
 
 set(ExecutionGraph_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include/ExecutionGraph")

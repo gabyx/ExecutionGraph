@@ -14,8 +14,9 @@ if(NOT EXISTS "${EIGEN3_INCLUDE_DIR}")
     include(DownloadProject)
     download_project(PROJ              eigen3
                     PREFIX             ${CMAKE_BINARY_DIR}/external/eigen
-                    HG_REPOSITORY      https://bitbucket.org/eigen/eigen
-                    HG_TAG             3.2
+                    # HG_REPOSITORY     https://bitbucket.org/eigen/eigen
+                    # HG_TAG            3.2
+                    URL                 http://bitbucket.org/eigen/eigen/get/3.3.4.zip
                     UPDATE_DISCONNECTED 1
                     INSTALL_DIR "${CMAKE_BINARY_DIR}/external/install/eigen")
 

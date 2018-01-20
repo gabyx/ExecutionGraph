@@ -1,3 +1,8 @@
+
+find_package(CEFLib REQUIRED) # our own script
+
+
+## Use CEF
 find_package(CEF REQUIRED)
 
 print_cef_config()
