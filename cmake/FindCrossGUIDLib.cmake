@@ -14,7 +14,8 @@ if(NOT EXISTS "${crossguid_INCLUDE_DIR}")
                     GIT_SHALLOW         ON
                     ${UPDATE_DISCONNECTED_IF_AVAILABLE}
     )
-
+    set(crossguid_SOURCE_DIR "${crossguid_SOURCE_DIR}" CACHE STRING "crossguid library src" FORCE)
+    set(crossguid_BINARY_DIR "${crossguid_BINARY_DIR}" CACHE STRING "crossguid library src" FORCE)
     set(crossguid_INCLUDE_DIR "${crossguid_SOURCE_DIR}" CACHE STRING "crossguid library (https://github.com/graeme-hill/crossguid.git) include directory" FORCE)
     set(crossguid_TARGET "xg" CACHE STRING "crossguid target (https://github.com/graeme-hill/crossguid.git) include directory" FORCE)
 else()

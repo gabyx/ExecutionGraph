@@ -67,24 +67,14 @@ print_target_properties(ExecutionGraph-Lib)
 set(ExecutionGraph_INCLUDE_CHARATERISTIC_HEADER ${ExecutionGraph/config/Config.hpp})
 
 # Install stuff (default location is not some where on the system! for safty reasons
-if(FIRST_CMAKE_RUN)
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/../install" CACHE STRING "Install prefix (e.g. /usr/local/)" FORCE)
+    message(WARNING "Check install dir! They have been changed!")
 endif()
 
 # Set install directories (if changed CMAKE_INSTALL_PREFIX adjust values)
 set(ExecutionGraph_LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib CACHE STRING "Install dir library")
 set(ExecutionGraph_INC_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include/ExecutionGraph CACHE STRING "Install dir includes")
-
-
-if( NOT CMAKE_INSTALL_PREFIX STREQUAL INSTALL_PREFIX_LAST_VALUE  )
-    set(INSTALL_PREFIX_LAST_VALUE ${CMAKE_INSTALL_PREFIX} CACHE INTERNAL "Last install prefix value")
-    message(WARNING "Check install dir! They have been changed!")
-    unset(ExecutionGraph_LIB_INSTALL_DIR)
-    unset(ExecutionGraph_INCLUDE_INSTALL_DIR)
-    set(ExecutionGraph_LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib CACHE STRING "Install dir library" FORCE)
-    set(ExecutionGraph_INC_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include CACHE STRING "Install dir includes" FORCE)
-    mark_as_advanced(FORCE ExecutionGraph_LIB_INSTALL_DIR ExecutionGraph_INC_INSTALL_DIR )
-endif()
 
 # Installing files
 ##################
