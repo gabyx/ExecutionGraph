@@ -5,10 +5,11 @@ include(FindPackageHandleStandardArgs)
 
 # Try to find the library, if it is installed!
 # otherwise download it
-message(STATUS "rttr library: finding...")
-find_package(RTTR QUIET)
+message(STATUS "rttr library: finding...: RTTR_DIR: ${RTTR_DIR}")
+find_package(RTTR CONFIG REQUIRED CORE QUIET)
 
-if(NOT ${RTTR_FOUND})
+if(NOT TARGET "RTTR::Core")
+
     message(STATUS "rttr library: inlcude dir not found -> download from https://github.com/gabyx/rttr.git")
 
     include(ExternalProject)
@@ -24,5 +25,8 @@ if(NOT ${RTTR_FOUND})
                                     "-DBUILD_BENCHMARKS=OFF" "-DBUILD_UNIT_TESTS=OFF" "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
                         INSTALL_DIR "${INSTALL_DIR}")
 
-    set(RTTR_DIR "${INSTALL_DIR}" CACHE STRING "rttr library directory" FORCE)
+    set(RTTR_DIR "${INSTALL_DIR}/cmake" CACHE STRING "rttr library directory" FORCE)
+    
+else()
+    message(STATUS "rttr library found!")
 endif()

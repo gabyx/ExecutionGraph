@@ -34,6 +34,9 @@ if(NOT EXISTS "${Meta_INCLUDE_DIR}")
   
     set(Meta_INCLUDE_DIR "${meta_SOURCE_DIR}/include" CACHE STRING "meta library (https://github.com/ericniebler/meta.git) include directory" FORCE)
     set(Meta_DIR "${Meta_INCLUDE_DIR}" CACHE STRING "meta library directory" FORCE)
+    
+else()
+    message(STATUS "meta3 library found!")
 endif()
 
 find_package_handle_standard_args(MetaLib DEFAULT_MSG Meta_INCLUDE_DIR)

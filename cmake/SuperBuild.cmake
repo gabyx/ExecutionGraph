@@ -15,9 +15,9 @@ include(FindRTTRLib)
 
 
 # FIXME add to default target "all"?
-ExternalProject_Add (ExecutionGraph
-  DEPENDS ${DEPENDENCIES}
-  SOURCE_DIR ${PROJECT_SOURCE_DIR}
-  CMAKE_ARGS -DUSE_SUPERBUILD=OFF ${EXTRA_CMAKE_ARGS}
-  INSTALL_COMMAND ""
-  BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
+# ExternalProject_Add(ExecutionGraph
+#                     DEPENDS ${DEPENDENCIES}
+#                     SOURCE_DIR ${PROJECT_SOURCE_DIR}
+#                     BINARY_DIR ${CMAKE_BINARY_DIR}
+#                     CMAKE_ARGS -DUSE_SUPERBUILD=OFF ${EXTRA_CMAKE_ARGS}
+#                     INSTALL_COMMAND "")

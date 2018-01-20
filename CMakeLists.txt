@@ -131,6 +131,7 @@ find_package(ArgsLib REQUIRED)
 list(APPEND ExecutionGraph_INC_DIRS_DEP ${args_INCLUDE_DIR})
 
 # Try to find the RTTR Library (use our own script)
+message(STATUS "rttr library: finding...: RTTR_DIR: ${RTTR_DIR}")
 find_package(RTTR CONFIG REQUIRED CORE)
 list(APPEND ExecutionGraph_DEPENDING_TARGETS_DEP "RTTR::Core")
 #list(APPEND ExecutionGraph_INC_DIRS_DEP ${RTTR_INCLUDE_DIR})

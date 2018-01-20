@@ -6,6 +6,7 @@ include(FindPackageHandleStandardArgs)
 # Try to find the library, if it is installed!
 # otherwise download it
 find_package(Eigen3)
+message(STATUS "eigen3 library: finding...")
 
 if(NOT EXISTS "${EIGEN3_INCLUDE_DIR}")
     message(STATUS "eigen3 library: include dir not found -> download from https://bitbucket.org/eigen/eigen")
@@ -20,6 +21,8 @@ if(NOT EXISTS "${EIGEN3_INCLUDE_DIR}")
 
     set(EIGEN3_INCLUDE_DIR "${eigen3_SOURCE_DIR}" CACHE STRING "eigen library (https://bitbucket.org/eigen/eigen) include directory" FORCE)
     set(EIGEN3_DIR "${CMAKE_BINARY_DIR}/external/install/eigen" CACHE STRING "eigen directory" FORCE)
+else()
+    message(STATUS "eigen3 library found!")
 endif()
 
 find_package_handle_standard_args(Eigen3Lib DEFAULT_MSG EIGEN3_INCLUDE_DIR)
