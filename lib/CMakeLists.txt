@@ -15,7 +15,6 @@ set(INCLUDE_FILES
 
 #include directories
 set(INCLUDE_DIRS
-    ${EIGEN_INCLUDE_DIR}
     ${ExecutionGraph_INC_DIRS}
 )
 

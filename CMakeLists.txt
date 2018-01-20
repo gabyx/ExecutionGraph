@@ -1,6 +1,22 @@
 #The CMake Minimum version that is required.
 cmake_minimum_required(VERSION 3.4)
 
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" ${CMAKE_MODULE_PATH})
+message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
+
+# Handle superbuild first
+option (USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)
+
+if (USE_SUPERBUILD)
+  project (SUPERBUILD NONE)
+  # execute the superbuild (this script will be invoked again without the
+  # USE_SUPERBUILD option this time)
+  include (SuperBuild)
+  return()                      # stop processing this file further
+endif()
+
+set(CMAKE_PREFIX_PATH "")
+
 message(STATUS "Binary dir:" ${CMAKE_BINARY_DIR})
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
@@ -20,9 +36,6 @@ endif()
 
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" ${CMAKE_MODULE_PATH})
-message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
-
 # Load print macros
 include(PrintMacros)
 # Load important modules
@@ -40,7 +53,6 @@ project(${ExecutionGraphProjectName})
 
 set(ExecutionGraph_BINARY_DIR ${PROJECT_BINARY_DIR})
 set(ExecutionGraph_ROOT_DIR   ${PROJECT_SOURCE_DIR})
-
 
 message(STATUS "Compiler ID is: " ${CMAKE_CXX_COMPILER_ID})
 
@@ -105,17 +117,17 @@ set(ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS ON CACHE BOOL "Force an exception i
 
 # Dependencies =========================================================
 # Define Eigen
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3Lib REQUIRED)
 set(EIGEN_INCLUDE_DIR ${EIGEN3_INCLUDE_DIR})
 list(APPEND ExecutionGraph_INC_DIRS_DEP ${EIGEN_INCLUDE_DIR})
 
 # Try to find Meta 
-find_package(Meta REQUIRED)
+find_package(MetaLib REQUIRED)
 list(APPEND ExecutionGraph_INC_DIRS_DEP ${Meta_INCLUDE_DIR})
 set(ExecutionGraph_DEPENDING_TARGETS_DEP ${Meta_TARGET})
 
 # Try to find the Argumentparser
-find_package(Args REQUIRED)
+find_package(ArgsLib REQUIRED)
 list(APPEND ExecutionGraph_INC_DIRS_DEP ${args_INCLUDE_DIR})
 
 # Try to find the RTTR Library (use our own script)
@@ -124,13 +136,13 @@ list(APPEND ExecutionGraph_DEPENDING_TARGETS_DEP "RTTR::Core")
 #list(APPEND ExecutionGraph_INC_DIRS_DEP ${RTTR_INCLUDE_DIR})
 
 # Try to find the crossguid Library (use our own script)
-find_package(CrossGUID REQUIRED)
+find_package(CrossGUIDLib REQUIRED)
 list(APPEND ExecutionGraph_INC_DIRS_DEP ${crossguid_INCLUDE_DIR})
 # build the library
 set(XG_TESTS OFF)
 add_subdirectory(${crossguid_SOURCE_DIR} ${crossguid_BINARY_DIR} EXCLUDE_FROM_ALL)
 
-find_package(PugiXML)
+find_package(PugiXMLLib)
 if(PUGIXML_FOUND)
     list(APPEND ExecutionGraph_INC_DIRS_DEP ${PUGIXML_INCLUDE_DIR} )
     list(APPEND ExecutionGraph_LIBRARIES_DEP ${PUGIXML_LIBRARIES})

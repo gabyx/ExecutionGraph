@@ -149,7 +149,6 @@
         "**/bower_components": true,
         "**/jspm_packages": true,
         "**/node_modules": true,
-        "**/build":true
     },
     "cmake.configureArgs": ["-DExecutionGraph_BUILD_TESTS=ON"]
 }
