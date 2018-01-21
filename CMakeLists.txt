@@ -32,11 +32,10 @@ set(ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS ON CACHE BOOL "Force an exception i
 #~ mark_as_advanced( ExecutionGraph_USE_OPENMP)
 #~ set(ExecutionGraph_USE_OPENMP ON CACHE BOOL "Try to use OpenMp for parallel speedup")
 
-set(ExecutionGraph_EXTERNAL_DIR "${CMAKE_BINARY_DIR}/external" CACHE STRING "Folder where all external shit is build!")
-set(ExecutionGraph_EXTERNAL_INSTALL_DIR "${ExecutionGraph_EXTERNAL_DIR}/install" CACHE STRING "Folder where all external shit is installed!")
+set(ExecutionGraph_EXTERNAL_DIR_POSTFIX "external" CACHE STRING "Folder where all external shit is build!")
+set(ExecutionGraph_EXTERNAL_DIR "${CMAKE_BINARY_DIR}/${ExecutionGraph_EXTERNAL_DIR_POSTFIX}" )
+set(ExecutionGraph_EXTERNAL_INSTALL_DIR "${ExecutionGraph_EXTERNAL_DIR}/install")
 #=======================================================================
-
-message(STATUS "Binary dir:" ${CMAKE_BINARY_DIR})
 
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
@@ -52,7 +51,10 @@ set(ExecutionGraphProjectName "ExecutionGraph")
 message(STATUS "Project name is: " ${ExecutionGraphProjectName})
 project(${ExecutionGraphProjectName})
 
-message(STATUS "CXX Flags: ${CMAKE_CXX_FLAGS}")
+# here we specify the installation directory
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH  "ExecutionGraph install prefix" FORCE)
+endif()
 
 # Handle superbuild first ===============
 option (USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)
@@ -64,15 +66,12 @@ if (USE_SUPERBUILD)
   message("SuperBuild configured! -> exit...")
   return()                      # stop processing this file further
 endif()
+# Set the superbuild off into the cache! super build should only run once!
+set(USE_SUPERBUILD OFF CACHE STRING "If a superbuild should be made (building all dependencies)" FORCE)
 
 message(STATUS " =================================================================")
 message(STATUS "                   NORMAL BUILD CONFIGURE [START]                 ")
 message(STATUS " =================================================================")
-
-# Set the superbuild off into the cache! super build should only run once!
-set(USE_SUPERBUILD OFF CACHE STRING "If a superbuild should be made (building all dependencies)" FORCE)
-
-# =======================================
 
 set(ExecutionGraph_BINARY_DIR ${PROJECT_BINARY_DIR})
 set(ExecutionGraph_ROOT_DIR   ${PROJECT_SOURCE_DIR})

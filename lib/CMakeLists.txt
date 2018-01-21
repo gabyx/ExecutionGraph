@@ -66,12 +66,6 @@ print_target_properties(ExecutionGraph-Lib)
 #########################
 set(ExecutionGraph_INCLUDE_CHARATERISTIC_HEADER ${ExecutionGraph/config/Config.hpp})
 
-# Install stuff (default location is not some where on the system! for safty reasons
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/../install" CACHE STRING "Install prefix (e.g. /usr/local/)" FORCE)
-    message(WARNING "Check install dir! They have been changed!")
-endif()
-
 # Set install directories (if changed CMAKE_INSTALL_PREFIX adjust values)
 set(ExecutionGraph_LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib CACHE STRING "Install dir library")
 set(ExecutionGraph_INC_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include/ExecutionGraph CACHE STRING "Install dir includes")
