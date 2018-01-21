@@ -29,20 +29,37 @@ With Clang 7.0 no problems have been detected.
 
 Set the `CXX` and `CC` variables in your `~/.bash_profile` or similar to 
 ```bash
-export PATH="/usr/local/opt/llvm/bin:$PATH"
-export CC="/usr/local/opt/llvm/bin/clang"
-export CXX="$CC++"
+export PATH="/usr/local/opt/llvm/bin:/usr/local/opt/gcc/bin:$PATH"
+if [ 1 -eq 1 ]; then
+	export CC="/usr/local/opt/llvm/bin/clang"
+	export CXX="${CC}++"
+	export LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
+	export CPPFLAGS="-I/usr/local/opt/llvm/include -I/usr/local/opt/llvm/include/c++/v1/"
+    export CXXFLAGS="$CPPFLAGS"
+else
+	export CC="/usr/local/opt/gcc/bin/gcc-7"
+	export CXX="/usr/local/opt/gcc/bin/g++-7"
+	export LDFLAGS="-L/usr/local/opt/gcc/lib -Wl,-rpath,/usr/local/gcc/lib/7/gcc"
+	export CPPFLAGS="-I/usr/local/opt/gcc/include -I/usr/local/opt/gcc/include/c++/7.2.0"
+    export CXXFLAGS="$CPPFLAGS"
+fi
 ```
+Use the if switch to quickly switch to another compiler, e.g. `gcc`.
 Now you should be ready to configure with cmake:
 
+## Buidling
 ```bash
     cd <pathToRepo>
     mkdir build
     cd build
-    cmake .. -DUSE_SUPERBUILD=ON -DCMAKE_VERBOSE_MAKEFILE=ON
+    cmake .. -DUSE_SUPERBUILD=ON
     make -j
-    
+    cmake ..
+    make -j
 ```
+We use a super build setup: every dependency gets downloaded and the once which need building (currently [rttr](http://www.rttr.org/)) first by configuring with `-DUSE_SUPERBUILD=ON` and building them. See the `build/external` folder.   
+After that, the cmake cache file `CMakeCache.txt` is setup with all necessary variables, that **later** cmake invocations will find all dependencies 
+and configure the project. This works also with VS Code and the cmake extension. 
 
 ## General Development Setup
 If you start developing, install the pre-commit hook with:
