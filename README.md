@@ -13,7 +13,12 @@ This library has these dependencies:
 
 - [Eigen](http://eigen.tuxfamily.org) at least version 3, 
 - [meta](https://github.com/ericniebler/meta)
-- [googletest](https://github.com/google/googletest)
+- [googletest](https://github.com/google/googletest) (for tests)
+- [crossguid](https://github.com/graeme-hill/crossguid) (guid implementation)
+- [args](https://github.com/Taywee/args) (argument parser)
+- [json](https://github.com/nlohmann/json) (for GUI only)
+- [CEF](https://github.com/chromiumembedded/cef-project) (for GUI only)
+- [rttr](https://github.com/rttrorg/rttr) (for GUI only)
 - [benchmark](https://github.com/google/benchmark)
 
 The library `Eigen` needs to be installed, `meta`, `googletest`, `benchmark` are installed as external projects when configuring this library!
