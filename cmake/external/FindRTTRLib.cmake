@@ -30,7 +30,7 @@ if(${USE_SUPERBUILD})
                                         "-DBUILD_BENCHMARKS=OFF" "-DBUILD_UNIT_TESTS=OFF" "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
                             INSTALL_DIR "${INSTALL_DIR}")
 
-        set(RTTR_DIR "${INSTALL_DIR}/cmake" CACHE STRING "rttr library directory" FORCE)
+        set(RTTR_DIR "${INSTALL_DIR}" CACHE STRING "rttr library directory" FORCE)
         message(STATUS "rttr library downloaded -> build it!")
     else()
         message(STATUS "rttr library found! no build necessary")
