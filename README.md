@@ -21,7 +21,7 @@ This library has these dependencies:
 - [rttr](https://github.com/rttrorg/rttr) (for GUI only)
 - [benchmark](https://github.com/google/benchmark)
 
-The library `Eigen` needs to be installed, `meta`, `googletest`, `benchmark` are installed as external projects when configuring this library!
+The library `Eigen`, `meta`, `rttr` can be installed in some system specific location. However, all dependencie are searched, downloaded and build if not found, during the first super build run.
 
 ### OS X
 Install `clang` with [homebrew](https://brew.sh) by
