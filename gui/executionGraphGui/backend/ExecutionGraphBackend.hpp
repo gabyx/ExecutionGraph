@@ -13,30 +13,21 @@
 #ifndef executionGraphGui_backend_ExecutionGraphBackend_hpp
 #define executionGraphGui_backend_ExecutionGraphBackend_hpp
 
-#include "backend/Backend.hpp"
 #include <executionGraph/common/ObjectID.hpp>
+#include "backend/Backend.hpp"
 
 class ExecutionGraphBackend : public Backend
 {
+    RTTR_ENABLE()
 public:
     using Backend::Id;
-    using Backend::Handler;
-    using Backend::HandlerList;
-    static const Id defaultId;
 
 public:
-    ExecutionGraphBackend(const Id& id = defaultId)
-        : Backend(id), m_dummyHandler(Id("DummyHandler"))
-    {}
+    ExecutionGraphBackend() : Backend("ExecutionGraphBackend"))
+    {
+    }
     virtual ~ExecutionGraphBackend() override = default;
-
-public:
-    //! Get the Messagehandlers
-    virtual HandlerList getMessageHandlers() override { return std::initializer_list<Handler*>{ &m_dummyHandler }; } 
-
-private:
-    Handler m_dummyHandler; //! A single dummy test handler.
-
 };
+RTTR_DECLARE_TYPE(ExecutionGraphBackend)
 
 #endif

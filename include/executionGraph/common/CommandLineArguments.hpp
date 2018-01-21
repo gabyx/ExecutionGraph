@@ -35,7 +35,7 @@ namespace executionGraph
     public:
         //! Get the application path. (can be relative)
         const std::path& getApplicationPath() { return m_applicationPath; }
-        
+
     protected:
         args::ArgumentParser m_parser;
 

@@ -13,22 +13,20 @@
 #ifndef executionGraphGui_backend_Backend_hpp
 #define executionGraphGui_backend_Backend_hpp
 
-#include "backend/BackendMessageHandler.hpp"
 #include <executionGraph/common/ObjectID.hpp>
+#include <rttr/type>
+#include "backend/BackendMessageHandler.hpp"
 
-class Backend : public executionGraph::ObjectID
+class Backend : public executionGraph::IObjectID
 {
-public:    
-    using Id = executionGraph::ObjectID::Id;
-    using Handler = BackendMessageHandler;
-    using HandlerList = std::vector<Handler*>;
-public:
-    Backend(const Id& id) : executionGraph::ObjectID(id) {}
-    virtual ~Backend() override = default;
+    RTTR_ENABLE()
+    EXECGRAPH_OBJECT_ID_DECLARATION
 
 public:
-    //! Get the Messagehandlers
-    virtual HandlerList getMessageHandlers() = 0; 
+    Backend(const Id& id)
+        : m_id(id) {}
+    virtual ~Backend() override = default;
 };
+RTTR_DECLARE_TYPE(Backend)
 
 #endif

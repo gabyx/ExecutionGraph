@@ -10,12 +10,24 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "backend/ExecutionGraphBackend.hpp"
+#include "backend/DummyBackendMsgHandler.cpp"
 
-const ExecutionGraphBackend::Id ExecutionGraphBackend::defaultId("ExecutionGraphBackend");
+const DummyBackendMsgHandler::Id DummyBackendMsgHandler::defaultId("DummyBackendMsgHandler");
 
 RTTR_REGISTRATION
 {
-    registration::class_<ExecutionGraphBackend>("ExecutionGraphBackend")
+    registration::class_<ExecutionGraphBackend>("DummyBackendMsgHandler")
         .constructor()
+}
+
+bool OnQuery(CefRefPtr<CefBrowser> browser,
+             CefRefPtr<CefFrame> frame,
+             int64 query_id,
+             const CefString& request,
+             bool persistent,
+             CefRefPtr<Callback> callback) override
+{
+    result = "received: " + request.ToString();
+    callback->Success(result);
+    return true;
 }

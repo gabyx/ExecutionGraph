@@ -13,16 +13,20 @@
 #ifndef executionGraphGui_backend_BackendMessageHandler_hpp
 #define executionGraphGui_backend_BackendMessageHandler_hpp
 
+#include <executionGraph/common/IObjectID.hpp>
+#include <rttr/type.h>
 #include <wrapper/cef_message_router.h>
-#include <executionGraph/common/ObjectID.hpp>
 
 class BackendMessageHandler : public CefMessageRouterBrowserSide::Handler,
-                              public executionGraph::ObjectID
+                              public executionGraph::IObjectID
 {
+    RTTR_ENABLE()
+    EXECGRAPH_OBJECT_ID_DECLARATION
+
 public:
-    using Id = executionGraph::ObjectID::Id;
-public:
-    BackendMessageHandler(const Id& id) : executionGraph::ObjectID(id) {}
+    BackendMessageHandler(const std::shared_ptr<Backend>& backend,
+                          const Id& id = "BackendMessageHandler")
+        : executionGraph::ObjectID(id), m_backend(backend) {}
 
     // Called due to cefQuery execution in message_router.html.
     virtual bool OnQuery(CefRefPtr<CefBrowser> browser,
@@ -30,10 +34,14 @@ public:
                          int64 query_id,
                          const CefString& request,
                          bool persistent,
-                         CefRefPtr<Callback> callback) override;
+                         CefRefPtr<Callback> callback) = 0;
+
+private:
+    std::shared_ptr<Backend> m_backend;  //! The backend which is called from this message handler.
 
 private:
     DISALLOW_COPY_AND_ASSIGN(BackendMessageHandler);
 };
+RTTR_DECLARE_TYPE(BackendMessageHandler)
 
 #endif

@@ -43,10 +43,10 @@ public:
     //@}
 
 private:
-    std::path m_clientSourcePath;  //! Client source path.
+    void installBackends();
 
 private:
-    CefRefPtr<AppHandler> m_handler;  // The main app handler.
+    std::path m_clientSourcePath;  //!< Client source path.
 };
 
 #endif

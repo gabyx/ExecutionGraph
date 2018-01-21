@@ -76,13 +76,13 @@ void AppHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
     {
         CefMessageRouterConfig config;
         m_router = CefMessageRouterBrowserSide::Create(config);
-        
+
         // Register all message handlers form the backends
         for(auto& p : m_backends)
         {
             auto& backend = p.second;
 
-            Backend::HandlerList handlers = backend->getMessageHandlers(); 
+            Backend::HandlerList handlers = backend->getMessageHandlers();
             for(Backend::Handler* handler : handlers)
             {
                 m_router->AddHandler(handler, true);
@@ -130,7 +130,7 @@ void AppHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
         {
             auto& backend = p.second;
 
-            Backend::HandlerList handlers = backend->getMessageHandlers(); 
+            Backend::HandlerList handlers = backend->getMessageHandlers();
             for(Backend::Handler* handler : handlers)
             {
                 m_router->RemoveHandler(handler);
@@ -194,7 +194,6 @@ void AppHandler::CloseAllBrowsers(bool force_close)
         (*it)->GetHost()->CloseBrowser(force_close);
 }
 
-
 /*! Register the backend `backend`:
  *  - Hold it as owner
  *  - Register it in the global message handler (todo...)  
@@ -208,5 +207,5 @@ void AppHandler::RegisterBackend(const std::shared_ptr<Backend>& backend)
 std::shared_ptr<Backend> AppHandler::GetBackend(const Backend::Id& id) const
 {
     auto it = m_backends.find(id);
-    return (it != m_backends.end())? it->second : nullptr;
+    return (it != m_backends.end()) ? it->second : nullptr;
 }

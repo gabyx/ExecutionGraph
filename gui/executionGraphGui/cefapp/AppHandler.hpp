@@ -14,12 +14,12 @@
 #define executionGraph_cefapp_AppHandler_H
 
 #include <cef_client.h>
-#include <vector>
-#include <unordered_map>
 #include <memory>
+#include <unordered_map>
+#include <vector>
 #include <wrapper/cef_message_router.h>
-#include "cefapp/MessageHandler.hpp"
 #include "backend/Backend.hpp"
+#include "cefapp/MessageHandler.hpp"
 
 class AppHandler : public CefClient,
                    public CefDisplayHandler,
@@ -94,7 +94,6 @@ public:
 private:
     std::unordered_map<Backend::Id, std::shared_ptr<Backend>> m_backends;
     //@}
-
 };
 
 #endif  // CEF_TESTS_CEFSIMPLE_SIMPLE_HANDLER_H_
