@@ -23,7 +23,7 @@ namespace executionGraph
         Exception(const std::stringstream& ss)
             : std::runtime_error(ss.str()) {}
         // we dont need a virtual dtor, the std destroys the exception correctly.
-    private:
+        // https://stackoverflow.com/questions/28353708/exception-with-non-virtual-destructor-c
     };
 
     class NodeConnectionException final : public Exception

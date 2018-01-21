@@ -13,10 +13,9 @@ include(FindPackageHandleStandardArgs)
 if(NOT EXISTS "${Meta_INCLUDE_DIR}")
     message(STATUS "meta library: finding...")
     find_path(Meta_INCLUDE_DIR
-      NAMES meta/meta.hpp 
-      DOC "Meta library header files"
-      PATH ${Meta_INCLUDE_DIR}
-      )
+            NAMES meta/meta.hpp 
+            DOC "Meta library header files"
+            PATHS "${Meta_DIR}/include")
 endif()
 
 if(NOT EXISTS "${Meta_INCLUDE_DIR}")
@@ -24,7 +23,7 @@ if(NOT EXISTS "${Meta_INCLUDE_DIR}")
     message(STATUS "meta library: inlcude dir not found -> download from https://github.com/ericniebler/meta.git")
     include(DownloadProject)
     download_project(PROJ               meta
-                    PREFIX              ${CMAKE_BINARY_DIR}/external/meta
+                    PREFIX              "${ExecutionGraph_EXTERNAL_DIR}/meta"
                     GIT_REPOSITORY      https://github.com/ericniebler/meta.git
                     GIT_TAG             master
                     GIT_SHALLOW         ON
@@ -33,7 +32,8 @@ if(NOT EXISTS "${Meta_INCLUDE_DIR}")
     )
   
     set(Meta_INCLUDE_DIR "${meta_SOURCE_DIR}/include" CACHE STRING "meta library (https://github.com/ericniebler/meta.git) include directory" FORCE)
-    set(Meta_DIR "${Meta_INCLUDE_DIR}" CACHE STRING "meta library directory" FORCE)
+    # define a path in the cache where to find this downloaded library (for cmake find_package)
+    set(Meta_DIR "${meta_SOURCE_DIR}" CACHE STRING "meta library directory" FORCE)
     
 else()
     message(STATUS "meta3 library found!")

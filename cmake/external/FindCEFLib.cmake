@@ -27,7 +27,7 @@ if(${USE_SUPERBUILD})
         endif()
 
         download_project(PROJ "cefbinaries"
-                        PREFIX     ${CMAKE_BINARY_DIR}/external/cefbinaries
+                        PREFIX     "${ExecutionGraph_EXTERNAL_DIR}/cefbinaries"
                         URL        ${CEF_URL}
                         ${UPDATE_DISCONNECTED_IF_AVAILABLE})
 

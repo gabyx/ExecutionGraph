@@ -13,7 +13,7 @@ if(NOT EXISTS "${EIGEN3_INCLUDE_DIR}")
 
     include(DownloadProject)
     download_project(PROJ              eigen3
-                    PREFIX             ${CMAKE_BINARY_DIR}/external/eigen
+                    PREFIX             "${ExecutionGraph_EXTERNAL_DIR}/eigen"
                     # HG_REPOSITORY     https://bitbucket.org/eigen/eigen
                     # HG_TAG            3.2
                     URL                 http://bitbucket.org/eigen/eigen/get/3.3.4.zip
@@ -21,8 +21,10 @@ if(NOT EXISTS "${EIGEN3_INCLUDE_DIR}")
                     INSTALL_DIR "${CMAKE_BINARY_DIR}/external/install/eigen")
 
     set(EIGEN3_INCLUDE_DIR "${eigen3_SOURCE_DIR}" CACHE STRING "eigen library (https://bitbucket.org/eigen/eigen) include directory" FORCE)
+    # define a path in the cache where to find this downloaded library
     set(EIGEN3_DIR "${CMAKE_BINARY_DIR}/external/install/eigen" CACHE STRING "eigen directory" FORCE)
 else()
+
     message(STATUS "eigen3 library found!")
 endif()
 

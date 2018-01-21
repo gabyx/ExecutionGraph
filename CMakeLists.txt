@@ -1,7 +1,7 @@
 #The CMake Minimum version that is required.
 cmake_minimum_required(VERSION 3.4)
 
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" ${CMAKE_MODULE_PATH})
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/external")
 message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
 
 #Optional Stuff ========================================================
@@ -12,7 +12,7 @@ mark_as_advanced( ExecutionGraph_BUILD_LIBRARY )
 set(ExecutionGraph_BUILD_LIBRARY ON CACHE BOOL "Build a shared library")
 
 mark_as_advanced( ExecutionGraph_BUILD_TESTS)
-set(ExecutionGraph_BUILD_TESTS OFF CACHE BOOL "Build the tests")
+set(ExecutionGraph_BUILD_TESTS ON CACHE BOOL "Build the tests")
 
 mark_as_advanced( ExecutionGraph_BUILD_BENCHMARKS)
 set(ExecutionGraph_BUILD_BENCHMARKS OFF CACHE BOOL "Build the benchmarks")
@@ -31,19 +31,10 @@ set(ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS ON CACHE BOOL "Force an exception i
 
 #~ mark_as_advanced( ExecutionGraph_USE_OPENMP)
 #~ set(ExecutionGraph_USE_OPENMP ON CACHE BOOL "Try to use OpenMp for parallel speedup")
+
+set(ExecutionGraph_EXTERNAL_DIR "${CMAKE_BINARY_DIR}/external" CACHE STRING "Folder where all external shit is build!")
+set(ExecutionGraph_EXTERNAL_INSTALL_DIR "${ExecutionGraph_EXTERNAL_DIR}/install" CACHE STRING "Folder where all external shit is installed!")
 #=======================================================================
-
-# Handle superbuild first
-option (USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)
-
-if (USE_SUPERBUILD)
-  project (SUPERBUILD NONE)
-  # execute the superbuild (this script will be invoked again without the
-  # USE_SUPERBUILD option this time)
-  include (SuperBuild)
-  message("SuperBuild configured! -> exit...")
-  return()                      # stop processing this file further
-endif()
 
 message(STATUS "Binary dir:" ${CMAKE_BINARY_DIR})
 
@@ -56,10 +47,32 @@ include(FirstCMakeRun)
 # Speed up the build
 include(cotire) 
 
-#The name of the project ===============================================
+# Define the Project ===============================================
 set(ExecutionGraphProjectName "ExecutionGraph")
 message(STATUS "Project name is: " ${ExecutionGraphProjectName})
 project(${ExecutionGraphProjectName})
+
+message(STATUS "CXX Flags: ${CMAKE_CXX_FLAGS}")
+
+# Handle superbuild first ===============
+option (USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)
+if (USE_SUPERBUILD)
+  project (SUPERBUILD NONE)
+  # execute the superbuild (this script will be invoked again without the
+  # USE_SUPERBUILD option this time)
+  include (SuperBuild)
+  message("SuperBuild configured! -> exit...")
+  return()                      # stop processing this file further
+endif()
+
+message(STATUS " =================================================================")
+message(STATUS "                   NORMAL BUILD CONFIGURE [START]                 ")
+message(STATUS " =================================================================")
+
+# Set the superbuild off into the cache! super build should only run once!
+set(USE_SUPERBUILD OFF CACHE STRING "If a superbuild should be made (building all dependencies)" FORCE)
+
+# =======================================
 
 set(ExecutionGraph_BINARY_DIR ${PROJECT_BINARY_DIR})
 set(ExecutionGraph_ROOT_DIR   ${PROJECT_SOURCE_DIR})
@@ -79,9 +92,6 @@ else()
     set(PROJECTNAMEPREFIX ${CMAKE_BUILD_TYPE})
 endif()
 
-
-message(STATUS "Compiler ID is: " ${CMAKE_CXX_COMPILER_ID})
-
 # use CCACHE if possible
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
@@ -91,7 +101,7 @@ endif(CCACHE_FOUND)
 message("Default Compiler Flags: '${CMAKE_CXX_FLAGS}' | '${CMAKE_CXX_FLAGS_DEBUG}' | '${CMAKE_CXX_FLAGS_RELEASE}'")
 message("Default Linker Flags: '${CMAKE_EXE_LINKER_FLAGS}' | '${CMAKE_SHARED_LINKER_FLAGS}' | '${CMAKE_STATIC_LINKER_FLAGS}'")
 
-#Add some multithreaded build support ==================================
+#Add some multithreaded build support 
 mark_as_advanced(MULTITHREADED_BUILD)
 set(MULTITHREADED_BUILD ON CACHE BOOL "Parallel build with as many threads as possible!")
 if(MULTITHREADED_BUILD)
@@ -168,10 +178,6 @@ endif()
 #~ endif()
 # ======================================================================
 
-if(ExecutionGraph_BUILD_EXAMPLE)
-  set(ExecutionGraph_BUILD_LIBRARY On CACHE BOOL "Build a shared library" FORCE)
-endif()
-
 # Define all ExecutionGraph Source files
 include(DefineExecutionGraphSources)
 
@@ -189,6 +195,12 @@ list(APPEND ExecutionGraph_INC_DIRS ${ExecutionGraph_INC_DIRS_DEP})
 set(ExecutionGraph_LINK_LIBS ${ExecutionGraph_LIBRARIES_DEP})
 list(APPEND ExecutionGraph_DEPENDING_TARGETS ${ExecutionGraph_DEPENDING_TARGETS_DEP})
 
+if( ${ExecutionGraph_BUILD_EXAMPLE} OR 
+    ${ExecutionGraph_BUILD_TESTS} OR 
+    ${ExecutionGraph_BUILD_GUI} OR 
+    ${ExecutionGraph_BUILD_BENCHMARKS})
+  set(ExecutionGraph_BUILD_LIBRARY On CACHE BOOL "Build a shared library" FORCE)
+endif()
 if(ExecutionGraph_BUILD_LIBRARY)
     add_subdirectory(lib)
 endif()
@@ -212,3 +224,7 @@ endif()
 if(ExecutionGraph_BUILD_GUI)
     add_subdirectory(gui)
 endif()
+
+message(STATUS "=================================================================")
+message(STATUS "                   NORMAL BUILD CONFIGURE [DONE ]                 ")
+message(STATUS "=================================================================")

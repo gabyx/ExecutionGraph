@@ -5,7 +5,7 @@ include(FindPackageHandleStandardArgs)
 
 # Try to find the library, if it is installed!
 # otherwise download it
-set(INSTALL_DIR ${CMAKE_BINARY_DIR}/external/install/rttr)
+set(INSTALL_DIR "${ExecutionGraph_EXTERNAL_INSTALL_DIR}/rttr")
 
 set(RTTR_COMPONENTS CORE)
 
@@ -15,7 +15,7 @@ if(${USE_SUPERBUILD})
 
     if(NOT TARGET "RTTR::Core")
 
-        message(STATUS "rttr library: inlcude dir not found -> download from https://github.com/gabyx/rttr.git")
+        message(STATUS "rttr library: targer not found -> download from https://github.com/gabyx/rttr.git")
 
         include(ExternalProject)
         

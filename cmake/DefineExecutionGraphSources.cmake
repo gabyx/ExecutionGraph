@@ -66,12 +66,11 @@ macro(set_target_compile_options_ExecutionGraph target)
        ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
 
         message(STATUS "Setting Compile/Linker Options for Clang")
-        set(CXX_FLAGS ${CMAKE_CXX_FLAGS})
         list(APPEND CXX_FLAGS "-std=c++17" 
+                              "-lc++"
                               "-lc++experimental" 
                               "-ferror-limit=50" 
                               "-Werror=return-type")
-        set(CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
         list(APPEND CXX_FLAGS_DEBUG "-g3"
                                     "-fno-omit-frame-pointer"
                                     "-Weverything"
@@ -98,11 +97,9 @@ macro(set_target_compile_options_ExecutionGraph target)
         set(LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lc++experimental")
     elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
         message(STATUS "Setting Compile/Linker Options for GCC")
-        set(CXX_FLAGS ${CMAKE_CXX_FLAGS})
         list(APPEND CXX_FLAGS "-std=c++17" 
                             "-lc++experimental" 
-                            #"-ferror-limit=50" 
-                            "-Werror=return-type")
+                            "-lc++")
         set(CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
         list(APPEND CXX_FLAGS_DEBUG "-g3"
                                     "-fno-omit-frame-pointer")
@@ -128,12 +125,13 @@ macro(set_target_compile_options_ExecutionGraph target)
         set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=leak -fsanitize=address")
     endif()
 
+    
     # Compile flags.
-    target_compile_options(${target} PRIVATE ${CXX_FLAGS})
-    target_compile_options(${target} PRIVATE $<$<CONFIG:Debug>:${CXX_FLAGS_DEBUG}>)
-    target_compile_options(${target} PRIVATE $<$<CONFIG:Release>:${CXX_FLAGS_RELEASE}>)
-    target_compile_options(${target} PRIVATE $<$<CONFIG:MinSizeRel>:${CXX_FLAGS_MINSIZEREL}>)
-    target_compile_options(${target} PRIVATE $<$<CONFIG:RelWithDebInfo>:${CXX_FLAGS_RELWITHDEBINFO}>)
+    target_compile_options(${target} PRIVATE ${CXX_FLAGS} ${REPLACED_FLAGS})
+    target_compile_options(${target} PRIVATE $<$<CONFIG:Debug>:${CXX_FLAGS_DEBUG} ${REPLACED_FLAGS}>)
+    target_compile_options(${target} PRIVATE $<$<CONFIG:Release>:${CXX_FLAGS_RELEASE} ${REPLACED_FLAGS}>)
+    target_compile_options(${target} PRIVATE $<$<CONFIG:MinSizeRel>:${CXX_FLAGS_MINSIZEREL} ${REPLACED_FLAGS}>)
+    target_compile_options(${target} PRIVATE $<$<CONFIG:RelWithDebInfo>:${CXX_FLAGS_RELWITHDEBINFO} ${REPLACED_FLAGS}>)
 
     # Linker flags.
     set_property(TARGET ${target} PROPERTY LINK_FLAGS ${LINKER_FLAGS})

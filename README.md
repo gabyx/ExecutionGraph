@@ -39,8 +39,9 @@ Now you should be ready to configure with cmake:
     cd <pathToRepo>
     mkdir build
     cd build
-    cmake ../
+    cmake .. -DUSE_SUPERBUILD=ON -DCMAKE_VERBOSE_MAKEFILE=ON
     make -j
+    
 ```
 
 ## General Development Setup

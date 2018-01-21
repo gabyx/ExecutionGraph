@@ -15,6 +15,7 @@
 
 #include <memory>
 
+#include "executionGraph/common/CommonTraits.hpp"
 #include "executionGraph/common/EnumClassHelper.hpp"
 #include "executionGraph/common/SfinaeMacros.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
@@ -81,18 +82,6 @@ namespace executionGraph
     //! See the examples.
     namespace details
     {
-        //! Trait which tests if T is a template X.
-        template<template<typename...> class X, typename T>
-        struct isInstantiationOf : meta::bool_<false>
-        {
-        };
-
-        //! Trait which tests if T is a template X.
-        template<template<typename...> class X, typename... Y>
-        struct isInstantiationOf<X, X<Y...>> : meta::bool_<true>
-        {
-        };
-
         //! The basis class for every socket declaration.
         template<typename TId, typename TData>
         struct SocketDeclarationBase
@@ -123,11 +112,11 @@ namespace executionGraph
             static const auto nSockets = meta::size<meta::list<TSocketDecl...>>::value;
 
         private:
-            // Filter out all not TMPSocketDeclIn<...> and compare length to TypeList
+            //! Filter out all not TMPSocketDeclIn<...> and compare length to TypeList
             template<typename T>
-            using isCorrectType = isInstantiationOf<TMPSocketDeclIn, T>;
+            using isCorrectType = meta::is<T, TMPSocketDeclIn>;
             static_assert(meta::size<meta::filter<meta::list<TSocketDecl...>,
-                                                  meta::quote_trait<isCorrectType>>>::value == nSockets,
+                                                  meta::quote<isCorrectType>>>::value == nSockets,
                           "Not all types in TypeList are of type SocketTraits");
 
             //! Build the type list
@@ -146,7 +135,7 @@ namespace executionGraph
         public:
             using TypeList = meta::transform<
                 IndexedTypeList,
-                meta::quote<makeSocketDecl>>;  // a list of all SocketDeclaration 'meta::list<SocketDeclaration,...>'
+                meta::quote<makeSocketDecl>>;  //! a list of all SocketDeclaration 'meta::list<SocketDeclaration,...>'
 
         private:
             //! Assert that the IdList has unique ids

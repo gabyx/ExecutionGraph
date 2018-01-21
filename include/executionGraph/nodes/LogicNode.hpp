@@ -132,7 +132,7 @@ namespace executionGraph
 
         //! Add all input sockets defined in the type list \p SocketDeclList.
         template<typename SocketDeclList,
-                 EXECGRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::InputSocketDeclarationList, SocketDeclList>::value))>
+                 EXECGRAPH_SFINAE_ENABLE_IF((meta::is<SocketDeclList, details::InputSocketDeclarationList>::value))>
         void addSockets()
         {
             auto add = [&](auto socketDeclaration) {
@@ -147,7 +147,7 @@ namespace executionGraph
         //! the corresponding default value in \p defaultValues.
         template<typename SocketDeclList,
                  typename... Args,
-                 EXECGRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::OutputSocketDeclarationList, SocketDeclList>::value))>
+                 EXECGRAPH_SFINAE_ENABLE_IF((meta::is<SocketDeclList, details::OutputSocketDeclarationList>::value))>
         void addSockets(std::tuple<Args...>&& defaultValues)
         {
             auto add = [&](auto socketDeclaration) {
@@ -197,14 +197,14 @@ namespace executionGraph
         const T& getOutVal(SocketIndex idx) const;
 
         //! Get the output socket value from a SocketDeclaration `OutputSocketDeclaration`.
-        template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::OutputSocketDeclaration, TSocketDeclaration>::value))>
+        template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF((meta::is<TSocketDeclaration, details::OutputSocketDeclaration>::value))>
         typename TSocketDeclaration::DataType& getValue();
         //! Get the output socket value from a SocketDeclaration `OutputSocketDeclaration`.
-        template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::OutputSocketDeclaration, TSocketDeclaration>::value))>
+        template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF((meta::is<TSocketDeclaration, details::OutputSocketDeclaration>::value))>
         const typename TSocketDeclaration::DataType& getValue() const;
 
         //! Get the input socket value from a SocketDeclaration `InputSocketDeclaration`.
-        template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF((details::isInstantiationOf<details::InputSocketDeclaration, TSocketDeclaration>::value))>
+        template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF((meta::is<TSocketDeclaration, details::InputSocketDeclaration>::value))>
         const typename TSocketDeclaration::DataType& getValue() const;
 
         //! Writes the value of the output socket at index \p idx to all inputs
@@ -331,7 +331,7 @@ namespace executionGraph
     }
 
     template<typename TConfig>
-    template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IMPL_IF((details::isInstantiationOf<details::OutputSocketDeclaration, TSocketDeclaration>::value))>
+    template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IMPL_IF((meta::is<TSocketDeclaration, details::OutputSocketDeclaration>::value))>
     typename TSocketDeclaration::DataType& LogicNode<TConfig>::getValue()
     {
         auto idx = TSocketDeclaration::Index::value;
@@ -340,7 +340,7 @@ namespace executionGraph
     }
 
     template<typename TConfig>
-    template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IMPL_IF((details::isInstantiationOf<details::InputSocketDeclaration, TSocketDeclaration>::value))>
+    template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IMPL_IF((meta::is<TSocketDeclaration, details::InputSocketDeclaration>::value))>
     const typename TSocketDeclaration::DataType& LogicNode<TConfig>::getValue() const
     {
         auto idx = TSocketDeclaration::Index::value;
@@ -349,7 +349,7 @@ namespace executionGraph
     }
 
     template<typename TConfig>
-    template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IMPL_IF((details::isInstantiationOf<details::OutputSocketDeclaration, TSocketDeclaration>::value))>
+    template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IMPL_IF((meta::is<TSocketDeclaration, details::OutputSocketDeclaration>::value))>
     const typename TSocketDeclaration::DataType& LogicNode<TConfig>::getValue() const
     {
         auto idx = TSocketDeclaration::Index::value;
