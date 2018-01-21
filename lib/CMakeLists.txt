@@ -15,7 +15,6 @@ set(INCLUDE_FILES
 
 #include directories
 set(INCLUDE_DIRS
-    ${EIGEN_INCLUDE_DIR}
     ${ExecutionGraph_INC_DIRS}
 )
 
@@ -30,11 +29,11 @@ message(STATUS "Configuring target: ExecutionGraph-Lib")
 
 if(ExecutionGraph_BUILD_LIBRARY_STATIC)
     add_library(ExecutionGraph-Lib STATIC ${SOURCE_FILES} ${INCLUDE_FILES})
-    set_target_properties(ExecutionGraph-Lib PROPERTIES OUTPUT_NAME ExecutionGraphStatic)
-
 else()
     add_library(ExecutionGraph-Lib SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
 endif()
+
+set_target_compile_options_ExecutionGraph(ExecutionGraph-Lib)
 
 if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
     add_dependencies(ExecutionGraph-Lib ${ExecutionGraph_DEPENDING_TARGETS})
@@ -54,7 +53,8 @@ set_target_properties(ExecutionGraph-Lib PROPERTIES
 # set build flag, for import/export specifiers in platform.hpp
 # Building a library means we only export the symbols which have ExecutionGraph_EXPORT set in the Platform.hpp file
 # We define all other symbols to be hidden by default as suggested by https://gcc.gnu.org/wiki/Visibility
-if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR 
+   ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
     target_compile_options(ExecutionGraph-Lib PRIVATE -DExecutionGraph_BUILD_LIBRARY -fvisibility=hidden)
 else()
     target_compile_options(ExecutionGraph-Lib PRIVATE /DExecutionGraph_BUILD_LIBRARY)
@@ -67,24 +67,14 @@ print_target_properties(ExecutionGraph-Lib)
 set(ExecutionGraph_INCLUDE_CHARATERISTIC_HEADER ${ExecutionGraph/config/Config.hpp})
 
 # Install stuff (default location is not some where on the system! for safty reasons
-if(FIRST_CMAKE_RUN)
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/../install" CACHE STRING "Install prefix (e.g. /usr/local/)" FORCE)
+    message(WARNING "Check install dir! They have been changed!")
 endif()
 
 # Set install directories (if changed CMAKE_INSTALL_PREFIX adjust values)
 set(ExecutionGraph_LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib CACHE STRING "Install dir library")
 set(ExecutionGraph_INC_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include/ExecutionGraph CACHE STRING "Install dir includes")
-
-
-if( NOT CMAKE_INSTALL_PREFIX STREQUAL INSTALL_PREFIX_LAST_VALUE  )
-    set(INSTALL_PREFIX_LAST_VALUE ${CMAKE_INSTALL_PREFIX} CACHE INTERNAL "Last install prefix value")
-    message(WARNING "Check install dir! They have been changed!")
-    unset(ExecutionGraph_LIB_INSTALL_DIR)
-    unset(ExecutionGraph_INCLUDE_INSTALL_DIR)
-    set(ExecutionGraph_LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib CACHE STRING "Install dir library" FORCE)
-    set(ExecutionGraph_INC_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include CACHE STRING "Install dir includes" FORCE)
-    mark_as_advanced(FORCE ExecutionGraph_LIB_INSTALL_DIR ExecutionGraph_INC_INSTALL_DIR )
-endif()
 
 # Installing files
 ##################

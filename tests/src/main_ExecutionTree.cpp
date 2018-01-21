@@ -12,9 +12,9 @@
 #include "TestFunctions.hpp"
 
 #include <meta/meta.hpp>
-#include "ExecutionGraph/graphs/ExecutionTreeInOut.hpp"
-#include "ExecutionGraph/nodes/LogicNode.hpp"
-#include "ExecutionGraph/nodes/LogicSocket.hpp"
+#include "executionGraph/graphs/ExecutionTreeInOut.hpp"
+#include "executionGraph/nodes/LogicNode.hpp"
+#include "executionGraph/nodes/LogicSocket.hpp"
 
 using namespace executionGraph;
 
@@ -147,7 +147,6 @@ MY_TEST(ExecutionTree_Test, IntBig)
         std::uniform_int_distribution<> dis(0, nNodes - 1);
 
         auto buildTree = [&](ExecutionTreeInOut<Config>& execTree, bool makeCycle) {
-
             std::vector<std::unique_ptr<IntNode>> vec(nNodes);
 
             execTree.getDefaultOuputPool().setDefaultValue<int>(2);

@@ -10,7 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "ExecutionGraph/common/DemangleTypes.hpp"
+#include "executionGraph/common/DemangleTypes.hpp"
 
 #if defined(__GNUG__) || defined(__clang__)
 #include <cstdlib>
@@ -37,7 +37,7 @@ namespace executionGraph
             return name;
         }
 #endif
-    }
+    }  // namespace details
 
     std::string shortenTemplateBrackets(std::string s, unsigned int fromLevel)
     {
@@ -80,4 +80,4 @@ namespace executionGraph
         return ss.str();
     }
 
-}  // executionGraph
+}  // namespace executionGraph

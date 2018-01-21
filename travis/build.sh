@@ -14,7 +14,7 @@ cd $ROOT_PATH/build
 cmake $CHECKOUT_PATH -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 make VERBOSE=1
 make install
-cd $ROOT_PATH
+cd $ROOT_PATHMar
 
 # make install and library usage!
 echo "Install and test if ExecutionGraph links:"

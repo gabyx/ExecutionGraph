@@ -9,12 +9,12 @@
 
 #Find Include Headers
 find_path(ExecutionGraph_INC_DIR 
-    NAMES "ExecutionGraph/Config/Config.hpp.in.cmake"
+    NAMES "executionGraph/Config/Config.hpp.in.cmake"
     HINTS ${ExecutionGraph_SEARCH_PATH}
     PATH_SUFFIXES
     "include"
     "ExecutionGraph"
-    "ExecutionGraph/include"
+    "executionGraph/include"
     NO_DEFAULT_PATHS
 )
 

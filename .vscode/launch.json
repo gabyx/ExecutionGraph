@@ -46,7 +46,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/executionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
-            "args": [],
+            "args": ["--clientSourcePath", "${workspaceFolder}/build/gui/executionGraphGui/client/build/client"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

@@ -10,10 +10,10 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "ExecutionGraph/nodes/LogicNode.hpp"
-#include "ExecutionGraph/common/Exception.hpp"
-#include "ExecutionGraph/nodes/LogicSocket.hpp"
+#include "executionGraph/nodes/LogicNode.hpp"
+#include "executionGraph/common/Exception.hpp"
+#include "executionGraph/nodes/LogicSocket.hpp"
 
 namespace executionGraph
 {
-}  // namespace
+}  // namespace executionGraph

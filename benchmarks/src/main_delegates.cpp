@@ -10,8 +10,8 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "ExecutionGraph/common/Delegates.hpp"
-#include "ExecutionGraph/common/TypeDefs.hpp"
+#include "executionGraph/common/Delegates.hpp"
+#include "executionGraph/common/TypeDefs.hpp"
 
 #include <functional>
 #include <iostream>

@@ -15,12 +15,17 @@
 
 #include <cef_scheme.h>
 #include <string>
+#include "executionGraph/common/FileSystem.hpp"
 
 // Implementation of the factory for creating client request handlers.
 class FileSchemeHandlerFactory : public CefSchemeHandlerFactory
 {
 public:
-    FileSchemeHandlerFactory(std::string folderPath, std::string urlPrefix);
+    FileSchemeHandlerFactory(std::path folderPath, std::path urlPrefix)
+        : m_folderPath(folderPath)
+        , m_urlPrefix(urlPrefix)
+    {
+    }
 
     virtual CefRefPtr<CefResourceHandler> Create(CefRefPtr<CefBrowser> browser,
                                                  CefRefPtr<CefFrame> frame,
@@ -28,8 +33,8 @@ public:
                                                  CefRefPtr<CefRequest> request) override;
 
 private:
-    std::string m_folderPath;
-    std::string m_urlPrefix;
+    const std::path m_folderPath;
+    const std::path m_urlPrefix;
 
     IMPLEMENT_REFCOUNTING(FileSchemeHandlerFactory);
 };

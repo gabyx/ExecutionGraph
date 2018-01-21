@@ -10,5 +10,5 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "ExecutionGraph/nodes/LogicSocket.hpp"
-#include "ExecutionGraph/nodes/LogicCommon.hpp"
+#include "executionGraph/nodes/LogicSocket.hpp"
+#include "executionGraph/nodes/LogicCommon.hpp"

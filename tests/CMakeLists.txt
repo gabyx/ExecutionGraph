@@ -1,35 +1,7 @@
 
-# Add GoogleTests ===========================================================================
-if (CMAKE_VERSION VERSION_LESS 3.2)
-    set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
-else()
-    set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
-endif()
-
-include(DownloadProject)
-download_project(PROJ                googletest
-                 PREFIX              ${CMAKE_BINARY_DIR}/external
-                 GIT_REPOSITORY      https://github.com/google/googletest.git
-                 GIT_TAG             master
-                 ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-)
-
-# Prevent GoogleTest from overriding our compiler/linker options
-# when building with Visual Studio
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-
+# Add googletest
+find_package(GoogleTestLib)
 add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
-
-# When using CMake 2.8.11 or later, header path dependencies
-# are automatically added to the gtest and gmock targets.
-# For earlier CMake versions, we have to explicitly add the
-# required directories to the header search path ourselves.
-#if (CMAKE_VERSION VERSION_LESS 2.8.11)
-    #include_directories("${gtest_SOURCE_DIR}/include"
-                        #"${gmock_SOURCE_DIR}/include")
-#endif()
-# ==============================================================================================
 
 set(ExecutionGraph_TESTS_OUTPUT_FILES_DIR "${PROJECT_BINARY_DIR}")
 set(ExecutionGraph_TESTS_INPUT_FILES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/files")
@@ -42,7 +14,6 @@ configure_file (
   ${PROJECT_BINARY_DIR}/include/TestConfig.hpp
 )
 #=========================
-
 
 set(SOURCE_FILES
     ${ExecutionGraph_SRC}
@@ -71,8 +42,9 @@ function(defineCompileDefs target)
     message(STATUS "====================================================")
     message(STATUS "Configuring target: ${target}")
 
+    set_target_compile_options_ExecutionGraph(${target})
     target_include_directories(${target} PRIVATE ${INCLUDE_DIRS})
-    target_link_libraries(${target} ExecutionGraph-LibForTestsOnly gtest gmock_main)
+    target_link_libraries(${target} ExecutionGraph-LibForTestsOnly gtest gmock_main ${ExecutionGraph_DEPENDING_TARGETS_DEP})
 
     if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
         target_compile_options(${target} PRIVATE -DExecutionGraph_BUILD_TESTS )
@@ -102,3 +74,8 @@ defineCompileDefs(${EXEC_NAME2})
 set(EXEC_NAME3 ${PROJECT_NAME}Test-CustomSocketTypes)
 add_executable(${EXEC_NAME3}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_CustomSocketTypes.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 defineCompileDefs(${EXEC_NAME3})
+
+#Factory Test
+set(EXEC_NAME4 ${PROJECT_NAME}Test-Factory)
+add_executable(${EXEC_NAME4}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Factory.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME4})

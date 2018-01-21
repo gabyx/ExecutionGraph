@@ -1,0 +1,29 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceRoot}/include",
+                "${workspaceRoot}/gui/executionGraphGui",
+                "${workspaceRoot}/gui/executionGraphGui/client",
+                "${workspaceRoot}/build/include"
+            ],
+            "defines": [],
+            "browse": {
+                "path": [
+                    "${workspaceRoot}/include",
+                    "${workspaceRoot}/gui/executionGraphGui",
+                    "${workspaceRoot}/build/include"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            },
+            "intelliSenseMode": "clang-x64",
+            "macFrameworkPath": [
+                "/System/Library/Frameworks",
+                "/Library/Frameworks"
+            ]
+        }
+    ],
+    "version": 3
+}

@@ -9,16 +9,10 @@
 //!  License, v. 2.0. If a copy of the MPL was not distributed with this
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
-
 #include "FileSchemeHandlerFactory.hpp"
 #include <cef_parser.h>
+#include <iostream>
 #include <wrapper/cef_stream_resource_handler.h>
-
-FileSchemeHandlerFactory::FileSchemeHandlerFactory(std::string folderPath, std::string urlPrefix)
-    : m_folderPath(folderPath)
-    , m_urlPrefix(urlPrefix)
-{
-}
 
 CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrowser> browser,
                                                                CefRefPtr<CefFrame> frame,
@@ -29,45 +23,61 @@ CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrow
     CefURLParts urlParts;
     if(CefParseURL(request->GetURL(), urlParts))
     {
-        CefString path(urlParts.path.str);
-        std::string resourceName = path.ToString();
-        while(resourceName.find("/") == 0)
+        //! todo: why do we get here a urlParts.path.str as "//host/folderA/folderB"
+        //! Shouldnt it be : "folderA/folderB".
+        //! the host is somehow not parsed?: http://www.magpcss.org/ceforum/viewtopic.php?f=6&t=6048
+
+        // e.g. "////host/folderA/folderB/file.ext"
+        std::string temp = CefString(urlParts.path.str).ToString();
+        auto itC         = temp.begin();
+        while(itC != temp.end() && *itC == '/')
         {
-            resourceName = resourceName.substr(1);
+            ++itC;
         }
-        while(resourceName.find("\\") == 0)
+        std::path url(itC, temp.end());
+        // e.g. url : "host/folderA/folderB/file.ext""
+
+        // Split urlPrefix from front (e.g "host/folderA")
+        auto it        = url.begin();
+        auto itEnd     = url.end();
+        auto itPref    = m_urlPrefix.begin();
+        auto itPrefEnd = m_urlPrefix.end();
+        for(; it != itEnd && itPref != itPrefEnd; ++it, ++itPref)
         {
-            resourceName = resourceName.substr(1);
+            if(*itPref != *it)
+            {
+                break;
+            }
+        }
+        if(itPref != itPrefEnd)
+        {
+            // Could not split urlPrefix
+            return nullptr;
         }
 
-        if(m_urlPrefix == "" || resourceName.compare(0, m_urlPrefix.size(), m_urlPrefix) == 0)
+        // Make new filePath from "m_folderPath + rest"
+        std::path filePath;
+        while(it != itEnd)
         {
-            if(m_urlPrefix != "")
+            filePath /= *it++;
+        }
+        if(filePath.empty())
+        {
+            return nullptr;
+        }
+        filePath                              = m_folderPath / filePath;
+        CefRefPtr<CefStreamReader> fileStream = CefStreamReader::CreateForFile(filePath.string());
+        if(fileStream != nullptr)
+        {
+            // "ext"
+            std::string fileExtension = filePath.extension().string().substr(1);
+            CefString mimeType(CefGetMimeType(fileExtension));
+            //todo: Complete known mime times with web-font extensions
+            if(mimeType.empty())
             {
-                resourceName = resourceName.substr(resourceName.find(m_urlPrefix) + m_urlPrefix.length());
-                while(resourceName.find("/") == 0)
-                {
-                    resourceName = resourceName.substr(1);
-                }
-                while(resourceName.find("\\") == 0)
-                {
-                    resourceName = resourceName.substr(1);
-                }
+                mimeType = "font/" + fileExtension;
             }
-            CefString sFilePath(m_folderPath + "/" + resourceName);
-            CefString sFileExtension(sFilePath.ToString().substr(sFilePath.ToString().find_last_of(".") + 1));
-
-            CefRefPtr<CefStreamReader> fileStream = CefStreamReader::CreateForFile(sFilePath);
-            if(fileStream != nullptr)
-            {
-                CefString sMimeType(CefGetMimeType(sFileExtension));
-                //todo: Complete known mime times with web-font extensions
-                if(sMimeType.empty())
-                {
-                    sMimeType = "font/" + sFileExtension.ToString();
-                }
-                return CefRefPtr<CefStreamResourceHandler>(new CefStreamResourceHandler(sMimeType, fileStream));
-            }
+            return CefRefPtr<CefStreamResourceHandler>(new CefStreamResourceHandler(mimeType, fileStream));
         }
     }
 

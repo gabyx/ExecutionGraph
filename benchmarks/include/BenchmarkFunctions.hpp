@@ -14,6 +14,6 @@
 
 #include <benchmark/benchmark.h>
 
-#include "ExecutionGraph/config/Config.hpp"
+#include "executionGraph/config/Config.hpp"
 
 #endif

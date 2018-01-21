@@ -10,11 +10,11 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "ExecutionGraph/Nodes/DummyNode.hpp"
+#include "executionGraph/Nodes/DummyNode.hpp"
 
 namespace execGraph
 {
     DummyNode::DummyNode(unsigned int id) {}
 
     DummyNode::~DummyNode() {}
-}
+}  // namespace execGraph

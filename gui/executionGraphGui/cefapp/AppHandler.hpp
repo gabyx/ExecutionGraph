@@ -10,13 +10,16 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef CEF_TESTS_CEFSIMPLE_SIMPLE_HANDLER_H_
-#define CEF_TESTS_CEFSIMPLE_SIMPLE_HANDLER_H_
+#ifndef executionGraph_cefapp_AppHandler_H
+#define executionGraph_cefapp_AppHandler_H
 
 #include <cef_client.h>
-#include <list>
+#include <memory>
+#include <unordered_map>
+#include <vector>
 #include <wrapper/cef_message_router.h>
-#include "MessageHandler.hpp"
+#include "backend/Backend.hpp"
+#include "cefapp/MessageHandler.hpp"
 
 class AppHandler : public CefClient,
                    public CefDisplayHandler,
@@ -77,11 +80,20 @@ private:
     bool m_isClosing;
 
     // List of existing browser windows. Only accessed on the CEF UI thread.
-    typedef std::list<CefRefPtr<CefBrowser>> BrowserList;
+    using BrowserList = std::vector<CefRefPtr<CefBrowser>>;
     BrowserList m_browserList;
 
     CefRefPtr<CefMessageRouterBrowserSide> m_router;
-    MessageHandler m_messageHandler;
+
+    //! Registering for Backends
+    //@{
+public:
+    void RegisterBackend(const std::shared_ptr<Backend>& backend);
+    std::shared_ptr<Backend> GetBackend(const Backend::Id& id) const;
+
+private:
+    std::unordered_map<Backend::Id, std::shared_ptr<Backend>> m_backends;
+    //@}
 };
 
 #endif  // CEF_TESTS_CEFSIMPLE_SIMPLE_HANDLER_H_

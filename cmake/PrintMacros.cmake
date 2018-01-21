@@ -9,6 +9,12 @@ macro(print_target_properties target)
     get_property(RES TARGET ${target} PROPERTY LINK_LIBRARIES)
     message(STATUS "Linking with: ${RES}")
 
+    get_property(RES TARGET ${target} PROPERTY COMPILE_FLAGS)
+    message(STATUS "Compile Flags: ${RES}")
+
+    get_property(RES TARGET ${target} PROPERTY COMPILE_OPTIONS)
+    message(STATUS "Compile Options: ${RES}")
+
     get_property(RES TARGET ${target} PROPERTY OUTPUT_NAME)
     message(STATUS "Output name: ${RES}")
 
