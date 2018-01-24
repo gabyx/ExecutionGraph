@@ -11,10 +11,45 @@
 //! ========================================================================================
 
 #include <iostream>
+#include <memory>
+#include <rttr/registration>
+#include <rttr/type>
 #include "TestFunctions.hpp"
 #include "executionGraph/common/Factory.hpp"
 
 using namespace executionGraph;
+
+// struct MyMessage{
+//     RTTR_ENABLE()
+//     public:
+//     int a = 3;
+// };
+
+// RTTR_REGISTRATION
+// {
+//     using namespace rttr;
+//     registration::class_<MyMessage>("MyMessage")
+//     .constructor<>()
+//                    (
+//                        policy::ctor::as_object
+//                    );;
+// }
+
+struct MyMessage2
+{
+    RTTR_ENABLE()
+public:
+    int a = 3;
+};
+
+RTTR_REGISTRATION
+{
+    using namespace rttr;
+    registration::class_<MyMessage2>("MyMessage2")
+        .constructor<>()(
+            policy::ctor::as_std_shared_ptr);
+    ;
+}
 
 struct FunnyTable
 {
@@ -67,6 +102,13 @@ MY_TEST(FactoryTest, StaticFactory)
     ASSERT_EQ(d.a, "double");
     ASSERT_EQ(e.a, "int");
     ASSERT_EQ(f.a, "float");
+
+    // Messages
+    using varT             = std::shared_ptr<MyMessage2>;
+    rttr::variant instance = rttr::type::get_by_name("MyMessage2").create();
+    ASSERT_TRUE(instance.is_type<varT>());
+    varT r = instance.get_value<varT>();
+    ASSERT_TRUE(r->a == 3);
 }
 
 int main(int argc, char** argv)

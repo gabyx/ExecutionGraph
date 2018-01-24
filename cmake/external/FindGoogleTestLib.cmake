@@ -7,13 +7,13 @@ if(NOT EXISTS "${googletest_SOURCE_DIR}" OR
 
     include(DownloadProject)
     download_project(PROJ               googletest
-                    PREFIX              "${ExecutionGraph_EXTERNAL_DIR}/googletest"
+                    PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/googletest"
                     GIT_REPOSITORY      https://github.com/google/googletest.git
                     GIT_TAG             master
                     UPDATE_DISCONNECTED 1
     )
-    set(googletest_SOURCE_DIR "${googletest_SOURCE_DIR}" CACHE STRING "googletest library src dir" FORCE)
-    set(googletest_BINARY_DIR "${googletest_BINARY_DIR}" CACHE STRING "googletest library binary dir" FORCE)
+    set(googletest_SOURCE_DIR "${googletest_SOURCE_DIR}" CACHE PATH "googletest library src dir" FORCE)
+    set(googletest_BINARY_DIR "${googletest_BINARY_DIR}" CACHE PATH "googletest library binary dir" FORCE)
 
 endif()
 

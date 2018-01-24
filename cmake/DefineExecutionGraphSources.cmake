@@ -127,11 +127,11 @@ macro(set_target_compile_options_ExecutionGraph target)
 
     
     # Compile flags.
-    target_compile_options(${target} PRIVATE ${CXX_FLAGS} ${REPLACED_FLAGS})
-    target_compile_options(${target} PRIVATE $<$<CONFIG:Debug>:${CXX_FLAGS_DEBUG} ${REPLACED_FLAGS}>)
-    target_compile_options(${target} PRIVATE $<$<CONFIG:Release>:${CXX_FLAGS_RELEASE} ${REPLACED_FLAGS}>)
-    target_compile_options(${target} PRIVATE $<$<CONFIG:MinSizeRel>:${CXX_FLAGS_MINSIZEREL} ${REPLACED_FLAGS}>)
-    target_compile_options(${target} PRIVATE $<$<CONFIG:RelWithDebInfo>:${CXX_FLAGS_RELWITHDEBINFO} ${REPLACED_FLAGS}>)
+    target_compile_options(${target} PRIVATE ${CXX_FLAGS} )
+    target_compile_options(${target} PRIVATE $<$<CONFIG:Debug>:${CXX_FLAGS_DEBUG}> )
+    target_compile_options(${target} PRIVATE $<$<CONFIG:Release>:${CXX_FLAGS_RELEASE}> )
+    target_compile_options(${target} PRIVATE $<$<CONFIG:MinSizeRel>:${CXX_FLAGS_MINSIZEREL}> )
+    target_compile_options(${target} PRIVATE $<$<CONFIG:RelWithDebInfo>:${CXX_FLAGS_RELWITHDEBINFO}> )
 
     # Linker flags.
     set_property(TARGET ${target} PROPERTY LINK_FLAGS ${LINKER_FLAGS})

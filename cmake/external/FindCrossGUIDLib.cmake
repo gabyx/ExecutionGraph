@@ -8,15 +8,15 @@ if(NOT EXISTS "${crossguid_INCLUDE_DIR}")
 
     include(DownloadProject)
     download_project(PROJ               crossguid
-                    PREFIX              "${ExecutionGraph_EXTERNAL_DIR}/crossguid"
+                    PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/crossguid"
                     GIT_REPOSITORY      https://github.com/graeme-hill/crossguid.git
                     GIT_TAG             e6c8514
                     GIT_SHALLOW         ON
                     ${UPDATE_DISCONNECTED_IF_AVAILABLE}
     )
-    set(crossguid_SOURCE_DIR "${crossguid_SOURCE_DIR}" CACHE STRING "crossguid library src dir" FORCE)
-    set(crossguid_BINARY_DIR "${crossguid_BINARY_DIR}" CACHE STRING "crossguid library binary dir" FORCE)
-    set(crossguid_INCLUDE_DIR "${crossguid_SOURCE_DIR}" CACHE STRING "crossguid library (https://github.com/graeme-hill/crossguid.git) include directory" FORCE)
+    set(crossguid_SOURCE_DIR "${crossguid_SOURCE_DIR}" CACHE PATH "crossguid library src dir" FORCE)
+    set(crossguid_BINARY_DIR "${crossguid_BINARY_DIR}" CACHE PATH "crossguid library binary dir" FORCE)
+    set(crossguid_INCLUDE_DIR "${crossguid_SOURCE_DIR}" CACHE PATH "crossguid library (https://github.com/graeme-hill/crossguid.git) include directory" FORCE)
     set(crossguid_TARGET "xg" CACHE STRING "crossguid target (https://github.com/graeme-hill/crossguid.git) include directory" FORCE)
 else()
     message(STATUS "crossguid library found!")

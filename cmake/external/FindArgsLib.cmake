@@ -15,14 +15,14 @@ if(NOT EXISTS "${args_INCLUDE_DIR}")
 
     include(DownloadProject)
     download_project(PROJ               args
-                    PREFIX              "${ExecutionGraph_EXTERNAL_DIR}/args"
+                    PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/args"
                     GIT_REPOSITORY      https://github.com/Taywee/args 
                     GIT_TAG             d8905de2
                     GIT_SHALLOW         ON
                     ${UPDATE_DISCONNECTED_IF_AVAILABLE})
 
-    set(args_INCLUDE_DIR ${args_SOURCE_DIR} CACHE STRING "args library (https://github.com/Taywee/args) include directory" FORCE)
-    set(args_DIR "${args_INCLUDE_DIR}" CACHE STRING "args library directory" FORCE)
+    set(args_INCLUDE_DIR ${args_SOURCE_DIR} CACHE PATH "args library (https://github.com/Taywee/args) include directory" FORCE)
+    set(args_DIR "${args_INCLUDE_DIR}" CACHE PATH "args library directory" FORCE)
 
 endif()
 

@@ -1,5 +1,11 @@
 
-if(${USE_SUPERBUILD})
+if(NOT EXISTS ${CEF_ROOT})
+    message(STATUS "CEF library: searching in ${ExecutionGraph_EXTERNAL_BUILD_DIR}")
+    
+    if(EXISTS "${ExecutionGraph_EXTERNAL_BUILD_DIR}/cefbinaries/cefbinaries-src")
+        set(CEF_ROOT "${ExecutionGraph_EXTERNAL_BUILD_DIR}/cefbinaries/cefbinaries-src" CACHE PATH "CEF director path" FORCE)
+    endif()
+
     if(NOT EXISTS "${CEF_ROOT}")
 
         # Determine the platform.
@@ -27,22 +33,14 @@ if(${USE_SUPERBUILD})
         endif()
 
         download_project(PROJ "cefbinaries"
-                        PREFIX     "${ExecutionGraph_EXTERNAL_DIR}/cefbinaries"
+                        PREFIX     "${ExecutionGraph_EXTERNAL_BUILD_DIR}/cefbinaries"
                         URL        ${CEF_URL}
                         ${UPDATE_DISCONNECTED_IF_AVAILABLE})
 
-        set(CEF_ROOT "${cefbinaries_SOURCE_DIR}" CACHE STRING "CEF director path" FORCE)
-
-    else()
-        message(STATUS "CEF library found - CEF_ROOT defined!")
-    endif()
-else()
-    if(NOT EXISTS ${CEF_ROOT})
-        if(EXISTS "${CMAKE_BINARY_DIR}/external/cefbinaries/cefbinaries-src")
-            set(CEF_ROOT "${CMAKE_BINARY_DIR}/external/cefbinaries/cefbinaries-src")
-        endif()
+        set(CEF_ROOT "${cefbinaries_SOURCE_DIR}" CACHE PATH "CEF director path" FORCE)
     endif()
 endif()
 
-find_package_handle_standard_args(CEFLib DEFAULT_MSG CEF_ROOT )
+message(STATUS "CEF library found - CEF_ROOT defined!")
+find_package_handle_standard_args(CEFLib DEFAULT_MSG CEF_ROOT)
 mark_as_advanced(CEF_ROOT)

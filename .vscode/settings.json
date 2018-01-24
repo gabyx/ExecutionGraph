@@ -150,7 +150,7 @@
         "**/jspm_packages": true,
         "**/node_modules": true,
     },
-    "cmake.configureArgs": ["-DExecutionGraph_BUILD_TESTS=ON" 
-                            "-DExecutionGraph_BUILD_GUI=ON"
-                            "-DExecutionGraph_EXTERNAL_DIR=../buildExternal"]
+    "cmake.configureArgs": ["-DExecutionGraph_BUILD_TESTS=ON",
+                            "-DExecutionGraph_BUILD_GUI=ON",
+                            "-DExecutionGraph_EXTERNAL_BUILD_DIR_POSTFIX=../buildExternal"]
 }

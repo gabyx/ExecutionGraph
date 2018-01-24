@@ -32,9 +32,9 @@ set(ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS ON CACHE BOOL "Force an exception i
 #~ mark_as_advanced( ExecutionGraph_USE_OPENMP)
 #~ set(ExecutionGraph_USE_OPENMP ON CACHE BOOL "Try to use OpenMp for parallel speedup")
 
-set(ExecutionGraph_EXTERNAL_DIR_POSTFIX "external" CACHE STRING "Folder where all external shit is build!")
-set(ExecutionGraph_EXTERNAL_DIR "${CMAKE_BINARY_DIR}/${ExecutionGraph_EXTERNAL_DIR_POSTFIX}" )
-set(ExecutionGraph_EXTERNAL_INSTALL_DIR "${ExecutionGraph_EXTERNAL_DIR}/install")
+set(ExecutionGraph_EXTERNAL_BUILD_DIR_POSTFIX "external" CACHE STRING "Folder where all external shit is build!")
+set(ExecutionGraph_EXTERNAL_BUILD_DIR "${CMAKE_BINARY_DIR}/${ExecutionGraph_EXTERNAL_BUILD_DIR_POSTFIX}" )
+set(ExecutionGraph_EXTERNAL_INSTALL_DIR "${ExecutionGraph_EXTERNAL_BUILD_DIR}/install")
 #=======================================================================
 
 set(CMAKE_VERBOSE_MAKEFILE OFF)

@@ -30,7 +30,7 @@ if(${USE_SUPERBUILD})
                                         "-DBUILD_BENCHMARKS=OFF" "-DBUILD_UNIT_TESTS=OFF" "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
                             INSTALL_DIR "${INSTALL_DIR}")
 
-        set(RTTR_DIR "${INSTALL_DIR}" CACHE STRING "rttr library directory" FORCE)
+        set(RTTR_DIR "${INSTALL_DIR}" CACHE PATH "rttr library directory" FORCE)
         message(STATUS "rttr library downloaded -> build it!")
     else()
         message(STATUS "rttr library found! no build necessary")
@@ -42,7 +42,7 @@ else()
     find_package(RTTR QUIET CONFIG OPTIONAL_COMPONENTS ${RTTR_COMPONENTS})
     if(NOT TARGET "RTTR::Core")
         # Try again but with the super build install dir:
-        set(RTTR_DIR ${INSTALL_DIR})
+        set(RTTR_DIR ${INSTALL_DIR} CACHE PATH "rttr library directory" FORCE)
         message(STATUS "rttr library: finding in super build folder...")
         find_package(RTTR QUIET CONFIG OPTIONAL_COMPONENTS ${RTTR_COMPONENTS})
     endif()

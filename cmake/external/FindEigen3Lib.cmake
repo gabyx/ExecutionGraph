@@ -13,7 +13,7 @@ if(NOT EXISTS "${EIGEN3_INCLUDE_DIR}")
 
     include(DownloadProject)
     download_project(PROJ              eigen3
-                    PREFIX             "${ExecutionGraph_EXTERNAL_DIR}/eigen"
+                    PREFIX             "${ExecutionGraph_EXTERNAL_BUILD_DIR}/eigen"
                     # HG_REPOSITORY     https://bitbucket.org/eigen/eigen
                     # HG_TAG            3.2
                     URL                 http://bitbucket.org/eigen/eigen/get/3.3.4.zip

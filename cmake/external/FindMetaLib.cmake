@@ -23,7 +23,7 @@ if(NOT EXISTS "${Meta_INCLUDE_DIR}")
     message(STATUS "meta library: inlcude dir not found -> download from https://github.com/ericniebler/meta.git")
     include(DownloadProject)
     download_project(PROJ               meta
-                    PREFIX              "${ExecutionGraph_EXTERNAL_DIR}/meta"
+                    PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/meta"
                     GIT_REPOSITORY      https://github.com/ericniebler/meta.git
                     GIT_TAG             master
                     GIT_SHALLOW         ON
@@ -31,9 +31,9 @@ if(NOT EXISTS "${Meta_INCLUDE_DIR}")
                     CMAKE_ARGS -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
     )
   
-    set(Meta_INCLUDE_DIR "${meta_SOURCE_DIR}/include" CACHE STRING "meta library (https://github.com/ericniebler/meta.git) include directory" FORCE)
+    set(Meta_INCLUDE_DIR "${meta_SOURCE_DIR}/include" CACHE PATH "meta library (https://github.com/ericniebler/meta.git) include directory" FORCE)
     # define a path in the cache where to find this downloaded library (for cmake find_package)
-    set(Meta_DIR "${meta_SOURCE_DIR}" CACHE STRING "meta library directory" FORCE)
+    set(Meta_DIR "${meta_SOURCE_DIR}" CACHE PATH "meta library directory" FORCE)
     
 else()
     message(STATUS "meta3 library found!")
