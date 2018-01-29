@@ -1,6 +1,11 @@
 #The CMake Minimum version that is required.
 cmake_minimum_required(VERSION 3.10)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMALE_CXX_EXTENSIONS OFF)
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/external")
 message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
 
@@ -37,7 +42,6 @@ set(ExecutionGraph_EXTERNAL_BUILD_DIR "${CMAKE_BINARY_DIR}/${ExecutionGraph_EXTE
 set(ExecutionGraph_EXTERNAL_INSTALL_DIR "${ExecutionGraph_EXTERNAL_BUILD_DIR}/install")
 #=======================================================================
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Load print macros
 include(PrintMacros)
