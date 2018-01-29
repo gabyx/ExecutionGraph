@@ -72,70 +72,31 @@ macro(setTargetCompileOptionsExecutionGraph target)
 
     if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR
        ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
-
         message(STATUS "Setting Compile/Linker Options for Clang")
-        list(APPEND CXX_FLAGS "-std=c++17"
-                              "-ferror-limit=50" 
-                              "-Werror=return-type")
-        list(APPEND CXX_FLAGS_DEBUG "-g3"
-                                    "-fno-omit-frame-pointer"
-                                    "-Weverything"
-                                    "-Wpedantic" 
-                                    "-Wno-deprecated-register" 
-                                    "-Wno-documentation" 
-                                    "-Wno-old-style-cast" 
-                                    "-Wno-comment" 
-                                    "-Wno-float-equal" 
-                                    "-Wno-deprecated" 
-                                    "-Wno-c++98-compat-pedantic" 
-                                    "-Wno-undef" 
-                                    "-Wno-unused-macros")
-        set(CXX_FLAGS_MINSIZEREL ${CMAKE_CXX_FLAGS_MINSIZEREL})
-        list(APPEND CXX_FLAGS_MINSIZEREL "-Os" 
-                                         "-DNDEBUG")
-        set(CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-        list(APPEND CXX_FLAGS_RELEASE "-O3" 
-                                      "-DNDEBUG")
-        set(CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
-        list(APPEND CXX_FLAGS_RELWITHDEBINFO "-O2"
-                                             "-g3")
+        list(APPEND CXX_FLAGS_DEBUG "-fno-omit-frame-pointer"
+                                    "-Wall"
+                                    "-Wpedantic"
+                                    "-Wno-documentation")
 
-        set(LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lc++experimental")
     elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-        message(STATUS "Setting Compile/Linker Options for GCC")
-        list(APPEND CXX_FLAGS "-std=c++17")
-        set(CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-        list(APPEND CXX_FLAGS_DEBUG "-g3"
-                                    "-fno-omit-frame-pointer")
-        set(CXX_FLAGS_MINSIZEREL ${CMAKE_CXX_FLAGS_MINSIZEREL})
-        list(APPEND CXX_FLAGS_MINSIZEREL "-Os" 
-                                        "-DNDEBUG")
-        set(CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-        list(APPEND CXX_FLAGS_RELEASE "-O3" 
-                                    "-DNDEBUG")
-        set(CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
-        list(APPEND CXX_FLAGS_RELWITHDEBINFO "-O2"
-                                            "-g3")
-
-        set(LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lc++experimental")
+        list(APPEND CXX_FLAGS_DEBUG "-fno-omit-frame-pointer"
+                                    "-Wall"
+                                    "-Wpedantic"
+                                    "-Wno-documentation")
     elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
         message(ERROR "MSVC is not yet supported!")
     endif()
 
-
     if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
         # with clang 5.0.1: -fsanitize=address produces weird output in lldb for std::string ...
-        list(APPEND CXX_FLAGS_DEBUG "-fsanitize=leak" "-fsanitize=address" "-fno-omit-frame-pointer")
+        list(APPEND CXX_FLAGS_DEBUG "-fsanitize=leak" "-fsanitize=address")
         set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=leak -fsanitize=address")
     endif()
 
-    
+    target_compile_features(${target} cxx_std_17)
+
     # Compile flags.
-    target_compile_options(${target} PRIVATE ${CXX_FLAGS} )
     target_compile_options(${target} PRIVATE $<$<CONFIG:Debug>:${CXX_FLAGS_DEBUG}> )
-    target_compile_options(${target} PRIVATE $<$<CONFIG:Release>:${CXX_FLAGS_RELEASE}> )
-    target_compile_options(${target} PRIVATE $<$<CONFIG:MinSizeRel>:${CXX_FLAGS_MINSIZEREL}> )
-    target_compile_options(${target} PRIVATE $<$<CONFIG:RelWithDebInfo>:${CXX_FLAGS_RELWITHDEBINFO}> )
 
     # Linker flags.
     set_property(TARGET ${target} PROPERTY LINK_FLAGS ${LINKER_FLAGS})
