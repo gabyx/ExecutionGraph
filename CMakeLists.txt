@@ -1,13 +1,18 @@
 #The CMake Minimum version that is required.
 cmake_minimum_required(VERSION 3.10)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMALE_CXX_EXTENSIONS OFF)
-set(CMAKE_VERBOSE_MAKEFILE ON)
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/external")
 message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
+
+# Define the Project ===============================================
+set(ExecutionGraphProjectName "ExecutionGraph")
+message(STATUS "Project name is: " ${ExecutionGraphProjectName})
+project(${ExecutionGraphProjectName})
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 #Optional Stuff ========================================================
 mark_as_advanced( CMAKE_DEBUG_POSTFIX )
@@ -42,18 +47,12 @@ set(ExecutionGraph_EXTERNAL_BUILD_DIR "${CMAKE_BINARY_DIR}/${ExecutionGraph_EXTE
 set(ExecutionGraph_EXTERNAL_INSTALL_DIR "${ExecutionGraph_EXTERNAL_BUILD_DIR}/install")
 #=======================================================================
 
-
 # Load print macros
 include(PrintMacros)
 # Load important modules
 include(FirstCMakeRun)
 # Speed up the build
 include(cotire) 
-
-# Define the Project ===============================================
-set(ExecutionGraphProjectName "ExecutionGraph")
-message(STATUS "Project name is: " ${ExecutionGraphProjectName})
-project(${ExecutionGraphProjectName})
 
 # Define Install Directories
 # Install stuff (default location is not some where on the system! for safty reasons)
