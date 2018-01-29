@@ -24,18 +24,24 @@ namespace executionGraph{
     //! Force log level
     #define EXECGRAPH_FORCE_MSGLOG_LEVEL @ExecutionGraph_FORCE_MSGLOG_LEVEL@
     
-    #cmakedefine EXECGRAPH_OPENMP_SUPPORT 
-    #cmakedefine EXECGRAPH_OPENMP_USE_NTHREADS
-    #define ExecutionGraph_OPENMP_NTHREADS @ExecutionGraph_OPENMP_NTHREADS@
-    
-    #ifdef EXECGRAPH_OPENMP_USE_NTHREADS
-        #define EXECGRAPH_OPENMP_NUMTHREADS num_threads(ExecutionGraph_OPENMP_NTHREADS)
-    #else
-        #define EXECGRAPH_OPENMP_NUMTHREADS
+    #cmakedefine ExecutionGraph_OPENMP_SUPPORT
+    #ifdef ExecutionGraph_OPENMP_SUPPORT
+
+        #define EXECGRAPH_OPENMP_SUPPORT
+
+        #cmakedefine ExecutionGraph_OPENMP_USE_NTHREADS
+        #ifdef ExecutionGraph_OPENMP_USE_NTHREADS
+            #define EXECGRAPH_OPENMP_USE_NTHREADS 
+            #define EXECGRAPH_OPENMP_NTHREADS @ExecutionGraph_OPENMP_NTHREADS@
+            #define EXECGRAPH_OPENMP_NUMTHREADS num_threads(EXECGRAPH_OPENMP_NTHREADS)
+        #else
+            #define EXECGRAPH_OPENMP_NUMTHREADS
+        #endif
     #endif
     
-    #cmakedefine EXECGRAPH_THROW_IF_BAD_SOCKET_CASTS
-    #ifdef EXECGRAPH_THROW_IF_BAD_SOCKET_CASTS
+    #cmakedefine ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS
+    #ifdef ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS
+        #define EXECGRAPH_THROW_IF_BAD_SOCKET_CASTS
         #define EXECGRAPH_THROW_BADSOCKETCAST_IF(cond,mess) EXECGRAPH_THROW_EXCEPTION_TYPE_IF(cond,mess,BadSocketCastException)
     #else
         #define EXECGRAPH_THROW_BADSOCKETCAST_IF(cond,mess) EXECGRAPH_ASSERT_TYPE(cond,mess,BadSocketCastException)

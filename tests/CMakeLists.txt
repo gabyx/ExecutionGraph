@@ -44,6 +44,7 @@ function(defineCompileDefs target)
     setTargetCompileOptionsExecutionGraph(${target})
     target_include_directories(${target} PRIVATE ${INCLUDE_DIRS})
     target_link_libraries(${target} ExecutionGraph::CoreForTests gtest gmock_main ${ExecutionGraph_LINK_TARGETS_GUI_DEP})
+    add_dependencies(build_and_test ${target})
 
     if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
         target_compile_options(${target} PRIVATE -DExecutionGraph_BUILD_TESTS )

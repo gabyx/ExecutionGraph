@@ -53,8 +53,8 @@ namespace executionGraph
     };
 }  // namespace executionGraph
 
-    // clang-format off
-#define EXECGRAPH_THROW_EXCEPTION_TYPE(message, type)                     \
+// clang-format off
+#define EXECGRAPH_THROW_EXCEPTION_TYPE(message, type)                         \
     {                                                                         \
         std::stringstream ___s___;                                            \
         ___s___ << message << std::endl                                       \
