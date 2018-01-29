@@ -16,52 +16,39 @@
 #include "executionGraph/config/Config.hpp"
 
 #ifdef __CYGWIN__
-#include "executionGraph/Common/CygwinPatch.hpp"
+#    include "executionGraph/Common/CygwinPatch.hpp"
 #endif
 
 namespace executionGraph
 {
 #if(defined _WIN32) || (defined __CYGWIN__) || (defined WIN32)
-
-// This macro is given to the compiler when building the library!
-#ifdef ExecutionGraph_BUILD_LIBRARY
-
-#pragma message(" Platform.hpp: Building library ...")
-
-#ifdef __GNUC__
-#define EXECGRAPH_EXPORT __attribute__((dllexport))
+#    ifdef ExecutionGraph_BUILD_LIBRARY  // This macro is given to the compiler when building the library!
+#        pragma message(" Platform.hpp: Building library ...")
+#        ifdef __GNUC__
+#            define EXECGRAPH_EXPORT __attribute__((dllexport))
+#        else
+#            define EXECGRAPH_EXPORT __declspec(dllexport)  // Note: actually gcc seems to also supports this syntax.
+#        endif
+#    else
+#        ifdef __GNUC__
+#            define EXECGRAPH_EXPORT __attribute__((dllimport))
+#        else
+#            define EXECGRAPH_EXPORT __declspec(dllimport)  // Note: actually gcc seems to also supports this syntax.
+#        endif
+#    endif
 #else
-#define EXECGRAPH_EXPORT __declspec(dllexport)  // Note: actually gcc seems to also supports this syntax.
+#    ifdef ExecutionGraph_BUILD_LIBRARY
+#        if __GNUC__ >= 4 || __clang__
+#            define EXECGRAPH_EXPORT __attribute__((visibility("default")))
+#        else
+#            define EXECGRAPH_EXPORT
+#            warning "Unknown compiler: Exporting everything into library!"
+#        endif
+#    else
+#        define EXECGRAPH_EXPORT
+#    endif
 #endif
 
-#else
-
-#ifdef __GNUC__
-#define EXECGRAPH_EXPORT __attribute__((dllimport))
-#else
-#define EXECGRAPH_EXPORT __declspec(dllimport)  // Note: actually gcc seems to also supports this syntax.
-#endif
-
-#endif
-
-#else
-
-#ifdef ExecutionGraph_BUILD_LIBRARY
-
-#pragma message(" Platform.hpp: Building library ...")
-
-#if __GNUC__ >= 4 || __clang__
-#define EXECGRAPH_EXPORT __attribute__((visibility("default")))
-#else
-#define EXECGRAPH_EXPORT
-#warning "Unknown compiler: Exporting everything into library!"
-#endif
-
-#else
-#define EXECGRAPH_EXPORT
-#endif
-
-#endif
 }  // namespace executionGraph
 
 #endif

@@ -1,7 +1,6 @@
 
 # Add googletest
 find_package(GoogleTestLib)
-add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
 
 set(ExecutionGraph_TESTS_OUTPUT_FILES_DIR "${PROJECT_BINARY_DIR}")
 set(ExecutionGraph_TESTS_INPUT_FILES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/files")
@@ -42,9 +41,9 @@ function(defineCompileDefs target)
     message(STATUS "====================================================")
     message(STATUS "Configuring target: ${target}")
 
-    set_target_compile_options_ExecutionGraph(${target})
+    setTargetCompileOptionsExecutionGraph(${target})
     target_include_directories(${target} PRIVATE ${INCLUDE_DIRS})
-    target_link_libraries(${target} ExecutionGraph-LibForTestsOnly gtest gmock_main ${ExecutionGraph_DEPENDING_TARGETS_DEP})
+    target_link_libraries(${target} ExecutionGraph::CoreForTests gtest gmock_main ${ExecutionGraph_LINK_TARGETS_GUI_DEP})
 
     if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
         target_compile_options(${target} PRIVATE -DExecutionGraph_BUILD_TESTS )

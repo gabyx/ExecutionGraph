@@ -6,6 +6,12 @@ macro(include_all_source_ExecutionGraph
       ExecutionGraph_ROOT_DIR 
       ExecutionGraph_BINARY_DIR)  
 
+    # WRITE CONFIGURATION FILE
+    include(${ExecutionGraph_ROOT_DIR}/cmake/WriteConfigFile.cmake)
+    set(ExecutionGraph_CONFIG_FILE ${ExecutionGraph_BINARY_DIR}/include/executionGraph/config/Config.hpp)
+    message(STATUS "ExecutionGraph: Write config file ${ExecutionGraph_CONFIG_FILE}")
+    ExecutionGraph_write_config_file( ${ExecutionGraph_CONFIG_FILE} ${ExecutionGraph_ROOT_DIR})
+    #=========================
 
     # Add all external sources/headers
     # include(${ExecutionGraph_ROOT_DIR}/cmake/DefineExecutionGraphExternalSources.cmake)
@@ -20,55 +26,55 @@ macro(include_all_source_ExecutionGraph
     )
 
     set(${INC}
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/Asserts.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/Delegates.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/DemangleTypes.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/EnumClassHelper.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/Exception.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/MyContainerTypeDefs.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/MyMatrixTypeDefs.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/Platform.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/SfinaeMacros.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/TypeDefs.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/CommandLineArguments.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/Identifier.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/IObjectID.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/common/Factory.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Asserts.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Delegates.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/DemangleTypes.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/EnumClassHelper.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Exception.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/MyContainerTypeDefs.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/MyMatrixTypeDefs.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Platform.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/SfinaeMacros.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/TypeDefs.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/CommandLineArguments.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Identifier.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/IObjectID.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Factory.hpp
 
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicCommon.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicSocket.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicSocketDefaultTypes.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/nodes/LogicNode.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/LogicCommon.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/LogicSocket.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/LogicSocketDefaultTypes.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/LogicNode.hpp
         
-        ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/graphs/ExecutionTreeInOut.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/graphs/ExecutionTreeInOut.hpp
+
+        ${ExecutionGraph_CONFIG_FILE}
     )
 
     set(${INCLUDE_DIRS}
-        ${ExecutionGraph_ROOT_DIR}/include
-        ${ExecutionGraph_BINARY_DIR}/include
+        $<BUILD_INTERFACE:${ExecutionGraph_ROOT_DIR}/include>
+        $<BUILD_INTERFACE:${ExecutionGraph_BINARY_DIR}/include>
     )
-
-
-    # WRITE CONFIGURATION FILE
     
-    include(${ExecutionGraph_ROOT_DIR}/cmake/WriteConfigFile.cmake)
-    set(ExecutionGraph_CONFIG_FILE ${ExecutionGraph_BINARY_DIR}/include/executionGraph/config/Config.hpp)
-    message(STATUS "ExecutionGraph: Write config file ${ExecutionGraph_CONFIG_FILE}")
-    ExecutionGraph_write_config_file( ${ExecutionGraph_CONFIG_FILE} ${ExecutionGraph_ROOT_DIR})
-    #=========================
-    
+    include(InstallMacros)
+    foreach(file ${${INC}})
+        getIncludeInstallFolderPostfix(${file} postfix )
+        if("${postfix}" STREQUAL "")
+            message(FATAL_ERROR "wrong path ${PATH}")
+        endif()
+        install( FILES ${file} DESTINATION "include/${postfix}" )
+    endforeach()   
+
 endmacro()
 
 
-macro(set_target_compile_options_ExecutionGraph target)
+macro(setTargetCompileOptionsExecutionGraph target)
 
     if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR
        ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
 
         message(STATUS "Setting Compile/Linker Options for Clang")
-        list(APPEND CXX_FLAGS "-std=c++17" 
-                              "-lc++"
-                              "-lc++experimental" 
+        list(APPEND CXX_FLAGS "-std=c++17"
                               "-ferror-limit=50" 
                               "-Werror=return-type")
         list(APPEND CXX_FLAGS_DEBUG "-g3"
@@ -97,9 +103,7 @@ macro(set_target_compile_options_ExecutionGraph target)
         set(LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lc++experimental")
     elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
         message(STATUS "Setting Compile/Linker Options for GCC")
-        list(APPEND CXX_FLAGS "-std=c++17" 
-                            "-lc++experimental" 
-                            "-lc++")
+        list(APPEND CXX_FLAGS "-std=c++17")
         set(CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
         list(APPEND CXX_FLAGS_DEBUG "-g3"
                                     "-fno-omit-frame-pointer")

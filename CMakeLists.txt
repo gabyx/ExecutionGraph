@@ -1,5 +1,5 @@
 #The CMake Minimum version that is required.
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.10)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/external")
 message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
@@ -29,8 +29,8 @@ set(ExecutionGraph_FORCE_MSGLOG_LEVEL "DEBUG" CACHE STRING "Force the message lo
 mark_as_advanced( ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS)
 set(ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS ON CACHE BOOL "Force an exception if a bad socket cast happens! (if false, the exception is thrown only in Debug mode!)")
 
-#~ mark_as_advanced( ExecutionGraph_USE_OPENMP)
-#~ set(ExecutionGraph_USE_OPENMP ON CACHE BOOL "Try to use OpenMp for parallel speedup")
+#mark_as_advanced( ExecutionGraph_USE_OPENMP)
+#set(ExecutionGraph_USE_OPENMP ON CACHE BOOL "Try to use OpenMp for parallel speedup")
 
 set(ExecutionGraph_EXTERNAL_BUILD_DIR_POSTFIX "external" CACHE STRING "Folder where all external shit is build!")
 set(ExecutionGraph_EXTERNAL_BUILD_DIR "${CMAKE_BINARY_DIR}/${ExecutionGraph_EXTERNAL_BUILD_DIR_POSTFIX}" )
@@ -51,9 +51,32 @@ set(ExecutionGraphProjectName "ExecutionGraph")
 message(STATUS "Project name is: " ${ExecutionGraphProjectName})
 project(${ExecutionGraphProjectName})
 
-# here we specify the installation directory
+# Define Install Directories
+# Install stuff (default location is not some where on the system! for safty reasons)
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH  "ExecutionGraph install prefix" FORCE)
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/../install" CACHE STRING "Install prefix (e.g. /usr/local/)" FORCE)
+endif()
+if(UNIX)
+    include(GNUInstallDirs)
+    set(ExecutionGraph_INC_INSTALL_DIR "${CMAKE_INSTALL_INCDIR}") 
+    set(ExecutionGraph_RUNTIME_INSTALL_DIR "${CMAKE_INSTALL_BINDIR}") 
+    set(ExecutionGraph_LIBRARY_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}")
+    set(ExecutionGraph_ARCHIVE_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}")
+    set(ExecutionGraph_FRAMEWORK_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}")
+
+    set(ExecutionGraph_INSTALL_FULL_LIBDIR "${CMAKE_INSTALL_FULL_LIBDIR}")
+
+    set(ExecutionGraph_CMAKE_CONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/ExecutionGraph/cmake")
+    set(ExecutionGraph_ADDITIONAL_FILES_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/ExecutionGraph")
+else(WINDOWS)
+    set(ExecutionGraph_INC_INSTALL_DIR "${CMAKE_INSTALL_INCDIR}") 
+    set(ExecutionGraph_RUNTIME_INSTALL_DIR "bin") 
+    set(ExecutionGraph_LIBRARY_INSTALL_DIR "bin")
+    set(ExecutionGraph_ARCHIVE_INSTALL_DIR "lib")
+    set(ExecutionGraph_FRAMEWORK_INSTALL_DIR "bin")
+
+    set(ExecutionGraph_CMAKE_CONFIG_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/cmake")
+    set(ExecutionGraph_ADDITIONAL_FILES_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}")
 endif()
 
 # Handle superbuild first ===============
@@ -75,21 +98,6 @@ message(STATUS " ===============================================================
 
 set(ExecutionGraph_BINARY_DIR ${PROJECT_BINARY_DIR})
 set(ExecutionGraph_ROOT_DIR   ${PROJECT_SOURCE_DIR})
-
-if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-    message(STATUS "Detect build type from folder")
-    #Detect Build Type if Debug appears in CMAKE_BINARY_DIR path
-    string(REGEX MATCH ".*(Debug|debug).*" DEBUG_MATCH ${CMAKE_BINARY_DIR})
-    if(DEBUG_MATCH)
-        set(CMAKE_BUILD_TYPE Debug CACHE STRING "The build type for makefile based generators")
-        set(PROJECTNAMEPREFIX Debug)
-    else()
-        set(CMAKE_BUILD_TYPE Release CACHE STRING "The build type for makefile based generators")
-        set(PROJECTNAMEPREFIX Release)
-    endif()
-else()
-    set(PROJECTNAMEPREFIX ${CMAKE_BUILD_TYPE})
-endif()
 
 # use CCACHE if possible
 find_program(CCACHE_FOUND ccache)
@@ -122,64 +130,49 @@ endif()
 # Dependencies =========================================================
 # Define Eigen
 find_package(Eigen3Lib REQUIRED)
-set(EIGEN_INCLUDE_DIR ${EIGEN3_INCLUDE_DIR})
-list(APPEND ExecutionGraph_INC_DIRS_DEP ${EIGEN_INCLUDE_DIR})
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "eigenLib")
 
 # Try to find Meta 
 find_package(MetaLib REQUIRED)
-list(APPEND ExecutionGraph_INC_DIRS_DEP ${Meta_INCLUDE_DIR})
-set(ExecutionGraph_DEPENDING_TARGETS_DEP ${Meta_TARGET})
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "metaLib")
 
 # Try to find the Argumentparser
 find_package(ArgsLib REQUIRED)
-list(APPEND ExecutionGraph_INC_DIRS_DEP ${args_INCLUDE_DIR})
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "argsLib")
 
 # Try to find the RTTR Library (use our own script)
 find_package(RTTRLib REQUIRED)
-list(APPEND ExecutionGraph_DEPENDING_TARGETS_DEP "RTTR::Core")
-#list(APPEND ExecutionGraph_INC_DIRS_DEP ${RTTR_INCLUDE_DIR})
+list(APPEND ExecutionGraph_LINK_TARGETS_GUI_DEP "RTTR::Core")
 
 # Try to find the crossguid Library (use our own script)
 find_package(CrossGUIDLib REQUIRED)
-list(APPEND ExecutionGraph_INC_DIRS_DEP ${crossguid_INCLUDE_DIR})
-# build the library
-set(XG_TESTS OFF)
-add_subdirectory(${crossguid_SOURCE_DIR} ${crossguid_BINARY_DIR} EXCLUDE_FROM_ALL)
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "crossguidLib")
 
-find_package(PugiXMLLib)
-if(PUGIXML_FOUND)
-    list(APPEND ExecutionGraph_INC_DIRS_DEP ${PUGIXML_INCLUDE_DIR} )
-    list(APPEND ExecutionGraph_LIBRARIES_DEP ${PUGIXML_LIBRARIES})
-    set(ExecutionGraph_SUPPORT_XML ON)
+if(ExecutionGraph_USE_OPENMP)
+
+    include(ProcessorCount)
+    ProcessorCount(NPROCESSES)
+
+    find_package(OpenMP)
+    if(OpenMP_FOUND)
+        set(ExecutionGraph_OPENMP_SUPPORT ON)
+
+        mark_as_advanced( ExecutionGraph_OPENMP_USE_NTHREADS)
+        set(ExecutionGraph_OPENMP_USE_NTHREADS OFF CACHE BOOL "If the number of threads should be fixed, otherwise determined at runtime!")
+
+        if(ExecutionGraph_OPENMP_USE_NTHREADS)
+            set(ExecutionGraph_OPENMP_NTHREADS ${NPROCESSES} CACHE STRING "The number of threads to use.")
+            mark_as_advanced( ExecutionGraph_OPENMP_NTHREADS )
+        endif()
+
+    else()
+        set(ExecutionGraph_OPENMP_SUPPORT OFF)
+    endif()
 endif()
-
-#~ if(ExecutionGraph_USE_OPENMP)
-
-  #~ include(ProcessorCount)
-  #~ ProcessorCount(NPROCESSES)
-
-  #~ find_package(OpenMP)
-  #~ if(OpenMP_FOUND)
-    #~ set(MYPROJECT_CXX_FLAGS "${MYPROJECT_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    #~ set(ExecutionGraph_OPENMP_SUPPORT ON)
-
-    #~ mark_as_advanced( ExecutionGraph_OPENMP_USE_NTHREADS)
-    #~ set(ExecutionGraph_OPENMP_USE_NTHREADS OFF CACHE BOOL "If the number of threads should be fixed, otherwise determined at runtime!")
-
-    #~ if(ExecutionGraph_OPENMP_USE_NTHREADS)
-        #~ set(ExecutionGraph_OPENMP_NTHREADS ${NPROCESSES} CACHE STRING "The number of threads to use.")
-        #~ mark_as_advanced( ExecutionGraph_OPENMP_NTHREADS )
-    #~ endif()
-
-  #~ else()
-    #~ set(ExecutionGraph_OPENMP_SUPPORT ON)
-  #~ endif()
-#~ endif()
 # ======================================================================
 
 # Define all ExecutionGraph Source files
 include(DefineExecutionGraphSources)
-
 set(ExecutionGraph_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include/ExecutionGraph")
 set(ExecutionGraph_EXTERNAL_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/external/")
 
@@ -190,16 +183,13 @@ include_all_source_ExecutionGraph(ExecutionGraph_SRC
                                   ExecutionGraph_DEPENDING_TARGETS
                                   ${PROJECT_SOURCE_DIR} ${ExecutionGraph_BINARY_DIR} )
 
-list(APPEND ExecutionGraph_INC_DIRS ${ExecutionGraph_INC_DIRS_DEP})
-set(ExecutionGraph_LINK_LIBS ${ExecutionGraph_LIBRARIES_DEP})
-list(APPEND ExecutionGraph_DEPENDING_TARGETS ${ExecutionGraph_DEPENDING_TARGETS_DEP})
+set(ExecutionGraph_LICENSE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set(ExecutionGraph_README_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 
-if( ${ExecutionGraph_BUILD_EXAMPLE} OR 
-    ${ExecutionGraph_BUILD_TESTS} OR 
-    ${ExecutionGraph_BUILD_GUI} OR 
-    ${ExecutionGraph_BUILD_BENCHMARKS})
+if( ${ExecutionGraph_BUILD_EXAMPLE} OR ${ExecutionGraph_BUILD_TESTS} OR ${ExecutionGraph_BUILD_GUI} OR ${ExecutionGraph_BUILD_BENCHMARKS})
   set(ExecutionGraph_BUILD_LIBRARY On CACHE BOOL "Build a shared library" FORCE)
 endif()
+
 if(ExecutionGraph_BUILD_LIBRARY)
     add_subdirectory(lib)
 endif()
@@ -225,5 +215,5 @@ if(ExecutionGraph_BUILD_GUI)
 endif()
 
 message(STATUS "=================================================================")
-message(STATUS "                   NORMAL BUILD CONFIGURE [DONE ]                 ")
+message(STATUS "                   NORMAL BUILD CONFIGURE [DONE ]                ")
 message(STATUS "=================================================================")

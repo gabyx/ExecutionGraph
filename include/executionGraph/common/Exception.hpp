@@ -15,6 +15,11 @@
 #include <stdexcept>
 #include <string>
 
+#ifdef __clang__
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
+
 namespace executionGraph
 {
     class Exception : public std::runtime_error
@@ -48,7 +53,8 @@ namespace executionGraph
     };
 }  // namespace executionGraph
 
-#define EXECGRAPH_THROW_EXCEPTION_TYPE(message, type)                         \
+    // clang-format off
+#define EXECGRAPH_THROW_EXCEPTION_TYPE(message, type)                     \
     {                                                                         \
         std::stringstream ___s___;                                            \
         ___s___ << message << std::endl                                       \
@@ -64,5 +70,11 @@ namespace executionGraph
 
 #define EXECGRAPH_THROW_EXCEPTION(message) EXECGRAPH_THROW_EXCEPTION_TYPE(message, Exception)
 #define EXECGRAPH_THROW_EXCEPTION_IF(condition, message) EXECGRAPH_THROW_EXCEPTION_TYPE_IF(condition, message, Exception)
+
+
+#ifdef __clang__
+#   pragma clang diagnostic pop
+#endif
+// clang-format on
 
 #endif

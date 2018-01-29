@@ -41,3 +41,7 @@ endif()
 
 find_package_handle_standard_args(MetaLib DEFAULT_MSG Meta_INCLUDE_DIR)
 mark_as_advanced(Meta_INCLUDE_DIR)
+
+add_library(metaLib INTERFACE IMPORTED)
+set_property(TARGET metaLib PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${Meta_INCLUDE_DIR})
+message(STATUS "meta library target added: metaLib")

@@ -127,75 +127,75 @@ namespace executionGraph
     };
 }  // namespace executionGraph
 
-#define EXECGRAPH_DEFINE_MATRIX_SPECIALTYPES                                     \
-    template<typename Derived>                                                   \
-    using MatrixBase = executionGraph::MyMatrix::MatrixBase<Derived>;            \
-    template<typename Derived>                                                   \
-    using ArrayBase = executionGraph::MyMatrix::ArrayBase<Derived>;              \
-                                                                                 \
-    template<typename Derived>                                                   \
-    using VectorBDyn = executionGraph::MyMatrix::VectorBDyn<Derived>;            \
-    template<typename Derived, int M>                                            \
-    using VectorBStat = executionGraph::MyMatrix::VectorBStat<Derived, M>;       \
-                                                                                 \
-    template<typename Derived>                                                   \
-    using MatrixBDynDyn = executionGraph::MyMatrix::MatrixBDynDyn<Derived>;      \
-    template<typename Derived, int N>                                            \
-    using MatrixBDynStat = executionGraph::MyMatrix::MatrixBDynStat<Derived, N>; \
-    template<typename Derived, int M>                                            \
-    using MatrixBStatDyn = executionGraph::MyMatrix::MatrixBStatDyn<Derived, M>; \
-                                                                                 \
-    template<typename EigenType>                                                 \
-    using MatrixRef = executionGraph::MyMatrix::MatrixRef<EigenType>;            \
-    template<typename EigenType>                                                 \
-    using MatrixMap = executionGraph::MyMatrix::MatrixMap<EigenType>;
+#    define EXECGRAPH_DEFINE_MATRIX_SPECIALTYPES                                     \
+        template<typename Derived>                                                   \
+        using MatrixBase = executionGraph::MyMatrix::MatrixBase<Derived>;            \
+        template<typename Derived>                                                   \
+        using ArrayBase = executionGraph::MyMatrix::ArrayBase<Derived>;              \
+                                                                                     \
+        template<typename Derived>                                                   \
+        using VectorBDyn = executionGraph::MyMatrix::VectorBDyn<Derived>;            \
+        template<typename Derived, int M>                                            \
+        using VectorBStat = executionGraph::MyMatrix::VectorBStat<Derived, M>;       \
+                                                                                     \
+        template<typename Derived>                                                   \
+        using MatrixBDynDyn = executionGraph::MyMatrix::MatrixBDynDyn<Derived>;      \
+        template<typename Derived, int N>                                            \
+        using MatrixBDynStat = executionGraph::MyMatrix::MatrixBDynStat<Derived, N>; \
+        template<typename Derived, int M>                                            \
+        using MatrixBStatDyn = executionGraph::MyMatrix::MatrixBStatDyn<Derived, M>; \
+                                                                                     \
+        template<typename EigenType>                                                 \
+        using MatrixRef = executionGraph::MyMatrix::MatrixRef<EigenType>;            \
+        template<typename EigenType>                                                 \
+        using MatrixMap = executionGraph::MyMatrix::MatrixMap<EigenType>;
 
-/**
+    /**
  * @brief This macro is used to typedef all custom matrix types which have
  * nothing to do with the system.
  */
-#define EXECGRAPH_DEFINE_MATRIX_TYPES_OF(_PREC_)                                   \
-    using Matrix44        = executionGraph::MyMatrix::Matrix44<_PREC_>;            \
-    using Matrix33        = executionGraph::MyMatrix::Matrix33<_PREC_>;            \
-    using Matrix22        = executionGraph::MyMatrix::Matrix22<_PREC_>;            \
-    using Matrix32        = executionGraph::MyMatrix::Matrix32<_PREC_>;            \
-    using Matrix23        = executionGraph::MyMatrix::Matrix23<_PREC_>;            \
-    using Matrix43        = executionGraph::MyMatrix::Matrix43<_PREC_>;            \
-    using Matrix34        = executionGraph::MyMatrix::Matrix34<_PREC_>;            \
-    using Vector3         = executionGraph::MyMatrix::Vector3<_PREC_>;             \
-    using Vector2         = executionGraph::MyMatrix::Vector2<_PREC_>;             \
-    using Vector4         = executionGraph::MyMatrix::Vector4<_PREC_>;             \
-    using Vector6         = executionGraph::MyMatrix::Vector6<_PREC_>;             \
-    using Quaternion      = executionGraph::MyMatrix::Quaternion<_PREC_>;          \
-    using AngleAxis       = executionGraph::MyMatrix::AngleAxis<_PREC_>;           \
-    using VectorDyn       = executionGraph::MyMatrix::VectorDyn<_PREC_>;           \
-    using MatrixDynDyn    = executionGraph::MyMatrix::MatrixDynDyn<_PREC_>;        \
-    using MatrixDiagDyn   = executionGraph::MyMatrix::MatrixDiagDyn<_PREC_>;       \
-    using MatrixDynDynRow = executionGraph::MyMatrix::MatrixDynDynRow<_PREC_>;     \
-                                                                                   \
-    template<int M>                                                                \
-    using MatrixStatDyn = executionGraph::MyMatrix::MatrixStatDyn<_PREC_, M>;      \
-    template<int N>                                                                \
-    using MatrixDynStat = executionGraph::MyMatrix::MatrixDynStat<_PREC_, N>;      \
-    template<int M, int N>                                                         \
-    using MatrixStatStat = executionGraph::MyMatrix::MatrixStatStat<_PREC_, M, N>; \
-    template<int M>                                                                \
-    using VectorStat = executionGraph::MyMatrix::VectorStat<_PREC_, M>;            \
-                                                                                   \
-    using AffineTrafo   = executionGraph::MyMatrix::AffineTrafo<_PREC_>;           \
-    using AffineTrafo2d = executionGraph::MyMatrix::AffineTrafo2d<_PREC_>;         \
-                                                                                   \
-    template<int M>                                                                \
-    using ArrayStatDyn = executionGraph::MyMatrix::ArrayStatDyn<_PREC_, M>;        \
-    template<int N>                                                                \
-    using ArrayDynStat = executionGraph::MyMatrix::ArrayDynStat<_PREC_, N>;        \
-    template<int M, int N>                                                         \
-    using ArrayStatStat = executionGraph::MyMatrix::ArrayStatStat<_PREC_, M, N>;   \
-    template<int M>                                                                \
-    using ArrayStat = executionGraph::MyMatrix::ArrayStat<_PREC_, M>;              \
-    using Array3    = executionGraph::MyMatrix::Array3<_PREC_>;                    \
-    using Array2    = executionGraph::MyMatrix::Array2<_PREC_>;                    \
-                                                                                   \
-    EXECGRAPH_DEFINE_MATRIX_SPECIALTYPES
+#    define EXECGRAPH_DEFINE_MATRIX_TYPES_OF(_PREC_)                                   \
+        using Matrix44        = executionGraph::MyMatrix::Matrix44<_PREC_>;            \
+        using Matrix33        = executionGraph::MyMatrix::Matrix33<_PREC_>;            \
+        using Matrix22        = executionGraph::MyMatrix::Matrix22<_PREC_>;            \
+        using Matrix32        = executionGraph::MyMatrix::Matrix32<_PREC_>;            \
+        using Matrix23        = executionGraph::MyMatrix::Matrix23<_PREC_>;            \
+        using Matrix43        = executionGraph::MyMatrix::Matrix43<_PREC_>;            \
+        using Matrix34        = executionGraph::MyMatrix::Matrix34<_PREC_>;            \
+        using Vector3         = executionGraph::MyMatrix::Vector3<_PREC_>;             \
+        using Vector2         = executionGraph::MyMatrix::Vector2<_PREC_>;             \
+        using Vector4         = executionGraph::MyMatrix::Vector4<_PREC_>;             \
+        using Vector6         = executionGraph::MyMatrix::Vector6<_PREC_>;             \
+        using Quaternion      = executionGraph::MyMatrix::Quaternion<_PREC_>;          \
+        using AngleAxis       = executionGraph::MyMatrix::AngleAxis<_PREC_>;           \
+        using VectorDyn       = executionGraph::MyMatrix::VectorDyn<_PREC_>;           \
+        using MatrixDynDyn    = executionGraph::MyMatrix::MatrixDynDyn<_PREC_>;        \
+        using MatrixDiagDyn   = executionGraph::MyMatrix::MatrixDiagDyn<_PREC_>;       \
+        using MatrixDynDynRow = executionGraph::MyMatrix::MatrixDynDynRow<_PREC_>;     \
+                                                                                       \
+        template<int M>                                                                \
+        using MatrixStatDyn = executionGraph::MyMatrix::MatrixStatDyn<_PREC_, M>;      \
+        template<int N>                                                                \
+        using MatrixDynStat = executionGraph::MyMatrix::MatrixDynStat<_PREC_, N>;      \
+        template<int M, int N>                                                         \
+        using MatrixStatStat = executionGraph::MyMatrix::MatrixStatStat<_PREC_, M, N>; \
+        template<int M>                                                                \
+        using VectorStat = executionGraph::MyMatrix::VectorStat<_PREC_, M>;            \
+                                                                                       \
+        using AffineTrafo   = executionGraph::MyMatrix::AffineTrafo<_PREC_>;           \
+        using AffineTrafo2d = executionGraph::MyMatrix::AffineTrafo2d<_PREC_>;         \
+                                                                                       \
+        template<int M>                                                                \
+        using ArrayStatDyn = executionGraph::MyMatrix::ArrayStatDyn<_PREC_, M>;        \
+        template<int N>                                                                \
+        using ArrayDynStat = executionGraph::MyMatrix::ArrayDynStat<_PREC_, N>;        \
+        template<int M, int N>                                                         \
+        using ArrayStatStat = executionGraph::MyMatrix::ArrayStatStat<_PREC_, M, N>;   \
+        template<int M>                                                                \
+        using ArrayStat = executionGraph::MyMatrix::ArrayStat<_PREC_, M>;              \
+        using Array3    = executionGraph::MyMatrix::Array3<_PREC_>;                    \
+        using Array2    = executionGraph::MyMatrix::Array2<_PREC_>;                    \
+                                                                                       \
+        EXECGRAPH_DEFINE_MATRIX_SPECIALTYPES
 
 #endif

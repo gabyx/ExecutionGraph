@@ -29,5 +29,9 @@ else()
 endif()
 
 find_package_handle_standard_args(Eigen3Lib DEFAULT_MSG EIGEN3_INCLUDE_DIR)
-mark_as_advanced(EIGEN3_INCLUDE_DIR EIGEN3_DIR)
-message(STATUS "eigen3 library: include dir: ${EIGEN3_INCLUDE_DIR}")
+mark_as_advanced(EIGEN3_INCLUDE_DIR)
+
+add_library(eigenLib INTERFACE IMPORTED)
+set_property(TARGET eigenLib PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${EIGEN3_INCLUDE_DIR})
+message(STATUS "eigen3 library target added: eigenLib")
+

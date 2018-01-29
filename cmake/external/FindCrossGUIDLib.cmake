@@ -17,10 +17,18 @@ if(NOT EXISTS "${crossguid_INCLUDE_DIR}")
     set(crossguid_SOURCE_DIR "${crossguid_SOURCE_DIR}" CACHE PATH "crossguid library src dir" FORCE)
     set(crossguid_BINARY_DIR "${crossguid_BINARY_DIR}" CACHE PATH "crossguid library binary dir" FORCE)
     set(crossguid_INCLUDE_DIR "${crossguid_SOURCE_DIR}" CACHE PATH "crossguid library (https://github.com/graeme-hill/crossguid.git) include directory" FORCE)
-    set(crossguid_TARGET "xg" CACHE STRING "crossguid target (https://github.com/graeme-hill/crossguid.git) include directory" FORCE)
 else()
     message(STATUS "crossguid library found!")
 endif()
 
-find_package_handle_standard_args(CrossGUIDLib DEFAULT_MSG crossguid_INCLUDE_DIR crossguid_TARGET)
+find_package_handle_standard_args(CrossGUIDLib DEFAULT_MSG crossguid_INCLUDE_DIR)
 mark_as_advanced(crossguid_INCLUDE_DIR)
+
+# build the library
+set(XG_TESTS OFF)
+add_subdirectory(${crossguid_SOURCE_DIR} ${crossguid_BINARY_DIR} EXCLUDE_FROM_ALL)
+
+add_library(crossguidLib INTERFACE IMPORTED)
+set_property(TARGET crossguidLib PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${crossguid_INCLUDE_DIR})
+set_property(TARGET crossguidLib PROPERTY INTERFACE_LINK_LIBRARIES xg)
+message(STATUS "crossguid library added target: crossguidLib")

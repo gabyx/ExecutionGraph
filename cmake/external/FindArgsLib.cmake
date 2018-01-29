@@ -18,13 +18,19 @@ if(NOT EXISTS "${args_INCLUDE_DIR}")
                     PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/args"
                     GIT_REPOSITORY      https://github.com/Taywee/args 
                     GIT_TAG             d8905de2
-                    GIT_SHALLOW         ON
+                    GIT_SHALLOW         OFF
                     ${UPDATE_DISCONNECTED_IF_AVAILABLE})
 
     set(args_INCLUDE_DIR ${args_SOURCE_DIR} CACHE PATH "args library (https://github.com/Taywee/args) include directory" FORCE)
     set(args_DIR "${args_INCLUDE_DIR}" CACHE PATH "args library directory" FORCE)
 
+else()
+    message(STATUS "args library found!")
 endif()
+
+add_library(argsLib INTERFACE IMPORTED)
+set_property(TARGET argsLib PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${args_INCLUDE_DIR})
 
 find_package_handle_standard_args(ArgsLib DEFAULT_MSG args_INCLUDE_DIR)
 mark_as_advanced(args_INCLUDE_DIR)
+message(STATUS "args library added target: argsLib")

@@ -13,9 +13,9 @@
 #include "executionGraph/common/DemangleTypes.hpp"
 
 #if defined(__GNUG__) || defined(__clang__)
-#include <cstdlib>
-#include <cxxabi.h>
-#include <memory>
+#    include <cstdlib>
+#    include <cxxabi.h>
+#    include <memory>
 #endif
 
 #include <regex>

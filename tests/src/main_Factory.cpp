@@ -19,27 +19,18 @@
 
 using namespace executionGraph;
 
-// struct MyMessage{
-//     RTTR_ENABLE()
-//     public:
-//     int a = 3;
-// };
+#ifdef __clang__
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
 
-// RTTR_REGISTRATION
-// {
-//     using namespace rttr;
-//     registration::class_<MyMessage>("MyMessage")
-//     .constructor<>()
-//                    (
-//                        policy::ctor::as_object
-//                    );;
-// }
-
-struct MyMessage2
+struct MyMessage2 final
 {
     RTTR_ENABLE()
 public:
     int a = 3;
+    void fromJSON();
+    void toJSON();
 };
 
 RTTR_REGISTRATION

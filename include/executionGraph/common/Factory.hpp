@@ -21,6 +21,12 @@
 #include "executionGraph/common/Exception.hpp"
 #include "executionGraph/config/Config.hpp"
 
+#ifdef __clang__
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wglobal-constructors"
+#    pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
+
 namespace executionGraph
 {
     namespace detailsStaticFactory
@@ -115,5 +121,9 @@ namespace executionGraph
     };
 
 }  // namespace executionGraph
+
+#    ifdef __clang__
+#        pragma clang diagnostic pop
+#    endif
 
 #endif

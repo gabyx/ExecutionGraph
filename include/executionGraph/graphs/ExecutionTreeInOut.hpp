@@ -994,5 +994,5 @@ namespace executionGraph
     };
 }  // namespace executionGraph
 
-#undef EXECGRAPH_EXECTREE_SOLVER_LOG
+#    undef EXECGRAPH_EXECTREE_SOLVER_LOG
 #endif  // ExecutionTreeInOut_hpp

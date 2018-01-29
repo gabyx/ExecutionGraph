@@ -24,20 +24,20 @@
 //! Some assert macro.
 
 #ifdef NDEBUG
-#define EXECGRAPH_DEBUG_ONLY(code)
-#define EXECGRAPH_ASSERT(condition, message)
-#define EXECGRAPH_ASSERT_TYPE(condition, message, type)
+#    define EXECGRAPH_DEBUG_ONLY(code)
+#    define EXECGRAPH_ASSERT(condition, message)
+#    define EXECGRAPH_ASSERT_TYPE(condition, message, type)
 #else
-// Debug!
-#define EXECGRAPH_DEBUG_ONLY(code) code
-#define EXECGRAPH_ASSERT(condition, message) EXECGRAPH_ASSERT_TYPE(condition, message, Exception)
-#define EXECGRAPH_ASSERT_TYPE(condition, message, type)   \
-    {                                                     \
-        if(!(condition))                                  \
-        {                                                 \
-            EXECGRAPH_THROW_EXCEPTION_TYPE(message, type) \
-        }                                                 \
-    }
+    // Debug!
+#    define EXECGRAPH_DEBUG_ONLY(code) code
+#    define EXECGRAPH_ASSERT(condition, message) EXECGRAPH_ASSERT_TYPE(condition, message, Exception)
+#    define EXECGRAPH_ASSERT_TYPE(condition, message, type)   \
+        {                                                     \
+            if(!(condition))                                  \
+            {                                                 \
+                EXECGRAPH_THROW_EXCEPTION_TYPE(message, type) \
+            }                                                 \
+        }
 #endif
 
 //! Some warning macro.
