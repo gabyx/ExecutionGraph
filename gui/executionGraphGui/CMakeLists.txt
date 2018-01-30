@@ -100,7 +100,6 @@ endif()
 
 set(ExecutionGraphGUI_INC_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CEF_INCLUDE_PATH}
 )
 
 # Configure the client application

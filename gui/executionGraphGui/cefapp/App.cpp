@@ -88,19 +88,19 @@ void App::OnContextInitialized()
                                     new FileSchemeHandlerFactory(m_clientSourcePath, "executionGraph"));
 
     // AppHandler implements browser-level callbacks.
-    m_handler = CefRefPtr<AppHandler>(new AppHandler(use_views));
+    m_appHandler = CefRefPtr<AppHandler>(new AppHandler(use_views));
 
+    // Install all backends for this application
     installBackends();
 
     // Specify CEF browser settings here.
     CefBrowserSettings browser_settings;
-
     CefString url = "client://executionGraph/index.html";
 
     if(use_views)
     {
         // Create the BrowserView.
-        CefRefPtr<CefBrowserView> browser_view = CefBrowserView::CreateBrowserView(m_handler, url, browser_settings, NULL, NULL);
+        CefRefPtr<CefBrowserView> browser_view = CefBrowserView::CreateBrowserView(m_appHandler, url, browser_settings, NULL, NULL);
 
         // Create the Window. It will show itself after creation.
         CefWindow::CreateTopLevelWindow(new SimpleWindowDelegate(browser_view));
@@ -117,15 +117,14 @@ void App::OnContextInitialized()
 #endif
 
         // Create the first browser window.
-        CefBrowserHost::CreateBrowser(window_info, m_handler, url, browser_settings, NULL);
+        CefBrowserHost::CreateBrowser(window_info, m_appHandler, url, browser_settings, NULL);
     }
 }
 
 //! Install various backends and setup all of them.
 void App::installBackends()
 {
-    // Install the ExecutionGraph Backend =================================
+    // Install the ExecutionGraph backend
     auto execGraphBackend = std::make_shared<ExecutionGraphBackend>();
-    m_backends.emplace_back(execGraphBackend);
-    m_handler->RegisterBackend(execGraphBackend);
+    m_appHandler->RegisterBackend(execGraphBackend);
 }

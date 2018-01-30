@@ -11,16 +11,16 @@
 //! ========================================================================================
 
 #include "AppHandler.hpp"
-
-#include <sstream>
-#include <string>
-
 #include <base/cef_bind.h>
 #include <cef_app.h>
+#include <executionGraph/common/Exception.hpp>
+#include <sstream>
+#include <string>
 #include <views/cef_browser_view.h>
 #include <views/cef_window.h>
 #include <wrapper/cef_closure_task.h>
 #include <wrapper/cef_helpers.h>
+#include "backend/BackendMessageHandlerFactory.hpp"
 
 namespace
 {
@@ -80,12 +80,18 @@ void AppHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
         // Register all message handlers form the backends
         for(auto& p : m_backends)
         {
-            auto& backend = p.second;
+            auto& id         = p.first;
+            Backend& backend = *p.second;
 
-            Backend::HandlerList handlers = backend->getMessageHandlers();
-            for(Backend::Handler* handler : handlers)
+            auto type            = rttr::type::get(backend);
+            auto messageHandlers = BackendMessageHandlerFactory::Create(type);
+            auto result          = m_backendHandlers.emplace(id, BackendMessageHandlerFactory::Create(type));
+            EXECGRAPH_THROW_EXCEPTION_IF(!result.second, "already added!");  // exception if no insertion!
+
+            // Register all created handlers
+            for(std::shared_ptr<BackendMessageHandler> handler : result.first->second)
             {
-                m_router->AddHandler(handler, true);
+                m_router->AddHandler(handler.get(), true);
             }
         }
     }
@@ -126,14 +132,14 @@ void AppHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 
     if(m_router)
     {
+        // Uninstall all message handlers for all backends
         for(auto& p : m_backends)
         {
-            auto& backend = p.second;
-
-            Backend::HandlerList handlers = backend->getMessageHandlers();
-            for(Backend::Handler* handler : handlers)
+            auto& id = p.first;
+            // Unregister all created handlers
+            for(std::shared_ptr<BackendMessageHandler> handler : m_backendHandlers[id])
             {
-                m_router->RemoveHandler(handler);
+                m_router->RemoveHandler(static_cast<CefMessageRouterBrowserSide::Handler*>(handler.get()));
             }
         }
     }
@@ -194,10 +200,11 @@ void AppHandler::CloseAllBrowsers(bool force_close)
         (*it)->GetHost()->CloseBrowser(force_close);
 }
 
-/*! Register the backend `backend`:
- *  - Hold it as owner
- *  - Register it in the global message handler (todo...)  
- */
+/*! 
+    Register the backend `backend`:
+    - Hold it as owner
+    - Register/Unregister all its corresponding message handlers.
+*/
 void AppHandler::RegisterBackend(const std::shared_ptr<Backend>& backend)
 {
     m_backends.emplace(backend->getId(), backend);

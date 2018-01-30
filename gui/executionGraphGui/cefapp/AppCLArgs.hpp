@@ -13,9 +13,9 @@
 #ifndef cefapp_AppCLArgs_hpp
 #define cefapp_AppCLArgs_hpp
 
-#include <ExecutionGraph/common/CommandLineArguments.hpp>
-#include <ExecutionGraph/common/Singleton.hpp>
-#include "executionGraph/common/FileSystem.hpp"
+#include <executionGraph/common/CommandLineArguments.hpp>
+#include <executionGraph/common/FileSystem.hpp>
+#include <executionGraph/common/Singleton.hpp>
 
 //! Commandline Arguments for the Application
 //! No need to make it thread-safe, since everything is read only!

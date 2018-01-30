@@ -54,7 +54,7 @@ private:
     CefRefPtr<CefMessageRouterRendererSide> m_router;
 
 private:
-    IMPLEMENT_REFCOUNTING(RendererApp);
+    IMPLEMENT_REFCOUNTING(RendererApp)
 };
 
 #endif

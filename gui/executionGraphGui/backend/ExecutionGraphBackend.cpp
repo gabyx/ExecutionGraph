@@ -11,11 +11,10 @@
 //! ========================================================================================
 
 #include "backend/ExecutionGraphBackend.hpp"
-
-const ExecutionGraphBackend::Id ExecutionGraphBackend::defaultId("ExecutionGraphBackend");
+#include <rttr/registration>
 
 RTTR_REGISTRATION
 {
-    registration::class_<ExecutionGraphBackend>("ExecutionGraphBackend")
-        .constructor()
+    rttr::registration::class_<ExecutionGraphBackend>("ExecutionGraphBackend")
+        .constructor();
 }

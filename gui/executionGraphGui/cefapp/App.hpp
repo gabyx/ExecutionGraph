@@ -43,6 +43,7 @@ public:
     //@}
 
 private:
+    CefRefPtr<AppHandler> m_appHandler;
     void installBackends();
 
 private:

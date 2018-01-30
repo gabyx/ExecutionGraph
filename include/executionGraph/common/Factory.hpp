@@ -93,10 +93,10 @@ namespace executionGraph
     public:
         using Traits        = detailsStaticFactory::Traits<CreatorList>;
         using StaticStorage = typename Traits::StaticStorage;
+        using DynamicMap    = typename Traits::DynamicMap;
 
     public:
         using CreatorType = typename Traits::CreatorType;
-        using DynamicMap  = typename Traits::DynamicMap;
 
         //! Create the type
         template<typename Key>

@@ -36,7 +36,7 @@ private:
     const std::path m_folderPath;
     const std::path m_urlPrefix;
 
-    IMPLEMENT_REFCOUNTING(FileSchemeHandlerFactory);
+    IMPLEMENT_REFCOUNTING(FileSchemeHandlerFactory)
 };
 
 #endif

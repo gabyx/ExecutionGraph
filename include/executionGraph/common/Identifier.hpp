@@ -26,6 +26,10 @@ namespace executionGraph
         friend struct std::hash;
 
     public:
+        Identifier(const char* name)
+            : m_name(name)
+        {
+        }
         Identifier(const std::string& name)
             : m_name(name)
         {

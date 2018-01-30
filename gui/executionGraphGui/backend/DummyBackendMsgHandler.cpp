@@ -11,13 +11,12 @@
 //! ========================================================================================
 
 #include "backend/DummyBackendMsgHandler.cpp"
-
-const DummyBackendMsgHandler::Id DummyBackendMsgHandler::defaultId("DummyBackendMsgHandler");
+#include <rttr/registration>
 
 RTTR_REGISTRATION
 {
     registration::class_<ExecutionGraphBackend>("DummyBackendMsgHandler")
-        .constructor()
+        .constructor();
 }
 
 bool OnQuery(CefRefPtr<CefBrowser> browser,

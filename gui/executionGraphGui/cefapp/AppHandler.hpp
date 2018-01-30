@@ -19,6 +19,7 @@
 #include <vector>
 #include <wrapper/cef_message_router.h>
 #include "backend/Backend.hpp"
+#include "backend/BackendMessageHandler.hpp"
 #include "cefapp/MessageHandler.hpp"
 
 class AppHandler : public CefClient,
@@ -26,7 +27,7 @@ class AppHandler : public CefClient,
                    public CefLifeSpanHandler,
                    public CefLoadHandler
 {
-    IMPLEMENT_REFCOUNTING(AppHandler);
+    IMPLEMENT_REFCOUNTING(AppHandler)
 
 public:
     explicit AppHandler(bool use_views);
@@ -92,7 +93,8 @@ public:
     std::shared_ptr<Backend> GetBackend(const Backend::Id& id) const;
 
 private:
-    std::unordered_map<Backend::Id, std::shared_ptr<Backend>> m_backends;
+    std::unordered_map<Backend::Id, std::shared_ptr<Backend>> m_backends;                                    //!< All backends.
+    std::unordered_map<Backend::Id, std::vector<std::shared_ptr<BackendMessageHandler>>> m_backendHandlers;  //!< All handlers for every backend.
     //@}
 };
 

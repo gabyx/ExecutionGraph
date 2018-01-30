@@ -21,12 +21,11 @@ class DummyBackendMsgHandler final : public BackendMessageHandler
 
 public:
     using Id = BackendMessageHandler::Id;
-    static const Id defaultId;
 
 public:
     template<typename... Args>
-    DummyBackendMsgHandler(const Id& id = defaultId, Args&&... args)
-        : DummyBackendMsgHandler(std::forward<Args>(args)...)
+    DummyBackendMsgHandler(const Id& id = "DummyBackendMsgHandler", Args&&... args)
+        : BackendMessageHandler(std::forward<Args>(args)...)
     {
     }
 
@@ -37,6 +36,5 @@ public:
                  bool persistent,
                  CefRefPtr<Callback> callback) override;
 };
-RTTR_DECLARE_TYPE(DummyBackendMsgHandler)
 
 #endif

@@ -93,7 +93,7 @@ macro(setTargetCompileOptionsExecutionGraph target)
         set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=leak -fsanitize=address")
     endif()
 
-    target_compile_features(${target} cxx_std_17)
+    target_compile_features(${target} PUBLIC cxx_std_17)
 
     # Compile flags.
     target_compile_options(${target} PRIVATE $<$<CONFIG:Debug>:${CXX_FLAGS_DEBUG}> )
