@@ -35,11 +35,9 @@ public:
 
 RTTR_REGISTRATION
 {
-    using namespace rttr;
-    registration::class_<MyMessage2>("MyMessage2")
+    rttr::registration::class_<MyMessage2>("MyMessage2")
         .constructor<>()(
-            policy::ctor::as_std_shared_ptr);
-    ;
+            rttr::policy::ctor::as_std_shared_ptr);
 }
 
 struct FunnyTable

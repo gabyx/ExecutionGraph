@@ -13,14 +13,15 @@
 #include "AppHandler.hpp"
 #include <base/cef_bind.h>
 #include <cef_app.h>
-#include <executionGraph/common/Exception.hpp>
 #include <sstream>
 #include <string>
 #include <views/cef_browser_view.h>
 #include <views/cef_window.h>
 #include <wrapper/cef_closure_task.h>
 #include <wrapper/cef_helpers.h>
-#include "backend/BackendMessageHandlerFactory.hpp"
+#include "backend/BackendStorage.hpp"
+#include "backend/ExecutionGraphBackend.hpp"
+#include "cefapp/PlatformTitleChanger.hpp"
 
 namespace
 {
@@ -32,6 +33,8 @@ AppHandler::AppHandler(bool use_views)
 {
     DCHECK(!g_instance);
     g_instance = this;
+
+    m_backendStorage = std::make_unique<BackendStorage>();
 }
 
 AppHandler::~AppHandler()
@@ -65,38 +68,25 @@ void AppHandler::OnTitleChange(CefRefPtr<CefBrowser> browser,
     else
     {
         // Set the title of the window using platform APIs.
-        PlatformTitleChange(browser, title);
+        PlatformTitleChanger::OnTitleChange(browser, title);
     }
 }
 
 void AppHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 {
+    // Add to the list of existing browsers.
+    m_browserList.push_back(browser);
+
+    // Install all backends
+    installBackends();
+
     CEF_REQUIRE_UI_THREAD();
     if(!m_router)
     {
         CefMessageRouterConfig config;
         m_router = CefMessageRouterBrowserSide::Create(config);
-
-        // Register all message handlers form the backends
-        for(auto& p : m_backends)
-        {
-            auto& id         = p.first;
-            Backend& backend = *p.second;
-
-            auto type            = rttr::type::get(backend);
-            auto messageHandlers = BackendMessageHandlerFactory::Create(type);
-            auto result          = m_backendHandlers.emplace(id, BackendMessageHandlerFactory::Create(type));
-            EXECGRAPH_THROW_EXCEPTION_IF(!result.second, "already added!");  // exception if no insertion!
-
-            // Register all created handlers
-            for(std::shared_ptr<BackendMessageHandler> handler : result.first->second)
-            {
-                m_router->AddHandler(handler.get(), true);
-            }
-        }
+        m_backendStorage->RegisterHandlersAtRouter(m_router);
     }
-    // Add to the list of existing browsers.
-    m_browserList.push_back(browser);
 }
 
 bool AppHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
@@ -130,20 +120,6 @@ void AppHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 {
     CEF_REQUIRE_UI_THREAD();
 
-    if(m_router)
-    {
-        // Uninstall all message handlers for all backends
-        for(auto& p : m_backends)
-        {
-            auto& id = p.first;
-            // Unregister all created handlers
-            for(std::shared_ptr<BackendMessageHandler> handler : m_backendHandlers[id])
-            {
-                m_router->RemoveHandler(static_cast<CefMessageRouterBrowserSide::Handler*>(handler.get()));
-            }
-        }
-    }
-
     // Remove from the list of existing browsers.
     BrowserList::iterator bit = m_browserList.begin();
     for(; bit != m_browserList.end(); ++bit)
@@ -153,6 +129,11 @@ void AppHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
             m_browserList.erase(bit);
             break;
         }
+    }
+
+    if(m_router)
+    {
+        m_backendStorage->UnregisterHandlersFromRouter(m_router);
     }
 
     if(m_browserList.empty())
@@ -200,19 +181,10 @@ void AppHandler::CloseAllBrowsers(bool force_close)
         (*it)->GetHost()->CloseBrowser(force_close);
 }
 
-/*! 
-    Register the backend `backend`:
-    - Hold it as owner
-    - Register/Unregister all its corresponding message handlers.
-*/
-void AppHandler::RegisterBackend(const std::shared_ptr<Backend>& backend)
+//! Install various backends and setup all of them.
+void AppHandler::installBackends()
 {
-    m_backends.emplace(backend->getId(), backend);
-}
-
-//! Get the backend with id `id`.
-std::shared_ptr<Backend> AppHandler::GetBackend(const Backend::Id& id) const
-{
-    auto it = m_backends.find(id);
-    return (it != m_backends.end()) ? it->second : nullptr;
+    // Install the ExecutionGraph backend
+    auto execGraphBackend = std::make_shared<ExecutionGraphBackend>();
+    m_backendStorage->RegisterBackend(execGraphBackend);
 }

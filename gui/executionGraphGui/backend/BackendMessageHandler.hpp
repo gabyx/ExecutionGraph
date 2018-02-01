@@ -15,19 +15,19 @@
 
 #include <executionGraph/common/IObjectID.hpp>
 #include <memory>
-#include <rttr/type.h>
+#include <rttr/type>
 #include <wrapper/cef_message_router.h>
 #include "backend/Backend.hpp"
 
-class BackendMessageHandler : public CefMessageRouterBrowserSide::Handler,
-                              public executionGraph::IObjectID
+class BackendMessageHandler : public CefMessageRouterBrowserSide::Handler
+    , public executionGraph::IObjectID
 {
     RTTR_ENABLE()
     EXECGRAPH_OBJECT_ID_DECLARATION
 
 public:
     BackendMessageHandler(const Id& id,
-                          const std::shared_ptr<Backend>& backend)
+                          const std::shared_ptr<Backend>& backend = nullptr)
         : m_id(id), m_backend(backend) {}
 
     // Called due to cefQuery execution in message_router.html.
@@ -42,7 +42,7 @@ private:
     std::shared_ptr<Backend> m_backend;  //! The backend which is called from this message handler.
 
 private:
-    DISALLOW_COPY_AND_ASSIGN(BackendMessageHandler);
+    //DISALLOW_COPY_AND_ASSIGN(BackendMessageHandler);
 };
 
 #endif

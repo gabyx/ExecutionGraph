@@ -2,7 +2,7 @@
 //!  ExecutionGraph
 //!  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 //!
-//!  @date Mon Jan 15 2018
+//!  @date Thu Feb 01 2018
 //!  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
 //!
 //!  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,11 +10,10 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "backend/ExecutionGraphBackend.hpp"
-//#include <rttr/registration>
+#include <cef_browser.h>
 
-// RTTR_REGISTRATION
-// {
-//     rttr::registration::class_<ExecutionGraphBackend>("ExecutionGraphBackend")
-//         .constructor();
-// }
+class PlatformTitleChanger
+{
+public:
+    static void OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title);
+};

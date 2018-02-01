@@ -17,7 +17,7 @@
 
 class DummyBackendMsgHandler final : public BackendMessageHandler
 {
-    RTTR_ENABLE(BackendMessageHandler);
+    RTTR_ENABLE(BackendMessageHandler)
 
 public:
     using Id = BackendMessageHandler::Id;
@@ -25,7 +25,7 @@ public:
 public:
     template<typename... Args>
     DummyBackendMsgHandler(const Id& id = "DummyBackendMsgHandler", Args&&... args)
-        : BackendMessageHandler(std::forward<Args>(args)...)
+        : BackendMessageHandler(id, std::forward<Args>(args)...)
     {
     }
 

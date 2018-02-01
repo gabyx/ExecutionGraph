@@ -10,23 +10,23 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "backend/DummyBackendMsgHandler.cpp"
-#include <rttr/registration>
+#include "backend/DummyBackendMsgHandler.hpp"
+//#include <rttr/registration>
 
-RTTR_REGISTRATION
-{
-    registration::class_<ExecutionGraphBackend>("DummyBackendMsgHandler")
-        .constructor();
-}
+// RTTR_REGISTRATION
+// {
+//     registration::class_<ExecutionGraphBackend>("DummyBackendMsgHandler")
+//         .constructor();
+// }
 
-bool OnQuery(CefRefPtr<CefBrowser> browser,
-             CefRefPtr<CefFrame> frame,
-             int64 query_id,
-             const CefString& request,
-             bool persistent,
-             CefRefPtr<Callback> callback) override
+bool DummyBackendMsgHandler::OnQuery(CefRefPtr<CefBrowser> browser,
+                                     CefRefPtr<CefFrame> frame,
+                                     int64 query_id,
+                                     const CefString& request,
+                                     bool persistent,
+                                     CefRefPtr<Callback> callback)
 {
-    result = "received: " + request.ToString();
+    auto result = "received: " + request.ToString();
     callback->Success(result);
     return true;
 }

@@ -70,15 +70,15 @@ endmacro()
 
 macro(setTargetCompileOptionsExecutionGraph target)
 
-    if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR
-       ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
+       CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
         message(STATUS "Setting Compile/Linker Options for Clang")
         list(APPEND CXX_FLAGS_DEBUG "-fno-omit-frame-pointer"
                                     "-Wall"
                                     "-Wpedantic"
                                     "-Wno-documentation")
 
-    elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         list(APPEND CXX_FLAGS_DEBUG "-fno-omit-frame-pointer"
                                     "-Wall"
                                     "-Wpedantic"
@@ -87,10 +87,13 @@ macro(setTargetCompileOptionsExecutionGraph target)
         message(ERROR "MSVC is not yet supported!")
     endif()
 
-    if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         # with clang 5.0.1: -fsanitize=address produces weird output in lldb for std::string ...
         list(APPEND CXX_FLAGS_DEBUG "-fsanitize=leak" "-fsanitize=address")
-        set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=leak -fsanitize=address")
+        set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=leak -fsanitize=address -lc++experimental")
+    elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+        message(ERROR "MSVC is not yet supported!")
     endif()
 
     target_compile_features(${target} PUBLIC cxx_std_17)

@@ -54,7 +54,7 @@ namespace executionGraph
         xg::Guid m_guid;     //!< The unique guid of this identifier.
     };
 
-    using Id = Identifier;
+    using Id = Identifier;  //! Abreviation
 
 }  // namespace executionGraph
 

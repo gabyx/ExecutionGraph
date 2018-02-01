@@ -27,15 +27,14 @@ namespace executionGraph
     public:
         virtual const Id& getId() const = 0;
     };
-
-#define EXECGRAPH_OBJECT_ID_DECLARATION                     \
-public:                                                     \
-    using Id = executionGraph::Id;                          \
-    const Id& getId() const override final { return m_id; } \
-                                                            \
-private:                                                    \
-    const Id m_id;
-
 }  // namespace executionGraph
+
+#    define EXECGRAPH_OBJECT_ID_DECLARATION                     \
+    public:                                                     \
+        using Id = executionGraph::Id;                          \
+        const Id& getId() const override final { return m_id; } \
+                                                                \
+    private:                                                    \
+        const Id m_id;
 
 #endif

@@ -13,6 +13,7 @@
 #ifndef executionGraphGui_backend_ExecutionGraphBackend_hpp
 #define executionGraphGui_backend_ExecutionGraphBackend_hpp
 
+#include <rttr/type>
 #include "backend/Backend.hpp"
 
 class ExecutionGraphBackend : public Backend

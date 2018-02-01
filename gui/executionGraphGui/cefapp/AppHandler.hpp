@@ -15,17 +15,13 @@
 
 #include <cef_client.h>
 #include <memory>
-#include <unordered_map>
-#include <vector>
 #include <wrapper/cef_message_router.h>
-#include "backend/Backend.hpp"
-#include "backend/BackendMessageHandler.hpp"
-#include "cefapp/MessageHandler.hpp"
+class BackendStorage;
 
-class AppHandler : public CefClient,
-                   public CefDisplayHandler,
-                   public CefLifeSpanHandler,
-                   public CefLoadHandler
+class AppHandler : public CefClient
+    , public CefDisplayHandler
+    , public CefLifeSpanHandler
+    , public CefLoadHandler
 {
     IMPLEMENT_REFCOUNTING(AppHandler)
 
@@ -72,30 +68,21 @@ public:
     bool IsClosing() const { return m_isClosing; }
 
 private:
-    // Platform-specific implementation.
-    void PlatformTitleChange(CefRefPtr<CefBrowser> browser,
-                             const CefString& title);
-
     // True if the application is using the Views framework.
     const bool m_useViews;
     bool m_isClosing;
 
+private:
     // List of existing browser windows. Only accessed on the CEF UI thread.
     using BrowserList = std::vector<CefRefPtr<CefBrowser>>;
     BrowserList m_browserList;
 
+private:
     CefRefPtr<CefMessageRouterBrowserSide> m_router;
 
-    //! Registering for Backends
-    //@{
-public:
-    void RegisterBackend(const std::shared_ptr<Backend>& backend);
-    std::shared_ptr<Backend> GetBackend(const Backend::Id& id) const;
-
 private:
-    std::unordered_map<Backend::Id, std::shared_ptr<Backend>> m_backends;                                    //!< All backends.
-    std::unordered_map<Backend::Id, std::vector<std::shared_ptr<BackendMessageHandler>>> m_backendHandlers;  //!< All handlers for every backend.
-    //@}
+    std::unique_ptr<BackendStorage> m_backendStorage;
+    void installBackends();
 };
 
 #endif  // CEF_TESTS_CEFSIMPLE_SIMPLE_HANDLER_H_

@@ -14,11 +14,11 @@
 #define executionGraph_common_Factory_hpp
 
 #include <meta/meta.hpp>
-#include <rttr/type.h>
+#include <rttr/type>
 #include <type_traits>
 #include <unordered_map>
+#include "executionGraph/common/Asserts.hpp"
 #include "executionGraph/common/CommonTraits.hpp"
-#include "executionGraph/common/Exception.hpp"
 #include "executionGraph/config/Config.hpp"
 
 #ifdef __clang__
@@ -114,7 +114,8 @@ namespace executionGraph
 
             if(it == StaticStorage::map.end())
             {
-                EXECGRAPH_THROW_EXCEPTION("No such type in Factory!");
+                EXECGRAPH_ASSERT(false, "No such type in Factory!");
+                return {};
             }
             return it->second();  // Will move automatically
         }

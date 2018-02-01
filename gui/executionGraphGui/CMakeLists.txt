@@ -19,13 +19,19 @@ set(ExecutionGraphGUI_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.hpp
 
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/Backend.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendStorage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendStorage.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendMessageHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendMessageHandler.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendMessageHandlerFactory.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendMessageHandlerFactory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/DummyBackendMsgHandler.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/DummyBackendMsgHandler.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/ExecutionGraphBackend.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/ExecutionGraphBackend.cpp
-
-    ${CMAKE_CURRENT_SOURCE_DIR}/backend/Backend.hpp
 )
 set(ExecutionGraphGUI_SRCS_LINUX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/linux/AppLinux.cpp
@@ -33,7 +39,7 @@ set(ExecutionGraphGUI_SRCS_LINUX
 )
 set(ExecutionGraphGUI_SRCS_MACOSX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/AppMac.mm
-    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/HandlerMac.mm
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/PlatformSpecificImplementations.mm
 )
 set(ExecutionGraphGUI_SRCS_WINDOWS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/App.exe.manifest

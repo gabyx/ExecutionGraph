@@ -14,7 +14,7 @@
 #define executionGraphGui_backend_BackendMessageHandlerFactory_hpp
 
 #include <executionGraph/common/Factory.hpp>
-#include <rttr/type.h>
+#include <rttr/type>
 #include "backend/BackendMessageHandler.hpp"
 #include "backend/ExecutionGraphBackend.hpp"
 
