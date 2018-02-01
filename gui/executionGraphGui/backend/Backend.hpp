@@ -21,7 +21,7 @@ class Backend : public executionGraph::IObjectID
     RTTR_ENABLE()
     EXECGRAPH_OBJECT_ID_DECLARATION
 
-public:
+protected:
     Backend(const Id& id)
         : m_id(id) {}
     virtual ~Backend() override = default;

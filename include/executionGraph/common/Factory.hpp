@@ -14,6 +14,7 @@
 #define executionGraph_common_Factory_hpp
 
 #include <meta/meta.hpp>
+#include <optional>
 #include <rttr/type>
 #include <type_traits>
 #include <unordered_map>
@@ -51,9 +52,17 @@ namespace executionGraph
                           "CreatorList needs to be meta::list!");
 
             using CreatorFunction = decltype(&meta::front<CreatorList>::create);
-            using CreatorType     = std::invoke_result_t<CreatorFunction>;
-            using DynamicMap      = std::unordered_map<rttr::type, CreatorFunction>;
-            using StaticStorage   = StaticMapStorage<DynamicMap, CreatorList>;
+            template<typename T>
+            struct functionTraits;
+            template<typename R, typename... Args>
+            struct functionTraits<R (*)(Args...)>
+            {
+                using returnType = R;
+                using arguments  = meta::list<Args...>;
+            };
+            using CreatorType   = typename functionTraits<CreatorFunction>::returnType;
+            using DynamicMap    = std::unordered_map<rttr::type, CreatorFunction>;
+            using StaticStorage = StaticMapStorage<DynamicMap, CreatorList>;
 
             // extract all Key types and check if unique -> otherwise assert!
             template<typename T>
@@ -99,25 +108,24 @@ namespace executionGraph
         using CreatorType = typename Traits::CreatorType;
 
         //! Create the type
-        template<typename Key>
-        static CreatorType create()
+        template<typename Key, typename... Args>
+        static CreatorType create(Args&&... args)
         {
             using Creator = typename Traits::template getCreatorType<Key>;
             static_assert(!Traits::template isUndefined<Creator>::value, "Your Key is not found in the factory!");
-            return Creator::create();
+            return Creator::create(std::forward<Args>(args)...);
         }
 
         //! Create the type registered with Key `key`.
-        static CreatorType create(const rttr::type& key)
+        template<typename... Args>
+        static std::optional<CreatorType> create(const rttr::type& key, Args&&... args)
         {
             auto it = StaticStorage::map.find(key);
-
             if(it == StaticStorage::map.end())
             {
-                EXECGRAPH_ASSERT(false, "No such type in Factory!");
                 return {};
             }
-            return it->second();  // Will move automatically
+            return it->second(std::forward<Args>(args)...);  // Will move automatically into the return
         }
     };
 

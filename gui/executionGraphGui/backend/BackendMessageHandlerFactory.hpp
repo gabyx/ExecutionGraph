@@ -30,7 +30,7 @@ private:
     {
         using Key = ExecutionGraphBackend;
         //! The actual creator function which creats all handlers for this key.
-        static HandlerList create();
+        static HandlerList create(std::shared_ptr<Backend> backend);
     };
 
     //! The used factory itself.
@@ -38,10 +38,14 @@ private:
 
 public:
     //! Create all handlers for the backend `BackendType`.
-    template<typename BackendType>
-    static HandlerList Create() { return Factory::create<BackendType>(); }
+    template<typename BackendType, typename... Args>
+    static HandlerList Create(Args&&... args) { return Factory::create<BackendType>(std::forward<Args>(args)...); }
     //! Create all handlers for the backend type given by an `rttr::type`.
-    static HandlerList Create(const rttr::type& type) { return Factory::create(type); }
+    template<typename... Args>
+    static std::optional<HandlerList> Create(const rttr::type& type, Args&&... args)
+    {
+        return Factory::create(type, std::forward<Args>(args)...);
+    }
 };
 
 #endif

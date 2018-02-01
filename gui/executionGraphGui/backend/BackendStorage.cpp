@@ -33,10 +33,10 @@ void BackendStorage::RegisterHandlersAtRouter(CefRefPtr<CefMessageRouterBrowserS
         Backend& backend = *p.second;
 
         auto type            = rttr::type::get(backend);
-        auto messageHandlers = BackendMessageHandlerFactory::Create(type);
-        if(messageHandlers.size())
+        auto messageHandlers = BackendMessageHandlerFactory::Create(type, p.second);
+        if(messageHandlers)
         {
-            auto result = m_backendHandlers.emplace(id, messageHandlers);
+            auto result = m_backendHandlers.emplace(id, *messageHandlers);
             EXECGRAPH_THROW_EXCEPTION_IF(!result.second, "already added!");  // exception if no insertion!
 
             // Register all created handlers

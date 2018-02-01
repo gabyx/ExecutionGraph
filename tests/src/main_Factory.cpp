@@ -53,17 +53,17 @@ struct FunnyTable
 struct CreatorA
 {
     using Key = int;
-    static FunnyTable create() { return {"int"}; }
+    static FunnyTable create(int a) { return {"int"}; }
 };
 struct CreatorB
 {
     using Key = double;
-    static FunnyTable create() { return {"double"}; }
+    static FunnyTable create(int b) { return {"double"}; }
 };
 struct CreatorC
 {
     using Key = float;
-    static FunnyTable create() { return {"float"}; }
+    static FunnyTable create(int c) { return {"float"}; }
 };
 
 template<typename T, typename K>
@@ -75,22 +75,22 @@ MY_TEST(FactoryTest, StaticFactory)
     using MySuperFactory = StaticFactory<CreatorList>;
 
     // create at compile time
-    auto a = MySuperFactory::create<double>();
-    auto b = MySuperFactory::create<int>();
-    auto c = MySuperFactory::create<float>();
+    auto a = MySuperFactory::create<double>(1);
+    auto b = MySuperFactory::create<int>(2);
+    auto c = MySuperFactory::create<float>(3);
 
     ASSERT_EQ(a.a, "double");
     ASSERT_EQ(b.a, "int");
     ASSERT_EQ(c.a, "float");
 
     // Create if you have a rtti
-    auto d = MySuperFactory::create(rttr::type::get<double>());
-    auto e = MySuperFactory::create(rttr::type::get<int>());
-    auto f = MySuperFactory::create(rttr::type::get<float>());
+    auto d = MySuperFactory::create(rttr::type::get<double>(), 1);
+    auto e = MySuperFactory::create(rttr::type::get<int>(), 2);
+    auto f = MySuperFactory::create(rttr::type::get<float>(), 3);
 
-    ASSERT_EQ(d.a, "double");
-    ASSERT_EQ(e.a, "int");
-    ASSERT_EQ(f.a, "float");
+    ASSERT_EQ(d->a, "double");
+    ASSERT_EQ(e->a, "int");
+    ASSERT_EQ(f->a, "float");
 
     // Messages
     using varT             = std::shared_ptr<MyMessage2>;
