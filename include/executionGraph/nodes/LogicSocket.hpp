@@ -342,9 +342,7 @@ namespace executionGraph
     };
 
     template<typename TData, typename TConfig>
-    class LogicSocketOutput final : public LogicSocketData<TData>,
-                                    /* order is important, since CTOR hands over the 
-                                data reference to the base class: */
+    class LogicSocketOutput final : public LogicSocketData<TData>, /* order is important, since CTOR hands over the data reference to the base class: */
                                     public LogicSocketOutputBase<TConfig>
     {
     public:

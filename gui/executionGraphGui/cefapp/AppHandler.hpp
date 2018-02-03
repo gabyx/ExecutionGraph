@@ -18,10 +18,10 @@
 #include <wrapper/cef_message_router.h>
 class BackendStorage;
 
-class AppHandler : public CefClient
-    , public CefDisplayHandler
-    , public CefLifeSpanHandler
-    , public CefLoadHandler
+class AppHandler : public CefClient,
+                   public CefDisplayHandler,
+                   public CefLifeSpanHandler,
+                   public CefLoadHandler
 {
     IMPLEMENT_REFCOUNTING(AppHandler)
 

@@ -19,8 +19,8 @@
 #include <wrapper/cef_message_router.h>
 #include "backend/Backend.hpp"
 
-class BackendMessageHandler : public CefMessageRouterBrowserSide::Handler
-    , public executionGraph::IObjectID
+class BackendMessageHandler : public CefMessageRouterBrowserSide::Handler,
+                              public executionGraph::IObjectID
 {
     RTTR_ENABLE()
     EXECGRAPH_OBJECT_ID_DECLARATION
