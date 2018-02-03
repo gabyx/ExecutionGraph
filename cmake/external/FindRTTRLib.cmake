@@ -9,10 +9,10 @@ set(INSTALL_DIR "${ExecutionGraph_EXTERNAL_INSTALL_DIR}/rttr")
 
 set(RTTR_COMPONENTS CORE)
 
-if(${USE_SUPERBUILD})
-    message(STATUS "rttr library (super-build): finding...:")
-    find_package(RTTR QUIET CONFIG OPTIONAL_COMPONENTS CORE)
+message(STATUS "rttr library (super-build): finding...:")
+find_package(RTTR QUIET CONFIG COMPONENTS ${RTTR_COMPONENTS})
 
+if(${USE_SUPERBUILD})
     if(NOT TARGET "RTTR::Core")
 
         message(STATUS "rttr library: targer not found -> download from https://github.com/gabyx/rttr.git")
@@ -23,34 +23,29 @@ if(${USE_SUPERBUILD})
                             GIT_REPOSITORY      https://github.com/gabyx/rttr.git
                             GIT_TAG             disable-warnings
                             GIT_SHALLOW         ON
-                            PREFIX              "${CMAKE_BINARY_DIR}/external/rttr"
+                            PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/rttr"
                             TIMEOUT 10
                             UPDATE_DISCONNECTED  ON
                             CMAKE_ARGS "-DCMAKE_BUILD_TYPE=Release" "-DCMAKE_VERBOSE_MAKEFILE=ON" "-DBUILD_STATIC=OFF" 
                                         "-DBUILD_BENCHMARKS=OFF" "-DBUILD_UNIT_TESTS=OFF" "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
                             INSTALL_DIR "${INSTALL_DIR}")
 
-        set(RTTR_DIR "${INSTALL_DIR}" CACHE PATH "rttr library directory" FORCE)
         message(STATUS "rttr library downloaded -> build it!")
     else()
         message(STATUS "rttr library found! no build necessary")
     endif()
 
 else()
-
-    message(STATUS "rttr library: finding...:")
-    find_package(RTTR QUIET CONFIG OPTIONAL_COMPONENTS ${RTTR_COMPONENTS})
     if(NOT TARGET "RTTR::Core")
         # Try again but with the super build install dir:
-        set(RTTR_DIR ${INSTALL_DIR} CACHE PATH "rttr library directory" FORCE)
         message(STATUS "rttr library: finding in super build folder...")
-        find_package(RTTR QUIET CONFIG OPTIONAL_COMPONENTS ${RTTR_COMPONENTS})
+        find_package(RTTR QUIET CONFIG COMPONENTS ${RTTR_COMPONENTS} PATHS ${INSTALL_DIR})
     endif()
 
     if(NOT TARGET "RTTR::Core" AND ${RTTRLib_FIND_REQUIRED})
         message(FATAL_ERROR "rttr library could not be found!")
     else()
-        message(STATUS "rttr library found!")
+        message(STATUS "rttr library found! Config File: ${RTTR_CONFIG}")
         message(STATUS "rttr library added targets: RTTR::Core")
     endif()
 endif()

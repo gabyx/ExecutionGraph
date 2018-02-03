@@ -149,10 +149,11 @@ endif()
 
 if(OS_MACOSX)
 
+    set(ExecutionGraphGUI_TARGET_OUTPUTNAME "ExecutionGraphGUI")
     set(ExecutionGraphGUI_HELPER_TARGET_OUTPUTNAME "ExecutionGraphGUI Helper") # This is hardcoded as described in <cef_types.h> browser_subprocess_path.
 
     # Output paths for the app bundles.
-    set(CEF_APP "${ExecutionGraphGUI_TARGET_OUT_DIR}/ExecutionGraph-GUI.app")
+    set(CEF_APP "${ExecutionGraphGUI_TARGET_OUT_DIR}/${ExecutionGraphGUI_TARGET_OUTPUTNAME}.app")
     set(CEF_HELPER_APP "${ExecutionGraphGUI_TARGET_OUT_DIR}/${ExecutionGraphGUI_HELPER_TARGET_OUTPUTNAME}.app")
 
     # Variable referenced from Info.plist files.
@@ -171,10 +172,13 @@ if(OS_MACOSX)
                                                      RUNTIME_OUTPUT_DIRECTORY "${ExecutionGraphGUI_TARGET_OUT_DIR}")
 
     add_dependencies(ExecutionGraphGUIHelper libcef_dll_wrapper)
-    target_link_libraries(ExecutionGraphGUIHelper libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ${ExecutionGraph_LINK_TARGETS_GUI_DEP} ExecutionGraph::Core)
+    target_link_libraries(ExecutionGraphGUIHelper libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
     
     # Fix the framework rpath in the helper executable.
-    fix_macosx_helper_framework_rpath(ExecutionGraphGUIHelper)
+    # The helper is in $app_name.app/Contents/Frameworks/$app_name Helper.app/Contents/MacOS/
+    # so set rpath up to Contents/ so that the loader can find Frameworks/.
+    set_target_properties(ExecutionGraphGUIHelper PROPERTIES INSTALL_RPATH "@executable_path/../../../..")
+    set_target_properties(ExecutionGraphGUIHelper PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE)
 
     print_target_properties(ExecutionGraphGUIHelper)
 
@@ -189,6 +193,7 @@ if(OS_MACOSX)
     add_dependencies(ExecutionGraph-GUI libcef_dll_wrapper ExecutionGraphGUIHelper ${ExecutionGraphGUI_CLIENT_TARGET})
     target_link_libraries(ExecutionGraph-GUI libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ${ExecutionGraph_LINK_TARGETS_GUI_DEP} ExecutionGraph::Core)
     set_target_properties(ExecutionGraph-GUI PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/Info.plist"
+                                                        OUTPUT_NAME "${ExecutionGraphGUI_TARGET_OUTPUTNAME}"
                                                         RUNTIME_OUTPUT_DIRECTORY "${ExecutionGraphGUI_TARGET_OUT_DIR}")
 
     # Copy files into the main app bundle.
@@ -207,10 +212,19 @@ if(OS_MACOSX)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
                 "${ExecutionGraphGUI_CLIENT_TARGET_OUT_DIR}"
                 "${CEF_APP}/Contents"
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+                "${CEF_APP}/Contents/libs"
+        COMMAND ${CMAKE_COMMAND} -E copy
+                "$<TARGET_FILE:ExecutionGraph::Core>" "$<TARGET_FILE:RTTR::Core>"
+                "${CEF_APP}/Contents/libs"
         VERBATIM)
 
     # Fix the framework rpath in the main executable.
-    fix_macosx_main_framework_rpath(ExecutionGraph-GUI)
+    # The main app is at $app_name.app/Contents/MacOS/$app_name
+    # so set rpath up to Contents/ so that the loader can find Frameworks/.
+    set_target_properties(ExecutionGraph-GUI PROPERTIES INSTALL_RPATH "@executable_path/..;@executable_path/../libs")
+    set_target_properties(ExecutionGraph-GUI PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE)
+    
 
     # Manually process and copy over resource files.
     # The Xcode generator can support this via the set_target_properties RESOURCE
@@ -218,6 +232,7 @@ if(OS_MACOSX)
     # Remove these prefixes from input file paths.
     set(PREFIXES "${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/")
     copy_macosx_resources("${ExecutionGraphGUI_RESOURCES_SRCS}" "${PREFIXES}" "ExecutionGraph-GUI" "${CMAKE_CURRENT_SOURCE_DIR}" "${CEF_APP}")
+
 
     print_target_properties(ExecutionGraph-GUI)
 endif()

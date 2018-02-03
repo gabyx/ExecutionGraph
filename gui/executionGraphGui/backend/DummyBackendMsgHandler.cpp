@@ -11,13 +11,6 @@
 //! ========================================================================================
 
 #include "backend/DummyBackendMsgHandler.hpp"
-//#include <rttr/registration>
-
-// RTTR_REGISTRATION
-// {
-//     registration::class_<ExecutionGraphBackend>("DummyBackendMsgHandler")
-//         .constructor();
-// }
 
 bool DummyBackendMsgHandler::OnQuery(CefRefPtr<CefBrowser> browser,
                                      CefRefPtr<CefFrame> frame,

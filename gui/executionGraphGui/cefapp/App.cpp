@@ -81,8 +81,6 @@ void App::OnContextInitialized()
     const bool use_views = false;
 #endif
 
-    //todo: This path is relative to the execution directory, which is normally set to the workspace when debugging.
-    // How to deploy these files to the app and reference them here?
     CefRegisterSchemeHandlerFactory("client",
                                     "executionGraph",
                                     new FileSchemeHandlerFactory(m_clientSourcePath, "executionGraph"));
