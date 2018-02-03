@@ -42,7 +42,7 @@
             "MIMode": "lldb"
         },
         {
-            "name": "(lldb) ExecutionGraph-CefApp",
+            "name": "(lldb) ExecutionGraphGUI",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
