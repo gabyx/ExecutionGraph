@@ -21,7 +21,7 @@ if(${USE_SUPERBUILD})
         
         ExternalProject_Add(rttr
                             GIT_REPOSITORY      https://github.com/gabyx/rttr.git
-                            GIT_TAG             disable-warnings
+                            GIT_TAG             master
                             GIT_SHALLOW         ON
                             PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/rttr"
                             TIMEOUT 10
