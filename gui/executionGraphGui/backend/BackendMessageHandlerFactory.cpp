@@ -17,5 +17,5 @@ BackendMessageHandlerFactory::HandlerList
 BackendMessageHandlerFactory::CreatorExecutionGraphBackend::create(std::shared_ptr<Backend> backend)
 {
     // create a simple dummy handler
-    return {std::make_shared<DummyBackendMsgHandler>()};
+    return {std::make_shared<DummyBackendMsgHandler>(backend)};
 }

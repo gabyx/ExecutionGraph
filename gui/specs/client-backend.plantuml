@@ -1,0 +1,74 @@
+
+@startuml
+set namespaceSeparator ::
+skinparam shadowing false
+
+namespace cefapp{
+    class App{
+        + OnContextInitialized()
+    }
+    class AppHandler #D3D3D3{
+        + OnAfterCreated()
+        + OnBeforeCloses()
+        - m_router
+        - m_backendStorage
+        - initializeBackends()
+    }
+    class FileSchemeHandlerFactory
+}
+
+class CefMessageRouterBrowserSide
+
+cefapp::App ..> cefapp::AppHandler : creates
+cefapp::App -right-> cefapp::FileSchemeHandlerFactory : registers
+
+cefapp::AppHandler "1" o-left- CefMessageRouterBrowserSide
+cefapp::AppHandler "1" *-down- backend::BackendStorage
+
+namespace backend {
+    class Backend #D3D3D3
+    class BackendMessageHandler #D3D3D3{
+        - m_backend
+        + OnQuery(...) {abstract} 
+    }
+
+    class BackendStorage {
+        + RegisterBackend(backend)
+        + GetBackend(id)
+        + RegisterHandlersAtRouter(router)
+        + UnregisterHandlersAtRouter(router)
+        - m_backends
+        - m_backendHandlers
+    }
+
+    class BackendMessageHandlerFactory {
+        + std::optional<HandlerList> Create(rttr::type) {static}
+    }
+
+    class CreatorExecutionGraphBackend
+
+    class DummyBackendMsgHandler
+}
+
+namespace executionGraph {
+    class StaticFactory<T...>
+}
+
+
+backend::BackendStorage "0...*" *-right- backend::Backend
+backend::BackendStorage "0...*" *-right- backend::BackendMessageHandler
+backend::BackendMessageHandler "1" *-- backend::Backend
+backend::BackendStorage .down.> backend::BackendMessageHandlerFactory : uses
+
+cefapp::AppHandler .right.> backend::ExecutionGraphBackend : instanciates
+
+backend::ExecutionGraphBackend -up-|> backend::Backend
+backend::DummyBackendMsgHandler -up-|> backend::BackendMessageHandler
+
+backend::BackendMessageHandlerFactory .down.> backend::CreatorExecutionGraphBackend : uses
+
+backend::CreatorExecutionGraphBackend .down.> backend::ExecutionGraphBackend : uses
+backend::CreatorExecutionGraphBackend .down.> backend::DummyBackendMsgHandler : uses
+
+backend::BackendMessageHandlerFactory .right.> executionGraph::StaticFactory
+@enduml

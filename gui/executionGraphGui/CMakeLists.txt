@@ -12,13 +12,10 @@ set(ExecutionGraphGUI_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/AppCLArgs.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/AppHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/AppHandler.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/MessageHandler.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/MessageHandler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/FileSchemeHandlerFactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/FileSchemeHandlerFactory.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.hpp
-
 
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/Backend.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendStorage.cpp
