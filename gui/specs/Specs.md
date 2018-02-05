@@ -12,11 +12,11 @@ During `AppHandler::OnAfterCreated()`, the backends are registered in `AppHandle
 Then, a browser-side router `m_router` of type `CefMessageRouterBrowserSide` is created and `BackendStorage::RegisterHandlersAtRouter(m_router)` is called which registers (by means of a factor `BackendMessageHandlerFactory`) all `BackendMessageHandlers` for all registered backends (in this case a `DummyBackendMsgHandler` for the single `ExecutionGraphBackend`). 
 
 ## Overview of MessageHandler Types
-We need the one message handlers for each of the following functionalities:
+We need one message handlers for each of the following grouped functionalities:
 
 -   Graph Creation Queries:
-    * Add graph (`graphId`)
-    * Delete graph 
+    * Add graph with id `graphId`
+    * Delete graph with id `graphId`
 
 -   Graph Info Queries :
     * Get info of all available socket types.
@@ -37,3 +37,4 @@ We need the one message handlers for each of the following functionalities:
 
 - Graph Execution Functionalities:
     * Run graph
+    * Stop graph
