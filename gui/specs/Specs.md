@@ -8,9 +8,11 @@ The communication between *client* and *backend* is done over the `./client/.../
 
 The application registers a file scheme handler factory `FileSchemeHandlerFactor` during `App::OnContextInitialized`. In this function, it also creates an application handler instance `AppHandler` which is forwarded to `CefBrowserHost::CreateBrowser`. 
 
-During `AppHandler::OnAfterCreated()`, a message dispatcher `m_messageDispatcher` of type `MessageDispatcher` is registerd at a newly instantiated `m_router` of type `CefMessageRouterBrowserSide`. Then, `AppHandler::initializeBackends()` is called which uses the `BackendFactor` to create the backends. At the moment, a backend instance of type `ExecutionGraphBackend` with its associated message handlers (currently an instance of `DummyBackendMsgHandler`).
+During `AppHandler::OnAfterCreated()`, a message dispatcher `m_messageDispatcher` of type `MessageDispatcher` is registerd at a newly instantiated `m_router` of type `CefMessageRouterBrowserSide`. Then, `AppHandler::initializeBackends()` is called which uses the `BackendFactory` to create the backends. At the moment, a backend instance of type `ExecutionGraphBackend` with its associated message handlers, currently an instance of `DummyBackendMsgHandler`, is created.
 The message handlers may share the instance of the backend internally.
-The message handlers of all backends are then added to the `m_messageDispatcher`. During communication, the dispatcher will forward all messages to its shared `BackendMessageHandlers` instances.
+At last, the message handlers of all backends are then added to the `m_messageDispatcher`. 
+
+During communication, the dispatcher will forward all messages to its shared `BackendMessageHandlers` instances.
 
 ## Overview of MessageHandler Types
 We need one message handlers for each of the following grouped functionalities:
@@ -39,3 +41,31 @@ We need one message handlers for each of the following grouped functionalities:
 - Graph Execution Functionalities:
     * Run graph
     * Stop graph
+
+## How To Serialize
+I strongly think we should try to use FlatBuffers
+as it is C++ and has JS wrappers to =), Awesomeness has arrived :-)!
+https://google.github.io/flatbuffers/flatbuffers_guide_use_javascript.html 
+
+## Message Specification: Graph Manipulation Queries
+Adding a node to the execution graph means:
+Client -> Backend:
+```json
+{
+    "version" : 1.0,
+    "messageType" : "addNode",
+    "graphId" : "${guid}"
+    "nodeType" : "MyStupidSquareRoot"
+    "..." : "??" 
+}
+```
+
+Backend -> Client:
+Bla bla, stream or simple error string or...
+```json
+{
+    "version": 1.0,
+    "messageType" : "addNode",
+    "nodeId" : 3
+}
+```
