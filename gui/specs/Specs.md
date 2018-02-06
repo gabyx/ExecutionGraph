@@ -55,20 +55,19 @@ Adding a node to the execution graph means:
 Client -> Backend:
 ```json
 {
-    "version" : 1.0,
     "messageType" : "addNode",
-    "graphId" : "${guid}"
-    "nodeType" : "MyStupidSquareRoot"
-    "..." : "??" 
+    "graphId" : ${guid},
+    "nodeType" : "MyStupidSquareRoot",
+    "constructorArgs" : ${args},
+    ...
 }
 ```
 
 Backend -> Client:
-Bla bla, stream or simple error string or...
 ```json
 {
-    "version": 1.0,
-    "messageType" : "addNode",
+    "messageType" : "addNode-response",
     "nodeId" : 3
+    ...
 }
 ```
