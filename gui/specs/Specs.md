@@ -46,6 +46,9 @@ We need one message handlers for each of the following grouped functionalities:
 I strongly think we should try to use FlatBuffers
 as it is C++ and has JS wrappers to =), Awesomeness has arrived :-)!
 https://google.github.io/flatbuffers/flatbuffers_guide_use_javascript.html 
+or Protocol Buffers (which would be more supported I think...)
+https://github.com/dcodeIO/ProtoBuf.js/
+
 
 ## Message Specification: Graph Manipulation Queries
 Adding a node to the execution graph means:
