@@ -16,7 +16,11 @@
 #include <cef_client.h>
 #include <memory>
 #include <wrapper/cef_message_router.h>
-class BackendStorage;
+
+class BackendMessageHandler;
+
+template<typename HandlerType>
+class MessageDispatcher;
 
 class AppHandler : public CefClient,
                    public CefDisplayHandler,
@@ -81,7 +85,9 @@ private:
     CefRefPtr<CefMessageRouterBrowserSide> m_router;
 
 private:
-    std::unique_ptr<BackendStorage> m_backendStorage;
+    using Dispatcher = MessageDispatcher<BackendMessageHandler>;
+    std::unique_ptr<Dispatcher> m_messageDispatcher;  //! Dispatcher which is installed in the `m_router`.
+
     void installBackends();
 };
 

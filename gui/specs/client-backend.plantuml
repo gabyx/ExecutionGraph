@@ -3,6 +3,9 @@
 set namespaceSeparator ::
 skinparam shadowing false
 
+class CefMessageRouterBrowserSide
+class Handler as "CefMessageRouterBrowserSide::Handler"
+
 namespace cefapp{
     class App{
         + OnContextInitialized()
@@ -11,38 +14,36 @@ namespace cefapp{
         + OnAfterCreated()
         + OnBeforeCloses()
         - m_router
-        - m_backendStorage
+        - m_messageDispatcher
         - initializeBackends()
+    }
+
+    class MessageDispatcher {
+        + AddHandler(backendHandler)
+        + RemoveHandler(backendHandler)
+        - m_handlers
+        - m_handlerMap
     }
     class FileSchemeHandlerFactory
 }
 
-class CefMessageRouterBrowserSide
 
 cefapp::App ..> cefapp::AppHandler : creates
-cefapp::App -right-> cefapp::FileSchemeHandlerFactory : registers
+cefapp::App --> cefapp::FileSchemeHandlerFactory : registers
 
 cefapp::AppHandler "1" o-left- CefMessageRouterBrowserSide
-cefapp::AppHandler "1" *-down- backend::BackendStorage
+cefapp::AppHandler "1" *-- cefapp::MessageDispatcher
+cefapp::MessageDispatcher -left-|> Handler
+cefapp::MessageDispatcher "1..*" *--- backend::BackendMessageHandler
 
 namespace backend {
     class Backend #D3D3D3
     class BackendMessageHandler #D3D3D3{
-        - m_backend
         + OnQuery(...) {abstract} 
     }
 
-    class BackendStorage {
-        + RegisterBackend(backend)
-        + GetBackend(id)
-        + RegisterHandlersAtRouter(router)
-        + UnregisterHandlersAtRouter(router)
-        - m_backends
-        - m_backendHandlers
-    }
-
-    class BackendMessageHandlerFactory {
-        + std::optional<HandlerList> Create(rttr::type) {static}
+    class BackendFactory {
+        + BackendData Create() {static}
     }
 
     class CreatorExecutionGraphBackend
@@ -54,21 +55,18 @@ namespace executionGraph {
     class StaticFactory<T...>
 }
 
+cefapp::AppHandler ..> backend::BackendFactory : uses
 
-backend::BackendStorage "0...*" *-right- backend::Backend
-backend::BackendStorage "0...*" *-right- backend::BackendMessageHandler
-backend::BackendMessageHandler "1" *-- backend::Backend
-backend::BackendStorage .down.> backend::BackendMessageHandlerFactory : uses
+backend::ExecutionGraphBackend --|> backend::Backend
+backend::DummyBackendMsgHandler --|> backend::BackendMessageHandler
 
-cefapp::AppHandler .right.> backend::ExecutionGraphBackend : instanciates
+backend::BackendFactory ..> backend::CreatorExecutionGraphBackend : uses
 
-backend::ExecutionGraphBackend -up-|> backend::Backend
-backend::DummyBackendMsgHandler -up-|> backend::BackendMessageHandler
+backend::CreatorExecutionGraphBackend ..> backend::ExecutionGraphBackend : instanciates
+backend::CreatorExecutionGraphBackend ..> backend::DummyBackendMsgHandler : instanciates
 
-backend::BackendMessageHandlerFactory .down.> backend::CreatorExecutionGraphBackend : uses
+backend::DummyBackendMsgHandler "1" *-- backend::ExecutionGraphBackend
 
-backend::CreatorExecutionGraphBackend .down.> backend::ExecutionGraphBackend : uses
-backend::CreatorExecutionGraphBackend .down.> backend::DummyBackendMsgHandler : uses
+backend::BackendFactory .right.> executionGraph::StaticFactory
 
-backend::BackendMessageHandlerFactory .right.> executionGraph::StaticFactory
 @enduml

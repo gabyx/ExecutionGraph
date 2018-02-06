@@ -10,8 +10,8 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef FILE_SCHEME_HANDLER_FACTORY_H
-#define FILE_SCHEME_HANDLER_FACTORY_H
+#ifndef backend_File_Scheme_Handler_Factory_h
+#define backend_File_Scheme_Handler_Factory_h
 
 #include <cef_scheme.h>
 #include <string>

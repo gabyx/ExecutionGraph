@@ -14,6 +14,7 @@
 #define executionGraphGui_backend_DummyBackendMsgHandler_hpp
 
 #include "backend/BackendMessageHandler.hpp"
+#include "backend/ExecutionGraphBackend.hpp"
 
 class DummyBackendMsgHandler final : public BackendMessageHandler
 {
@@ -23,18 +24,22 @@ public:
     using Id = BackendMessageHandler::Id;
 
 public:
-    template<typename... Args>
-    DummyBackendMsgHandler(const Id& id = "DummyBackendMsgHandler", Args&&... args)
-        : BackendMessageHandler(id, std::forward<Args>(args)...)
+    DummyBackendMsgHandler(std::shared_ptr<ExecutionGraphBackend> backend,
+                           const Id& id = "DummyBackendMsgHandler")
+        : BackendMessageHandler(id)
     {
     }
 
+public:
     bool OnQuery(CefRefPtr<CefBrowser> browser,
                  CefRefPtr<CefFrame> frame,
                  int64 query_id,
                  const CefString& request,
                  bool persistent,
-                 CefRefPtr<Callback> callback) override;
+                 CefRefPtr<CefMessageRouterBrowserSide::Callback> callback) override;
+
+private:
+    std::shared_ptr<ExecutionGraphBackend> m_backend;
 };
 
 #endif

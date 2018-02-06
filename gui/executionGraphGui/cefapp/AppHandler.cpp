@@ -19,8 +19,8 @@
 #include <views/cef_window.h>
 #include <wrapper/cef_closure_task.h>
 #include <wrapper/cef_helpers.h>
-#include "backend/BackendStorage.hpp"
-#include "backend/ExecutionGraphBackend.hpp"
+#include "backend/BackendFactory.hpp"
+#include "cefapp/MessageDispatcher.hpp"
 #include "cefapp/PlatformTitleChanger.hpp"
 
 namespace
@@ -34,7 +34,7 @@ AppHandler::AppHandler(bool use_views)
     DCHECK(!g_instance);
     g_instance = this;
 
-    m_backendStorage = std::make_unique<BackendStorage>();
+    m_messageDispatcher = std::make_unique<Dispatcher>();
 }
 
 AppHandler::~AppHandler()
@@ -85,7 +85,7 @@ void AppHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
     {
         CefMessageRouterConfig config;
         m_router = CefMessageRouterBrowserSide::Create(config);
-        m_backendStorage->RegisterHandlersAtRouter(m_router);
+        m_router->AddHandler(m_messageDispatcher.get(), true);
     }
 }
 
@@ -133,7 +133,7 @@ void AppHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 
     if(m_router)
     {
-        m_backendStorage->UnregisterHandlersFromRouter(m_router);
+        m_router->RemoveHandler(m_messageDispatcher.get());
     }
 
     if(m_browserList.empty())
@@ -184,7 +184,11 @@ void AppHandler::CloseAllBrowsers(bool force_close)
 //! Install various backends and setup all of them.
 void AppHandler::installBackends()
 {
-    // Install the ExecutionGraph backend
-    auto execGraphBackend = std::make_shared<ExecutionGraphBackend>();
-    m_backendStorage->RegisterBackend(execGraphBackend);
+    // Install the executionGraph backend
+    BackendFactory::BackendData messageHandlers = BackendFactory::Create<ExecutionGraphBackend>();
+
+    for(auto& backendHandler : messageHandlers.second)
+    {
+        m_messageDispatcher->AddHandler(backendHandler);
+    }
 }

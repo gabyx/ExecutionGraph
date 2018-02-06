@@ -10,12 +10,17 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "backend/BackendMessageHandlerFactory.hpp"
+#include "backend/BackendFactory.hpp"
+#include <utility>
 #include "backend/DummyBackendMsgHandler.hpp"
 
-BackendMessageHandlerFactory::HandlerList
-BackendMessageHandlerFactory::CreatorExecutionGraphBackend::create(std::shared_ptr<Backend> backend)
+BackendFactory::BackendData
+BackendFactory::CreatorExecutionGraphBackend::create()
 {
+    // create the executionGraph backend
+    auto backend = std::make_shared<ExecutionGraphBackend>();
+
     // create a simple dummy handler
-    return {std::make_shared<DummyBackendMsgHandler>(backend)};
+    auto dummyHandler = std::make_shared<DummyBackendMsgHandler>(backend);
+    return BackendData{backend, {dummyHandler}};
 }

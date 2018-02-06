@@ -10,27 +10,31 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_backend_BackendMessageHandlerFactory_hpp
-#define executionGraphGui_backend_BackendMessageHandlerFactory_hpp
+#ifndef executionGraphGui_backend_BackendFactory_hpp
+#define executionGraphGui_backend_BackendFactory_hpp
 
 #include <executionGraph/common/Factory.hpp>
+#include <memory>
 #include <rttr/type>
+#include "backend/Backend.hpp"
 #include "backend/BackendMessageHandler.hpp"
 #include "backend/ExecutionGraphBackend.hpp"
 
-class BackendMessageHandlerFactory
+class BackendFactory
 {
 public:
-    //! This factory returns a list of backend handlers.
+    //! This factory returns the backend and a list of backend handlers.
+    //! The handlers internally share the backend, and will stay consistent!
     using HandlerList = std::vector<std::shared_ptr<BackendMessageHandler>>;
+    using BackendData = std::pair<std::shared_ptr<Backend>, HandlerList>;
 
 private:
     //! The creator which creates all handlers for the ExecutionGraphBackend.
     struct CreatorExecutionGraphBackend
     {
         using Key = ExecutionGraphBackend;
-        //! The actual creator function which creats all handlers for this key.
-        static HandlerList create(std::shared_ptr<Backend> backend);
+        //! The actual creator function which creates all handlers and the backend for this key.
+        static BackendData create();
     };
 
     //! The used factory itself.
@@ -39,10 +43,10 @@ private:
 public:
     //! Create all handlers for the backend `BackendType`.
     template<typename BackendType, typename... Args>
-    static HandlerList Create(Args&&... args) { return Factory::create<BackendType>(std::forward<Args>(args)...); }
+    static BackendData Create(Args&&... args) { return Factory::create<BackendType>(std::forward<Args>(args)...); }
     //! Create all handlers for the backend type given by an `rttr::type`.
     template<typename... Args>
-    static std::optional<HandlerList> Create(const rttr::type& type, Args&&... args)
+    static std::optional<BackendData> Create(const rttr::type& type, Args&&... args)
     {
         return Factory::create(type, std::forward<Args>(args)...);
     }

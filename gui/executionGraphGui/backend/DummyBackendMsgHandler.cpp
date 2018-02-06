@@ -17,7 +17,7 @@ bool DummyBackendMsgHandler::OnQuery(CefRefPtr<CefBrowser> browser,
                                      int64 query_id,
                                      const CefString& request,
                                      bool persistent,
-                                     CefRefPtr<Callback> callback)
+                                     CefRefPtr<CefMessageRouterBrowserSide::Callback> callback)
 {
     auto result = "received: " + request.ToString();
     callback->Success(result);

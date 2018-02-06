@@ -12,18 +12,17 @@ set(ExecutionGraphGUI_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/AppCLArgs.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/AppHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/AppHandler.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/MessageDispatcher.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/FileSchemeHandlerFactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/FileSchemeHandlerFactory.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.hpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/Backend.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendStorage.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendStorage.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendMessageHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendMessageHandler.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendMessageHandlerFactory.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendMessageHandlerFactory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendFactory.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendFactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/DummyBackendMsgHandler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/DummyBackendMsgHandler.cpp
 

@@ -16,33 +16,27 @@
 #include <executionGraph/common/IObjectID.hpp>
 #include <memory>
 #include <rttr/type>
-#include <wrapper/cef_message_router.h>
+#include <wrapper/cef_message_router.h>  //! @todo make forward declarations!
 #include "backend/Backend.hpp"
 
-class BackendMessageHandler : public CefMessageRouterBrowserSide::Handler,
-                              public executionGraph::IObjectID
+class BackendMessageHandler : public executionGraph::IObjectID
 {
     RTTR_ENABLE()
     EXECGRAPH_OBJECT_ID_DECLARATION
 
 public:
-    BackendMessageHandler(const Id& id,
-                          const std::shared_ptr<Backend>& backend = nullptr)
-        : m_id(id), m_backend(backend) {}
+    BackendMessageHandler(const Id& id)
+        : m_id(id) {}
+    BackendMessageHandler(const BackendMessageHandler&) = delete;
+    BackendMessageHandler& operator=(const BackendMessageHandler&) = delete;
 
-    // Called due to cefQuery execution in message_router.html.
+    //! @todo Probably make an own specialized query, with less cef garbage we dont need :-)
     virtual bool OnQuery(CefRefPtr<CefBrowser> browser,
                          CefRefPtr<CefFrame> frame,
                          int64 query_id,
                          const CefString& request,
                          bool persistent,
-                         CefRefPtr<Callback> callback) override = 0;
-
-private:
-    std::shared_ptr<Backend> m_backend;  //! The backend which is called from this message handler.
-
-private:
-    //DISALLOW_COPY_AND_ASSIGN(BackendMessageHandler);
+                         CefRefPtr<CefMessageRouterBrowserSide::Callback> callback) = 0;
 };
 
 #endif

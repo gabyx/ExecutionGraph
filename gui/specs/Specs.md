@@ -9,7 +9,7 @@ The communication between *client* and *backend* is done over the `./client/.../
 The application registers a file scheme handler factory `FileSchemeHandlerFactor` during `App::OnContextInitialized`. In this function, it also creates an application handler instance `AppHandler` which is forwarded to `CefBrowserHost::CreateBrowser`. 
 
 During `AppHandler::OnAfterCreated()`, the backends are registered in `AppHandler::initializeBackends()`. So far an instance of `ExecutionGraphBackend` is registered in the `m_backendStorage`. 
-Then, a browser-side router `m_router` of type `CefMessageRouterBrowserSide` is created and `BackendStorage::RegisterHandlersAtRouter(m_router)` is called which registers (by means of a factor `BackendMessageHandlerFactory`) all `BackendMessageHandlers` for all registered backends (in this case a `DummyBackendMsgHandler` for the single `ExecutionGraphBackend`). 
+Then, a browser-side router `m_router` of type `CefMessageRouterBrowserSide` is created and `BackendStorage::RegisterHandlersAtRouter(m_router)` is called which registers (by means of a factor `BackendFactory`) all `BackendMessageHandlers` for all registered backends (in this case a `DummyBackendMsgHandler` for the single `ExecutionGraphBackend`). 
 
 ## Overview of MessageHandler Types
 We need one message handlers for each of the following grouped functionalities:
