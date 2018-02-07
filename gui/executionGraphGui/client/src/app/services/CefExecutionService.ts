@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-
 import { ExecutionService } from './ExecutionService';
 import { CefMessageRouterService } from './CefMessageRouterService';
 
@@ -13,8 +12,12 @@ export class CefExecutionService extends ExecutionService {
     }
 
     public execute(): Promise<void> {
-        return this.messageRouter.execute("execute", {
-            graphId: "someGraphToExecute"
-        });
+        return this.messageRouter.execute("executeGraph",
+            {
+                "payload": {
+                    "graphId": 12,
+                    "args" : [1,2,3]
+                }
+            });
     }
 }

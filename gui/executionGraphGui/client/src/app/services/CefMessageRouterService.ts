@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
+import * as msgpack from 'msgpack-lite';
+import * as ab2s from 'arraybuffer-to-string';
 
 type CefRequest = {
-    request: string, 
+    request: string,
     persistent: boolean,
     onSuccess: (response: any) => any,
     onFailure: (errorCode: number, errorMessage: string) => void
@@ -28,8 +30,10 @@ export class CefMessageRouterService {
 
         return new Promise((resolve, reject) => {
             var requestString = JSON.stringify({requestId: requestId, payload: payload});
+            var requestBinary = ab2s(msgpack.encode(requestString)); // UInt8Array zu binary string
+
             this.cef.cefQuery({
-                request: requestString,
+                request: requestBinary,
                 persistent: false,
                 onSuccess: response => {
                     console.log(`[CefMessageRouterService] Response for '${requestId}': ${response}`);
