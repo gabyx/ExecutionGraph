@@ -11,12 +11,12 @@
 //! ========================================================================================
 
 #import <Cocoa/Cocoa.h>
+#include <spdlog/spdlog.h>
 #include <cef_application_mac.h>
 #include <wrapper/cef_helpers.h>
 #include "cefapp/App.hpp"
 #include "cefapp/AppCLArgs.hpp"
 #include "cefapp/AppHandler.hpp"
-//#include <rttr/type>
 
 // Receives notifications from the application.
 @interface SimpleAppDelegate : NSObject<NSApplicationDelegate>
@@ -120,6 +120,11 @@ int main(int argc, char* argv[]) {
   // Provide CEF with command-line arguments.
   CefMainArgs mainArgs(argc, argv);
   
+  // Make a core-logger
+  auto consoleLogger = spdlog::stdout_color_mt("core-logger");
+  spdlog::set_level(spdlog::level::debug);
+
+  // Parse command line arguments
   EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(AppCLArgs, appCLArgs, (argc,argv));
 
   // Initialize the AutoRelease pool.

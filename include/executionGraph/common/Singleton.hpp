@@ -47,6 +47,7 @@ namespace executionGraph
     public:
         static T& getInstance(void)
         {
+            EXECGRAPH_ASSERT(Creator::instance, "Singleton not instanciated!");
             return *Creator::instance;
         }
     };
@@ -54,12 +55,13 @@ namespace executionGraph
     template<typename T>
     T* Singleton<T>::Creator::instance = nullptr;
 
-//! Instanciate a singelton `name` with type `type` and ctor arguments `ctor_args`.
-#define EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(type, name, ctor_args) \
-    auto name = std::unique_ptr<type>(new type ctor_args);
-
-//! Instanciate a singelton `name` with type `type`.
-#define EXECGRAPH_INSTANCIATE_SINGLETON(type, name) INSTANCIATE_UNIQUE_SINGELTON_CTOR(type, name, ())
 }  // namespace executionGraph
+
+    //! Instanciate a singelton `name` with type `type` and ctor arguments `ctor_args`.
+#    define EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(type, name, ctor_args) \
+        auto name = std::unique_ptr<type>(new type ctor_args);
+
+    //! Instanciate a singelton `name` with type `type`.
+#    define EXECGRAPH_INSTANCIATE_SINGLETON(type, name) INSTANCIATE_UNIQUE_SINGELTON_CTOR(type, name, ())
 
 #endif

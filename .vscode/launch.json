@@ -42,11 +42,23 @@
             "MIMode": "lldb"
         },
         {
-            "name": "(lldb) ExecutionGraphGUI",
+            "name": "(lldb) ExecutionGraphGUI (client src from build folder)",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
             "args": ["--clientSourcePath", "${workspaceFolder}/build/gui/executionGraphGui/client/build/client"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        }
+        {
+            "name": "(lldb) ExecutionGraphGUI (client src from dist folder)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
+            "args": ["--clientSourcePath", "${workspaceFolder}/gui/executionGraphGui/client/dist"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

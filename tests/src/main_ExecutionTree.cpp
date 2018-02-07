@@ -153,9 +153,9 @@ MY_TEST(ExecutionTree_Test, IntBig)
             for(int i = 0; i < nNodes; ++i)
             {
                 vec[i] = std::move(std::make_unique<IntNode>(i));
-                // EXECGRAPH_LOG_TRACE_NE(vec[i]->getId() <<",");
+                EXECGRAPH_LOG_MSG(TRACE, vec[i]->getId() << ",");
             }
-            // EXECGRAPH_LOG_TRACE("")
+            EXECGRAPH_LOG_MSG(TRACE, std::endl);
 
             // Links
             std::vector<int> idWithConnectionToZero;

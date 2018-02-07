@@ -28,9 +28,10 @@ else()
     message(STATUS "args library found!")
 endif()
 
+find_package_handle_standard_args(ArgsLib DEFAULT_MSG args_INCLUDE_DIR)
+mark_as_advanced(args_INCLUDE_DIR)
+
 add_library(argsLib INTERFACE IMPORTED)
 set_property(TARGET argsLib PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${args_INCLUDE_DIR})
 
-find_package_handle_standard_args(ArgsLib DEFAULT_MSG args_INCLUDE_DIR)
-mark_as_advanced(args_INCLUDE_DIR)
 message(STATUS "args library added target: argsLib")

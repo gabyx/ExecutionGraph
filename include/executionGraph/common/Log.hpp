@@ -13,6 +13,7 @@
 #ifndef executionGraph_common_Log_hpp
 #define executionGraph_common_Log_hpp
 
+#include <spdlog/spdlog.h>
 #include "executionGraph/config/Config.hpp"
 
 #ifndef EXECGRAPH_FORCE_MSGLOG_LEVEL
@@ -31,10 +32,16 @@
 #define CONCAT(L) CONCATT(L)               // x and y will be expanded before the call to STEP2
 #define EXECGRAPH_LOGLEVEL_CURRENT CONCAT(EXECGRAPH_FORCE_MSGLOG_LEVEL)
 
-#define EXECGRAPH_LOGMSG_LEVEL(LEVEL, MSG, END)     \
+#define EXECGRAPH_LOGMSG(LEVEL, MSG)                \
     if(CONCAT(LEVEL) <= EXECGRAPH_LOGLEVEL_CURRENT) \
     {                                               \
-        std::cerr << "[" #LEVEL "] " << MSG END     \
+        std::cerr << MSG;                           \
+    }
+
+#define EXECGRAPH_LOGMSG_LEVEL(LEVEL, MSG)          \
+    if(CONCAT(LEVEL) <= EXECGRAPH_LOGLEVEL_CURRENT) \
+    {                                               \
+        std::cerr << "[" #LEVEL "] " << MSG;        \
     }
 
 // Undefine all log macros
@@ -48,33 +55,32 @@
 // Define only those which are active!
 #if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_TRACE
 #    undef EXECGRAPH_LOG_TRACE
-#    define EXECGRAPH_LOG_TRACE(MSG) EXECGRAPH_LOGMSG_LEVEL(TRACE, MSG, << std::endl;)
-#    define EXECGRAPH_LOG_TRACE_NE(MSG) EXECGRAPH_LOGMSG_LEVEL(TRACE, MSG, )
+#    define EXECGRAPH_LOG_TRACE(MSG) EXECGRAPH_LOGMSG_LEVEL(TRACE, MSG << std::endl)
 #endif
 
 #if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_DEBUG
 #    undef EXECGRAPH_LOG_DEBUG
-#    define EXECGRAPH_LOG_DEBUG(MSG) EXECGRAPH_LOGMSG_LEVEL(DEBUG, MSG, << std::endl;)
+#    define EXECGRAPH_LOG_DEBUG(MSG) EXECGRAPH_LOGMSG_LEVEL(DEBUG, MSG << std::endl)
 #endif
 
 #if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_INFO
 #    undef EXECGRAPH_LOG_INFO
-#    define EXECGRAPH_LOG_INFO(MSG) EXECGRAPH_LOGMSG_LEVEL(INFO, MSG, << std::endl;)
+#    define EXECGRAPH_LOG_INFO(MSG) EXECGRAPH_LOGMSG_LEVEL(INFO, MSG << std::endl)
 #endif
 
 #if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_WARN
 #    undef EXECGRAPH_LOG_WARN
-#    define EXECGRAPH_LOG_WARN(MSG) EXECGRAPH_LOGMSG_LEVEL(WARN, MSG, << std::endl;)
+#    define EXECGRAPH_LOG_WARN(MSG) EXECGRAPH_LOGMSG_LEVEL(WARN, MSG << std::endl)
 #endif
 
 #if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_ERROR
 #    undef EXECGRAPH_LOG_ERROR
-#    define EXECGRAPH_LOG_ERROR(MSG) EXECGRAPH_LOGMSG_LEVEL(ERROR, MSG, << std::endl;)
+#    define EXECGRAPH_LOG_ERROR(MSG) EXECGRAPH_LOGMSG_LEVEL(ERROR, MSG << std::endl)
 #endif
 
 #if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_FATAL
 #    undef EXECGRAPH_LOG_FATAL
-#    define EXECGRAPH_LOG_FATAL(MSG) EXECGRAPH_LOGMSG_LEVEL(FATAL, MSG, << std::endl;)
+#    define EXECGRAPH_LOG_FATAL(MSG) EXECGRAPH_LOGMSG_LEVEL(FATAL, MSG << std::endl)
 #endif
 
 #undef CONCAT1

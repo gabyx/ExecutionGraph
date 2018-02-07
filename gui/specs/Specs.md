@@ -51,23 +51,37 @@ https://github.com/dcodeIO/ProtoBuf.js/
 
 
 ## Message Specification: Graph Manipulation Queries
-Adding a node to the execution graph means:
-Client -> Backend:
+### Adding Node:
+*Message*
 ```json
 {
-    "messageType" : "addNode",
-    "graphId" : ${guid},
-    "nodeType" : "MyStupidSquareRoot",
-    "constructorArgs" : ${args},
-    ...
+    "requestId" : "addNode",
+    "payload" : {
+        "version" : 0,
+        "graphId" : ${guid},
+        "nodeType" : "${nodeTypeName}",
+        "constructorArgs" : ${args} 
+    }
 }
 ```
 
-Backend -> Client:
+*Success-Response*:
 ```json
 {
-    "messageType" : "addNode-response",
-    "nodeId" : 3
-    ...
+    "responseId" : "addNode",
+    "payload" : {
+        "version" : 0,
+        "nodeId" : 3
+    }
+}
+```
+
+*Failure-Response*:
+```json
+{
+    "responseId" : "addNode",
+    "payload" : {
+        "exception" : "..."
+    }
 }
 ```
