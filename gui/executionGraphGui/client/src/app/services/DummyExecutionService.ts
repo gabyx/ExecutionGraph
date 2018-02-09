@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ExecutionService } from './ExecutionService';
 
-import { binaryXHRRequest, RequestResult } from './BinaryXHRRequest';
+import { binaryXHRRequest, RequestResult } from '../common/BinaryXHRRequest';
 import * as msgpack from 'msgpack-lite';
 
 @Injectable()
