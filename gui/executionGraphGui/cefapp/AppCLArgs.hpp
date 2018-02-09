@@ -30,9 +30,11 @@ public:
     //@{
 public:
     std::path getClientSourcePath() { return args::get(m_clientSourcePath); }
+    std::path getLogPath() { return args::get(m_logPath); }
 
 private:
-    args::ValueFlag<std::string> m_clientSourcePath;
+    args::ValueFlag<std::string> m_clientSourcePath;  //!< Path to the client source files (anuglar application)
+    args::ValueFlag<std::string> m_logPath;           //!< Path where all logs are placed
     //@}
 };
 

@@ -10,20 +10,18 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef backend_File_Scheme_Handler_Factory_h
-#define backend_File_Scheme_Handler_Factory_h
+#ifndef cefapp_File_Scheme_Handler_Factory_h
+#define cefapp_File_Scheme_Handler_Factory_h
 
 #include <cef_scheme.h>
 #include <string>
 #include "executionGraph/common/FileSystem.hpp"
 
 // Implementation of the factory for creating client request handlers.
-class FileSchemeHandlerFactory : public CefSchemeHandlerFactory
+class BackendSchemeHandlerFactory : public CefSchemeHandlerFactory
 {
 public:
-    FileSchemeHandlerFactory(std::path folderPath, std::path pathPrefix)
-        : m_folderPath(folderPath)
-        , m_pathPrefix(pathPrefix)
+    BackendSchemeHandlerFactory(std::path pathPrefix), m_pathPrefix(pathPrefix)
     {
     }
 
@@ -33,10 +31,9 @@ public:
                                                  CefRefPtr<CefRequest> request) override;
 
 private:
-    const std::path m_folderPath;  //! Where the files this handler serves are located.
-    const std::path m_pathPrefix;  //! Prefix of the URL Path part.
+    const std::path m_pathPrefix;
 
-    IMPLEMENT_REFCOUNTING(FileSchemeHandlerFactory)
+    IMPLEMENT_REFCOUNTING(BackendSchemeHandlerFactory)
 };
 
 #endif

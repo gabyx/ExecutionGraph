@@ -22,6 +22,12 @@ AppCLArgs::AppCLArgs(int argc, char* argv[])
                          "Source path to the client application.",
                          {'c', "clientSourcePath"},
                          this->getApplicationPath().parent_path().append("/../client"))
+    , m_logPath(m_parser,
+                "logPath",
+                "Directory path where all logs are placed.",
+                {'l', "logPath"},
+                this->getApplicationPath().parent_path().append("/../"))
+
 {
     args::HelpFlag help(m_parser, "help", "Display this help menu.", {'h', "help"});
 

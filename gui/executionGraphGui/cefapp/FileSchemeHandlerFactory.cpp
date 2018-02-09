@@ -11,8 +11,9 @@
 //! ========================================================================================
 #include "FileSchemeHandlerFactory.hpp"
 #include <cef_parser.h>
-#include <iostream>
 #include <wrapper/cef_stream_resource_handler.h>
+#include "cefapp/Loggers.hpp"
+#include "cefapp/SchemeHandlerHelper.hpp"
 
 CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrowser> browser,
                                                                CefRefPtr<CefFrame> frame,
@@ -29,48 +30,20 @@ CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrow
 
         // e.g. "////host/folderA/folderB/file.ext"
         std::string temp = CefString(urlParts.path.str).ToString();
-        auto itC         = temp.begin();
-        while(itC != temp.end() && *itC == '/')
-        {
-            ++itC;
-        }
-        std::path url(itC, temp.end());
-        // e.g. url : "host/folderA/folderB/file.ext""
+        auto filePath    = schemeHandlerHelper::splitPrefixFromPath(temp, m_pathPrefix);
 
-        // Split urlPrefix from front (e.g "host/folderA")
-        auto it        = url.begin();
-        auto itEnd     = url.end();
-        auto itPref    = m_urlPrefix.begin();
-        auto itPrefEnd = m_urlPrefix.end();
-        for(; it != itEnd && itPref != itPrefEnd; ++it, ++itPref)
+        if(!filePath)
         {
-            if(*itPref != *it)
-            {
-                break;
-            }
-        }
-        if(itPref != itPrefEnd)
-        {
-            // Could not split urlPrefix
+            EXECGRAPHGUI_APPLOG_ERROR("FileSchemeHandlerFactory: requestUrl '%s' failed!", requestUrl);
             return nullptr;
         }
 
-        // Make new filePath from "m_folderPath + rest"
-        std::path filePath;
-        while(it != itEnd)
-        {
-            filePath /= *it++;
-        }
-        if(filePath.empty())
-        {
-            return nullptr;
-        }
-        filePath                              = m_folderPath / filePath;
-        CefRefPtr<CefStreamReader> fileStream = CefStreamReader::CreateForFile(filePath.string());
+        filePath                              = m_folderPath / *filePath;
+        CefRefPtr<CefStreamReader> fileStream = CefStreamReader::CreateForFile(filePath->string());
         if(fileStream != nullptr)
         {
             // "ext"
-            std::string fileExtension = filePath.extension().string().substr(1);
+            std::string fileExtension = filePath->extension().string().substr(1);
             CefString mimeType(CefGetMimeType(fileExtension));
             //todo: Complete known mime times with web-font extensions
             if(mimeType.empty())

@@ -17,6 +17,7 @@
 #include "cefapp/App.hpp"
 #include "cefapp/AppCLArgs.hpp"
 #include "cefapp/AppHandler.hpp"
+#include "cefapp/Loggers.hpp"
 
 // Receives notifications from the application.
 @interface SimpleAppDelegate : NSObject<NSApplicationDelegate>
@@ -120,12 +121,11 @@ int main(int argc, char* argv[]) {
   // Provide CEF with command-line arguments.
   CefMainArgs mainArgs(argc, argv);
   
-  // Make a core-logger
-  auto consoleLogger = spdlog::stdout_color_mt("core-logger");
-  spdlog::set_level(spdlog::level::debug);
-
   // Parse command line arguments
   EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(AppCLArgs, appCLArgs, (argc,argv));
+
+  // Make all application loggers
+  EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(Loggers, loggers, (AppCLArgs::getInstance().getLogPath()) );
 
   // Initialize the AutoRelease pool.
   NSAutoreleasePool* autopool = [[NSAutoreleasePool alloc] init];

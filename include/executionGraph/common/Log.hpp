@@ -13,7 +13,6 @@
 #ifndef executionGraph_common_Log_hpp
 #define executionGraph_common_Log_hpp
 
-#include <spdlog/spdlog.h>
 #include "executionGraph/config/Config.hpp"
 
 #ifndef EXECGRAPH_FORCE_MSGLOG_LEVEL
