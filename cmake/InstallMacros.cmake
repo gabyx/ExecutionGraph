@@ -1,6 +1,6 @@
 macro(getIncludeInstallFolderPostfix PATH RESULT)
     get_filename_component(dir "${PATH}" DIRECTORY)
-    message(STATUS ${dir})
+    #message(STATUS ${dir})
     string(REGEX MATCH "include/(executionGraph.*)" _Dummy "${dir}")
     set(${RESULT} ${CMAKE_MATCH_1})
     #message(STATUS ${${RESULT}})

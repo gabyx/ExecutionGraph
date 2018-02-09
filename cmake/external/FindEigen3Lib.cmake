@@ -24,7 +24,6 @@ if(NOT EXISTS "${EIGEN3_INCLUDE_DIR}")
     # define a path in the cache where to find this downloaded library
     set(EIGEN3_DIR "${CMAKE_BINARY_DIR}/external/install/eigen" CACHE STRING "eigen directory" FORCE)
 else()
-
     message(STATUS "eigen3 library found!")
 endif()
 

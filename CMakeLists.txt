@@ -159,11 +159,14 @@ list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "argsLib")
 
 # Try to find the RTTR Library (use our own script)
 find_package(RTTRLib REQUIRED)
-list(APPEND ExecutionGraph_LINK_TARGETS_GUI_DEP "RTTR::Core")
+list(APPEND ExecutionGraph_LINK_TARGETS_GUI_DEP "rttrLib")
 
 # Try to find the crossguid Library (use our own script)
 find_package(CrossGUIDLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "crossguidLib")
+
+find_package(CerealLib REQUIRED)
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "cerealLib")
 
 if(ExecutionGraph_USE_OPENMP)
 

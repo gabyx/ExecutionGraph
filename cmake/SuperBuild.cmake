@@ -7,21 +7,21 @@ include (ExternalProject)
 set(ExecutionGraph_DEPENDENCIES)
 set(EXTRA_CMAKE_ARGS)
 
-include(FindEigen3Lib)
-include(FindMetaLib)
+include(FindEigen3Lib) # not really dependency yet
+include(FindMetaLib) # needed
+
+include(FindCerealLib) # for serialization
+include(FindSpdLogLib) # for logging
+include(FindArgsLib) # for commandline args
+include(FindCrossGUIDLib) # guid
 
 if(${ExecutionGraph_BUILD_GUI})
-    include(FindArgsLib)
-    include(FindCrossGUIDLib)
     include(FindCEFLib)
-    
     include(FindRTTRLib)
-    list (APPEND DEPENDENCIES ${RTTR_TARGET})
 endif()
 
 if(${ExecutionGraph_BUILD_TESTS})
     include(FindGoogleTestLib)
-    list (APPEND DEPENDENCIES google)
 endif()
 
 

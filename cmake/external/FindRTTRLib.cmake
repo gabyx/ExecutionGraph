@@ -6,13 +6,13 @@ include(FindPackageHandleStandardArgs)
 # Try to find the library, if it is installed!
 # otherwise download it
 set(INSTALL_DIR "${ExecutionGraph_EXTERNAL_INSTALL_DIR}/rttr")
-
 set(RTTR_COMPONENTS CORE)
 
-message(STATUS "rttr library (super-build): finding...:")
-find_package(RTTR QUIET CONFIG COMPONENTS ${RTTR_COMPONENTS})
+message(STATUS "rttr library finding ...")
+find_package(RTTR QUIET CONFIG COMPONENTS ${RTTR_COMPONENTS} PATHS ${INSTALL_DIR})
 
 if(${USE_SUPERBUILD})
+
     if(NOT TARGET "RTTR::Core")
 
         message(STATUS "rttr library: targer not found -> download from https://github.com/gabyx/rttr.git")
@@ -31,21 +31,22 @@ if(${USE_SUPERBUILD})
                             INSTALL_DIR "${INSTALL_DIR}")
 
         message(STATUS "rttr library downloaded -> build it!")
-    else()
-        message(STATUS "rttr library found! no build necessary")
     endif()
 
 else()
     if(NOT TARGET "RTTR::Core")
-        # Try again but with the super build install dir:
-        message(STATUS "rttr library: finding in super build folder...")
-        find_package(RTTR QUIET CONFIG COMPONENTS ${RTTR_COMPONENTS} PATHS ${INSTALL_DIR})
+        if(${RTTRLib_FIND_REQUIRED})
+            message(FATAL_ERROR "rttr library could not be found!")
+        else()
+            message(WARNING "rttr library could not be found!")
+        endif()
     endif()
+endif()
 
-    if(NOT TARGET "RTTR::Core" AND ${RTTRLib_FIND_REQUIRED})
-        message(FATAL_ERROR "rttr library could not be found!")
-    else()
-        message(STATUS "rttr library found! Config File: ${RTTR_CONFIG}")
-        message(STATUS "rttr library added targets: RTTR::Core")
-    endif()
+if(TARGET "RTTR::Core")
+    add_library(rttrLib INTERFACE IMPORTED)
+    set_property(TARGET rttrLib PROPERTY INTERFACE_LINK_LIBRARIES RTTR::Core)
+
+    message(STATUS "rttr library found! Config File: ${RTTR_CONFIG}")
+    message(STATUS "rttr library added targets: rttrLib")
 endif()

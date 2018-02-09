@@ -13,11 +13,9 @@ if(NOT EXISTS spdlog_INCLUDE_DIR)
                     GIT_REPOSITORY      https://github.com/gabime/spdlog 
                     GIT_TAG             master
                     GIT_SHALLOW         OFF
-                    ${UPDATE_DISCONNECTED_IF_AVAILABLE})
+                    UPDATE_DISCONNECTED 1)
 
     set(spdlog_INCLUDE_DIR "${spdlog_SOURCE_DIR}/include" CACHE PATH "spdlog library (https://github.com/gabime/spdlog) include directory" FORCE)
-    set(spdlog_DIR "${spdlog_INCLUDE_DIR}" CACHE PATH "spdlog library directory" FORCE)
-
 else()
     message(STATUS "spdlog library found!")
 endif()

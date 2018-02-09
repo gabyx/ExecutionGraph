@@ -24,18 +24,10 @@ if(NOT EXISTS ${CEF_ROOT})
 
         message(STATUS "CEF library (super-build): not found -> download from ${CEF_URL}")
 
-        # Download CEF3
-        include(DownloadProject)
-        if (CMAKE_VERSION VERSION_LESS 3.2)
-            set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
-        else()
-            set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
-        endif()
-
-        download_project(PROJ "cefbinaries"
-                        PREFIX     "${ExecutionGraph_EXTERNAL_BUILD_DIR}/cefbinaries"
-                        URL        ${CEF_URL}
-                        ${UPDATE_DISCONNECTED_IF_AVAILABLE})
+        download_project(PROJ               "cefbinaries"
+                        PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/cefbinaries"
+                        URL                 ${CEF_URL}
+                        UPDATE_DISCONNECTED 1)
 
         set(CEF_ROOT "${cefbinaries_SOURCE_DIR}" CACHE PATH "CEF director path" FORCE)
     endif()

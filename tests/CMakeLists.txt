@@ -61,21 +61,26 @@ function(defineCompileDefs target)
 endfunction()
 
 # NodeTests
-set(EXEC_NAME1 ${PROJECT_NAME}Test-LogicNodes)
-add_executable(${EXEC_NAME1}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_LogicNode.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-defineCompileDefs(${EXEC_NAME1})
+set(EXEC_NAME ${PROJECT_NAME}Test-LogicNodes)
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_LogicNode.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME})
 
 #ExecutionTree Test
-set(EXEC_NAME2 ${PROJECT_NAME}Test-ExecutionTree)
-add_executable(${EXEC_NAME2}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_ExecutionTree.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-defineCompileDefs(${EXEC_NAME2})
+set(EXEC_NAME ${PROJECT_NAME}Test-ExecutionTree)
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_ExecutionTree.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME})
 
 #ExecutionTree Test
-set(EXEC_NAME3 ${PROJECT_NAME}Test-CustomSocketTypes)
-add_executable(${EXEC_NAME3}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_CustomSocketTypes.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-defineCompileDefs(${EXEC_NAME3})
+set(EXEC_NAME ${PROJECT_NAME}Test-CustomSocketTypes)
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_CustomSocketTypes.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME})
 
 #Factory Test
-set(EXEC_NAME4 ${PROJECT_NAME}Test-Factory)
-add_executable(${EXEC_NAME4}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Factory.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-defineCompileDefs(${EXEC_NAME4})
+set(EXEC_NAME ${PROJECT_NAME}Test-Factory)
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Factory.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME})
+
+# JSON Test
+set(EXEC_NAME ${PROJECT_NAME}Test-Json)
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Json.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME})
