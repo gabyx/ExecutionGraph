@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ExecutionService } from './ExecutionService';
 
+import { binaryXHRRequest, RequestResult } from './BinaryXHRRequest';
 import * as msgpack from 'msgpack-lite';
-import * as ab2s from 'arraybuffer-to-string';
 
 @Injectable()
 export class DummyExecutionService extends ExecutionService {
@@ -12,19 +12,26 @@ export class DummyExecutionService extends ExecutionService {
     }
 
     public execute(): Promise<void> {
-        return new Promise((resolve, reject) => {
+        console.log(`[DummyExecutionService] execute()`);
 
-            var requestBinary = msgpack.encode({
-                "requestId": "executeGraph",
-                "payload": {
-                    "graphId": 12,
-                    "args" : [1,2,3]
-                }
-            }) as Uint8Array;
-            console.log("Dummy binary:", requestBinary);
-            console.log("Dummy binary as string:", ab2s(requestBinary, 'binary'));
-            console.log(`[DummyExecutionService] execute()`);
-            resolve();
+        var message = msgpack.encode({
+            "requestId": "addNode",
+            "payload": {
+                "graphId": 12,
+                "args": [1, 2, 3]
+            }
+        }) as Uint8Array;
+
+        return new Promise((resolve, reject) => {
+            binaryXHRRequest('post', "backend://executionGraph/addNode", 3 , message).then(
+                (requestResult: RequestResult) => {
+                    console.log(`[DummyExecutionService] binaryXHRRequest() success: ${requestResult.statusText}`);
+                    resolve("`[DummyExecutionService] binaryXHRRequest() success");
+                },
+                (requestResult: RequestResult) => {
+                    console.log(`[DummyExecutionService] binaryXHRRequest() failed: ${requestResult.statusText}`);
+                    reject("[DummyExecutionService] binaryXHRRequest() failed");
+                });
         })
     }
 }

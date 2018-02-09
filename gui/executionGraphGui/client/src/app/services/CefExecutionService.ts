@@ -16,7 +16,7 @@ export class CefExecutionService extends ExecutionService {
             {
                 "payload": {
                     "graphId": 12,
-                    "args" : [1,2,3]
+                    "args": [1, 2, 3]
                 }
             });
     }

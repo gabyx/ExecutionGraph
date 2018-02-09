@@ -109,36 +109,6 @@
             "${commentbegin}",
             "${commentbegin}${license}",
             "${commentbegin}${bar}"
-        ],
-        ".cpp": [
-            "${commentbegin}${bar}",
-            "${commentbegin}${header}",
-            "${commentbegin}",
-            "${commentbegin} @date ${date}",
-            "${commentbegin} @author ${authorName}, ${authorEmail}",
-            "${commentbegin}",
-            "${commentbegin}${license}",
-            "${commentbegin}${bar}"
-        ],
-        ".hpp": [
-            "${commentbegin}${bar}",
-            "${commentbegin}${header}",
-            "${commentbegin}",
-            "${commentbegin} @date ${date}",
-            "${commentbegin} @author ${authorName}, ${authorEmail}",
-            "${commentbegin}",
-            "${commentbegin}${license}",
-            "${commentbegin}${bar}"
-        ],
-        ".ts": [
-            "${commentbegin}${bar}",
-            "${commentbegin}${header}",
-            "${commentbegin}",
-            "${commentbegin} @date ${date}",
-            "${commentbegin} @author ${authorName}, ${authorEmail}",
-            "${commentbegin}",
-            "${commentbegin}${license}",
-            "${commentbegin}${bar}"
         ]
     },
     "files.exclude": {
