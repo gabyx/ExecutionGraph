@@ -6,6 +6,10 @@ Fast Execution Graph consisting of Execution Nodes
 Be able to design and run such input/output graphs, such as this one used in [http://gabyx.github.io/GRSFramework/#videos] :
 ![Execution Graphs like this](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)
 
+## Contributors
+- Gabriel Nützi (graph)
+- Simon Spörri (gui, graph)
+
 ## Installing and Dependencies
 To build the library, the tests and the example you need the build tool [cmake](
 http://www.cmake.org).
@@ -19,6 +23,7 @@ This library has these dependencies:
 - [json](https://github.com/nlohmann/json) (for GUI only)
 - [CEF](https://github.com/chromiumembedded/cef-project) (for GUI only)
 - [rttr](https://github.com/rttrorg/rttr) (for GUI only)
+- [spdlog](https://github.com/gabime/spdlog) (for GUI only)
 - [benchmark](https://github.com/google/benchmark)
 
 The library `Eigen`, `meta`, `rttr` can be installed in some system specific location. However, all dependencie are searched, downloaded and build if not found, during the first super build run.
