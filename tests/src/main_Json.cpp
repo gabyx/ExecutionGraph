@@ -38,10 +38,12 @@ CEREAL_CLASS_VERSION(Message, 32);
 MY_TEST(JsonTest, Test1)
 {
     std::ostringstream os;
-    cereal::JSONOutputArchive archive(os);
+    {
+        cereal::JSONOutputArchive archive(os);
+        Message myData{1, 3, 4.0};
+        archive(CEREAL_NVP(myData));
+    }
 
-    Message myData{1, 3, 4.0};
-    archive(CEREAL_NVP(myData));
     std::cout << os.str() << std::endl;
 }
 
