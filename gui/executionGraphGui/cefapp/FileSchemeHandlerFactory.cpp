@@ -34,7 +34,7 @@ CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrow
 
         if(!filePath)
         {
-            EXECGRAPHGUI_APPLOG_ERROR("FileSchemeHandlerFactory: requestUrl '%s' failed!", requestUrl);
+            EXECGRAPHGUI_APPLOG_ERROR("FileSchemeHandlerFactory: requestUrl '{0}' failed!", requestUrl);
             return nullptr;
         }
 
@@ -50,6 +50,8 @@ CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrow
             {
                 mimeType = "font/" + fileExtension;
             }
+
+            EXECGRAPHGUI_APPLOG_INFO("FileSchemeHandlerFactory: requestUrl '{0}' handled!", requestUrl);
             return CefRefPtr<CefStreamResourceHandler>(new CefStreamResourceHandler(mimeType, fileStream));
         }
     }

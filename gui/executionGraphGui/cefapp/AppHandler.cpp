@@ -20,6 +20,7 @@
 #include <wrapper/cef_closure_task.h>
 #include <wrapper/cef_helpers.h>
 #include "backend/BackendFactory.hpp"
+#include "cefapp/BackendSchemeHandlerFactory.hpp"
 #include "cefapp/MessageDispatcher.hpp"
 #include "cefapp/PlatformTitleChanger.hpp"
 
@@ -184,6 +185,11 @@ void AppHandler::CloseAllBrowsers(bool force_close)
 //! Install various backends and setup all of them.
 void AppHandler::installBackends()
 {
+    // Install the URL RequestHandler for the backend
+    CefRegisterSchemeHandlerFactory("backend",
+                                    "executionGraph",
+                                    new BackendSchemeHandlerFactory("executionGraph"));
+
     // Install the executionGraph backend
     BackendFactory::BackendData messageHandlers = BackendFactory::Create<ExecutionGraphBackend>();
 

@@ -14,7 +14,7 @@
 
 Loggers::Loggers(const std::path& logPath)
 {
-    auto format  = "[%H:%M:%S,%e] [%I] [%n] [tid: %t] : %v";
+    auto format  = "[%H:%M:%S,%e] [%l] [%n] [tid: %t] : %v";
     auto logFile = logPath / "AppLog.log";
 
     try

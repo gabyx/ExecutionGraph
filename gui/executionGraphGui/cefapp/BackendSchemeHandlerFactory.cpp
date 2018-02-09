@@ -13,6 +13,7 @@
 #include <cef_parser.h>
 #include <wrapper/cef_stream_resource_handler.h>
 #include "cefapp/Loggers.hpp"
+#include "cefapp/SchemeHandlerHelper.hpp"
 
 CefRefPtr<CefResourceHandler> BackendSchemeHandlerFactory::Create(CefRefPtr<CefBrowser> browser,
                                                                   CefRefPtr<CefFrame> frame,
@@ -23,6 +24,7 @@ CefRefPtr<CefResourceHandler> BackendSchemeHandlerFactory::Create(CefRefPtr<CefB
     CefURLParts urlParts;
     if(CefParseURL(request->GetURL(), urlParts))
     {
+        std::string query = CefString(urlParts.query.str).ToString();
         //! todo: why do we get here a urlParts.path.str as "//host/folderA/folderB"
         //! Shouldnt it be : "folderA/folderB".
         //! the host is somehow not parsed?: http://www.magpcss.org/ceforum/viewtopic.php?f=6&t=6048
@@ -33,16 +35,16 @@ CefRefPtr<CefResourceHandler> BackendSchemeHandlerFactory::Create(CefRefPtr<CefB
 
         if(!path)
         {
-            EXECGRAPHGUI_APPLOG_ERROR("BackendSchemeHandlerFactory: requestUrl '%s' failed!");
-            return;
+            EXECGRAPHGUI_APPLOG_ERROR("BackendSchemeHandlerFactory: requestUrl '{0}' failed!", requestUrl);
+            return nullptr;
         }
 
-        std::string requestId = path.filename();
-        EXECGRAPHGUI_ASSERTMSG(!requestId.empty(), "Empty request ID: %s", requestId)
+        std::string requestId = path->filename();
+        EXECGRAPHGUI_ASSERTMSG(!requestId.empty(), "Empty requestId in '{0}'!", requestUrl);
 
-        //EXECGRAPHGUI_APPLOG_DEBUG("BackendSchemeHandlerFactory:: Received requestId: '%s', query: '%s'", requestId, urlParts.query.str);
+        EXECGRAPHGUI_APPLOG_DEBUG("BackendSchemeHandlerFactory:: Received requestId: '{0}', query: '{1}'", requestId, query);
     }
 
-    //EXECGRAPHGUI_APPLOG_ERROR("BackendSchemeHandlerFactory: requestUrl '%s' failed!");
+    EXECGRAPHGUI_APPLOG_ERROR("BackendSchemeHandlerFactory: requestUrl '{0}' failed!", requestUrl);
     return nullptr;
 }

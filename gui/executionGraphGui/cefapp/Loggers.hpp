@@ -33,7 +33,7 @@ private:
     std::unique_ptr<spdlog::logger> m_appLog;      //! Log for the app (mutlti-threaded)
 };
 
-    // Undef all macros
+// Undef all macros
 #    define EXECGRAPHGUI_APPLOG_TRACE(...)
 #    define EXECGRAPHGUI_APPLOG_DEBUG(...)
 #    define EXECGRAPHGUI_APPLOG_INFO(...)
@@ -48,7 +48,7 @@ private:
 #    define EXECGRAPHGUI_BACKENDLOG_ERROR(...)
 #    define EXECGRAPHGUI_BACKENDLOG_FATAL(...)
 
-    // Define only those which are active!
+// Define only those which are active!
 #    if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_TRACE
 #        undef EXECGRAPHGUI_APPLOG_TRACE
 #        define EXECGRAPHGUI_APPLOG_TRACE(...) Loggers::getInstance().getAppLogger().trace(__VA_ARGS__)
@@ -92,13 +92,16 @@ private:
 #    endif
 
     // Define some asserts
-#    define EXECGRAPHGUI_ASSERTMSG(condition, ...)                                    \
-        {                                                                             \
-            if(!(condition))                                                          \
-            {                                                                         \
-                EXECGRAPHGUI_APPLOG_FATAL(__VA_ARGS__);                               \
-                EXECGRAPH_THROW_EXCEPTION("Exception: @ " __FILE__ "(" __LINE__ ")"); \
-            }                                                                         \
+#    define EXECGRAPH_STRINGIFY(x) #    x
+#    define EXECGRAPH_TOSTRING(x) EXECGRAPH_STRINGIFY(x)
+
+#    define EXECGRAPHGUI_ASSERTMSG(condition, ...)                                                        \
+        {                                                                                                 \
+            if(!(condition))                                                                              \
+            {                                                                                             \
+                EXECGRAPHGUI_APPLOG_FATAL(__VA_ARGS__);                                                   \
+                EXECGRAPH_THROW_EXCEPTION("Exception: @ " __FILE__ "(" EXECGRAPH_TOSTRING(__LINE__) ")"); \
+            }                                                                                             \
         }
 
 #endif

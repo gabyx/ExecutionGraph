@@ -81,6 +81,7 @@ void App::OnContextInitialized()
     const bool use_views = false;
 #endif
 
+    // Register the URL Scheme handler for the client (angular application)
     CefRegisterSchemeHandlerFactory("client",
                                     "executionGraph",
                                     new FileSchemeHandlerFactory(m_clientSourcePath, "executionGraph"));

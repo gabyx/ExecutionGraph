@@ -17,8 +17,8 @@
 #include <string>
 #include "executionGraph/common/FileSystem.hpp"
 
-// Implementation of the factory for creating client request handlers.
-class FileSchemeHandlerFactory : public CefSchemeHandlerFactory
+//! Factory for creating client request handlers.
+class FileSchemeHandlerFactory final : public CefSchemeHandlerFactory
 {
 public:
     FileSchemeHandlerFactory(std::path folderPath, std::path pathPrefix)
@@ -26,6 +26,7 @@ public:
         , m_pathPrefix(pathPrefix)
     {
     }
+    virtual ~FileSchemeHandlerFactory() = default;
 
     virtual CefRefPtr<CefResourceHandler> Create(CefRefPtr<CefBrowser> browser,
                                                  CefRefPtr<CefFrame> frame,

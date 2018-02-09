@@ -52,7 +52,7 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "lldb"
-        }
+        },
         {
             "name": "(lldb) ExecutionGraphGUI (client src from dist folder)",
             "type": "cppdbg",

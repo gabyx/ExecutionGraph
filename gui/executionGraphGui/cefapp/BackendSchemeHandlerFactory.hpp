@@ -14,16 +14,17 @@
 #define cefapp_File_Scheme_Handler_Factory_h
 
 #include <cef_scheme.h>
-#include <string>
 #include "executionGraph/common/FileSystem.hpp"
 
-// Implementation of the factory for creating client request handlers.
-class BackendSchemeHandlerFactory : public CefSchemeHandlerFactory
+//! Factory for creating client request handlers.
+class BackendSchemeHandlerFactory final : public CefSchemeHandlerFactory
 {
 public:
-    BackendSchemeHandlerFactory(std::path pathPrefix), m_pathPrefix(pathPrefix)
+    BackendSchemeHandlerFactory(const std::path& pathPrefix)
+        : m_pathPrefix(pathPrefix)
     {
     }
+    virtual ~BackendSchemeHandlerFactory() = default;
 
     virtual CefRefPtr<CefResourceHandler> Create(CefRefPtr<CefBrowser> browser,
                                                  CefRefPtr<CefFrame> frame,
