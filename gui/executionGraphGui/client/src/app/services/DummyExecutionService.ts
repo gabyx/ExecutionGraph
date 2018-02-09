@@ -23,7 +23,7 @@ export class DummyExecutionService extends ExecutionService {
         }) as Uint8Array;
 
         return new Promise((resolve, reject) => {
-            binaryXHRRequest('post', "backend://executionGraph/addNode", 3 , message).then(
+            binaryXHRRequest('post', "backend://executionGraph/addNode", undefined , message).then(
                 (requestResult: RequestResult) => {
                     console.log(`[DummyExecutionService] binaryXHRRequest() success: ${requestResult.statusText}`);
                     resolve("`[DummyExecutionService] binaryXHRRequest() success");
