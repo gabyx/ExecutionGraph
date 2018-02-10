@@ -6,6 +6,7 @@ import { MatIconModule, MatToolbarModule, MatMenuModule, MatButtonModule, MatChe
 import { CefMessageRouterService } from './services/CefMessageRouterService';
 import { ExecutionService } from './services/ExecutionService';
 import { CefExecutionService } from './services/CefExecutionService';
+import { BinaryHttpExecutionService } from './services/BinaryHttpExecutionService';
 import { DummyExecutionService } from './services/DummyExecutionService';
 
 import { AppComponent } from './app.component';
@@ -27,7 +28,7 @@ import { environment } from "../environments/environment";
   ],
   providers: [
     CefMessageRouterService,
-    { provide: ExecutionService, useClass: environment.production ? CefExecutionService : DummyExecutionService }
+    { provide: ExecutionService, useClass: environment.production ? BinaryHttpExecutionService : DummyExecutionService }
   ],
   bootstrap: [AppComponent]
 })
