@@ -74,13 +74,13 @@ Now you should be ready to configure with cmake:
     cd <pathToRepo>
     mkdir build
     cd build
-    cmake .. -DUSE_SUPERBUILD=ON
-    make -j
     cmake ..
-    make -j
+    make -j all
+    cmake ..
+    make -j <targetName>
 ```
-We use a super build setup: every dependency gets downloaded and the once which need building (currently [rttr](http://www.rttr.org/)) first by configuring with `-DUSE_SUPERBUILD=ON` and building them. See the `build/external` folder.   
-After that, the cmake cache file `CMakeCache.txt` is setup with all necessary variables, that **later** cmake invocations will find all dependencies 
+We use a super build setup: every dependency gets downloaded and the once which need building (currently [rttr](http://www.rttr.org/)) first by configuring with `-DUSE_SUPERBUILD=ON` (automatically set at first run) and building them. See the `buildExternal` folder.   
+After that, the cmake cache file `CMakeCache.txt` is setup with all necessary variables, that **later** cmake *configure* invocations will find all dependencies 
 and configure the project. This works also with VS Code and the cmake extension. 
 
 ## General Development Setup
