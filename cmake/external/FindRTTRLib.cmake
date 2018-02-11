@@ -20,7 +20,7 @@ if(${USE_SUPERBUILD})
         include(ExternalProject)
         
         ExternalProject_Add(rttr
-                            GIT_REPOSITORY      https://github.com/gabyx/rttr.git
+                            GIT_REPOSITORY      https://github.com/rttrorg/rttr.git
                             GIT_TAG             master
                             GIT_SHALLOW         ON
                             PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/rttr"

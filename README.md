@@ -79,7 +79,7 @@ Now you should be ready to configure with cmake:
     cmake ..
     make -j <targetName>
 ```
-We use a super build setup: every dependency gets downloaded and the once which need building (currently [rttr](http://www.rttr.org/)) first by configuring with `-DUSE_SUPERBUILD=ON` (automatically set at first run) and building them. See the `buildExternal` folder.   
+We use a super build setup: every dependency gets downloaded and the once which need building (currently [rttr](http://www.rttr.org/)) first by configuring with `-DUSE_SUPERBUILD=ON` (automatically set at first run) and building them. See the path `build/external`. The path `build/external/install` is used for all built dependencies, at the moment `rttr`. If you configure cmake in VS Code with the extension, the external build path is set to `buildFolder` for convenience to be able to quickly delete certain dependencies without deleting the normal build folder `build`).   
 After that, the cmake cache file `CMakeCache.txt` is setup with all necessary variables, that **later** cmake *configure* invocations will find all dependencies 
 and configure the project. This works also with VS Code and the cmake extension. 
 
