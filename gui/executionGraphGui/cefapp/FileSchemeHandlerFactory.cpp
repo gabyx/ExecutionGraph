@@ -39,7 +39,7 @@ CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrow
         }
 
         filePath = m_folderPath / *filePath;
-        EXECGRAPHGUI_APPLOG_DEBUG("FileSchemeHandlerFactory: make stream for file: '{0}' failed!", filePath->string());
+        EXECGRAPHGUI_APPLOG_DEBUG("FileSchemeHandlerFactory: make stream for file: '{0}' ...", filePath->string());
         CefRefPtr<CefStreamReader> fileStream = CefStreamReader::CreateForFile(filePath->string());
         if(fileStream != nullptr)
         {
