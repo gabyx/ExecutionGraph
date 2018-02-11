@@ -18,6 +18,13 @@ MACRO(ExecutionGraph_WRITE_CONFIG_FILE ExecutionGraph_CONFIG_FILE ExecutionGraph
     set(ExecutionGraph_VERSION_STRING "${ExecutionGraph_VERSION_MAJOR}.${ExecutionGraph_VERSION_MINOR}.${ExecutionGraph_VERSION_PATCH}")
     MESSAGE(STATUS "ExecutionGraph Version: ${ExecutionGraph_VERSION_STRING} extracted from git tags!")
 
+    if("${ExecutionGraph_VERSION_MAJOR}" STREQUAL "" OR 
+       "${ExecutionGraph_VERSION_MINOR}" STREQUAL "" OR 
+       "${ExecutionGraph_VERSION_PATCH}" STREQUAL "")
+    
+        MESSAGE(STATUS "ExecutionGraph Version is bogus!")
+    endif()
+
     configure_file(
       ${ExecutionGraph_ROOT_DIR}/include/ExecutionGraph/config/Config.hpp.in.cmake
       ${ExecutionGraph_CONFIG_FILE}
