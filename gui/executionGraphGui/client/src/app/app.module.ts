@@ -1,3 +1,5 @@
+import { HttpClientModule } from '@angular/common/http';
+
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -22,13 +24,14 @@ import { environment } from "../environments/environment";
     WorkspaceComponent
   ],
   imports: [
+    HttpClientModule,
     BrowserModule,
     BrowserAnimationsModule,
     MatIconModule, MatToolbarModule, MatMenuModule, MatButtonModule, MatCheckboxModule
   ],
   providers: [
     CefMessageRouterService,
-    { provide: ExecutionService, useClass: environment.production ? BinaryHttpExecutionService : DummyExecutionService }
+    { provide: ExecutionService, useClass: !environment.production ? BinaryHttpExecutionService : DummyExecutionService }
   ],
   bootstrap: [AppComponent]
 })
