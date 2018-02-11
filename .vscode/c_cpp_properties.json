@@ -18,12 +18,7 @@
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": "$[workspaceRoot}/.vscode/browse.vc.db"
             },
-            "intelliSenseMode": "clang-x64",
-            "macFrameworkPath": [
-                "/System/Library/Frameworks",
-                "/Library/Frameworks"
-            ],
-            "compileCommands" : "${workspaceRoot}/build/compile_commands.json"
+            "intelliSenseMode": "clang-x64"
         }
     ],
     "version": 3

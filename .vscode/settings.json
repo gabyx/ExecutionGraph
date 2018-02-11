@@ -146,6 +146,6 @@
     "plantuml.exportFormat": "svg",
     "plantuml.exportSubFolder": false,
     "markdown-preview-enhanced.previewTheme": "github-dark.css",
-    
-    
+    "C_Cpp.clang_format_fallbackStyle": "none",
+    "C_Cpp.loggingLevel": "Information",
 }
