@@ -31,7 +31,7 @@ import { environment } from "../environments/environment";
   ],
   providers: [
     CefMessageRouterService,
-    { provide: ExecutionService, useClass: !environment.production ? BinaryHttpExecutionService : DummyExecutionService }
+    { provide: ExecutionService, useClass: environment.production ? BinaryHttpExecutionService : DummyExecutionService }
   ],
   bootstrap: [AppComponent]
 })
