@@ -379,7 +379,7 @@ namespace executionGraph
         {
         public:
             ExecutionSolverBase(ConstantNodeStorage& constantNodes, LogicNodeDefaultOutputs* defaultOutputSockets = nullptr)
-                : m_constantNodes(constantNodes), m_defaultOutputSockets(defaultOutputSockets) {}
+                : m_defaultOutputSockets(defaultOutputSockets), m_constantNodes(constantNodes) {}
 
             //! Connects all dangling input sockets to the default output socket.
             void connectAllDanglingInputs(NodeData& nodeData)
@@ -524,7 +524,7 @@ namespace executionGraph
                     {
                         EXECGRAPH_EXECTREE_SOLVER_LOG("DFS Start: Node id: " << nodeData->m_node->getId()
                                                                              << " already visited -> skip it."
-                                                                             << std::endl;);
+                                                                             << std::endl);
                         continue;
                     }
 

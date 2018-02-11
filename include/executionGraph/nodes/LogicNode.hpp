@@ -410,7 +410,7 @@ namespace executionGraph
     static constexpr const SocketIndex& getOutIdx() { return OutSocketDeclList::template Get<S>::Index::value; }
 
 #define EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME() \
-    virtual std::string getTypeName() override { return shortenTemplateBrackets(demangle(this)); };
+    virtual std::string getTypeName() override { return shortenTemplateBrackets(demangle(this)); }
 
 }  // namespace executionGraph
 

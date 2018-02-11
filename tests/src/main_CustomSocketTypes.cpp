@@ -60,15 +60,15 @@ public:
     {
         Result1,
     };
-    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
+    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs)
 
     using InSockets = InSocketDeclList<InSocketDecl<Value1, std::shared_ptr<A>>,
                                        InSocketDecl<Value2, std::shared_ptr<A>>>;
 
     using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, std::shared_ptr<A>>>;
 
-    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME();
-    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets);
+    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME()
+    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
 
     template<typename... Args>
     IntegerNode(Args&&... args)

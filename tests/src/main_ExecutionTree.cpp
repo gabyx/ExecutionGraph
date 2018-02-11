@@ -36,15 +36,15 @@ public:
     {
         Result1,
     };
-    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
+    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs)
 
     using InSockets = InSocketDeclList<InSocketDecl<Value1, int>,
                                        InSocketDecl<Value2, int>>;
 
     using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, int>>;
 
-    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME();
-    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets);
+    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME()
+    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
 
     template<typename... Args>
     IntegerNode(Args&&... args)
@@ -152,10 +152,10 @@ MY_TEST(ExecutionTree_Test, IntBig)
             execTree.getDefaultOuputPool().setDefaultValue<int>(2);
             for(int i = 0; i < nNodes; ++i)
             {
-                vec[i] = std::move(std::make_unique<IntNode>(i));
-                EXECGRAPH_LOG_MSG(TRACE, vec[i]->getId() << ",");
+                vec[i] = std::make_unique<IntNode>(i);
+                EXECGRAPH_LOG_TRACE_CONT(vec[i]->getId() << ",");
             }
-            EXECGRAPH_LOG_MSG(TRACE, std::endl);
+            EXECGRAPH_LOG_TRACE_CONT(std::endl);
 
             // Links
             std::vector<int> idWithConnectionToZero;
