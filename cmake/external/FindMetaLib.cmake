@@ -24,7 +24,7 @@ if(NOT EXISTS "${meta_INCLUDE_DIR}")
   
     set(meta_INCLUDE_DIR "${meta_SOURCE_DIR}/include" CACHE PATH "meta library (https://github.com/ericniebler/meta.git) include directory" FORCE)
     # define a path in the cache where to find this downloaded library (for cmake find_package)
-    set(meta_DIR "${meta_SOURCE_DIR}/include" CACHE PATH "meta library directory" FORCE)
+    set(meta_DIR "${meta_SOURCE_DIR}" CACHE PATH "meta library directory" FORCE)
     
 else()
     message(STATUS "meta library found!")

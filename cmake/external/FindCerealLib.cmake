@@ -8,7 +8,7 @@ if(NOT EXISTS "${cereal_INCLUDE_DIR}")
     find_path(cereal_INCLUDE_DIR
             NAMES cereal/cereal.hpp 
             DOC "cereal library header files"
-            PATHS "${cereal_DIR}")
+            PATHS "${cereal_DIR}/include")
 endif()
 
 if(NOT EXISTS "${cereal_INCLUDE_DIR}")

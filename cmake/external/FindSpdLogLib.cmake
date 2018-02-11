@@ -1,8 +1,13 @@
-# Try to find the Argument Parser Library https://github.com/gabime/spdlog
-# defines spdlog_INCLUDE_DIR
+# Try to find the spdlog Library https://github.com/gabime/spdlog
 include(FindPackageHandleStandardArgs)
 
-find_package(spdlog CONFIG REQUIRED)
+if(NOT EXISTS "${spdlog_INCLUDE_DIR}")
+    message(STATUS "meta library: finding...")
+    find_path(spdlog_INCLUDE_DIR
+            NAMES spdlog/spdlog.hpp 
+            DOC "spdlog library header files"
+            PATHS "${spdlog_DIR}/include")
+endif()
 
 if(NOT EXISTS spdlog_INCLUDE_DIR)
     message(STATUS "spdlog library: inlcude dir not found -> download from https://github.com/gabime/spdlog")
@@ -12,13 +17,16 @@ if(NOT EXISTS spdlog_INCLUDE_DIR)
                     PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/spdlog"
                     GIT_REPOSITORY      https://github.com/gabime/spdlog 
                     GIT_TAG             master
-                    GIT_SHALLOW         OFF
+                    GIT_SHALLOW         ON
                     UPDATE_DISCONNECTED 1)
 
     set(spdlog_INCLUDE_DIR "${spdlog_SOURCE_DIR}/include" CACHE PATH "spdlog library (https://github.com/gabime/spdlog) include directory" FORCE)
+    set(spdlog_DIR "${spdlog_SOURCE_DIR}" CACHE PATH "spdlog library directory" FORCE)
+
 else()
     message(STATUS "spdlog library found!")
 endif()
+
 find_package_handle_standard_args(spdlogLib DEFAULT_MSG spdlog_INCLUDE_DIR)
 mark_as_advanced(spdlog_INCLUDE_DIR)
 
