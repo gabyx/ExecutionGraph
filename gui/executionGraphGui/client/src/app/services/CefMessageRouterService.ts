@@ -30,10 +30,9 @@ export class CefMessageRouterService {
 
         return new Promise((resolve, reject) => {
             var requestString = JSON.stringify({requestId: requestId, payload: payload});
-            var requestBinary = ab2s(msgpack.encode(requestString)); // UInt8Array zu binary string
 
             this.cef.cefQuery({
-                request: requestBinary,
+                request: requestString,
                 persistent: false,
                 onSuccess: response => {
                     console.log(`[CefMessageRouterService] Response for '${requestId}': ${response}`);
