@@ -5,6 +5,7 @@ include(FindPackageHandleStandardArgs)
 
 # Try to find the library, if it is installed!
 # otherwise download it
+set(URL "https://github.com/rttrorg/rttr.git")
 set(INSTALL_DIR "${ExecutionGraph_EXTERNAL_INSTALL_DIR}/rttr")
 set(RTTR_COMPONENTS CORE)
 
@@ -15,12 +16,12 @@ if(${USE_SUPERBUILD})
 
     if(NOT TARGET "RTTR::Core")
 
-        message(STATUS "rttr library: targer not found -> download from https://github.com/gabyx/rttr.git")
+        message(STATUS "rttr library: targer not found -> download from ${URL}")
 
         include(ExternalProject)
         
         ExternalProject_Add(rttr
-                            GIT_REPOSITORY      https://github.com/rttrorg/rttr.git
+                            GIT_REPOSITORY      "${URL}"
                             GIT_TAG             master
                             GIT_SHALLOW         ON
                             PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/rttr"
