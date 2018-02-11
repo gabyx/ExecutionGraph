@@ -15,6 +15,51 @@
 #include "cefapp/Loggers.hpp"
 #include "cefapp/SchemeHandlerHelper.hpp"
 
+namespace
+{
+    void debugTest(CefRefPtr<CefRequest> request)
+    {
+        std::string requestUrl = request->GetURL().ToString();
+        CefURLParts urlParts;
+        if(CefParseURL(request->GetURL(), urlParts))
+        {
+            // DEBUG TEST
+            std::string temp = CefString(urlParts.path.str).ToString();
+            auto path        = schemeHandlerHelper::splitPrefixFromPath(temp, "executionGraphBackend");
+
+            if(!path)
+            {
+                EXECGRAPHGUI_APPLOG_ERROR("BackendSchemeHandlerFactory: requestUrl '{0}' failed!", requestUrl);
+                return;
+            }
+
+            std::string requestId = path->filename();
+            EXECGRAPHGUI_ASSERTMSG(!requestId.empty(), "Empty requestId in '{0}'!", requestUrl);
+
+            // Printing the binary data ============
+            CefRefPtr<CefPostData> postData = request->GetPostData();
+            if(postData)
+            {
+                EXECGRAPHGUI_APPLOG_DEBUG("Received {0} post data elements.", postData->GetElementCount());
+                CefPostData::ElementVector elements;
+                postData->GetElements(elements);
+                for(CefRefPtr<CefPostDataElement> element : elements)
+                {
+                    std::vector<uint8_t> buffer(element->GetBytesCount());
+                    element->GetBytes(buffer.size(), static_cast<void*>(buffer.data()));
+                    std::stringstream ss;
+                    for(auto& byte : buffer)
+                    {
+                        ss << byte << ",";
+                    }
+                    EXECGRAPHGUI_APPLOG_DEBUG("Post Data Binary: '%s'", ss.str());
+                }
+            }
+        }
+    }
+
+}  // namespace
+
 CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrowser> browser,
                                                                CefRefPtr<CefFrame> frame,
                                                                const CefString& scheme_name,
@@ -24,6 +69,7 @@ CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrow
     CefURLParts urlParts;
     if(CefParseURL(request->GetURL(), urlParts))
     {
+        debugTest(request);
         //! todo: why do we get here a urlParts.path.str as "//host/folderA/folderB"
         //! Shouldnt it be : "folderA/folderB".
         //! the host is somehow not parsed?: http://www.magpcss.org/ceforum/viewtopic.php?f=6&t=6048

@@ -1,0 +1,64 @@
+@startuml
+participant client as "client js"
+
+box "CEF [IO-Thread]" #LightGrey
+participant CEF
+
+participant backendHandlerFactory << BackendSchemeHandlerFactory >>
+participant requestHandler << CefResourceHandler >>
+end box
+
+box "Backend [Browser-Thread]" #LightGrey
+	participant messageDispatcher as "AppHandler::m_messageDispatcher" <<MessageDispatcher>>
+	participant backendMessageHandler <<BackendMessageHandler>>
+    participant executionGraphBackend <<ExecutionGraphBackend>>
+end box
+
+client -> CEF : AJAX Request:\nbackend://executionGraph/<requestId>
+activate CEF
+
+    CEF -> backendHandlerFactory : ""Create(...)""
+    activate backendHandlerFactory
+        backendHandlerFactory -> requestHandler : ""new CefResourceHandler(...)""
+        backendHandlerFactory <-- requestHandler
+
+        CEF <-- backendHandlerFactory : ""requestHandler""
+    deactivate backendHandlerFactory
+
+    CEF -> requestHandler : ""ProcessRequest(request, callback)""
+    activate requestHandler
+        note right: Yes, we handle this request!
+        requestHandler -> requestHandler : Response headers are available:\n""callback.Continue()"" 
+        CEF <-- requestHandler : ""true""
+    deactivate requestHandler
+
+    CEF -> requestHandler : ""ReadResponse(dataOut, bytesToRead, bytesRead, callback)""
+    activate requestHandler
+        requestHandler --> messageDispatcher : IPC Message: ""Post(requestBinData, callback)"" 
+        CEF <- requestHandler : ""true, bytesRead = 0""
+        note right: Data not yet available
+    deactivate requestHandler
+
+    activate messageDispatcher
+    messageDispatcher -> backendMessageHandler : ""handleRequest(requestBinData)""
+        activate backendMessageHandler
+            backendMessageHandler -> backendMessageHandler : ""deserialize(requestBinData)""
+            backendMessageHandler -> executionGraphBackend : do work, e.g. ""addNode(...)""
+            activate executionGraphBackend
+                backendMessageHandler <-- executionGraphBackend : completed
+            deactivate executionGraphBackend
+            backendMessageHandler -> backendMessageHandler : ""serialize(responseBinData)""
+            messageDispatcher <-- backendMessageHandler : ""reponseBinData""
+        deactivate backendMessageHandler
+    messageDispatcher -> messageDispatcher : make data available by running\n""callback()""
+    deactivate messageDispatcher
+
+    CEF -> requestHandler : ""ReadResponse(dataOut, bytesToRead, bytesRead, callback)""
+    activate requestHandler
+         note right: Data is availbale
+        CEF <- requestHandler : ""true, bytesRead = 512""
+    deactivate requestHandler
+
+    CEF -> client : AJAX Response
+deactivate CEF
+@enduml

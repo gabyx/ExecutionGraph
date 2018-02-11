@@ -43,6 +43,26 @@ CefRefPtr<CefResourceHandler> BackendSchemeHandlerFactory::Create(CefRefPtr<CefB
         std::string requestId = path->filename();
         EXECGRAPHGUI_ASSERTMSG(!requestId.empty(), "Empty requestId in '{0}'!", requestUrl);
 
+        // Printing the binary data ============
+        CefRefPtr<CefPostData> postData = request->GetPostData();
+        if(postData)
+        {
+            EXECGRAPHGUI_APPLOG_DEBUG("Received {0} post data elements.", postData->GetElementCount());
+            CefPostData::ElementVector elements;
+            postData->GetElements(elements);
+            for(CefRefPtr<CefPostDataElement> element : elements)
+            {
+                std::vector<uint8_t> buffer(element->GetBytesCount());
+                element->GetBytes(buffer.size(), static_cast<void*>(buffer.data()));
+                std::stringstream ss;
+                for(auto& byte : buffer)
+                {
+                    ss << byte << ",";
+                }
+                EXECGRAPHGUI_APPLOG_DEBUG("Post Data Binary: '%s'", ss.str());
+            }
+        }
+        // =====================================
         EXECGRAPHGUI_APPLOG_DEBUG("BackendSchemeHandlerFactory:: Received requestId: '{0}', query: '{1}'", requestId, query);
     }
 

@@ -14,6 +14,10 @@ At last, the message handlers of all backends are then added to the `m_messageDi
 
 During communication, the dispatcher will forward all messages to its shared `BackendMessageHandlers` instances.
 
+## Message Send/Receive Workflow
+Communication workflow for an AJAX Request on the scheme `backend://` between the client and backend:
+![Client-Backend-Communication](ajax-backend-comm.svg "Client-Backend Communication")
+
 ## Overview of MessageHandler Types
 We need one message handlers for each of the following grouped functionalities:
 

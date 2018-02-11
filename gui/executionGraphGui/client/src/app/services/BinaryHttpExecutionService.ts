@@ -17,11 +17,15 @@ export class BinaryHttpExecutionService extends ExecutionService {
     }
 
     public async execute(): Promise<void> {
-        console.log(`[BinaryHttpExecutionService] execute()`);
+        console.log("[BinaryHttpExecutionService] send()");
+        await this.testSend("backend://executionGraph/addNode");
+    }
+
+    private async testSend(url: string): Promise<void> {
 
         const data = this.createBinaryData();
         // Create a post request that returns an observable, which is kind of a stream of response events
-        let httpRequest: Observable<ArrayBuffer> = this.httpClient.post("backend://executionGraph/addNode", data, { responseType: "arraybuffer" });
+        let httpRequest: Observable<ArrayBuffer> = this.httpClient.post(url, data, { responseType: "arraybuffer" });
         // Add a callback function that is executed whenever there is a new event in the request stream
         httpRequest = httpRequest.do(() => console.log(`[BinaryHttpExecutionService] success`));
         // In case of an error in the http event stream, catch it to log it and rethrow it, note that an error will only be actually thrown once
