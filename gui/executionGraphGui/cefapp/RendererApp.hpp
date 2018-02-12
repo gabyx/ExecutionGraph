@@ -27,10 +27,8 @@ public:
 
     //! @name CefApp Methods
     //@{
-    virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler() override
-    {
-        return this;
-    }
+    virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler() override { return this; }
+    virtual void OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar) override;
     //@}
 
     ///! @name CefRenderProcessHandler Methods

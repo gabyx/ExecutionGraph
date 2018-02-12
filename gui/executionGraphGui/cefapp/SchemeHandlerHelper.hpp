@@ -13,13 +13,19 @@
 #ifndef cefapp_SchemeHandlerHelper_hpp
 #define cefapp_SchemeHandlerHelper_hpp
 
+#include <cef_scheme.h>
+#include <executionGraph/common/FileSystem.hpp>
 #include <optional>
 #include <string>
-#include "executionGraph/common/FileSystem.hpp"
+#include <vector>
 
 namespace schemeHandlerHelper
 {
     std::optional<std::path> splitPrefixFromPath(const std::string& path, const std::path& prefix);
-}
+
+    //! Return all custom schemes which get registered in this application.
+    inline std::vector<std::string> getCustomSchemes() { return {"client", "backend"}; }
+    void registerCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar);
+}  // namespace schemeHandlerHelper
 
 #endif

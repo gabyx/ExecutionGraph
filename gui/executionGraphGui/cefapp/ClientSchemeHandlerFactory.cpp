@@ -9,7 +9,7 @@
 //!  License, v. 2.0. If a copy of the MPL was not distributed with this
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
-#include "FileSchemeHandlerFactory.hpp"
+#include "ClientSchemeHandlerFactory.hpp"
 #include <cef_parser.h>
 #include <wrapper/cef_stream_resource_handler.h>
 #include "cefapp/Loggers.hpp"
@@ -60,10 +60,10 @@ namespace
 
 }  // namespace
 
-CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrowser> browser,
-                                                               CefRefPtr<CefFrame> frame,
-                                                               const CefString& scheme_name,
-                                                               CefRefPtr<CefRequest> request)
+CefRefPtr<CefResourceHandler> ClientSchemeHandlerFactory::Create(CefRefPtr<CefBrowser> browser,
+                                                                 CefRefPtr<CefFrame> frame,
+                                                                 const CefString& scheme_name,
+                                                                 CefRefPtr<CefRequest> request)
 {
     std::string requestUrl = request->GetURL().ToString();
     CefURLParts urlParts;
@@ -80,12 +80,12 @@ CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrow
 
         if(!filePath)
         {
-            EXECGRAPHGUI_APPLOG_ERROR("FileSchemeHandlerFactory: requestUrl '{0}' failed!", requestUrl);
+            EXECGRAPHGUI_APPLOG_ERROR("ClientSchemeHandlerFactory: requestUrl '{0}' failed!", requestUrl);
             return nullptr;
         }
 
         filePath = m_folderPath / *filePath;
-        EXECGRAPHGUI_APPLOG_DEBUG("FileSchemeHandlerFactory: make stream for file: '{0}' ...", filePath->string());
+        EXECGRAPHGUI_APPLOG_DEBUG("ClientSchemeHandlerFactory: make stream for file: '{0}' ...", filePath->string());
         CefRefPtr<CefStreamReader> fileStream = CefStreamReader::CreateForFile(filePath->string());
         if(fileStream != nullptr)
         {
@@ -98,7 +98,7 @@ CefRefPtr<CefResourceHandler> FileSchemeHandlerFactory::Create(CefRefPtr<CefBrow
                 mimeType = "font/" + fileExtension;
             }
 
-            EXECGRAPHGUI_APPLOG_INFO("FileSchemeHandlerFactory: requestUrl '{0}' handled!", requestUrl);
+            EXECGRAPHGUI_APPLOG_INFO("ClientSchemeHandlerFactory: requestUrl '{0}' handled!", requestUrl);
             return CefRefPtr<CefStreamResourceHandler>(new CefStreamResourceHandler(mimeType, fileStream));
         }
     }

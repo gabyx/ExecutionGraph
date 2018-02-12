@@ -37,6 +37,9 @@ AppHandler::AppHandler(bool use_views)
     g_instance = this;
 
     m_messageDispatcher = std::make_unique<Dispatcher>();
+
+    // Install all backends
+    installBackends();
 }
 
 AppHandler::~AppHandler()
@@ -78,9 +81,6 @@ void AppHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 {
     // Add to the list of existing browsers.
     m_browserList.push_back(browser);
-
-    // Install all backends
-    installBackends();
 
     CEF_REQUIRE_UI_THREAD();
     if(!m_router)
@@ -187,15 +187,15 @@ void AppHandler::CloseAllBrowsers(bool force_close)
 void AppHandler::installBackends()
 {
     // Install the URL RequestHandler for the backend
-    CefRegisterSchemeHandlerFactory("http",
-                                    "executionGraphBackend",
-                                    new BackendSchemeHandlerFactory("executionGraphBackend"));
+    CefRegisterSchemeHandlerFactory("backend",
+                                    "executionGraph",
+                                    new BackendSchemeHandlerFactory("executionGraph"));
     // So far an own scheme does not work:
     // WebKit does not pass POST data to the request for synchronous XHRs executed on non-HTTP schemes.
     // See the m\_url.protocolInHTTPFamily()
     // https://bitbucket.org/chromiumembedded/cef/issues/404
     // however we only uses asynchronous XHR requests... ?
-    CefAddCrossOriginWhitelistEntry("client://", "http", "", true);  // only needed if we use the scheme "backend://" to allow CORS
+    //CefAddCrossOriginWhitelistEntry("client://", "backend", "", true);  // only needed if we use the scheme "backend://" to allow CORS
 
     // Install the executionGraph backend
     BackendFactory::BackendData messageHandlers = BackendFactory::Create<ExecutionGraphBackend>();

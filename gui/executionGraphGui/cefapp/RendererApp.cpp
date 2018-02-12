@@ -11,6 +11,7 @@
 //! ========================================================================================
 
 #include "RendererApp.hpp"
+#include "SchemeHandlerHelper.hpp"
 
 void RendererApp::OnWebKitInitialized()
 {
@@ -37,4 +38,9 @@ bool RendererApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
                                            CefRefPtr<CefProcessMessage> message)
 {
     return m_router->OnProcessMessageReceived(browser, source_process, message);
+}
+
+void RendererApp::OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)
+{
+    schemeHandlerHelper::registerCustomSchemes(registrar);
 }

@@ -24,12 +24,12 @@ namespace cefapp{
         - m_handlers
         - m_handlerMap
     }
-    class FileSchemeHandlerFactory
+    class ClientSchemeHandlerFactory
 }
 
 
 cefapp::App ..> cefapp::AppHandler : creates
-cefapp::App --> cefapp::FileSchemeHandlerFactory : registers
+cefapp::App --> cefapp::ClientSchemeHandlerFactory : registers
 
 cefapp::AppHandler "1" o-left- CefMessageRouterBrowserSide
 cefapp::AppHandler "1" *-- cefapp::MessageDispatcher

@@ -57,4 +57,20 @@ namespace schemeHandlerHelper
         return filePath;
     }
 
+    //! Register all custom schemes for the application as standard and secure.
+    //! Must be the same implementation in all processes.
+    void registerCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)
+    {
+        for(auto& scheme : getCustomSchemes())
+        {
+            registrar->AddCustomScheme(scheme,
+                                       true /* is standart*/,
+                                       false /* is local */,
+                                       false /* is display_isolated */,
+                                       true /* is secure */,
+                                       false /* is cors enabled*/,
+                                       true /* is_csp_bypassing*/);
+        }
+    }
+
 }  // namespace schemeHandlerHelper

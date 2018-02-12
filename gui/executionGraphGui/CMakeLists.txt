@@ -13,8 +13,8 @@ set(ExecutionGraphGUI_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/AppHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/AppHandler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/MessageDispatcher.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/FileSchemeHandlerFactory.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/FileSchemeHandlerFactory.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/ClientSchemeHandlerFactory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/ClientSchemeHandlerFactory.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/BackendSchemeHandlerFactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/BackendSchemeHandlerFactory.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/SchemeHandlerHelper.cpp
@@ -64,9 +64,11 @@ set(ExecutionGraphGUI_SRCS ${ExecutionGraphGUI_SRCS} ${ExecutionGraphGUI_RES_SRC
 # App Helper Sources
 # -------------
 set(ExecutionGraphGUI_HELPER_SRCS_MACOSX
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/ProcessHelperMac.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/ProcessHelperMac.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/SchemeHandlerHelper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/SchemeHandlerHelper.hpp
 )
 append_platform_sources(ExecutionGraphGUI_HELPER_SRCS)
 # -------------
@@ -174,7 +176,7 @@ if(OS_MACOSX)
                                                      RUNTIME_OUTPUT_DIRECTORY "${ExecutionGraphGUI_TARGET_OUT_DIR}")
 
     add_dependencies(ExecutionGraphGUIHelper libcef_dll_wrapper)
-    target_link_libraries(ExecutionGraphGUIHelper libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
+    target_link_libraries(ExecutionGraphGUIHelper libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ExecutionGraph::Core)
     
     # Fix the framework rpath in the helper executable.
     # The helper is in $app_name.app/Contents/Frameworks/$app_name Helper.app/Contents/MacOS/

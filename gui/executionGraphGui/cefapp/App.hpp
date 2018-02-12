@@ -31,15 +31,13 @@ public:
 
     //! @name CefApp Methods
     //@{
-    virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() OVERRIDE
-    {
-        return this;
-    }
+    virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() override { return this; }
+    virtual void OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar) override;
     //@}
 
     //! @name CefBrowserProcessHandler Methods
     //@{
-    virtual void OnContextInitialized() OVERRIDE;
+    virtual void OnContextInitialized() override;
     //@}
 
 private:

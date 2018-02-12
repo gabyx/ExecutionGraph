@@ -20,7 +20,8 @@
 #include <wrapper/cef_helpers.h>
 #include "backend/ExecutionGraphBackend.hpp"
 #include "cefapp/AppHandler.hpp"
-#include "cefapp/FileSchemeHandlerFactory.hpp"
+#include "cefapp/ClientSchemeHandlerFactory.hpp"
+#include "cefapp/SchemeHandlerHelper.hpp"
 
 namespace
 {
@@ -84,7 +85,7 @@ void App::OnContextInitialized()
     // Register the URL Scheme handler for the client (angular application)
     CefRegisterSchemeHandlerFactory("client",
                                     "executionGraph",
-                                    new FileSchemeHandlerFactory(m_clientSourcePath, "executionGraph"));
+                                    new ClientSchemeHandlerFactory(m_clientSourcePath, "executionGraph"));
 
     // AppHandler implements browser-level callbacks.
     m_appHandler = CefRefPtr<AppHandler>(new AppHandler(use_views));
@@ -115,4 +116,9 @@ void App::OnContextInitialized()
         // Create the first browser window.
         CefBrowserHost::CreateBrowser(window_info, m_appHandler, url, browser_settings, NULL);
     }
+}
+
+void App::OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)
+{
+    schemeHandlerHelper::registerCustomSchemes(registrar);
 }
