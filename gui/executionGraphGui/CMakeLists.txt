@@ -176,7 +176,7 @@ if(OS_MACOSX)
                                                      RUNTIME_OUTPUT_DIRECTORY "${ExecutionGraphGUI_TARGET_OUT_DIR}")
 
     add_dependencies(ExecutionGraphGUIHelper libcef_dll_wrapper)
-    target_link_libraries(ExecutionGraphGUIHelper libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ExecutionGraph::Core)
+    target_link_libraries(ExecutionGraphGUIHelper libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ExecutionGraph::Core-Headers)
     
     # Fix the framework rpath in the helper executable.
     # The helper is in $app_name.app/Contents/Frameworks/$app_name Helper.app/Contents/MacOS/

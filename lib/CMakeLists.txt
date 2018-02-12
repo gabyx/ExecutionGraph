@@ -7,10 +7,17 @@ set(ExecutionGraph_BUILD_LIBRARY_STATIC OFF CACHE BOOL "Build a static library")
 ################################
 
 macro(add_ExecutionGraph_lib STATICorSHARED TARGETNAME EXPORTNAME DOINSTALL)
+    # Add the real library
     add_library(${TARGETNAME} ${STATICorSHARED} ${ExecutionGraph_SRC} ${ExecutionGraph_INC})
     target_include_directories(${TARGETNAME} PUBLIC ${ExecutionGraph_INC_DIRS} $<INSTALL_INTERFACE:include>)
     target_link_libraries(${TARGETNAME} PUBLIC ${ExecutionGraph_LINK_TARGETS_CORE_DEP})
     add_library("ExecutionGraph::${EXPORTNAME}" ALIAS ${TARGETNAME})
+
+    # Add library for headers only
+    add_library("${TARGETNAME}-Headers" INTERFACE)
+    add_library("ExecutionGraph::${EXPORTNAME}-Headers" ALIAS "${TARGETNAME}-Headers")
+    target_include_directories("${TARGETNAME}-Headers" INTERFACE ${ExecutionGraph_INC_DIRS} $<INSTALL_INTERFACE:include>)
+
 
     set_target_properties(${TARGETNAME} 
         PROPERTIES
