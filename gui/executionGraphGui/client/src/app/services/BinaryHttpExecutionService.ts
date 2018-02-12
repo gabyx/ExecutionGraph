@@ -18,7 +18,7 @@ export class BinaryHttpExecutionService extends ExecutionService {
 
     public async execute(): Promise<void> {
         console.log("[BinaryHttpExecutionService] send()");
-        // await this.testSend("http://executionGraphBackend/addNode");
+        await this.testSend("http://executionGraph/addNode");
         await this.testSend("backend://executionGraph/addNode");
     }
 

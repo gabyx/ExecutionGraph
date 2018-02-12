@@ -82,7 +82,7 @@ namespace
     void setupBackends(std::shared_ptr<Dispatcher> messageDispatcher)
     {
         // Install the URL RequestHandler for the backend
-        CefRegisterSchemeHandlerFactory("backend",
+        CefRegisterSchemeHandlerFactory("http",
                                         "executionGraph",
                                         new BackendSchemeHandlerFactory("executionGraph"));
         // So far an own scheme does not work:
@@ -90,7 +90,7 @@ namespace
         // See the m\_url.protocolInHTTPFamily()
         // https://bitbucket.org/chromiumembedded/cef/issues/404
         // however we only uses asynchronous XHR requests... ?
-        CefAddCrossOriginWhitelistEntry("client://", "backend", "", true);  // only needed if we use the scheme "backend://" to allow CORS
+        CefAddCrossOriginWhitelistEntry("client://", "http", "", true);  // only needed if we use the scheme "backend://" to allow CORS
 
         // Install the executionGraph backend
         BackendFactory::BackendData messageHandlers = BackendFactory::Create<ExecutionGraphBackend>();

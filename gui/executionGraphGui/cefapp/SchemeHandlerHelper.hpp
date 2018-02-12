@@ -24,6 +24,9 @@ namespace schemeHandlerHelper
     std::optional<std::path> splitPrefixFromPath(const std::string& path, const std::path& prefix);
 
     //! Return all custom schemes which get registered in this application.
+    //! I tried here to register "backend" and "client" as in the minial
+    //! example https://github.com/chromiumembedded/cef-project/blob/185e8338bfcb36d98f57797078a671c7c239766c/examples/scheme_handler/app_browser_impl.cc#L41
+    //! which somehow does not work. even client:// does not get through anymore??
     inline std::vector<CefString> getCustomSchemes() { return {}; }
     void registerCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar);
 }  // namespace schemeHandlerHelper
