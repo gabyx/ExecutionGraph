@@ -143,7 +143,7 @@ int main(int argc, char* argv[]) {
     CefRefPtr<App> app(new App(appCLArgs->getClientSourcePath()));
 
     // Initialize CEF for the browser process.
-    CefInitialize(mainArgs, settings, app.get(), NULL);
+    CefInitialize(mainArgs, settings, app.get(), nullptr);
 
     // Create the application delegate.
     NSObject* delegate = [[SimpleAppDelegate alloc] init];

@@ -14,13 +14,17 @@
 
 #include <cef_browser.h>
 #include <cef_command_line.h>
+#include <cef_origin_whitelist.h>
 #include <string>
 #include <views/cef_browser_view.h>
 #include <views/cef_window.h>
 #include <wrapper/cef_helpers.h>
+#include "backend/BackendFactory.hpp"
 #include "backend/ExecutionGraphBackend.hpp"
 #include "cefapp/AppHandler.hpp"
+#include "cefapp/BackendSchemeHandlerFactory.hpp"
 #include "cefapp/ClientSchemeHandlerFactory.hpp"
+#include "cefapp/MessageDispatcher.hpp"
 #include "cefapp/SchemeHandlerHelper.hpp"
 
 namespace
@@ -64,12 +68,60 @@ namespace
         DISALLOW_COPY_AND_ASSIGN(SimpleWindowDelegate);
     };
 
+    //! Install the client
+    void setupClient(const std::string& clientSourcePath)
+    {
+        // Register the URL Scheme handler for the client (angular application)
+        CefRegisterSchemeHandlerFactory("client",
+                                        "executionGraph",
+                                        new ClientSchemeHandlerFactory(clientSourcePath, "executionGraph"));
+    }
+
+    //! Install various backends and setup all of them.
+    template<typename Dispatcher>
+    void setupBackends(std::shared_ptr<Dispatcher> messageDispatcher)
+    {
+        // Install the URL RequestHandler for the backend
+        CefRegisterSchemeHandlerFactory("backend",
+                                        "executionGraph",
+                                        new BackendSchemeHandlerFactory("executionGraph"));
+        // So far an own scheme does not work:
+        // WebKit does not pass POST data to the request for synchronous XHRs executed on non-HTTP schemes.
+        // See the m\_url.protocolInHTTPFamily()
+        // https://bitbucket.org/chromiumembedded/cef/issues/404
+        // however we only uses asynchronous XHR requests... ?
+        CefAddCrossOriginWhitelistEntry("client://", "backend", "", true);  // only needed if we use the scheme "backend://" to allow CORS
+
+        // Install the executionGraph backend
+        BackendFactory::BackendData messageHandlers = BackendFactory::Create<ExecutionGraphBackend>();
+
+        for(auto& backendHandler : messageHandlers.second)
+        {
+            messageDispatcher->AddHandler(backendHandler);
+        }
+    }
 }  // namespace
 
 void App::OnContextInitialized()
 {
     CEF_REQUIRE_UI_THREAD();
 
+    // setup the client
+    setupClient(m_clientSourcePath);
+
+    // make a global message dispatcher
+    using Dispatcher       = MessageDispatcher<BackendMessageHandler>;
+    auto messageDispatcher = std::make_shared<Dispatcher>();
+
+    // setup the backends
+    setupBackends(messageDispatcher);
+
+    // setup the browser
+    setupBrowser(messageDispatcher);
+}
+
+void App::setupBrowser(std::shared_ptr<CefMessageRouterBrowserSide::Handler> messageDispatcher)
+{
     CefRefPtr<CefCommandLine> command_line = CefCommandLine::GetGlobalCommandLine();
 
 #if defined(OS_WIN) || defined(OS_LINUX)
@@ -77,24 +129,19 @@ void App::OnContextInitialized()
     // via the command-line. Otherwise, create the browser using the native
     // platform framework. The Views framework is currently only supported on
     // Windows and Linux.
-    const bool use_views = command_line->HasSwitch("use-views");
+    const bool useViews = command_line->HasSwitch("use-views");
 #else
-    const bool use_views = false;
+    const bool useViews = false;
 #endif
 
-    // Register the URL Scheme handler for the client (angular application)
-    CefRegisterSchemeHandlerFactory("client",
-                                    "executionGraph",
-                                    new ClientSchemeHandlerFactory(m_clientSourcePath, "executionGraph"));
-
     // AppHandler implements browser-level callbacks.
-    m_appHandler = CefRefPtr<AppHandler>(new AppHandler(use_views));
+    m_appHandler = CefRefPtr<AppHandler>(new AppHandler(messageDispatcher, useViews));
 
     // Specify CEF browser settings here.
     CefBrowserSettings browser_settings;
     CefString url = "client://executionGraph/index.html";
 
-    if(use_views)
+    if(useViews)
     {
         // Create the BrowserView.
         CefRefPtr<CefBrowserView> browser_view = CefBrowserView::CreateBrowserView(m_appHandler, url, browser_settings, NULL, NULL);

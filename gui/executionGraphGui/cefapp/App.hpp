@@ -14,6 +14,8 @@
 #define APP_H
 
 #include <cef_app.h>
+#include <memory>
+#include <wrapper/cef_message_router.h>
 #include "executionGraph/common/FileSystem.hpp"
 class AppHandler;
 
@@ -41,8 +43,8 @@ public:
     //@}
 
 private:
+    void setupBrowser(std::shared_ptr<CefMessageRouterBrowserSide::Handler> messageDispatcher);
     CefRefPtr<AppHandler> m_appHandler;
-    void installBackends();
 
 private:
     std::path m_clientSourcePath;  //!< Client source path.

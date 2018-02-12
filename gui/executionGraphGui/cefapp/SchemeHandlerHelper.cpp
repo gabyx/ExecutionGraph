@@ -67,9 +67,9 @@ namespace schemeHandlerHelper
                                        true /* is standart*/,
                                        false /* is local */,
                                        false /* is display_isolated */,
-                                       true /* is secure */,
+                                       false /* is secure */,
                                        false /* is cors enabled*/,
-                                       true /* is_csp_bypassing*/);
+                                       false /* is_csp_bypassing*/);
         }
     }
 

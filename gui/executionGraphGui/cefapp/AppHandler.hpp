@@ -18,19 +18,18 @@
 #include <wrapper/cef_message_router.h>
 
 class BackendMessageHandler;
-
 template<typename HandlerType>
 class MessageDispatcher;
 
-class AppHandler : public CefClient,
-                   public CefDisplayHandler,
-                   public CefLifeSpanHandler,
-                   public CefLoadHandler
+class AppHandler final : public CefClient,
+                         public CefDisplayHandler,
+                         public CefLifeSpanHandler,
+                         public CefLoadHandler
 {
     IMPLEMENT_REFCOUNTING(AppHandler)
 
 public:
-    explicit AppHandler(bool use_views);
+    explicit AppHandler(std::shared_ptr<CefMessageRouterBrowserSide::Handler> messageDispatcher, bool useViews);
     ~AppHandler();
 
     // Provide access to the single global instance of this object.
@@ -69,13 +68,6 @@ public:
     // Request that all existing browser windows close.
     void CloseAllBrowsers(bool force_close);
 
-    bool IsClosing() const { return m_isClosing; }
-
-private:
-    // True if the application is using the Views framework.
-    const bool m_useViews;
-    bool m_isClosing;
-
 private:
     // List of existing browser windows. Only accessed on the CEF UI thread.
     using BrowserList = std::vector<CefRefPtr<CefBrowser>>;
@@ -85,10 +77,17 @@ private:
     CefRefPtr<CefMessageRouterBrowserSide> m_router;
 
 private:
-    using Dispatcher = MessageDispatcher<BackendMessageHandler>;
-    std::unique_ptr<Dispatcher> m_messageDispatcher;  //! Dispatcher which is installed in the `m_router`.
+    std::shared_ptr<CefMessageRouterBrowserSide::Handler> m_messageDispatcher;  //! Dispatcher which is installed in the `m_router`.
 
-    void installBackends();
+private:
+    //! True if the application is using the Views framework.
+    const bool m_useViews;
+
+public:
+    bool IsClosing() const { return m_isClosing; }
+
+private:
+    bool m_isClosing;
 };
 
 #endif  // CEF_TESTS_CEFSIMPLE_SIMPLE_HANDLER_H_

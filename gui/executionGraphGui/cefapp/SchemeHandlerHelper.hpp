@@ -24,7 +24,7 @@ namespace schemeHandlerHelper
     std::optional<std::path> splitPrefixFromPath(const std::string& path, const std::path& prefix);
 
     //! Return all custom schemes which get registered in this application.
-    inline std::vector<std::string> getCustomSchemes() { return {"client", "backend"}; }
+    inline std::vector<CefString> getCustomSchemes() { return {}; }
     void registerCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar);
 }  // namespace schemeHandlerHelper
 

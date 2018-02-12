@@ -13,16 +13,12 @@
 #include "AppHandler.hpp"
 #include <base/cef_bind.h>
 #include <cef_app.h>
-#include <cef_origin_whitelist.h>
 #include <sstream>
 #include <string>
 #include <views/cef_browser_view.h>
 #include <views/cef_window.h>
 #include <wrapper/cef_closure_task.h>
 #include <wrapper/cef_helpers.h>
-#include "backend/BackendFactory.hpp"
-#include "cefapp/BackendSchemeHandlerFactory.hpp"
-#include "cefapp/MessageDispatcher.hpp"
 #include "cefapp/PlatformTitleChanger.hpp"
 
 namespace
@@ -30,16 +26,11 @@ namespace
     AppHandler* g_instance = nullptr;
 }
 
-AppHandler::AppHandler(bool use_views)
-    : m_useViews(use_views), m_isClosing(false)
+AppHandler::AppHandler(std::shared_ptr<CefMessageRouterBrowserSide::Handler> messageDispatcher, bool useViews)
+    : m_messageDispatcher(messageDispatcher), m_useViews(useViews), m_isClosing(false)
 {
     DCHECK(!g_instance);
     g_instance = this;
-
-    m_messageDispatcher = std::make_unique<Dispatcher>();
-
-    // Install all backends
-    installBackends();
 }
 
 AppHandler::~AppHandler()
@@ -79,10 +70,11 @@ void AppHandler::OnTitleChange(CefRefPtr<CefBrowser> browser,
 
 void AppHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 {
+    CEF_REQUIRE_UI_THREAD();
+
     // Add to the list of existing browsers.
     m_browserList.push_back(browser);
 
-    CEF_REQUIRE_UI_THREAD();
     if(!m_router)
     {
         CefMessageRouterConfig config;
@@ -181,27 +173,4 @@ void AppHandler::CloseAllBrowsers(bool force_close)
     BrowserList::const_iterator it = m_browserList.begin();
     for(; it != m_browserList.end(); ++it)
         (*it)->GetHost()->CloseBrowser(force_close);
-}
-
-//! Install various backends and setup all of them.
-void AppHandler::installBackends()
-{
-    // Install the URL RequestHandler for the backend
-    CefRegisterSchemeHandlerFactory("backend",
-                                    "executionGraph",
-                                    new BackendSchemeHandlerFactory("executionGraph"));
-    // So far an own scheme does not work:
-    // WebKit does not pass POST data to the request for synchronous XHRs executed on non-HTTP schemes.
-    // See the m\_url.protocolInHTTPFamily()
-    // https://bitbucket.org/chromiumembedded/cef/issues/404
-    // however we only uses asynchronous XHR requests... ?
-    //CefAddCrossOriginWhitelistEntry("client://", "backend", "", true);  // only needed if we use the scheme "backend://" to allow CORS
-
-    // Install the executionGraph backend
-    BackendFactory::BackendData messageHandlers = BackendFactory::Create<ExecutionGraphBackend>();
-
-    for(auto& backendHandler : messageHandlers.second)
-    {
-        m_messageDispatcher->AddHandler(backendHandler);
-    }
 }

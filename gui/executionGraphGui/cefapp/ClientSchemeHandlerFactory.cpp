@@ -11,6 +11,7 @@
 //! ========================================================================================
 #include "ClientSchemeHandlerFactory.hpp"
 #include <cef_parser.h>
+#include <wrapper/cef_helpers.h>
 #include <wrapper/cef_stream_resource_handler.h>
 #include "cefapp/Loggers.hpp"
 #include "cefapp/SchemeHandlerHelper.hpp"
@@ -65,6 +66,8 @@ CefRefPtr<CefResourceHandler> ClientSchemeHandlerFactory::Create(CefRefPtr<CefBr
                                                                  const CefString& scheme_name,
                                                                  CefRefPtr<CefRequest> request)
 {
+    CEF_REQUIRE_IO_THREAD();
+
     std::string requestUrl = request->GetURL().ToString();
     CefURLParts urlParts;
     if(CefParseURL(request->GetURL(), urlParts))
