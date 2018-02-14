@@ -10,12 +10,12 @@ if(NOT EXISTS ${CEF_ROOT})
 
         # Determine the platform.
         if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
-            set(CEF_URL "http://opensource.spotify.com/cefbuilds/cef_binary_3.3239.1710.g85f637a_macosx64.tar.bz2")
+            set(CEF_URL "http://opensource.spotify.com/cefbuilds/cef_binary_3.3282.1733.g9091548_macosx64.tar.bz2")
         elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-            set(CEF_URL "http://opensource.spotify.com/cefbuilds/cef_binary_3.3239.1710.g85f637a_linux64.tar.bz2")
+            set(CEF_URL "http://opensource.spotify.com/cefbuilds/cef_binary_3.3282.1733.g9091548_linux64.tar.bz2")
         elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
         set(OS_WINDOWS 1)
-            set(CEF_URL "http://opensource.spotify.com/cefbuilds/cef_binary_3.3239.1709.g093cae4_windows64.tar.bz2")
+            set(CEF_URL "http://opensource.spotify.com/cefbuilds/cef_binary_3.3282.1733.g9091548_windows64.tar.bz2")
         endif()
 
         if(NOT DEFINED CEF_URL)
