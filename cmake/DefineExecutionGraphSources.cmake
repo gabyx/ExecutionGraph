@@ -88,10 +88,13 @@ macro(setTargetCompileOptionsExecutionGraph target)
     endif()
 
 
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         # with clang 5.0.1: -fsanitize=address produces weird output in lldb for std::string ...
-        list(APPEND CXX_FLAGS_DEBUG "-fsanitize=leak" "-fsanitize=address")
+        list(APPEND CXX_FLAGS_DEBUG "-fsanitize=address" "-fsanitize=leak")
         set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=leak -fsanitize=address -lc++experimental")
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+        list(APPEND CXX_FLAGS_DEBUG "-fsanitize=address")
+        set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address -lc++experimental")
     elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
         message(ERROR "MSVC is not yet supported!")
     endif()
