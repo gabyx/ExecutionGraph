@@ -20,10 +20,12 @@ brew install gcc || echo "suppress failures in order to ignore warnings"
 brew link --overwrite --dry-run gcc
 brew link --overwrite gcc
 
-brew install llvm || echo "suppress failures in order to ignore warnings"
-brew link --overwrite --dry-run llvm
-brew link --overwrite llvm
-export PATH="/usr/local/opt/llvm/bin:$PATH"
+if [[ ${USE_APPLE_CLANG} == "OFF" ]]; then
+    brew install llvm || echo "suppress failures in order to ignore warnings"
+    brew link --overwrite --dry-run llvm
+    brew link --overwrite llvm
+    export PATH="/usr/local/opt/llvm/bin:$PATH"
+fi
 
 # Cmake
 brew install cmake || echo "suppress failures in order to ignore warnings"

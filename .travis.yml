@@ -36,6 +36,17 @@ matrix:
 
   - os: osx
     compiler: clang
+    env: USE_APPLE_CLANG="OFF"
+
+  - os: osx
+    osx_image: xcode9.2
+    compiler: clang
+    env: USE_APPLE_CLANG="ON"
+    
+  - os: osx
+    osx_image: xcode9
+    compiler: clang
+    env: USE_APPLE_CLANG="ON"
 
 before_install:
    # Workaround for Travis CI macOS bug (https://github.com/travis-ci/travis-ci/issues/6307)
