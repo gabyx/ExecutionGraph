@@ -30,6 +30,7 @@ The library `Eigen`, `meta`, `rttr` can be installed in some system specific loc
 
 ### OS X
 Install `clang` with [homebrew](https://brew.sh) by
+installing a [code-sign certificate](https://llvm.org/svn/llvm-project/lldb/trunk/docs/code-signing.txt) for lldb and then running:
 ```bash
     brew install --HEAD llvm --with-toolchain --with-lldb
     brew install eigen
