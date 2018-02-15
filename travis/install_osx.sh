@@ -21,7 +21,8 @@ brew link --overwrite --dry-run gcc
 brew link --overwrite gcc
 
 #install angular (https://gist.github.com/DanHerbert/9520689)
-brew install node
+brew install node || echo "suppress failures in order to ignore warnings"
+brew upgrade node
 npm install -g @angular/cli
 
 if [[ ${USE_APPLE_CLANG} == "OFF" ]]; then
