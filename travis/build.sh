@@ -21,7 +21,7 @@ cd $ROOT_PATH
 # echo "Install and test if ExecutionGraph links:"
 # mkdir $ROOT_PATH/buildLibUsage
 # cd $ROOT_PATH/buildLibUsage
-# INSTALL=$(find $ROOT_PATH/build/install/lib/cmake/* -type d)
+# INSTALL=$(find $ROOT_PATH/build/install/share/cmake/* -type d)
 # echo "Install dir= $INSTALL"
 # cmake $CHECKOUT_PATH/examples/libraryUsage -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DExecutionGraph_DIR=$INSTALL
 # make VERBOSE=1

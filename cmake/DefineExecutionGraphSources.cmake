@@ -26,6 +26,7 @@ macro(include_all_source_ExecutionGraph
     )
 
     set(${INC}
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Log.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Asserts.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Delegates.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/DemangleTypes.hpp

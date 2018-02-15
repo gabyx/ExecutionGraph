@@ -58,7 +58,7 @@ include(cotire)
 # Define Install Directories
 # Install stuff (default location is not some where on the system! for safty reasons)
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/../install" CACHE STRING "Install prefix (e.g. /usr/local/)" FORCE)
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE STRING "Install prefix (e.g. /usr/local/)" FORCE)
 endif()
 if(UNIX)
     include(GNUInstallDirs)
@@ -142,32 +142,30 @@ endif()
 
 
 # Dependencies =========================================================
+add_library(ExecutionGraph::Core-Dependencies INTERFACE IMPORTED)
 # Define Eigen
 find_package(Eigen3Lib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "eigenLib")
-
 # Try to find Meta 
 find_package(MetaLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "metaLib")
-
 # Try to find the spdlog
 find_package(spdlogLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "spdlogLib")
-
 # Try to find the Argumentparser
 find_package(ArgsLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "argsLib")
-
 # Try to find the RTTR Library (use our own script)
 find_package(RTTRLib REQUIRED)
-list(APPEND ExecutionGraph_LINK_TARGETS_GUI_DEP "rttrLib")
-
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "rttrLib")
 # Try to find the crossguid Library (use our own script)
 find_package(CrossGUIDLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "crossguidLib")
-
+# Try find cereal
 find_package(CerealLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "cerealLib")
+
+set_target_properties(ExecutionGraph::Core-Dependencies PROPERTIES INTERFACE_LINK_LIBRARIES "${ExecutionGraph_LINK_TARGETS_CORE_DEP}")
 
 if(ExecutionGraph_USE_OPENMP)
 
