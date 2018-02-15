@@ -1,6 +1,8 @@
 # Try to find the spdlog Library https://github.com/gabime/spdlog
 include(FindPackageHandleStandardArgs)
 
+set(URL "https://github.com/gabime/spdlog")
+
 if(NOT EXISTS "${spdlog_INCLUDE_DIR}")
     message(STATUS "meta library: finding...")
     find_path(spdlog_INCLUDE_DIR
@@ -10,17 +12,17 @@ if(NOT EXISTS "${spdlog_INCLUDE_DIR}")
 endif()
 
 if(NOT EXISTS spdlog_INCLUDE_DIR)
-    message(STATUS "spdlog library: inlcude dir not found -> download from https://github.com/gabime/spdlog")
+    message(STATUS "spdlog library: inlcude dir not found -> download from ${URL}")
 
     include(DownloadProject)
     download_project(PROJ               spdlog
                     PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/spdlog"
-                    GIT_REPOSITORY      https://github.com/gabime/spdlog 
+                    GIT_REPOSITORY      ${URL}
                     GIT_TAG             master
                     GIT_SHALLOW         ON
                     UPDATE_DISCONNECTED 1)
 
-    set(spdlog_INCLUDE_DIR "${spdlog_SOURCE_DIR}/include" CACHE PATH "spdlog library (https://github.com/gabime/spdlog) include directory" FORCE)
+    set(spdlog_INCLUDE_DIR "${spdlog_SOURCE_DIR}/include" CACHE PATH "spdlog library ${URL} include directory" FORCE)
     set(spdlog_DIR "${spdlog_SOURCE_DIR}" CACHE PATH "spdlog library directory" FORCE)
 
 else()

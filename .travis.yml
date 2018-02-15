@@ -4,7 +4,7 @@ language: cpp
 matrix:
   include:
 
-  - env: GCC_VERSION=5
+  - env: GCC_VERSION=5 BUILD_GUI="OFF"
     os: linux
     addons: &gcc5
         apt:
@@ -13,7 +13,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
 
-  - env: GCC_VERSION=6
+  - env: GCC_VERSION=6 BUILD_GUI="OFF"
     os: linux
     addons: &gcc6
         apt:
@@ -22,7 +22,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
 
-  - env: CLANG_VERSION=5.0
+  - env: CLANG_VERSION=5.0 BUILD_GUI="OFF"
     os: linux
     addons: &clang5
         apt:
@@ -36,17 +36,17 @@ matrix:
 
   - os: osx
     compiler: clang
-    env: USE_APPLE_CLANG="OFF"
+    env: USE_APPLE_CLANG="OFF" BUILD_GUI="ON"
 
   - os: osx
     osx_image: xcode9.2
     compiler: clang
-    env: USE_APPLE_CLANG="ON"
+    env: USE_APPLE_CLANG="ON" BUILD_GUI="ON"
     
   - os: osx
     osx_image: xcode9
     compiler: clang
-    env: USE_APPLE_CLANG="ON"
+    env: USE_APPLE_CLANG="ON" BUILD_GUI="ON"
 
 before_install:
    # Workaround for Travis CI macOS bug (https://github.com/travis-ci/travis-ci/issues/6307)

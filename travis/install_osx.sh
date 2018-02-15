@@ -20,6 +20,16 @@ brew install gcc || echo "suppress failures in order to ignore warnings"
 brew link --overwrite --dry-run gcc
 brew link --overwrite gcc
 
+#install angular (https://gist.github.com/DanHerbert/9520689)
+rm -rf /usr/local/lib/node_modules
+brew uninstall node
+brew install node --without-npm
+echo prefix=~/.npm-packages >> ~/.npmrc
+curl -L https://www.npmjs.com/install.sh | sh
+export PATH="$HOME/.npm-packages/bin:$PATH"
+npm update npm -g
+npm install -g @angular/cli
+
 if [[ ${USE_APPLE_CLANG} == "OFF" ]]; then
     brew install llvm || echo "suppress failures in order to ignore warnings"
     brew link --overwrite --dry-run llvm
