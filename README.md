@@ -110,7 +110,7 @@ Install the following extensions for VS Code:
 ## GUI Development Setup
 The UI is made up of an [Angular](https://angular.io) application that uses the [Angular CLI](https://cli.angular.io) to create the web assets that are ultimately displayed in a [CEF](https://bitbucket.org/chromiumembedded/cef) browser.
 Please visit the Angular CLI website for its prerequisites (node.js and npm respectively, also a globally installed Angular CLI aka `ng` ).
-Once you installed the prerequisites build the client application by navigating to the client directory and starting the build process. Please make sure you do this before compiling the C++ GUI application.
+Once you installed the prerequisites build the client application by navigating to the client directory and starting the build process.
 
 ```bash
 cd gui/client
