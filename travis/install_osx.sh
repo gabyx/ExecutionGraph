@@ -26,7 +26,7 @@ brew upgrade node
 npm install -g @angular/cli
 
 if [[ ${USE_APPLE_CLANG} == "OFF" ]]; then
-    brew install llvm --HEAD llvm --with-toolchain --with-lldb|| echo "suppress failures in order to ignore warnings"
+    brew install llvm --HEAD llvm --with-toolchain --with-lldb || echo "suppress failures in order to ignore warnings"
     brew link --overwrite --dry-run llvm
     brew link --overwrite llvm
     export PATH="/usr/local/opt/llvm/bin:$PATH"
