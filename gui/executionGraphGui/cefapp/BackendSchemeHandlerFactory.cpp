@@ -61,7 +61,7 @@ CefRefPtr<CefResourceHandler> BackendSchemeHandlerFactory::Create(CefRefPtr<CefB
                 {
                     ss << byte << ",";
                 }
-                EXECGRAPHGUI_APPLOG_DEBUG("Post Data Binary: '%s'", ss.str());
+                EXECGRAPHGUI_APPLOG_DEBUG("Post Data Binary: bytes: '{0}', data: '{1}'", element->GetBytesCount(), ss.str());
             }
         }
         // =====================================

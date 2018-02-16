@@ -23,7 +23,8 @@ export class BinaryHttpExecutionService extends ExecutionService {
 
     private async testSend(url: string): Promise<void> {
 
-        const data = this.createBinaryData();
+        const data = this.createBinaryData().buffer as ArrayBuffer;
+        console.info(`[BinaryHttpExecutionService]: sending data: bytes: '${data.byteLength}'`);
         // Create a post request that returns an observable, which is kind of a stream of response events
         let httpRequest: Observable<ArrayBuffer> = this.httpClient.post(url, data, { responseType: "arraybuffer" });
         // Add a callback function that is executed whenever there is a new event in the request stream
