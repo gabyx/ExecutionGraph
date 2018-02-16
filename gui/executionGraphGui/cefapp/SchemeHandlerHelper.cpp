@@ -69,7 +69,7 @@ namespace schemeHandlerHelper
                                                                      false /* is local */,
                                                                      false /* is display_isolated */,
                                                                      true /* is secure */,
-                                                                     false /* is cors enabled*/,
+                                                                     true /* is cors enabled*/,
                                                                      false /* is_csp_bypassing*/),
                                          "Scheme not registered!");
         }

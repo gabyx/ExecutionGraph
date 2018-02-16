@@ -73,8 +73,8 @@ namespace
     {
         // Register the URL Scheme handler for the client (angular application)
         CefRegisterSchemeHandlerFactory("client",
-                                        "executionGraph",
-                                        new ClientSchemeHandlerFactory(clientSourcePath, "executionGraph"));
+                                        "executiongraph",
+                                        new ClientSchemeHandlerFactory(clientSourcePath));
     }
 
     //! Install various backends and setup all of them.
@@ -82,15 +82,15 @@ namespace
     void setupBackends(std::shared_ptr<Dispatcher> messageDispatcher)
     {
         // Install the URL RequestHandler for the backend
-        CefRegisterSchemeHandlerFactory("backend",
-                                        "executionGraph",
-                                        new BackendSchemeHandlerFactory("executionGraph"));
+        CefRegisterSchemeHandlerFactory("http",
+                                        "executiongraph",
+                                        new BackendSchemeHandlerFactory());
         // So far an own scheme does not work:
         // WebKit does not pass POST data to the request for synchronous XHRs executed on non-HTTP schemes.
         // See the m\_url.protocolInHTTPFamily()
         // https://bitbucket.org/chromiumembedded/cef/issues/404
         // however we only uses asynchronous XHR requests... ?
-        CefAddCrossOriginWhitelistEntry("client://", "backend", "", true);  // only needed if we use the scheme "backend://" to allow CORS
+        //CefAddCrossOriginWhitelistEntry("client://", "http", "", true);  // only needed if we use the scheme "backend://" to allow CORS
 
         // Install the executionGraph backend
         BackendFactory::BackendData messageHandlers = BackendFactory::Create<ExecutionGraphBackend>();
@@ -139,7 +139,7 @@ void App::setupBrowser(std::shared_ptr<CefMessageRouterBrowserSide::Handler> mes
 
     // Specify CEF browser settings here.
     CefBrowserSettings browser_settings;
-    CefString url = "client://executionGraph/index.html";
+    CefString url = "client://executiongraph/index.html";
 
     if(useViews)
     {
@@ -157,7 +157,7 @@ void App::setupBrowser(std::shared_ptr<CefMessageRouterBrowserSide::Handler> mes
 #if defined(OS_WIN)
         // On Windows we need to specify certain flags that will be passed to
         // CreateWindowEx().
-        window_info.SetAsPopup(NULL, "executionGraphGui");
+        window_info.SetAsPopup(NULL, "ExecutionGraphGui");
 #endif
 
         // Create the first browser window.

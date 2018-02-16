@@ -21,7 +21,7 @@
 class ClientSchemeHandlerFactory final : public CefSchemeHandlerFactory
 {
 public:
-    ClientSchemeHandlerFactory(std::path folderPath, std::path pathPrefix)
+    ClientSchemeHandlerFactory(std::path folderPath, std::path pathPrefix = "")
         : m_folderPath(folderPath)
         , m_pathPrefix(pathPrefix)
     {

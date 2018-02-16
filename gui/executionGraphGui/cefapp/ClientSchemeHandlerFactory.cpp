@@ -72,7 +72,7 @@ CefRefPtr<CefResourceHandler> ClientSchemeHandlerFactory::Create(CefRefPtr<CefBr
     CefURLParts urlParts;
     if(CefParseURL(request->GetURL(), urlParts))
     {
-        debugTest(request);
+        //debugTest(request);
         //! todo: why do we get here a urlParts.path.str as "//host/folderA/folderB"
         //! Shouldnt it be : "folderA/folderB".
         //! the host is somehow not parsed?: http://www.magpcss.org/ceforum/viewtopic.php?f=6&t=6048

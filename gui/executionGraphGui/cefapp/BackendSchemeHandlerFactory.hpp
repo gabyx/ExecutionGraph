@@ -20,7 +20,7 @@
 class BackendSchemeHandlerFactory final : public CefSchemeHandlerFactory
 {
 public:
-    BackendSchemeHandlerFactory(const std::path& pathPrefix)
+    BackendSchemeHandlerFactory(const std::path& pathPrefix = "")
         : m_pathPrefix(pathPrefix)
     {
     }

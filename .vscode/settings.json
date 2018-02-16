@@ -112,7 +112,7 @@
         ]
     },
     "files.exclude": {
-        "**/.git": false,
+        "**/.git": true,
         "**/.svn": true,
         "**/.hg": true,
         "**/.DS_Store": true,
@@ -125,18 +125,18 @@
         "**/.git/subtree-cache/**": true,
         "**/node_modules/**": true,
         "**/build/**" : true,
-        "**/buildExternal" : true,
-        "**/dist" : true
+        "**/buildExternal/**" : true,
+        "**/dist/**" : true
     },
     "search.exclude": {
-        "**/.git": false,
+        "**/.git": true,
         "**/.svn": true,
         "**/.hg": true,
         "**/.DS_Store": true,
         "**/bower_components": true,
         "**/jspm_packages": true,
         "**/node_modules": true,
-        "**/build/**" : true,
+        "**/build" : true,
         "**/buildExternal" : true,
         "**/dist" : true
     },
