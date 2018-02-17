@@ -85,10 +85,10 @@ function enableCompiler(){
   fi
 }
 export -f enableCompiler
-
-enableCompiler "clang"
+enableCompiler "clang6"
 ```
-Use the if switch to quickly switch to another compiler, e.g. `gcc`.
+Use the `enableCompiler` function to quickly switch to another compiler, e.g. `gcc`.
+Restart VS Code if you reconfigured!
 Now you should be ready to configure with cmake:
 
 ## Buidling
