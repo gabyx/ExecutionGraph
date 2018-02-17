@@ -106,9 +106,10 @@ After that, the cmake cache file `CMakeCache.txt` is setup with all necessary va
 and configure the project. This works also with VS Code and the cmake extension. 
 
 ## General Development Setup
-If you start developing, install the pre-commit hook with:
+If you start developing, install the pre-commit/post-commit hooks with:
 ```bash
     npm install -g typescript-formatter json-fmt xmllint
+    brew install plantuml
     cd .git && mv hooks hooks.old && ln -s ../tools/git-hooks hooks
 ```
 
