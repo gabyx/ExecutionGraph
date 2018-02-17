@@ -9,7 +9,7 @@ function formatFile() {
     file=$1
     echo "formatting file: $file"
     fileTmp=$(mktemp)
-    json-fmt $file -p -o $fileTmp || echo 'fatal: `json-fmt` failed for:' "$file" >&2 && exit 1
+    json-fmt $file -p -o $fileTmp || (echo 'fatal: `json-fmt` failed for:' "$file" >&2; exit 1)
     mv $fileTmp $file
 }
 export -f formatFile

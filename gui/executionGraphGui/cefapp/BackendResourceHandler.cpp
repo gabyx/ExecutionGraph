@@ -93,6 +93,7 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
     response->SetMimeType("application/octet-stream");
     responseLength = c_debugResponse.size();  // quit the ReadResponse after 10bytes have been read (-1 for manual quitting)
 }
+
 bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
                                             CefRefPtr<CefCallback> callback)
 {

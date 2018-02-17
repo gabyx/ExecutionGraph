@@ -1,11 +1,13 @@
 #!/bin/bash
-
 echo "Pre-Commit Hook: autoformat"
+
+owndir="$(cd "$(dirname "$0")"; pwd -P)"
 
 root="$(git rev-parse --show-toplevel)"
 [ -d "$root" ] || exit 1
 
-owndir="$(cd "$(dirname "$0")"; pwd -P)"
+# check if .pre-commmit-changed file is here
+[ -f "${root}/.pre-commit-changed" ] && rm "${root}/.pre-commit-changed"
 
 OS_NAME=$(uname)
 

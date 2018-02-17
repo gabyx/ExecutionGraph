@@ -19,7 +19,7 @@ function formatFile() {
     cd "${REPO_DIR}"
     file=$1
     echo "formatting file: $file"
-    clang-format -style=file -fallback-style=none -i ${file} || echo 'fatal: `clang-format` failed for:' "$file" && exit 1
+    clang-format -style=file -fallback-style=none -i ${file} || (echo 'fatal: `clang-format` failed for:' "$file"; exit 1)
 }
 export -f formatFile
 

@@ -3,6 +3,7 @@ CMakeFiles
 # Build stuff
 __pycache__
 .ipynb_checkpoints
+.pre-commit-changed
 build
 buildExternal
 out

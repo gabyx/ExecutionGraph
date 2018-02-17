@@ -9,7 +9,7 @@ function formatFile() {
     file=$1
     echo "formatting xml file: $file"
     fileTmp=$(mktemp)
-    tidy -config $2 -xml -m $file 2>/dev/null || echo 'fatal: `tidy` failed for:' "$file" >&2 && exit 1
+    tidy -config $2 -xml -m $file 2>/dev/null || (echo 'fatal: `tidy` failed for:' "$file" >&2 ; exit 1)
     mv $fileTmp $file
 }
 export -f formatFile

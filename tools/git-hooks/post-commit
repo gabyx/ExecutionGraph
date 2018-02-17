@@ -1,0 +1,37 @@
+#!/bin/bash
+root="$(git rev-parse --show-toplevel)"
+[ -d "$root" ] || exit 1
+
+# check if file is here
+[ -f "${root}/.pre-commit-changed" ] || exit 0
+
+echo "Post-Commit Hook: add automatically changed files ..."
+
+function addFile()
+{
+    file="$1"
+    echo "stage file: ${file}"
+    git add ${file}
+}
+export -f addFile
+
+cat "${root}/.pre-commit-changed" | xargs -n 1 -0 -I {} bash -c 'addFile "${@}"' _ {}
+rm "${root}/.pre-commit-changed"
+
+# Show the status
+git status
+
+# Allows us to read user input below, assigns stdin to keyboard
+exec < /dev/tty
+read -p "Post-Commit Hook: Do you want to auto amend-commit the changed files? (Y/n) (default: n) " yn
+if [ "$yn" = "" ]; then
+    yn='n'
+fi
+case $yn in
+    [Y] ) git commit --amend -C HEAD --no-verify
+esac
+
+echo "Post-Commit Hook: add automatically changed files [DONE]"
+exit 0
+
+

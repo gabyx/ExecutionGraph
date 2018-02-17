@@ -1,0 +1,32 @@
+#!/bin/bash
+# format all .cpp|.hpp files in the repository
+
+REPO_DIR="$(git rev-parse --show-toplevel)"
+
+function makeUML() {
+    repoDir="$1"
+
+    file="$2"
+    dir=$(dirname ${file})
+
+    cd "${dir}"
+    echo "exporting platnuml to svg: $file"
+    plantuml -quite -tsvg -nbthread 4 -progress -style=file ${file} || (echo 'fatal: `plantuml` failed for:' "$file"; exit 1)
+    echo -e "\n"
+
+    filename=$(basename "$file")
+    extension="${filename##*.}"
+    filename="${filename%.*}"
+    outputFile="${dir}/${filename}.svg"
+
+    echo "Output file: ${outputFile} will be added to a post-commit step!"
+    echo -ne "${outputFile}\0" >> "${repoDir}/.pre-commit-changed"
+}
+export -f makeUML
+
+function makeUMLs() {
+    find "$1" -ipath "$2*" | xargs -I {} bash -c 'makeUML "${@}"' _ "${REPO_DIR}" {}
+}
+
+makeUMLs "$1" "$REPO_DIR/gui"
+
