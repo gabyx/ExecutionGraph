@@ -69,5 +69,4 @@ backend::BackendFactory ..> backend::DummyBackendMsgHandler : instanciates
 backend::DummyBackendMsgHandler "1" *-- backend::ExecutionGraphBackend
 
 backend::BackendFactory ..> executionGraph::StaticFactory : uses
-
 @enduml
