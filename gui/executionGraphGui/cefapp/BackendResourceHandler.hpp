@@ -82,6 +82,9 @@ private:
 private:
     void finish();
     void reset();
+
+private:
+    std::size_t m_bytesRead = 0;
 };
 
 #endif

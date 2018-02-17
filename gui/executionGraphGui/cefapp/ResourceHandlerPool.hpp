@@ -68,6 +68,8 @@ void ResourceHandlerPool<HandlerType>::batchAllocateHandlers(unsigned int size)
         m_resourceHandlers.emplace(handler->getId(), handler);
         m_unusedHandlers.push_back(handler);
     }
+
+    EXECGRAPHGUI_APPLOG_DEBUG("ResourceHandlerPool: increased handler pool to '{0}'", m_resourceHandlers.size());
 }
 
 //! Callback which is called when a usued request handler has finished.
@@ -91,6 +93,7 @@ void ResourceHandlerPool<HandlerType>::onRequestHandlerFinished(const Id& id)
 
         // Put handler in the unused set.
         m_unusedHandlers.push_back(handler);
+        EXECGRAPHGUI_APPLOG_DEBUG("ResourceHandlerPool: finished: current unused handlers: '{0}'", m_unusedHandlers.size());
     }
 }
 
@@ -101,6 +104,8 @@ typename ResourceHandlerPool<HandlerType>::PointerType
 ResourceHandlerPool<HandlerType>::checkoutUnusuedHandler()
 {
     CEF_REQUIRE_IO_THREAD();
+
+    EXECGRAPHGUI_APPLOG_DEBUG("ResourceHandlerPool: current unused handlers: '{0}'", m_unusedHandlers.size());
 
     if(!m_unusedHandlers.size())
     {

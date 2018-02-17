@@ -5,7 +5,6 @@ import { _throw } from 'rxjs/observable/throw';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/first';
-import * as msgpack from 'msgpack-lite';
 
 @Injectable()
 export class CefBinaryRouterService {
@@ -47,6 +46,6 @@ export class CefBinaryRouterService {
     }
 
     private createBinaryData(data: any): Uint8Array {
-        return msgpack.encode(data) as Uint8Array;
+        return new Uint8Array([0x81, 0xA3, 0x66, 0x6F, 0x6F, 0xA3, 0x62, 0x61, 0x72]);
     }
 }
