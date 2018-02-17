@@ -53,7 +53,7 @@ function enableCompiler(){
     export CXXFLAGS="$CPPFLAGS"
   elif [[ ${comp} == "clang6" ]] ; then
     echo "enabling clang6"
-     export PATH="/usr/local/opt/myllvm6.0rc1rc1/bin:$PATH"
+     export PATH="/usr/local/opt/myllvm6.0rc1/bin:$PATH"
     export CC="/usr/local/opt/myllvm6.0rc1/bin/clang"
     export CXX="${CC}++"
     export LDFLAGS="-L/usr/local/opt/myllvm6.0rc1/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
