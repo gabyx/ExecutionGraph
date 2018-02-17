@@ -27,11 +27,11 @@ namespace executionGraph
 
     public:
         Identifier(const char* name)
-            : m_name(name)
+            : m_name(name), m_guid(xg::newGuid())
         {
         }
         Identifier(const std::string& name)
-            : m_name(name)
+            : m_name(name), m_guid(xg::newGuid())
         {
         }
         Identifier(const std::string& name, const xg::Guid& guid)

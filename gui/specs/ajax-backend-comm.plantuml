@@ -5,7 +5,7 @@ box "CEF [IO-Thread]" #LightGrey
 participant CEF
 
 participant backendHandlerFactory << BackendSchemeHandlerFactory >>
-participant requestHandler << CefResourceHandler >>
+participant requestHandler << BackendResourceHandler >>
 end box
 
 box "Backend [Browser-Thread]" #LightGrey

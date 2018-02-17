@@ -10,15 +10,21 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef cefapp_File_Scheme_Handler_Factory_h
-#define cefapp_File_Scheme_Handler_Factory_h
+#ifndef cefapp_BackendSchemeHandlerFactory_hpp
+#define cefapp_BackendSchemeHandlerFactory_hpp
 
 #include <cef_scheme.h>
-#include "executionGraph/common/FileSystem.hpp"
+#include <executionGraph/common/FileSystem.hpp>
+#include <queue>
+#include <vector>
+#include "cefapp/BackendResourceHandler.hpp"
+#include "cefapp/ResourceHandlerPool.hpp"
 
 //! Factory for creating client request handlers.
 class BackendSchemeHandlerFactory final : public CefSchemeHandlerFactory
 {
+    IMPLEMENT_REFCOUNTING(BackendSchemeHandlerFactory);
+
 public:
     BackendSchemeHandlerFactory(const std::path& pathPrefix = "")
         : m_pathPrefix(pathPrefix)
@@ -34,7 +40,8 @@ public:
 private:
     const std::path m_pathPrefix;
 
-    IMPLEMENT_REFCOUNTING(BackendSchemeHandlerFactory)
+private:
+    ResourceHandlerPool<BackendResourceHandler> m_pool;  //! Simple request handler pool.
 };
 
 #endif

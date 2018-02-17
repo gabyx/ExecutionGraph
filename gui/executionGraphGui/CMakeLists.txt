@@ -17,6 +17,9 @@ set(ExecutionGraphGUI_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/ClientSchemeHandlerFactory.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/BackendSchemeHandlerFactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/BackendSchemeHandlerFactory.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/BackendResourceHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/BackendResourceHandler.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/ResourceHandlerPool.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/SchemeHandlerHelper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/SchemeHandlerHelper.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.cpp

@@ -15,7 +15,7 @@
 #include <gtest/gtest.h>
 #include <random>
 
-#include "executionGraph/common/Asserts.hpp"
+#include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/SfinaeMacros.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/config/Config.hpp"

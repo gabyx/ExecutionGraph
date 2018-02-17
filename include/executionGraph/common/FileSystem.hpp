@@ -14,12 +14,21 @@
 #define executionGraph_common_FileSystem_hpp
 
 #include <experimental/filesystem>
+#include <optional>
+#include "executionGraph/common/Platform.hpp"
 #include "executionGraph/config/Config.hpp"
 
 namespace std
 {
     namespace filesystem = std::experimental::filesystem;
     using path           = std::filesystem::path;
+
 }  // namespace std
+
+namespace executionGraph
+{
+    EXECGRAPH_EXPORT std::path splitLeadingSlashes(const std::path& path);
+    EXECGRAPH_EXPORT std::optional<std::path> splitPrefixFromPath(const std::path& path, const std::path& prefix);
+}  // namespace executionGraph
 
 #endif

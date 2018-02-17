@@ -18,7 +18,7 @@
 #include <set>
 #include <unordered_set>
 
-#include "executionGraph/common/Asserts.hpp"
+#include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/DemangleTypes.hpp"
 #include "executionGraph/common/StringFormat.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"

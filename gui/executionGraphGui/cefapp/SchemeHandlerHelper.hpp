@@ -21,6 +21,7 @@
 
 namespace schemeHandlerHelper
 {
+    std::path splitLeadingSlashes(const std::path& path);
     std::optional<std::path> splitPrefixFromPath(const std::string& path, const std::path& prefix);
 
     //! Return all custom schemes which get registered in this application.

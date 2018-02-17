@@ -18,7 +18,7 @@
 #include <rttr/type>
 #include <type_traits>
 #include <unordered_map>
-#include "executionGraph/common/Asserts.hpp"
+#include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/CommonTraits.hpp"
 #include "executionGraph/config/Config.hpp"
 

@@ -15,7 +15,7 @@
 
 #include <memory>
 #include <vector>
-#include "executionGraph/common/Asserts.hpp"
+#include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/DemangleTypes.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 

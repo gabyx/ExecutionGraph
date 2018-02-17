@@ -13,7 +13,7 @@
 #ifndef backend_File_Scheme_Handler_Factory_h
 #define backend_File_Scheme_Handler_Factory_h
 
-#include <executionGraph/common/Asserts.hpp>
+#include <executionGraph/common/Assert.hpp>
 #include <memory>
 #include <unordered_set>
 #include <vector>

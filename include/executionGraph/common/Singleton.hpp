@@ -14,7 +14,7 @@
 #define executionGraph_common_Singelton_hpp
 
 #include <memory>
-#include "executionGraph/common/Asserts.hpp"
+#include "executionGraph/common/Assert.hpp"
 
 namespace executionGraph
 {
@@ -57,11 +57,11 @@ namespace executionGraph
 
 }  // namespace executionGraph
 
-    //! Instanciate a singelton `name` with type `type` and ctor arguments `ctor_args`.
+//! Instanciate a singelton `name` with type `type` and ctor arguments `ctor_args`.
 #    define EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(type, name, ctor_args) \
         auto name = std::unique_ptr<type>(new type ctor_args);
 
-    //! Instanciate a singelton `name` with type `type`.
+//! Instanciate a singelton `name` with type `type`.
 #    define EXECGRAPH_INSTANCIATE_SINGLETON(type, name) INSTANCIATE_UNIQUE_SINGELTON_CTOR(type, name, ())
 
 #endif

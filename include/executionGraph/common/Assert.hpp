@@ -28,7 +28,7 @@
 #    define EXECGRAPH_ASSERT(condition, message)
 #    define EXECGRAPH_ASSERT_TYPE(condition, message, type)
 #else
-    // Debug!
+// Debug!
 #    define EXECGRAPH_DEBUG_ONLY(code) code
 #    define EXECGRAPH_ASSERT(condition, message) EXECGRAPH_ASSERT_TYPE(condition, message, Exception)
 #    define EXECGRAPH_ASSERT_TYPE(condition, message, type)   \

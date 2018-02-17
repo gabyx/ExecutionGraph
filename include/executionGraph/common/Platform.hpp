@@ -23,7 +23,6 @@ namespace executionGraph
 {
 #if(defined _WIN32) || (defined __CYGWIN__) || (defined WIN32)
 #    ifdef ExecutionGraph_BUILD_LIBRARY  // This macro is given to the compiler when building the library!
-#        pragma message(" Platform.hpp: Building library ...")
 #        ifdef __GNUC__
 #            define EXECGRAPH_EXPORT __attribute__((dllexport))
 #        else

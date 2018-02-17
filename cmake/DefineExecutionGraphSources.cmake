@@ -23,11 +23,13 @@ macro(include_all_source_ExecutionGraph
 
         ${ExecutionGraph_ROOT_DIR}/src/LogicSocket.cpp
         ${ExecutionGraph_ROOT_DIR}/src/LogicNode.cpp
+
+        ${ExecutionGraph_ROOT_DIR}/src/FileSystem.cpp
     )
 
     set(${INC}
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Log.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Asserts.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Assert.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Delegates.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/DemangleTypes.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/EnumClassHelper.hpp
@@ -41,6 +43,7 @@ macro(include_all_source_ExecutionGraph
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Identifier.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/IObjectID.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Factory.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/FileSystem.hpp
 
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/LogicCommon.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/LogicSocket.hpp

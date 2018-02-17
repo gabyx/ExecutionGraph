@@ -16,7 +16,7 @@
 #include <meta/meta.hpp>
 #include <unordered_set>
 
-#include "executionGraph/common/Asserts.hpp"
+#include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/DemangleTypes.hpp"
 #include "executionGraph/common/EnumClassHelper.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
