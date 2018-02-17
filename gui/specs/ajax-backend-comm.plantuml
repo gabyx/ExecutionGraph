@@ -34,7 +34,7 @@ activate CEF
 
     CEF -> requestHandler : ""ReadResponse(dataOut, bytesToRead, bytesRead, callback)""
     activate requestHandler
-        requestHandler --> messageDispatcher : IPC Message: ""Post(requestBinData, callback)"" 
+        requestHandler --> messageDispatcher : CefPostTask: ""HandleMessageTask(requestBinData, callback)"" 
         CEF <- requestHandler : ""true, bytesRead = 0""
         note right: Data not yet available
     deactivate requestHandler

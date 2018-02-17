@@ -9,6 +9,8 @@ class Handler as "CefMessageRouterBrowserSide::Handler"
 namespace cefapp{
     class App{
         + OnContextInitialized()
+        - m_appHandler
+        - m_messageDispatcher
     }
     class AppHandler #D3D3D3{
         + OnAfterCreated()
@@ -19,34 +21,35 @@ namespace cefapp{
     }
 
     class MessageDispatcher {
-        + AddHandler(backendHandler)
-        + RemoveHandler(backendHandler)
-        - m_handlers
+        + AddHandler(backendHandler, requestId)
+        + RemoveHandler(id)
+        - m_generalHandlers
+        - m_specificHandlers
         - m_handlerMap
     }
     class ClientSchemeHandlerFactory
+    class BackendSchemeHandlerFactory
 }
 
-
 cefapp::App ..> cefapp::AppHandler : creates
-cefapp::App --> cefapp::ClientSchemeHandlerFactory : registers
+cefapp::App ..> cefapp::ClientSchemeHandlerFactory : registers
+cefapp::App ..> cefapp::BackendSchemeHandlerFactory : registers
 
-cefapp::AppHandler "1" o-left- CefMessageRouterBrowserSide
-cefapp::AppHandler "1" *-- cefapp::MessageDispatcher
-cefapp::MessageDispatcher -left-|> Handler
+cefapp::AppHandler "1" *-down- Handler
+cefapp::MessageDispatcher -down-|> Handler
 cefapp::MessageDispatcher "1..*" *--- backend::BackendMessageHandler
+cefapp::AppHandler "1" *-down- CefMessageRouterBrowserSide
 
 namespace backend {
     class Backend #D3D3D3
-    class BackendMessageHandler #D3D3D3{
+    class BackendMessageHandler #D3D3D3 {
         + OnQuery(...) {abstract} 
+        + OnRequest(...) {abstract}
     }
 
     class BackendFactory {
         + BackendData Create() {static}
     }
-
-    class CreatorExecutionGraphBackend
 
     class DummyBackendMsgHandler
 }
@@ -55,18 +58,16 @@ namespace executionGraph {
     class StaticFactory<T...>
 }
 
-cefapp::AppHandler ..> backend::BackendFactory : uses
+cefapp::App ..> backend::BackendFactory : uses
 
 backend::ExecutionGraphBackend --|> backend::Backend
 backend::DummyBackendMsgHandler --|> backend::BackendMessageHandler
 
-backend::BackendFactory ..> backend::CreatorExecutionGraphBackend : uses
-
-backend::CreatorExecutionGraphBackend ..> backend::ExecutionGraphBackend : instanciates
-backend::CreatorExecutionGraphBackend ..> backend::DummyBackendMsgHandler : instanciates
+backend::BackendFactory ..> backend::ExecutionGraphBackend : instanciates
+backend::BackendFactory ..> backend::DummyBackendMsgHandler : instanciates
 
 backend::DummyBackendMsgHandler "1" *-- backend::ExecutionGraphBackend
 
-backend::BackendFactory .right.> executionGraph::StaticFactory
+backend::BackendFactory ..> executionGraph::StaticFactory : uses
 
 @enduml

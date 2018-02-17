@@ -23,6 +23,7 @@ CefRefPtr<CefResourceHandler> BackendSchemeHandlerFactory::Create(CefRefPtr<CefB
                                                                   CefRefPtr<CefRequest> request)
 {
     CEF_REQUIRE_IO_THREAD();
+
     std::string requestUrl = request->GetURL().ToString();
     CefURLParts urlParts;
     if(CefParseURL(request->GetURL(), urlParts))
@@ -44,6 +45,7 @@ CefRefPtr<CefResourceHandler> BackendSchemeHandlerFactory::Create(CefRefPtr<CefB
 
         std::string requestId = path->filename();
         EXECGRAPHGUI_ASSERTMSG(!requestId.empty(), "Empty requestId in '{0}'!", requestUrl);
+        EXECGRAPHGUI_APPLOG_DEBUG("BackendSchemeHandlerFactory:: Received requestId: '{0}', query: '{1}'", requestId, query);
 
         // Printing the binary data ============
         CefRefPtr<CefPostData> postData = request->GetPostData();
@@ -65,7 +67,6 @@ CefRefPtr<CefResourceHandler> BackendSchemeHandlerFactory::Create(CefRefPtr<CefB
             }
         }
         // =====================================
-        EXECGRAPHGUI_APPLOG_DEBUG("BackendSchemeHandlerFactory:: Received requestId: '{0}', query: '{1}'", requestId, query);
     }
 
     EXECGRAPHGUI_APPLOG_ERROR("BackendSchemeHandlerFactory: requestUrl '{0}' failed!", requestUrl);

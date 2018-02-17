@@ -39,12 +39,14 @@ public:
                  bool persistent,
                  CefRefPtr<Callback> callback) override
     {
+        CEF_REQUIRE_UI_THREAD();
+
         // Check first all specific handlers
         // todo ....
         // if message handler handled the message -> return
 
         // otherwise, dispatch to all other handlers
-        for(auto* handler : m_handlers)
+        for(auto* handler : m_generalHandlers)
         {
             if(handler->OnQuery(browser, frame, queryId, request, persistent, callback))
             {
@@ -57,6 +59,7 @@ public:
     //! Callback for binary data from XHR Requests
     bool HandleMessage()
     {
+        CEF_REQUIRE_UI_THREAD();
         // Check first all specific handlers
         // todo ...
         // if message handler handled the message -> return
@@ -67,13 +70,14 @@ public:
     }
 
 public:
-    //! Sets a message handler `handler` for the specific request id `requestId`.
-    void SetHandler(const std::string& requestId, std::shared_ptr<HandlerType> handler)
+    //! Adds a message handler `handler` for an optional specific request id `requestId`.
+    //! Messages are first dispatched to all specific handlers added with a `requestId`.
+    bool AddHandler(std::shared_ptr<HandlerType> handler, const std::string& requestId)
     {
         if(!handler || requestId.empty())
         {
             EXECGRAPH_ASSERT(false, "nullptr or empty requestId")
-            return;  // nullptr
+            return false;
         }
         Id id = handler->getId();
 
@@ -81,17 +85,18 @@ public:
                                      "MessageHandler with id: " << id.getFullName() << " already exists!");
 
         m_handlerStorage.emplace(id, HandlerData{requestId, handler.get()});
-        m_specificHandlers.emplace(requestId, handler.get());
+        m_specificHandlers[requestId].emplace(handler.get());
+        return true;
     }
 
-    //! Adds a message handler `handler` to the back of the dispatch sequence.
+    //! Adds a message handler `handler` to the back or the front of all general handlers.
     template<bool insertAtFront = false>
-    void AddHandler(std::shared_ptr<HandlerType> handler)
+    bool AddHandler(std::shared_ptr<HandlerType> handler)
     {
         if(!handler)
         {
             EXECGRAPH_ASSERT(false, "nullptr!")
-            return;  // nullptr
+            return false;
         }
 
         Id id = handler->getId();
@@ -102,16 +107,18 @@ public:
         if(insertAtFront)
         {
             m_handlerStorage.emplace(id, HandlerData{0, handler});
-            m_handlers.emplace_back(handler.get());
+            m_generalHandlers.emplace_back(handler.get());
         }
         else
         {
-            m_handlerStorage.emplace(id, HandlerData{m_handlers.size(), handler});
-            m_handlers.emplace_back(handler.get());
+            m_handlerStorage.emplace(id, HandlerData{m_generalHandlers.size(), handler});
+            m_generalHandlers.emplace_back(handler.get());
         }
+        return true;
     }
 
     //! Removes a message handler with id `id`.
+    //! @return the removed handler.
     std::shared_ptr<HandlerType> RemoveHandler(Id id)
     {
         std::shared_ptr<HandlerType> handler;
@@ -122,12 +129,12 @@ public:
             handler = it->second.m_handler;
             if(it->second.m_requestId.empty())
             {
-                EXECGRAPH_ASSERT(it->second.m_index < m_handlers.size(), "Wrong index!")
-                m_handlers.erase(m_handlers.begin() + it->index);  // Remove from list
+                EXECGRAPH_ASSERT(it->second.m_index < m_generalHandlers.size(), "Wrong index!")
+                m_generalHandlers.erase(m_generalHandlers.begin() + it->index);  // Remove from list
             }
             else
             {
-                m_specificHandlers.erase(it->second.m_requestId);
+                m_specificHandlers[it->second.m_requestId].erase(it->second.m_handler.get());
             }
 
             m_handlerStorage.erase(it);  // Remove from storage
@@ -147,14 +154,14 @@ private:
         {}
 
         const std::string m_requestId;                 //! The requestId if it is a specific handler.
-        const std::size_t m_index = 0;                 //! Index into `m_handlers` if `m_requestId` is empty.
+        const std::size_t m_index = 0;                 //! Index into `m_generalHandlers` if `m_requestId` is empty.
         const std::shared_ptr<HandlerType> m_handler;  //! The message handler.
     };
 
 private:
-    std::unordered_map<std::string, HandlerType*> m_specificHandlers;            //! A unique handler for each specific request id.
-    std::vector<HandlerType*> m_handlers;                                        //!< The handlers to which all messages are dispatched (no requestId).
-    std::unordered_map<typename HandlerType::Id, HandlerData> m_handlerStorage;  //!< Storage for handlers.
+    std::unordered_map<std::string, std::unordered_set<HandlerType*>> m_specificHandlers;  //! Handlers for a specific request id (handled first).
+    std::vector<HandlerType*> m_generalHandlers;                                           //!< The handlers to which all messages are dispatched (no requestId).
+    std::unordered_map<typename HandlerType::Id, HandlerData> m_handlerStorage;            //!< Storage for handlers.
 };
 
 #endif

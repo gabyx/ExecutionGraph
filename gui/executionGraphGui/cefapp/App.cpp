@@ -82,15 +82,16 @@ namespace
     void setupBackends(std::shared_ptr<Dispatcher> messageDispatcher)
     {
         // Install the URL RequestHandler for the backend
+        CefRefPtr<BackendSchemeHandlerFactory> backendSchemeHandlerFactory(new BackendSchemeHandlerFactory());
         CefRegisterSchemeHandlerFactory("http",
-                                        "executiongraph",
-                                        new BackendSchemeHandlerFactory());
+                                        "executiongraph-backend",
+                                        backendSchemeHandlerFactory);
         // So far an own scheme does not work:
         // WebKit does not pass POST data to the request for synchronous XHRs executed on non-HTTP schemes.
         // See the m\_url.protocolInHTTPFamily()
         // https://bitbucket.org/chromiumembedded/cef/issues/404
         // however we only uses asynchronous XHR requests... ?
-        //CefAddCrossOriginWhitelistEntry("client://", "http", "", true);  // only needed if we use the scheme "backend://" to allow CORS
+        // CefAddCrossOriginWhitelistEntry("client://", "http", "", true);  // only needed if we use the scheme "backend://" to allow CORS
 
         // Install the executionGraph backend
         BackendFactory::BackendData messageHandlers = BackendFactory::Create<ExecutionGraphBackend>();
@@ -112,15 +113,16 @@ void App::OnContextInitialized()
     // make a global message dispatcher
     using Dispatcher       = MessageDispatcher<BackendMessageHandler>;
     auto messageDispatcher = std::make_shared<Dispatcher>();
+    m_messageDispatcher    = messageDispatcher;
 
     // setup the backends
     setupBackends(messageDispatcher);
 
     // setup the browser
-    setupBrowser(messageDispatcher);
+    setupBrowser();
 }
 
-void App::setupBrowser(std::shared_ptr<CefMessageRouterBrowserSide::Handler> messageDispatcher)
+void App::setupBrowser()
 {
     CefRefPtr<CefCommandLine> command_line = CefCommandLine::GetGlobalCommandLine();
 
@@ -135,7 +137,7 @@ void App::setupBrowser(std::shared_ptr<CefMessageRouterBrowserSide::Handler> mes
 #endif
 
     // AppHandler implements browser-level callbacks.
-    m_appHandler = CefRefPtr<AppHandler>(new AppHandler(messageDispatcher, useViews));
+    m_appHandler = CefRefPtr<AppHandler>(new AppHandler(m_messageDispatcher, useViews));
 
     // Specify CEF browser settings here.
     CefBrowserSettings browser_settings;
