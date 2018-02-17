@@ -7,32 +7,30 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/first';
 import * as msgpack from 'msgpack-lite';
 
-import { ExecutionService } from './ExecutionService';
-
 @Injectable()
-export class BinaryHttpExecutionService extends ExecutionService {
+export class CefBinaryRouterService {
 
     constructor(private httpClient: HttpClient) {
-        super();
     }
 
-    public async execute(): Promise<void> {
-        console.log("[BinaryHttpExecutionService] send()");
-        await this.testSend("http://executionGraph/addNode");
+    public async execute<T>(requestId: string, payload: any): Promise<void> {
+        console.log("[CefBinaryRouterService] send()");
+        await this.testSend(`http://executiongraph-backend/${requestId}`, this.createBinaryData(payload));
     }
 
-    private async testSend(url: string): Promise<void> {
+    private async testSend(url: string, payload: Uint8Array): Promise<void> {
 
-        const data = this.createBinaryData().buffer as ArrayBuffer;
-        console.info(`[BinaryHttpExecutionService]: sending data: bytes: '${data.byteLength}'`);
+        const data = payload.buffer as ArrayBuffer;
+
+        console.info(`[CefBinaryRouterService]: sending data: bytes: '${data.byteLength}'`);
         // Create a post request that returns an observable, which is kind of a stream of response events
         let httpRequest: Observable<ArrayBuffer> = this.httpClient.post(url, data, { responseType: "arraybuffer" });
         // Add a callback function that is executed whenever there is a new event in the request stream
-        httpRequest = httpRequest.do(() => console.log(`[BinaryHttpExecutionService] success`));
+        httpRequest = httpRequest.do(() => console.log(`[CefBinaryRouterService] success`));
         // In case of an error in the http event stream, catch it to log it and rethrow it, note that an error will only be actually thrown once
         // the observable is subscribed to, or in this case is converted into a promise and the promise is actually awaited.
         httpRequest = httpRequest.catch((error: HttpErrorResponse) => {
-            console.error(`[BinaryHttpExecutionService]: ${error.statusText}`);
+            console.error(`[CefBinaryRouterService]: ${error.statusText}`);
             return _throw(error);
         });
         // After the first successful event in the stream, unsubscribe from the event stream
@@ -48,13 +46,7 @@ export class BinaryHttpExecutionService extends ExecutionService {
         const responseData: ArrayBuffer = await requestPromise;
     }
 
-    private createBinaryData(): Uint8Array {
-        return msgpack.encode({
-            "requestId": "addNode",
-            "payload": {
-                "graphId": 12,
-                "args": [1, 2, 3]
-            }
-        }) as Uint8Array;
+    private createBinaryData(data: any): Uint8Array {
+        return msgpack.encode(data) as Uint8Array;
     }
 }

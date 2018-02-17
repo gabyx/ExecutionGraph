@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { ExecutionService } from './ExecutionService';
 import { CefMessageRouterService } from './CefMessageRouterService';
+import { CefBinaryRouterService } from './CefBinaryRouterService';
 
 @Injectable()
 export class CefExecutionService extends ExecutionService {
 
     constructor(
-        private readonly messageRouter: CefMessageRouterService
+        private readonly messageRouter: CefBinaryRouterService
     ) {
         super();
     }
