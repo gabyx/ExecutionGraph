@@ -41,8 +41,9 @@ With Clang 7.0 no problems have been detected.
 
 Set the `CXX` and `CC` variables in your `~/.bash_profile` or similar to 
 ```bash
-comp="clang"
-if [[ ${comp} == "clang" ]] ; then
+function enableCompiler(){
+  comp="$1"
+  if [[ ${comp} == "clang" ]] ; then
     echo "enabling clang7.0"
     export PATH="/usr/local/opt/llvm/bin:$PATH"
     export CC="/usr/local/opt/llvm/bin/clang"
@@ -50,15 +51,23 @@ if [[ ${comp} == "clang" ]] ; then
     export LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
     export CPPFLAGS="-I/usr/local/opt/llvm/include -I/usr/local/opt/llvm/include/c++/v1/"
     export CXXFLAGS="$CPPFLAGS"
-elif [[ ${comp} == "gcc@7.0" ]] ; then
-    echo "enabling gcc@7.0"
+  elif [[ ${comp} == "clang6" ]] ; then
+    echo "enabling clang6"
+     export PATH="/usr/local/opt/myllvm6.0rc1rc1/bin:$PATH"
+    export CC="/usr/local/opt/myllvm6.0rc1/bin/clang"
+    export CXX="${CC}++"
+    export LDFLAGS="-L/usr/local/opt/myllvm6.0rc1/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
+    export CPPFLAGS="-I/usr/local/opt/myllvm6.0rc1/include -I/usr/local/opt/myllvm6.0rc1/include/c++/v1/"
+    export CXXFLAGS="$CPPFLAGS"
+  elif [[ ${comp} == "gcc" ]] ; then
+    echo "enabling gcc7.2"
     export PATH="/usr/local/opt/$comp/bin:$PATH"
     export CC="/usr/local/opt/$comp/bin/gcc-7"
     export CXX="/usr/local/opt/$comp/bin/g++-7"
     export LDFLAGS="-L/usr/local/opt/$comp/lib/gcc/7 -Wl,-rpath,/usr/local/opt/$comp/lib/gcc/7"
     export CPPFLAGS="-I/usr/local/opt/$comp/include -I/usr/local/opt/$comp/include/c++/7.2.0"
     export CXXFLAGS="$CPPFLAGS"
-elif [[ ${comp} == "gcc@4.9" ]] ; then
+  elif [[ ${comp} == "gcc@4.9" ]] ; then
     echo "enabling gcc@4.9"
     export PATH="/usr/local/opt/$comp/bin:$PATH"
     export CC="/usr/local/opt/$comp/bin/gcc-4.9"
@@ -66,7 +75,18 @@ elif [[ ${comp} == "gcc@4.9" ]] ; then
     export LDFLAGS="-L/usr/local/opt/$comp/lib/gcc/4.9 -Wl,-rpath,/usr/local/opt/$comp/lib/gcc/4.9"
     export CPPFLAGS="-I/usr/local/opt/$comp/include -I/usr/local/opt/$comp/include/c++/4.9.4/"
     export CXXFLAGS="$CPPFLAGS"
-fi
+  else
+    echo "enabling no compiler"
+    export CC=
+    export CXX=
+    export LDFLAGS=
+    export CPPFLAGS=
+    export CXXFLAGS=
+  fi
+}
+export -f enableCompiler
+
+enableCompiler "clang"
 ```
 Use the if switch to quickly switch to another compiler, e.g. `gcc`.
 Now you should be ready to configure with cmake:
