@@ -51,7 +51,8 @@ namespace
         }
     }
 
-    void debugWaitOnUIThread(CefRefPtr<CefCallback> callback)
+    //! Wait some time in another other to simulate working.
+    void debugWaitOnOtherThread(CefRefPtr<CefCallback> callback)
     {
         using namespace std::chrono_literals;
 
@@ -116,12 +117,13 @@ bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
     // and then serializes a proper reponse
     // if an error happens, the returned response contains no payload, but a well defined error message.
     // todo
-    // DEBUG ==========
-    m_bytesRead = 0;
-    // FILE Threads does not block UI,
-    // here
-    CefPostTask(TID_FILE, base::Bind(&debugWaitOnUIThread, callback));
-    // DEBUG ==========
+
+    {  // DEBUG ==========
+        m_bytesRead = 0;
+        // FILE Threads does not block UI,
+        CefPostTask(TID_FILE, base::Bind(&debugWaitOnOtherThread, callback));
+    }  // DEBUG ==========
+
     return true;
 }
 bool BackendResourceHandler::ReadResponse(void* dataOut,
@@ -132,24 +134,24 @@ bool BackendResourceHandler::ReadResponse(void* dataOut,
     CEF_REQUIRE_IO_THREAD();
     // Handle the repsponse
     // todo
-    // DEBUG ==========
+    {  // DEBUG ==========
+        if(m_bytesRead < c_debugResponse.size())
+        {
+            std::memcpy(dataOut, c_debugResponse.data() + m_bytesRead, 1);
+            m_bytesRead++;
+            bytesRead = 1;  // one byte read
+        }
 
-    if(m_bytesRead < c_debugResponse.size())
-    {
-        std::memcpy(dataOut, c_debugResponse.data() + m_bytesRead, 1);
-        m_bytesRead++;
-        bytesRead = 1;  // one byte read
-    }
+        if(m_bytesRead == c_debugResponse.size())
+        {
+            // Response is finished, we returned all bytes to read, so
+            // finish up and return false.
+            finish();
+            return false;
+        }
 
-    if(m_bytesRead == c_debugResponse.size())
-    {
-        // Response is finished, we returned all bytes to read, so
-        // finish up and return false.
-        finish();
-        return false;
-    }
-    return true;
-    // DEBUG ==========
+        return true;
+    }  // DEBUG ==========
 }
 
 //! Initilize the request by extracting the requestId and query string.
