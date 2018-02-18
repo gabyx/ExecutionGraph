@@ -24,7 +24,9 @@ namespace executionGraph
     /*!
         A thread-safe task queue.
         The tasks which are pushed into this queue are copied.
-        So the TTask type either is cheap copyable or movable or is a std::shared_ptr<T>.
+        
+        So the TTask type either is cheap copyable or movable.
+        If your task type can not be copied or moved: use a std::shared_ptr.
 
         @date Sun Feb 18 2018
         @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
@@ -40,10 +42,9 @@ namespace executionGraph
         TaskQueue()          = default;
         virtual ~TaskQueue() = default;
 
-        //! Move allowed!
-        TaskQueue(TaskQueue&&) = default;
-        TaskQueue& operator=(TaskQueue&&) = default;
-
+        //! No move allowed!
+        TaskQueue(TaskQueue&&) = delete;
+        TaskQueue& operator=(TaskQueue&&) = delete;
         //! No copy allowed!
         TaskQueue(const TaskQueue&) = delete;
         TaskQueue& operator=(const TaskQueue&) = delete;

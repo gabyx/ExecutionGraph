@@ -23,10 +23,10 @@ namespace executionGraph
 {
     /* ---------------------------------------------------------------------------------------*/
     /*!
-        A task consumer thread which pops from a thread-safe queue
-        and executes the task.
+        A task consumer thread which pops tasks from a thread-safe queue
+        and executes them in its consumer loop.
 
-        The task needs a call operator `operator(std::thread:id id)`.
+        The tasks need a call operator `operator(std::thread:id id)`.
 
         @date Sun Feb 18 2018
         @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
@@ -48,10 +48,9 @@ namespace executionGraph
             : m_queue(queue){};
         virtual ~TaskConsumer() = default;
 
-        //! Move allowed!
-        TaskConsumer(TaskConsumer&&) = default;
-        TaskConsumer& operator=(TaskConsumer&&) = default;
-
+        //! No move allowed!
+        TaskConsumer(TaskConsumer&&) = delete;
+        TaskConsumer& operator=(TaskConsumer&&) = delete;
         //! No copy allowed!
         TaskConsumer(const TaskConsumer&) = delete;
         TaskConsumer& operator=(const TaskConsumer&) = delete;

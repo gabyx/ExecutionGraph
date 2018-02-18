@@ -62,6 +62,7 @@ public:
         m_i   = t.m_i;
         t.m_i = -1;
         m_a   = std::move(t.m_a);
+        return *this;
     };
 
     void operator()(std::thread::id threadId)
@@ -70,7 +71,7 @@ public:
         std::string id = getId();
         DEFINE_RANDOM_GENERATOR_FUNC(hashString(id));
         using namespace std::chrono_literals;
-        auto sleep = int(rand() * 500);
+        auto sleep = int(rand() * 2000);
         PrintThread{} << "Thread: " << threadId << " Task: " << m_i << " running: " << sleep << "ms" << std::endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(sleep));
         PrintThread{} << "Thread: " << threadId << " Task: " << m_i << " finished " << std::endl;
@@ -102,7 +103,7 @@ MY_TEST(ProducerConsumer, Test1)
             PrintThread{} << "task " << i << " adding " << std::endl;
             Task t{i};
             queue->emplace(std::move(t));
-            std::this_thread::sleep_for(std::chrono::milliseconds(int(rand() * 500)));
+            std::this_thread::sleep_for(std::chrono::milliseconds(int(rand() * 200)));
         }
 
         auto sleep = int(rand() * 2000);
