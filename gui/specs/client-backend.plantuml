@@ -23,6 +23,10 @@ namespace cefapp{
     class MessageDispatcher {
         + AddHandler(backendHandler, requestId)
         + RemoveHandler(id)
+        + OnQuery()
+        + AddRequest()
+        + StartMessageHandler()
+        + StopMessageHandler()
         - m_generalHandlers
         - m_specificHandlers
         - m_handlerMap
