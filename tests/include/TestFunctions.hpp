@@ -20,14 +20,13 @@
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/config/Config.hpp"
 
-#define MY_TEST(name1, name2) TEST(name1, name2)
+std::size_t hashString(std::string s);
 
-#define MY_TEST_RANDOM_STUFF(name)                                                        \
-    std::string testName = #name;                                                         \
-    auto seed            = hashString(#name);                                             \
-    EXECGRAPH_LOG_TRACE("Seed for this test: " << seed);                                  \
-    ExecutionGraph::RandomGenerators::DefaultRandomGen rng(seed);                         \
-    ExecutionGraph::RandomGenerators::DefaultUniformRealDistribution<PREC> uni(0.0, 1.0); \
-    auto f = [&](PREC) { return uni(rng); };
+#    define DEFINE_RANDOM_GENERATOR_FUNC(seed)                \
+        std::mt19937 rng(seed);                               \
+        std::uniform_real_distribution<double> uni(0.0, 1.0); \
+        auto rand = [&]() { return uni(rng); };
+
+#    define MY_TEST(name1, name2) TEST(name1, name2)
 
 #endif

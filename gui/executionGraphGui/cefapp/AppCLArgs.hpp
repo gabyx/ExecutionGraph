@@ -17,8 +17,15 @@
 #include <executionGraph/common/FileSystem.hpp>
 #include <executionGraph/common/Singleton.hpp>
 
-//! Commandline Arguments for the Application
-//! No need to make it thread-safe, since everything is read only!
+/* ---------------------------------------------------------------------------------------*/
+/*!
+    Commandline Arguments for the Application
+    No need to make it thread-safe, since everything is read only!
+
+    @date Sun Feb 18 2018
+    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+ */
+/* ---------------------------------------------------------------------------------------*/
 class AppCLArgs final : public executionGraph::CommandLineArguments,
                         public executionGraph::Singleton<AppCLArgs>
 {

@@ -11,3 +11,13 @@
 //! ========================================================================================
 
 #include "TestFunctions.hpp"
+
+std::size_t hashString(std::string s)
+{
+    std::size_t h = 3141459;
+    for(char& c : s)
+    {
+        h = h * 101 + c;
+    }
+    return h;
+}

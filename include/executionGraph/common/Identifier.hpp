@@ -20,30 +20,42 @@
 
 namespace executionGraph
 {
+    /* ---------------------------------------------------------------------------------------*/
+    /*!
+        Class for representing a unique identifier.
+
+        @date Sun Feb 18 2018
+        @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+    */
+    /* ---------------------------------------------------------------------------------------*/
     class Identifier final
     {
         template<typename T>
         friend struct std::hash;
 
     public:
-        Identifier(const char* name)
+        Identifier()
+            : m_name(""), m_guid(xg::newGuid())
+        {}
+
+        template<typename T>
+        Identifier(const T& name)
             : m_name(name), m_guid(xg::newGuid())
-        {
-        }
-        Identifier(const std::string& name)
-            : m_name(name), m_guid(xg::newGuid())
-        {
-        }
+        {}
+
         Identifier(const std::string& name, const xg::Guid& guid)
             : m_name(name), m_guid(guid)
         {
         }
 
+        //! Castoperator which returns the stringyfied GUID.
+        operator std::string() const { return m_guid; }
+
         //! Get the name of this identifier
         const std::string& getName() const { return m_name; }
 
         //! Get full name of this identifier: "<name>-<guid>".
-        std::string getFullName() const { return m_name + "-" + std::string(m_guid); }
+        std::string getUniqueName() const { return m_name + "-" + std::string(m_guid); }
 
         //! Comparison operators.
         bool operator==(const Identifier& id) const { return m_guid == id.m_guid; }

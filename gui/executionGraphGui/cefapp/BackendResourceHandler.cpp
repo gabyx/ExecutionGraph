@@ -69,14 +69,11 @@ void BackendResourceHandler::Cancel()
 {
     CEF_REQUIRE_IO_THREAD();
     EXECGRAPH_ASSERT(m_isUsed, "Handler should be used by now!");
-    EXECGRAPHGUI_APPLOG_ERROR(
-        "BackendResourceHandler id:{0} : "
-        "cancelled!",
-        getId().getName());
+    EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler id:{0} : cancelled!", getId().getName());
 
-    // if from external this Handling can be cancelled
-    // we need to properly wait for pending tasks in the UI-Thread
-    // and after that call finish() and leave here!
+    // if from external this handling can be cancelled
+    // we need to properly wait for pending launched tasks
+    // and after that -> call finish() and leave here!
     // todo
 
     finish();
@@ -123,10 +120,12 @@ bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
         m_bytesRead = 0;
         // FILE Threads does not block UI,
         CefPostTask(TID_FILE, base::Bind(&debugWaitOnOtherThread, callback));
+
     }  // DEBUG ==========
 
     return true;
 }
+
 bool BackendResourceHandler::ReadResponse(void* dataOut,
                                           int bytesToRead,
                                           int& bytesRead,

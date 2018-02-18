@@ -17,7 +17,14 @@
 
 namespace executionGraph
 {
-    //! Interface which provides an ID.
+    /* ---------------------------------------------------------------------------------------*/
+    /*!
+        Interface which provides an ID.
+
+        @date Sun Feb 18 2018
+        @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+    */
+    /* ---------------------------------------------------------------------------------------*/
     class IObjectID
     {
     protected:
@@ -29,6 +36,7 @@ namespace executionGraph
     };
 }  // namespace executionGraph
 
+    //! Macro to define the implementation.
 #    define EXECGRAPH_OBJECT_ID_DECLARATION                     \
     public:                                                     \
         using Id = executionGraph::Id;                          \
@@ -37,4 +45,11 @@ namespace executionGraph
     private:                                                    \
         const Id m_id;
 
+#    define EXECGRAPH_OBJECT_ID_NON_VIRTUAL_DECLARATION \
+    public:                                             \
+        using Id = executionGraph::Id;                  \
+        const Id& getId() const { return m_id; }        \
+                                                        \
+    private:                                            \
+        const Id m_id;
 #endif

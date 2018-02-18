@@ -17,7 +17,14 @@
 #include <executionGraph/common/FileSystem.hpp>
 #include <string>
 
-//! Factory for creating client request handlers.
+/* ---------------------------------------------------------------------------------------*/
+/*!
+    Factory for creating client request handlers.
+
+    @date Sun Feb 18 2018
+    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+ */
+/* ---------------------------------------------------------------------------------------*/
 class ClientSchemeHandlerFactory final : public CefSchemeHandlerFactory
 {
     IMPLEMENT_REFCOUNTING(ClientSchemeHandlerFactory)

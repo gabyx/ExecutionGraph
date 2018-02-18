@@ -19,6 +19,14 @@
 #include <executionGraph/common/IObjectID.hpp>
 #include <wrapper/cef_helpers.h>
 
+/* ---------------------------------------------------------------------------------------*/
+/*!
+    Resource handler which handles binary data and dispatched to the backend.
+
+    @date Sun Feb 18 2018
+    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+ */
+/* ---------------------------------------------------------------------------------------*/
 class BackendResourceHandler final : public CefResourceHandler,
                                      public executionGraph::IObjectID
 {

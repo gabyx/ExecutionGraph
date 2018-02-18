@@ -74,10 +74,11 @@
     "editor.formatOnSave": false,
     "fileHeaderComment.parameter": {
         "*": {
-            "commentbegin": "//! ",
-            "commentprefix": "//! ",
-            "commentend": "//! ",
-            "bar": "========================================================================================",
+            "commentbegin": "// ",
+            "commentprefix": "// ",
+            "commentend": "// ",
+            "bar": "=========================================================================================",
+            "barComment": "/* ---------------------------------------------------------------------------------------*/",
             "header": [
                 " ExecutionGraph",
                 " Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>"
@@ -99,6 +100,22 @@
             "${commentbegin}",
             "${commentbegin}${license}",
             "${commentbegin}${bar}"
+        ],
+        "funcDoc" : [
+            "//! Description",
+            "//! ",
+            "//! @return  ReturnValue",
+            "//!"
+        ],
+        "classDoc" : [
+            "${barComment}",
+            "/*!",
+            "    Description",
+            "",
+            "    @date ${date}",
+            "    @author ${authorName}, ${authorEmail}",
+            " */",
+            "${barComment}",
         ],
         "cpp&tsHeader": [
             "${commentbegin}${bar}",

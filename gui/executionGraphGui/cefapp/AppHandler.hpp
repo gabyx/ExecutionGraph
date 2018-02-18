@@ -21,6 +21,14 @@ class BackendMessageHandler;
 template<typename HandlerType>
 class MessageDispatcher;
 
+/* ---------------------------------------------------------------------------------------*/
+/*!
+    The CEF application handler.
+
+    @date Sun Feb 18 2018
+    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+ */
+/* ---------------------------------------------------------------------------------------*/
 class AppHandler final : public CefClient,
                          public CefDisplayHandler,
                          public CefLifeSpanHandler,

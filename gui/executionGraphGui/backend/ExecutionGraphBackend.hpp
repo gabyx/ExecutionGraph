@@ -16,6 +16,14 @@
 #include <rttr/type>
 #include "backend/Backend.hpp"
 
+/* ---------------------------------------------------------------------------------------*/
+/*!
+    The execution graph backend.
+
+    @date Sun Feb 18 2018
+    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+ */
+/* ---------------------------------------------------------------------------------------*/
 class ExecutionGraphBackend : public Backend
 {
     RTTR_ENABLE()

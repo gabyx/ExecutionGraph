@@ -12,6 +12,14 @@
 
 #include <cef_browser.h>
 
+/* ---------------------------------------------------------------------------------------*/
+/*!
+    Platform-sepcific implementations.
+
+    @date Sun Feb 18 2018
+    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+ */
+/* ---------------------------------------------------------------------------------------*/
 class PlatformTitleChanger
 {
 public:

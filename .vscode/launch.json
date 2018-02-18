@@ -29,6 +29,18 @@
             "MIMode": "lldb"
         },
         {
+            "name": "(lldb) ExecutionGraphTests-TaskQueue",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/tests/ExecutionGraphTest-TaskQueue",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
             "name": "(lldb) ExecutionGraphTests-CEFSimple",
             "type": "cppdbg",
             "request": "launch",

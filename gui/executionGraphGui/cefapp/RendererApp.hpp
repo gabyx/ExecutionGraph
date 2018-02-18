@@ -18,6 +18,14 @@
 #include <cef_render_process_handler.h>
 #include <wrapper/cef_message_router.h>
 
+/* ---------------------------------------------------------------------------------------*/
+/*!
+    The render process.
+
+    @date Sun Feb 18 2018
+    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+ */
+/* ---------------------------------------------------------------------------------------*/
 class RendererApp : public CefApp,
                     public CefRenderProcessHandler
 {

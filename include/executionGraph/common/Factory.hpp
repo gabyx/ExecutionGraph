@@ -95,7 +95,14 @@ namespace executionGraph
 
     }  // namespace detailsStaticFactory
 
-    //! A factory class which creates types `CreatorType`.
+    /* ---------------------------------------------------------------------------------------*/
+    /*!
+        A factory class which creates types `CreatorType`.
+
+        @date Sun Feb 18 2018
+        @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+    */
+    /* ---------------------------------------------------------------------------------------*/
     template<typename CreatorList>
     class StaticFactory
     {

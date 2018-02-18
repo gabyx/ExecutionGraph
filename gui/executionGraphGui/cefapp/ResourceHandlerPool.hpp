@@ -22,7 +22,14 @@
 #include <unordered_map>
 #include <wrapper/cef_helpers.h>
 
-//! Some stupid pool for resource handlers.
+/* ---------------------------------------------------------------------------------------*/
+/*!
+    A stupid pool for resource handlers.
+
+    @date Sun Feb 18 2018
+    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+ */
+/* ---------------------------------------------------------------------------------------*/
 template<typename THandlerType>
 class ResourceHandlerPool final
 {
@@ -87,7 +94,7 @@ void ResourceHandlerPool<HandlerType>::onRequestHandlerFinished(const Id& id)
         EXECGRAPH_ASSERT(std::find_if(m_unusedHandlers.begin(),
                                       m_unusedHandlers.end(),
                                       [&id](auto& h) { return h->getId() == id; }) == m_unusedHandlers.end(),
-                         "Request handler: " << id.getFullName() << "is in the unused set!");
+                         "Request handler: " << id.getUniqueName() << "is in the unused set!");
 
         EXECGRAPH_ASSERT(!handler->isUsed(), "Handler should now be unused!");
 

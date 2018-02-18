@@ -20,6 +20,14 @@
 #include "backend/BackendMessageHandler.hpp"
 #include "backend/ExecutionGraphBackend.hpp"
 
+/* ---------------------------------------------------------------------------------------*/
+/*!
+    Factory which makes all backends.
+
+    @date Sun Feb 18 2018
+    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+ */
+/* ---------------------------------------------------------------------------------------*/
 class BackendFactory
 {
 public:

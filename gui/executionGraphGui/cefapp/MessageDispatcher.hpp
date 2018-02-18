@@ -19,7 +19,14 @@
 #include <vector>
 #include <wrapper/cef_message_router.h>
 
-//! A message dispatcher which dispatches to shared message handlers.
+/* ---------------------------------------------------------------------------------------*/
+/*!
+    A message dispatcher which dispatches to shared message handlers.
+
+    @date Sun Feb 18 2018
+    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+ */
+/* ---------------------------------------------------------------------------------------*/
 template<typename THandlerType>
 class MessageDispatcher final : public CefMessageRouterBrowserSide::Handler
 {
@@ -57,7 +64,7 @@ public:
     }
 
     //! Callback for binary data from XHR Requests
-    bool HandleMessage()
+    bool OnRequest()
     {
         CEF_REQUIRE_UI_THREAD();
         // Check first all specific handlers
@@ -82,7 +89,7 @@ public:
         Id id = handler->getId();
 
         EXECGRAPH_THROW_EXCEPTION_IF(m_handlerStorage.find(id) != m_handlerStorage.end(),
-                                     "MessageHandler with id: " << id.getFullName() << " already exists!");
+                                     "MessageHandler with id: " << id.getUniqueName() << " already exists!");
 
         m_handlerStorage.emplace(id, HandlerData{requestId, handler.get()});
         m_specificHandlers[requestId].emplace(handler.get());
@@ -102,7 +109,7 @@ public:
         Id id = handler->getId();
 
         EXECGRAPH_THROW_EXCEPTION_IF(m_handlerStorage.find(id) != m_handlerStorage.end(),
-                                     "MessageHandler with id: " << id.getFullName() << " already exists!");
+                                     "MessageHandler with id: " << id.getUniqueName() << " already exists!");
 
         if(insertAtFront)
         {

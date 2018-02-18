@@ -20,7 +20,14 @@
 #include "cefapp/BackendResourceHandler.hpp"
 #include "cefapp/ResourceHandlerPool.hpp"
 
-//! Factory for creating client request handlers.
+/* ---------------------------------------------------------------------------------------*/
+/*!
+    Factory for creating client request handlers.
+
+    @date Sun Feb 18 2018
+    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+ */
+/* ---------------------------------------------------------------------------------------*/
 class BackendSchemeHandlerFactory final : public CefSchemeHandlerFactory
 {
     IMPLEMENT_REFCOUNTING(BackendSchemeHandlerFactory);
