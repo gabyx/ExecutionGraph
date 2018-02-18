@@ -24,7 +24,7 @@ namespace executionGraph
     /*!
         A thread-safe task queue.
         The tasks which are pushed into this queue are copied.
-        So the TTask type either is cheap copyable or a std::shared_ptr<T>.
+        So the TTask type either is cheap copyable or movable or is a std::shared_ptr<T>.
 
         @date Sun Feb 18 2018
         @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
