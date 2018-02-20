@@ -88,14 +88,14 @@ namespace executionGraph
             }
         }
 
-        //! Dispatching for std::shared_ptr
+        //! Dispatching for std::shared_ptr.
         template<typename T, typename... Args, EXECGRAPH_SFINAE_ENABLE_IF(IsSharedPointer<T>{})>
         void runTask(T& task, Args&&... args)
         {
             task->operator()(std::forward<Args>(args)...);
         }
 
-        //! Dispatching for copyable
+        //! Dispatching for normal types.
         template<typename T, typename... Args, EXECGRAPH_SFINAE_ENABLE_IF(!IsSharedPointer<T>{})>
         void runTask(T& task, Args&&... args)
         {

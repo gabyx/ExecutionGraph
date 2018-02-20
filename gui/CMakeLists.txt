@@ -21,5 +21,5 @@ set_target_properties(libcef_lib PROPERTIES
 
 ###########################################################
 
-# add_subdirectory(cefsimple)
+add_subdirectory(cefsimple)
 add_subdirectory(executionGraphGui)

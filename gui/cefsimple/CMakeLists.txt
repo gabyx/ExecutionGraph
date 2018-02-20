@@ -82,8 +82,6 @@ if(OS_MACOSX)
   set(CEF_HELPER_TARGET_OUTPUTNAME "CEFSimple Helper")
 endif()
 
-# Logical target used to link the libcef library.
-ADD_LOGICAL_TARGET("libcef_lib" "${CEF_LIB_DEBUG}" "${CEF_LIB_RELEASE}")
 
 # Determine the target output directory.
 SET_CEF_TARGET_OUT_DIR()
