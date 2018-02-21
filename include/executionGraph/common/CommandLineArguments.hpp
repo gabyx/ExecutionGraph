@@ -27,6 +27,8 @@ namespace executionGraph
                              const std::string& briefDescription,
                              const std::string& detailedDescription)
             : m_parser(briefDescription, detailedDescription)
+            , m_argc(argc)
+            , m_argv(argv)
             , m_applicationPath(argv[0])
         {
         }
@@ -37,7 +39,10 @@ namespace executionGraph
         const std::path& getApplicationPath() { return m_applicationPath; }
 
     protected:
-        args::ArgumentParser m_parser;
+        args::ArgumentParser m_parser;  //! Argument parser
+
+        int m_argc;
+        char** m_argv;
 
     private:
         std::path m_applicationPath;  //!< Application path: argv[0]

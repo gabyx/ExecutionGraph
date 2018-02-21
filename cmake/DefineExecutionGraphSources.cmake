@@ -111,4 +111,12 @@ macro(setTargetCompileOptionsExecutionGraph target)
     # Linker flags.
     set_property(TARGET ${target} PROPERTY LINK_FLAGS ${LINKER_FLAGS})
 
+
+    if(OS_MACOSX)
+        set_target_properties(${target} PROPERTIES
+            OSX_ARCHITECTURES_DEBUG      "${CMAKE_OSX_ARCHITECTURES}"
+            OSX_ARCHITECTURES_RELEASE    "${CMAKE_OSX_ARCHITECTURES}"
+        )
+    endif()
+
 endmacro()

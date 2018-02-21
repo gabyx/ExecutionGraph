@@ -117,12 +117,13 @@
 
 // Entry point function for the browser process.
 int main(int argc, char* argv[]) {
-  
-    // Provide CEF with command-line arguments.
-    CefMainArgs mainArgs(argc, argv);
-    
+
     // Parse command line arguments
     EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(AppCLArgs, appCLArgs, (argc,argv));
+    auto cefArgs = AppCLArgs::getInstance().getCEFArgs();
+
+    // Provide CEF with command-line arguments.
+    CefMainArgs mainArgs(cefArgs.size(), cefArgs.data());
 
     // Make all application loggers
     EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(Loggers, loggers, (AppCLArgs::getInstance().getLogPath()) );

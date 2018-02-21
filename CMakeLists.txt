@@ -15,6 +15,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # Needed by VS Code for Intellisense
 
+if(OS_MACOSX)
+    if(NOT "${CMAKE_OSX_SYSROOT}" )
+        message(FATAL_ERROR "OSX_SYSROOT needs to be defined!")
+    endif()
+endif()
+
 #Optional Stuff ========================================================
 mark_as_advanced( CMAKE_DEBUG_POSTFIX )
 set(CMAKE_DEBUG_POSTFIX "-dbg" CACHE STRING "Debug postfix for library/executable")

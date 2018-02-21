@@ -19,6 +19,25 @@
 
 namespace executionGraph
 {
+    inline std::vector<std::string> splitString(std::string s, std::string delimiter = " ")
+    {
+        std::size_t posOld = 0;
+        std::size_t pos    = 0;
+        std::size_t size   = s.size();
+        std::vector<std::string> tokens;
+
+        while(posOld < size)
+        {
+            pos = s.find(delimiter, posOld);
+            if(pos == std::string::npos)
+                pos = size;
+            if(pos != posOld)
+                tokens.emplace_back(s.substr(posOld, pos - posOld));
+            posOld = pos + delimiter.size();
+        }
+        return tokens;
+    }
+
     //! Format a string like printf, http://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
     template<typename... Args>
     std::string stringFormat(const std::string& format, Args... args)
