@@ -41,12 +41,12 @@ namespace executionGraph
 
     private:
         template<typename T>
-        using IsSharedPointer = meta::is<T, std::shared_ptr>;
+        using IsPointerType = meta::or_<meta::is<T, std::shared_ptr>, meta::is<T, std::unique_ptr>>;
 
     public:
-        TaskConsumer(std::shared_ptr<TaskQueue> queue)
+        TaskConsumer(const std::shared_ptr<TaskQueue>& queue)
             : m_queue(queue){};
-        virtual ~TaskConsumer() = default;
+        virtual ~TaskConsumer() { join(); };
 
         //! No move allowed!
         TaskConsumer(TaskConsumer&&) = delete;
@@ -75,6 +75,41 @@ namespace executionGraph
         auto getId() { return m_thread.get_id(); }
 
     private:
+        template<typename T, typename = void>
+        struct Dispatch;
+
+        //! Dispatching for std::shared_ptr.
+        template<typename T>
+        struct Dispatch<T, EXECGRAPH_SFINAE_ENABLE_IF_CLASS(IsPointerType<T>{})>
+        {
+            template<typename... Args>
+            static void runTask(T& task, Args&&... args)
+            {
+                task->operator()(std::forward<Args>(args)...);
+            }
+            template<typename... Args>
+            static void onException(T& task, Args&&... args)
+            {
+                task->onException(std::forward<Args>(args)...);
+            }
+        };
+
+        //! Dispatching for normal types.
+        template<typename T>
+        struct Dispatch<T, EXECGRAPH_SFINAE_ENABLE_IF_CLASS(!IsPointerType<T>{})>
+        {
+            template<typename... Args>
+            static void runTask(T& task, Args&&... args)
+            {
+                task.operator()(std::forward<Args>(args)...);
+            }
+            template<typename... Args>
+            static void onException(T& task, Args&&... args)
+            {
+                task.onException(std::forward<Args>(args)...);
+            }
+        };
+
         //! Consumer run loop.
         void run()
         {
@@ -83,23 +118,20 @@ namespace executionGraph
                 auto optionalTask = m_queue->pop();
                 if(optionalTask)
                 {
-                    runTask(*optionalTask, getId());  // run the task in this consumer thread.
+                    try
+                    {
+                        Dispatch<Task>::runTask(*optionalTask, getId());  // run the task in this consumer thread.
+                    }
+                    catch(const std::exception& e)
+                    {
+                        Dispatch<Task>::onException(*optionalTask, e.what());
+                    }
+                    catch(...)
+                    {
+                        Dispatch<Task>::onException(*optionalTask, "An unknown unhandled exception occured!");
+                    }
                 }
             }
-        }
-
-        //! Dispatching for std::shared_ptr.
-        template<typename T, typename... Args, EXECGRAPH_SFINAE_ENABLE_IF(IsSharedPointer<T>{})>
-        void runTask(T& task, Args&&... args)
-        {
-            task->operator()(std::forward<Args>(args)...);
-        }
-
-        //! Dispatching for normal types.
-        template<typename T, typename... Args, EXECGRAPH_SFINAE_ENABLE_IF(!IsSharedPointer<T>{})>
-        void runTask(T& task, Args&&... args)
-        {
-            task.operator()(std::forward<Args>(args)...);
         }
 
     private:

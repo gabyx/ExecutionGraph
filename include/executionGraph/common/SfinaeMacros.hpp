@@ -13,26 +13,43 @@
 
 #include <type_traits>
 
-/** use this macro in sfinae selection in templated functions
- *
- *   template<typename TopoType,
- *            typename
- * std::enable_if<MPILayer::isGridTopoBuilder<TopoType>::value>::type * =
- * nullptr
- *            typename
- * std::enable_if<MPILayer::isPolymorphic<TopoType>::value>::type * = nullptr
- *   >
- *   void foo(){}
- *
- *   becomes =>
- *
- *   template<typename TopoType,
- *           SFINAE_ENABLE_IF( MPILayer::isGridTopoBuilder<TopoType>::value ),
- *           SFINAE_ENABLE_IF( MPILayer::isPolymorphic<TopoType>::value ),
- *   >
- *   void foo(){}
+/* ---------------------------------------------------------------------------------------*/
+/*!
+    SFINAE macros:
+
+    usage:
+
+    @code
+    template<typename T,
+              EXECGRAPH_SFINAE_ENABLE_IF( T::value == 2 ),
+              EXECGRAPH_SFINAE_ENABLE_IF( T::size == 5 ),
+    >
+    void foo(){}
+    @endcode
+
+    @code
+    template<typename T, typename = void> struct A;
+    template<typename T> 
+    struct A<T, EXECGRAPH_SFINAE_ENABLE_IF_CLASS(T::a ==3)>
+    {
+        // code
+    }
+    template<typename T> 
+    struct A<T, EXECGRAPH_SFINAE_ENABLE_IF_CLASS(T::a ==4)>
+    {
+        // code
+    }
+    @endcode
+
+
+    @date Thu Feb 22 2018
+    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
  */
-#define EXECGRAPH_SFINAE_ENABLE_IF(__meta__) typename std::enable_if<(__meta__)>::type* = nullptr
-#define EXECGRAPH_SFINAE_ENABLE_IMPL_IF(__meta__) typename std::enable_if<(__meta__)>::type*
+/* ---------------------------------------------------------------------------------------*/
+
+#define EXECGRAPH_SFINAE_ENABLE_IF_IMPL(__meta__) typename std::enable_if<(__meta__)>::type*
+#define EXECGRAPH_SFINAE_ENABLE_IF(__meta__) EXECGRAPH_SFINAE_ENABLE_IF_IMPL(__meta__) = nullptr
+
+#define EXECGRAPH_SFINAE_ENABLE_IF_CLASS(__meta__) typename std::enable_if<(__meta__)>::type
 
 #endif

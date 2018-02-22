@@ -331,7 +331,7 @@ namespace executionGraph
     }
 
     template<typename TConfig>
-    template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IMPL_IF((meta::is<TSocketDeclaration, details::OutputSocketDeclaration>::value))>
+    template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF_IMPL((meta::is<TSocketDeclaration, details::OutputSocketDeclaration>::value))>
     typename TSocketDeclaration::DataType& LogicNode<TConfig>::getValue()
     {
         auto idx = TSocketDeclaration::Index::value;
@@ -340,7 +340,7 @@ namespace executionGraph
     }
 
     template<typename TConfig>
-    template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IMPL_IF((meta::is<TSocketDeclaration, details::InputSocketDeclaration>::value))>
+    template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF_IMPL((meta::is<TSocketDeclaration, details::InputSocketDeclaration>::value))>
     const typename TSocketDeclaration::DataType& LogicNode<TConfig>::getValue() const
     {
         auto idx = TSocketDeclaration::Index::value;
@@ -349,7 +349,7 @@ namespace executionGraph
     }
 
     template<typename TConfig>
-    template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IMPL_IF((meta::is<TSocketDeclaration, details::OutputSocketDeclaration>::value))>
+    template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF_IMPL((meta::is<TSocketDeclaration, details::OutputSocketDeclaration>::value))>
     const typename TSocketDeclaration::DataType& LogicNode<TConfig>::getValue() const
     {
         auto idx = TSocketDeclaration::Index::value;

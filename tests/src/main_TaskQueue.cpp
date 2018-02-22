@@ -15,6 +15,7 @@
 #include "executionGraph/common/IObjectID.hpp"
 #include "executionGraph/common/TaskConsumer.hpp"
 #include "executionGraph/common/TaskQueue.hpp"
+#include "executionGraph/common/ThreadPool.hpp"
 
 #ifdef __clang__
 #    pragma clang diagnostic push
@@ -39,6 +40,17 @@ private:
 };
 
 std::mutex PrintThread::s_mutex{};
+
+void doRandomStuff(std::thread::id threadId, int i, const std::string& name)
+{
+    EXECGRAPH_THROW_EXCEPTION_IF(i < 0, "Wow, a moved task gets executed!! WTF!");
+    DEFINE_RANDOM_GENERATOR_FUNC(i);
+    using namespace std::chrono_literals;
+    auto sleep = int(rand() * 2000);
+    PrintThread{} << "Thread: " << threadId << " Task: " << name << " running: " << sleep << "ms" << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(sleep));
+    PrintThread{} << "Thread: " << threadId << " Task: " << name << " finished " << std::endl;
+}
 
 struct Task
 {
@@ -67,17 +79,49 @@ public:
 
     void operator()(std::thread::id threadId)
     {
-        EXECGRAPH_THROW_EXCEPTION_IF(m_i < 0, "Wow, a moved task gets executed!! WTF!");
-        std::string id = getId();
-        DEFINE_RANDOM_GENERATOR_FUNC(hashString(id));
-        using namespace std::chrono_literals;
-        auto sleep = int(rand() * 2000);
-        PrintThread{} << "Thread: " << threadId << " Task: " << m_i << " running: " << sleep << "ms" << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(sleep));
-        PrintThread{} << "Thread: " << threadId << " Task: " << m_i << " finished " << std::endl;
+        doRandomStuff(threadId, m_i, std::to_string(m_i));
     }
+
+    void onException(const std::string& what)
+    {
+        PrintThread{} << "Task: " << m_i << " exception: " << what << std::endl;
+    }
+
     int m_i;
     std::unique_ptr<int> m_a;  // testing movable tasks
+};
+
+struct ITask
+{
+    ITask(int i)
+        : m_i(i) {}
+    virtual ~ITask()                                  = default;
+    virtual void operator()(std::thread::id threadId) = 0;
+    virtual void onException(const std::string& what)
+    {
+        PrintThread{} << "ITask: " << m_i << " exception: " << what << std::endl;
+    }
+    int m_i;
+};
+struct TaskA : ITask
+{
+    TaskA(int i)
+        : ITask(i) {}
+    ~TaskA() = default;
+    virtual void operator()(std::thread::id threadId) override
+    {
+        doRandomStuff(threadId, m_i, "A");
+    }
+};
+struct TaskB : ITask
+{
+    TaskB(int i)
+        : ITask(i) {}
+    ~TaskB() = default;
+    virtual void operator()(std::thread::id threadId) override
+    {
+        doRandomStuff(threadId, m_i, "B");
+    }
 };
 
 MY_TEST(ProducerConsumer, Test1)
@@ -115,6 +159,43 @@ MY_TEST(ProducerConsumer, Test1)
     {
         c.join();
     }
+}
+
+MY_TEST(ProducerConsumer, VirtualTasks)
+{
+    DEFINE_RANDOM_GENERATOR_FUNC(hashString("VirtualTasks"))
+
+    using Pool = ThreadPool<std::unique_ptr<ITask>>;
+
+    Pool pool(4);
+    auto& queue = pool.getQueue();
+
+    pool.start();
+
+    for(int l = 0; l < 3; ++l)
+    {
+        PrintThread{} << "Pushing tasks ..." << std::endl;
+
+        for(int i = 0; i < 20; ++i)
+        {
+            PrintThread{} << "task " << i << " adding " << std::endl;
+            if(i % 3 == 0)
+            {
+                queue->emplace(std::make_unique<TaskA>(i));
+            }
+            else
+            {
+                queue->emplace(std::make_unique<TaskB>(i));
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(int(rand() * 200)));
+        }
+
+        auto sleep = int(rand() * 2000);
+        PrintThread{} << "Going to sleep: " << sleep << "ms" << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(sleep));
+    }
+
+    pool.join();
 }
 
 int main(int argc, char** argv)
