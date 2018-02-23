@@ -31,7 +31,7 @@ if(${USE_SUPERBUILD})
                                         "-DBUILD_BENCHMARKS=OFF" "-DBUILD_UNIT_TESTS=OFF" "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
                             INSTALL_DIR "${INSTALL_DIR}")
 
-        message(STATUS "rttr library downloaded -> build it!")
+        message(STATUS "rttr library setup -> build it!")
     endif()
 
 else()

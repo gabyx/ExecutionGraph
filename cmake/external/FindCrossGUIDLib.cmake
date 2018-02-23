@@ -1,32 +1,44 @@
 # Try to find the crossguid Library Library 
 include(FindPackageHandleStandardArgs)
 
-set(URL "https://github.com/graeme-hill/crossguid.git")
+set(URL "https://github.com/gabyx/crossguid.git")
+set(INSTALL_DIR "${ExecutionGraph_EXTERNAL_INSTALL_DIR}/crossguid")
 
-if(NOT EXISTS "${crossguid_INCLUDE_DIR}")
-    message(STATUS "crossguid library: include dir not found -> download from ${URL}")
+message(STATUS "crossguid library finding ...")
+find_package(crossguid CONFIG PATHS ${INSTALL_DIR})
 
-    include(DownloadProject)
-    download_project(PROJ               crossguid
-                    PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/crossguid"
-                    GIT_REPOSITORY      "${URL}"
-                    GIT_TAG             master #e6c8514
-                    GIT_SHALLOW         ON
-                    UPDATE_DISCONNECTED 1}
-    )
-    set(crossguid_SOURCE_DIR "${crossguid_SOURCE_DIR}" CACHE PATH "crossguid library src dir" FORCE)
-    set(crossguid_BINARY_DIR "${crossguid_BINARY_DIR}" CACHE PATH "crossguid library binary dir" FORCE)
-    set(crossguid_INCLUDE_DIR "${crossguid_SOURCE_DIR}" CACHE PATH "crossguid library (${URL}) include directory" FORCE)
+if(${USE_SUPERBUILD})
+    if(NOT TARGET "crossguid::xg")
+        message(STATUS "crossguid library: include dir not found -> download from ${URL}")
+
+        include(ExternalProject)
+        ExternalProject_Add(crossguid
+                            PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/crossguid"
+                            GIT_REPOSITORY      "${URL}"
+                            GIT_TAG             add-modern-cmake
+                            GIT_SHALLOW         ON
+                            TIMEOUT 10
+                            UPDATE_DISCONNECTED  ON
+                            CMAKE_ARGS "-DCMAKE_BUILD_TYPE=Release" "-DCMAKE_VERBOSE_MAKEFILE=ON" "-DXG_TESTS=OFF" 
+                                       "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
+                            INSTALL_DIR "${INSTALL_DIR}")
+                            
+        message(STATUS "crossguid library setup -> build it!")
+    endif()
 else()
-    message(STATUS "crossguid library found!")
+    if(NOT TARGET "crossguid::xg")
+        if(${CrossGUIDLib_FIND_REQUIRED})
+            message(FATAL_ERROR "crossguid library could not be found!")
+        else()
+            message(WARNING "crossguid library could not be found!")
+        endif()
+    endif()
 endif()
-find_package_handle_standard_args(CrossGUIDLib DEFAULT_MSG crossguid_INCLUDE_DIR)
 
-# build the library
-set(XG_TESTS OFF)
-add_subdirectory(${crossguid_SOURCE_DIR} ${crossguid_BINARY_DIR} EXCLUDE_FROM_ALL)
+if(TARGET "crossguid::xg")
+    add_library(crossguidLib INTERFACE IMPORTED)
+    set_property(TARGET crossguidLib PROPERTY INTERFACE_LINK_LIBRARIES "crossguid::xg")
 
-add_library(crossguidLib INTERFACE IMPORTED)
-set_property(TARGET crossguidLib PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${crossguid_INCLUDE_DIR})
-set_property(TARGET crossguidLib PROPERTY INTERFACE_LINK_LIBRARIES xg)
-message(STATUS "crossguid library added target: crossguidLib")
+    message(STATUS "crossguid library found! Config File: ${crossguid_CONFIG}")
+    message(STATUS "crossguid library added targets: crossguidLib")
+endif()

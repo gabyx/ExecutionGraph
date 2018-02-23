@@ -78,7 +78,7 @@ if(UNIX)
 
     set(ExecutionGraph_CMAKE_CONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/ExecutionGraph/cmake")
     set(ExecutionGraph_ADDITIONAL_FILES_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/ExecutionGraph")
-else(WINDOWS)
+elseif(WINDOWS)
     set(ExecutionGraph_INC_INSTALL_DIR "${CMAKE_INSTALL_INCDIR}") 
     set(ExecutionGraph_RUNTIME_INSTALL_DIR "bin") 
     set(ExecutionGraph_LIBRARY_INSTALL_DIR "bin")
@@ -87,6 +87,8 @@ else(WINDOWS)
 
     set(ExecutionGraph_CMAKE_CONFIG_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/cmake")
     set(ExecutionGraph_ADDITIONAL_FILES_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}")
+else()
+	message(FATAL_ERROR "Could not set install folders for this platform!")
 endif()
 
 # set the rpath for executables

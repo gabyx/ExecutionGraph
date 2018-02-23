@@ -30,7 +30,7 @@
 /* ---------------------------------------------------------------------------------------*/
 class BackendSchemeHandlerFactory final : public CefSchemeHandlerFactory
 {
-    IMPLEMENT_REFCOUNTING(BackendSchemeHandlerFactory);
+    IMPLEMENT_REFCOUNTING(BackendSchemeHandlerFactory)
 
 public:
     BackendSchemeHandlerFactory(const std::path& pathPrefix = "")
