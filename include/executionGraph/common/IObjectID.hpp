@@ -28,7 +28,9 @@ namespace executionGraph
     class IObjectID
     {
     protected:
-        IObjectID()          = default;
+        IObjectID() = default;
+
+    public:
         virtual ~IObjectID() = default;
 
     public:
@@ -36,7 +38,7 @@ namespace executionGraph
     };
 }  // namespace executionGraph
 
-    //! Macro to define the implementation.
+//! Macro to define the implementation.
 #    define EXECGRAPH_OBJECT_ID_DECLARATION                     \
     public:                                                     \
         using Id = executionGraph::Id;                          \

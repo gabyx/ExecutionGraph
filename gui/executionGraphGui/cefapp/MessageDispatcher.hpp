@@ -14,10 +14,13 @@
 #define backend_File_Scheme_Handler_Factory_h
 
 #include <executionGraph/common/Assert.hpp>
+#include <executionGraph/common/ThreadPool.hpp>
 #include <memory>
 #include <unordered_set>
 #include <vector>
 #include <wrapper/cef_message_router.h>
+#include "cefapp/IRequest.hpp"
+#include "cefapp/Loggers.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -38,7 +41,7 @@ public:
     MessageDispatcher()          = default;
     virtual ~MessageDispatcher() = default;
 
-public:
+private:
     bool OnQuery(CefRefPtr<CefBrowser> browser,
                  CefRefPtr<CefFrame> frame,
                  int64 queryId,
@@ -47,33 +50,16 @@ public:
                  CefRefPtr<Callback> callback) override
     {
         CEF_REQUIRE_UI_THREAD();
-
-        // Check first all specific handlers
-        // todo ....
-        // if message handler handled the message -> return
-
-        // otherwise, dispatch to all other handlers
-        for(auto* handler : m_generalHandlers)
-        {
-            if(handler->OnQuery(browser, frame, queryId, request, persistent, callback))
-            {
-                return true;  // it was handled!
-            }
-        }
-        return false;
+        //todo wrap here into IRequest
+        // m_pool.getQueue()->emplace(TaskHandleMessage{this, request});
+        return true;
     }
 
-    //! Callback for binary data from XHR Requests
-    bool OnRequest()
+public:
+    //! Handle a general request. Can be called on any thread!
+    void AddRequest(std::shared_ptr<IRequest> request)
     {
-        CEF_REQUIRE_UI_THREAD();
-        // Check first all specific handlers
-        // todo ...
-        // if message handler handled the message -> return
-
-        // otherwise, dispatch to all other handlers
-        // todo ...
-        return false;
+        m_pool.getQueue()->emplace(TaskHandleMessage{this, request});
     }
 
 public:
@@ -81,6 +67,8 @@ public:
     //! Messages are first dispatched to all specific handlers added with a `requestId`.
     bool AddHandler(std::shared_ptr<HandlerType> handler, const std::string& requestId)
     {
+        std::scoped_lock<std::mutex> lock(m_access);
+
         if(!handler || requestId.empty())
         {
             EXECGRAPH_ASSERT(false, "nullptr or empty requestId")
@@ -100,6 +88,8 @@ public:
     template<bool insertAtFront = false>
     bool AddHandler(std::shared_ptr<HandlerType> handler)
     {
+        std::scoped_lock<std::mutex> lock(m_access);
+
         if(!handler)
         {
             EXECGRAPH_ASSERT(false, "nullptr!")
@@ -128,6 +118,8 @@ public:
     //! @return the removed handler.
     std::shared_ptr<HandlerType> RemoveHandler(Id id)
     {
+        std::scoped_lock<std::mutex> lock(m_access);
+
         std::shared_ptr<HandlerType> handler;
 
         auto it = m_handlerStorage.find(id);
@@ -169,6 +161,66 @@ private:
     std::unordered_map<std::string, std::unordered_set<HandlerType*>> m_specificHandlers;  //! Handlers for a specific request id (handled first).
     std::vector<HandlerType*> m_generalHandlers;                                           //!< The handlers to which all messages are dispatched (no requestId).
     std::unordered_map<typename HandlerType::Id, HandlerData> m_handlerStorage;            //!< Storage for handlers.
+    std::mutex m_access;
+
+private:
+    class TaskHandleMessage
+    {
+    public:
+        TaskHandleMessage(MessageDispatcher& d, std::shared_ptr<IRequest> message)
+            : m_d(d), m_request(message)
+        {
+            EXECGRAPH_ASSERT(m_request, "Message is nullptr!");
+        }
+
+        void runTask(std::thread::id threadId)
+        {
+            std::scoped_lock<std::mutex> lock(m_d.m_access);
+
+            const std::string requestId = m_request->getRequestId();
+
+            // Check all specific handlers first
+            auto it = m_d.m_specificHandlers.find(requestId);
+            if(it != m_d.m_specificHandlers.end())
+            {
+                for(auto* handler : it->second)
+                {
+                    if(handler->handleMessage(m_request))
+                    {
+                        return;
+                    }
+                }
+            }
+
+            // Check all general handlers
+            for(auto* handler : m_d.m_generalHandlers)
+            {
+                if(handler->handleMessage(m_request))
+                {
+                    return;
+                }
+            }
+
+            EXECGRAPHGUI_APPLOG_WARN("Request with requestId: '{0}' has not been handled, it will be cancled!", requestId);
+            m_request->cancel();
+        };
+
+        void onTaskException(const std::string& what)
+        {
+            EXECGRAPHGUI_APPLOG_WARN("Request with requestId: '{0}' has thrown exception: {1}, it will be cancled!", m_request->getRequestId(), what);
+            m_request->cancel();
+        };
+
+    private:
+        std::shared_ptr<IRequest> m_request;
+        MessageDispatcher& m_d;
+    };
+
+private:
+    friend class TaskHandleMessage;
+
+private:
+    executionGraph::ThreadPool<TaskHandleMessage> m_pool{1};
 };
 
 #endif

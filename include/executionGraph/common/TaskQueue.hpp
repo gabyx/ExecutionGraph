@@ -35,19 +35,15 @@ namespace executionGraph
     template<typename TTask>
     class TaskQueue
     {
+        //! No move/copy allowed!
+        EXECGRAPH_DISALLOW_COPY_AND_MOVE(TaskQueue)
+
     public:
         using Task = TTask;
 
     public:
         TaskQueue()          = default;
         virtual ~TaskQueue() = default;
-
-        //! No move allowed!
-        TaskQueue(TaskQueue&&) = delete;
-        TaskQueue& operator=(TaskQueue&&) = delete;
-        //! No copy allowed!
-        TaskQueue(const TaskQueue&) = delete;
-        TaskQueue& operator=(const TaskQueue&) = delete;
 
     public:
         template<typename... Args>

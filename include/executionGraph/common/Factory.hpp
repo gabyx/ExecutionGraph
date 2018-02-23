@@ -19,7 +19,6 @@
 #include <type_traits>
 #include <unordered_map>
 #include "executionGraph/common/Assert.hpp"
-#include "executionGraph/common/CommonTraits.hpp"
 #include "executionGraph/config/Config.hpp"
 
 #ifdef __clang__

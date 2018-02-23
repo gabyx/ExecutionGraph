@@ -14,8 +14,6 @@
 #define executionGraph_nodes_LogicCommon_hpp
 
 #include <memory>
-
-#include "executionGraph/common/CommonTraits.hpp"
 #include "executionGraph/common/EnumClassHelper.hpp"
 #include "executionGraph/common/SfinaeMacros.hpp"
 #include "executionGraph/common/TypeDefs.hpp"

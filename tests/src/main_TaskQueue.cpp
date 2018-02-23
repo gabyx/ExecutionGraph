@@ -12,6 +12,7 @@
 
 #include <array>
 #include "TestFunctions.hpp"
+#include "executionGraph/common/Exception.hpp"
 #include "executionGraph/common/IObjectID.hpp"
 #include "executionGraph/common/TaskConsumer.hpp"
 #include "executionGraph/common/TaskQueue.hpp"
@@ -41,7 +42,7 @@ private:
 
 std::mutex PrintThread::s_mutex{};
 
-void doRandomStuff(std::thread::id threadId, int i, const std::string& name)
+void doRandomStuff(std::thread::id threadId, int i, const std::string& name, bool doThrow = false)
 {
     EXECGRAPH_THROW_EXCEPTION_IF(i < 0, "Wow, a moved task gets executed!! WTF!");
     DEFINE_RANDOM_GENERATOR_FUNC(i);
@@ -50,6 +51,11 @@ void doRandomStuff(std::thread::id threadId, int i, const std::string& name)
     PrintThread{} << "Thread: " << threadId << " Task: " << name << " running: " << sleep << "ms" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(sleep));
     PrintThread{} << "Thread: " << threadId << " Task: " << name << " finished " << std::endl;
+
+    if(doThrow)
+    {
+        EXECGRAPH_THROW_EXCEPTION_IF(i % 5 == 0, "Ups, task failed for test!");
+    }
 }
 
 struct Task
@@ -77,12 +83,12 @@ public:
         return *this;
     };
 
-    void operator()(std::thread::id threadId)
+    void runTask(std::thread::id threadId)
     {
         doRandomStuff(threadId, m_i, std::to_string(m_i));
     }
 
-    void onException(const std::string& what)
+    void onTaskException(const std::string& what)
     {
         PrintThread{} << "Task: " << m_i << " exception: " << what << std::endl;
     }
@@ -95,9 +101,9 @@ struct ITask
 {
     ITask(int i)
         : m_i(i) {}
-    virtual ~ITask()                                  = default;
-    virtual void operator()(std::thread::id threadId) = 0;
-    virtual void onException(const std::string& what)
+    virtual ~ITask()                               = default;
+    virtual void runTask(std::thread::id threadId) = 0;
+    virtual void onTaskException(const std::string& what)
     {
         PrintThread{} << "ITask: " << m_i << " exception: " << what << std::endl;
     }
@@ -108,9 +114,9 @@ struct TaskA : ITask
     TaskA(int i)
         : ITask(i) {}
     ~TaskA() = default;
-    virtual void operator()(std::thread::id threadId) override
+    virtual void runTask(std::thread::id threadId) override
     {
-        doRandomStuff(threadId, m_i, "A");
+        doRandomStuff(threadId, m_i, "A", true);
     }
 };
 struct TaskB : ITask
@@ -118,9 +124,9 @@ struct TaskB : ITask
     TaskB(int i)
         : ITask(i) {}
     ~TaskB() = default;
-    virtual void operator()(std::thread::id threadId) override
+    virtual void runTask(std::thread::id threadId) override
     {
-        doRandomStuff(threadId, m_i, "B");
+        doRandomStuff(threadId, m_i, "B", true);
     }
 };
 

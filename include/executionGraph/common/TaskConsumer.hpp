@@ -17,6 +17,7 @@
 #include <memory>
 #include <meta/meta.hpp>
 #include <thread>
+#include "executionGraph/common/AccessMacros.hpp"
 #include "executionGraph/common/SfinaeMacros.hpp"
 
 namespace executionGraph
@@ -35,6 +36,9 @@ namespace executionGraph
     template<typename TTaskQueue>
     class TaskConsumer
     {
+        //! No move/copy allowed!
+        EXECGRAPH_DISALLOW_COPY_AND_MOVE(TaskConsumer)
+
     public:
         using TaskQueue = TTaskQueue;
         using Task      = typename TTaskQueue::Task;
@@ -47,13 +51,6 @@ namespace executionGraph
         TaskConsumer(const std::shared_ptr<TaskQueue>& queue)
             : m_queue(queue){};
         virtual ~TaskConsumer() { join(); };
-
-        //! No move allowed!
-        TaskConsumer(TaskConsumer&&) = delete;
-        TaskConsumer& operator=(TaskConsumer&&) = delete;
-        //! No copy allowed!
-        TaskConsumer(const TaskConsumer&) = delete;
-        TaskConsumer& operator=(const TaskConsumer&) = delete;
 
         //! Start this consumer.
         void start()
@@ -85,12 +82,12 @@ namespace executionGraph
             template<typename... Args>
             static void runTask(T& task, Args&&... args)
             {
-                task->operator()(std::forward<Args>(args)...);
+                task->runTask(std::forward<Args>(args)...);
             }
             template<typename... Args>
-            static void onException(T& task, Args&&... args)
+            static void onTaskException(T& task, Args&&... args)
             {
-                task->onException(std::forward<Args>(args)...);
+                task->onTaskException(std::forward<Args>(args)...);
             }
         };
 
@@ -101,12 +98,12 @@ namespace executionGraph
             template<typename... Args>
             static void runTask(T& task, Args&&... args)
             {
-                task.operator()(std::forward<Args>(args)...);
+                task.runTask(std::forward<Args>(args)...);
             }
             template<typename... Args>
-            static void onException(T& task, Args&&... args)
+            static void onTaskException(T& task, Args&&... args)
             {
-                task.onException(std::forward<Args>(args)...);
+                task.onTaskException(std::forward<Args>(args)...);
             }
         };
 
@@ -124,11 +121,11 @@ namespace executionGraph
                     }
                     catch(const std::exception& e)
                     {
-                        Dispatch<Task>::onException(*optionalTask, e.what());
+                        Dispatch<Task>::onTaskException(*optionalTask, e.what());
                     }
                     catch(...)
                     {
-                        Dispatch<Task>::onException(*optionalTask, "An unknown unhandled exception occured!");
+                        Dispatch<Task>::onTaskException(*optionalTask, "An unknown unhandled exception occured!");
                     }
                 }
             }

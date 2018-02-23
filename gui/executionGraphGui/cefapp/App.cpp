@@ -64,7 +64,7 @@ namespace
     private:
         CefRefPtr<CefBrowserView> browser_view_;
 
-        IMPLEMENT_REFCOUNTING(SimpleWindowDelegate);
+        IMPLEMENT_REFCOUNTING(SimpleWindowDelegate)
         DISALLOW_COPY_AND_ASSIGN(SimpleWindowDelegate);
     };
 

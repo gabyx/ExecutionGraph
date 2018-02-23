@@ -30,6 +30,9 @@ namespace executionGraph
     template<typename TTask>
     class ThreadPool
     {
+        //! No move/copy allowed!
+        EXECGRAPH_DISALLOW_COPY_AND_MOVE(ThreadPool)
+
     public:
         using Task     = TTask;
         using Queue    = TaskQueue<TTask>;
@@ -44,9 +47,6 @@ namespace executionGraph
                 m_consumers.emplace_back(std::make_unique<Consumer>(m_queue));
             }
         };
-
-        ThreadPool(const ThreadPool&) = delete;
-        ThreadPool& operator=(const ThreadPool&) = delete;
 
         //! Destructor joins all threads automatically.
         virtual ~ThreadPool() = default;
