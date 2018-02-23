@@ -212,15 +212,15 @@ private:
         };
 
     private:
-        std::shared_ptr<IRequest> m_request;
-        MessageDispatcher& m_d;
+        std::shared_ptr<IRequest> m_request;  //! The request to handle.
+        MessageDispatcher& m_d;               // Dispatcher.
     };
 
 private:
     friend class TaskHandleMessage;
 
 private:
-    executionGraph::ThreadPool<TaskHandleMessage> m_pool{1};
+    executionGraph::ThreadPool<TaskHandleMessage> m_pool{1};  //! One seperate thread will handle all messages for this dispatcher.
 };
 
 #endif
