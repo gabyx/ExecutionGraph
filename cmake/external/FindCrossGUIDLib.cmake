@@ -19,7 +19,7 @@ if(${USE_SUPERBUILD})
                             GIT_SHALLOW         ON
                             TIMEOUT 10
                             UPDATE_DISCONNECTED  ON
-                            CMAKE_ARGS "-DCMAKE_BUILD_TYPE=Release" "-DCMAKE_VERBOSE_MAKEFILE=ON" "-DXG_TESTS=OFF" 
+                            CMAKE_ARGS "-DCMAKE_BUILD_TYPE=Release" "-DCMAKE_VERBOSE_MAKEFILE=ON" "-DCROSSGUID_TESTS=OFF" 
                                        "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
                             INSTALL_DIR "${INSTALL_DIR}")
                             
