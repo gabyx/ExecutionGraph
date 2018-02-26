@@ -76,10 +76,10 @@ if(UNIX)
 
     set(ExecutionGraph_INSTALL_FULL_LIBDIR "${CMAKE_INSTALL_FULL_LIBDIR}")
 
-    set(ExecutionGraph_CMAKE_CONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/ExecutionGraph/cmake")
-    set(ExecutionGraph_ADDITIONAL_FILES_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/ExecutionGraph")
+    set(ExecutionGraph_CMAKE_CONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/executionGraph/cmake")
+    set(ExecutionGraph_ADDITIONAL_FILES_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/executionGraph")
 elseif(WINDOWS)
-    set(ExecutionGraph_INC_INSTALL_DIR "${CMAKE_INSTALL_INCDIR}") 
+    set(ExecutionGraph_INC_INSTALL_DIR "include") 
     set(ExecutionGraph_RUNTIME_INSTALL_DIR "bin") 
     set(ExecutionGraph_LIBRARY_INSTALL_DIR "bin")
     set(ExecutionGraph_ARCHIVE_INSTALL_DIR "lib")
