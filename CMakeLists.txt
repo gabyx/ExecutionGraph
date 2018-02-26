@@ -39,6 +39,7 @@ set(ExecutionGraph_BUILD_EXAMPLE OFF CACHE BOOL "Build the example, the library 
 
 mark_as_advanced( ExecutionGraph_BUILD_GUI )
 set(ExecutionGraph_BUILD_GUI ON CACHE BOOL "Build Graphical User Interface for the Execution Graph")
+set(ExecutionGraph_USE_CEF_DEBUG ON CACHE BOOL "Use the CEF Debug Binaries")
 
 mark_as_advanced( ExecutionGraph_FORCE_MSGLOG_LEVEL)
 set(ExecutionGraph_FORCE_MSGLOG_LEVEL "TRACE" CACHE STRING "Force the message log level (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)")
@@ -85,8 +86,8 @@ elseif(WINDOWS)
     set(ExecutionGraph_ARCHIVE_INSTALL_DIR "lib")
     set(ExecutionGraph_FRAMEWORK_INSTALL_DIR "bin")
 
-    set(ExecutionGraph_CMAKE_CONFIG_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/cmake")
-    set(ExecutionGraph_ADDITIONAL_FILES_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}")
+    set(ExecutionGraph_CMAKE_CONFIG_INSTALL_DIR "cmake")
+    set(ExecutionGraph_ADDITIONAL_FILES_INSTALL_DIR "./")
 else()
 	message(FATAL_ERROR "Could not set install folders for this platform!")
 endif()
@@ -157,6 +158,7 @@ list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "eigenLib")
 # Try to find Meta 
 find_package(MetaLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "metaLib")
+
 # Try to find the spdlog
 find_package(SpdLogLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "spdlogLib")
@@ -169,9 +171,12 @@ list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "rttrLib")
 # Try to find the crossguid Library (use our own script)
 find_package(CrossGUIDLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "crossguidLib")
+# Try to find the crossguid Library (use our own script)
+find_package(MemoryLib REQUIRED)
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "memoryLib")
 # Try find cereal
-find_package(CerealLib REQUIRED)
-list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "cerealLib")
+# find_package(CerealLib REQUIRED)
+# list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "cerealLib")
 
 set_target_properties(ExecutionGraph::Core-Dependencies PROPERTIES INTERFACE_LINK_LIBRARIES "${ExecutionGraph_LINK_TARGETS_CORE_DEP}")
 

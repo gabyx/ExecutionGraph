@@ -178,8 +178,7 @@ if(OS_MACOSX)
                                                      OUTPUT_NAME "${ExecutionGraphGUI_HELPER_TARGET_OUTPUTNAME}"
                                                      RUNTIME_OUTPUT_DIRECTORY "${ExecutionGraphGUI_TARGET_OUT_DIR}")
 
-    add_dependencies(ExecutionGraphGUIHelper libcef_dll_wrapper)
-    target_link_libraries(ExecutionGraphGUIHelper libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ExecutionGraph::Core-Headers)
+    target_link_libraries(ExecutionGraphGUIHelper cefLib ExecutionGraph::Core-Headers)
     
     # Fix the framework rpath in the helper executable.
     # The helper is in $app_name.app/Contents/Frameworks/$app_name Helper.app/Contents/MacOS/
@@ -197,8 +196,8 @@ if(OS_MACOSX)
 
     # Additional Include Directories
     target_include_directories(ExecutionGraph-GUI PRIVATE ${ExecutionGraphGUI_INC_DIRS})
-    add_dependencies(ExecutionGraph-GUI libcef_dll_wrapper ExecutionGraphGUIHelper ${ExecutionGraphGUI_CLIENT_TARGET})
-    target_link_libraries(ExecutionGraph-GUI libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ${ExecutionGraph_LINK_TARGETS_GUI_DEP} ExecutionGraph::Core)
+    add_dependencies(ExecutionGraph-GUI ExecutionGraphGUIHelper ${ExecutionGraphGUI_CLIENT_TARGET})
+    target_link_libraries(ExecutionGraph-GUI cefLib ${ExecutionGraph_LINK_TARGETS_GUI_DEP} ExecutionGraph::Core)
     set_target_properties(ExecutionGraph-GUI PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/Info.plist"
                                                         OUTPUT_NAME "${ExecutionGraphGUI_TARGET_OUTPUTNAME}"
                                                         RUNTIME_OUTPUT_DIRECTORY "${ExecutionGraphGUI_TARGET_OUT_DIR}")

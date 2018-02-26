@@ -15,9 +15,12 @@
 
 #include <cef_scheme.h>
 #include <executionGraph/common/FileSystem.hpp>
+#include <foonathan/memory/heap_allocator.hpp>
+#include <foonathan/memory/memory_pool.hpp>
 #include <queue>
 #include <vector>
 #include "cefapp/BackendResourceHandler.hpp"
+#include "cefapp/BufferPool.hpp"
 #include "cefapp/ResourceHandlerPool.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
@@ -35,6 +38,8 @@ class BackendSchemeHandlerFactory final : public CefSchemeHandlerFactory
 public:
     BackendSchemeHandlerFactory(const std::path& pathPrefix = "")
         : m_pathPrefix(pathPrefix)
+        , m_bufferPool(std::make_shared<BufferPool>())
+        , m_handlerPool(sizeof(m_bufferPool), sizeof(m_bufferPool) * 30000)
     {
     }
     virtual ~BackendSchemeHandlerFactory() = default;
@@ -48,7 +53,22 @@ private:
     const std::path m_pathPrefix;
 
 private:
-    ResourceHandlerPool<BackendResourceHandler> m_pool;  //! Simple request handler pool.
+    // struct HandlerFactory
+    // {
+    //     HandlerFactory(std::shared_ptr<BufferPool> bufferPool) : m_bufferPool(bufferPool){}
+    //     using Handler = CefRefPtr<BackendResourceHandler>;
+    //     template<typename... Args>
+    //     Handler create(Args&&... args)
+    //     {
+    //         // inject binary buffers, together with other arguments...
+    //         return new BackendResourceHandler(std::forward<Args>(args)..., m_bufferPool);
+    //     }
+    //     std::shared_ptr<BufferPool> m_bufferPool;
+    // };
+
+private:
+    std::shared_ptr<BufferPool> m_bufferPool;        //! Binary buffers for the messages.
+    foonathan::memory::memory_pool<> m_handlerPool;  //! Simple request handler pool.
 };
 
 #endif

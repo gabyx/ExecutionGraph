@@ -19,8 +19,17 @@ list(APPEND INC_DIRS "${CEF_INCLUDE_PATH}/include" "${CEF_INCLUDE_PATH}")
 set_target_properties(libcef_lib PROPERTIES 
                                  INTERFACE_INCLUDE_DIRECTORIES "${INC_DIRS}")
 
+add_library(cefLib INTERFACE IMPORTED)
+set_property(TARGET cefLib PROPERTY INTERFACE_LINK_LIBRARIES libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
+
 print_target_properties("libcef_lib")
+print_target_properties("libcef_dll_wrapper")
+message(STATUS "cef standart libs: ${CEF_STANDARD_LIBS}")
 ###########################################################
 
 add_subdirectory(cefsimple)
 add_subdirectory(executionGraphGui)
+
+if(ExecutionGraph_BUILD_TESTS)
+    add_subdirectory(tests)
+endif()

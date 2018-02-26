@@ -17,7 +17,9 @@
 #include <cef_resource_handler.h>
 #include <executionGraph/common/FileSystem.hpp>
 #include <executionGraph/common/IObjectID.hpp>
+#include <functional>
 #include <wrapper/cef_helpers.h>
+class BufferPool;
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -30,16 +32,21 @@
 class BackendResourceHandler final : public CefResourceHandler,
                                      public executionGraph::IObjectID
 {
-    IMPLEMENT_REFCOUNTING(BackendResourceHandler)
     EXECGRAPH_OBJECT_ID_DECLARATION
 
 public:
-    template<typename Func>
-    BackendResourceHandler(Func&& callback)
+    template<typename Deleter>
+    BackendResourceHandler(std::shared_ptr<BufferPool> bufferPool, Deleter&& deleter)
         : CefResourceHandler()
         , m_id("BackendResourceHandler")
-        , m_callbackFinished([this, c = std::forward<Func>(callback)]() { c(getId()); })
+        , m_bufferPool(bufferPool)
+        , m_deleter(deleter)
     {}
+
+    virtual ~BackendResourceHandler()
+    {
+        //CEF_REQUIRE_IO_THREAD();
+    }
 
     //! CefResourceHandler overrides
     //@{
@@ -59,28 +66,28 @@ public:
                               CefRefPtr<CefCallback> callback) override;
     //@}
 
-    //! Check if this request handler is already used.
-    bool isUsed()
-    {
-        CEF_REQUIRE_IO_THREAD();
-        return m_isUsed;
-    }
+    //     //! Check if this request handler is already used.
+    //     bool isUsed()
+    //     {
+    //         CEF_REQUIRE_IO_THREAD();
+    //         return m_isUsed;
+    //     }
 
-private:
-    template<typename HandlerType>
-    friend class ResourceHandlerPool;
+    // private:
+    //     template<typename HandlerType>
+    //     friend class ResourceHandlerPool;
 
-    //! Set this request handler as used.
-    void setUsed(bool used)
-    {
-        CEF_REQUIRE_IO_THREAD();
-        m_isUsed = used;
-    }
+    //     //! Set this request handler as used.
+    //     void setUsed(bool used)
+    //     {
+    //         CEF_REQUIRE_IO_THREAD();
+    //         m_isUsed = used;
+    //     }
 
-    bool m_isUsed = false;  //!< Used flag if this handler is used.
+    //     bool m_isUsed = false;  //!< Used flag if this handler is used.
 
-    //! Callback which is called when this handler is finished, and again ununused. Executed in IO-Thread.
-    std::function<void()> m_callbackFinished;
+    //     //! Callback which is called when this handler is finished, and again ununused. Executed in IO-Thread.
+    //     std::function<void()> m_callbackFinished;
 
 private:
     std::path m_requestId;
@@ -92,7 +99,27 @@ private:
     void reset();
 
 private:
+    std::shared_ptr<BufferPool> m_bufferPool;
     std::size_t m_bytesRead = 0;  // DEBUG ==========
+
+public:
+    void AddRef() const override { m_refCount.AddRef(); }
+    bool Release() const override
+    {
+        if(m_refCount.Release())
+        {
+            CEF_REQUIRE_IO_THREAD();
+            m_deleter(const_cast<BackendResourceHandler*>(this));
+
+            return true;
+        }
+        return false;
+    }
+    bool HasOneRef() const override { return m_refCount.HasOneRef(); }
+
+private:
+    const std::function<void(BackendResourceHandler*)> m_deleter;
+    CefRefCount m_refCount;
 };
 
 #endif

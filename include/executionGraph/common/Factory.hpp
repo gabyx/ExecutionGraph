@@ -96,7 +96,7 @@ namespace executionGraph
 
     /* ---------------------------------------------------------------------------------------*/
     /*!
-        A factory class which creates types `CreatorType`.
+        A factory class which a statically fixed list of creators which create types `CreatorType`.
 
         @date Sun Feb 18 2018
         @author Gabriel Nützi, gnuetzi (at) gmail (døt) com

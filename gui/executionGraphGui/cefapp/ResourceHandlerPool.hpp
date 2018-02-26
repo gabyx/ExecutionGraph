@@ -30,25 +30,31 @@
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
  */
 /* ---------------------------------------------------------------------------------------*/
-template<typename THandlerType>
+template<typename THandlerFactory>
 class ResourceHandlerPool final
 {
 public:
-    using HandlerType                      = THandlerType;
-    using PointerType                      = CefRefPtr<HandlerType>;
-    using CallbackOnRequestHandlerFinished = void (*)(PointerType);
-    using Id                               = executionGraph::Id;
+    using HandlerFactory = THandlerFactory;
+    //! The Handler is of shared pointer type e.g. `CefRefPtr<...>`.
+    using Handler = typename HandlerFactory::Handler;
+    using Id      = executionGraph::Id;
 
 public:
-    ResourceHandlerPool() { batchAllocateHandlers<true>(); }
+    template<typename... Args>
+    ResourceHandlerPool(Args&&... args)
+        : m_factory(std::forward<Args>(args)...)
+    {
+        batchAllocateHandlers<true>();
+    }
+
     ~ResourceHandlerPool() = default;
 
-    PointerType checkoutUnusuedHandler();
+    Handler checkoutUnusuedHandler();
 
 private:
-    std::deque<PointerType> m_unusedHandlers;                //!< A FIFO queue of unused request handlers.
-    std::unordered_map<Id, PointerType> m_resourceHandlers;  //!< A pool of request handlers.
-
+    std::deque<Handler> m_unusedHandlers;                //!< A FIFO queue of unused request handlers.
+    std::unordered_map<Id, Handler> m_resourceHandlers;  //!< A pool of request handlers.
+    HandlerFactory m_factory;                            //!< The factory which creates the handlers.
 private:
     void onRequestHandlerFinished(const Id& id);
 
@@ -59,9 +65,9 @@ private:
 };
 
 //! Allocate some handlers.
-template<typename HandlerType>
+template<typename THandlerFactory>
 template<bool inCtor>
-void ResourceHandlerPool<HandlerType>::batchAllocateHandlers(unsigned int size)
+void ResourceHandlerPool<THandlerFactory>::batchAllocateHandlers(unsigned int size)
 {
     // Only check thread if not in constructor!
     if(!inCtor)
@@ -71,7 +77,7 @@ void ResourceHandlerPool<HandlerType>::batchAllocateHandlers(unsigned int size)
 
     for(int i = 0; i < size; ++i)
     {
-        PointerType handler(new HandlerType([this](const Id& id) { onRequestHandlerFinished(id); }));
+        Handler handler = m_factory.create([this](const Id& id) { onRequestHandlerFinished(id); });
         m_resourceHandlers.emplace(handler->getId(), handler);
         m_unusedHandlers.push_back(handler);
     }
@@ -80,8 +86,8 @@ void ResourceHandlerPool<HandlerType>::batchAllocateHandlers(unsigned int size)
 }
 
 //! Callback which is called when a usued request handler has finished.
-template<typename HandlerType>
-void ResourceHandlerPool<HandlerType>::onRequestHandlerFinished(const Id& id)
+template<typename THandlerFactory>
+void ResourceHandlerPool<THandlerFactory>::onRequestHandlerFinished(const Id& id)
 {
     CEF_REQUIRE_IO_THREAD();
 
@@ -106,9 +112,9 @@ void ResourceHandlerPool<HandlerType>::onRequestHandlerFinished(const Id& id)
 
 //! Checkout an unused request handler.
 //! @param nullptr if not succesful.
-template<typename HandlerType>
-typename ResourceHandlerPool<HandlerType>::PointerType
-ResourceHandlerPool<HandlerType>::checkoutUnusuedHandler()
+template<typename THandlerFactory>
+typename ResourceHandlerPool<THandlerFactory>::Handler
+ResourceHandlerPool<THandlerFactory>::checkoutUnusuedHandler()
 {
     CEF_REQUIRE_IO_THREAD();
 

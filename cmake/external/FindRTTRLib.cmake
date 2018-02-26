@@ -1,6 +1,4 @@
 # Try to find the RTTR Library Library https://github.com/rttrorg/rttr.git
-# We use this library header only!, so we dont build it!
-# defines rttr_INCLUDE_DIR
 include(FindPackageHandleStandardArgs)
 
 # Try to find the library, if it is installed!

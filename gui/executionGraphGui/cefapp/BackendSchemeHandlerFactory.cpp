@@ -13,8 +13,14 @@
 #include "BackendSchemeHandlerFactory.hpp"
 #include <executionGraph/common/Assert.hpp>
 #include <executionGraph/common/Exception.hpp>
+#include <foonathan/memory/heap_allocator.hpp>
+#include <foonathan/memory/smart_ptr.hpp>
+#include <memory>
+#include <random>
 #include "cefapp/Loggers.hpp"
 #include "cefapp/SchemeHandlerHelper.hpp"
+
+using namespace foonathan::memory;
 
 CefRefPtr<CefResourceHandler> BackendSchemeHandlerFactory::Create(CefRefPtr<CefBrowser> browser,
                                                                   CefRefPtr<CefFrame> frame,
@@ -22,10 +28,32 @@ CefRefPtr<CefResourceHandler> BackendSchemeHandlerFactory::Create(CefRefPtr<CefB
                                                                   CefRefPtr<CefRequest> request)
 {
     CEF_REQUIRE_IO_THREAD();
-    auto handler = m_pool.checkoutUnusuedHandler();
-    if(!handler)
-    {
-        EXECGRAPHGUI_APPLOG_ERROR("BackendSchemeHandlerFactory: No unused handler could be found.");
-    }
-    return handler;
+
+    // {
+    //     using Type         = BackendResourceHandler;
+    //     using RawAllocator = memory_pool<>;
+    //     using Ptr = std::unique_ptr<Type, allocator_deleter<Type, RawAllocator>>;
+    //     using RawPtr = std::unique_ptr<Type, allocator_deallocator<Type, RawAllocator>>;
+    //     std::vector<CefRefPtr<CefResourceHandler>> vec;
+
+    //     std::vector<Ptr> vec2;
+    //     for(auto i = 0; i < 3; i++)
+    //     {
+
+    //         // get the memory from the pool
+    //         auto memory = m_handlerPool.allocate_node(/*sizeof(Type), alignof(Type)*/);
+
+    //         using RawPtr = std::unique_ptr<Type, allocator_deallocator<Type, RawAllocator>>;
+    //         // raw_ptr deallocates memory in case of constructor exception
+    //         RawPtr result(static_cast<Type*>(memory), {m_handlerPool});
+    //         // call constructor (placement new)
+    //         ::new(memory) Type(m_bufferPool, [this](auto* ptr) { allocator_deleter<Type, RawAllocator>{m_handlerPool}(ptr); });
+    //         // pass ownership to return value CefRefPtr which will use the internal BackendResourceHandler::m_deleter
+    //         EXECGRAPHGUI_APPLOG_INFO("Allocated node: {0}", i);
+    //         vec.emplace_back(result.release());
+    //     }
+    //     std::shuffle(vec.begin(), vec.end(), std::mt19937{});
+    // }
+
+    return new BackendResourceHandler{m_bufferPool, [](auto* p) { delete p; }};
 }
