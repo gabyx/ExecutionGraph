@@ -239,6 +239,17 @@ if(OS_MACOSX)
     set(PREFIXES "${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/")
     copy_macosx_resources("${ExecutionGraphGUI_RESOURCES_SRCS}" "${PREFIXES}" "ExecutionGraph-GUI" "${CMAKE_CURRENT_SOURCE_DIR}" "${CEF_APP}")
 
+    # Link the dSYM file into the bundle
+    # if configured in FindCEFLib.cmake
+    if(NOT ${CEF_DSYM_FILE} STREQUAL "")
+        add_custom_command(
+            TARGET ExecutionGraph-GUI
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E create_symlink
+                    "${CEF_DSYM_FILE}"
+                    "${CEF_APP}/Contents/Frameworks/Chromium Embedded Framework.dSYM"
+        )
+    endif()
 
     print_target_properties(ExecutionGraph-GUI)
 endif()

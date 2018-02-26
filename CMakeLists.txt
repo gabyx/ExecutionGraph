@@ -39,7 +39,7 @@ set(ExecutionGraph_BUILD_EXAMPLE OFF CACHE BOOL "Build the example, the library 
 
 mark_as_advanced( ExecutionGraph_BUILD_GUI )
 set(ExecutionGraph_BUILD_GUI ON CACHE BOOL "Build Graphical User Interface for the Execution Graph")
-set(ExecutionGraph_USE_CEF_DEBUG ON CACHE BOOL "Use the CEF Debug Binaries")
+set(ExecutionGraph_USE_CEF_DSYM_FILE ON CACHE BOOL "Use the CEF Debug Symbols")
 
 mark_as_advanced( ExecutionGraph_FORCE_MSGLOG_LEVEL)
 set(ExecutionGraph_FORCE_MSGLOG_LEVEL "TRACE" CACHE STRING "Force the message log level (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)")
