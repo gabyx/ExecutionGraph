@@ -68,7 +68,6 @@ namespace
 void BackendResourceHandler::Cancel()
 {
     CEF_REQUIRE_IO_THREAD();
-    // EXECGRAPH_ASSERT(m_isUsed, "Handler should be used by now!");
     EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler id:{0} : cancelled!", getId().getName());
 
     // if from external this handling can be cancelled
@@ -84,7 +83,6 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
                                                 CefString& redirectUrl)
 {
     CEF_REQUIRE_IO_THREAD();
-    // EXECGRAPH_ASSERT(m_isUsed, "Handler should be used by now!");
 
     //response->Set
     response->SetMimeType("application/octet-stream");
@@ -95,7 +93,6 @@ bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
                                             CefRefPtr<CefCallback> callback)
 {
     CEF_REQUIRE_IO_THREAD();
-    // EXECGRAPH_ASSERT(m_isUsed, "Handler should be used by now!");
 
     if(!initRequest(request))
     {
@@ -189,15 +186,4 @@ bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
 //! Finish handling the request: Reset everyhting and signal callback.
 void BackendResourceHandler::finish()
 {
-    // reset();
-    // setUsed(false);
-    // m_callbackFinished();
-}
-
-//! Reset all internal data, such that this resource handler can be used again.
-void BackendResourceHandler::reset()
-{
-    m_requestId = "";
-    m_query     = "";
-    m_bytesRead = 0;
 }

@@ -45,7 +45,7 @@ public:
 
     virtual ~BackendResourceHandler()
     {
-        //CEF_REQUIRE_IO_THREAD();
+        CEF_REQUIRE_IO_THREAD();
     }
 
     //! CefResourceHandler overrides
@@ -66,29 +66,6 @@ public:
                               CefRefPtr<CefCallback> callback) override;
     //@}
 
-    //     //! Check if this request handler is already used.
-    //     bool isUsed()
-    //     {
-    //         CEF_REQUIRE_IO_THREAD();
-    //         return m_isUsed;
-    //     }
-
-    // private:
-    //     template<typename HandlerType>
-    //     friend class ResourceHandlerPool;
-
-    //     //! Set this request handler as used.
-    //     void setUsed(bool used)
-    //     {
-    //         CEF_REQUIRE_IO_THREAD();
-    //         m_isUsed = used;
-    //     }
-
-    //     bool m_isUsed = false;  //!< Used flag if this handler is used.
-
-    //     //! Callback which is called when this handler is finished, and again ununused. Executed in IO-Thread.
-    //     std::function<void()> m_callbackFinished;
-
 private:
     std::path m_requestId;
     std::string m_query;
@@ -96,7 +73,6 @@ private:
 
 private:
     void finish();
-    void reset();
 
 private:
     std::shared_ptr<BufferPool> m_bufferPool;
@@ -118,7 +94,7 @@ public:
     bool HasOneRef() const override { return m_refCount.HasOneRef(); }
 
 private:
-    const std::function<void(BackendResourceHandler*)> m_deleter;
+    const std::function<void(BackendResourceHandler*)> m_deleter;  //!< Special deleter since we allocated over a pool!
     CefRefCount m_refCount;
 };
 
