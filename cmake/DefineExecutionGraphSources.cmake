@@ -1,17 +1,16 @@
-macro(include_all_source_ExecutionGraph 
-      SRC 
-      INC 
-      INCLUDE_DIRS 
-      DEPENDING_TARGETS # Input variable names
-      ExecutionGraph_ROOT_DIR 
-      ExecutionGraph_BINARY_DIR)  
+function(include_all_source_ExecutionGraph 
+        SRC 
+        INC 
+        INCLUDE_DIRS 
+        DEPENDING_TARGETS # Input variable names
+        ExecutionGraph_ROOT_DIR 
+        ExecutionGraph_BINARY_DIR)
 
-    # WRITE CONFIGURATION FILE
+    # Write Config files
     include(${ExecutionGraph_ROOT_DIR}/cmake/WriteConfigFile.cmake)
     set(ExecutionGraph_CONFIG_FILE ${ExecutionGraph_BINARY_DIR}/include/executionGraph/config/Config.hpp)
     message(STATUS "ExecutionGraph: Write config file ${ExecutionGraph_CONFIG_FILE}")
     ExecutionGraph_write_config_file( ${ExecutionGraph_CONFIG_FILE} ${ExecutionGraph_ROOT_DIR})
-    #=========================
 
     # Add all external sources/headers
     # include(${ExecutionGraph_ROOT_DIR}/cmake/DefineExecutionGraphExternalSources.cmake)
@@ -25,6 +24,7 @@ macro(include_all_source_ExecutionGraph
         ${ExecutionGraph_ROOT_DIR}/src/LogicNode.cpp
 
         ${ExecutionGraph_ROOT_DIR}/src/FileSystem.cpp
+        PARENT_SCOPE
     )
 
     set(${INC}
@@ -53,11 +53,13 @@ macro(include_all_source_ExecutionGraph
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/graphs/ExecutionTreeInOut.hpp
 
         ${ExecutionGraph_CONFIG_FILE}
+        PARENT_SCOPE
     )
 
     set(${INCLUDE_DIRS}
         $<BUILD_INTERFACE:${ExecutionGraph_ROOT_DIR}/include>
         $<BUILD_INTERFACE:${ExecutionGraph_BINARY_DIR}/include>
+        PARENT_SCOPE
     )
     
     include(InstallMacros)
@@ -66,13 +68,13 @@ macro(include_all_source_ExecutionGraph
         if("${postfix}" STREQUAL "")
             message(FATAL_ERROR "wrong path ${PATH}")
         endif()
-        install( FILES ${file} DESTINATION "include/${postfix}" )
+        install(FILES ${file} DESTINATION "include/${postfix}" )
     endforeach()   
 
-endmacro()
+endfunction()
 
 
-macro(setTargetCompileOptionsExecutionGraph target)
+function(setTargetCompileOptionsExecutionGraph target)
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
        CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
@@ -91,11 +93,10 @@ macro(setTargetCompileOptionsExecutionGraph target)
         message(ERROR "MSVC is not yet supported!")
     endif()
 
-
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         # with clang 5.0.1: -fsanitize=address produces weird output in lldb for std::string ...
-        list(APPEND CXX_FLAGS_DEBUG "-fsanitize=address" "-fsanitize=leak")
-        set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=leak -fsanitize=address -lc++experimental")
+        list(APPEND CXX_FLAGS_DEBUG  "-fsanitize=thread")
+        set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=thread -lc++experimental")
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
         list(APPEND CXX_FLAGS_DEBUG "-fsanitize=address")
         set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address -lc++experimental")
@@ -119,4 +120,4 @@ macro(setTargetCompileOptionsExecutionGraph target)
         )
     endif()
 
-endmacro()
+endfunction()

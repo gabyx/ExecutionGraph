@@ -29,31 +29,18 @@ CefRefPtr<CefResourceHandler> BackendSchemeHandlerFactory::Create(CefRefPtr<CefB
 {
     CEF_REQUIRE_IO_THREAD();
 
-    // {
-    //     using Type         = BackendResourceHandler;
-    //     using RawAllocator = memory_pool<>;
-    //     using Ptr = std::unique_ptr<Type, allocator_deleter<Type, RawAllocator>>;
-    //     using RawPtr = std::unique_ptr<Type, allocator_deallocator<Type, RawAllocator>>;
-    //     std::vector<CefRefPtr<CefResourceHandler>> vec;
+    // Handback a new Handler (use an efficient memory pool)
+    using Type         = BackendResourceHandler;
+    using RawAllocator = decltype(m_handlerPool);
+    using RawPtr       = std::unique_ptr<Type, allocator_deallocator<Type, RawAllocator>>;
 
-    //     std::vector<Ptr> vec2;
-    //     for(auto i = 0; i < 3; i++)
-    //     {
+    // get the memory from the pool
+    auto memory = m_handlerPool.allocate_node();
+    // using RawPtr = std::unique_ptr<Type, allocator_deallocator<Type, RawAllocator>>;
+    // raw_ptr deallocates memory in case of constructor exception
+    RawPtr result(static_cast<BackendResourceHandler*>(memory), {m_handlerPool});
+    // call constructor (placement new)
+    ::new(memory) BackendResourceHandler(m_bufferPool, [this](auto* ptr) { allocator_deleter<Type, RawAllocator>{m_handlerPool}(ptr); });
 
-    //         // get the memory from the pool
-    //         auto memory = m_handlerPool.allocate_node(/*sizeof(Type), alignof(Type)*/);
-
-    //         using RawPtr = std::unique_ptr<Type, allocator_deallocator<Type, RawAllocator>>;
-    //         // raw_ptr deallocates memory in case of constructor exception
-    //         RawPtr result(static_cast<Type*>(memory), {m_handlerPool});
-    //         // call constructor (placement new)
-    //         ::new(memory) Type(m_bufferPool, [this](auto* ptr) { allocator_deleter<Type, RawAllocator>{m_handlerPool}(ptr); });
-    //         // pass ownership to return value CefRefPtr which will use the internal BackendResourceHandler::m_deleter
-    //         EXECGRAPHGUI_APPLOG_INFO("Allocated node: {0}", i);
-    //         vec.emplace_back(result.release());
-    //     }
-    //     std::shuffle(vec.begin(), vec.end(), std::mt19937{});
-    // }
-
-    return new BackendResourceHandler{m_bufferPool, [](auto* p) { delete p; }};
+    return result.release();
 }

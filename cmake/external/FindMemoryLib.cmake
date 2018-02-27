@@ -24,7 +24,7 @@ if(${USE_SUPERBUILD})
                             PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/memory"
                             TIMEOUT 10
                             UPDATE_DISCONNECTED  ON
-                            CMAKE_ARGS "-DCMAKE_BUILD_TYPE=Release" "-DFOONATHAN_MEMORY_BUILD_EXAMPLES=OFF" 
+                            CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "-DFOONATHAN_MEMORY_BUILD_EXAMPLES=OFF" 
                                        "-DFOONATHAN_MEMORY_BUILD_TESTS=OFF" "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
                             INSTALL_DIR "${INSTALL_DIR}")
 

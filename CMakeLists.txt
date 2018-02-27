@@ -203,6 +203,10 @@ if(ExecutionGraph_USE_OPENMP)
 endif()
 # ======================================================================
 
+# Get Version
+include(GetVersion)
+get_version_ExecutionGraph()
+
 # Define all ExecutionGraph Source files
 include(DefineExecutionGraphSources)
 set(ExecutionGraph_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include/ExecutionGraph")
