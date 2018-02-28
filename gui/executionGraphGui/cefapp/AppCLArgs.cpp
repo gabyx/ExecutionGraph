@@ -72,10 +72,5 @@ std::vector<char*> AppCLArgs::getCEFArgs()
     {
         vec.emplace_back(charVec.data());
     }
-    std::cout << vec.size() << std::endl;
-    for(auto& v : vec)
-    {
-        std::cout << vec.back() << std::endl;
-    }
     return vec;
 }
