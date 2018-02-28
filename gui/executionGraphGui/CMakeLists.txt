@@ -128,7 +128,7 @@ if(OS_LINUX)
     # Executable target.
     add_executable(ExecutionGraph-GUI ${ExecutionGraphGUI_SRCS})
     # Compile Options
-    setTargetCompileOptionsExecutionGraph(ExecutionGraph-GUI)
+    setTargetCompileOptionsExecutionGraph(ExecutionGraph-GUI ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
     # Additional Include Directories
     target_include_directories(ExecutionGraph-GUI PRIVATE ${ExecutionGraphGUI_INC_DIRS})
     add_dependencies(ExecutionGraph-GUI libcef_dll_wrapper)
@@ -170,7 +170,7 @@ if(OS_MACOSX)
     # Helper executable target.
     add_executable(ExecutionGraphGUIHelper MACOSX_BUNDLE ${ExecutionGraphGUI_HELPER_SRCS})
     # Compile Options
-    setTargetCompileOptionsExecutionGraph(ExecutionGraphGUIHelper)
+    setTargetCompileOptionsExecutionGraph(ExecutionGraphGUIHelper ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
     # Additional Include Directories
     target_include_directories(ExecutionGraphGUIHelper PRIVATE ${ExecutionGraphGUI_INC_DIRS})
     set_target_properties(ExecutionGraphGUIHelper    PROPERTIES
@@ -192,7 +192,7 @@ if(OS_MACOSX)
     # Main executable target.
     add_executable(ExecutionGraph-GUI MACOSX_BUNDLE ${ExecutionGraphGUI_RESOURCES_SRCS} ${ExecutionGraphGUI_SRCS})
     # Compile Options
-    setTargetCompileOptionsExecutionGraph(ExecutionGraph-GUI)
+    setTargetCompileOptionsExecutionGraph(ExecutionGraph-GUI ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
 
     # Additional Include Directories
     target_include_directories(ExecutionGraph-GUI PRIVATE ${ExecutionGraphGUI_INC_DIRS})
@@ -265,7 +265,7 @@ if(OS_WINDOWS)
     # Executable target.
     add_executable(ExecutionGraph-GUI WIN32 ${ExecutionGraphGUI_SRCS})
     # Compile Options
-    setTargetCompileOptionsExecutionGraph(ExecutionGraph-GUI)
+    setTargetCompileOptionsExecutionGraph(ExecutionGraph-GUI ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
     add_dependencies(ExecutionGraph-GUI libcef_dll_wrapper)
     target_link_libraries(ExecutionGraph-GUI libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ${ExecutionGraph_LINK_TARGETS_GUI_DEP} ExecutionGraph::Core)
 

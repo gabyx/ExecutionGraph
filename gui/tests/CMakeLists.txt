@@ -26,7 +26,7 @@ function(defineCompileDefs target)
     message(STATUS "====================================================")
     message(STATUS "Configuring target: ${target}")
 
-    setTargetCompileOptionsExecutionGraph(${target})
+    setTargetCompileOptionsExecutionGraph(${target} ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
     target_include_directories(${target} PRIVATE ${INCLUDE_DIRS})
     target_link_libraries(${target} ExecutionGraph::CoreForTests gtest gmock_main ${ExecutionGraph_LINK_TARGETS_GUI_DEP} cefLib)
     add_dependencies(build_and_test ${target})

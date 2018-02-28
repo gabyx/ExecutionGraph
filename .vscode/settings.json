@@ -160,7 +160,8 @@
     "cmake.configureArgs": ["-DExecutionGraph_BUILD_TESTS=ON",
                             "-DExecutionGraph_BUILD_GUI=ON",
                             "-DExecutionGraph_EXTERNAL_BUILD_DIR_POSTFIX=../buildExternal",
-                            "-ExecutionGraph_USE_CEF_DSYM_FILE=ON"],
+                            "-DExecutionGraph_USE_CEF_DSYM_FILE=ON"   
+                            ],
     "plantuml.exportFormat": "svg",
     "plantuml.exportSubFolder": false,
     "markdown-preview-enhanced.previewTheme": "github-dark.css",

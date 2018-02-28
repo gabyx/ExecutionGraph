@@ -10,6 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
+#include <iostream>
 #include <cef_app.h>
 #include "cefapp/RendererApp.hpp"
 
@@ -39,12 +40,15 @@ namespace
     {
         // The command-line flag won't be specified for the browser process.
         if(!command_line->HasSwitch(kProcessType))
+        {
             return PROCESS_TYPE_BROWSER;
+        }
 
         const std::string& process_type = command_line->GetSwitchValue(kProcessType);
         if(process_type == kRendererProcess)
+        {
             return PROCESS_TYPE_RENDERER;
-
+        }
 #if defined(OS_LINUX)
         // On Linux the zygote process is used to spawn other process types. Since we
         // don't know what type of process it will be we give it the renderer app.
@@ -71,12 +75,11 @@ int main(int argc, char* argv[])
     switch(GetProcessType(command_line))
     {
         case PROCESS_TYPE_RENDERER:
+            std::cout << "ProcessHelperMac:: starting RenderApp" << std::endl;
             app = new RendererApp();
             break;
-        // case PROCESS_TYPE_OTHER:
-        //     app = CreateOtherProcessApp();
-        //     break;
         default:
+            std::cout << "ProcessHelperMac:: WARNING: process type not recognized!" << std::endl;
             break;
     }
 

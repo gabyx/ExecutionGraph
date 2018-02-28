@@ -25,7 +25,7 @@ macro(add_ExecutionGraph_lib STATICorSHARED TARGETNAME EXPORTNAME DOINSTALL)
         DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
         EXPORT_NAME ${EXPORTNAME})
 
-    setTargetCompileOptionsExecutionGraph(${TARGETNAME})
+    setTargetCompileOptionsExecutionGraph(${TARGETNAME} ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
     
     # set build flag, for import/export specifiers in platform.hpp
     # Building a library means we only export the symbols which have ExecutionGraph_EXPORT set in the Platform.hpp file

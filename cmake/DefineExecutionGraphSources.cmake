@@ -74,7 +74,7 @@ function(include_all_source_ExecutionGraph
 endfunction()
 
 
-function(setTargetCompileOptionsExecutionGraph target)
+function(setTargetCompileOptionsExecutionGraph target use_address_san use_leak_san)
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
        CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
@@ -93,13 +93,35 @@ function(setTargetCompileOptionsExecutionGraph target)
         message(ERROR "MSVC is not yet supported!")
     endif()
 
+    if(${use_address_san})
+        if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+            # with clang 5.0.1: -fsanitize=address produces weird output in lldb for std::string ...
+            list(APPEND CXX_FLAGS_DEBUG  "-fsanitize=address")
+            set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address")
+        elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+            list(APPEND CXX_FLAGS_DEBUG "-fsanitize=address")
+            set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address")
+        elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+            message(FATAL_ERROR "MSVC is not yet supported!")
+        endif()
+    endif()
+
+    if(${use_leak_san})
+        if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+            list(APPEND CXX_FLAGS_DEBUG  "-fsanitize=leak")
+            set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=leak")
+        elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+            message(FATAL_ERROR "AppleClang does not support -fsanitize=leak (please check)")
+        elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+            message(FATAL_ERROR "MSVC is not yet supported!")
+        endif()
+    endif()
+
+    # Link with experimental library
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        # with clang 5.0.1: -fsanitize=address produces weird output in lldb for std::string ...
-        list(APPEND CXX_FLAGS_DEBUG  "-fsanitize=thread")
-        set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=thread -lc++experimental")
+        set(LINKER_FLAGS "${LINKER_FLAGS} -lc++experimental")
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-        list(APPEND CXX_FLAGS_DEBUG "-fsanitize=address")
-        set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address -lc++experimental")
+        set(LINKER_FLAGS "${LINKER_FLAGS} -lc++experimental")
     elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
         message(ERROR "MSVC is not yet supported!")
     endif()
@@ -111,7 +133,6 @@ function(setTargetCompileOptionsExecutionGraph target)
 
     # Linker flags.
     set_property(TARGET ${target} PROPERTY LINK_FLAGS ${LINKER_FLAGS})
-
 
     if(OS_MACOSX)
         set_target_properties(${target} PROPERTIES

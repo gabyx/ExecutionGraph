@@ -9,6 +9,9 @@ macro(print_target_properties target)
     get_property(RES TARGET ${target} PROPERTY LINK_LIBRARIES)
     message(STATUS "Linking with: ${RES}")
 
+    get_property(RES TARGET ${target} PROPERTY LINK_FLAGS)
+    message(STATUS "Link flags: ${RES}")
+
     get_property(RES TARGET ${target} PROPERTY INTERFACE_LINK_LIBRARIES)
     message(STATUS "Interface Link Libraires: ${RES}")
 

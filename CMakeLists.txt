@@ -25,26 +25,31 @@ endif()
 mark_as_advanced( CMAKE_DEBUG_POSTFIX )
 set(CMAKE_DEBUG_POSTFIX "-dbg" CACHE STRING "Debug postfix for library/executable")
 
-mark_as_advanced( ExecutionGraph_BUILD_LIBRARY )
+mark_as_advanced(ExecutionGraph_USE_LEAK_SANITIZER)
+set(ExecutionGraph_USE_LEAK_SANITIZER OFF CACHE BOOL "Use the leak sanitizer!" )
+mark_as_advanced(ExecutionGraph_USE_ADDRESS_SANITIZER)
+set(ExecutionGraph_USE_ADDRESS_SANITIZER OFF CACHE BOOL "Use the address sanitizer!" )
+
+mark_as_advanced(ExecutionGraph_BUILD_LIBRARY)
 set(ExecutionGraph_BUILD_LIBRARY ON CACHE BOOL "Build a shared library")
 
-mark_as_advanced( ExecutionGraph_BUILD_TESTS)
+mark_as_advanced(ExecutionGraph_BUILD_TESTS)
 set(ExecutionGraph_BUILD_TESTS ON CACHE BOOL "Build the tests")
 
-mark_as_advanced( ExecutionGraph_BUILD_BENCHMARKS)
+mark_as_advanced(ExecutionGraph_BUILD_BENCHMARKS)
 set(ExecutionGraph_BUILD_BENCHMARKS OFF CACHE BOOL "Build the benchmarks")
 
-mark_as_advanced( ExecutionGraph_BUILD_EXAMPLE )
+mark_as_advanced(ExecutionGraph_BUILD_EXAMPLE)
 set(ExecutionGraph_BUILD_EXAMPLE OFF CACHE BOOL "Build the example, the library is automatically built if this is true")
 
-mark_as_advanced( ExecutionGraph_BUILD_GUI )
+mark_as_advanced(ExecutionGraph_BUILD_GUI)
 set(ExecutionGraph_BUILD_GUI ON CACHE BOOL "Build Graphical User Interface for the Execution Graph")
 set(ExecutionGraph_USE_CEF_DSYM_FILE ON CACHE BOOL "Use the CEF Debug Symbols")
 
 mark_as_advanced( ExecutionGraph_FORCE_MSGLOG_LEVEL)
 set(ExecutionGraph_FORCE_MSGLOG_LEVEL "TRACE" CACHE STRING "Force the message log level (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)")
 
-mark_as_advanced( ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS)
+mark_as_advanced(ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS)
 set(ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS ON CACHE BOOL "Force an exception if a bad socket cast happens! (if false, the exception is thrown only in Debug mode!)")
 
 #mark_as_advanced( ExecutionGraph_USE_OPENMP)
