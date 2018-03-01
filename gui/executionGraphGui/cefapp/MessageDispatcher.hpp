@@ -57,7 +57,7 @@ private:
 
 public:
     //! Handle a general request. Can be called on any thread!
-    void AddRequest(std::shared_ptr<IRequest> request)
+    void AddRequest(std::shared_ptr<Request> request)
     {
         m_pool.getQueue()->emplace(TaskHandleMessage{this, request});
     }
@@ -167,7 +167,7 @@ private:
     class TaskHandleMessage
     {
     public:
-        TaskHandleMessage(MessageDispatcher& d, std::shared_ptr<IRequest> message)
+        TaskHandleMessage(MessageDispatcher& d, std::shared_ptr<Request> message)
             : m_d(d), m_request(message)
         {
             EXECGRAPH_ASSERT(m_request, "Message is nullptr!");
@@ -202,18 +202,18 @@ private:
             }
 
             EXECGRAPHGUI_APPLOG_WARN("Request with requestId: '{0}' has not been handled, it will be cancled!", requestId);
-            m_request->cancel();
+            //m_request->setCanceled("No handler found!");
         };
 
         void onTaskException(const std::string& what)
         {
             EXECGRAPHGUI_APPLOG_WARN("Request with requestId: '{0}' has thrown exception: {1}, it will be cancled!", m_request->getRequestId(), what);
-            m_request->cancel();
+            //m_request->setCanceled("No handler found!");
         };
 
     private:
-        std::shared_ptr<IRequest> m_request;  //! The request to handle.
-        MessageDispatcher& m_d;               // Dispatcher.
+        std::shared_ptr<Request> m_request;  //! The request to handle.
+        MessageDispatcher& m_d;              // Dispatcher.
     };
 
 private:

@@ -16,39 +16,55 @@
 #include <rttr/type>
 #include <string>
 #include "cefapp/IResponse.hpp"
+class BinaryBuffer;
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
     General Request Message
 
+    A BackendMessageHandler is handling such a request. It can be registered in
+    the message dispatcher for handling one or several request ids (see `m_requestId`)
+    The request id is in the form "category/subcategory" (e.g. "graphManip/addNode").
+    We use a category and a subcategory to be able to structure requests into groups.
+    Also for the future, when more and more requests get added.
+
+    The serializer which decodes the payload is kept outside of this class and other derived
+    ones.
+
     @date Thu Feb 22 2018
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
  */
 /* ---------------------------------------------------------------------------------------*/
-class IRequest
+class Request
 {
     RTTR_ENABLE()
 
 protected:
-    IRequest() = default;
+    Request(const std::string& requestId)
+        : m_requestId(requestId) {}
 
 public:
-    virtual ~IRequest() = default;
+    virtual ~Request() = default;
 
 public:
     //! Get the request id describing this message.
     virtual std::string getRequestId() = 0;
 
 public:
-    //! Get the response object.
-    virtual IResponse& getResponse() = 0;
+    //! Get the payload of this request. Nullptr if there is no payload for this request.
+    //! The return value does not need to be thread-safe.
+    virtual const BinaryBuffer* getPayload() = 0;
 
-public:
-    //! Callback for signaling that the request is fullfilled and the response object is available.
-    virtual void ready() = 0;
+    //! Get the MimeType of the payload.
+    //! Could be "application/octet-stream" for a binary file or
+    //! "application/json" for a json file in utf-8 encoding.
+    virtual const std::string& getMimeType() = 0;
 
-    //! Callback for signaling that this request is cancled.
-    virtual void cancel() = 0;
+private:
+    //! The requestId (e.g. "category/subcategory" -> "graphManip/addNode")
+    //! A BackendMessageHandler handling such a request can be registered on
+    //! a set of such requestIds.
+    std::string m_requestId;
 };
 
 #endif

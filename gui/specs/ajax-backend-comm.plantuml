@@ -5,7 +5,6 @@ box "CEF [IO-Thread]" #LightGrey
 participant CEF
 
 participant backendHandlerFactory << BackendSchemeHandlerFactory >>
-participant resourceHandlerPool << ResourceHandlerPool >>
 participant requestHandler << BackendResourceHandler >>
 end box
 
@@ -20,14 +19,10 @@ activate CEF
 
     CEF -> backendHandlerFactory : ""Create(...)"" 
     activate backendHandlerFactory
-        backendHandlerFactory -> resourceHandlerPool : ""checkoutUnusuedHandler()""
-        activate resourceHandlerPool
-        resourceHandlerPool -> requestHandler
+        backendHandlerFactory -> requestHandler : ""create (from pool)""
         activate requestHandler
-        resourceHandlerPool <-- requestHandler : ""requestHandler""
+        backendHandlerFactory <-- requestHandler : ""requestHandler""
         deactivate requestHandler
-        backendHandlerFactory <-- resourceHandlerPool : ""requestHandler""
-        deactivate resourceHandlerPool
         CEF <-- backendHandlerFactory : ""requestHandler""
     deactivate backendHandlerFactory
 
@@ -36,29 +31,32 @@ activate CEF
         requestHandler -> requestHandler : initRequest()
         CEF <-- requestHandler : ""false"" [error happened]
         hnote over requestHandler : handling request
-        requestHandler --> messageDispatcher : ""addRequest(requestBin,responseBin)""\n[responseBin contains the callback]
+        requestHandler -> messageDispatcher : ""addRequest(request,response)""\n[response contains callback: response headers ready]
+        activate messageDispatcher
+        requestHandler <-- messageDispatcher :
+        deactivate messageDispatcher
         CEF <-- requestHandler : ""true""
     deactivate requestHandler
 
     
     activate messageDispatcher
-        messageDispatcher -> backendMessageHandler : ""handleRequest(requestBin, responseBin)""\n[optional threaded]
+        messageDispatcher -> backendMessageHandler : ""handleRequest(request, response)""\n[optional threaded]
         activate backendMessageHandler
-            hnote over backendMessageHandler: ""deserialize(requestBin)""
+            hnote over backendMessageHandler: ""deserialize(request)""
             backendMessageHandler -> executionGraphBackend : do work, e.g. ""addNode(...)""
             activate executionGraphBackend
                 backendMessageHandler <-- executionGraphBackend : completed
             deactivate executionGraphBackend
-            hnote over backendMessageHandler: ""serialize(responseBin)""
+            hnote over backendMessageHandler: ""serialize(response)""
             messageDispatcher <-- backendMessageHandler
         deactivate backendMessageHandler
-    hnote over messageDispatcher: ""responseBin.Finished()""
+    hnote over messageDispatcher: ""response.ready()""\n[or ""cancel("could not add node")""]
 
     CEF -> requestHandler : ""GetResponseHeaders(response, responseLength, redirectUrl)""
     deactivate messageDispatcher 
     activate requestHandler
-        hnote over requestHandler: set MIME type and response length
-        CEF <- requestHandler : ""true, bytesRead = 512""
+        hnote over requestHandler: set MIME type and response length \n[or ""SetError()""]
+        CEF <- requestHandler
     deactivate requestHandler
 
     CEF -> requestHandler : ""ReadResponse(dataOut, bytesToRead, bytesRead, callback)""
