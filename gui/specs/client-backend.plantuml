@@ -41,12 +41,12 @@ cefapp::App ..> cefapp::BackendSchemeHandlerFactory : registers
 
 cefapp::AppHandler "1" *-down- Handler
 cefapp::MessageDispatcher -down-|> Handler
-cefapp::MessageDispatcher "1..*" *--- backend::BackendMessageHandler
+cefapp::MessageDispatcher "1..*" *--- backend::BackendRequestHandler
 cefapp::AppHandler "1" *-down- CefMessageRouterBrowserSide
 
 namespace backend {
     class Backend #D3D3D3
-    class BackendMessageHandler #D3D3D3 {
+    class BackendRequestHandler #D3D3D3 {
         + OnQuery(...) {abstract} 
         + OnRequest(...) {abstract}
     }
@@ -55,7 +55,7 @@ namespace backend {
         + BackendData Create() {static}
     }
 
-    class DummyBackendMsgHandler
+    class DummyBackendRequestHandler
 }
 
 namespace executionGraph {
@@ -65,12 +65,12 @@ namespace executionGraph {
 cefapp::App ..> backend::BackendFactory : uses
 
 backend::ExecutionGraphBackend --|> backend::Backend
-backend::DummyBackendMsgHandler --|> backend::BackendMessageHandler
+backend::DummyBackendRequestHandler --|> backend::BackendRequestHandler
 
 backend::BackendFactory ..> backend::ExecutionGraphBackend : instanciates
-backend::BackendFactory ..> backend::DummyBackendMsgHandler : instanciates
+backend::BackendFactory ..> backend::DummyBackendRequestHandler : instanciates
 
-backend::DummyBackendMsgHandler "1" *-- backend::ExecutionGraphBackend
+backend::DummyBackendRequestHandler "1" *-- backend::ExecutionGraphBackend
 
 backend::BackendFactory ..> executionGraph::StaticFactory : uses
 @enduml

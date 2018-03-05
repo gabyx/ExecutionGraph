@@ -13,11 +13,13 @@
 #ifndef cefapp_BufferPool_h
 #define cefapp_BufferPool_h
 
-class BufferPool final
+#include <foonathan/memory/heap_allocator.hpp>
+
+class BufferPool : public foonathan::memory::heap_allocator
 {
 public:
-    BufferPool()  = default;
-    ~BufferPool() = default;
+    BufferPool()          = default;
+    virtual ~BufferPool() = default;
 };
 
 #endif

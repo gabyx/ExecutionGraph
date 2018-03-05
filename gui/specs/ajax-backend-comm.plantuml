@@ -10,7 +10,7 @@ end box
 
 box "backend [Dispatcher-Thread]" #LightGrey
     participant messageDispatcher as "AppHandler::m_messageDispatcher" <<MessageDispatcher>>
-	participant backendMessageHandler <<BackendMessageHandler>>
+	participant BackendRequestHandler <<BackendRequestHandler>>
     participant executionGraphBackend <<ExecutionGraphBackend>>
 end box
 
@@ -30,7 +30,7 @@ activate CEF
     activate requestHandler
         requestHandler -> requestHandler : initRequest()
         CEF <-- requestHandler : ""false"" [error happened]
-        hnote over requestHandler : handling request
+        hnote over requestHandler : handling request\n[or SetError]
         requestHandler -> messageDispatcher : ""addRequest(request,response)""\n[response contains callback: response headers ready]
         activate messageDispatcher
         requestHandler <-- messageDispatcher :
@@ -40,16 +40,16 @@ activate CEF
 
     
     activate messageDispatcher
-        messageDispatcher -> backendMessageHandler : ""handleRequest(request, response)""\n[optional threaded]
-        activate backendMessageHandler
-            hnote over backendMessageHandler: ""deserialize(request)""
-            backendMessageHandler -> executionGraphBackend : do work, e.g. ""addNode(...)""
+        messageDispatcher -> BackendRequestHandler : ""handleRequest(request, response)""\n[optional threaded]
+        activate BackendRequestHandler
+            hnote over BackendRequestHandler: ""deserialize(request)""
+            BackendRequestHandler -> executionGraphBackend : do work, e.g. ""addNode(...)""
             activate executionGraphBackend
-                backendMessageHandler <-- executionGraphBackend : completed
+                BackendRequestHandler <-- executionGraphBackend : completed
             deactivate executionGraphBackend
-            hnote over backendMessageHandler: ""serialize(response)""
-            messageDispatcher <-- backendMessageHandler
-        deactivate backendMessageHandler
+            hnote over BackendRequestHandler: ""serialize(response)""
+            messageDispatcher <-- BackendRequestHandler
+        deactivate BackendRequestHandler
     hnote over messageDispatcher: ""response.ready()""\n[or ""cancel("could not add node")""]
 
     CEF -> requestHandler : ""GetResponseHeaders(response, responseLength, redirectUrl)""

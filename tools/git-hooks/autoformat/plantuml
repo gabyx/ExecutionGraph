@@ -1,6 +1,8 @@
 #!/bin/bash
 # format all .cpp|.hpp files in the repository
 
+set -e
+
 REPO_DIR="$(git rev-parse --show-toplevel)"
 
 function makeUML() {

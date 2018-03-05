@@ -88,6 +88,20 @@ MY_TEST(MemoryPool, Test2)
     }
 }
 
+MY_TEST(MemoryPool, Test3)
+{
+    using RawAllocator = memory_pool<node_pool>;
+    using RawPtr       = std::unique_ptr<uint8_t[], allocator_deleter<uint8_t[], RawAllocator>>;
+
+    RawAllocator pool(10, 10 * 10);
+    std::vector<RawPtr> vec;
+    for(auto i = 0; i < 30; ++i)
+    {
+        vec.emplace_back(allocate_unique<uint8_t[]>(pool, 10u));
+        uint8_t* data = vec.back().get();
+    }
+}
+
 int main(int argc, char** argv)
 {
     testing::InitGoogleTest(&argc, argv);

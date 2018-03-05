@@ -4,6 +4,7 @@
 
 REPO_DIR="$(git rev-parse --show-toplevel)"
 
+set -e
 
 function formatFile() {
     file=$1

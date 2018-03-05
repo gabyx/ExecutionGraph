@@ -19,8 +19,9 @@
 #include <unordered_set>
 #include <vector>
 #include <wrapper/cef_message_router.h>
-#include "cefapp/IRequest.hpp"
 #include "cefapp/Loggers.hpp"
+#include "cefapp/Request.hpp"
+#include "cefapp/Response.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -31,7 +32,7 @@
  */
 /* ---------------------------------------------------------------------------------------*/
 template<typename THandlerType>
-class MessageDispatcher final : public CefMessageRouterBrowserSide::Handler
+class MessageDispatcher : public CefMessageRouterBrowserSide::Handler
 {
 public:
     using HandlerType = THandlerType;
@@ -50,16 +51,18 @@ private:
                  CefRefPtr<Callback> callback) override
     {
         CEF_REQUIRE_UI_THREAD();
-        //todo wrap here into IRequest
-        // m_pool.getQueue()->emplace(TaskHandleMessage{this, request});
+        //todo wrap here
         return true;
     }
 
 public:
-    //! Handle a general request. Can be called on any thread!
-    void AddRequest(std::shared_ptr<Request> request)
+    //! Handle a general request/response. Can be called on any thread!
+    template<typename Request, typename Response>
+    void AddRequest(Request&& request, Response&& response)
     {
-        m_pool.getQueue()->emplace(TaskHandleMessage{this, request});
+        m_pool.getQueue()->emplace(TaskHandleRequest{this,
+                                                     std::forward<Request>(request),
+                                                     std::forward<Response>(response)});
     }
 
 public:
@@ -164,11 +167,16 @@ private:
     std::mutex m_access;
 
 private:
-    class TaskHandleMessage
+    class TaskHandleRequest
     {
     public:
-        TaskHandleMessage(MessageDispatcher& d, std::shared_ptr<Request> message)
-            : m_d(d), m_request(message)
+        template<typename Request, typename Response>
+        TaskHandleRequest(MessageDispatcher& d,
+                          Request&& request,
+                          Response&& response)
+            : m_d(d)
+            , m_request(std::forward<Request>(request))
+            , m_response(std::forward<Response>(response))
         {
             EXECGRAPH_ASSERT(m_request, "Message is nullptr!");
         }
@@ -185,7 +193,7 @@ private:
             {
                 for(auto* handler : it->second)
                 {
-                    if(handler->handleMessage(m_request))
+                    if(handler->handleRequest(*m_request, *m_response))
                     {
                         return;
                     }
@@ -195,32 +203,33 @@ private:
             // Check all general handlers
             for(auto* handler : m_d.m_generalHandlers)
             {
-                if(handler->handleMessage(m_request))
+                if(handler->handleRequest(*m_request, *m_response))
                 {
                     return;
                 }
             }
 
             EXECGRAPHGUI_APPLOG_WARN("Request with requestId: '{0}' has not been handled, it will be cancled!", requestId);
-            //m_request->setCanceled("No handler found!");
+            m_response->setCanceled("No handler found!");
         };
 
         void onTaskException(const std::string& what)
         {
             EXECGRAPHGUI_APPLOG_WARN("Request with requestId: '{0}' has thrown exception: {1}, it will be cancled!", m_request->getRequestId(), what);
-            //m_request->setCanceled("No handler found!");
+            m_response->setCanceled(what);
         };
 
     private:
-        std::shared_ptr<Request> m_request;  //! The request to handle.
-        MessageDispatcher& m_d;              // Dispatcher.
+        std::unique_ptr<Request> m_request;           //!< The request to handle.
+        std::unique_ptr<ResponsePromise> m_response;  //!< The response to handle.
+        MessageDispatcher& m_d;                       //!< Dispatcher.
     };
 
 private:
-    friend class TaskHandleMessage;
+    friend class TaskHandleRequest;
 
 private:
-    executionGraph::ThreadPool<TaskHandleMessage> m_pool{1};  //! One seperate thread will handle all messages for this dispatcher.
+    executionGraph::ThreadPool<TaskHandleRequest> m_pool{1};  //! One seperate thread will handle all messages for this dispatcher.
 };
 
 #endif

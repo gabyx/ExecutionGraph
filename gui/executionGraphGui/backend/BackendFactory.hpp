@@ -17,7 +17,7 @@
 #include <memory>
 #include <rttr/type>
 #include "backend/Backend.hpp"
-#include "backend/BackendMessageHandler.hpp"
+#include "backend/BackendRequestHandler.hpp"
 #include "backend/ExecutionGraphBackend.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
@@ -33,7 +33,7 @@ class BackendFactory
 public:
     //! This factory returns the backend and a list of backend handlers.
     //! The handlers internally share the backend, and will stay consistent!
-    using HandlerList = std::vector<std::shared_ptr<BackendMessageHandler>>;
+    using HandlerList = std::vector<std::shared_ptr<BackendRequestHandler>>;
     using BackendData = std::pair<std::shared_ptr<Backend>, HandlerList>;
 
 private:

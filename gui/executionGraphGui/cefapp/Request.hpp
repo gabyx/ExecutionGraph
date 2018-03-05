@@ -10,19 +10,19 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef cefapp_IRequest_h
-#define cefapp_IRequest_h
+#ifndef cefapp_Request_h
+#define cefapp_Request_h
 
 #include <rttr/type>
 #include <string>
-#include "cefapp/IResponse.hpp"
-class BinaryBuffer;
+#include "cefapp/BinaryPayload.hpp"
+#include "cefapp/Response.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
     General Request Message
 
-    A BackendMessageHandler is handling such a request. It can be registered in
+    A BackendRequestHandler is handling such a request. It can be registered in
     the message dispatcher for handling one or several request ids (see `m_requestId`)
     The request id is in the form "category/subcategory" (e.g. "graphManip/addNode").
     We use a category and a subcategory to be able to structure requests into groups.
@@ -38,31 +38,29 @@ class BinaryBuffer;
 class Request
 {
     RTTR_ENABLE()
+public:
+    using Payload = BinaryPayload;
 
 protected:
     Request(const std::string& requestId)
-        : m_requestId(requestId) {}
+        : m_requestId(requestId)
+    {}
 
 public:
     virtual ~Request() = default;
 
 public:
     //! Get the request id describing this message.
-    virtual std::string getRequestId() = 0;
+    virtual const std::string& getRequestId() { return m_requestId; }
 
 public:
     //! Get the payload of this request. Nullptr if there is no payload for this request.
     //! The return value does not need to be thread-safe.
-    virtual const BinaryBuffer* getPayload() = 0;
-
-    //! Get the MimeType of the payload.
-    //! Could be "application/octet-stream" for a binary file or
-    //! "application/json" for a json file in utf-8 encoding.
-    virtual const std::string& getMimeType() = 0;
+    virtual Payload* getPayload() const = 0;
 
 private:
-    //! The requestId (e.g. "category/subcategory" -> "graphManip/addNode")
-    //! A BackendMessageHandler handling such a request can be registered on
+    //! The requestId "<category>/<subcategory>" (e.g. "graphManip/addNode")
+    //! A BackendRequestHandler handling such a requestId can be registered on
     //! a set of such requestIds.
     std::string m_requestId;
 };

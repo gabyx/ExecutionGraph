@@ -2,6 +2,8 @@
 # format all TypeScript .ts files in the repository
 # to use this tool install: npm install -g typescript-formatter
 
+set -e
+
 REPO_DIR="$(git rev-parse --show-toplevel)"
 
 function formatFile() {

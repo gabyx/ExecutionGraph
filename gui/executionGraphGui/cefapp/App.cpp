@@ -111,7 +111,7 @@ void App::OnContextInitialized()
     setupClient(m_clientSourcePath);
 
     // make a global message dispatcher
-    using Dispatcher       = MessageDispatcher<BackendMessageHandler>;
+    using Dispatcher       = MessageDispatcher<BackendRequestHandler>;
     auto messageDispatcher = std::make_shared<Dispatcher>();
     m_messageDispatcher    = messageDispatcher;
 

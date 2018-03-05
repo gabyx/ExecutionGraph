@@ -17,7 +17,7 @@
 #include <memory>
 #include <wrapper/cef_message_router.h>
 
-class BackendMessageHandler;
+class BackendRequestHandler;
 template<typename HandlerType>
 class MessageDispatcher;
 

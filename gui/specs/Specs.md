@@ -8,11 +8,11 @@ The communication between *client* and *backend* is done over the `./client/.../
 
 The application registers a file scheme handler factory `FileSchemeHandlerFactor` during `App::OnContextInitialized`. In this function, it also creates an application handler instance `AppHandler` which is forwarded to `CefBrowserHost::CreateBrowser`. 
 
-During `AppHandler::OnAfterCreated()`, a message dispatcher `m_messageDispatcher` of type `MessageDispatcher` is registerd at a newly instantiated `m_router` of type `CefMessageRouterBrowserSide`. Then, `AppHandler::initializeBackends()` is called which uses the `BackendFactory` to create the backends. At the moment, a backend instance of type `ExecutionGraphBackend` with its associated message handlers, currently an instance of `DummyBackendMsgHandler`, is created.
+During `AppHandler::OnAfterCreated()`, a message dispatcher `m_messageDispatcher` of type `MessageDispatcher` is registerd at a newly instantiated `m_router` of type `CefMessageRouterBrowserSide`. Then, `AppHandler::initializeBackends()` is called which uses the `BackendFactory` to create the backends. At the moment, a backend instance of type `ExecutionGraphBackend` with its associated message handlers, currently an instance of `DummyBackendRequestHandler`, is created.
 The message handlers may share the instance of the backend internally.
 At last, the message handlers of all backends are then added to the `m_messageDispatcher`. 
 
-During communication, the dispatcher will forward all messages to its shared `BackendMessageHandlers` instances.
+During communication, the dispatcher will forward all messages to its shared `BackendRequestHandlers` instances.
 
 ## Message Send/Receive Workflow
 Communication workflow for an AJAX Request on the scheme `backend://` between the client and backend:
