@@ -40,7 +40,7 @@ private:
     std::unique_ptr<spdlog::logger> m_appLog;      //! Log for the app (mutlti-threaded)
 };
 
-    // Undef all macros
+// Undef all macros
 #    define EXECGRAPHGUI_APPLOG_TRACE(...)
 #    define EXECGRAPHGUI_APPLOG_DEBUG(...)
 #    define EXECGRAPHGUI_APPLOG_INFO(...)
@@ -55,7 +55,7 @@ private:
 #    define EXECGRAPHGUI_BACKENDLOG_ERROR(...)
 #    define EXECGRAPHGUI_BACKENDLOG_FATAL(...)
 
-    // Define only those which are active!
+// Define only those which are active!
 #    if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_TRACE
 #        undef EXECGRAPHGUI_APPLOG_TRACE
 #        define EXECGRAPHGUI_APPLOG_TRACE(...) Loggers::getInstance().getAppLogger().trace(__VA_ARGS__)
@@ -98,7 +98,7 @@ private:
 #        define EXECGRAPHGUI_BACKENDLOG_FATAL(...) Loggers::getInstance().getBackendLogger().critical(__VA_ARGS__)
 #    endif
 
-// Define some asserts
+    // Define some asserts
 #    define EXECGRAPH_STRINGIFY(x) #    x
 #    define EXECGRAPH_TOSTRING(x) EXECGRAPH_STRINGIFY(x)
 

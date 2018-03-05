@@ -98,4 +98,4 @@ private:
     bool m_isClosing;
 };
 
-#endif  // CEF_TESTS_CEFSIMPLE_SIMPLE_HANDLER_H_
+#endif

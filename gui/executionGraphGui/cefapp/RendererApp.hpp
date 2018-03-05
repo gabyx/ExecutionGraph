@@ -10,8 +10,8 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef RENDERER_APP_H
-#define RENDERER_APP_H
+#ifndef cefapp_RenderApp_h
+#define cefapp_RenderApp_h
 
 #include <cef_app.h>
 

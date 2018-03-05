@@ -10,6 +10,9 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
+#ifndef cefapp_PlatformTitleChanger_hpp
+#define cefapp_PlatformTitleChanger_hpp
+
 #include <cef_browser.h>
 
 /* ---------------------------------------------------------------------------------------*/
@@ -25,3 +28,5 @@ class PlatformTitleChanger
 public:
     static void OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title);
 };
+
+#endif
