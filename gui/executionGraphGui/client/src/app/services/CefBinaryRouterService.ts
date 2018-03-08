@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { _throw } from 'rxjs/observable/throw';
 import 'rxjs/add/operator/do';
@@ -14,16 +14,20 @@ export class CefBinaryRouterService {
 
     public async execute<T>(requestId: string, payload: any): Promise<void> {
         console.log("[CefBinaryRouterService] send()");
-        await this.testSend(`http://executiongraph-backend/${requestId}`, this.createBinaryData(payload));
+        await this.testSend(`http://executiongraph-backend/${requestId}`, this.createBinaryData(payload), "application/octet-stream");
     }
 
-    private async testSend(url: string, payload: Uint8Array): Promise<void> {
+    private async testSend(url: string, payload: Uint8Array, mimeType: string): Promise<void> {
 
         const data = payload.buffer as ArrayBuffer;
 
-        console.info(`[CefBinaryRouterService]: sending data: bytes: '${data.byteLength}'`);
+        console.info(`[CefBinaryRouterService]: sending data: bytes: '${data.byteLength}' with MIME type '${mimeType}' to '${url}'!`);
         // Create a post request that returns an observable, which is kind of a stream of response events
-        let httpRequest: Observable<ArrayBuffer> = this.httpClient.post(url, data, { responseType: "arraybuffer" });
+        let httpRequest: Observable<ArrayBuffer> = this.httpClient.post(url, data,
+            {
+                responseType: "arraybuffer",
+                //headers : new HttpHeaders({"Content-Type" : mimeType})
+            });
         // Add a callback function that is executed whenever there is a new event in the request stream
         httpRequest = httpRequest.do(() => console.log(`[CefBinaryRouterService] success`));
         // In case of an error in the http event stream, catch it to log it and rethrow it, note that an error will only be actually thrown once

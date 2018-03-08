@@ -17,39 +17,40 @@
 #include <cef_request.h>
 #include "cefapp/Response.hpp"
 
-class ResponseCef final : public Response
+class ResponseCef final : public ResponsePromise
 {
 public:
-    using Payload = Response::Payload;
+    using Payload = ResponsePromise::Payload;
 
 public:
-    ResponseCef(CefRefPtr<CefResponse> response, CefRefPtr<CefCallback> responseHeaderReady)
-        : m_response(response), m_responseHeaderReady(responseHeaderReady)
+    template<typename... Args>
+    ResponseCef(CefRefPtr<CefCallback> cbResponseHeaderReady, Args&&... args)
+        : ResponsePromise(std::forward<Args>(args)...)
+        , m_cbResponseHeaderReady(cbResponseHeaderReady)
     {}
 
-private:
-    virtual void setReady() override
+    ~ResponseCef()
     {
-        // Signal that the response is available
-        m_responseHeaderReady.Continue();
-    }
-
-    virtual void setCanceled(const std::string& reason) override
-    {
-        //todo implement setCancled
-        // Set the status code to failed
-        m_response.SetError(cef_errorcode_t::ERR_FAILED);
-
-        // Serialize a default standardized error message payload
-        // todo
-
-        // Signal that the response is available
-        m_responseHeaderReady.Continue();
+        setResolveOnDestruction();
     }
 
 private:
-    CefRefPtr<CefResponse> m_response;             //!< The CEF Response.
-    CefRefPtr<CefCallback> m_responseHeaderReady;  //!< The callback to call when the response header is ready.
+    virtual void setReadyImpl() override
+    {
+        // Signal that the response is available
+        m_cbResponseHeaderReady->Continue();
+        m_cbResponseHeaderReady = nullptr;  // Set to nullptr to mark that it has been called!
+    }
+
+    virtual void setCanceledImpl(const std::string& reason) override
+    {
+        // Signal that the response is available (an exception is set in the promise!)
+        m_cbResponseHeaderReady->Continue();
+        m_cbResponseHeaderReady = nullptr;  // Set to nullptr to mark that it has been called!
+    }
+
+private:
+    CefRefPtr<CefCallback> m_cbResponseHeaderReady;  //!< The callback to call when the response header is ready.
 };
 
 #endif

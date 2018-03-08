@@ -40,7 +40,7 @@ private:
     std::unique_ptr<spdlog::logger> m_appLog;      //! Log for the app (mutlti-threaded)
 };
 
-// Undef all macros
+    // Undef all macros
 #    define EXECGRAPHGUI_APPLOG_TRACE(...)
 #    define EXECGRAPHGUI_APPLOG_DEBUG(...)
 #    define EXECGRAPHGUI_APPLOG_INFO(...)
@@ -55,12 +55,21 @@ private:
 #    define EXECGRAPHGUI_BACKENDLOG_ERROR(...)
 #    define EXECGRAPHGUI_BACKENDLOG_FATAL(...)
 
-// Define only those which are active!
+#    define EXECGRAPHGUI_LOGCODE_TRACE(...)
+#    define EXECGRAPHGUI_LOGCODE_DEBUG(...)
+#    define EXECGRAPHGUI_LOGCODE_INFO(...)
+#    define EXECGRAPHGUI_LOGCODE_WARN(...)
+#    define EXECGRAPHGUI_LOGCODE_ERROR(...)
+#    define EXECGRAPHGUI_LOGCODE_FATAL(...)
+
+    // Define only those which are active!
 #    if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_TRACE
 #        undef EXECGRAPHGUI_APPLOG_TRACE
 #        define EXECGRAPHGUI_APPLOG_TRACE(...) Loggers::getInstance().getAppLogger().trace(__VA_ARGS__)
 #        undef EXECGRAPHGUI_BACKENDLOG_TRACE
 #        define EXECGRAPHGUI_BACKENDLOG_TRACE(...) Loggers::getInstance().getBackendLogger().trace(__VA_ARGS__)
+#        undef EXECGRAPHGUI_LOGCODE_TRACE
+#        define EXECGRAPHGUI_LOGCODE_TRACE(expr) expr
 #    endif
 
 #    if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_DEBUG
@@ -68,6 +77,8 @@ private:
 #        define EXECGRAPHGUI_APPLOG_DEBUG(...) Loggers::getInstance().getAppLogger().debug(__VA_ARGS__)
 #        undef EXECGRAPHGUI_BACKENDLOG_DEBUG
 #        define EXECGRAPHGUI_BACKENDLOG_DEBUG(...) Loggers::getInstance().getBackendLogger().debug(__VA_ARGS__)
+#        undef EXECGRAPHGUI_LOGCODE_DEBUG
+#        define EXECGRAPHGUI_LOGCODE_DEBUG(expr) expr
 #    endif
 
 #    if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_INFO
@@ -75,6 +86,8 @@ private:
 #        define EXECGRAPHGUI_APPLOG_INFO(...) Loggers::getInstance().getAppLogger().info(__VA_ARGS__)
 #        undef EXECGRAPHGUI_BACKENDLOG_INFO
 #        define EXECGRAPHGUI_BACKENDLOG_INFO(...) Loggers::getInstance().getBackendLogger().info(__VA_ARGS__)
+#        undef EXECGRAPHGUI_LOGCODE_INFO
+#        define EXECGRAPHGUI_LOGCODE_INFO(expr) expr
 #    endif
 
 #    if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_WARN
@@ -82,6 +95,8 @@ private:
 #        define EXECGRAPHGUI_APPLOG_WARN(...) Loggers::getInstance().getAppLogger().warn(__VA_ARGS__)
 #        undef EXECGRAPHGUI_BACKENDLOG_WARN
 #        define EXECGRAPHGUI_BACKENDLOG_WARN(...) Loggers::getInstance().getBackendLogger().warn(__VA_ARGS__)
+#        undef EXECGRAPHGUI_LOGCODE_WARN
+#        define EXECGRAPHGUI_LOGCODE_WARN(expr) expr
 #    endif
 
 #    if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_ERROR
@@ -89,6 +104,8 @@ private:
 #        define EXECGRAPHGUI_APPLOG_ERROR(...) Loggers::getInstance().getAppLogger().error(__VA_ARGS__)
 #        undef EXECGRAPHGUI_BACKENDLOG_ERROR
 #        define EXECGRAPHGUI_BACKENDLOG_ERROR(...) Loggers::getInstance().getBackendLogger().error(MSG, __VA_ARGS__)
+#        undef EXECGRAPHGUI_LOGCODE_ERROR
+#        define EXECGRAPHGUI_LOGCODE_ERROR(expr) expr
 #    endif
 
 #    if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_FATAL
@@ -96,9 +113,11 @@ private:
 #        define EXECGRAPHGUI_APPLOG_FATAL(...) Loggers::getInstance().getAppLogger().critical(__VA_ARGS__)
 #        undef EXECGRAPHGUI_BACKENDLOG_FATAL
 #        define EXECGRAPHGUI_BACKENDLOG_FATAL(...) Loggers::getInstance().getBackendLogger().critical(__VA_ARGS__)
+#        undef EXECGRAPHGUI_LOGCODE_FATAL
+#        define EXECGRAPHGUI_LOGCODE_FATAL(expr) expr
 #    endif
 
-    // Define some asserts
+// Define some asserts
 #    define EXECGRAPH_STRINGIFY(x) #    x
 #    define EXECGRAPH_TOSTRING(x) EXECGRAPH_STRINGIFY(x)
 

@@ -92,8 +92,10 @@ MY_TEST(MemoryPool, Test3)
 {
     using RawAllocator = memory_pool<node_pool>;
     using RawPtr       = std::unique_ptr<uint8_t[], allocator_deleter<uint8_t[], RawAllocator>>;
-
     RawAllocator pool(10, 10 * 10);
+
+    RawPtr ptr(0, {foonathan::memory::make_allocator_reference(pool), 0});
+
     std::vector<RawPtr> vec;
     for(auto i = 0; i < 30; ++i)
     {

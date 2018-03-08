@@ -56,7 +56,7 @@ public:
 public:
     //! Get the payload of this request. Nullptr if there is no payload for this request.
     //! The return value does not need to be thread-safe.
-    virtual Payload* getPayload() const = 0;
+    virtual const Payload* getPayload() const = 0;
 
 private:
     //! The requestId "<category>/<subcategory>" (e.g. "graphManip/addNode")

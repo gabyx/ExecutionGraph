@@ -30,14 +30,24 @@ template<typename RawAllocator>
 class BinaryBuffer
 {
 private:
-    using AllocatorDeallocator = foonathan::memory::allocator_deallocator<uint8_t[], RawAllocator>;
+    using Deleter = foonathan::memory::allocator_deleter<uint8_t[], RawAllocator>;
 
 public:
-    using BufferPtr = std::unique_ptr<uint8_t[], AllocatorDeallocator>;
+    using BufferPtr      = std::unique_ptr<uint8_t[], Deleter>;
+    using iterator       = uint8_t*;
+    using const_iterator = const uint8_t*;
 
 public:
+    //! Constructor for an empty buffer!
+    BinaryBuffer(std::shared_ptr<RawAllocator> allocator)
+        : m_allocator(allocator)
+        , m_data(nullptr, Deleter{foonathan::memory::make_allocator_reference(*allocator), 0})
+    {}
+
+    //! Constructor for a meaningful buffer!
     BinaryBuffer(std::size_t bytes, std::shared_ptr<RawAllocator> allocator)
-        : m_data(foonathan::memory::allocate_unique<uint8_t[]>(*allocator, bytes))
+        : m_allocator(allocator)
+        , m_data(foonathan::memory::allocate_unique<uint8_t[]>(*allocator, bytes))
         , m_bytes(bytes)
     {
     }
@@ -48,15 +58,26 @@ public:
     BinaryBuffer(BinaryBuffer&&) = default;
     BinaryBuffer& operator=(BinaryBuffer&&) = default;
 
+    iterator begin() { return getData(); }
+    const_iterator begin() const { return getData(); }
+    const_iterator cbegin() const { return begin(); }
+    iterator end() { return getData() + getSize(); }
+    const_iterator end() const { return getData() + getSize(); }
+    const_iterator cend() const { return end(); }
+
     uint8_t* getData() { return m_data.get(); }
     const uint8_t* getData() const { return m_data.get(); }
 
-    std::size_t getBytes() { return m_bytes; }
+    std::size_t getSize() const { return m_bytes; }
+
+    bool isEmpty() const { return getSize() == 0; }
 
 private:
-    BufferPtr m_data;                           //!< Data pointer.
-    std::size_t m_bytes = 0;                    //!< Number of bytes.
     std::shared_ptr<RawAllocator> m_allocator;  //!< Reference to the allocator.
+    /*! Data pointer. It is guaranteed by this declaration order 
+        that `m_data` is destroyed first, and then possibly the `m_allocator`! */
+    BufferPtr m_data;
+    std::size_t m_bytes = 0;  //!< Number of bytes.
 };
 
 #endif

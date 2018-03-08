@@ -29,9 +29,12 @@ class BinaryPayload final
 {
 public:
     template<typename Buffer>
-    BinaryPayload(Buffer&& buffer, const std::string mimeType)
-        : m_buffer(buffer), m_mimeType(mimeType)
-    {}
+    BinaryPayload(Buffer&& buffer, const std::string& mimeType)
+        : m_buffer(std::forward<Buffer>(buffer)), m_mimeType(mimeType)
+    {
+    }
+
+    void setMIMEType(const std::string& mimeType) { m_mimeType = mimeType; }
 
     //! No copy
     BinaryPayload(const BinaryPayload&) = delete;

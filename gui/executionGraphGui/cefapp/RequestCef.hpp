@@ -24,10 +24,10 @@ public:
     using Payload = Request::Payload;
 
 public:
+    template<typename Payload>
     RequestCef(const std::string& requestId,
-               CefRefPtr<CefRequest> request,
-               const std::optional<Payload>& payload)
-        : Request(requestId), m_payload(payload), m_request(request)
+               Payload&& payload)
+        : Request(requestId), m_payload(std::forward<Payload>(payload))
     {}
 
     virtual ~RequestCef() = default;
@@ -38,8 +38,7 @@ public:
     };
 
 private:
-    std::optional<Payload> payload;  //!< The payload of the message;
-    CefRefPtr<CefRequest> m_request  //!< The CEF request.
+    std::optional<Payload> m_payload;  //!< The payload of the message;
 };
 
 #endif

@@ -19,6 +19,7 @@
 #include <executionGraph/common/IObjectID.hpp>
 #include <functional>
 #include <wrapper/cef_helpers.h>
+#include "cefapp/Response.hpp"
 class BufferPool;
 
 /* ---------------------------------------------------------------------------------------*/
@@ -36,10 +37,10 @@ class BackendResourceHandler final : public CefResourceHandler,
 
 public:
     template<typename Deleter>
-    BackendResourceHandler(std::shared_ptr<BufferPool> bufferPool, Deleter&& deleter)
+    BackendResourceHandler(std::shared_ptr<BufferPool> allocator, Deleter&& deleter)
         : CefResourceHandler()
         , m_id("BackendResourceHandler")
-        , m_bufferPool(bufferPool)
+        , m_allocator(allocator)
         , m_deleter(deleter)
     {}
 
@@ -58,7 +59,7 @@ public:
                                     CefString& redirectUrl) override;
 
     virtual bool ProcessRequest(CefRefPtr<CefRequest> request,
-                                CefRefPtr<CefCallback> callback) override;
+                                CefRefPtr<CefCallback> cbResponseHeaderReady) override;
 
     virtual bool ReadResponse(void* dataOut,
                               int bytesToRead,
@@ -67,17 +68,22 @@ public:
     //@}
 
 private:
-    std::path m_requestId;
-    std::string m_query;
+    std::path m_requestId;   //!< The request id "<category/subcategory>" (e.g. "graphManip/addNode" ).
+    std::string m_query;     //!< The additional query (everything after "?").
+    std::string m_mimeType;  //!< MIME type of the post data.
     bool initRequest(CefRefPtr<CefRequest> request);
 
 private:
     void finish();
 
 private:
-    std::shared_ptr<BufferPool> m_bufferPool;
-    std::size_t m_bytesRead = 0;  // DEBUG ==========
+    std::shared_ptr<BufferPool> m_allocator;
 
+    std::size_t m_bytesRead = 0;  // DEBUG ==========
+    ResponseFuture m_responseFuture;
+
+    //! CefRefCounted overrides
+    //@{
 public:
     void AddRef() const override { m_refCount.AddRef(); }
     bool Release() const override
@@ -96,6 +102,7 @@ public:
 private:
     const std::function<void(BackendResourceHandler*)> m_deleter;  //!< Special deleter since we allocated over a pool!
     CefRefCount m_refCount;
+    //@}
 };
 
 #endif

@@ -83,6 +83,10 @@ namespace
     {
         // Install the URL RequestHandler for the backend
         CefRefPtr<BackendSchemeHandlerFactory> backendSchemeHandlerFactory(new BackendSchemeHandlerFactory());
+        // A custom scheme receiving post data does not work
+        // CefRegisterSchemeHandlerFactory("backend",
+        //                                 "executiongraph-backend",
+        //                                 backendSchemeHandlerFactory);
         CefRegisterSchemeHandlerFactory("http",
                                         "executiongraph-backend",
                                         backendSchemeHandlerFactory);
@@ -91,7 +95,7 @@ namespace
         // See the m\_url.protocolInHTTPFamily()
         // https://bitbucket.org/chromiumembedded/cef/issues/404
         // however we only uses asynchronous XHR requests... ?
-        // CefAddCrossOriginWhitelistEntry("client://", "http", "", true);  // only needed if we use the scheme "backend://" to allow CORS
+        // CefAddCrossOriginWhitelistEntry("client://executiongraph", "backend", "", true);  // only needed if we use the scheme "backend://" to allow CORS
 
         // Install the executionGraph backend
         BackendFactory::BackendData messageHandlers = BackendFactory::Create<ExecutionGraphBackend>();

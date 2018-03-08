@@ -19,6 +19,7 @@
 #include <string>
 #include "cefapp/BinaryPayload.hpp"
 #include "cefapp/BufferPool.hpp"
+#include "cefapp/Loggers.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -37,12 +38,21 @@ class ResponsePromise
 {
     RTTR_ENABLE()
 
+private:
+    enum class State
+    {
+        Nothing,
+        Ready,
+        Canceled
+    };
+
 public:
     using Payload = BinaryPayload;
 
 protected:
-    ResponsePromise(std::shared_ptr<BufferPool> allocator)
-        : m_allocator(allocator){};
+    ResponsePromise(std::shared_ptr<BufferPool> allocator, bool bCancelOnDestruction = false)
+        : m_allocator(allocator)
+        , m_bCancelOnDestruction(bCancelOnDestruction){};
 
     ResponsePromise(const ResponsePromise&) = delete;
     ResponsePromise& operator=(const ResponsePromise&) = delete;
@@ -57,6 +67,12 @@ public:
     //! Callback for signaling that the response object is available.
     void setReady(Payload&& payload)
     {
+        if(m_state != State::Nothing)
+        {
+            EXECGRAPHGUI_BACKENDLOG_WARN("Promise is already set to a state!");
+            return;
+        }
+        m_state = State::Ready;
         m_promisePayload.set_value(std::move(payload));
         setReadyImpl();  // forward to actual instance
     }
@@ -64,6 +80,12 @@ public:
     //! Callback for signaling that this request is cancled.
     void setCanceled(const std::string& reason)
     {
+        if(m_state != State::Nothing)
+        {
+            EXECGRAPHGUI_BACKENDLOG_WARN("Promise is already set to a state!");
+            return;
+        }
+        m_state = State::Canceled;
         m_promisePayload.set_exception(std::make_exception_ptr(std::runtime_error(reason)));
         setCanceledImpl(reason);  // forward to actual instance
     }
@@ -71,6 +93,19 @@ public:
 protected:
     virtual void setReadyImpl()                             = 0;
     virtual void setCanceledImpl(const std::string& reason) = 0;
+
+    //! Function to be called in derived classed, which want to automatically
+    //! resolve on destruction!
+    virtual void setResolveOnDestruction()
+    {
+        if(m_state == State::Nothing)
+        {
+            if(m_bCancelOnDestruction)
+            {
+                setCanceled("Cancled promise on destruction, because of unknown reason!");
+            }
+        }
+    }
 
 private:
     friend class ResponseFuture;
@@ -80,6 +115,9 @@ private:
     // The dispatcher creats the flatbuffer, returns a DetachedBuffer which ends up somehow in the payload promise
     // and gets deleted (over the same instance m_allocator) in the BackendResourceHandler ...
     std::shared_ptr<BufferPool> m_allocator;  //! Thread-safe allocator which allocates a buffer for us.
+
+    State m_state               = State::Nothing;  //!< The state of this promise
+    bool m_bCancelOnDestruction = false;           //!< If the promise should be cancled on destruction.
 };
 
 /* ---------------------------------------------------------------------------------------*/
@@ -98,12 +136,22 @@ public:
     using Payload = ResponsePromise::Payload;
 
 public:
+    ResponseFuture() = default;
     ResponseFuture(ResponsePromise& responsePromise)
         : m_payloadFuture(responsePromise.m_promisePayload.get_future()){};
+
+    //! Copy forbidden
+    ResponseFuture(const ResponseFuture&) = delete;
+    ResponseFuture& operator=(const ResponseFuture&) = delete;
+
+    //! Move allowed
+    ResponseFuture(ResponseFuture&&) = default;
+    ResponseFuture& operator=(ResponseFuture&&) = default;
+
     ~ResponseFuture() = default;
 
 public:
-    //std::future<ResponseData> getResponseData() { return m_response->m_promiseData.get_future(); }
+    auto& getFuture() { return m_payloadFuture; }
 
 private:
     std::future<Payload> m_payloadFuture;

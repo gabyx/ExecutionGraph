@@ -16,11 +16,11 @@
 
 namespace
 {
-    enum ProcessType
+    enum ProcessType : int
     {
-        PROCESS_TYPE_BROWSER,
-        PROCESS_TYPE_RENDERER,
-        PROCESS_TYPE_OTHER,
+        PROCESS_TYPE_BROWSER  = 0,
+        PROCESS_TYPE_RENDERER = 1,
+        PROCESS_TYPE_OTHER    = 2,
     };
 
     const char kProcessType[]     = "type";
@@ -66,20 +66,28 @@ int main(int argc, char* argv[])
     // Provide CEF with command-line arguments.
     CefMainArgs main_args(argc, argv);
 
+    std::cout << "ProcessHelperMac: args: ";
+    for(auto i = 0; i < argc; ++i)
+    {
+        std::cout << argv[i] << ", ";
+    }
+    std::cout << std::endl;
+
     // Create a temporary CommandLine object.
     CefRefPtr<CefCommandLine> command_line = CreateCommandLine(main_args);
 
     // Create a CefApp of the correct process type. The browser process is handled
     // by main_mac.mm.
     CefRefPtr<CefApp> app;
-    switch(GetProcessType(command_line))
+    auto type = GetProcessType(command_line);
+    switch(type)
     {
         case PROCESS_TYPE_RENDERER:
             std::cout << "ProcessHelperMac:: starting RenderApp" << std::endl;
             app = new RendererApp();
             break;
         default:
-            std::cout << "ProcessHelperMac:: WARNING: process type not recognized!" << std::endl;
+            std::cout << "ProcessHelperMac:: process type not recognized, executing process with no app!" << std::endl;
             break;
     }
 
