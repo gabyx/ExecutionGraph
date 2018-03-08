@@ -52,31 +52,42 @@ public:
     {
     }
 
+    //! Copy prohibited
     BinaryBuffer(const BinaryBuffer&) = delete;
     BinaryBuffer& operator=(const BinaryBuffer&) = delete;
 
+    //! Move allowed
     BinaryBuffer(BinaryBuffer&&) = default;
     BinaryBuffer& operator=(BinaryBuffer&&) = default;
 
+    //! Begin/End Iterators
+    //@{
     iterator begin() { return getData(); }
     const_iterator begin() const { return getData(); }
     const_iterator cbegin() const { return begin(); }
     iterator end() { return getData() + getSize(); }
     const_iterator end() const { return getData() + getSize(); }
     const_iterator cend() const { return end(); }
+    //@}
 
+    //! Get the buffer pointer.
     uint8_t* getData() { return m_data.get(); }
+    //! Get the constant buffer pointer.
     const uint8_t* getData() const { return m_data.get(); }
 
+    //! Get the size in bytes of the buffer.
     std::size_t getSize() const { return m_bytes; }
 
-    bool isEmpty() const { return getSize() == 0; }
+    //! Check if buffer is empty (nullptr or no bytes)
+    bool isEmpty() const { return getSize() == 0 || getData() == nullptr; }
 
 private:
     std::shared_ptr<RawAllocator> m_allocator;  //!< Reference to the allocator.
+
     /*! Data pointer. It is guaranteed by this declaration order 
         that `m_data` is destroyed first, and then possibly the `m_allocator`! */
     BufferPtr m_data;
+
     std::size_t m_bytes = 0;  //!< Number of bytes.
 };
 

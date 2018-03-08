@@ -15,6 +15,14 @@
 
 #include <foonathan/memory/heap_allocator.hpp>
 
+/* ---------------------------------------------------------------------------------------*/
+/*!
+    A thread-safe memory allocator which is used for `BinaryBuffer` instances.
+
+    @date Thu Mar 08 2018
+    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+ */
+/* ---------------------------------------------------------------------------------------*/
 class BufferPool : public foonathan::memory::heap_allocator
 {
 public:
