@@ -116,6 +116,7 @@ namespace
 
 }  // namespace
 
+//! Cancel the request (see: http://magpcss.org/ceforum/apidocs3/projects/(default)/CefResourceHandler.html)
 void BackendResourceHandler::Cancel()
 {
     CEF_REQUIRE_IO_THREAD();
@@ -129,6 +130,7 @@ void BackendResourceHandler::Cancel()
     finish();
 }
 
+//! Get the response headers (see: http://magpcss.org/ceforum/apidocs3/projects/(default)/CefResourceHandler.html)
 void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
                                                 int64& responseLength,
                                                 CefString& redirectUrl)
@@ -139,6 +141,7 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
     responseLength = c_debugResponse.size();  // quit the ReadResponse after 10bytes have been read (-1 for manual quitting)
 }
 
+//! Process the request (see: http://magpcss.org/ceforum/apidocs3/projects/(default)/CefResourceHandler.html)
 bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
                                             CefRefPtr<CefCallback> cbResponseHeaderReady)
 {
@@ -188,6 +191,7 @@ bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
     return true;
 }
 
+//! Read the response (see: http://magpcss.org/ceforum/apidocs3/projects/(default)/CefResourceHandler.html)
 bool BackendResourceHandler::ReadResponse(void* dataOut,
                                           int bytesToRead,
                                           int& bytesRead,
