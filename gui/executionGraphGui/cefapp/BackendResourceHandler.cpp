@@ -27,32 +27,6 @@ namespace
 {
     const std::array<uint8_t, 10> c_debugResponse = {'e', 'x', 'e', 'c', 'g', 'r', 'a', 'p', 'h', '!'};
 
-    // void printPostData2(CefRefPtr<CefRequest> request)
-    // {
-    //     CefRefPtr<CefPostData> postData = request->GetPostData();
-    //     if(postData)
-    //     {
-    //         EXECGRAPHGUI_APPLOG_DEBUG("Received {0} post data elements.", postData->GetElementCount());
-    //         CefPostData::ElementVector elements;
-    //         postData->GetElements(elements);
-    //         for(CefRefPtr<CefPostDataElement> element : elements)
-    //         {
-    //             std::vector<uint8_t> buffer(element->GetBytesCount());
-    //             element->GetBytes(buffer.size(), static_cast<void*>(buffer.data()));
-    //             std::stringstream ss;
-    //             for(auto& byte : buffer)
-    //             {
-    //                 ss << byte << ",";
-    //             }
-    //             EXECGRAPHGUI_APPLOG_DEBUG("Post Data Binary: bytes: '{0}', data: '{1}'", element->GetBytesCount(), ss.str());
-    //         }
-    //     }
-    //     else
-    //     {
-    //         EXECGRAPHGUI_APPLOG_WARN("Received no post data!");
-    //     }
-    // }
-
     //! Printing the binary data
     void printPostData(const BinaryBuffer<BufferPool>& buffer)
     {
