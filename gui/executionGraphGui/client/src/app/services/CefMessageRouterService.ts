@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import * as msgpack from 'msgpack-lite';
-import * as ab2s from 'arraybuffer-to-string';
 
 type CefRequest = {
     request: string,

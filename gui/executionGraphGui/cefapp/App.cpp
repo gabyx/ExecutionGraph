@@ -145,7 +145,9 @@ void App::setupBrowser()
 
     // Specify CEF browser settings here.
     CefBrowserSettings browser_settings;
-    CefString url = "client://executiongraph/index.html";
+    // Disable security, such that http:// XHRequests do not trigger a CORS Preflight Request (if special headers are used)
+    browser_settings.web_security = cef_state_t::STATE_DISABLED;
+    CefString url                 = "client://executiongraph/index.html";
 
     if(useViews)
     {

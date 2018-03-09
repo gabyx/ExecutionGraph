@@ -5,6 +5,7 @@ import { _throw } from 'rxjs/observable/throw';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/first';
+import * as ab2s from 'arraybuffer-to-string';
 
 @Injectable()
 export class CefBinaryRouterService {
@@ -26,7 +27,7 @@ export class CefBinaryRouterService {
         let httpRequest: Observable<ArrayBuffer> = this.httpClient.post(url, data,
             {
                 responseType: "arraybuffer",
-                //headers : new HttpHeaders({"Content-Type" : mimeType})
+                headers : new HttpHeaders({"Content-Type" : mimeType})
             });
         // Add a callback function that is executed whenever there is a new event in the request stream
         httpRequest = httpRequest.do(() => console.log(`[CefBinaryRouterService] success`));
@@ -47,6 +48,7 @@ export class CefBinaryRouterService {
         // Note: The await keyword leaves the current function, so the Event-Loop can continue, until the awaiting (Promise) is resolved, and
         // the function continues after the `await` keyword.
         const responseData: ArrayBuffer = await requestPromise;
+        console.debug(`[CefBinaryRouterService] : response: size: ${responseData.byteLength} : '${ab2s(responseData, "utf-8")}'`);
     }
 
     private createBinaryData(data: any): Uint8Array {

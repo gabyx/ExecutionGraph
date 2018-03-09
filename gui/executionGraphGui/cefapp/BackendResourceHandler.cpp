@@ -83,6 +83,10 @@ namespace
                       std::optional<RequestCef::Payload>& payload,
                       std::shared_ptr<RawAllocator> allocator)
     {
+        if(mimeType.empty())
+        {
+            return false;
+        }
         // Read post data
         if(postData && postData->GetElementCount() != 0)
         {
@@ -91,25 +95,23 @@ namespace
 
             auto& element = elements.back();  // get the last post data element.
 
-            if(element->GetBytesCount() == 0 || mimeType.empty())
+            if(element->GetBytesCount() == 0)
             {
-                EXECGRAPHGUI_APPLOG_ERROR("Received no bytes [{0}] in post data or mimeType is empty [{1}]!",
-                                          element->GetBytesCount() == 0,
-                                          mimeType.empty());
+                EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler: Received no bytes!");
                 return false;  // dont continue
             }
 
             // Allocate BinaryBuffer
             BinaryBuffer<BufferPool> buffer(element->GetBytesCount(), allocator);
             element->GetBytes(buffer.getSize(), static_cast<void*>(buffer.getData()));
-            EXECGRAPHGUI_APPLOG_DEBUG("Read last post data element: bytes: {0}.", element->GetBytesCount());
+            EXECGRAPHGUI_APPLOG_DEBUG("BackendResourceHandler: Read last post data element: bytes: {0}.", element->GetBytesCount());
             EXECGRAPHGUI_LOGCODE_DEBUG(printPostData(buffer));
             payload = RequestCef::Payload{std::move(buffer), mimeType};
             return true;  // continue
         }
 
-        EXECGRAPHGUI_APPLOG_WARN("Received no post data!");
-        return mimeType.empty();  // continue if there is no mimeType.
+        EXECGRAPHGUI_APPLOG_WARN("BackendResourceHandler: Received no post data!");
+        return false;  // dont continue
     }
 
 }  // namespace
@@ -201,17 +203,15 @@ bool BackendResourceHandler::ReadResponse(void* dataOut,
             std::memcpy(dataOut, c_debugResponse.data() + m_bytesRead, 1);
             m_bytesRead++;
             bytesRead = 1;  // one byte read
+            return true;
         }
-
-        if(m_bytesRead == c_debugResponse.size())
+        else
         {
             // Response is finished, we returned all bytes to read, so
             // finish up and return false.
             finish();
             return false;
         }
-
-        return true;
     }  // DEBUG ==========
 }
 
