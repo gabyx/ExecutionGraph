@@ -62,8 +62,22 @@ protected:
     ResponsePromise(const ResponsePromise&) = delete;
     ResponsePromise& operator=(const ResponsePromise&) = delete;
 
-    ResponsePromise(ResponsePromise&&) = default;
-    ResponsePromise& operator=(ResponsePromise&&) = default;
+    ResponsePromise(ResponsePromise&& other)
+    {
+        *this = std::move(other);
+    };
+    ResponsePromise& operator=(ResponsePromise&& other)
+    {
+        m_requestId            = other.m_requestId;
+        m_promisePayload       = std::move(other.m_promisePayload);
+        m_allocator            = other.m_allocator;
+        m_state                = other.m_state;
+        m_bCancelOnDestruction = other.m_bCancelOnDestruction;
+
+        // dont do anything in the moved-from object.
+        other.m_bCancelOnDestruction = false;
+        return *this;
+    };
 
 public:
     virtual ~ResponsePromise() = default;
