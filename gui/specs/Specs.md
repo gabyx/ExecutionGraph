@@ -21,6 +21,8 @@ Communication workflow for an REST Request on the scheme `http://executiongraph-
 During communication, a processed request by an instancen `BackendResourceHandler` created by the
 `BackendResourceHandlerFactory` will add the request to the dispatcher by calling the non-blocking function `BackendRequestDispatcher::addRequest(std::move(request), std::move(responsePromise))` with a request (`RequestCef`) and a response object (`ResponsePromiseCef`). Note that, the request and response promise are moved to the dispatcher (actually it gets moved into the task queue of the thread pool inside the dispatcher). Before doing this, the backend resource handler has exctracted the response future ( `RepsonseFuture`) which gets used when `BackendResourceHandler::GetResponseHeaders` and `BackendResourceHandler::ReadResponse` is called. The consumer thread of the backend request dispatcher then forwards this request/response to the corresponding registered handler. If no handler is found, the request is automatically cancled by calling `setCancel(...)` on the response promise.
 
+![Client-Backend-Communication](ajax-backend-comm.svg "Request and response promise/future objects.")
+
 ## Overview of MessageHandler Types
 We need one message handlers for each of the following grouped functionalities:
 
