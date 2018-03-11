@@ -15,7 +15,7 @@ Next, in function `App::setupBackend`, a scheme handler factory `BackendSchemeHa
 After setting up the backend, a browser is created by `CefBrowserHost::CreateBrowser` in `App::setupBrowser` with an instance of type `AppHandler` (`CefClient`) which implements various CEF related handling functions.
 
 ## Message Send/Receive Workflow
-Communication workflow for an AJAX Request on the scheme `backend://` between the client and backend:
+Communication workflow for an REST Request on the scheme `http://executiongraph-backend` between the client and the backend:
 ![Client-Backend-Communication](ajax-backend-comm.svg "Client-Backend Communication")
 
 During communication, a processed request by an instancen `BackendResourceHandler` created by the
