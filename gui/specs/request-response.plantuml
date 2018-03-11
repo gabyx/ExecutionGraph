@@ -58,7 +58,6 @@ cefapp::ResponsePromiseCef --|> common::ResponsePromise
 common::ResponsePromise "1" *-- std::promise
 cefapp::ResponseFutureCef --|> common::ResponseFuture
 common::ResponseFuture "1" *-- std::future
-cefapp::ResponseFutureCef .right.> cefapp::ResponsePromiseCef : uses
 
 common::Request .right.> common::BinaryPayload : uses
 cefapp::RequestCef "0...1" *--  common::BinaryPayload
