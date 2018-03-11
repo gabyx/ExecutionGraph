@@ -54,16 +54,19 @@ namespace cefapp{
 cefapp::App ..> cefapp::AppHandler : creates
 cefapp::App ..> cefapp::ClientSchemeHandlerFactory : registers
 cefapp::App ..> cefapp::BackendSchemeHandlerFactory : registers
+cefapp::App .right.> backend::BackendFactory : uses
+
 cefapp::BackendSchemeHandlerFactory ..> cefapp::BackendResourceHandler : creates
-cefapp::BackendResourceHandler --|> CefResourceHandler
 cefapp::BackendResourceHandler "1" *-- cefapp::BackendRequestDispatcher : uses
 
-cefapp::AppHandler "1" *-down- Handler
 cefapp::BackendRequestDispatcherAdapterCef "1" *-- cefapp::BackendRequestDispatcher
 cefapp::BackendRequestDispatcherAdapterCef -down-|> Handler
 cefapp::BackendSchemeHandlerFactory "1" *-- cefapp::BackendRequestDispatcher
-cefapp::BackendRequestDispatcher "1..*" *-- backend::BackendRequestHandler
-cefapp::AppHandler "1" *-- CefMessageRouterBrowserSide
+cefapp::BackendRequestDispatcher "1..*" *-up- backend::BackendRequestHandler
+
+cefapp::AppHandler "1" *-left- Handler
+cefapp::AppHandler "1" *-left- CefMessageRouterBrowserSide
+cefapp::BackendResourceHandler -left-|> CefResourceHandler
 
 namespace backend {
     class Backend #D3D3D3
@@ -81,8 +84,6 @@ namespace backend {
 namespace executionGraph {
     class StaticFactory<T...>
 }
-
-cefapp::App ..> backend::BackendFactory : uses
 
 backend::ExecutionGraphBackend --|> backend::Backend
 backend::DummyBackendRequestHandler --|> backend::BackendRequestHandler
