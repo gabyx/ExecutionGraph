@@ -13,8 +13,8 @@
 #include <cef_parser.h>
 #include <wrapper/cef_helpers.h>
 #include <wrapper/cef_stream_resource_handler.h>
-#include "cefapp/Loggers.hpp"
 #include "cefapp/SchemeHandlerHelper.hpp"
+#include "common/Loggers.hpp"
 
 CefRefPtr<CefResourceHandler> ClientSchemeHandlerFactory::Create(CefRefPtr<CefBrowser> browser,
                                                                  CefRefPtr<CefFrame> frame,

@@ -16,7 +16,7 @@
 #include <cef_base.h>
 #include <cef_request.h>
 #include <optional>
-#include "cefapp/Request.hpp"
+#include "common/Request.hpp"
 
 class RequestCef final : public Request
 {

@@ -15,8 +15,8 @@
 
 #include <rttr/type>
 #include <string>
-#include "cefapp/BinaryPayload.hpp"
-#include "cefapp/Response.hpp"
+#include "common/BinaryPayload.hpp"
+#include "common/Response.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!

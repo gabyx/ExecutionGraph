@@ -15,7 +15,7 @@
 
 #include <cef_base.h>
 #include <cef_request.h>
-#include "cefapp/Response.hpp"
+#include "common/Response.hpp"
 
 class ResponsePromiseCef final : public ResponsePromise
 {
@@ -52,5 +52,7 @@ private:
 private:
     CefRefPtr<CefCallback> m_cbResponseHeaderReady;  //!< The callback to call when the response header is ready.
 };
+
+using ResponseFutureCef = ResponseFuture;
 
 #endif

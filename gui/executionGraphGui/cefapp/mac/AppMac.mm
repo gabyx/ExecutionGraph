@@ -17,7 +17,7 @@
 #include "cefapp/App.hpp"
 #include "cefapp/AppCLArgs.hpp"
 #include "cefapp/AppHandler.hpp"
-#include "cefapp/Loggers.hpp"
+#include "common/Loggers.hpp"
 
 // Receives notifications from the application.
 @interface SimpleAppDelegate : NSObject<NSApplicationDelegate>

@@ -17,9 +17,9 @@
 #include <memory>
 #include <rttr/type>
 #include <string>
-#include "cefapp/BinaryPayload.hpp"
-#include "cefapp/BufferPool.hpp"
-#include "cefapp/Loggers.hpp"
+#include "common/BinaryPayload.hpp"
+#include "common/BufferPool.hpp"
+#include "common/Loggers.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -109,7 +109,7 @@ protected:
 
 private:
     friend class ResponseFuture;
-    std::promise<Payload> m_promisePayload;  //!< Response Data which gets set in `m_responseWrite`.
+    std::promise<Payload> m_promisePayload;  //!< Response Data which gets set in `setReady`.
 
     // todo: Up to now: Hand over the buffer to Dispatcher thread, it will be used in the FlatBufferBuilder
     // The dispatcher creats the flatbuffer, returns a DetachedBuffer which ends up somehow in the payload promise

@@ -10,7 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "cefapp/Loggers.hpp"
+#include "common/Loggers.hpp"
 
 Loggers::Loggers(const std::path& logPath)
 {

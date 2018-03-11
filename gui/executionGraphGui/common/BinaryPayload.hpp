@@ -14,8 +14,8 @@
 #define cefapp_BinaryPayload
 
 #include <string>
-#include "cefapp/BinaryBuffer.hpp"
-#include "cefapp/BufferPool.hpp"
+#include "common/BinaryBuffer.hpp"
+#include "common/BufferPool.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!

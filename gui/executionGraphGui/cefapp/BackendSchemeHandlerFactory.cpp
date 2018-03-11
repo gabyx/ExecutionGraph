@@ -16,8 +16,8 @@
 #include <memory>
 #include "cefapp/BackendRequestDispatcher.hpp"
 #include "cefapp/BackendResourceHandler.hpp"
-#include "cefapp/BufferPool.hpp"
-#include "cefapp/Loggers.hpp"
+#include "common/BufferPool.hpp"
+#include "common/Loggers.hpp"
 
 using namespace foonathan::memory;
 

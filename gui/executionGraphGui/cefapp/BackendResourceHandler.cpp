@@ -18,10 +18,10 @@
 #include <thread>
 #include <wrapper/cef_closure_task.h>
 #include <wrapper/cef_helpers.h>
-#include "cefapp/BinaryBuffer.hpp"
-#include "cefapp/Loggers.hpp"
 #include "cefapp/RequestCef.hpp"
 #include "cefapp/ResponseCef.hpp"
+#include "common/BinaryBuffer.hpp"
+#include "common/Loggers.hpp"
 
 namespace
 {

@@ -17,8 +17,8 @@
 #include <memory>
 #include <rttr/type>
 #include "backend/Backend.hpp"
-#include "cefapp/Request.hpp"
-#include "cefapp/Response.hpp"
+#include "common/Request.hpp"
+#include "common/Response.hpp"
 
 class BackendRequestHandler : public executionGraph::IObjectID
 {

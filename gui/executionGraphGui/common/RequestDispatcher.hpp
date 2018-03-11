@@ -18,9 +18,9 @@
 #include <memory>
 #include <unordered_set>
 #include <vector>
-#include "cefapp/Loggers.hpp"
-#include "cefapp/Request.hpp"
-#include "cefapp/Response.hpp"
+#include "common/Loggers.hpp"
+#include "common/Request.hpp"
+#include "common/Response.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!

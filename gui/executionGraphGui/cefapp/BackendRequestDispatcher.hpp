@@ -14,7 +14,7 @@
 #define cefapp_BackendRequestDispatcher_hpp
 
 #include "backend/BackendRequestHandler.hpp"
-#include "cefapp/RequestDispatcher.hpp"
+#include "common/RequestDispatcher.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!

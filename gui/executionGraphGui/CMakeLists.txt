@@ -12,7 +12,6 @@ set(ExecutionGraphGUI_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/AppCLArgs.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/AppHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/AppHandler.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RequestDispatcher.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/ClientSchemeHandlerFactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/ClientSchemeHandlerFactory.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/BackendSchemeHandlerFactory.cpp
@@ -23,8 +22,12 @@ set(ExecutionGraphGUI_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/SchemeHandlerHelper.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/Loggers.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/Loggers.hpp
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/common/Loggers.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/common/Loggers.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/common/BinaryBuffer.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/common/BinaryPayload.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/common/BufferPool.hpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/Backend.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendRequestHandler.cpp
@@ -33,6 +36,9 @@ set(ExecutionGraphGUI_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendFactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/DummyBackendRequestHandler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/DummyBackendRequestHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/RequestDispatcher.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/Request.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/Response.hpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/ExecutionGraphBackend.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/ExecutionGraphBackend.cpp

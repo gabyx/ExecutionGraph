@@ -19,7 +19,7 @@
 #include <executionGraph/common/IObjectID.hpp>
 #include <functional>
 #include <wrapper/cef_helpers.h>
-#include "cefapp/Response.hpp"
+#include "cefapp/ResponseCef.hpp"
 class BackendRequestDispatcher;
 class BufferPool;
 
@@ -83,7 +83,7 @@ private:
 private:
     std::shared_ptr<BackendRequestDispatcher> m_dispatcher;  //!< The dispatcher to which request/response get dispatched.
     std::shared_ptr<BufferPool> m_allocator;                 //!< The allocator for `BinaryPayload` of request and responses.
-    ResponseFuture m_responseFuture;                         //!< The response future we await in the resource handler.
+    ResponseFutureCef m_responseFuture;                      //!< The response future we await in the resource handler.
 
     std::size_t m_bytesRead = 0;  // DEBUG ==========
 
