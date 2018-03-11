@@ -26,8 +26,8 @@ namespace
     AppHandler* g_instance = nullptr;
 }
 
-AppHandler::AppHandler(std::shared_ptr<CefMessageRouterBrowserSide::Handler> messageDispatcher, bool useViews)
-    : m_messageDispatcher(messageDispatcher), m_useViews(useViews), m_isClosing(false)
+AppHandler::AppHandler(std::shared_ptr<CefMessageRouterBrowserSide::Handler> requestDispatcher, bool useViews)
+    : m_requestDispatcher(requestDispatcher), m_useViews(useViews), m_isClosing(false)
 {
     DCHECK(!g_instance);
     g_instance = this;
@@ -79,7 +79,7 @@ void AppHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
     {
         CefMessageRouterConfig config;
         m_router = CefMessageRouterBrowserSide::Create(config);
-        m_router->AddHandler(m_messageDispatcher.get(), true);
+        m_router->AddHandler(m_requestDispatcher.get(), true);
     }
 }
 
@@ -127,7 +127,7 @@ void AppHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 
     if(m_router)
     {
-        m_router->RemoveHandler(m_messageDispatcher.get());
+        m_router->RemoveHandler(m_requestDispatcher.get());
     }
 
     if(m_browserList.empty())

@@ -10,15 +10,14 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef backend_File_Scheme_Handler_Factory_h
-#define backend_File_Scheme_Handler_Factory_h
+#ifndef cefapp_RequestDispatcher_h
+#define cefapp_RequestDispatcher_h
 
 #include <executionGraph/common/Assert.hpp>
 #include <executionGraph/common/ThreadPool.hpp>
 #include <memory>
 #include <unordered_set>
 #include <vector>
-#include <wrapper/cef_message_router.h>
 #include "cefapp/Loggers.hpp"
 #include "cefapp/Request.hpp"
 #include "cefapp/Response.hpp"
@@ -32,33 +31,20 @@
  */
 /* ---------------------------------------------------------------------------------------*/
 template<typename THandlerType>
-class MessageDispatcher : public CefMessageRouterBrowserSide::Handler
+class RequestDispatcher
 {
 public:
     using HandlerType = THandlerType;
     using Id          = typename HandlerType::Id;
 
 public:
-    MessageDispatcher()          = default;
-    virtual ~MessageDispatcher() = default;
-
-private:
-    bool OnQuery(CefRefPtr<CefBrowser> browser,
-                 CefRefPtr<CefFrame> frame,
-                 int64 queryId,
-                 const CefString& request,
-                 bool persistent,
-                 CefRefPtr<Callback> callback) override
-    {
-        CEF_REQUIRE_UI_THREAD();
-        //todo wrap here
-        return true;
-    }
+    RequestDispatcher()          = default;
+    virtual ~RequestDispatcher() = default;
 
 public:
     //! Handle a general request/response. Can be called on any thread!
     template<typename Request, typename Response>
-    void AddRequest(Request&& request, Response&& response)
+    void addRequest(Request&& request, Response&& response)
     {
         m_pool.getQueue()->emplace(TaskHandleRequest{this,
                                                      std::forward<Request>(request),
@@ -68,7 +54,7 @@ public:
 public:
     //! Adds a message handler `handler` for an optional specific request id `requestId`.
     //! Messages are first dispatched to all specific handlers added with a `requestId`.
-    bool AddHandler(std::shared_ptr<HandlerType> handler, const std::string& requestId)
+    bool addHandler(std::shared_ptr<HandlerType> handler, const std::string& requestId)
     {
         std::scoped_lock<std::mutex> lock(m_access);
 
@@ -89,7 +75,7 @@ public:
 
     //! Adds a message handler `handler` to the back or the front of all general handlers.
     template<bool insertAtFront = false>
-    bool AddHandler(std::shared_ptr<HandlerType> handler)
+    bool addHandler(std::shared_ptr<HandlerType> handler)
     {
         std::scoped_lock<std::mutex> lock(m_access);
 
@@ -119,7 +105,7 @@ public:
 
     //! Removes a message handler with id `id`.
     //! @return the removed handler.
-    std::shared_ptr<HandlerType> RemoveHandler(Id id)
+    std::shared_ptr<HandlerType> removeHandler(Id id)
     {
         std::scoped_lock<std::mutex> lock(m_access);
 
@@ -171,7 +157,7 @@ private:
     {
     public:
         template<typename Request, typename Response>
-        TaskHandleRequest(MessageDispatcher& d,
+        TaskHandleRequest(RequestDispatcher& d,
                           Request&& request,
                           Response&& response)
             : m_d(d)
@@ -222,7 +208,7 @@ private:
     private:
         std::unique_ptr<Request> m_request;           //!< The request to handle.
         std::unique_ptr<ResponsePromise> m_response;  //!< The response to handle.
-        MessageDispatcher& m_d;                       //!< Dispatcher.
+        RequestDispatcher& m_d;                       //!< Dispatcher.
     };
 
 private:

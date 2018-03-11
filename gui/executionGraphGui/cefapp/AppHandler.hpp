@@ -17,10 +17,6 @@
 #include <memory>
 #include <wrapper/cef_message_router.h>
 
-class BackendRequestHandler;
-template<typename HandlerType>
-class MessageDispatcher;
-
 /* ---------------------------------------------------------------------------------------*/
 /*!
     The CEF application handler.
@@ -37,7 +33,7 @@ class AppHandler final : public CefClient,
     IMPLEMENT_REFCOUNTING(AppHandler)
 
 public:
-    explicit AppHandler(std::shared_ptr<CefMessageRouterBrowserSide::Handler> messageDispatcher, bool useViews);
+    explicit AppHandler(std::shared_ptr<CefMessageRouterBrowserSide::Handler> requestDispatcher, bool useViews);
     ~AppHandler();
 
     // Provide access to the single global instance of this object.
@@ -85,7 +81,7 @@ private:
     CefRefPtr<CefMessageRouterBrowserSide> m_router;
 
 private:
-    std::shared_ptr<CefMessageRouterBrowserSide::Handler> m_messageDispatcher;  //! Dispatcher which is installed in the `m_router`.
+    std::shared_ptr<CefMessageRouterBrowserSide::Handler> m_requestDispatcher;  //! Dispatcher which is installed in the `m_router`.
 
 private:
     //! True if the application is using the Views framework.

@@ -54,7 +54,7 @@ MY_TEST(MemoryPool, Test1)
         RawPtr result(static_cast<A*>(memory), {pool});
         // call constructor (placement new)
         ::new(memory) A(i);
-        // pass ownership to return value CefRefPtr which will use the internal BackendResourceHandler::m_deleter
+        // pass ownership to return value CefRefPtr which will use the internal BackendRequestHandler::m_deleter
         std::cout << "allocated " << i << std::endl;
         vec.emplace_back(Ptr(result.release(), {pool}));
     }
@@ -76,7 +76,7 @@ MY_TEST(MemoryPool, Test2)
         RawPtr result(static_cast<A*>(memory), {pool});
         // call constructor (placement new), insert a deleter into the instance
         ::new(memory) A(i, [&pool](auto* p) { allocator_deleter<A, RawAllocator>{pool}(p); });
-        // pass ownership to return value CefRefPtr which will use the internal BackendResourceHandler::m_deleter
+        // pass ownership to return value CefRefPtr which will use the internal BackendRequestHandler::m_deleter
         std::cout << "allocated " << i << std::endl;
         vec.emplace_back(result.release());
     }

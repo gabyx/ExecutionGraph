@@ -17,19 +17,19 @@
 #include <cef_request.h>
 #include "cefapp/Response.hpp"
 
-class ResponseCef final : public ResponsePromise
+class ResponsePromiseCef final : public ResponsePromise
 {
 public:
     using Payload = ResponsePromise::Payload;
 
 public:
     template<typename... Args>
-    ResponseCef(CefRefPtr<CefCallback> cbResponseHeaderReady, Args&&... args)
+    ResponsePromiseCef(CefRefPtr<CefCallback> cbResponseHeaderReady, Args&&... args)
         : ResponsePromise(std::forward<Args>(args)...)
         , m_cbResponseHeaderReady(cbResponseHeaderReady)
     {}
 
-    ~ResponseCef()
+    ~ResponsePromiseCef()
     {
         setResolveOnDestruction();
     }

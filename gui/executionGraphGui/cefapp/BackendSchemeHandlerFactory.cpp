@@ -11,16 +11,24 @@
 //! ========================================================================================
 
 #include "BackendSchemeHandlerFactory.hpp"
-#include <executionGraph/common/Assert.hpp>
-#include <executionGraph/common/Exception.hpp>
 #include <foonathan/memory/heap_allocator.hpp>
 #include <foonathan/memory/smart_ptr.hpp>
 #include <memory>
-#include <random>
+#include "cefapp/BackendRequestDispatcher.hpp"
+#include "cefapp/BackendResourceHandler.hpp"
+#include "cefapp/BufferPool.hpp"
 #include "cefapp/Loggers.hpp"
-#include "cefapp/SchemeHandlerHelper.hpp"
 
 using namespace foonathan::memory;
+
+BackendSchemeHandlerFactory::BackendSchemeHandlerFactory(std::shared_ptr<BackendRequestDispatcher> dispatcher,
+                                                         const std::path& pathPrefix)
+    : m_pathPrefix(pathPrefix)
+    , m_dispatcher(dispatcher)
+    , m_bufferPool(std::make_shared<BufferPool>())
+    , m_handlerPool(sizeof(BackendResourceHandler), sizeof(BackendResourceHandler) * 30)
+{
+}
 
 CefRefPtr<CefResourceHandler> BackendSchemeHandlerFactory::Create(CefRefPtr<CefBrowser> browser,
                                                                   CefRefPtr<CefFrame> frame,
@@ -40,7 +48,7 @@ CefRefPtr<CefResourceHandler> BackendSchemeHandlerFactory::Create(CefRefPtr<CefB
     // raw_ptr deallocates memory in case of constructor exception
     RawPtr result(static_cast<BackendResourceHandler*>(memory), {m_handlerPool});
     // call constructor (placement new)
-    ::new(memory) BackendResourceHandler(m_bufferPool, [this](auto* ptr) { allocator_deleter<Type, RawAllocator>{m_handlerPool}(ptr); });
+    ::new(memory) BackendResourceHandler(m_dispatcher, m_bufferPool, [this](auto* ptr) { allocator_deleter<Type, RawAllocator>{m_handlerPool}(ptr); });
 
     return result.release();
 }

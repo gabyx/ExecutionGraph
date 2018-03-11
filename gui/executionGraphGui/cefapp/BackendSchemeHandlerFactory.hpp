@@ -19,9 +19,8 @@
 #include <foonathan/memory/memory_pool.hpp>
 #include <queue>
 #include <vector>
-#include "cefapp/BackendResourceHandler.hpp"
-#include "cefapp/BufferPool.hpp"
-#include "cefapp/ResourceHandlerPool.hpp"
+class BackendRequestDispatcher;
+class BufferPool;
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -36,12 +35,9 @@ class BackendSchemeHandlerFactory final : public CefSchemeHandlerFactory
     IMPLEMENT_REFCOUNTING(BackendSchemeHandlerFactory)
 
 public:
-    BackendSchemeHandlerFactory(const std::path& pathPrefix = "")
-        : m_pathPrefix(pathPrefix)
-        , m_bufferPool(std::make_shared<BufferPool>())
-        , m_handlerPool(sizeof(BackendResourceHandler), sizeof(BackendResourceHandler) * 30)
-    {
-    }
+    BackendSchemeHandlerFactory(std::shared_ptr<BackendRequestDispatcher> dispatcher,
+                                const std::path& pathPrefix = "");
+
     virtual ~BackendSchemeHandlerFactory() = default;
 
     virtual CefRefPtr<CefResourceHandler> Create(CefRefPtr<CefBrowser> browser,
@@ -53,6 +49,7 @@ private:
     const std::path m_pathPrefix;
 
 private:
+    std::shared_ptr<BackendRequestDispatcher> m_dispatcher;
     std::shared_ptr<BufferPool> m_bufferPool;        //! Binary buffers for the messages.
     foonathan::memory::memory_pool<> m_handlerPool;  //! Simple request handler pool.
 };

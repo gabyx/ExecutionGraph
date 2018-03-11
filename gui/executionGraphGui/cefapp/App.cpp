@@ -22,9 +22,11 @@
 #include "backend/BackendFactory.hpp"
 #include "backend/ExecutionGraphBackend.hpp"
 #include "cefapp/AppHandler.hpp"
+#include "cefapp/BackendRequestDispatcher.hpp"
+#include "cefapp/BackendRequestDispatcherAdapterCef.hpp"
+#include "cefapp/BackendResourceHandler.hpp"
 #include "cefapp/BackendSchemeHandlerFactory.hpp"
 #include "cefapp/ClientSchemeHandlerFactory.hpp"
-#include "cefapp/MessageDispatcher.hpp"
 #include "cefapp/SchemeHandlerHelper.hpp"
 
 namespace
@@ -49,7 +51,7 @@ namespace
 
         void OnWindowDestroyed(CefRefPtr<CefWindow> window) OVERRIDE
         {
-            browser_view_ = NULL;
+            browser_view_ = nullptr;
         }
 
         bool CanClose(CefRefPtr<CefWindow> window) OVERRIDE
@@ -79,10 +81,10 @@ namespace
 
     //! Install various backends and setup all of them.
     template<typename Dispatcher>
-    void setupBackends(std::shared_ptr<Dispatcher> messageDispatcher)
+    void setupBackends(std::shared_ptr<Dispatcher> requestDispatcher)
     {
         // Install the URL RequestHandler for the backend
-        CefRefPtr<BackendSchemeHandlerFactory> backendSchemeHandlerFactory(new BackendSchemeHandlerFactory());
+        CefRefPtr<BackendSchemeHandlerFactory> backendSchemeHandlerFactory(new BackendSchemeHandlerFactory(requestDispatcher));
         // A custom scheme receiving post data does not work
         // CefRegisterSchemeHandlerFactory("backend",
         //                                 "executiongraph-backend",
@@ -92,85 +94,87 @@ namespace
                                         backendSchemeHandlerFactory);
         // So far an own scheme does not work:
         // WebKit does not pass POST data to the request for synchronous XHRs executed on non-HTTP schemes.
-        // See the m\_url.protocolInHTTPFamily()
-        // https://bitbucket.org/chromiumembedded/cef/issues/404
+        // See the m\_url.protocolInHTTPFamily() https://bitbucket.org/chromiumembedded/cef/issues/404
         // however we only uses asynchronous XHR requests... ?
-        // CefAddCrossOriginWhitelistEntry("client://executiongraph", "backend", "", true);  // only needed if we use the scheme "backend://" to allow CORS
+        // CefAddCrossOriginWhitelistEntry("client://executiongraph", "backend", "", true);
+        // only needed if we use the scheme "backend://" to allow CORS
 
         // Install the executionGraph backend
         BackendFactory::BackendData messageHandlers = BackendFactory::Create<ExecutionGraphBackend>();
 
         for(auto& backendHandler : messageHandlers.second)
         {
-            messageDispatcher->AddHandler(backendHandler);
+            requestDispatcher->addHandler(backendHandler);
         }
     }
+
+    //! Setup tht CEF Browser
+    template<typename Dispatcher>
+    void setupBrowser(std::shared_ptr<Dispatcher> requestDispatcher)
+    {
+        CefRefPtr<CefCommandLine> command_line = CefCommandLine::GetGlobalCommandLine();
+
+#if defined(OS_WIN) || defined(OS_LINUX)
+        // Create the browser using the Views framework if "--use-views" is specified
+        // via the command-line. Otherwise, create the browser using the native
+        // platform framework. The Views framework is currently only supported on
+        // Windows and Linux.
+        const bool useViews = command_line->HasSwitch("use-views");
+#else
+        const bool useViews = false;
+#endif
+
+        // AppHandler implements browser-level callbacks.
+        auto dispatcherAdapter = std::make_shared<BackendRequestDispatcherAdapterCef>(requestDispatcher);
+        auto appHandler        = CefRefPtr<AppHandler>(new AppHandler(dispatcherAdapter, useViews));
+
+        // Specify CEF browser settings here.
+        CefBrowserSettings browser_settings;
+        // Disable security, such that http:// XHRequests do not trigger a CORS Preflight Request (if special headers are used)
+        browser_settings.web_security = cef_state_t::STATE_DISABLED;
+        CefString url                 = "client://executiongraph/index.html";
+
+        if(useViews)
+        {
+            // Create the BrowserView.
+            CefRefPtr<CefBrowserView> browser_view = CefBrowserView::CreateBrowserView(appHandler, url, browser_settings, nullptr, nullptr);
+
+            // Create the Window. It will show itself after creation.
+            CefWindow::CreateTopLevelWindow(new SimpleWindowDelegate(browser_view));
+        }
+        else
+        {
+            // Information used when creating the native window.
+            CefWindowInfo window_info;
+
+#if defined(OS_WIN)
+            // On Windows we need to specify certain flags that will be passed to
+            // CreateWindowEx().
+            window_info.SetAsPopup(nullptr, "ExecutionGraphGui");
+#endif
+
+            // Create the first browser window.
+            CefBrowserHost::CreateBrowser(window_info, appHandler, url, browser_settings, nullptr);
+        }
+    }
+
 }  // namespace
 
 void App::OnContextInitialized()
 {
     CEF_REQUIRE_UI_THREAD();
 
-    // setup the client
+    // Setup the client
     setupClient(m_clientSourcePath);
 
-    // make a global message dispatcher
-    using Dispatcher       = MessageDispatcher<BackendRequestHandler>;
-    auto messageDispatcher = std::make_shared<Dispatcher>();
-    m_messageDispatcher    = messageDispatcher;
+    // Make a global message dispatcher
+    auto requestDispatcher = std::make_shared<BackendRequestDispatcher>();
 
-    // setup the backends
-    setupBackends(messageDispatcher);
+    // Setup the backends
+    setupBackends(requestDispatcher);
 
-    // setup the browser
-    setupBrowser();
-}
-
-void App::setupBrowser()
-{
-    CefRefPtr<CefCommandLine> command_line = CefCommandLine::GetGlobalCommandLine();
-
-#if defined(OS_WIN) || defined(OS_LINUX)
-    // Create the browser using the Views framework if "--use-views" is specified
-    // via the command-line. Otherwise, create the browser using the native
-    // platform framework. The Views framework is currently only supported on
-    // Windows and Linux.
-    const bool useViews = command_line->HasSwitch("use-views");
-#else
-    const bool useViews = false;
-#endif
-
-    // AppHandler implements browser-level callbacks.
-    m_appHandler = CefRefPtr<AppHandler>(new AppHandler(m_messageDispatcher, useViews));
-
-    // Specify CEF browser settings here.
-    CefBrowserSettings browser_settings;
-    // Disable security, such that http:// XHRequests do not trigger a CORS Preflight Request (if special headers are used)
-    browser_settings.web_security = cef_state_t::STATE_DISABLED;
-    CefString url                 = "client://executiongraph/index.html";
-
-    if(useViews)
-    {
-        // Create the BrowserView.
-        CefRefPtr<CefBrowserView> browser_view = CefBrowserView::CreateBrowserView(m_appHandler, url, browser_settings, NULL, NULL);
-
-        // Create the Window. It will show itself after creation.
-        CefWindow::CreateTopLevelWindow(new SimpleWindowDelegate(browser_view));
-    }
-    else
-    {
-        // Information used when creating the native window.
-        CefWindowInfo window_info;
-
-#if defined(OS_WIN)
-        // On Windows we need to specify certain flags that will be passed to
-        // CreateWindowEx().
-        window_info.SetAsPopup(NULL, "ExecutionGraphGui");
-#endif
-
-        // Create the first browser window.
-        CefBrowserHost::CreateBrowser(window_info, m_appHandler, url, browser_settings, NULL);
-    }
+    // Setup the browser
+    setupBrowser(requestDispatcher);
 }
 
 void App::OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)

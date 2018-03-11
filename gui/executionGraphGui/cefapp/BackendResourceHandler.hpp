@@ -20,6 +20,7 @@
 #include <functional>
 #include <wrapper/cef_helpers.h>
 #include "cefapp/Response.hpp"
+class BackendRequestDispatcher;
 class BufferPool;
 
 /* ---------------------------------------------------------------------------------------*/
@@ -37,9 +38,12 @@ class BackendResourceHandler final : public CefResourceHandler,
 
 public:
     template<typename Deleter>
-    BackendResourceHandler(std::shared_ptr<BufferPool> allocator, Deleter&& deleter)
+    BackendResourceHandler(std::shared_ptr<BackendRequestDispatcher> dispatcher,
+                           std::shared_ptr<BufferPool> allocator,
+                           Deleter&& deleter)
         : CefResourceHandler()
         , m_id("BackendResourceHandler")
+        , m_dispatcher(dispatcher)
         , m_allocator(allocator)
         , m_deleter(deleter)
     {}
@@ -77,26 +81,17 @@ private:
     void finish();
 
 private:
-    std::shared_ptr<BufferPool> m_allocator;
+    std::shared_ptr<BackendRequestDispatcher> m_dispatcher;  //!< The dispatcher to which request/response get dispatched.
+    std::shared_ptr<BufferPool> m_allocator;                 //!< The allocator for `BinaryPayload` of request and responses.
+    ResponseFuture m_responseFuture;                         //!< The response future we await in the resource handler.
 
     std::size_t m_bytesRead = 0;  // DEBUG ==========
-    ResponseFuture m_responseFuture;
 
     //! CefRefCounted overrides
     //@{
 public:
     void AddRef() const override { m_refCount.AddRef(); }
-    bool Release() const override
-    {
-        if(m_refCount.Release())
-        {
-            CEF_REQUIRE_IO_THREAD();
-            m_deleter(const_cast<BackendResourceHandler*>(this));
-
-            return true;
-        }
-        return false;
-    }
+    bool Release() const override;
     bool HasOneRef() const override { return m_refCount.HasOneRef(); }
 
 private:

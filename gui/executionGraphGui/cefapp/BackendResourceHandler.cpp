@@ -145,7 +145,7 @@ bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
     // Make a RequestCef (move the payload into it)
     RequestCef requestCef(m_requestId, std::move(payload));
     // Make a ResponseCef
-    ResponseCef responseCef(cbResponseHeaderReady, m_allocator, false);
+    ResponsePromiseCef responseCef(cbResponseHeaderReady, m_allocator, false);
     // Get the future out
     m_responseFuture = ResponseFuture(responseCef);
 
@@ -251,4 +251,17 @@ void BackendResourceHandler::finish()
     m_requestId.clear();
     m_query.clear();
     m_mimeType.clear();
+}
+
+//! Release method for CefRefCounted
+bool BackendResourceHandler::Release() const
+{
+    if(m_refCount.Release())
+    {
+        CEF_REQUIRE_IO_THREAD();
+        m_deleter(const_cast<BackendResourceHandler*>(this));
+
+        return true;
+    }
+    return false;
 }

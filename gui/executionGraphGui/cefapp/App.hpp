@@ -43,13 +43,6 @@ public:
     //@}
 
 private:
-    void setupBrowser();
-    CefRefPtr<AppHandler> m_appHandler;
-
-private:
-    std::shared_ptr<CefMessageRouterBrowserSide::Handler> m_messageDispatcher;
-
-private:
     std::path m_clientSourcePath;  //!< Client source path.
 };
 

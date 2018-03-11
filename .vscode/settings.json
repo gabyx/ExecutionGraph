@@ -138,24 +138,16 @@
         "**/node_modules": true,
     },
     "files.watcherExclude": {
-        "**/.git/objects/**": true,
-        "**/.git/subtree-cache/**": true,
+        "**/.git/**": true,
         "**/node_modules/**": true,
         "**/build/**" : true,
         "**/buildExternal/**" : true,
         "**/dist/**" : true
     },
     "search.exclude": {
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/.DS_Store": true,
-        "**/bower_components": true,
-        "**/jspm_packages": true,
-        "**/node_modules": true,
-        "**/build" : true,
-        "**/buildExternal" : true,
-        "**/dist" : true
+        "**/build/**" : true,
+        "**/buildExternal/**" : true,
+        "**/dist/**" : true
     },
     "cmake.configureArgs": ["-DExecutionGraph_BUILD_TESTS=ON",
                             "-DExecutionGraph_BUILD_GUI=ON",

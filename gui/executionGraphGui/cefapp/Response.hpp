@@ -25,10 +25,10 @@
 /*!
     A move-only response promise wrapper.
 
-    Such an instance is created by a `BackendResourceHandler`, 
+    Such an instance is created by a `BackendRequestHandler`, 
     which will move it to the BackendRequestHandler.
 
-    The `BackendResourceHandler` will extract the future for read access to the payload. 
+    The `BackendRequestHandler` will extract the future for read access to the payload. 
 
     @date Thu Feb 22 2018
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
@@ -113,7 +113,7 @@ private:
 
     // todo: Up to now: Hand over the buffer to Dispatcher thread, it will be used in the FlatBufferBuilder
     // The dispatcher creats the flatbuffer, returns a DetachedBuffer which ends up somehow in the payload promise
-    // and gets deleted (over the same instance m_allocator) in the BackendResourceHandler ...
+    // and gets deleted (over the same instance m_allocator) in the BackendRequestHandler ...
     std::shared_ptr<BufferPool> m_allocator;  //! Thread-safe allocator which allocates a buffer for us.
 
     State m_state               = State::Nothing;  //!< The state of this promise
