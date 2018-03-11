@@ -6,17 +6,18 @@ The communication between *client* and *backend* is done over the `./client/.../
 
 ![Specs](client-backend.svg "Specs")
 
-The application registers a file scheme handler factory `FileSchemeHandlerFactor` during `App::OnContextInitialized`. In this function, it also creates an application handler instance `AppHandler` which is forwarded to `CefBrowserHost::CreateBrowser`. 
-
-During `AppHandler::OnAfterCreated()`, a message dispatcher `m_requestDispatcher` of type `RequestDispatcher` is registerd at a newly instantiated `m_router` of type `CefMessageRouterBrowserSide`. Then, `AppHandler::initializeBackends()` is called which uses the `BackendFactory` to create the backends. At the moment, a backend instance of type `ExecutionGraphBackend` with its associated message handlers, currently an instance of `DummyBackendRequestHandler`, is created.
-The message handlers may share the instance of the backend internally.
-At last, the message handlers of all backends are then added to the `m_requestDispatcher`. 
-
-During communication, the dispatcher will forward all messages to its shared `BackendRequestHandlers` instances.
+The application registers two scheme handler factorys and creates a browser during `App::OnContextInitialized`. 
+First, a scheme handler factory `ClientSchemeHandlerFactor` for the client requests (files and resources for the client angular application) is registered in `App::setupClient`.
+Second, a backend request dispatcher `BackendRequestDispatcher` is created and its request handling loop (1 thread) is started.
+Next, in function `App::setupBackend`, a scheme handler factory `BackendSchemeHandlerFactory` (sharing the backend request dispatcher) for the backend request handling is setup and then the `BackendFactory` creates the backends and its corresponding request handlers. At the moment, a backend instance of type `ExecutionGraphBackend` with its associated request handlers (sharing the backend), currently an instance of `DummyBackendRequestHandler`, is created. All backend request handlers are then added to the backend request dispatcher.
+After setting up the backend, a browser is created by `CefBrowserHost::CreateBrowser` in `App::setupBrowser` with an instance of type `AppHandler` (`CefClient`) which implements various CEF related handling functions.
 
 ## Message Send/Receive Workflow
 Communication workflow for an AJAX Request on the scheme `backend://` between the client and backend:
 ![Client-Backend-Communication](ajax-backend-comm.svg "Client-Backend Communication")
+
+During communication, a processed request by an instancen `BackendResourceHandler` created by the
+`BackendResourceHandlerFactory` will add the request to the dispatcher by calling the non-blocking function `BackendRequestDispatcher::addRequest(std::move(request), std::move(responsePromise))` with a request (`RequestCef`) and a response object (`ResponsePromiseCef`). Note that, the request and response promise are moved to the dispatcher (actually it gets moved into the task queue of the thread pool inside the dispatcher). Before doing this, the backend resource handler has exctracted the response future ( `RepsonseFuture`) which gets used when `BackendResourceHandler::GetResponseHeaders` and `BackendResourceHandler::ReadResponse` is called. The consumer thread of the backend request dispatcher then forwards this request/response to the corresponding registered handler. If no handler is found, the request is automatically cancled by calling `setCancel(...)` on the response promise.
 
 ## Overview of MessageHandler Types
 We need one message handlers for each of the following grouped functionalities:

@@ -6,49 +6,69 @@ skinparam shadowing false
 class CefMessageRouterBrowserSide
 class Handler as "CefMessageRouterBrowserSide::Handler"
 
+class CefResourceHandler {
+    + Cancel(...) {abstract} 
+    + GetResponseHeaders(...) {abstract} 
+    + ProcessRequest(...) {abstract} 
+    + ReadResponse(...) {abstract}
+}
+
 namespace cefapp{
     class App{
         + OnContextInitialized()
         - m_appHandler
-        - m_messageDispatcher
     }
     class AppHandler #D3D3D3{
         + OnAfterCreated()
         + OnBeforeCloses()
         - m_router
-        - m_messageDispatcher
-        - initializeBackends()
+        - m_requestDispatcher
     }
 
-    class MessageDispatcher {
-        + AddHandler(backendHandler, requestId)
-        + RemoveHandler(id)
-        + OnQuery()
-        + AddRequest()
-        + StartMessageHandler()
-        + StopMessageHandler()
+    class BackendRequestDispatcher {
+        + addHandler(...)
+        + removeHandler(...)
+        + addRequest(request, response)
+        + start()
+        + stop()
         - m_generalHandlers
         - m_specificHandlers
         - m_handlerMap
     }
-    class ClientSchemeHandlerFactory
-    class BackendSchemeHandlerFactory
+    class BackendRequestDispatcherAdapterCef {
+        - m_dispatcher
+    }
+
+    class ClientSchemeHandlerFactory {
+        + Create(...)
+    }
+    class BackendSchemeHandlerFactory {
+        + Create(...)
+        - m_dispatcher
+    }
+    class BackendResourceHandler {
+        - m_dispatcher
+    }
 }
 
 cefapp::App ..> cefapp::AppHandler : creates
 cefapp::App ..> cefapp::ClientSchemeHandlerFactory : registers
 cefapp::App ..> cefapp::BackendSchemeHandlerFactory : registers
+cefapp::BackendSchemeHandlerFactory ..> cefapp::BackendResourceHandler : creates
+cefapp::BackendResourceHandler --|> CefResourceHandler
+cefapp::BackendResourceHandler "1" *-- cefapp::BackendRequestDispatcher : uses
 
 cefapp::AppHandler "1" *-down- Handler
-cefapp::MessageDispatcher -down-|> Handler
-cefapp::MessageDispatcher "1..*" *--- backend::BackendRequestHandler
-cefapp::AppHandler "1" *-down- CefMessageRouterBrowserSide
+cefapp::BackendRequestDispatcherAdapterCef "1" *-- cefapp::BackendRequestDispatcher
+cefapp::BackendRequestDispatcherAdapterCef -down-|> Handler
+cefapp::BackendSchemeHandlerFactory "1" *-- cefapp::BackendRequestDispatcher
+cefapp::BackendRequestDispatcher "1..*" *-- backend::BackendRequestHandler
+cefapp::AppHandler "1" *-- CefMessageRouterBrowserSide
 
 namespace backend {
     class Backend #D3D3D3
     class BackendRequestHandler #D3D3D3 {
-        + OnQuery(...) {abstract} 
-        + OnRequest(...) {abstract}
+        + handleRequest(request, responsePromise) {abstract} 
     }
 
     class BackendFactory {
@@ -67,8 +87,8 @@ cefapp::App ..> backend::BackendFactory : uses
 backend::ExecutionGraphBackend --|> backend::Backend
 backend::DummyBackendRequestHandler --|> backend::BackendRequestHandler
 
-backend::BackendFactory ..> backend::ExecutionGraphBackend : instanciates
-backend::BackendFactory ..> backend::DummyBackendRequestHandler : instanciates
+backend::BackendFactory ..> backend::ExecutionGraphBackend : creates
+backend::BackendFactory ..> backend::DummyBackendRequestHandler : creates
 
 backend::DummyBackendRequestHandler "1" *-- backend::ExecutionGraphBackend
 
