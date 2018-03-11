@@ -169,6 +169,7 @@ void App::OnContextInitialized()
 
     // Make a global message dispatcher
     auto requestDispatcher = std::make_shared<BackendRequestDispatcher>();
+    requestDispatcher->start();  // start the dispatcher thread
 
     // Setup the backends
     setupBackends(requestDispatcher);

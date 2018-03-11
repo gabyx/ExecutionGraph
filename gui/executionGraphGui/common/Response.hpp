@@ -13,6 +13,7 @@
 #ifndef cefapp_Response_hpp
 #define cefapp_Response_hpp
 
+#include <executionGraph/common/Identifier.hpp>
 #include <future>
 #include <memory>
 #include <rttr/type>
@@ -48,10 +49,14 @@ private:
 
 public:
     using Payload = BinaryPayload;
+    using Id      = executionGraph::Id;
 
 protected:
-    ResponsePromise(std::shared_ptr<BufferPool> allocator, bool bCancelOnDestruction = false)
-        : m_allocator(allocator)
+    ResponsePromise(Id requestId,
+                    std::shared_ptr<BufferPool> allocator,
+                    bool bCancelOnDestruction = false)
+        : m_requestId(requestId)
+        , m_allocator(allocator)
         , m_bCancelOnDestruction(bCancelOnDestruction){};
 
     ResponsePromise(const ResponsePromise&) = delete;
@@ -69,7 +74,7 @@ public:
     {
         if(m_state != State::Nothing)
         {
-            EXECGRAPHGUI_BACKENDLOG_WARN("Promise is already set to a state!");
+            EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', is already set to a state!", m_requestId.getUniqueName());
             return;
         }
         m_state = State::Ready;
@@ -82,7 +87,7 @@ public:
     {
         if(m_state != State::Nothing)
         {
-            EXECGRAPHGUI_BACKENDLOG_WARN("Promise is already set to a state!");
+            EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', is already set to a state!", m_requestId.getUniqueName());
             return;
         }
         m_state = State::Canceled;
@@ -102,6 +107,7 @@ protected:
         {
             if(m_bCancelOnDestruction)
             {
+                EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', has not been resolved. It will be cancled!", m_requestId.getUniqueName());
                 setCanceled("Cancled promise on destruction, because of unknown reason!");
             }
         }
@@ -109,6 +115,7 @@ protected:
 
 private:
     friend class ResponseFuture;
+    Id m_requestId;                          //! The id of the corresponding request.
     std::promise<Payload> m_promisePayload;  //!< Response Data which gets set in `setReady`.
 
     // todo: Up to now: Hand over the buffer to Dispatcher thread, it will be used in the FlatBufferBuilder
@@ -134,11 +141,13 @@ class ResponseFuture final
 
 public:
     using Payload = ResponsePromise::Payload;
+    using Id      = ResponsePromise::Id;
 
 public:
     ResponseFuture() = default;
     ResponseFuture(ResponsePromise& responsePromise)
-        : m_payloadFuture(responsePromise.m_promisePayload.get_future()){};
+        : m_requestId(responsePromise.m_requestId)
+        , m_payloadFuture(responsePromise.m_promisePayload.get_future()){};
 
     //! Copy forbidden
     ResponseFuture(const ResponseFuture&) = delete;
@@ -154,6 +163,7 @@ public:
     auto& getFuture() { return m_payloadFuture; }
 
 private:
+    Id m_requestId;  //!< The id of the corresponding request.
     std::future<Payload> m_payloadFuture;
 };
 

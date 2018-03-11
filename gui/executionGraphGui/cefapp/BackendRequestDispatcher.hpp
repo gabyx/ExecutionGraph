@@ -14,6 +14,8 @@
 #define cefapp_BackendRequestDispatcher_hpp
 
 #include "backend/BackendRequestHandler.hpp"
+#include "cefapp/RequestCef.hpp"
+#include "cefapp/ResponseCef.hpp"
 #include "common/RequestDispatcher.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
@@ -24,10 +26,14 @@
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
  */
 /* ---------------------------------------------------------------------------------------*/
-class BackendRequestDispatcher final : public RequestDispatcher<BackendRequestHandler>
+class BackendRequestDispatcher final : public RequestDispatcher<BackendRequestHandler,
+                                                                RequestCef,
+                                                                ResponsePromiseCef>
 {
 public:
-    using Base = RequestDispatcher<BackendRequestHandler>;
+    using Base = RequestDispatcher<BackendRequestHandler,
+                                   RequestCef,
+                                   ResponsePromiseCef>;
 
 public:
     template<typename... Args>

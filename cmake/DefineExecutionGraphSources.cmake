@@ -82,7 +82,8 @@ function(setTargetCompileOptionsExecutionGraph target use_address_san use_leak_s
         list(APPEND CXX_FLAGS_DEBUG "-fno-omit-frame-pointer"
                                     "-Wall"
                                     "-Wpedantic"
-                                    "-Wno-documentation")
+                                    "-Wno-documentation"
+                                    "-ftemplate-backtrace-limit=0")
 
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         list(APPEND CXX_FLAGS_DEBUG "-fno-omit-frame-pointer"

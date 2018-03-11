@@ -30,37 +30,37 @@
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
  */
 /* ---------------------------------------------------------------------------------------*/
-template<typename THandlerType>
+template<typename THandlerType, typename TRequestType, typename TResponseType>
 class RequestDispatcher
 {
 public:
-    using HandlerType = THandlerType;
-    using Id          = typename HandlerType::Id;
+    using HandlerType  = THandlerType;
+    using RequestType  = TRequestType;
+    using ResponseType = TResponseType;
+
+    using Id = typename HandlerType::Id;
 
 public:
-    RequestDispatcher()          = default;
+    RequestDispatcher() = default;
+
+    //! Destructor automatically stops the pool by its DTOR.
     virtual ~RequestDispatcher() = default;
 
 public:
     //! Handle a general request/response. Can be called on any thread!
     template<typename Request, typename Response>
-    void addRequest(Request&& request, Response&& response)
-    {
-        m_pool.getQueue()->emplace(TaskHandleRequest{this,
-                                                     std::forward<Request>(request),
-                                                     std::forward<Response>(response)});
-    }
+    void addRequest(Request&& request, Response&& response);
 
 public:
-    //! Adds a message handler `handler` for an optional specific request id `requestId`.
-    //! Messages are first dispatched to all specific handlers added with a `requestId`.
-    bool addHandler(std::shared_ptr<HandlerType> handler, const std::string& requestId)
+    //! Adds a message handler `handler` for an optional specific request id `requestType`.
+    //! Messages are first dispatched to all specific handlers added with a `requestType`.
+    bool addHandler(std::shared_ptr<HandlerType> handler, const std::string& requestType)
     {
         std::scoped_lock<std::mutex> lock(m_access);
 
-        if(!handler || requestId.empty())
+        if(!handler || requestType.empty())
         {
-            EXECGRAPH_ASSERT(false, "nullptr or empty requestId")
+            EXECGRAPH_ASSERT(false, "nullptr or empty requestType")
             return false;
         }
         Id id = handler->getId();
@@ -68,8 +68,8 @@ public:
         EXECGRAPH_THROW_EXCEPTION_IF(m_handlerStorage.find(id) != m_handlerStorage.end(),
                                      "MessageHandler with id: " << id.getUniqueName() << " already exists!");
 
-        m_handlerStorage.emplace(id, HandlerData{requestId, handler.get()});
-        m_specificHandlers[requestId].emplace(handler.get());
+        m_handlerStorage.emplace(id, HandlerData{requestType, handler.get()});
+        m_specificHandlers[requestType].emplace(handler.get());
         return true;
     }
 
@@ -115,14 +115,14 @@ public:
         if(it != m_handlerStorage.end())
         {
             handler = it->second.m_handler;
-            if(it->second.m_requestId.empty())
+            if(it->second.m_requestType.empty())
             {
                 EXECGRAPH_ASSERT(it->second.m_index < m_generalHandlers.size(), "Wrong index!")
                 m_generalHandlers.erase(m_generalHandlers.begin() + it->index);  // Remove from list
             }
             else
             {
-                m_specificHandlers[it->second.m_requestId].erase(it->second.m_handler.get());
+                m_specificHandlers[it->second.m_requestType].erase(it->second.m_handler.get());
             }
 
             m_handlerStorage.erase(it);  // Remove from storage
@@ -130,25 +130,37 @@ public:
         return handler;
     }
 
+    //! Starts the dispatcher thread.
+    void start()
+    {
+        m_pool.start();
+    }
+
+    //! Stops the dispatcher thread.
+    void stop()
+    {
+        m_pool.join();
+    }
+
 private:
     struct HandlerData
     {
-        HandlerData(const std::string& requestId, std::shared_ptr<HandlerType> handler)
-            : m_requestId(requestId), m_handler(handler)
+        HandlerData(const std::string& requestType, std::shared_ptr<HandlerType> handler)
+            : m_requestType(requestType), m_handler(handler)
         {}
 
         HandlerData(const std::size_t& index, std::shared_ptr<HandlerType> handler)
             : m_index(index), m_handler(handler)
         {}
 
-        const std::string m_requestId;                 //! The requestId if it is a specific handler.
-        const std::size_t m_index = 0;                 //! Index into `m_generalHandlers` if `m_requestId` is empty.
+        const std::string m_requestType;               //! The requestType if it is a specific handler.
+        const std::size_t m_index = 0;                 //! Index into `m_generalHandlers` if `m_requestType` is empty.
         const std::shared_ptr<HandlerType> m_handler;  //! The message handler.
     };
 
 private:
     std::unordered_map<std::string, std::unordered_set<HandlerType*>> m_specificHandlers;  //! Handlers for a specific request id (handled first).
-    std::vector<HandlerType*> m_generalHandlers;                                           //!< The handlers to which all messages are dispatched (no requestId).
+    std::vector<HandlerType*> m_generalHandlers;                                           //!< The handlers to which all messages are dispatched (no requestType).
     std::unordered_map<typename HandlerType::Id, HandlerData> m_handlerStorage;            //!< Storage for handlers.
     std::mutex m_access;
 
@@ -164,22 +176,24 @@ private:
             , m_request(std::forward<Request>(request))
             , m_response(std::forward<Response>(response))
         {
-            EXECGRAPH_ASSERT(m_request, "Message is nullptr!");
         }
+
+        TaskHandleRequest(TaskHandleRequest&&) = default;
+        TaskHandleRequest& operator=(TaskHandleRequest&&) = default;
 
         void runTask(std::thread::id threadId)
         {
             std::scoped_lock<std::mutex> lock(m_d.m_access);
 
-            const std::string requestId = m_request->getRequestId();
+            const std::string requestType = m_request.getRequestType();
 
             // Check all specific handlers first
-            auto it = m_d.m_specificHandlers.find(requestId);
+            auto it = m_d.m_specificHandlers.find(requestType);
             if(it != m_d.m_specificHandlers.end())
             {
                 for(auto* handler : it->second)
                 {
-                    if(handler->handleRequest(*m_request, *m_response))
+                    if(handler->handleRequest(m_request, m_response))
                     {
                         return;
                     }
@@ -189,26 +203,26 @@ private:
             // Check all general handlers
             for(auto* handler : m_d.m_generalHandlers)
             {
-                if(handler->handleRequest(*m_request, *m_response))
+                if(handler->handleRequest(m_request, m_response))
                 {
                     return;
                 }
             }
 
-            EXECGRAPHGUI_APPLOG_WARN("Request with requestId: '{0}' has not been handled, it will be cancled!", requestId);
-            m_response->setCanceled("No handler found!");
+            EXECGRAPHGUI_APPLOG_WARN("Request id: '{0}' has not been handled, it will be cancled!", m_request.getId().getUniqueName());
+            m_response.setCanceled("No handler found!");
         };
 
         void onTaskException(const std::string& what)
         {
-            EXECGRAPHGUI_APPLOG_WARN("Request with requestId: '{0}' has thrown exception: {1}, it will be cancled!", m_request->getRequestId(), what);
-            m_response->setCanceled(what);
+            EXECGRAPHGUI_APPLOG_WARN("Request id: '{0}' has thrown exception: {1}, it will be cancled!", m_request.getId().getUniqueName(), what);
+            m_response.setCanceled(what);
         };
 
     private:
-        std::unique_ptr<Request> m_request;           //!< The request to handle.
-        std::unique_ptr<ResponsePromise> m_response;  //!< The response to handle.
-        RequestDispatcher& m_d;                       //!< Dispatcher.
+        RequestDispatcher& m_d;   //!< Dispatcher.
+        RequestType m_request;    //!< The request to handle.
+        ResponseType m_response;  //!< The response to handle.
     };
 
 private:
@@ -217,5 +231,12 @@ private:
 private:
     executionGraph::ThreadPool<TaskHandleRequest> m_pool{1};  //! One seperate thread will handle all messages for this dispatcher.
 };
+
+template<typename THandlerType, typename TRequestType, typename TResponseType>
+template<typename Request, typename Response>
+void RequestDispatcher<THandlerType, TRequestType, TResponseType>::addRequest(Request&& request, Response&& response)
+{
+    m_pool.getQueue()->emplace(*this, std::forward<Request>(request), std::forward<Response>(response));
+}
 
 #endif

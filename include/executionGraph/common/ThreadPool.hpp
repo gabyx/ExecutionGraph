@@ -48,7 +48,7 @@ namespace executionGraph
             }
         };
 
-        //! Destructor joins all threads automatically.
+        //! Destructor joins all threads automatically by the DTOR of Consumer.
         virtual ~ThreadPool() = default;
 
         //! Start all threads.

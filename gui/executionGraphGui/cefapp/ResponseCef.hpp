@@ -17,6 +17,14 @@
 #include <cef_request.h>
 #include "common/Response.hpp"
 
+/* ---------------------------------------------------------------------------------------*/
+/*!
+    A response for which implements the beaviour for CEF in the `BackendResourceHandler`.
+
+    @date Sun Mar 11 2018
+    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+ */
+/* ---------------------------------------------------------------------------------------*/
 class ResponsePromiseCef final : public ResponsePromise
 {
 public:
@@ -33,6 +41,9 @@ public:
     {
         setResolveOnDestruction();
     }
+
+    ResponsePromiseCef(ResponsePromiseCef&&) = default;
+    ResponsePromiseCef& operator=(ResponsePromiseCef&&) = default;
 
 private:
     virtual void setReadyImpl() override
@@ -53,6 +64,7 @@ private:
     CefRefPtr<CefCallback> m_cbResponseHeaderReady;  //!< The callback to call when the response header is ready.
 };
 
+//! The response future corresponding to `ResponsePromiseCef`.
 using ResponseFutureCef = ResponseFuture;
 
 #endif

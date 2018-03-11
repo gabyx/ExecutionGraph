@@ -13,6 +13,7 @@
 #ifndef cefapp_Request_h
 #define cefapp_Request_h
 
+#include <executionGraph/common/IObjectID.hpp>
 #include <rttr/type>
 #include <string>
 #include "common/BinaryPayload.hpp"
@@ -23,7 +24,7 @@
     General Request Message
 
     A BackendRequestHandler is handling such a request. It can be registered in
-    the message dispatcher for handling one or several request ids (see `m_requestId`)
+    the message dispatcher for handling one or several request ids (see `m_requestType`)
     The request id is in the form "category/subcategory" (e.g. "graphManip/addNode").
     We use a category and a subcategory to be able to structure requests into groups.
     Also for the future, when more and more requests get added.
@@ -35,15 +36,18 @@
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
  */
 /* ---------------------------------------------------------------------------------------*/
-class Request
+class Request : public executionGraph::IObjectID
 {
+    EXECGRAPH_OBJECT_ID_DECLARATION
     RTTR_ENABLE()
+
 public:
     using Payload = BinaryPayload;
 
 protected:
-    Request(const std::string& requestId)
-        : m_requestId(requestId)
+    Request(const std::string& requestType)
+        : m_id("Request-" + requestType)
+        , m_requestType(requestType)
     {}
 
 public:
@@ -51,7 +55,7 @@ public:
 
 public:
     //! Get the request id describing this message.
-    virtual const std::string& getRequestId() { return m_requestId; }
+    virtual const std::string& getRequestType() { return m_requestType; }
 
 public:
     //! Get the payload of this request. Nullptr if there is no payload for this request.
@@ -59,10 +63,10 @@ public:
     virtual const Payload* getPayload() const = 0;
 
 private:
-    //! The requestId "<category>/<subcategory>" (e.g. "graphManip/addNode")
-    //! A BackendRequestHandler handling such a requestId can be registered on
+    //! The requestType "<category>/<subcategory>" (e.g. "graphManip/addNode")
+    //! A BackendRequestHandler handling such a requestType can be registered on
     //! a set of such requestIds.
-    std::string m_requestId;
+    std::string m_requestType;
 };
 
 #endif

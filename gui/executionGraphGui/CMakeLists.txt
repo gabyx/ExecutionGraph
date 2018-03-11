@@ -28,6 +28,9 @@ set(ExecutionGraphGUI_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/common/BinaryBuffer.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/common/BinaryPayload.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/common/BufferPool.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/common/RequestDispatcher.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/common/Request.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/common/Response.hpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/Backend.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendRequestHandler.cpp
@@ -36,9 +39,6 @@ set(ExecutionGraphGUI_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/BackendFactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/DummyBackendRequestHandler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/DummyBackendRequestHandler.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/backend/RequestDispatcher.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/backend/Request.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/backend/Response.hpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/ExecutionGraphBackend.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/ExecutionGraphBackend.cpp

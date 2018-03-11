@@ -32,6 +32,9 @@ public:
 
     virtual ~RequestCef() = default;
 
+    RequestCef(RequestCef&&) = default;
+    RequestCef& operator=(RequestCef&&) = default;
+
     virtual const Payload* getPayload() const override
     {
         return m_payload ? &(*m_payload) : nullptr;

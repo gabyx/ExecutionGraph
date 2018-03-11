@@ -151,8 +151,7 @@ MY_TEST(ProducerConsumer, Test1)
         for(int i = 0; i < 20; ++i)
         {
             PrintThread{} << "task " << i << " adding " << std::endl;
-            Task t{i};
-            queue->emplace(std::move(t));
+            queue->emplace(i);
             std::this_thread::sleep_for(std::chrono::milliseconds(int(rand() * 200)));
         }
 

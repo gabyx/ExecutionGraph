@@ -13,6 +13,7 @@
 #ifndef executionGraph_common_ObjectID_hpp
 #define executionGraph_common_ObjectID_hpp
 
+#include <rttr/type>
 #include "executionGraph/common/Identifier.hpp"
 
 namespace executionGraph
@@ -27,6 +28,7 @@ namespace executionGraph
     /* ---------------------------------------------------------------------------------------*/
     class IObjectID
     {
+        RTTR_ENABLE()
     protected:
         IObjectID() = default;
 
@@ -38,7 +40,7 @@ namespace executionGraph
     };
 }  // namespace executionGraph
 
-//! Macro to define the implementation.
+    //! Macro to define the implementation.
 #    define EXECGRAPH_OBJECT_ID_DECLARATION                     \
     public:                                                     \
         using Id = executionGraph::Id;                          \

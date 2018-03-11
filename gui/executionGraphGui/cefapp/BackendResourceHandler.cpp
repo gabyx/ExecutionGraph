@@ -18,6 +18,7 @@
 #include <thread>
 #include <wrapper/cef_closure_task.h>
 #include <wrapper/cef_helpers.h>
+#include "cefapp/BackendRequestDispatcher.hpp"
 #include "cefapp/RequestCef.hpp"
 #include "cefapp/ResponseCef.hpp"
 #include "common/BinaryBuffer.hpp"
@@ -143,24 +144,22 @@ bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
     // over to the message dispatcher.
     ////////////////////////////////////////////////////
     // Make a RequestCef (move the payload into it)
-    RequestCef requestCef(m_requestId, std::move(payload));
+    RequestCef requestCef(m_requestType, std::move(payload));
     // Make a ResponseCef
-    ResponsePromiseCef responseCef(cbResponseHeaderReady, m_allocator, false);
+    ResponsePromiseCef responseCef(cbResponseHeaderReady, requestCef.getId(), m_allocator, true);
     // Get the future out
     m_responseFuture = ResponseFuture(responseCef);
 
-    // Post a task to the UI-Thread to handle the message in the message dispatcher
-    // which serializes the data, processes the request (its possible to launch a new worker thread, to not block UI-Thread),
-    // and then serializes a proper reponse
-    // if an error happens, the returned response contains no payload, but a well defined error message.
-    // todo
+    // Add the request to the dispatcher (threaded)
 
-    {  // DEBUG ==========
-        m_bytesRead = 0;
-        // FILE Threads does not block UI,
-        CefPostTask(TID_FILE, base::Bind(&debugWaitOnOtherThread, cbResponseHeaderReady));
+    m_dispatcher->addRequest(std::move(requestCef), std::move(responseCef));
 
-    }  // DEBUG ==========
+    // {  // DEBUG ==========
+    //     m_bytesRead = 0;
+    //     // FILE Threads does not block UI,
+    //     CefPostTask(TID_FILE, base::Bind(&debugWaitOnOtherThread, cbResponseHeaderReady));
+
+    // }  // DEBUG ==========
 
     return true;
 }
@@ -207,10 +206,10 @@ bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
     }
 
     // Exctract requestId
-    // e.g. m_requestId := "catergory/subcategory/command"
-    m_requestId = executionGraph::splitLeadingSlashes(CefString(urlParts.path.str).ToString());
+    // e.g. m_requestType := "catergory/subcategory/command"
+    m_requestType = executionGraph::splitLeadingSlashes(CefString(urlParts.path.str).ToString());
 
-    if(m_requestId.empty())
+    if(m_requestType.empty())
     {
         EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler id: '{0}' : url '{1}': requestId extract failed!",
                                   getId().getName(),
@@ -248,7 +247,7 @@ bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
 //! Finish handling the request: Reset everything and signal callback.
 void BackendResourceHandler::finish()
 {
-    m_requestId.clear();
+    m_requestType.clear();
     m_query.clear();
     m_mimeType.clear();
 }
