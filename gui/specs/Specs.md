@@ -2,7 +2,9 @@ Specifications for Client and Backend Communication
 ===
 In this document *client* is referred to the Angular implementation in `./client` which provides the GUI (HTML/CSS/TypeScript) implementation. The *backend*  is referred to the C++ implementation in `./backend`.
 
-The communication between *client* and *backend* is done over the `./client/.../CefMessageRouterService.ts` which executes the pre-registered `window.cef.cefQuery` on the *client* side and the receiving router `m_router` in `./cefapp/AppHandler.hpp`. Several message handlers are installed in the router `m_router` for the backend, in this case the `backend/ExecututionGraphBackend.cpp`, which provides all functionality for reading, storing, manipulating and executing a graph consisting of `LogicNodes`.
+The communication between *client* and *backend* is done over the `./client/.../CefMessageRouterService.ts` which executes the pre-registered `window.cef.cefQuery` on the *client* side and the receiving router `m_router` in `./cefapp/AppHandler.hpp` which eventually forwards the request to the backend request dispatcher `./cefapp/BackendRequestDispatcher`. 
+Binary message communication is done over the `./client/.../CefBinaryRouterService.ts` and the `BackendSchemeHandlerFactory` which also eventually forwards the request to the `.cefapp/BackendRequestDispatcher`. 
+Instanced of type `BackendRequestHandler` are installed in the dispatcher `BackendSchemeHandlerFactory::m_dispatcher` for the backends, in this case the `backend/ExecututionGraphBackend.cpp`, which provides all functionality for reading, storing, manipulating and executing a graph consisting of `LogicNodes`.
 
 ![Specs](client-backend.svg "Specs")
 
