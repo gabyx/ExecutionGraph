@@ -1,0 +1,18 @@
+:host {
+    // background: gray;
+    display: block;
+    margin: 0px;
+    overflow: hidden;
+    position: relative;
+
+    ::ng-deep .ngcs-node {
+        display: inline-block;
+        position: absolute;
+        background: white;
+        border: 1px solid black;
+        z-index: 1000;
+    }
+    ::ng-deep svg {
+        z-index: 100;
+    }
+}

@@ -1,12 +1,39 @@
 {
-  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "$schema": "./node_modules/@nrwl/schematics/src/schema.json",
   "project": {
-    "name": "eg-client"
+    "name": "eg",
+    "npmScope": "eg",
+    "latestMigration": "20180227-cleanup-scripts"
+  },
+  "e2e": {
+    "protractor": {
+      "config": "./protractor.conf.js"
+    }
+  },
+  "lint": [
+    {
+      "project": "./tsconfig.spec.json",
+      "exclude": "**/node_modules/**"
+    },
+    {
+      "project": "apps/eg/src/tsconfig.app.json",
+      "exclude": "**/node_modules/**"
+    },
+    {
+      "project": "apps/eg/e2e/tsconfig.e2e.json",
+      "exclude": "**/node_modules/**"
+    }
+  ],
+  "test": {
+    "karma": {
+      "config": "./karma.conf.js"
+    }
   },
   "apps": [
     {
-      "root": "src",
-      "outDir": "dist",
+      "name": "eg",
+      "root": "apps/eg/src",
+      "outDir": "dist/apps/eg",
       "assets": [
         "assets",
         "favicon.ico"
@@ -14,10 +41,10 @@
       "index": "index.html",
       "main": "main.ts",
       "polyfills": "polyfills.ts",
-      "test": "test.ts",
+      "test": "../../../test.js",
       "tsconfig": "tsconfig.app.json",
-      "testTsconfig": "tsconfig.spec.json",
-      "prefix": "eg",
+      "testTsconfig": "../../../tsconfig.spec.json",
+      "prefix": "app",
       "styles": [
         "styles.css"
       ],
@@ -27,34 +54,27 @@
         "dev": "environments/environment.ts",
         "prod": "environments/environment.prod.ts"
       }
-    }
-  ],
-  "e2e": {
-    "protractor": {
-      "config": "./protractor.conf.js"
-    }
-  },
-  "lint": [
-    {
-      "project": "src/tsconfig.app.json",
-      "exclude": "**/node_modules/**"
     },
     {
-      "project": "src/tsconfig.spec.json",
-      "exclude": "**/node_modules/**"
+      "name": "graph",
+      "root": "libs/graph/src",
+      "test": "../../../test.js",
+      "appRoot": ""
     },
     {
-      "project": "e2e/tsconfig.e2e.json",
-      "exclude": "**/node_modules/**"
+      "name": "$workspaceRoot",
+      "root": ".",
+      "appRoot": ""
     }
   ],
-  "test": {
-    "karma": {
-      "config": "./karma.conf.js"
-    }
-  },
   "defaults": {
-    "styleExt": "scss",
+    "schematics": {
+      "collection": "@nrwl/schematics"
+    },
+    "styleExt": "css",
     "component": {}
+  },
+  "warnings": {
+    "typescriptMismatch": false
   }
 }
