@@ -1,12 +1,14 @@
 {
-  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "$schema": "./node_modules/@nrwl/schematics/src/schema.json",
   "project": {
-    "name": "eg-client"
+    "name": "eg-client",
+    "npmScope": "eg",
+    "latestMigration": "20180227-cleanup-scripts"
   },
   "apps": [
     {
-      "root": "src",
-      "outDir": "dist",
+      "root": "apps/eg/src",
+      "outDir": "dist/apps/eg",
       "assets": [
         "assets",
         "favicon.ico"
@@ -14,9 +16,9 @@
       "index": "index.html",
       "main": "main.ts",
       "polyfills": "polyfills.ts",
-      "test": "test.ts",
+      "test": "../../../test.js",
       "tsconfig": "tsconfig.app.json",
-      "testTsconfig": "tsconfig.spec.json",
+      "testTsconfig": "../../../tsconfig.spec.json",
       "prefix": "eg",
       "styles": [
         "styles.css"
@@ -26,7 +28,15 @@
       "environments": {
         "dev": "environments/environment.ts",
         "prod": "environments/environment.prod.ts"
-      }
+      },
+      "name": "eg"
+    },
+    {
+      "name": "graph",
+      "root": "libs/graph/src",
+      "test": "../../../test.js",
+      "prefix": "eg",
+      "appRoot": ""
     }
   ],
   "e2e": {
@@ -36,15 +46,15 @@
   },
   "lint": [
     {
-      "project": "src/tsconfig.app.json",
+      "project": "apps/eg/src/tsconfig.app.json",
       "exclude": "**/node_modules/**"
     },
     {
-      "project": "src/tsconfig.spec.json",
+      "project": "./tsconfig.spec.json",
       "exclude": "**/node_modules/**"
     },
     {
-      "project": "e2e/tsconfig.e2e.json",
+      "project": "eg/tsconfig.e2e.json",
       "exclude": "**/node_modules/**"
     }
   ],
@@ -55,6 +65,14 @@
   },
   "defaults": {
     "styleExt": "scss",
-    "component": {}
+    "component": {},
+    "schematics": {
+      "collection": "@nrwl/schematics",
+      "postGenerate": "npm run format",
+      "newProject": [
+        "app",
+        "lib"
+      ]
+    }
   }
 }
