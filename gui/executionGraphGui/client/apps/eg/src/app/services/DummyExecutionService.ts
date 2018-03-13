@@ -3,12 +3,12 @@ import { ExecutionService } from './ExecutionService';
 
 @Injectable()
 export class DummyExecutionService extends ExecutionService {
-    constructor() {
-        super();
-    }
+  constructor() {
+    super();
+  }
 
-    public execute(): Promise<void> {
-        console.log(`[DummyExecutionService] execute()`);
-        return Promise.resolve();
-    }
+  public execute(): Promise<void> {
+    console.log(`[DummyExecutionService] execute()`);
+    return Promise.resolve();
+  }
 }

@@ -2,15 +2,13 @@
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
     "outDir": "../../../dist/out-tsc/apps/eg",
-    "baseUrl": "./",
-    "module": "es2015",
-    "types": []
+    "module": "es2015"
   },
-  "exclude": [
-    "test.ts",
-    "**/*.spec.ts"
-  ],
   "include": [
     "**/*.ts"
+    /* add all lazy-loaded libraries here: "../../../libs/my-lib/index.ts" */
+  ],
+  "exclude": [
+    "**/*.spec.ts"
   ]
 }

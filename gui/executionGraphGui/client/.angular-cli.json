@@ -1,12 +1,37 @@
 {
   "$schema": "./node_modules/@nrwl/schematics/src/schema.json",
   "project": {
-    "name": "eg-client",
+    "name": "eg",
     "npmScope": "eg",
     "latestMigration": "20180227-cleanup-scripts"
   },
+  "e2e": {
+    "protractor": {
+      "config": "./protractor.conf.js"
+    }
+  },
+  "lint": [
+    {
+      "project": "./tsconfig.spec.json",
+      "exclude": "**/node_modules/**"
+    },
+    {
+      "project": "apps/eg/src/tsconfig.app.json",
+      "exclude": "**/node_modules/**"
+    },
+    {
+      "project": "apps/eg/e2e/tsconfig.e2e.json",
+      "exclude": "**/node_modules/**"
+    }
+  ],
+  "test": {
+    "karma": {
+      "config": "./karma.conf.js"
+    }
+  },
   "apps": [
     {
+      "name": "eg",
       "root": "apps/eg/src",
       "outDir": "dist/apps/eg",
       "assets": [
@@ -19,7 +44,7 @@
       "test": "../../../test.js",
       "tsconfig": "tsconfig.app.json",
       "testTsconfig": "../../../tsconfig.spec.json",
-      "prefix": "eg",
+      "prefix": "app",
       "styles": [
         "styles.css"
       ],
@@ -28,51 +53,28 @@
       "environments": {
         "dev": "environments/environment.ts",
         "prod": "environments/environment.prod.ts"
-      },
-      "name": "eg"
+      }
     },
     {
       "name": "graph",
       "root": "libs/graph/src",
       "test": "../../../test.js",
-      "prefix": "eg",
+      "appRoot": ""
+    },
+    {
+      "name": "$workspaceRoot",
+      "root": ".",
       "appRoot": ""
     }
   ],
-  "e2e": {
-    "protractor": {
-      "config": "./protractor.conf.js"
-    }
-  },
-  "lint": [
-    {
-      "project": "apps/eg/src/tsconfig.app.json",
-      "exclude": "**/node_modules/**"
-    },
-    {
-      "project": "./tsconfig.spec.json",
-      "exclude": "**/node_modules/**"
-    },
-    {
-      "project": "eg/tsconfig.e2e.json",
-      "exclude": "**/node_modules/**"
-    }
-  ],
-  "test": {
-    "karma": {
-      "config": "./karma.conf.js"
-    }
-  },
   "defaults": {
-    "styleExt": "scss",
-    "component": {},
     "schematics": {
-      "collection": "@nrwl/schematics",
-      "postGenerate": "npm run format",
-      "newProject": [
-        "app",
-        "lib"
-      ]
-    }
+      "collection": "@nrwl/schematics"
+    },
+    "styleExt": "css",
+    "component": {}
+  },
+  "warnings": {
+    "typescriptMismatch": false
   }
 }

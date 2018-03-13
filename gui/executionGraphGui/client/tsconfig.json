@@ -1,7 +1,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
@@ -15,11 +14,15 @@
       "es2017",
       "dom"
     ],
+    "baseUrl": ".",
     "paths": {
       "@eg/*": [
         "libs/*"
       ]
-    },
-    "baseUrl": "."
-  }
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
 }

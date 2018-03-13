@@ -2,7 +2,6 @@
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
     "outDir": "../../../dist/out-tsc/e2e/eg",
-    "baseUrl": "./",
     "module": "commonjs",
     "target": "es5",
     "types": [
@@ -11,10 +10,11 @@
       "node"
     ]
   },
-  "exclude": [
-    "**/*.spec.ts"
-  ],
   "include": [
     "../**/*.ts"
+    /* add all lazy-loaded libraries here: "../../../libs/my-lib/index.ts" */
+  ],
+  "exclude": [
+    "**/*.spec.ts"
   ]
 }

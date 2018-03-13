@@ -21,23 +21,23 @@ import { WorkspaceComponent } from './components/workspace/workspace.component';
 import { environment } from '../environments/environment';
 
 @NgModule({
-    declarations: [AppComponent, ToolbarComponent, WorkspaceComponent],
-    imports: [
-        HttpClientModule,
-        BrowserModule,
-        BrowserAnimationsModule,
-        MatIconModule,
-        MatToolbarModule,
-        MatMenuModule,
-        MatButtonModule,
-        MatCheckboxModule,
-        GraphModule
-    ],
-    providers: [
-        CefMessageRouterService,
-        CefBinaryRouterService,
-        { provide: ExecutionService, useClass: environment.production ? CefExecutionService : DummyExecutionService }
-    ],
-    bootstrap: [AppComponent]
+  declarations: [AppComponent, ToolbarComponent, WorkspaceComponent],
+  imports: [
+    HttpClientModule,
+    BrowserModule,
+    BrowserAnimationsModule,
+    MatIconModule,
+    MatToolbarModule,
+    MatMenuModule,
+    MatButtonModule,
+    MatCheckboxModule,
+    GraphModule
+  ],
+  providers: [
+    CefMessageRouterService,
+    CefBinaryRouterService,
+    { provide: ExecutionService, useClass: environment.production ? CefExecutionService : DummyExecutionService }
+  ],
+  bootstrap: [AppComponent]
 })
 export class AppModule {}
