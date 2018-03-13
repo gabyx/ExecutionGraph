@@ -11,10 +11,35 @@
 //! ========================================================================================
 
 #include "backend/DummyBackendRequestHandler.hpp"
+#include <chrono>
 #include <common/Loggers.hpp>
+
+namespace
+{
+    const std::string c_debugResponse = "Hello from ExecutionGraphBackend!";
+}
 
 bool DummyBackendRequestHandler::handleRequest(const Request& m_request, ResponsePromise& m_response)
 {
-    EXECGRAPHGUI_APPLOG_INFO("DummyBackendRequestHandler::handleRequest");
+    EXECGRAPHGUI_BACKENDLOG_INFO("DummyBackendRequestHandler::handleRequest");
+    using namespace std::chrono_literals;
+
+    EXECGRAPHGUI_BACKENDLOG_INFO("DummyBackendRequestHandler: Computing started [2sec] ...");
+    std::this_thread::sleep_for(1.3s);
+    EXECGRAPHGUI_BACKENDLOG_INFO("DummyBackendRequestHandler: Computing finished!");
+
+    BinaryBuffer<BufferPool> buffer(c_debugResponse.size(), m_response.getAllocator());
+
+    auto it = buffer.begin();
+    for(const char& v : c_debugResponse)
+    {
+        *it = v;
+        ++it;
+    }
+    EXECGRAPHGUI_BACKENDLOG_INFO("DummyBackendRequestHandler: Allocated Payload");
+
+    // Set the response ready!
+    m_response.setReady(ResponsePromise::Payload{std::move(buffer), "application/octet-stream"});
+
     return true;
 }

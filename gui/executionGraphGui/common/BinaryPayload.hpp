@@ -28,9 +28,17 @@
 class BinaryPayload final
 {
 public:
-    template<typename Buffer>
-    BinaryPayload(Buffer&& buffer, const std::string& mimeType)
-        : m_buffer(std::forward<Buffer>(buffer)), m_mimeType(mimeType)
+    using Buffer = BinaryBuffer<BufferPool>;
+
+public:
+    //! Representing an empty payload!
+    template<typename TBuffer>
+    BinaryPayload(TBuffer&& buffer)
+        : m_buffer(std::forward<TBuffer>(buffer)){};
+
+    template<typename TBuffer>
+    BinaryPayload(TBuffer&& buffer, const std::string& mimeType)
+        : m_buffer(std::forward<TBuffer>(buffer)), m_mimeType(mimeType)
     {
     }
 
@@ -44,14 +52,14 @@ public:
     BinaryPayload(BinaryPayload&&) = default;
     BinaryPayload& operator=(BinaryPayload&&) = default;
 
-    BinaryBuffer<BufferPool>& getBuffer();
-    const BinaryBuffer<BufferPool>& getBuffer() const;
+    Buffer& getBuffer() { return m_buffer; }
+    const Buffer& getBuffer() const { return m_buffer; }
 
     const std::string& getMIMEType() const { return m_mimeType; }
 
 private:
-    BinaryBuffer<BufferPool> m_buffer;  //!< The binary buffer.
-    std::string m_mimeType;             //!< The MIME type of the binary buffer.
+    Buffer m_buffer;         //!< The binary buffer.
+    std::string m_mimeType;  //!< The MIME type of the binary buffer.
 };
 
 #endif

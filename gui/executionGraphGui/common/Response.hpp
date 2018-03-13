@@ -109,6 +109,9 @@ public:
         setCanceledImpl(reason);  // forward to actual instance
     }
 
+    //! Return the allocator for allocating the payload.
+    auto getAllocator() { return m_allocator; }
+
 protected:
     virtual void setReadyImpl()                             = 0;
     virtual void setCanceledImpl(const std::string& reason) = 0;

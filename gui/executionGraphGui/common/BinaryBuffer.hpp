@@ -19,7 +19,7 @@
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
-    Simple Binary Buffer View
+    Simple Binary Buffer
     Can be moved around but not copied.
 
     @date Mon Mar 05 2018

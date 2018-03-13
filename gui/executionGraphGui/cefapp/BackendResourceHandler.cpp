@@ -11,10 +11,12 @@
 //! ========================================================================================
 
 #include "cefapp/BackendResourceHandler.hpp"
+#include <algorithm>
 #include <array>
 #include <cef_parser.h>
 #include <chrono>
 #include <executionGraph/common/Assert.hpp>
+#include <executionGraph/common/Exception.hpp>
 #include <thread>
 #include <wrapper/cef_closure_task.h>
 #include <wrapper/cef_helpers.h>
@@ -26,31 +28,6 @@
 
 namespace
 {
-    const std::array<uint8_t, 10> c_debugResponse = {'e', 'x', 'e', 'c', 'g', 'r', 'a', 'p', 'h', '!'};
-
-    //! Printing the binary data
-    void printPostData(const BinaryBuffer<BufferPool>& buffer)
-    {
-        std::stringstream ss;
-        for(const uint8_t& byte : buffer)
-        {
-            ss << byte << ",";
-        }
-        EXECGRAPHGUI_APPLOG_DEBUG("PostData received: '{0}'", ss.str());
-    }
-
-    //! Wait some time in another other to simulate working.
-    void debugWaitOnOtherThread(CefRefPtr<CefCallback> callback)
-    {
-        using namespace std::chrono_literals;
-
-        EXECGRAPHGUI_APPLOG_DEBUG("Computing started [2sec] ...");
-        std::this_thread::sleep_for(1.3s);
-        EXECGRAPHGUI_APPLOG_DEBUG("Computing finished!");
-
-        callback->Continue();  // Signal that response headers are here.
-    }
-
     //! Read the post data `postData` and store it in the `BinaryBuffer`.
     template<typename RawAllocator>
     bool readPostData(CefRefPtr<CefPostData> postData,
@@ -112,8 +89,27 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
 {
     CEF_REQUIRE_IO_THREAD();
 
-    response->SetMimeType("application/octet-stream");
-    responseLength = c_debugResponse.size();  // quit the ReadResponse after 10bytes have been read (-1 for manual quitting)
+    auto& future = m_responseFuture.getFuture();
+
+    try
+    {
+        EXECGRAPH_THROW_EXCEPTION_IF(!future.valid(), "Future is invalid!")
+        m_payload = future.get();  // Set the payload!
+
+        response->SetMimeType(m_payload.getMIMEType());    // set the mime type
+        responseLength = m_payload.getBuffer().getSize();  // set the response byte size
+        response->SetStatusText("success");
+        response->SetStatus(200);  // http status code: 200 := The request has succeeded! (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
+
+        m_bytesRead = 0;
+    }
+    catch(const std::exception& e)
+    {
+        // Exception while processing the request -> abort!
+        response->SetStatusText(e.what());
+        response->SetStatus(400);  // http status code: 400 : Bad request!
+        response->SetError(cef_errorcode_t::ERR_FAILED);
+    }
 }
 
 //! Process the request (see: http://magpcss.org/ceforum/apidocs3/projects/(default)/CefResourceHandler.html)
@@ -151,15 +147,7 @@ bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
     m_responseFuture = ResponseFuture(responseCef);
 
     // Add the request to the dispatcher (threaded)
-
     m_dispatcher->addRequest(std::move(requestCef), std::move(responseCef));
-
-    // {  // DEBUG ==========
-    //     m_bytesRead = 0;
-    //     // FILE Threads does not block UI,
-    //     CefPostTask(TID_FILE, base::Bind(&debugWaitOnOtherThread, cbResponseHeaderReady));
-
-    // }  // DEBUG ==========
 
     return true;
 }
@@ -172,23 +160,25 @@ bool BackendResourceHandler::ReadResponse(void* dataOut,
 {
     CEF_REQUIRE_IO_THREAD();
     // Handle the repsponse
-    // todo
-    {  // DEBUG ==========
-        if(m_bytesRead < c_debugResponse.size())
-        {
-            std::memcpy(dataOut, c_debugResponse.data() + m_bytesRead, 1);
-            m_bytesRead++;
-            bytesRead = 1;  // one byte read
-            return true;
-        }
-        else
-        {
-            // Response is finished, we returned all bytes to read, so
-            // finish up and return false.
-            finish();
-            return false;
-        }
-    }  // DEBUG ==========
+
+    auto bufferSize = m_payload.getBuffer().getSize();
+
+    if(m_bytesRead < bufferSize)
+    {
+        // Copy as many bytes as possible into the output buffer
+        std::size_t nBytes = std::min(std::size_t(bytesToRead), bufferSize - m_bytesRead);
+        std::memcpy(dataOut, m_payload.getBuffer().getData() + m_bytesRead, nBytes);
+        m_bytesRead += nBytes;
+        bytesRead = nBytes;
+        return true;
+    }
+    else
+    {
+        // Response is finished, we copied all bytes into the output buffer, so
+        // finish up and return false.
+        finish();
+        return false;
+    }
 }
 
 //! Initilize the request by extracting the requestId and query string.
