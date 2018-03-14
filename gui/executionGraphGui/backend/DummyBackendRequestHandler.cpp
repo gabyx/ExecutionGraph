@@ -24,9 +24,11 @@ bool DummyBackendRequestHandler::handleRequest(const Request& m_request, Respons
     EXECGRAPHGUI_BACKENDLOG_INFO("DummyBackendRequestHandler::handleRequest");
     using namespace std::chrono_literals;
 
-    EXECGRAPHGUI_BACKENDLOG_INFO("DummyBackendRequestHandler: Computing started [2sec] ...");
-    std::this_thread::sleep_for(1.3s);
+    EXECGRAPHGUI_BACKENDLOG_INFO("DummyBackendRequestHandler: Computing started [1sec] ...");
+    std::this_thread::sleep_for(1.0s);
     EXECGRAPHGUI_BACKENDLOG_INFO("DummyBackendRequestHandler: Computing finished!");
+
+    EXECGRAPH_THROW_EXCEPTION_IF(std::rand() % 2 == 0, "DummyBackendRequestHandler: Spontanously deciced to throw a meaningless exception! Because its fun!")
 
     BinaryBuffer<BufferPool> buffer(c_debugResponse.size(), m_response.getAllocator());
 

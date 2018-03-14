@@ -88,9 +88,9 @@ public:
         doRandomStuff(threadId, m_i, std::to_string(m_i));
     }
 
-    void onTaskException(const std::string& what)
+    void onTaskException(std::exception_ptr e)
     {
-        PrintThread{} << "Task: " << m_i << " exception: " << what << std::endl;
+        PrintThread{} << "Task: " << m_i << " exception: " << std::endl;
     }
 
     int m_i;
@@ -103,9 +103,9 @@ struct ITask
         : m_i(i) {}
     virtual ~ITask()                               = default;
     virtual void runTask(std::thread::id threadId) = 0;
-    virtual void onTaskException(const std::string& what)
+    virtual void onTaskException(std::exception_ptr e)
     {
-        PrintThread{} << "ITask: " << m_i << " exception: " << what << std::endl;
+        PrintThread{} << "ITask: " << m_i << " exception!" << std::endl;
     }
     int m_i;
 };

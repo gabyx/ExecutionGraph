@@ -27,7 +27,9 @@ namespace executionGraph
         A task consumer thread which pops tasks from a thread-safe queue
         and executes them in its consumer loop.
 
-        The tasks need a call operator `operator(std::thread:id id)`.
+        The tasks need the following public interface: 
+        - void runTask(std::thread:id)
+        - void onTaskException(std::exception_ptr e)
 
         @date Sun Feb 18 2018
         @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
@@ -119,13 +121,9 @@ namespace executionGraph
                     {
                         Dispatch<Task>::runTask(*optionalTask, getId());  // run the task in this consumer thread.
                     }
-                    catch(const std::exception& e)
-                    {
-                        Dispatch<Task>::onTaskException(*optionalTask, e.what());
-                    }
                     catch(...)
                     {
-                        Dispatch<Task>::onTaskException(*optionalTask, "An unknown unhandled exception occured!");
+                        Dispatch<Task>::onTaskException(*optionalTask, std::current_exception());
                     }
                 }
             }

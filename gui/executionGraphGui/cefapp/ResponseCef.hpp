@@ -53,7 +53,7 @@ private:
         m_cbResponseHeaderReady = nullptr;  // Set to nullptr to mark that it has been called!
     }
 
-    virtual void setCanceledImpl(const std::string& reason) override
+    virtual void setCanceledImpl(std::exception_ptr exception) override
     {
         // Signal that the response is available (an exception is set in the promise!)
         m_cbResponseHeaderReady->Continue();

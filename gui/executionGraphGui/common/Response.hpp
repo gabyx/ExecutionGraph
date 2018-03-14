@@ -97,7 +97,7 @@ public:
     }
 
     //! Callback for signaling that this request is cancled.
-    void setCanceled(const std::string& reason)
+    void setCanceled(std::exception_ptr exception)
     {
         if(m_state != State::Nothing)
         {
@@ -105,16 +105,16 @@ public:
             return;
         }
         m_state = State::Canceled;
-        m_promisePayload.set_exception(std::make_exception_ptr(std::runtime_error(reason)));
-        setCanceledImpl(reason);  // forward to actual instance
+        m_promisePayload.set_exception(exception);
+        setCanceledImpl(exception);  // forward to actual instance
     }
 
     //! Return the allocator for allocating the payload.
     auto getAllocator() { return m_allocator; }
 
 protected:
-    virtual void setReadyImpl()                             = 0;
-    virtual void setCanceledImpl(const std::string& reason) = 0;
+    virtual void setReadyImpl()                                = 0;
+    virtual void setCanceledImpl(std::exception_ptr exception) = 0;
 
     //! Function to be called in derived classed, which want to automatically
     //! resolve on destruction!
@@ -125,7 +125,7 @@ protected:
             if(m_bCancelOnDestruction)
             {
                 EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', has not been resolved. It will be cancled!", m_requestId.getUniqueName());
-                setCanceled("Cancled promise on destruction, because of unknown reason!");
+                setCanceled(std::make_exception_ptr(std::runtime_error("Cancled promise on destruction, because of unknown reason!")));
             }
         }
     }

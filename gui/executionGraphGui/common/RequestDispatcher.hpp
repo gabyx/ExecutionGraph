@@ -209,14 +209,17 @@ private:
                 }
             }
 
-            EXECGRAPHGUI_APPLOG_WARN("Request id: '{0}' has not been handled, it will be cancled!", m_request.getId().getUniqueName());
-            m_response.setCanceled("No handler found!");
+            EXECGRAPHGUI_APPLOG_WARN("RequestDispatcher: Request id: '{0}' has not been handled, it will be cancled!", m_request.getId().getUniqueName());
+            EXECGRAPH_THROW_EXCEPTION("No handler found!");
         };
 
-        void onTaskException(const std::string& what)
+        void onTaskException(std::exception_ptr e)
         {
-            EXECGRAPHGUI_APPLOG_WARN("Request id: '{0}' has thrown exception: {1}, it will be cancled!", m_request.getId().getUniqueName(), what);
-            m_response.setCanceled(what);
+            EXECGRAPHGUI_APPLOG_WARN(
+                "RequestDispatcher: Request id: '{0}' has thrown exception, "
+                "it will be cancled!",
+                m_request.getId().getUniqueName());
+            m_response.setCanceled(e);
         };
 
     private:
