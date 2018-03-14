@@ -28,6 +28,17 @@
 
 namespace
 {
+    //! Printing the binary data
+    void printPostData(const BinaryBuffer<BufferPool>& buffer)
+    {
+        std::stringstream ss;
+        for(const uint8_t& byte : buffer)
+        {
+            ss << byte << ",";
+        }
+        EXECGRAPHGUI_APPLOG_DEBUG("PostData received: '{0}'", ss.str());
+    }
+
     //! Read the post data `postData` and store it in the `BinaryBuffer`.
     template<typename RawAllocator>
     bool readPostData(CefRefPtr<CefPostData> postData,
@@ -56,8 +67,8 @@ namespace
             // Allocate BinaryBuffer
             BinaryBuffer<BufferPool> buffer(element->GetBytesCount(), allocator);
             element->GetBytes(buffer.getSize(), static_cast<void*>(buffer.getData()));
-            EXECGRAPHGUI_APPLOG_DEBUG("BackendResourceHandler: Read last post data element: bytes: {0}.", element->GetBytesCount());
             EXECGRAPHGUI_LOGCODE_DEBUG(printPostData(buffer));
+            EXECGRAPHGUI_APPLOG_DEBUG("BackendResourceHandler: Read last post data element: bytes: {0}.", element->GetBytesCount());
             payload = RequestCef::Payload{std::move(buffer), mimeType};
             return true;  // continue
         }
