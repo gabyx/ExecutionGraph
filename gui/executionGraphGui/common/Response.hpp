@@ -26,10 +26,11 @@
 /*!
     A move-only response promise wrapper.
 
-    Such an instance is created by a `BackendRequestHandler`, 
+    Such an instance is created by a `BackendResourceHandler`, 
     which will move it to the BackendRequestHandler.
 
-    The `BackendRequestHandler` will extract the future for read access to the payload. 
+    The `BackendResourceHandler` will extract the future for read access to the payload
+    once the `ResponsePromise` has been resolved. 
 
     @date Thu Feb 22 2018
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
@@ -146,7 +147,7 @@ private:
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
-    Futre wrapper which only allows to read the response.
+    Future wrapper which only allows to read the response.
 
     @date Thu Mar 01 2018
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
