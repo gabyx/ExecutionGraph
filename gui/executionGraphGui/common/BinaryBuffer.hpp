@@ -39,10 +39,7 @@ public:
 
 public:
     //! Constructor for an empty buffer!
-    BinaryBuffer(std::shared_ptr<RawAllocator> allocator)
-        : m_allocator(allocator)
-        , m_data(nullptr, Deleter{foonathan::memory::make_allocator_reference(*allocator), 0})
-    {}
+    BinaryBuffer() = default;
 
     //! Constructor for a meaningful buffer!
     BinaryBuffer(std::size_t bytes, std::shared_ptr<RawAllocator> allocator)

@@ -3,7 +3,7 @@ include(FindPackageHandleStandardArgs)
 
 # Try to find the library, if it is installed!
 # otherwise download it
-set(URL "https://github.com/gabyx/memory.git")
+set(URL "https://github.com/foonathan/memory.git")
 set(INSTALL_DIR "${ExecutionGraph_EXTERNAL_INSTALL_DIR}/memory")
 
 message(STATUS "memory library finding ...")

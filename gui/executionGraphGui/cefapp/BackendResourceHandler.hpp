@@ -45,7 +45,6 @@ public:
         , m_id("BackendResourceHandler")
         , m_dispatcher(dispatcher)
         , m_allocator(allocator)
-        , m_payload(ResponseFutureCef::Payload::Buffer{allocator})
         , m_deleter(deleter)
     {}
 
@@ -85,7 +84,7 @@ private:
     std::shared_ptr<BackendRequestDispatcher> m_dispatcher;  //!< The dispatcher to which request/response get dispatched.
     std::shared_ptr<BufferPool> m_allocator;                 //!< The allocator for `BinaryPayload` of request and responses.
     ResponseFutureCef m_responseFuture;                      //!< The response future we await in the resource handler.
-    ResponseFutureCef::Payload m_payload;                    //!< The moved payload from the future.
+    ResponseFutureCef::Payload m_payload;                    //!< The moved payload from the future. (default = empty)
 
     std::size_t m_bytesRead = 0;  // DEBUG ==========
 

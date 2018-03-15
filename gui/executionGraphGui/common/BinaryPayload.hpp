@@ -31,11 +31,10 @@ public:
     using Buffer = BinaryBuffer<BufferPool>;
 
 public:
-    //! Representing an empty payload!
-    template<typename TBuffer>
-    BinaryPayload(TBuffer&& buffer)
-        : m_buffer(std::forward<TBuffer>(buffer)){};
+    //! Representing an empty payload.
+    BinaryPayload() = default;
 
+    //! Representing a meaningful payload.
     template<typename TBuffer>
     BinaryPayload(TBuffer&& buffer, const std::string& mimeType)
         : m_buffer(std::forward<TBuffer>(buffer)), m_mimeType(mimeType)

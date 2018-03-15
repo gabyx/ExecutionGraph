@@ -104,6 +104,15 @@ MY_TEST(MemoryPool, Test3)
     }
 }
 
+MY_TEST(MemoryPool, TestingDefaultCTORDeleter)
+{
+    using RawAllocator = memory_pool<node_pool>;
+    using Deleter      = allocator_deleter<uint8_t[], RawAllocator>;
+    using RawPtr       = std::unique_ptr<uint8_t[], allocator_deleter<uint8_t[], RawAllocator>>;
+    Deleter d;
+    RawPtr p;
+}
+
 int main(int argc, char** argv)
 {
     testing::InitGoogleTest(&argc, argv);
