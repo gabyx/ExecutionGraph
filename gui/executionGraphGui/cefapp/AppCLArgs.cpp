@@ -22,7 +22,7 @@ AppCLArgs::AppCLArgs(int argc, char* argv[])
                          "client",
                          "Source path to the client application.",
                          {'c', "clientSourcePath"},
-                         this->getApplicationPath().parent_path().append("/../client"))
+                         this->getApplicationPath().parent_path().append("/../client/apps/eg"))
     , m_logPath(m_parser,
                 "logPath",
                 "Directory path where all logs are placed.",

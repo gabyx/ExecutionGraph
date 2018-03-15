@@ -6,6 +6,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build-watch": "ng build --prod --watch",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
@@ -41,7 +42,10 @@
     "core-js": "^2.4.1",
     "material-design-icons": "^3.0.1",
     "msgpack-lite": "^0.1.26",
+    "npm": "^5.7.1",
     "rxjs": "^5.5.6",
+    "to": "^0.2.9",
+    "update": "^0.7.4",
     "zone.js": "^0.8.19"
   },
   "devDependencies": {
