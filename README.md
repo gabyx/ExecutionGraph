@@ -1,5 +1,5 @@
 This library is in alpha and still under development. First usable version will be `v1.0.1`.
-Note: This library is under heavy development (especially a gui client)! :-) Forking should mainly be considered for looking around :-), or contributing of course :)
+Note: This library is under heavy development on the `devGUI` branch! :-) Forking should mainly be considered for looking around :-), or contributing of course :)
 
 # ExecutionGraph [![Build Status](https://travis-ci.org/gabyx/ExecutionGraph.svg?branch=master)](https://travis-ci.org/gabyx/ExecutionGraph) ![Deps](https://img.shields.io/badge/dependencies-eigen3,meta-blue.svg) ![System](https://img.shields.io/badge/system-linux,osx-lightgrey.svg)
 Fast Execution Graph consisting of Execution Nodes
