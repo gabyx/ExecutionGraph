@@ -19,6 +19,7 @@ find_package(MemoryLib) # memory pool
 if(${ExecutionGraph_BUILD_GUI})
     find_package(CEFLib)
     find_package(RTTRLib)
+    find_package(FlatBuffersLib)
 endif()
 
 if(${ExecutionGraph_BUILD_TESTS})

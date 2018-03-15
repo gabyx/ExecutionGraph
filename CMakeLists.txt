@@ -182,6 +182,9 @@ list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "memoryLib")
 # Try find cereal
 # find_package(CerealLib REQUIRED)
 # list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "cerealLib")
+# Try find flatbuffer
+find_package(FlatBuffersLib REQUIRED)
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "flatbuffersLib")
 
 set_target_properties(ExecutionGraph::Core-Dependencies PROPERTIES INTERFACE_LINK_LIBRARIES "${ExecutionGraph_LINK_TARGETS_CORE_DEP}")
 
