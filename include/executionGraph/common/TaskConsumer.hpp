@@ -28,7 +28,7 @@ namespace executionGraph
         and executes them in its consumer loop.
 
         The tasks need the following public interface: 
-        - void runTask(std::thread:id)
+        - void runTask(std::thread::id)
         - void onTaskException(std::exception_ptr e)
 
         @date Sun Feb 18 2018
@@ -97,18 +97,34 @@ namespace executionGraph
         template<typename T>
         struct Dispatch<T, EXECGRAPH_SFINAE_ENABLE_IF_CLASS(!IsPointerType<T>{})>
         {
-            template<typename... Args>
-            static void runTask(T& task, Args&&... args)
+            template<typename TT, typename... Args>
+            static void runTask(TT&& task, Args&&... args)
             {
                 task.runTask(std::forward<Args>(args)...);
             }
-            template<typename... Args>
-            static void onTaskException(T& task, Args&&... args)
+            template<typename TT, typename... Args>
+            static void onTaskException(TT&& task, Args&&... args)
             {
                 task.onTaskException(std::forward<Args>(args)...);
             }
         };
 
+    public:
+        // Static run loop, to execute the task right away in calling thread.
+        template<typename T, typename... Args>
+        static void Run(T&& task, std::thread::id threadId)
+        {
+            try
+            {
+                Dispatch<Task>::runTask(std::forward<T>(task), threadId);  // run the task
+            }
+            catch(...)
+            {
+                Dispatch<Task>::onTaskException(std::forward<T>(task), std::current_exception());
+            }
+        }
+
+    private:
         //! Consumer run loop.
         void run()
         {
@@ -117,14 +133,7 @@ namespace executionGraph
                 auto optionalTask = m_queue->pop();
                 if(optionalTask)
                 {
-                    try
-                    {
-                        Dispatch<Task>::runTask(*optionalTask, getId());  // run the task in this consumer thread.
-                    }
-                    catch(...)
-                    {
-                        Dispatch<Task>::onTaskException(*optionalTask, std::current_exception());
-                    }
+                    Run(*optionalTask, getId());
                 }
             }
         }

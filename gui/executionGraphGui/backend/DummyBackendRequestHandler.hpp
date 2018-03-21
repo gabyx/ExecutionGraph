@@ -31,7 +31,10 @@ public:
     }
 
 public:
-    bool handleRequest(const Request& m_request, ResponsePromise& m_response) override;
+    void handleRequest(const Request& m_request, ResponsePromise& m_response) override;
+
+public:
+    const std::unordered_set<std::string>& getRequestTypes() const override;
 
 private:
     std::shared_ptr<ExecutionGraphBackend> m_backend;

@@ -10,10 +10,10 @@ export class CefExecutionService extends ExecutionService {
   }
 
   public execute(): Promise<void> {
-    return this.messageRouter.execute('executeGraph', {
+    return this.messageRouter.execute('general/addGraph', {
       payload: {
-        graphId: 12,
-        args: 'gugus'
+        number: 12,
+        string: 'gugus'
       }
     });
   }

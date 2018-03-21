@@ -161,14 +161,14 @@ bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
     // over to the message dispatcher.
     ////////////////////////////////////////////////////
     // Make a RequestCef (move the payload into it)
-    RequestCef requestCef(m_requestType, std::move(payload));
+    auto requestCef = std::make_unique<RequestCef>(m_requestURL, std::move(payload));
     // Make a ResponseCef
-    ResponsePromiseCef responseCef(cbResponseHeaderReady, requestCef.getId(), m_allocator, true);
+    auto responseCef = std::make_unique<ResponsePromiseCef>(cbResponseHeaderReady, requestCef->getId(), m_allocator, true);
     // Get the future out
-    m_responseFuture = ResponseFuture(responseCef);
+    m_responseFuture = ResponseFuture(*responseCef);
 
     // Add the request to the dispatcher (threaded)
-    m_dispatcher->addRequest(std::move(requestCef), std::move(responseCef));
+    m_dispatcher->handleRequest(std::move(requestCef), std::move(responseCef));
 
     return true;
 }
@@ -217,10 +217,10 @@ bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
     }
 
     // Exctract requestId
-    // e.g. m_requestType := "catergory/subcategory/command"
-    m_requestType = executionGraph::splitLeadingSlashes(CefString(urlParts.path.str).ToString());
+    // e.g. m_requestURL := "catergory/subcategory/command"
+    m_requestURL = executionGraph::splitLeadingSlashes(CefString(urlParts.path.str).ToString());
 
-    if(m_requestType.empty())
+    if(m_requestURL.empty())
     {
         EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler id: '{0}' : url '{1}': requestId extract failed!",
                                   getId().getName(),
@@ -258,7 +258,7 @@ bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
 //! Finish handling the request: Reset everything and signal callback.
 void BackendResourceHandler::finish()
 {
-    m_requestType.clear();
+    m_requestURL.clear();
     m_query.clear();
     m_mimeType.clear();
 }

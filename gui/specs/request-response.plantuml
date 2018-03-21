@@ -16,10 +16,10 @@ namespace common {
 
     class BufferPool
     class Request #33cc33 {
-        + getRequestType()
+        + getRequestURL()
         + getPayload() {abstract}
         - m_id
-        - m_requestType
+        - m_requestURL
     }
     class ResponsePromise #ff6600 {
         + setCancel(what)

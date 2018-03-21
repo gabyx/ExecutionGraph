@@ -24,7 +24,7 @@
     General Request Message
 
     A BackendRequestHandler is handling such a request. It can be registered in
-    the message dispatcher for handling one or several request ids (see `m_requestType`)
+    the message dispatcher for handling one or several request ids (see `m_requestURL`)
     The request id is in the form "category/subcategory" (e.g. "graphManip/addNode").
     We use a category and a subcategory to be able to structure requests into groups.
     Also for the future, when more and more requests get added.
@@ -45,17 +45,19 @@ public:
     using Payload = BinaryPayload;
 
 protected:
-    Request(const std::string& requestType)
-        : m_id("Request-" + requestType)
-        , m_requestType(requestType)
+    Request(const std::path& requestURL)
+        : m_id("Request-" + requestURL.string())
+        , m_requestURL(requestURL)
     {}
 
 public:
     virtual ~Request() = default;
 
 public:
-    //! Get the request id describing this message.
-    virtual const std::string& getRequestType() { return m_requestType; }
+    //! Get the request url describing this message.
+    const std::path& getRequestURL() { return m_requestURL; }
+    //! Set the request url describing this message.
+    void setRequestURL(const std::path& requestURL) { m_requestURL = requestURL; }
 
 public:
     //! Get the payload of this request. Nullptr if there is no payload for this request.
@@ -63,10 +65,10 @@ public:
     virtual const Payload* getPayload() const = 0;
 
 private:
-    //! The requestType "<category>/<subcategory>" (e.g. "graphManip/addNode")
-    //! A BackendRequestHandler handling such a requestType can be registered on
-    //! a set of such requestIds.
-    std::string m_requestType;
+    //! The request URL (it will get adjusted during request forwarding)
+    //! e.g. "graph/6fdb1cb9-2d2b-46ba-93b5-0b7083ea28c3/addNode"
+    //! e.g. "general/addGraph"
+    std::path m_requestURL;
 };
 
 #endif

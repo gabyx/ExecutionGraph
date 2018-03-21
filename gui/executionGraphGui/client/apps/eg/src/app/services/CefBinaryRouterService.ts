@@ -11,10 +11,10 @@ import * as ab2s from 'arraybuffer-to-string';
 export class CefBinaryRouterService {
   constructor(private httpClient: HttpClient) {}
 
-  public async execute<T>(requestId: string, payload: any): Promise<void> {
+  public async execute<T>(requestURL: string, payload: any): Promise<void> {
     console.log('[CefBinaryRouterService] send()');
     await this.testSend(
-      `http://executiongraph-backend/${requestId}`,
+      `http://executiongraph-backend/${requestURL}`,
       this.createBinaryData(payload),
       'application/octet-stream'
     );

@@ -16,6 +16,7 @@
 #include <executionGraph/common/IObjectID.hpp>
 #include <memory>
 #include <rttr/type>
+#include <unordered_set>
 #include "backend/Backend.hpp"
 #include "common/Request.hpp"
 #include "common/Response.hpp"
@@ -32,7 +33,11 @@ public:
     BackendRequestHandler(const BackendRequestHandler&) = delete;
     BackendRequestHandler& operator=(const BackendRequestHandler&) = delete;
 
-    virtual bool handleRequest(const Request& m_request, ResponsePromise& m_response) = 0;
+    //! Return all request types which this handler will handle.
+    virtual const std::unordered_set<std::string>& getRequestTypes() const = 0;
+
+    //! Handle the `request` by resolving the response promise `response`.
+    virtual void handleRequest(const Request& request, ResponsePromise& response) = 0;
 };
 
 #endif

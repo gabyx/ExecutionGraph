@@ -16,10 +16,16 @@
 
 namespace
 {
-    const std::string c_debugResponse = "Hello from ExecutionGraphBackend!";
+    const std::string c_debugResponse                    = "Hello from ExecutionGraphBackend!";
+    const std::unordered_set<std::string> c_requestTypes = {"general/addGraph"};
+}  // namespace
+
+const std::unordered_set<std::string>& DummyBackendRequestHandler::getRequestTypes() const
+{
+    return c_requestTypes;
 }
 
-bool DummyBackendRequestHandler::handleRequest(const Request& m_request, ResponsePromise& m_response)
+void DummyBackendRequestHandler::handleRequest(const Request& m_request, ResponsePromise& m_response)
 {
     EXECGRAPHGUI_BACKENDLOG_INFO("DummyBackendRequestHandler::handleRequest");
     using namespace std::chrono_literals;
@@ -42,6 +48,4 @@ bool DummyBackendRequestHandler::handleRequest(const Request& m_request, Respons
 
     // Set the response ready!
     m_response.setReady(ResponsePromise::Payload{std::move(buffer), "application/octet-stream"});
-
-    return true;
 }

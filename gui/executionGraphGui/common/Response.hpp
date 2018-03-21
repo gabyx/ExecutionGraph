@@ -110,6 +110,8 @@ public:
         setCanceledImpl(exception);  // forward to actual instance
     }
 
+    bool isResolved() { return m_state != State::Nothing; }
+
     //! Return the allocator for allocating the payload.
     auto getAllocator() { return m_allocator; }
 
@@ -121,12 +123,12 @@ protected:
     //! resolve on destruction!
     virtual void setResolveOnDestruction()
     {
-        if(m_state == State::Nothing)
+        if(!isResolved())
         {
             if(m_bCancelOnDestruction)
             {
                 EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', has not been resolved. It will be cancled!", m_requestId.getUniqueName());
-                setCanceled(std::make_exception_ptr(std::runtime_error("Cancled promise on destruction, because of unknown reason!")));
+                setCanceled(std::make_exception_ptr(std::runtime_error("Cancled promise on destruction, because not handled properly!")));
             }
         }
     }
