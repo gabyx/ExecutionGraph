@@ -27,13 +27,13 @@
  */
 /* ---------------------------------------------------------------------------------------*/
 class BackendRequestDispatcher final : public RequestDispatcher<BackendRequestHandler,
-                                                                RequestCef,
-                                                                ResponsePromiseCef>
+                                                                Request,
+                                                                ResponsePromise>
 {
 public:
     using Base = RequestDispatcher<BackendRequestHandler,
-                                   RequestCef,
-                                   ResponsePromiseCef>;
+                                   Request,
+                                   ResponsePromise>;
 
 public:
     template<typename... Args>

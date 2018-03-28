@@ -23,21 +23,21 @@ export class CefMessageRouterService {
     this.cef = window as any;
   }
 
-  public execute<T>(requestId: string, payload: any): Promise<T> {
-    console.log(`[CefMessageRouterService] Executing '${requestId}'`);
+  public execute<T>(requestURL: string, payload: any): Promise<T> {
+    console.log(`[CefMessageRouterService] Executing '${requestURL}'`);
 
     return new Promise((resolve, reject) => {
-      var requestString = JSON.stringify({ requestId: requestId, payload: payload });
+      var requestString = JSON.stringify({ requestURL: requestURL, payload: payload });
 
       this.cef.cefQuery({
         request: requestString,
         persistent: false,
         onSuccess: response => {
-          console.log(`[CefMessageRouterService] Response for '${requestId}': ${response}`);
+          console.log(`[CefMessageRouterService] Response for '${requestURL}': ${response}`);
           resolve(response);
         },
         onFailure: (errorCode, errorMessage) => {
-          console.error(`[CefMessageRouterService] Request '${requestId}' failed (${errorCode}): ${errorMessage}`);
+          console.error(`[CefMessageRouterService] Request '${requestURL}' failed (${errorCode}): ${errorMessage}`);
           reject(errorMessage);
         }
       });
