@@ -26,6 +26,12 @@
 /* ---------------------------------------------------------------------------------------*/
 /*!
     A message dispatcher which dispatches to shared message handlers.
+    Forwarding the message can be achieved where the message handlers accept a moved
+    response and promise.
+    
+    Important:
+    The THandlerType::handleRequest function needs to be thread-safe (stateless handler) 
+    as it will be called on the same instance on possible multiple threads.
 
     @date Sun Feb 18 2018
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com

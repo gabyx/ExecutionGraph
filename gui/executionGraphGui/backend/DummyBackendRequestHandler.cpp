@@ -17,7 +17,7 @@
 namespace
 {
     const std::string c_debugResponse                    = "Hello from ExecutionGraphBackend!";
-    const std::unordered_set<std::string> c_requestTypes = {"general/addGraph"};
+    const std::unordered_set<std::string> c_requestTypes = {"general/dummyRequest"};
 }  // namespace
 
 const std::unordered_set<std::string>& DummyBackendRequestHandler::getRequestTypes() const
