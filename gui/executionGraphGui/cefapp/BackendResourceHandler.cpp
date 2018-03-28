@@ -167,7 +167,7 @@ bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
     // Get the future out
     m_responseFuture = ResponseFuture(*responseCef);
 
-    // Add the request to the dispatcher (threaded)
+    // Add the request to the dispatcher (multi-threaded)
     m_dispatcher->handleRequest(std::move(requestCef), std::move(responseCef));
 
     return true;
