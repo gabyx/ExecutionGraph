@@ -1,0 +1,26 @@
+include "LogicNode.fbs";
+include "SocketLink.fbs";
+
+namespace executionGraph.serialization;
+
+enum NodeClassification:byte
+{
+    NormalNode   = 0,
+    InputNode    = 1,
+    OutputNode   = 2,
+    ConstantNode = 3
+}
+
+table NodeProperty
+{
+    classification:NodeClassification (id:0);
+    groups:[uint64] (id:1);
+}
+
+table ExecutionGraph {
+    nodes:[LogicNode] (id:0);
+    links:[SocketLink] (id:1);
+    properties:[NodeProperty] (id:2);
+}
+
+root_type ExecutionGraph;

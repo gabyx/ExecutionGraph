@@ -8,6 +8,7 @@
         "shd101wyy.markdown-preview-enhanced",
         "EditorConfig.editorconfig",
         "msjsdiag.debugger-for-chrome",
-        "doi.fileheadercomment"
+        "doi.fileheadercomment",
+        "gaborv.flatbuffers"
     ]
 }

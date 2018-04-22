@@ -1,0 +1,11 @@
+
+include "LogicNodeDataUnion.fbs";
+
+namespace executionGraph.serialization;
+
+table LogicNode {
+  nodeId:uint64 (id: 0); //!< The unique logic node id.
+  type:string (id: 1); //!< The rtti of the logic node.
+  name:string (id: 2); //!< The name of the logic node.
+  data:LogicNodeDataUnion (id: 4); //!< The additional data for this node.
+}

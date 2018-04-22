@@ -1,0 +1,11 @@
+namespace executionGraph.serialization;
+
+struct SocketLink {
+    outNodeId:uint64 (id:1);
+    outSocketIdx:uint64 (id:2);
+
+    inNodeId:uint64 (id:3);
+    inSocketIdx:uint64 (id:4);
+
+    isWriteLink:bool (id:5);
+}

@@ -41,6 +41,18 @@
             "MIMode": "lldb"
         },
         {
+            "name": "(lldb) ExecutionGraphTests-Flatbuffer",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/tests/ExecutionGraphTest-Flatbuffer",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
             "name": "(lldb) ExecutionGraphTests-CEFSimple",
             "type": "cppdbg",
             "request": "launch",

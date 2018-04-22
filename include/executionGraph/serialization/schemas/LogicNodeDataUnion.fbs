@@ -1,0 +1,13 @@
+namespace executionGraph.serialization;
+
+table DummyNodeData
+{
+    dummy:int = 3;
+}
+
+union LogicNodeDataUnion
+{
+    DummyNodeData
+    // Insert here the additional data 
+    // you need for all your 
+}
