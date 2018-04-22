@@ -55,7 +55,7 @@ public:
 protected:
     ResponsePromise(Id requestId,
                     std::shared_ptr<BufferPool> allocator,
-                    bool bCancelOnDestruction = false)
+                    bool bCancelOnDestruction = true)
         : m_requestId(requestId)
         , m_allocator(allocator)
         , m_bCancelOnDestruction(bCancelOnDestruction){};

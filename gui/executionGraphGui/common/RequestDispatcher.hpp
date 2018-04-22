@@ -85,21 +85,17 @@ public:
         const auto& requestTypes = handler->getRequestTypes();
         EXECGRAPH_THROW_EXCEPTION_IF(!handler || requestTypes.size() == 0, "nullptr or no requestTypes");
 
-        for(auto& requestType : requestTypes)
-        {
-            EXECGRAPH_THROW_EXCEPTION_IF(m_specificHandlers.find(requestType) != m_specificHandlers.end(),
-                                         "Handler for request type:" << requestType << "already registered");
-        }
-
         Id id = handler->getId();
         EXECGRAPH_THROW_EXCEPTION_IF(m_handlerStorage.find(id) != m_handlerStorage.end(),
                                      "MessageHandler with id: " << id.getUniqueName() << " already exists!");
 
-        m_handlerStorage.emplace(id, HandlerData{requestTypes, handler});
+        auto p = m_handlerStorage.emplace(id, HandlerData{requestTypes, handler});
 
         for(auto& requestType : requestTypes)
         {
-            m_specificHandlers[requestType] = handler.get();
+            EXECGRAPH_THROW_EXCEPTION_IF(m_specificHandlers.find(requestType) != m_specificHandlers.end(),
+                                         "Handler for request type:" << requestType << "already registered");
+            m_specificHandlers[requestType] = &(p.first->second);
         }
     }
 
@@ -154,7 +150,7 @@ private:
     };
 
 private:
-    std::unordered_map<std::string, HandlerType*> m_specificHandlers;            //!< Handlers for a specific request type (handled first).
+    std::unordered_map<std::string, HandlerData*> m_specificHandlers;            //!< Handlers for a specific request type (handled first).
     std::unordered_map<typename HandlerType::Id, HandlerData> m_handlerStorage;  //!< Storage for handlers.
     std::mutex m_access;
 
@@ -177,24 +173,38 @@ private:
 
         void runTask(std::thread::id threadId)
         {
-            std::scoped_lock<std::mutex> lock(m_d.m_access);
+            std::shared_ptr<HandlerType> handler;
 
-            // Get the request type
-            const std::string requestType = m_request->getRequestURL().string();
+            {  // Lock start
+                std::scoped_lock<std::mutex> lock(m_d.m_access);
+                // Get the request type
+                const std::string requestType = m_request->getRequestURL().string();
 
-            // Find handler and handle the request
-            auto it = m_d.m_specificHandlers.find(requestType);
-            if(it != m_d.m_specificHandlers.end())
+                // Find handler
+                auto it = m_d.m_specificHandlers.find(requestType);
+
+                if(it != m_d.m_specificHandlers.end())
+                {
+                    handler = it->m_handler;
+                }
+            }  // Lock end
+
+            // Handling the request
+            if(handler)
             {
-                it->second->handleRequest(*m_request, *m_response);
+                handler->handleRequest(*m_request, *m_response);
                 if(m_response->isResolved())
                 {
-                    return;
+                    return;  // Handled correctly, return
                 }
+                EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: Request id: '{0}' has not been handled correctly, it will be cancled!",
+                                             m_request->getId().getUniqueName());
             }
-            EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: Request id: '{0}' has not been handled correctly, it will be cancled!",
-                                         m_request->getId().getUniqueName());
-            EXECGRAPH_THROW_EXCEPTION("RequestDispatcher: Not handled properly!");
+            else
+            {
+                EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: No handler found for request id: '{0}'!, it will be cancled!",
+                                             m_request->getId().getUniqueName());
+            }
         };
 
         void onTaskException(std::exception_ptr e)
@@ -228,18 +238,33 @@ private:
 
         void runTask(std::thread::id threadId)
         {
-            std::scoped_lock<std::mutex> lock(m_d.m_access);
+            std::shared_ptr<HandlerType> handler;
 
-            // Get the request type
-            const std::string requestType = m_request.getRequestURL().string();
+            {  // Lock start
+                std::scoped_lock<std::mutex> lock(m_d.m_access);
+                // Get the request type
+                const std::string requestType = m_request->getRequestURL().string();
 
-            // Find handler and forward the request
-            auto it = m_d.m_specificHandlers.find(requestType);
-            if(it != m_d.m_specificHandlers.end())
+                // Find handler
+                auto it = m_d.m_specificHandlers.find(requestType);
+
+                if(it != m_d.m_specificHandlers.end())
+                {
+                    handler = it->m_handler;
+                }
+            }  // Lock end
+
+            // Handling the request
+            if(handler)
             {
-                it->second->handleRequest(std::move(m_request), std::move(m_response));
+                handler->handleRequest(std::move(m_request), std::move(m_response));
             }
-        };
+            else
+            {
+                EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: No handler found for request id: '{0}'!, it will be cancled!",
+                                             m_request->getId().getUniqueName());
+            }
+        }
 
         void onTaskException(std::exception_ptr e)
         {
