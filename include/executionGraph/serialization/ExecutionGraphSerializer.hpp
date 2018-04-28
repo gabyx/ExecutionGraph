@@ -11,13 +11,18 @@
 // =========================================================================================
 
 #ifndef executionGraph_serialization_ExecutionGraphSerializer_hpp
-#    define executionGraph_serialization_ExecutionGraphSerializer_hpp
+#define executionGraph_serialization_ExecutionGraphSerializer_hpp
 
-#    include <meta/meta.hpp>
-#    include <string>
+#include <meta/meta.hpp>
 
-#    include "executionGraph/common/Exception.hpp"
-#    include "executionGraph/common/TypeDefs.hpp"
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#include "executionGraph/common/Exception.hpp"
+#include "executionGraph/common/TypeDefs.hpp"
 
 namespace executionGraph
 {
@@ -27,10 +32,22 @@ namespace executionGraph
     public:
         using GraphType = GraphType;
 
-        ExecutionGraphSerializer(const GraphType& graph)
+        ExecutionGraphSerializer(GraphType& graph)
             : m_graph(graph)
         {}
         ~ExecutionGraphSerializer() = default;
-    }
+
+    public:
+        void load(const std::path& filePath) throw
+        {
+        }
+
+        void store(const std::path& filePath, bool bOverwrite = false) throw;
+
+    private:
+        GraphType& m_graph;
+    };
 
 }  // namespace executionGraph
+
+#endif

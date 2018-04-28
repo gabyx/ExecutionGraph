@@ -6,7 +6,7 @@
 
 #include "flatbuffers/flatbuffers.h"
 
-#include "Datatypes_generated.h"
+#include "DataTypes_generated.h"
 #include "SocketLink_generated.h"
 
 namespace executionGraph {

@@ -24,6 +24,9 @@ function(include_all_source_ExecutionGraph
         ${ExecutionGraph_ROOT_DIR}/src/LogicNode.cpp
 
         ${ExecutionGraph_ROOT_DIR}/src/FileSystem.cpp
+
+        ${ExecutionGraph_ROOT_DIR}/src/FileMapper.cpp
+
         PARENT_SCOPE
     )
 
@@ -51,6 +54,9 @@ function(include_all_source_ExecutionGraph
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/LogicNode.hpp
         
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/graphs/ExecutionTreeInOut.hpp
+
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/ExecutionGraphSerializer.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/FileMapper.hpp
 
         ${ExecutionGraph_CONFIG_FILE}
         PARENT_SCOPE
