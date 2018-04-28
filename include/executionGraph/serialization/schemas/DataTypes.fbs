@@ -10,16 +10,28 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-namespace executionGraph.serialization;
-
-table DummyNodeData
+struct Vector2f
 {
-    dummy:int = 3;
+    x:float32;
+    y:float32;
 }
 
-union LogicNodeDataUnion
+struct Vector2d
 {
-    DummyNodeData
-    // Insert here the additional data 
-    // you need for all your 
+    x:float64;
+    y:float64;
 }
+
+struct Vector3d
+{
+    x:float64;
+    y:float64;
+    z:float64;
+}
+
+struct Box2f
+{
+    positionMin:Vector2f (id:0);
+    positionMax:Vector2f (id:1);
+}
+
