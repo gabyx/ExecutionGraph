@@ -91,5 +91,7 @@ namespace executionGraph
 
         m_mappedBytes       = std::move(other.m_mappedBytes);
         other.m_mappedBytes = 0;
+
+        return *this;
     }
 }  // namespace executionGraph

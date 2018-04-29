@@ -15,6 +15,7 @@
 
 #include <stdint.h>
 #include "executionGraph/common/FileSystem.hpp"
+#include "executionGraph/common/Platform.hpp"
 
 namespace executionGraph
 {
@@ -24,9 +25,9 @@ namespace executionGraph
 
     @date Sat Apr 28 2018
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
- */
+    */
     /* ---------------------------------------------------------------------------------------*/
-    class FileMapper final
+    class EXECGRAPH_EXPORT FileMapper final
     {
     public:
         FileMapper(const std::path& filePath) noexcept(false);
@@ -41,8 +42,8 @@ namespace executionGraph
         FileMapper& operator=(const FileMapper&&) = delete;
 
         //! Get the mapped address and size of the file.
-        std::pair<uint8_t*, std::size_t> getMappedAddress() { return {static_cast<uint8_t*>(m_mappedAddress),
-                                                                      m_mappedBytes}; }
+        std::pair<const uint8_t*, std::size_t> getData() { return {static_cast<const uint8_t*>(m_mappedAddress),
+                                                                   m_mappedBytes}; }
 
     private:
         void load(const std::path& filePath) noexcept(false);

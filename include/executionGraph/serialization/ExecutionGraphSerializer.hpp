@@ -13,40 +13,106 @@
 #ifndef executionGraph_serialization_ExecutionGraphSerializer_hpp
 #define executionGraph_serialization_ExecutionGraphSerializer_hpp
 
-#include <meta/meta.hpp>
-
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-
+#include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/Exception.hpp"
+#include "executionGraph/common/Log.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
+#include "executionGraph/serialization/FileMapper.hpp"
+#include "executionGraph/serialization/schemas/ExecutionGraph_generated.h"
 
 namespace executionGraph
 {
-    template<typename GraphType>
-    class ExecutionGraphSerializer
+    namespace serialization
     {
-    public:
-        using GraphType = GraphType;
+        /* ---------------------------------------------------------------------------------------*/
+        /*!
+        Serializer to store and read an execution graph.
 
-        ExecutionGraphSerializer(GraphType& graph)
-            : m_graph(graph)
-        {}
-        ~ExecutionGraphSerializer() = default;
+        @date Sat Apr 28 2018
+        @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+    */
+        /* ---------------------------------------------------------------------------------------*/
 
-    public:
-        void load(const std::path& filePath) throw
+        template<typename TGraphType>
+        class ExecutionGraphSerializer
         {
-        }
+        public:
+            using GraphType = TGraphType;
 
-        void store(const std::path& filePath, bool bOverwrite = false) throw;
+            ExecutionGraphSerializer(GraphType& graph)
+                : m_graph(graph)
+            {}
+            ~ExecutionGraphSerializer() = default;
 
-    private:
-        GraphType& m_graph;
-    };
+        public:
+            //! Loading an execution graph from a file `filePath`.
+            void load(const std::path& filePath) noexcept(false)
+            {
+                m_filePath = filePath;
+                // Memory mapping the file
+                FileMapper mapper(m_filePath);
+                const uint8_t* buffer = nullptr;
+                std::size_t size;
+                std::tie(buffer, size) = mapper.getData();
+                EXECGRAPH_ASSERT(buffer != nullptr, "FileMapper returned nullptr for file '" << m_filePath << "'");
+
+                // Deserialize
+                EXECGRAPH_THROW_EXCEPTION_IF(!serialization::ExecutionGraphBufferHasIdentifier(buffer),
+                                             "File identifier in '" << m_filePath << "' not found!");
+
+                flatbuffers::Verifier verifier(buffer, size);
+                EXECGRAPH_THROW_EXCEPTION_IF(!serialization::VerifyExecutionGraphBuffer(verifier),
+                                             "Buffer in '" << m_filePath << "' could not be verified!");
+
+                auto graph = serialization::GetExecutionGraph(buffer);
+
+                EXECGRAPH_THROW_EXCEPTION_IF(graph == nullptr,
+                                             "Deserialization from '" << m_filePath << "' is invalid!");
+
+                setupGraph(*graph);
+            }
+
+            //! Store an execution graph to the file `filePath`.
+            void store(const std::path& filePath, bool bOverwrite = false) noexcept(false);
+
+        private:
+            void setupGraph(const serialization::ExecutionGraph& graph)
+            {
+                auto nodes = graph.nodes();
+                if(nodes)
+                {
+                    setupNodes(*nodes);
+                }
+
+                auto links = graph.links();
+                if(links)
+                {
+                    setupLinks(*links);
+                }
+            }
+
+            template<typename Nodes>
+            void setupNodes(Nodes& nodes)
+            {
+                for(auto node : nodes)
+                {
+                    //EXECGRAPH_LOG_TRACE("Adding node with id: " << node->nodeId());
+                }
+            }
+
+            template<typename Links>
+            void setupLinks(Links& links)
+            {
+                for(auto link : links)
+                {
+                }
+            }
+
+        private:
+            std::path m_filePath;
+            GraphType& m_graph;
+        };
+    }  // namespace serialization
 
 }  // namespace executionGraph
 

@@ -11,7 +11,7 @@ namespace serialization {
 
 struct SocketLink;
 
-MANUALLY_ALIGNED_STRUCT(8) SocketLink FLATBUFFERS_FINAL_CLASS {
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SocketLink FLATBUFFERS_FINAL_CLASS {
  private:
   uint64_t outNodeId_;
   uint64_t outSocketIdx_;
@@ -51,7 +51,7 @@ MANUALLY_ALIGNED_STRUCT(8) SocketLink FLATBUFFERS_FINAL_CLASS {
     return flatbuffers::EndianScalar(isWriteLink_) != 0;
   }
 };
-STRUCT_END(SocketLink, 40);
+FLATBUFFERS_STRUCT_END(SocketLink, 40);
 
 }  // namespace serialization
 }  // namespace executionGraph

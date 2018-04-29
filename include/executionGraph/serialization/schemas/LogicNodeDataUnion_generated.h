@@ -18,16 +18,16 @@ enum LogicNodeDataUnion {
   LogicNodeDataUnion_MAX = LogicNodeDataUnion_DummyNodeData
 };
 
-inline LogicNodeDataUnion (&EnumValuesLogicNodeDataUnion())[2] {
-  static LogicNodeDataUnion values[] = {
+inline const LogicNodeDataUnion (&EnumValuesLogicNodeDataUnion())[2] {
+  static const LogicNodeDataUnion values[] = {
     LogicNodeDataUnion_NONE,
     LogicNodeDataUnion_DummyNodeData
   };
   return values;
 }
 
-inline const char **EnumNamesLogicNodeDataUnion() {
-  static const char *names[] = {
+inline const char * const *EnumNamesLogicNodeDataUnion() {
+  static const char * const names[] = {
     "NONE",
     "DummyNodeData",
     nullptr

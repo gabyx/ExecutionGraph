@@ -4,9 +4,9 @@ CMakeFiles
 __pycache__
 .ipynb_checkpoints
 .pre-commit-changed
-build
-buildExternal
+build*
 out
+*.eg
 
 GPUCache
 install

@@ -28,8 +28,8 @@ enum NodeClassification {
   NodeClassification_MAX = NodeClassification_ConstantNode
 };
 
-inline NodeClassification (&EnumValuesNodeClassification())[4] {
-  static NodeClassification values[] = {
+inline const NodeClassification (&EnumValuesNodeClassification())[4] {
+  static const NodeClassification values[] = {
     NodeClassification_NormalNode,
     NodeClassification_InputNode,
     NodeClassification_OutputNode,
@@ -38,8 +38,8 @@ inline NodeClassification (&EnumValuesNodeClassification())[4] {
   return values;
 }
 
-inline const char **EnumNamesNodeClassification() {
-  static const char *names[] = {
+inline const char * const *EnumNamesNodeClassification() {
+  static const char * const names[] = {
     "NormalNode",
     "InputNode",
     "OutputNode",
@@ -225,26 +225,35 @@ inline const executionGraph::serialization::ExecutionGraph *GetSizePrefixedExecu
   return flatbuffers::GetSizePrefixedRoot<executionGraph::serialization::ExecutionGraph>(buf);
 }
 
+inline const char *ExecutionGraphIdentifier() {
+  return "EXGR";
+}
+
+inline bool ExecutionGraphBufferHasIdentifier(const void *buf) {
+  return flatbuffers::BufferHasIdentifier(
+      buf, ExecutionGraphIdentifier());
+}
+
 inline bool VerifyExecutionGraphBuffer(
     flatbuffers::Verifier &verifier) {
-  return verifier.VerifyBuffer<executionGraph::serialization::ExecutionGraph>(nullptr);
+  return verifier.VerifyBuffer<executionGraph::serialization::ExecutionGraph>(ExecutionGraphIdentifier());
 }
 
 inline bool VerifySizePrefixedExecutionGraphBuffer(
     flatbuffers::Verifier &verifier) {
-  return verifier.VerifySizePrefixedBuffer<executionGraph::serialization::ExecutionGraph>(nullptr);
+  return verifier.VerifySizePrefixedBuffer<executionGraph::serialization::ExecutionGraph>(ExecutionGraphIdentifier());
 }
 
 inline void FinishExecutionGraphBuffer(
     flatbuffers::FlatBufferBuilder &fbb,
     flatbuffers::Offset<executionGraph::serialization::ExecutionGraph> root) {
-  fbb.Finish(root);
+  fbb.Finish(root, ExecutionGraphIdentifier());
 }
 
 inline void FinishSizePrefixedExecutionGraphBuffer(
     flatbuffers::FlatBufferBuilder &fbb,
     flatbuffers::Offset<executionGraph::serialization::ExecutionGraph> root) {
-  fbb.FinishSizePrefixed(root);
+  fbb.FinishSizePrefixed(root, ExecutionGraphIdentifier());
 }
 
 }  // namespace serialization

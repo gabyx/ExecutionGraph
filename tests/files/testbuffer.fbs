@@ -1,8 +1,6 @@
-namespace testbuffer;
+namespace test;
 
 file_identifier "TEST";
-
-attribute "priority";
 
 struct Vec3 {
   x:float;
@@ -10,10 +8,8 @@ struct Vec3 {
   z:float;
 }
 
-table TestBuffer {
-  pos:Vec3 (id:0);
-  name:string (id:1);
-  used:bool = false (id:2);
+table Test {
+  pos:[Vec3] (id:0);
 }
 
-root_type TestBuffer;
+root_type Test;

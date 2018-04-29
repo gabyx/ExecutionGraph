@@ -40,4 +40,5 @@ table ExecutionGraph
     visualization:GraphVisualization (id:3);
 }
 
+file_identifier "EXGR";
 root_type ExecutionGraph;
