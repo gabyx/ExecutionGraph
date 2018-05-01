@@ -5,11 +5,11 @@
 #define FLATBUFFERS_GENERATED_EXECUTIONGRAPH_EXECUTIONGRAPH_SERIALIZATION_H_
 
 #include "flatbuffers/flatbuffers.h"
+#include "flatbuffers/flexbuffers.h"
 
 #include "DataTypes_generated.h"
 #include "GraphVisualization_generated.h"
 #include "LogicNode_generated.h"
-#include "LogicNodeDataUnion_generated.h"
 #include "SocketLink_generated.h"
 
 namespace executionGraph {

@@ -12,11 +12,14 @@
 
 #include <executionGraph/common/Log.hpp>
 #include <executionGraph/graphs/ExecutionTreeInOut.hpp>
+#include <executionGraph/nodes/LogicNode.hpp>
 #include <executionGraph/serialization/ExecutionGraphSerializer.hpp>
 #include <executionGraph/serialization/FileMapper.hpp>
+#include <executionGraph/serialization/LogicNodeSerializer.hpp>
 #include <executionGraph/serialization/schemas/ExecutionGraph_generated.h>
 #include <flatbuffers/flatbuffers.h>
 #include <fstream>
+#include <rttr/registration>
 #include <vector>
 #include "../files/testbuffer_generated.h"
 #include "TestFunctions.hpp"
@@ -26,10 +29,45 @@
 #    pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 
+namespace s = executionGraph::serialization;
+
+using Config    = executionGraph::GeneralConfig<>;
+using GraphType = executionGraph::ExecutionTreeInOut<Config>;
+
+class DummyNode final : public Config::NodeBaseType
+{
+    RTTR_ENABLE()
+public:
+    template<typename... Args>
+    DummyNode(Args&&... args)
+        : Config::NodeBaseType(std::forward<Args>(args)...){};
+    ~DummyNode() = default;
+
+private:
+    void compute() override {}
+    void reset() override {}
+};
+
+RTTR_REGISTRATION
+{
+    rttr::registration::class_<DummyNode>("DummyNode");
+}
+
+struct NodeSerializer
+{
+    EXECGRAPH_TYPEDEF_CONFIG(Config);
+
+    using Key = DummyNode;
+
+    static std::unique_ptr<NodeBaseType>
+    create(executionGraph::NodeId id, const s::LogicNode& node)
+    {
+        return std::make_unique<DummyNode>(id);
+    }
+};
+
 MY_TEST(FlatBuffer, Test1)
 {
-    namespace s = executionGraph::serialization;
-
     unsigned int nNodes = 500;
 
     auto makeLogicNodes = [&](auto& builder) {
@@ -38,13 +76,11 @@ MY_TEST(FlatBuffer, Test1)
         EXECGRAPH_LOG_TRACE("Serializing " << nNodes << " nodes!")
         for(int i = 0; i < nNodes; ++i)
         {
-            uint64_t id        = i;
-            auto dummy         = builder.CreateString("DummyNode");
-            auto dummyNodeData = s::CreateDummyNodeData(builder);
+            uint64_t id = i;
+            auto dummy  = builder.CreateString("DummyNode");
             s::LogicNodeBuilder lnBuilder(builder);
-            lnBuilder.add_nodeId(id);
+            lnBuilder.add_id(id);
             lnBuilder.add_type(dummy);
-            lnBuilder.add_data(dummyNodeData.Union());
             nodes.push_back(lnBuilder.Finish());
         }
         EXECGRAPH_LOG_TRACE("Serializing done!");
@@ -69,7 +105,7 @@ MY_TEST(FlatBuffer, Test1)
     EXECGRAPH_LOG_TRACE("Write file done");
 
     {
-        EXECGRAPH_LOG_TRACE("Read graph 1");
+        EXECGRAPH_LOG_TRACE("Read graph simple");
         executionGraph::FileMapper mapper("myGraph.eg");
         std::tie(buf, size) = mapper.getData();
         auto graph          = s::GetExecutionGraph(buf);
@@ -77,11 +113,11 @@ MY_TEST(FlatBuffer, Test1)
     }
 
     {
-        EXECGRAPH_LOG_TRACE("Read graph 2");
-        using Config    = executionGraph::GeneralConfig<>;
-        using GraphType = executionGraph::ExecutionTreeInOut<Config>;
+        EXECGRAPH_LOG_TRACE("Read graph by Serializer");
         GraphType graph;
-        s::ExecutionGraphSerializer<GraphType> serializer(graph);
+        using LogicNodeS = s::LogicNodeSerializer<Config, meta::list<NodeSerializer>>;
+        LogicNodeS nodeSerializer;
+        s::ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(graph, nodeSerializer);
         serializer.load("myGraph.eg");
     }
 
@@ -96,20 +132,19 @@ MY_TEST(FlatBuffer, Test2)
     flatbuffers::FlatBufferBuilder builder;
     std::vector<t::Vec3> vecs(n, t::Vec3(1, 3, 4));
     auto vecsOffsets = builder.CreateVectorOfStructs(vecs.data(), vecs.size());
-    auto testB       = t::TestBuilder(builder);
-    testB.add_pos(vecsOffsets);
-    auto test = testB.Finish();
+
+    auto testBuilder = t::TestBuilder(builder);
+    testBuilder.add_pos(vecsOffsets);
+    auto test = testBuilder.Finish();
     builder.Finish(test);
 
-    uint8_t* buf     = builder.GetBufferPointer();
+    uint8_t* file    = builder.GetBufferPointer();
     std::size_t size = builder.GetSize();
-    std::vector<uint8_t> file(size);
-    std::memcpy(file.data(), buf, size);
 
     // Reading back.
-    flatbuffers::Verifier v(file.data(), size);
-    //ASSERT_TRUE(t::VerifyTestBuffer(v));
-    auto rtest = t::GetTest(file.data());
+    flatbuffers::Verifier v(file, size);
+    ASSERT_TRUE(t::VerifyTestBuffer(v));
+    auto rtest = t::GetTest(file);
     ASSERT_EQ(rtest->pos()->size(), n) << " Wupi, wrong serialization!";
     ASSERT_EQ((*rtest->pos())[n - 1]->z(), 4);
 }

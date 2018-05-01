@@ -18,7 +18,7 @@ namespace executionGraph.serialization;
 table WorkspaceVisualization
 {
     workspaceId:uint64 (id:0); //!< workspace id
-    box:Box2f (id:1); //!< canvas dimensions of the workspace
+    box:Box2f (id:1, required); //!< canvas dimensions of the workspace
 }
 
 table NodeVisualization
@@ -31,7 +31,7 @@ table NodeVisualization
 
 table LinkVisualization
 {
-    socket:SocketLink (id:0);
+    socket:SocketLink (id:0, required);
     // and more visualization stuff
     // ...
 }

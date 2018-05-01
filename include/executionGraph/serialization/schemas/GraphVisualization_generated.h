@@ -34,7 +34,7 @@ struct WorkspaceVisualization FLATBUFFERS_FINAL_CLASS : private flatbuffers::Tab
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_WORKSPACEID) &&
-           VerifyField<Box2f>(verifier, VT_BOX) &&
+           VerifyFieldRequired<Box2f>(verifier, VT_BOX) &&
            verifier.EndTable();
   }
 };
@@ -56,6 +56,7 @@ struct WorkspaceVisualizationBuilder {
   flatbuffers::Offset<WorkspaceVisualization> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<WorkspaceVisualization>(end);
+    fbb_.Required(o, WorkspaceVisualization::VT_BOX);
     return o;
   }
 };
@@ -129,7 +130,7 @@ struct LinkVisualization FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<SocketLink>(verifier, VT_SOCKET) &&
+           VerifyFieldRequired<SocketLink>(verifier, VT_SOCKET) &&
            verifier.EndTable();
   }
 };
@@ -148,6 +149,7 @@ struct LinkVisualizationBuilder {
   flatbuffers::Offset<LinkVisualization> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<LinkVisualization>(end);
+    fbb_.Required(o, LinkVisualization::VT_SOCKET);
     return o;
   }
 };

@@ -96,35 +96,26 @@ inline const test::Test *GetSizePrefixedTest(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<test::Test>(buf);
 }
 
-inline const char *TestIdentifier() {
-  return "TEST";
-}
-
-inline bool TestBufferHasIdentifier(const void *buf) {
-  return flatbuffers::BufferHasIdentifier(
-      buf, TestIdentifier());
-}
-
 inline bool VerifyTestBuffer(
     flatbuffers::Verifier &verifier) {
-  return verifier.VerifyBuffer<test::Test>(TestIdentifier());
+  return verifier.VerifyBuffer<test::Test>(nullptr);
 }
 
 inline bool VerifySizePrefixedTestBuffer(
     flatbuffers::Verifier &verifier) {
-  return verifier.VerifySizePrefixedBuffer<test::Test>(TestIdentifier());
+  return verifier.VerifySizePrefixedBuffer<test::Test>(nullptr);
 }
 
 inline void FinishTestBuffer(
     flatbuffers::FlatBufferBuilder &fbb,
     flatbuffers::Offset<test::Test> root) {
-  fbb.Finish(root, TestIdentifier());
+  fbb.Finish(root);
 }
 
 inline void FinishSizePrefixedTestBuffer(
     flatbuffers::FlatBufferBuilder &fbb,
     flatbuffers::Offset<test::Test> root) {
-  fbb.FinishSizePrefixed(root, TestIdentifier());
+  fbb.FinishSizePrefixed(root);
 }
 
 }  // namespace test

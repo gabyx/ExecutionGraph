@@ -1,7 +1,5 @@
 namespace test;
 
-file_identifier "TEST";
-
 struct Vec3 {
   x:float;
   y:float;

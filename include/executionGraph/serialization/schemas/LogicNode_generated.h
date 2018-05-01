@@ -5,8 +5,7 @@
 #define FLATBUFFERS_GENERATED_LOGICNODE_EXECUTIONGRAPH_SERIALIZATION_H_
 
 #include "flatbuffers/flatbuffers.h"
-
-#include "LogicNodeDataUnion_generated.h"
+#include "flatbuffers/flexbuffers.h"
 
 namespace executionGraph {
 namespace serialization {
@@ -15,14 +14,13 @@ struct LogicNode;
 
 struct LogicNode FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_NODEID = 4,
+    VT_ID = 4,
     VT_TYPE = 6,
     VT_NAME = 8,
-    VT_DATA_TYPE = 10,
-    VT_DATA = 12
+    VT_DATA = 10
   };
-  uint64_t nodeId() const {
-    return GetField<uint64_t>(VT_NODEID, 0);
+  uint64_t id() const {
+    return GetField<uint64_t>(VT_ID, 0);
   }
   const flatbuffers::String *type() const {
     return GetPointer<const flatbuffers::String *>(VT_TYPE);
@@ -30,39 +28,31 @@ struct LogicNode FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::String *name() const {
     return GetPointer<const flatbuffers::String *>(VT_NAME);
   }
-  LogicNodeDataUnion data_type() const {
-    return static_cast<LogicNodeDataUnion>(GetField<uint8_t>(VT_DATA_TYPE, 0));
+  const flatbuffers::Vector<uint8_t> *data() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_DATA);
   }
-  const void *data() const {
-    return GetPointer<const void *>(VT_DATA);
-  }
-  template<typename T> const T *data_as() const;
-  const DummyNodeData *data_as_DummyNodeData() const {
-    return data_type() == LogicNodeDataUnion_DummyNodeData ? static_cast<const DummyNodeData *>(data()) : nullptr;
+  flexbuffers::Reference data_flexbuffer_root() const {
+    auto v = data();
+    return flexbuffers::GetRoot(v->Data(), v->size());
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<uint64_t>(verifier, VT_NODEID) &&
-           VerifyOffset(verifier, VT_TYPE) &&
+           VerifyField<uint64_t>(verifier, VT_ID) &&
+           VerifyOffsetRequired(verifier, VT_TYPE) &&
            verifier.Verify(type()) &&
            VerifyOffset(verifier, VT_NAME) &&
            verifier.Verify(name()) &&
-           VerifyField<uint8_t>(verifier, VT_DATA_TYPE) &&
            VerifyOffset(verifier, VT_DATA) &&
-           VerifyLogicNodeDataUnion(verifier, data(), data_type()) &&
+           verifier.Verify(data()) &&
            verifier.EndTable();
   }
 };
 
-template<> inline const DummyNodeData *LogicNode::data_as<DummyNodeData>() const {
-  return data_as_DummyNodeData();
-}
-
 struct LogicNodeBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_nodeId(uint64_t nodeId) {
-    fbb_.AddElement<uint64_t>(LogicNode::VT_NODEID, nodeId, 0);
+  void add_id(uint64_t id) {
+    fbb_.AddElement<uint64_t>(LogicNode::VT_ID, id, 0);
   }
   void add_type(flatbuffers::Offset<flatbuffers::String> type) {
     fbb_.AddOffset(LogicNode::VT_TYPE, type);
@@ -70,10 +60,7 @@ struct LogicNodeBuilder {
   void add_name(flatbuffers::Offset<flatbuffers::String> name) {
     fbb_.AddOffset(LogicNode::VT_NAME, name);
   }
-  void add_data_type(LogicNodeDataUnion data_type) {
-    fbb_.AddElement<uint8_t>(LogicNode::VT_DATA_TYPE, static_cast<uint8_t>(data_type), 0);
-  }
-  void add_data(flatbuffers::Offset<void> data) {
+  void add_data(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> data) {
     fbb_.AddOffset(LogicNode::VT_DATA, data);
   }
   explicit LogicNodeBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -84,40 +71,37 @@ struct LogicNodeBuilder {
   flatbuffers::Offset<LogicNode> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<LogicNode>(end);
+    fbb_.Required(o, LogicNode::VT_TYPE);
     return o;
   }
 };
 
 inline flatbuffers::Offset<LogicNode> CreateLogicNode(
     flatbuffers::FlatBufferBuilder &_fbb,
-    uint64_t nodeId = 0,
+    uint64_t id = 0,
     flatbuffers::Offset<flatbuffers::String> type = 0,
     flatbuffers::Offset<flatbuffers::String> name = 0,
-    LogicNodeDataUnion data_type = LogicNodeDataUnion_NONE,
-    flatbuffers::Offset<void> data = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> data = 0) {
   LogicNodeBuilder builder_(_fbb);
-  builder_.add_nodeId(nodeId);
+  builder_.add_id(id);
   builder_.add_data(data);
   builder_.add_name(name);
   builder_.add_type(type);
-  builder_.add_data_type(data_type);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<LogicNode> CreateLogicNodeDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    uint64_t nodeId = 0,
+    uint64_t id = 0,
     const char *type = nullptr,
     const char *name = nullptr,
-    LogicNodeDataUnion data_type = LogicNodeDataUnion_NONE,
-    flatbuffers::Offset<void> data = 0) {
+    const std::vector<uint8_t> *data = nullptr) {
   return executionGraph::serialization::CreateLogicNode(
       _fbb,
-      nodeId,
+      id,
       type ? _fbb.CreateString(type) : 0,
       name ? _fbb.CreateString(name) : 0,
-      data_type,
-      data);
+      data ? _fbb.CreateVector<uint8_t>(*data) : 0);
 }
 
 }  // namespace serialization

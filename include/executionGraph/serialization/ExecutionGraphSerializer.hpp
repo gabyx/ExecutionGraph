@@ -30,17 +30,19 @@ namespace executionGraph
 
         @date Sat Apr 28 2018
         @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
-    */
+        */
         /* ---------------------------------------------------------------------------------------*/
 
-        template<typename TGraphType>
+        template<typename TGraphType, typename TLogicNodeSerializer>
         class ExecutionGraphSerializer
         {
         public:
-            using GraphType = TGraphType;
+            using Graph = TGraphType;
+            EXECGRAPH_TYPEDEF_CONFIG(typename Graph::Config);
+            using LogicNodeSerializer = TLogicNodeSerializer;
 
-            ExecutionGraphSerializer(GraphType& graph)
-                : m_graph(graph)
+            ExecutionGraphSerializer(Graph& graph, LogicNodeSerializer& nodeSerializer)
+                : m_graph(graph), m_nodeSerializer(nodeSerializer)
             {}
             ~ExecutionGraphSerializer() = default;
 
@@ -60,7 +62,7 @@ namespace executionGraph
                 EXECGRAPH_THROW_EXCEPTION_IF(!serialization::ExecutionGraphBufferHasIdentifier(buffer),
                                              "File identifier in '" << m_filePath << "' not found!");
 
-                flatbuffers::Verifier verifier(buffer, size);
+                flatbuffers::Verifier verifier(buffer, size, 64, 1000000000);
                 EXECGRAPH_THROW_EXCEPTION_IF(!serialization::VerifyExecutionGraphBuffer(verifier),
                                              "Buffer in '" << m_filePath << "' could not be verified!");
 
@@ -96,7 +98,16 @@ namespace executionGraph
             {
                 for(auto node : nodes)
                 {
-                    //EXECGRAPH_LOG_TRACE("Adding node with id: " << node->nodeId());
+                    std::unique_ptr<NodeBaseType> logicNode = m_nodeSerializer.load(*node);
+                    if(logicNode)
+                    {
+                        EXECGRAPH_LOG_TRACE("Adding node with id: " << node->id());
+                        m_graph.addNode(std::move(logicNode));
+                    }
+                    else
+                    {
+                        EXECGRAPH_LOG_TRACE("Could not load node with id: " << node->id());
+                    }
                 }
             }
 
@@ -109,8 +120,9 @@ namespace executionGraph
             }
 
         private:
-            std::path m_filePath;
-            GraphType& m_graph;
+            std::path m_filePath;                   //!< The temporary file path.
+            Graph& m_graph;                         //!< The graph which is stored or deserialized into.
+            LogicNodeSerializer& m_nodeSerializer;  //!< The node serializer which provides load/store operations for LogicNodes.
         };
     }  // namespace serialization
 
