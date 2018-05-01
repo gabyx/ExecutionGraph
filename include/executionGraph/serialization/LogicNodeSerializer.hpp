@@ -23,12 +23,12 @@ namespace executionGraph
     {
         /* ---------------------------------------------------------------------------------------*/
         /*!
-    Serializer which loads a Logic Node.
-    `TNodeSerialize` needs to fullfill the requirements of `StaticFactory`.
+            Serializer which loads a Logic Node.
+            `TNodeSerialize` needs to fullfill the requirements of `StaticFactory`.
 
-    @date Tue May 01 2018
-    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
- */
+            @date Tue May 01 2018
+            @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+        */
         /* ---------------------------------------------------------------------------------------*/
         template<typename TConfig, typename... TNodeSerialize>
         class LogicNodeSerializer final
