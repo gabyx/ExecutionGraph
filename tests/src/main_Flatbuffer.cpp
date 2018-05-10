@@ -59,10 +59,18 @@ struct NodeSerializerWrite
 
     using Key = DummyNode;
 
-    static flatbuffers::Offset<flatbuffers::Vector<uint8_t>>
+    static std::pair<const uint8_t*, std::size_t>
     create(flatbuffers::FlatBufferBuilder& builder, const NodeBaseType& node)
     {
-        return {};
+        namespace t = test;
+        std::vector<t::Vec3> vecs(3, t::Vec3(1, 3, 4));
+        auto vecsOffsets = builder.CreateVectorOfStructs(vecs.data(), vecs.size());
+        auto testBuilder = t::TestBuilder(builder);
+        testBuilder.add_pos(vecsOffsets);
+        auto test = testBuilder.Finish();
+
+        builder.Finish(test);
+        return {builder.GetBufferPointer(), builder.GetSize()};
     }
 };
 struct NodeSerializerRead

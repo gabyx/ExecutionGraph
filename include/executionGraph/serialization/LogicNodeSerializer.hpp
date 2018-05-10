@@ -24,7 +24,8 @@ namespace executionGraph
         /* ---------------------------------------------------------------------------------------*/
         /*!
             Serializer which loads a Logic Node.
-            `TNodeSerialize` needs to fullfill the requirements of `StaticFactory`.
+            `CreatorListWrite` and `CreatorListRead` needs to fullfill 
+            the requirements of the template parameter of `StaticFactory`.
 
             @date Tue May 01 2018
             @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
@@ -62,29 +63,38 @@ namespace executionGraph
 
             //! Store a logic node by using the builder `builder`.
             static flatbuffers::Offset<serialization::LogicNode>
-            write(serialization::LogicNodeBuilder& builder, const NodeBaseType& node)
+            write(flatbuffers::FlatBufferBuilder& builder, const NodeBaseType& node)
             {
-                NodeId id        = node.getId();
+                NodeId id = node.getId();
+
                 std::string type = rttr::type::get(node).get_name();
+                auto typeOffsets = builder.CreateString(type);
 
-                // // Dispatch to the correct serialization write function
-                // // the factory writes the additional data of the flexbuffer
-                using DataOffset                  = flatbuffers::Offset<flatbuffers::Vector<uint8_t>>;
-                std::optional<DataOffset> optData = FactoryWrite::create(rttr::type::get_by_name(type), builder, node);
+                // Dispatch to the correct serialization write function.
+                // The factory writes the additional data of the flexbuffer `data` field
+                flatbuffers::FlatBufferBuilder builderData;
+                flatbuffers::Offset<flatbuffers::Vector<uint8_t>> dataOffset;
 
-                // // Build the logic node
-                // auto typeOffsets = builder.CreateString(type);
-                // LogicNodeBuilder lnBuilder(builder);
-                // lnBuilder.add_id(id);
-                // lnBuilder.add_type(typeOffsets);
+                std::optional<std::pair<const uint8_t*,
+                                        std::size_t>>
+                    optData = FactoryWrite::create(rttr::type::get_by_name(type),
+                                                   builderData,
+                                                   node);
 
-                // // Add the additional flexbuffer data
-                // if(optData)
-                // {
-                //     lnBuilder.add_data(*optData);
-                // }
+                if(optData)
+                {
+                    dataOffset = builder.CreateVector(optData->first, optData->second);
+                }
 
-                // return lnBuilder.Finish()
+                // Build the logic node
+                LogicNodeBuilder lnBuilder(builder);
+                lnBuilder.add_id(id);
+                lnBuilder.add_type(typeOffsets);
+                if(optData)
+                {
+                    lnBuilder.add_data(dataOffset);
+                }
+                return lnBuilder.Finish();
             }
 
         private:
