@@ -98,7 +98,7 @@ namespace executionGraph
             {
                 for(auto node : nodes)
                 {
-                    std::unique_ptr<NodeBaseType> logicNode = m_nodeSerializer.load(*node);
+                    std::unique_ptr<NodeBaseType> logicNode = m_nodeSerializer.read(*node);
                     if(logicNode)
                     {
                         EXECGRAPH_LOG_TRACE("Adding node with id: " << node->id());

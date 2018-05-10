@@ -37,11 +37,11 @@ namespace executionGraph
         struct StaticMapStorage<TMap, meta::list<Creator...>>
         {
             using Map = TMap;
-            static Map map;  //!< Map with CreatorFunctions for the Factory.
+            static Map m_map;  //!< Map with CreatorFunctions for the Factory.
         };
         //! Static initialization of the factory map with all key,function pointer pairs.
         template<typename TMap, typename... Creator>
-        TMap StaticMapStorage<TMap, meta::list<Creator...>>::map = {{rttr::type::get<typename Creator::Key>(), &Creator::create}...};
+        TMap StaticMapStorage<TMap, meta::list<Creator...>>::m_map = {{rttr::type::get<typename Creator::Key>(), &Creator::create}...};
 
         template<typename TCreatorList>
         struct Traits
@@ -96,7 +96,12 @@ namespace executionGraph
 
     /* ---------------------------------------------------------------------------------------*/
     /*!
-        A factory class with a statically fixed list of creators which create types `CreatorType`.
+        A factory class with a statically fixed list of creators which create types 
+        `CreatorType`. The `CreatorType` needs a unique typedef `CreatorType::Key` which is 
+        used to identify the correct creator during `create<Key,...>()`.
+
+        Each `CreatorType::Key` is also registered by its RTTI type (rttr::type) which enables  
+        dynamic creation by `create(const rttr::type& type, ...)
 
         @date Sun Feb 18 2018
         @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
@@ -118,7 +123,7 @@ namespace executionGraph
         static CreatorType create(Args&&... args)
         {
             using Creator = typename Traits::template getCreatorType<Key>;
-            static_assert(!Traits::template isUndefined<Creator>::value, "Your Key is not found in the factory!");
+            static_assert(!exists<Key>(), "Your Key is not found in the factory!");
             return Creator::create(std::forward<Args>(args)...);
         }
 
@@ -126,12 +131,26 @@ namespace executionGraph
         template<typename... Args>
         static std::optional<CreatorType> create(const rttr::type& key, Args&&... args)
         {
-            auto it = StaticStorage::map.find(key);
-            if(it == StaticStorage::map.end())
+            auto it = StaticStorage::m_map.find(key);
+            if(it == StaticStorage::m_map.end())
             {
                 return {};
             }
             return it->second(std::forward<Args>(args)...);  // Will move automatically into the return
+        }
+
+        //! Static check if the Creator with `Key` exists.
+        template<typename Key>
+        static constexpr bool exists()
+        {
+            using Creator = typename Traits::template getCreatorType<Key>;
+            return !Traits::template isUndefined<Creator>::value;
+        }
+
+        //! Dynamic check if the Creator corresponding to the RTTI `key` exists.
+        static bool exists(const rttr::type& key)
+        {
+            return StaticStorage::m_map.find(key) != StaticStorage::m_map.end();
         }
     };
 

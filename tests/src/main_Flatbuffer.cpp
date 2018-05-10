@@ -9,7 +9,7 @@
 //!  License, v. 2.0. If a copy of the MPL was not distributed with this
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
-
+#define FLATBUFFERS_DEBUG_VERIFICATION_FAILURE 1
 #include <executionGraph/common/Log.hpp>
 #include <executionGraph/graphs/ExecutionTreeInOut.hpp>
 #include <executionGraph/nodes/LogicNode.hpp>
@@ -53,7 +53,19 @@ RTTR_REGISTRATION
     rttr::registration::class_<DummyNode>("DummyNode");
 }
 
-struct NodeSerializer
+struct NodeSerializerWrite
+{
+    EXECGRAPH_TYPEDEF_CONFIG(Config);
+
+    using Key = DummyNode;
+
+    static flatbuffers::Offset<flatbuffers::Vector<uint8_t>>
+    create(flatbuffers::FlatBufferBuilder& builder, const NodeBaseType& node)
+    {
+        return {};
+    }
+};
+struct NodeSerializerRead
 {
     EXECGRAPH_TYPEDEF_CONFIG(Config);
 
@@ -78,9 +90,26 @@ MY_TEST(FlatBuffer, Test1)
         {
             uint64_t id = i;
             auto dummy  = builder.CreateString("DummyNode");
+
+            // make some sepcific flexbuffer and add it as data()
+            namespace t = test;
+            flatbuffers::FlatBufferBuilder builderData;
+            {
+                std::vector<t::Vec3> vecs(3, t::Vec3(1, 3, 4));
+                auto vecsOffsets = builderData.CreateVectorOfStructs(vecs.data(), vecs.size());
+                auto testBuilder = t::TestBuilder(builderData);
+                testBuilder.add_pos(vecsOffsets);
+                auto test = testBuilder.Finish();
+
+                builderData.Finish(test);
+            }
+            flatbuffers::Offset<flatbuffers::Vector<uint8_t>> data =
+                builder.CreateVector(builderData.GetBufferPointer(), builderData.GetSize());
+
             s::LogicNodeBuilder lnBuilder(builder);
             lnBuilder.add_id(id);
             lnBuilder.add_type(dummy);
+            lnBuilder.add_data(data);
             nodes.push_back(lnBuilder.Finish());
         }
         EXECGRAPH_LOG_TRACE("Serializing done!");
@@ -115,7 +144,9 @@ MY_TEST(FlatBuffer, Test1)
     {
         EXECGRAPH_LOG_TRACE("Read graph by Serializer");
         GraphType graph;
-        using LogicNodeS = s::LogicNodeSerializer<Config, meta::list<NodeSerializer>>;
+        using LogicNodeS = s::LogicNodeSerializer<Config,
+                                                  meta::list<NodeSerializerWrite>,
+                                                  meta::list<NodeSerializerRead>>;
         LogicNodeS nodeSerializer;
         s::ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(graph, nodeSerializer);
         serializer.load("myGraph.eg");
@@ -126,7 +157,7 @@ MY_TEST(FlatBuffer, Test1)
 
 MY_TEST(FlatBuffer, Test2)
 {
-    unsigned int n = 1;
+    unsigned int n = 100;
     namespace t    = test;
 
     flatbuffers::FlatBufferBuilder builder;

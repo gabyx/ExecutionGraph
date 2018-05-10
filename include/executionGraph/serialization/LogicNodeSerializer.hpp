@@ -30,7 +30,9 @@ namespace executionGraph
             @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
         */
         /* ---------------------------------------------------------------------------------------*/
-        template<typename TConfig, typename... TNodeSerialize>
+        template<typename TConfig,
+                 typename CreatorListWrite,
+                 typename CreatorListRead>
         class LogicNodeSerializer final
         {
         public:
@@ -43,14 +45,14 @@ namespace executionGraph
         public:
             //! Load a logic node from a `flatbuffers::Offset`.
             static std::unique_ptr<NodeBaseType>
-            load(const serialization::LogicNode& logicNode)
+            read(const serialization::LogicNode& logicNode)
             {
                 NodeId id        = logicNode.id();
                 std::string type = logicNode.type()->str();
 
-                // dispatch to the correct serialization function
-                // the serializer loads and returns the logic node
-                auto optNode = SerializeFactory::create(rttr::type::get_by_name(type), id, logicNode);
+                // Dispatch to the correct serialization read function
+                // the factory reads and returns the logic node
+                auto optNode = FactoryRead::create(rttr::type::get_by_name(type), id, logicNode);
                 if(optNode)
                 {
                     return std::move(*optNode);
@@ -59,13 +61,35 @@ namespace executionGraph
             }
 
             //! Store a logic node by using the builder `builder`.
-            static void store(serialization::LogicNodeBuilder& builder,
-                              NodeBaseType& node)
+            static flatbuffers::Offset<serialization::LogicNode>
+            write(serialization::LogicNodeBuilder& builder, const NodeBaseType& node)
             {
+                NodeId id        = node.getId();
+                std::string type = rttr::type::get(node).get_name();
+
+                // // Dispatch to the correct serialization write function
+                // // the factory writes the additional data of the flexbuffer
+                using DataOffset                  = flatbuffers::Offset<flatbuffers::Vector<uint8_t>>;
+                std::optional<DataOffset> optData = FactoryWrite::create(rttr::type::get_by_name(type), builder, node);
+
+                // // Build the logic node
+                // auto typeOffsets = builder.CreateString(type);
+                // LogicNodeBuilder lnBuilder(builder);
+                // lnBuilder.add_id(id);
+                // lnBuilder.add_type(typeOffsets);
+
+                // // Add the additional flexbuffer data
+                // if(optData)
+                // {
+                //     lnBuilder.add_data(*optData);
+                // }
+
+                // return lnBuilder.Finish()
             }
 
         private:
-            using SerializeFactory = StaticFactory<TNodeSerialize...>;
+            using FactoryWrite = StaticFactory<CreatorListWrite>;
+            using FactoryRead  = StaticFactory<CreatorListRead>;
         };
     }  // namespace serialization
 }  // namespace executionGraph
