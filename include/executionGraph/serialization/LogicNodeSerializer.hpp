@@ -75,10 +75,9 @@ namespace executionGraph
                 flatbuffers::FlatBufferBuilder builderData;
                 flatbuffers::Offset<flatbuffers::Vector<uint8_t>> dataOffset;
 
-                std::optional<std::pair<const uint8_t*,
-                                        std::size_t>>
+                std::optional<std::pair<const uint8_t*, std::size_t>>
                     optData = FactoryWrite::create(rttr::type::get_by_name(type),
-                                                   builderData,
+                                                   builder,
                                                    node);
 
                 if(optData)

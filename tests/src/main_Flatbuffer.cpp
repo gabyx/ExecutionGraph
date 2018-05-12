@@ -157,7 +157,10 @@ MY_TEST(FlatBuffer, Test1)
                                                   meta::list<NodeSerializerRead>>;
         LogicNodeS nodeSerializer;
         s::ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(graph, nodeSerializer);
-        serializer.load("myGraph.eg");
+        serializer.read("myGraph.eg");
+
+        EXECGRAPH_LOG_TRACE("Write graph by Serializer");
+        serializer.write("myGraph-out.eg");
     }
 
     std::filesystem::remove("myGraph.eg");

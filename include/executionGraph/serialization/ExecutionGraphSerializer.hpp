@@ -36,6 +36,9 @@ namespace executionGraph
         template<typename TGraphType, typename TLogicNodeSerializer>
         class ExecutionGraphSerializer
         {
+        private:
+            namespace s = serialization;
+
         public:
             using Graph = TGraphType;
             EXECGRAPH_TYPEDEF_CONFIG(typename Graph::Config);
@@ -47,8 +50,8 @@ namespace executionGraph
             ~ExecutionGraphSerializer() = default;
 
         public:
-            //! Loading an execution graph from a file `filePath`.
-            void load(const std::path& filePath) noexcept(false)
+            //! Read an execution graph from a file `filePath`.
+            void read(const std::path& filePath) noexcept(false)
             {
                 m_filePath = filePath;
                 // Memory mapping the file
@@ -59,42 +62,75 @@ namespace executionGraph
                 EXECGRAPH_ASSERT(buffer != nullptr, "FileMapper returned nullptr for file '" << m_filePath << "'");
 
                 // Deserialize
-                EXECGRAPH_THROW_EXCEPTION_IF(!serialization::ExecutionGraphBufferHasIdentifier(buffer),
+                EXECGRAPH_THROW_EXCEPTION_IF(!s::ExecutionGraphBufferHasIdentifier(buffer),
                                              "File identifier in '" << m_filePath << "' not found!");
 
                 flatbuffers::Verifier verifier(buffer, size, 64, 1000000000);
-                EXECGRAPH_THROW_EXCEPTION_IF(!serialization::VerifyExecutionGraphBuffer(verifier),
+                EXECGRAPH_THROW_EXCEPTION_IF(!s::VerifyExecutionGraphBuffer(verifier),
                                              "Buffer in '" << m_filePath << "' could not be verified!");
 
-                auto graph = serialization::GetExecutionGraph(buffer);
+                auto graph = s::GetExecutionGraph(buffer);
 
                 EXECGRAPH_THROW_EXCEPTION_IF(graph == nullptr,
                                              "Deserialization from '" << m_filePath << "' is invalid!");
 
-                setupGraph(*graph);
+                readGraph(*graph);
             }
 
-            //! Store an execution graph to the file `filePath`.
-            void store(const std::path& filePath, bool bOverwrite = false) noexcept(false);
+            //! Write an execution graph to the file `filePath`.
+            void write(const std::path& filePath, bool bOverwrite = false) noexcept(false);
+            {
+                flatbuffers::FlatBufferBuilder builder;
+                auto graphOffset = writeGraph(builder, m_graph);
+                s::FinishExecutionGraphBuffer(builder, graphOffset);
+
+                std::ofstream file;
+                EXECGRAPH_THROW_EXCEPTION_IF(!bOverwrite && std::filesystem::exists(filePath),
+                                             "File '" << filePath << "' already exists!");
+
+                file.open(filePath.string(), std::ios_base::trunc | std::ios_base::binary | std::ios_base::in);
+                file.write(reinterpret_cast<const char*>(builder.GetBufferPointer()), builder.GetSize());
+                file.close();
+            }
 
         private:
-            void setupGraph(const serialization::ExecutionGraph& graph)
+            flatbuffers::Offset<s::ExecutionGraph> writeGraph(flatbuffers::FlatBufferBuilder& builder, const Graph& graph) const
+            {
+                flatbuffers::Offset<flatbuffers::Vector<s::LogicNode>> nodesOffset;
+                flatbuffers::Offset<flatbuffers::Vector<s::ExecutionGraphNodeProperties>> nodePropertiesOffset;
+
+                std::tie(nodesOffset, nodePropertiesOffset) = writeNodes(builder, graph);
+                auto linksOffset                            = writeLinks(builder, graph);
+
+                s::ExecutionGraphBuilder graphBuilder(builder);
+                graphBuilder.add_nodes(nodesOffset);
+                graphBuilder.add_nodeProperties(nodePropertiesOffset);
+                graphBuilder.add_links(linksOffset);
+            }
+
+            void writeNodes(flatbuffers::FlatBufferBuilder& builder, const Graph& graph) const
+            {
+                writeNodes(builder, graph);
+            }
+
+        private:
+            void readGraph(const s::ExecutionGraph& graph)
             {
                 auto nodes = graph.nodes();
                 if(nodes)
                 {
-                    setupNodes(*nodes);
+                    readNodes(*nodes);
                 }
 
                 auto links = graph.links();
                 if(links)
                 {
-                    setupLinks(*links);
+                    readLinks(*links);
                 }
             }
 
             template<typename Nodes>
-            void setupNodes(Nodes& nodes)
+            void readNodes(Nodes& nodes)
             {
                 for(auto node : nodes)
                 {
@@ -112,7 +148,7 @@ namespace executionGraph
             }
 
             template<typename Links>
-            void setupLinks(Links& links)
+            void readLinks(Links& links)
             {
                 for(auto link : links)
                 {

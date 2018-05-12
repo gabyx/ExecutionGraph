@@ -70,7 +70,7 @@ namespace executionGraph
                 Visited,          //!< All visited nodes (globally)
                 OnCurrentDFRPath  //!< This mark is set for all nodes on the current depth-first recursion path.
             };
-            bool isFlagSet(TraversalFlags position) { return m_flags & (1 << position); }
+            bool isFlagSet(TraversalFlags position) const { return m_flags & (1 << position); }
             void setFlag(TraversalFlags position) { m_flags |= (1 << position); }
             void unsetFlag(TraversalFlags position) { m_flags &= ~(1 << position); }
 
@@ -165,6 +165,11 @@ namespace executionGraph
             EXECGRAPH_THROW_EXCEPTION_IF(it == m_nodeGroups.end(),
                                          "Group with id: " << groupId << " is not part of the tree!");
             return it->second;
+        }
+
+        const NodeDataSet& getNodes() const
+        {
+            return m_allNodes;
         }
 
         //! Adds a node to the execution tree and classifies it as \p type.

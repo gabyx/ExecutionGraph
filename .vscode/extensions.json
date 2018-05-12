@@ -9,6 +9,6 @@
         "EditorConfig.editorconfig",
         "msjsdiag.debugger-for-chrome",
         "doi.fileheadercomment",
-        "gaborv.flatbuffers"
+        "gaborv.flatbuffers",
     ]
 }
