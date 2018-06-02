@@ -108,9 +108,65 @@ namespace executionGraph
                 graphBuilder.add_links(linksOffset);
             }
 
-            void writeNodes(flatbuffers::FlatBufferBuilder& builder, const Graph& graph) const
+            auto writeNodes(flatbuffers::FlatBufferBuilder& builder, const Graph& graph) const
             {
-                writeNodes(builder, graph);
+                using NodesOffset          = flatbuffers::Offset<flatbuffers::Vector<s::LogicNode>>;
+                using NodePropertiesOffset = flatbuffers::Offset<flatbuffers::Vector<s::ExecutionGraphNodeProperties>>;
+
+                std::vector<flatbuffers::Offset<s::ExecutionGraphNodeProperties>> nodeProps;
+                std::vector<flatbuffers::Offset<s::LogicNode>> nodes;
+                for(auto* nodeData : graph.getNodes())
+                {
+                    auto& node = *nodeData.m_node;
+                    // Serialize Node
+                    nodes.emplace_back(m_nodeSerializer.write(node));
+
+                    // Serialize Properties
+                    std::vector<uint64_t> groups(nodeData.m_groups.begin(), nodeData.end());
+                    auto groupsOffset = builder.CreateVector(groups.data(), groups.size());
+                    s::ExecutionGraphNodePropertiesBuilder nodePropsBuilder(builder);
+                    nodePropsBuilder.add_nodeId(node.getId());
+                    auto enumClass = s::EnumValuesNodeClassification(static_cast<std::underlying_type_t<Graph::NodeClassfication>>(nodeData.m_class))
+                                         nodePropsBuilder.add_classification(enumClass);
+                    nodePropsBuilder.add_groups(groupsOffset);
+                    nodeProps.emplace_back(nodePropsBuilder.Finish());
+                }
+
+                return {builder.CreateVector(nodes),
+                        builder.CreateVector(nodeProps)};
+            }
+
+            auto writeLinks(flatbuffers::FlatBufferBuilder& builder, const Graph& graph) const
+            {
+                std::vector<s::SocketLink> socketLinks;
+                for(auto* nodeData : graph.getNodes())
+                {
+                    auto& node = *nodeData.m_node;
+
+                    for(auto& inputSocket : node.getInputs())
+                    {
+                        // Serialize all Write-Links
+                        for(auto& writeSockets : inputSocket->getWritingSockets())
+                        {
+                            socketLinks.emplace_back(s::SocketLink{writeSocket.getParent().getId(),
+                                                                   writeSocket.getIndex(),
+                                                                   node.getId(),
+                                                                   inputSocket.getIndex(),
+                                                                   true});
+                        }
+                        // Serialize Get-Link
+                        if(inputSocket->hasGetLink())
+                        {
+                            SocketOutputBaseType* outSocket = inputSocket->fallowGetLink();
+                            socketLinks.emplace_back(s::SocketLink{outSocket->getId(),
+                                                                   outSocket->getIndex(),
+                                                                   node.getId(),
+                                                                   inputSocket.getIndex(),
+                                                                   false});
+                        }
+                    }
+                }
+                return builder.CreateVectorOfStructs(socketLinks, socketLinks.size());
             }
 
         private:

@@ -50,6 +50,7 @@ namespace executionGraph
     private:
         static const std::underlying_type_t<NodeClassification> m_nNodeClasses = 4;
 
+    public:
         //! Internal Datastructure to store node related data.
         using NodePointer = std::unique_ptr<NodeBaseType>;
         struct NodeData
@@ -61,8 +62,8 @@ namespace executionGraph
 
             NodePointer m_node         = nullptr;
             NodeClassification m_class = NodeClassification::NormalNode;
-            std::unordered_set<GroupId> m_groups;  //! To which group ids this node belongs.
-            IndexType m_priority = 0;              //! The priority of this node
+            std::unordered_set<GroupId> m_groups;  //!< To which group ids this node belongs.
+            IndexType m_priority = 0;              //!< The priority of this node
 
             void resetTraversalParameters() { m_flags = 0; }
             enum TraversalFlags : int
@@ -91,13 +92,15 @@ namespace executionGraph
         using LogicNodeDefaultOutputs = LogicNodeDefaultPool<TConfig>;
 
     public:
-        ExecutionTreeInOut()
+        ExecutionTreeInOut(bool addDefaultOutputPool = true)
         {
-            // Make a default pool of output sockets.
-            auto p                  = std::make_unique<LogicNodeDefaultOutputs>(std::numeric_limits<NodeId>::max(), "DefaultOutputPool");
-            m_nodeDefaultOutputPool = p.get();
-            addNode(std::move(p), NodeClassification::ConstantNode);
+            if(addDefaultOutputPool)
+            {
+                addDefaultOutputPool(std::make_unique<LogicNodeDefaultOutputs>(std::numeric_limits<NodeId>::max(),
+                                                                               "DefaultOutputPool"));
+            }
         }
+
         virtual ~ExecutionTreeInOut() = default;
 
         //! Set the node class of a specific node id \p nodeId.
@@ -151,6 +154,15 @@ namespace executionGraph
             return p;
         }
 
+        void addDefaultOutputPool(std::unique_ptr<LogicNodeDefaultOutputs> defaultOutputPool)
+        {
+            EXECGRAPH_THROW_EXCEPTION_IF(m_nodeDefaultOutputPool != nullptr, "Default output pool already added!");
+            // Make a default pool of output sockets.
+            auto p                  = defaultOutputPool;
+            m_nodeDefaultOutputPool = p.get();
+            addNode(std::move(p), NodeClassification::ConstantNode);
+        }
+
         //! Get the pool of default output sockets.
         //! All not connected input sockets will be hooked up to these default output sockets!
         LogicNodeDefaultOutputs& getDefaultOuputPool() { return *m_nodeDefaultOutputPool; }
@@ -167,10 +179,8 @@ namespace executionGraph
             return it->second;
         }
 
-        const NodeDataSet& getNodes() const
-        {
-            return m_allNodes;
-        }
+        //! Get all nodes in this graph.
+        const NodeDataSet& getNodes() const { return m_allNodes; }
 
         //! Adds a node to the execution tree and classifies it as \p type.
         virtual NodeBaseType* addNode(NodePointer node,
@@ -392,16 +402,14 @@ namespace executionGraph
                 // All input sockets need to be connected!
                 for(SocketInputBasePointer& inSocket : nodeData.m_node->getInputs())
                 {
-                    if(m_defaultOutputSockets)
+                    // Socket is dangling!
+                    if(inSocket->getConnectionCount() == 0)
                     {
-                        m_defaultOutputSockets->connectIfDangling(*inSocket);
-                    }
-                    else
-                    {
-                        EXECGRAPH_THROW_EXCEPTION_TYPE_IF(inSocket->getConnectionCount() == 0,
+                        EXECGRAPH_THROW_EXCEPTION_TYPE_IF(m_defaultOutputSockets == nullptr,
                                                           "Input socket index: " << inSocket->getIndex()
-                                                                                 << "of node: " << nodeData.m_node->getId() << " is not connected!",
+                                                                                 << "of node: " << nodeData.m_node->getId() << " is dangling and cannot be connected to default output, since it is not set!",
                                                           NodeConnectionException);
+                        m_defaultOutputSockets->connect(*inSocket);
                     }
                 }
             }

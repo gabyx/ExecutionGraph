@@ -42,23 +42,20 @@ namespace executionGraph
         }
 
         //! Connects the input socket `inSocket` to this default output socket which is
-        //! specified by `inSocket.getDefaultOutputSocketIndex()` which cooresponds
+        //! specified by `inSocket.getDefaultOutputSocketIndex()` which corresponds
         //! by default to the type-matching output socket id of this class.
-        void connectIfDangling(SocketInputBaseType& inSocket)
+        void connect(SocketInputBaseType& inSocket)
         {
-            if(inSocket.getConnectionCount() == 0)
+            IndexType defaultOutSocketID = inSocket.getType();  // the type index corresponds to our output socket index.
+            if(this->hasOSocket(defaultOutSocketID))
             {
-                IndexType defaultOutSocketID = inSocket.getDefaultOutputSocketIndex();
-                if(this->hasOSocket(defaultOutSocketID))
-                {
-                    inSocket.setGetLink(this->getOSocket(defaultOutSocketID));
-                }
-                else
-                {
-                    EXECGRAPH_THROW_EXCEPTION_TYPE("Default output socket id: " << defaultOutSocketID
-                                                                                << "does not exist in default output socket pool!",
-                                                   NodeConnectionException);
-                }
+                inSocket.setGetLink(this->getOSocket(defaultOutSocketID));
+            }
+            else
+            {
+                EXECGRAPH_THROW_EXCEPTION_TYPE("Default output socket id: " << defaultOutSocketID
+                                                                            << "does not exist in default output socket pool!",
+                                               NodeConnectionException);
             }
         }
 

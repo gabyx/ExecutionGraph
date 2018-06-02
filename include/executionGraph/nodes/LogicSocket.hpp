@@ -70,8 +70,8 @@ namespace executionGraph
                       "SocketInputBaseType not the same as this base!");
 
         template<typename... Args>
-        LogicSocketInputBase(IndexType type, IndexType defaultOutputSocketIndex, Args&&... args)
-            : LogicSocketBase<TConfig>(type, std::forward<Args>(args)...), m_defaultOutputSocketIndex(defaultOutputSocketIndex)
+        LogicSocketInputBase(IndexType type, Args&&... args)
+            : LogicSocketBase<TConfig>(type, std::forward<Args>(args)...)
         {
         }
 
@@ -130,11 +130,6 @@ namespace executionGraph
         //! Get the connection count of this input socket.
         IndexType getConnectionCount() const { return (hasGetLink() ? 1 : 0) + m_writingParents.size(); }
 
-        //! Get the default output socket id.
-        //! This can be used by the execution graph, to automatically connect dangling input sockets
-        //! to a pool of default output sockets.
-        IndexType getDefaultOutputSocketIndex() { return m_defaultOutputSocketIndex; }
-
     protected:
         //! Remove the Get-Link and optionally notify output.
         template<bool notifyOutput = true>
@@ -170,10 +165,6 @@ namespace executionGraph
                 m_data = hasGetLink() ? m_getFrom->m_data : nullptr;
             }
         }
-
-        //! The default output socket id. This defaults to `m_type` since for every type
-        //! in SocketTypes there needs to be a default socket which is used as default.
-        const IndexType m_defaultOutputSocketIndex;
 
         SocketOutputBaseType* m_getFrom = nullptr;                   //!< The single Get-Link attached to this Socket.
         void const* m_data              = nullptr;                   //!< The pointer to the actual data of this input node.

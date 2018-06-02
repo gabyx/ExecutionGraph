@@ -106,18 +106,17 @@ namespace executionGraph
 
         //! Add an input socket with default value from the default output socket \p defaultOutputSocketId.
         template<typename TData>
-        void addISock(IndexType defaultOutputSocketId = meta::find_index<SocketTypes, TData>::value,
-                      const std::string& name         = "noname")
+        void addISock(onst std::string& name = "noname")
         {
             SocketIndex id = m_inputs.size();
 
             auto p = SocketPointer<SocketInputBaseType>(
-                new SocketInputType<TData>(defaultOutputSocketId, id, *this, name),
+                new SocketInputType<TData>(id, *this, name),
                 [](SocketInputBaseType* s) { delete static_cast<SocketInputType<TData>*>(s); });
             m_inputs.push_back(std::move(p));
         }
 
-        //! Add an input socket with default value \p defaultValue.
+        //! Add an output socket with default value \p defaultValue.
         template<typename TData, typename T>
         void addOSock(T&& defaultValue,
                       const std::string& name = "noname")
@@ -206,11 +205,6 @@ namespace executionGraph
         //! Get the input socket value from a SocketDeclaration `InputSocketDeclaration`.
         template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF((meta::is<TSocketDeclaration, details::InputSocketDeclaration>::value))>
         const typename TSocketDeclaration::DataType& getValue() const;
-
-        //! Writes the value of the output socket at index \p idx to all inputs
-        //! which are accesible by write links.
-        template<typename T>
-        void distributeOSocketValue(SocketIndex idx);
 
         //! Constructs a Get-Link to get the data from output socket at index \p outS
         //! of logic node \p outN at the input socket at index \p inS of logic node \p
@@ -355,14 +349,6 @@ namespace executionGraph
         auto idx = TSocketDeclaration::Index::value;
         EXECGRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
         return m_outputs[idx]->template castToType<typename TSocketDeclaration::DataType>()->getValue();
-    }
-
-    template<typename TConfig>
-    template<typename T>
-    void LogicNode<TConfig>::distributeOSocketValue(SocketIndex idx)
-    {
-        EXECGRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
-        m_outputs[idx]->template castToType<T>()->distributeValue();
     }
 
     template<typename TConfig>
