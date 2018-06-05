@@ -67,7 +67,7 @@ namespace executionGraph
             {
                 NodeId id = node.getId();
 
-                std::string type = rttr::type::get(node).get_name();
+                std::string type = rttr::type::get(node).get_name().to_string();
                 auto typeOffsets = builder.CreateString(type);
 
                 // Dispatch to the correct serialization write function.

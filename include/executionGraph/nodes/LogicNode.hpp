@@ -106,7 +106,7 @@ namespace executionGraph
 
         //! Add an input socket with default value from the default output socket \p defaultOutputSocketId.
         template<typename TData>
-        void addISock(onst std::string& name = "noname")
+        void addISock(const std::string& name = "noname")
         {
             SocketIndex id = m_inputs.size();
 
