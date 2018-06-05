@@ -41,15 +41,21 @@ FLATBUFFERS_STRUCT_END(Vec3, 12);
 
 struct Test FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_POS = 4
+    VT_POS = 4,
+    VT_POS2 = 6
   };
   const flatbuffers::Vector<const Vec3 *> *pos() const {
     return GetPointer<const flatbuffers::Vector<const Vec3 *> *>(VT_POS);
+  }
+  const flatbuffers::Vector<const Vec3 *> *pos2() const {
+    return GetPointer<const flatbuffers::Vector<const Vec3 *> *>(VT_POS2);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_POS) &&
            verifier.Verify(pos()) &&
+           VerifyOffset(verifier, VT_POS2) &&
+           verifier.Verify(pos2()) &&
            verifier.EndTable();
   }
 };
@@ -59,6 +65,9 @@ struct TestBuilder {
   flatbuffers::uoffset_t start_;
   void add_pos(flatbuffers::Offset<flatbuffers::Vector<const Vec3 *>> pos) {
     fbb_.AddOffset(Test::VT_POS, pos);
+  }
+  void add_pos2(flatbuffers::Offset<flatbuffers::Vector<const Vec3 *>> pos2) {
+    fbb_.AddOffset(Test::VT_POS2, pos2);
   }
   explicit TestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -74,18 +83,22 @@ struct TestBuilder {
 
 inline flatbuffers::Offset<Test> CreateTest(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<const Vec3 *>> pos = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<const Vec3 *>> pos = 0,
+    flatbuffers::Offset<flatbuffers::Vector<const Vec3 *>> pos2 = 0) {
   TestBuilder builder_(_fbb);
+  builder_.add_pos2(pos2);
   builder_.add_pos(pos);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<Test> CreateTestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<Vec3> *pos = nullptr) {
+    const std::vector<Vec3> *pos = nullptr,
+    const std::vector<Vec3> *pos2 = nullptr) {
   return test::CreateTest(
       _fbb,
-      pos ? _fbb.CreateVectorOfStructs<Vec3>(*pos) : 0);
+      pos ? _fbb.CreateVectorOfStructs<Vec3>(*pos) : 0,
+      pos2 ? _fbb.CreateVectorOfStructs<Vec3>(*pos2) : 0);
 }
 
 inline const test::Test *GetTest(const void *buf) {

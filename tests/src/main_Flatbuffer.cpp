@@ -29,6 +29,34 @@
 #    pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 
+MY_TEST(FlatBuffer, Test1)
+{
+    unsigned int n = 100;
+    namespace t    = test;
+
+    flatbuffers::FlatBufferBuilder builder;
+    std::vector<t::Vec3> vecs(n, t::Vec3(1, 3, 4));
+    auto vecsOffsets  = builder.CreateVectorOfStructs(vecs.data(), vecs.size());
+    auto vecsOffsets2 = builder.CreateVectorOfStructs(vecs.data(), vecs.size());
+
+    auto testBuilder = t::TestBuilder(builder);
+    testBuilder.add_pos(vecsOffsets);
+    testBuilder.add_pos2(vecsOffsets2);
+
+    auto test = testBuilder.Finish();
+    builder.Finish(test);
+
+    uint8_t* file    = builder.GetBufferPointer();
+    std::size_t size = builder.GetSize();
+
+    // Reading back.
+    flatbuffers::Verifier v(file, size);
+    ASSERT_TRUE(t::VerifyTestBuffer(v));
+    auto rtest = t::GetTest(file);
+    ASSERT_EQ(rtest->pos()->size(), n) << " Wupi, wrong serialization!";
+    ASSERT_EQ((*rtest->pos())[n - 1]->z(), 4);
+}
+
 namespace s = executionGraph::serialization;
 
 using Config    = executionGraph::GeneralConfig<>;
@@ -86,7 +114,7 @@ struct NodeSerializerRead
     }
 };
 
-MY_TEST(FlatBuffer, Test1)
+MY_TEST(FlatBuffer, Test2)
 {
     unsigned int nNodes = 500;
 
@@ -164,31 +192,6 @@ MY_TEST(FlatBuffer, Test1)
     }
 
     std::filesystem::remove("myGraph.eg");
-}
-
-MY_TEST(FlatBuffer, Test2)
-{
-    unsigned int n = 100;
-    namespace t    = test;
-
-    flatbuffers::FlatBufferBuilder builder;
-    std::vector<t::Vec3> vecs(n, t::Vec3(1, 3, 4));
-    auto vecsOffsets = builder.CreateVectorOfStructs(vecs.data(), vecs.size());
-
-    auto testBuilder = t::TestBuilder(builder);
-    testBuilder.add_pos(vecsOffsets);
-    auto test = testBuilder.Finish();
-    builder.Finish(test);
-
-    uint8_t* file    = builder.GetBufferPointer();
-    std::size_t size = builder.GetSize();
-
-    // Reading back.
-    flatbuffers::Verifier v(file, size);
-    ASSERT_TRUE(t::VerifyTestBuffer(v));
-    auto rtest = t::GetTest(file);
-    ASSERT_EQ(rtest->pos()->size(), n) << " Wupi, wrong serialization!";
-    ASSERT_EQ((*rtest->pos())[n - 1]->z(), 4);
 }
 
 int main(int argc, char** argv)

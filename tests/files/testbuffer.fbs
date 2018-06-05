@@ -8,6 +8,7 @@ struct Vec3 {
 
 table Test {
   pos:[Vec3] (id:0);
+  pos2:[Vec3] (id:1);
 }
 
 root_type Test;
