@@ -473,7 +473,7 @@ namespace executionGraph
                 }
             }
 
-        private:
+        protected:
             LogicNodeDefaultOutputs* m_defaultOutputSockets;  //!< Default output sockets which are used for all dangling input sockets.
             ConstantNodeDataStorage& m_constantNodes;         //!< Constant nodes which do not need evaluation.
         };
@@ -648,9 +648,9 @@ namespace executionGraph
             }
 
             /**
-         * This is the visit function during Depth-First-Search,
-         * It adds nodes to the dfsStack if the priority is lower then the one of `nodeData`.
-         */
+             * This is the visit function during Depth-First-Search,
+             * It adds nodes to the dfsStack if the priority is lower then the one of `nodeData`.
+             */
             void visit(NodeData& nodeData)
             {
                 EXECGRAPH_EXECTREE_SOLVER_LOG("visit: " << nodeData.m_node->getId());
@@ -659,8 +659,13 @@ namespace executionGraph
                     // Get NodeData of parentNode
                     auto& parentNode = socket->getParent();
                     auto itParent    = m_nodes.find(parentNode.getId());
-                    EXECGRAPH_THROW_EXCEPTION_IF(itParent == m_nodes.end(),
-                                                 "Node with id: " << parentNode.getId() << " has not been added to the execution tree!");
+                    if(itParent == m_nodes.end())
+                    {
+                        EXECGRAPH_ASSERT(this->m_constantNodes.find(parentNode.getId()) != this->m_constantNodes.end(),
+                                         "Parent node with id: " << parentNode.getId() << " is not a constant node!");
+                        return;
+                    }
+
                     NodeData* parentNodeData = &itParent->second;
 
                     if(parentNodeData->m_priority <= nodeData.m_priority)
@@ -875,8 +880,12 @@ namespace executionGraph
                     // Get NodeData of parentNode
                     auto& parentNode = socket->getParent();
                     auto itParent    = m_nodes.find(parentNode.getId());
-                    EXECGRAPH_THROW_EXCEPTION_IF(itParent == m_nodes.end(),
-                                                 "Node with id: " << parentNode.getId() << " has not been added to the execution tree!");
+                    if(itParent == m_nodes.end())
+                    {
+                        EXECGRAPH_ASSERT(this->m_constantNodes.find(parentNode.getId()) != this->m_constantNodes.end(),
+                                         "Parent node with id: " << parentNode.getId() << " is not a constant node!");
+                        return;
+                    }
                     NodeData* parentNodeData = &itParent->second;
 
                     if(!parentNodeData->isFlagSet(NodeData::Visited))
@@ -940,8 +949,7 @@ namespace executionGraph
 
             bool m_inputReachable     = false;
             NodeBaseType* m_reachNode = nullptr;
-            NodeDataStorage& m_nodes;  //!< All NodeDatas of the execution tree.
-
+            NodeDataStorage& m_nodes;           //!< All node datas of of non-constant nodes.
             std::vector<NodeData*> m_dfrStack;  //!< Depth-First-Search Stack
         };
 

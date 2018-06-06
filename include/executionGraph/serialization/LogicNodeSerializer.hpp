@@ -25,7 +25,19 @@ namespace executionGraph
         /*!
             Serializer which loads a Logic Node.
             `CreatorListWrite` and `CreatorListRead` needs to fullfill 
-            the requirements of the template parameter of `StaticFactory`.
+            the requirements of the template parameter of `executionGrpah::StaticFactory`:
+
+            The CreatorListRead contains Creators with the following interface:
+            @code
+                static std::unique_ptr<NodeBaseType>
+                create(const serialization::LogicNode& node)
+            @endcode
+
+            The CreatorListWrite contains Creators with the following interface:
+            @code
+                static std::pair<const uint8_t*, std::size_t>
+                create(flatbuffers::FlatBufferBuilder& builder, const NodeBaseType& node)
+            @endcode
 
             @date Tue May 01 2018
             @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
@@ -48,12 +60,10 @@ namespace executionGraph
             static std::unique_ptr<NodeBaseType>
             read(const serialization::LogicNode& logicNode)
             {
-                NodeId id        = logicNode.id();
                 std::string type = logicNode.type()->str();
-
                 // Dispatch to the correct serialization read function
                 // the factory reads and returns the logic node
-                auto optNode = FactoryRead::create(rttr::type::get_by_name(type), id, logicNode);
+                auto optNode = FactoryRead::create(rttr::type::get_by_name(type), logicNode);
                 if(optNode)
                 {
                     return std::move(*optNode);
@@ -76,8 +86,8 @@ namespace executionGraph
                 flatbuffers::Offset<flatbuffers::Vector<uint8_t>> dataOffset;
 
                 std::optional<std::pair<const uint8_t*, std::size_t>>
-                    optData = FactoryWrite::create(rttr::type::get_by_name(type),
-                                                   builder,
+                    optData = FactoryWrite::create(rttr::type::get(node),
+                                                   builderData,
                                                    node);
 
                 if(optData)

@@ -201,14 +201,14 @@ namespace executionGraph
     }  // namespace details
 
 //! Some handy macro to use when inheriting from LogicNode.
-#define EXECGRAPH_DEFINE_SOCKET_TRAITS(InputEnum, OutputEnum)                                                       \
-    template<InputEnum id, typename TData>                                                                          \
-    using InSocketDecl = executionGraph::details::InputSocketDeclarationBase<meta::size_t<enumToInt(id)>, TData>;   \
-    template<OutputEnum id, typename TData>                                                                         \
-    using OutSocketDecl = executionGraph::details::OutputSocketDeclarationBase<meta::size_t<enumToInt(id)>, TData>; \
-    template<typename... TSockets>                                                                                  \
-    using InSocketDeclList = executionGraph::details::InputSocketDeclarationList<InputEnum, TSockets...>;           \
-    template<typename... TSockets>                                                                                  \
+#define EXECGRAPH_DEFINE_SOCKET_TRAITS(InputEnum, OutputEnum)                                                                       \
+    template<InputEnum id, typename TData>                                                                                          \
+    using InSocketDecl = executionGraph::details::InputSocketDeclarationBase<meta::size_t<executionGraph::enumToInt(id)>, TData>;   \
+    template<OutputEnum id, typename TData>                                                                                         \
+    using OutSocketDecl = executionGraph::details::OutputSocketDeclarationBase<meta::size_t<executionGraph::enumToInt(id)>, TData>; \
+    template<typename... TSockets>                                                                                                  \
+    using InSocketDeclList = executionGraph::details::InputSocketDeclarationList<InputEnum, TSockets...>;                           \
+    template<typename... TSockets>                                                                                                  \
     using OutSocketDeclList = executionGraph::details::OutputSocketDeclarationList<OutputEnum, TSockets...>;
 
 }  // namespace executionGraph

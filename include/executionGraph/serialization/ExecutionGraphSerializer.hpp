@@ -37,19 +37,19 @@ namespace executionGraph
         class ExecutionGraphSerializer
         {
         public:
-            using Graph   = TGraphType;
-            using TConfig = typename Graph::Config;
+            using GraphType = TGraphType;
+            using TConfig   = typename GraphType::Config;
             EXECGRAPH_TYPEDEF_CONFIG(TConfig);
             using LogicNodeSerializer = TLogicNodeSerializer;
 
-            ExecutionGraphSerializer(Graph& graph, LogicNodeSerializer& nodeSerializer)
-                : m_graph(graph), m_nodeSerializer(nodeSerializer)
+            ExecutionGraphSerializer(LogicNodeSerializer& nodeSerializer)
+                : m_nodeSerializer(nodeSerializer)
             {}
             ~ExecutionGraphSerializer() = default;
 
         public:
             //! Read an execution graph from a file `filePath`.
-            void read(const std::path& filePath) noexcept(false)
+            std::unique_ptr<GraphType> read(const std::path& filePath) noexcept(false)
             {
                 m_filePath = filePath;
                 // Memory mapping the file
@@ -72,14 +72,16 @@ namespace executionGraph
                 EXECGRAPH_THROW_EXCEPTION_IF(graph == nullptr,
                                              "Deserialization from '" << m_filePath << "' is invalid!");
 
-                readGraph(*graph);
+                auto execGraph = std::make_unique<GraphType>();
+                readGraph(*execGraph, *graph);
+                return std::move(execGraph);
             }
 
             //! Write an execution graph to the file `filePath`.
-            void write(const std::path& filePath, bool bOverwrite = false) noexcept(false)
+            void write(const GraphType& execGraph, const std::path& filePath, bool bOverwrite = false) noexcept(false)
             {
                 flatbuffers::FlatBufferBuilder builder;
-                auto graphOffset = writeGraph(builder, m_graph);
+                auto graphOffset = writeGraph(builder, execGraph);
                 FinishExecutionGraphBuffer(builder, graphOffset);
 
                 std::ofstream file;
@@ -94,13 +96,13 @@ namespace executionGraph
         private:
             //! Serialize a graph `graph` and return the offsets.
             flatbuffers::Offset<ExecutionGraph>
-            writeGraph(flatbuffers::FlatBufferBuilder& builder, const Graph& graph) const
+            writeGraph(flatbuffers::FlatBufferBuilder& builder, const GraphType& execGraph) const
             {
                 flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<LogicNode>>> nodesOffset;
                 flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<ExecutionGraphNodeProperties>>> nodePropertiesOffset;
 
-                std::tie(nodesOffset, nodePropertiesOffset) = writeNodes(builder, graph);
-                auto linksOffset                            = writeLinks(builder, graph);
+                std::tie(nodesOffset, nodePropertiesOffset) = writeNodes(builder, execGraph);
+                auto linksOffset                            = writeLinks(builder, execGraph);
 
                 ExecutionGraphBuilder graphBuilder(builder);
                 graphBuilder.add_nodes(nodesOffset);
@@ -109,13 +111,13 @@ namespace executionGraph
                 return graphBuilder.Finish();
             }
 
-            //! Serialize all nodes of the graph `graph` and return the offsets.
-            auto writeNodes(flatbuffers::FlatBufferBuilder& builder, const Graph& graph) const
+            //! Serialize all nodes of the graph `execGraph` and return the offsets.
+            auto writeNodes(flatbuffers::FlatBufferBuilder& builder, const GraphType& execGraph) const
             {
                 std::vector<flatbuffers::Offset<ExecutionGraphNodeProperties>> nodeProps;
                 std::vector<flatbuffers::Offset<LogicNode>> nodes;
 
-                auto pair              = graph.getNodes();
+                auto pair              = execGraph.getNodes();
                 auto& nonConstantNodes = pair.first;
                 auto& constantNodes    = pair.second;
 
@@ -147,7 +149,7 @@ namespace executionGraph
                         auto groupsOffset = builder.CreateVector(groups.data(), groups.size());
                         ExecutionGraphNodePropertiesBuilder nodePropsBuilder(builder);
                         nodePropsBuilder.add_nodeId(node->getId());
-                        using NodeClassification = typename Graph::NodeClassification;
+                        using NodeClassification = typename GraphType::NodeClassification;
                         auto enumClass           = EnumValuesNodeClassification()[static_cast<std::underlying_type_t<NodeClassification>>(nodeData.m_class)];
                         nodePropsBuilder.add_classification(enumClass);
                         nodePropsBuilder.add_groups(groupsOffset);
@@ -170,11 +172,11 @@ namespace executionGraph
             }
 
             //! Serialize all links of a graph `graph` and return the offsets.
-            auto writeLinks(flatbuffers::FlatBufferBuilder& builder, const Graph& graph) const
+            auto writeLinks(flatbuffers::FlatBufferBuilder& builder, const GraphType& execGraph) const
             {
                 std::vector<SocketLink> socketLinks;
 
-                auto& nonConstantNodes = graph.getNodes().first;
+                auto& nonConstantNodes = execGraph.getNodes().first;
                 // Iterate over all non-constant nodes.
                 for(auto& keyValue : nonConstantNodes)
                 {
@@ -208,24 +210,24 @@ namespace executionGraph
 
         private:
             //! Deserialize a graph `graph` into the internal graph.
-            void readGraph(const ExecutionGraph& graph)
+            void readGraph(GraphType& execGraph, const ExecutionGraph& graph)
             {
                 auto nodes = graph.nodes();
                 if(nodes)
                 {
-                    readNodes(*nodes);
+                    readNodes(execGraph, *nodes);
                 }
 
                 auto links = graph.links();
                 if(links)
                 {
-                    readLinks(*links);
+                    readLinks(execGraph, *links);
                 }
             }
 
             //! Deserialize all nodes of a graph `graph` into the internal graph.
             template<typename Nodes>
-            void readNodes(Nodes& nodes)
+            void readNodes(GraphType& execGraph, Nodes& nodes)
             {
                 for(auto node : nodes)
                 {
@@ -233,18 +235,18 @@ namespace executionGraph
                     if(logicNode)
                     {
                         EXECGRAPH_LOG_TRACE("Adding node with id: " << node->id());
-                        m_graph.addNode(std::move(logicNode));
+                        execGraph.addNode(std::move(logicNode));
                     }
                     else
                     {
-                        EXECGRAPH_LOG_TRACE("Could not load node with id: " << node->id());
+                        EXECGRAPH_THROW_EXCEPTION("Could not load node with id: " << node->id());
                     }
                 }
             }
 
             //! Deserialize all links of a graph `graph` into the internal graph.
             template<typename Links>
-            void readLinks(Links& links)
+            void readLinks(GraphType& execGraph, Links& links)
             {
                 for(auto link : links)
                 {
@@ -253,7 +255,6 @@ namespace executionGraph
 
         private:
             std::path m_filePath;                   //!< The temporary file path.
-            Graph& m_graph;                         //!< The graph which is stored or deserialized into.
             LogicNodeSerializer& m_nodeSerializer;  //!< The node serializer which provides load/store operations for LogicNodes.
         };
     }  // namespace serialization

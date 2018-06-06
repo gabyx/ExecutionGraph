@@ -45,7 +45,7 @@ using SocketTypes = meta::list<double, std::shared_ptr<A>>;
 using Config      = GeneralConfig<SocketTypes>;
 
 template<typename TConfig>
-class IntegerNode : public TConfig::NodeBaseType
+class CustomDummyNode : public TConfig::NodeBaseType
 {
 public:
     using Config = TConfig;
@@ -71,7 +71,7 @@ public:
     EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
 
     template<typename... Args>
-    IntegerNode(Args&&... args)
+    CustomDummyNode(Args&&... args)
         : Base(std::forward<Args>(args)...)
     {
         // Add all sockets
@@ -96,16 +96,16 @@ public:
 MY_TEST(ExecutionTree_Test, Int_Int)
 {
     // Integer node connection (wrong connection)
-    auto node1a = std::make_unique<IntegerNode<Config>>(0u);
-    auto node1b = std::make_unique<IntegerNode<Config>>(1u);
+    auto node1a = std::make_unique<CustomDummyNode<Config>>(0u);
+    auto node1b = std::make_unique<CustomDummyNode<Config>>(1u);
 
-    auto node2a = std::make_unique<IntegerNode<Config>>(2u);
-    auto node2b = std::make_unique<IntegerNode<Config>>(3u);
+    auto node2a = std::make_unique<CustomDummyNode<Config>>(2u);
+    auto node2b = std::make_unique<CustomDummyNode<Config>>(3u);
 
-    auto node3a = std::make_unique<IntegerNode<Config>>(4u);
-    auto node3b = std::make_unique<IntegerNode<Config>>(5u);
+    auto node3a = std::make_unique<CustomDummyNode<Config>>(4u);
+    auto node3b = std::make_unique<CustomDummyNode<Config>>(5u);
 
-    auto node4a     = std::make_unique<IntegerNode<Config>>(6u);
+    auto node4a     = std::make_unique<CustomDummyNode<Config>>(6u);
     auto resultNode = node4a.get();
 
     try
@@ -153,8 +153,8 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 
     execTree.execute(0);
 
-    EXECGRAPH_LOG_TRACE("Result : " << resultNode->getOutVal<IntegerNode<Config>::Result1>()->memory[1]);
-    EXECGRAPH_THROW_EXCEPTION_IF(resultNode->getOutVal<IntegerNode<Config>::Result1>()->memory[1] != 30, "wrong result");
+    EXECGRAPH_LOG_TRACE("Result : " << resultNode->getOutVal<CustomDummyNode<Config>::Result1>()->memory[1]);
+    EXECGRAPH_THROW_EXCEPTION_IF(resultNode->getOutVal<CustomDummyNode<Config>::Result1>()->memory[1] != 30, "wrong result");
 }
 
 int main(int argc, char** argv)

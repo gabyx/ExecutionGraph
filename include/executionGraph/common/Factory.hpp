@@ -123,7 +123,7 @@ namespace executionGraph
         static CreatorType create(Args&&... args)
         {
             using Creator = typename Traits::template getCreatorType<Key>;
-            static_assert(!exists<Key>(), "Your Key is not found in the factory!");
+            static_assert(exists<Key>(), "Your Key is not found in the factory!");
             return Creator::create(std::forward<Args>(args)...);
         }
 

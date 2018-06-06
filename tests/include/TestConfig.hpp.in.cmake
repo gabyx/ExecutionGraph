@@ -9,12 +9,12 @@
 //!  License, v. 2.0. If a copy of the MPL was not distributed with this
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
-#ifndef TestConfig_hpp
-#define TestConfig_hpp
+#ifndef tests_TestConfig_hpp
+#define tests_TestConfig_hpp
 
-  
   #define ExecutionGraph_TESTS_INPUT_FILES_DIR         "@ExecutionGraph_TESTS_INPUT_FILES_DIR@"
   #define ExecutionGraph_TESTS_VALIDATION_FILES_DIR    "@ExecutionGraph_TESTS_VALIDATION_FILES_DIR@"
   #define ExecutionGraph_TESTS_OUTPUT_FILES_DIR        "@ExecutionGraph_TESTS_OUTPUT_FILES_DIR@"
   #define ExecutionGraph_TESTS_INPUT_FILES_ADD_DIR     "@ExecutionGraph_TESTS_INPUT_FILES_ADD_DIR@"
+  
 #endif

@@ -19,9 +19,10 @@
 #include <executionGraph/serialization/schemas/ExecutionGraph_generated.h>
 #include <flatbuffers/flatbuffers.h>
 #include <fstream>
-#include <rttr/registration>
 #include <vector>
 #include "../files/testbuffer_generated.h"
+#include "DummyNode.hpp"
+#include "GraphGenerator.hpp"
 #include "TestFunctions.hpp"
 
 #ifdef __clang__
@@ -59,33 +60,15 @@ MY_TEST(FlatBuffer, Test1)
 
 namespace s = executionGraph::serialization;
 
-using Config    = executionGraph::GeneralConfig<>;
-using GraphType = executionGraph::ExecutionTreeInOut<Config>;
-
-class DummyNode final : public Config::NodeBaseType
-{
-    RTTR_ENABLE()
-public:
-    template<typename... Args>
-    DummyNode(Args&&... args)
-        : Config::NodeBaseType(std::forward<Args>(args)...){};
-    ~DummyNode() = default;
-
-private:
-    void compute() override {}
-    void reset() override {}
-};
-
-RTTR_REGISTRATION
-{
-    rttr::registration::class_<DummyNode>("DummyNode");
-}
+using Config        = executionGraph::GeneralConfig<>;
+using GraphType     = executionGraph::ExecutionTreeInOut<Config>;
+using DummyNodeType = DummyNode<Config>;
 
 struct NodeSerializerWrite
 {
     EXECGRAPH_TYPEDEF_CONFIG(Config);
 
-    using Key = DummyNode;
+    using Key = DummyNodeType;
 
     static std::pair<const uint8_t*, std::size_t>
     create(flatbuffers::FlatBufferBuilder& builder, const NodeBaseType& node)
@@ -105,12 +88,13 @@ struct NodeSerializerRead
 {
     EXECGRAPH_TYPEDEF_CONFIG(Config);
 
-    using Key = DummyNode;
+    using Key = DummyNodeType;
 
     static std::unique_ptr<NodeBaseType>
-    create(executionGraph::NodeId id, const s::LogicNode& node)
+    create(const s::LogicNode& node)
     {
-        return std::make_unique<DummyNode>(id);
+        executionGraph::NodeId id = node.id();
+        return std::make_unique<DummyNodeType>(id);
     }
 };
 
@@ -125,7 +109,7 @@ MY_TEST(FlatBuffer, Test2)
         for(int i = 0; i < nNodes; ++i)
         {
             uint64_t id = i;
-            auto dummy  = builder.CreateString("DummyNode");
+            auto dummy  = builder.CreateString(rttr::type::get<DummyNodeType>().get_name().to_string());
 
             // make some sepcific flexbuffer and add it as data()
             namespace t = test;
@@ -179,17 +163,33 @@ MY_TEST(FlatBuffer, Test2)
 
     {
         EXECGRAPH_LOG_TRACE("Read graph by Serializer");
-        GraphType graph;
+
         using LogicNodeS = s::LogicNodeSerializer<Config,
                                                   meta::list<NodeSerializerWrite>,
                                                   meta::list<NodeSerializerRead>>;
         LogicNodeS nodeSerializer;
-        s::ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(graph, nodeSerializer);
-        serializer.read("myGraph.eg");
+        s::ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(nodeSerializer);
+        auto execGraph = serializer.read("myGraph.eg");
 
         EXECGRAPH_LOG_TRACE("Write graph by Serializer");
-        serializer.write("myGraph-out.eg");
+        serializer.write(*execGraph, "myGraph-out.eg", true);
     }
+
+    std::filesystem::remove("myGraph.eg");
+}
+
+MY_TEST(FlatBuffer, Test3)
+{
+    EXECGRAPH_LOG_TRACE("Build graph");
+    auto execGraph   = createRandomTree<GraphType, DummyNodeType>(3, 123456);
+    using LogicNodeS = s::LogicNodeSerializer<Config,
+                                              meta::list<NodeSerializerWrite>,
+                                              meta::list<NodeSerializerRead>>;
+    LogicNodeS nodeSerializer;
+    s::ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(nodeSerializer);
+    EXECGRAPH_LOG_TRACE("Write graph by Serializer");
+    serializer.write(*execGraph, "myGraph.eg", true);
+    auto graphRead = serializer.read("myGraph.eg");
 
     std::filesystem::remove("myGraph.eg");
 }
