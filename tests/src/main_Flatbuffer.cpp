@@ -63,6 +63,7 @@ namespace s = executionGraph::serialization;
 using Config        = executionGraph::GeneralConfig<>;
 using GraphType     = executionGraph::ExecutionTreeInOut<Config>;
 using DummyNodeType = DummyNode<Config>;
+static const DummyNodeType::AutoRegisterRTTR autoRegisterRTTR;
 
 struct NodeSerializerWrite
 {
@@ -109,7 +110,9 @@ MY_TEST(FlatBuffer, Test2)
         for(int i = 0; i < nNodes; ++i)
         {
             uint64_t id = i;
-            auto dummy  = builder.CreateString(rttr::type::get<DummyNodeType>().get_name().to_string());
+            // DummyNodeType a(1, "asd");
+            // int aa = DummyNodeType::autoRegisterRTTR.m_a + 1;
+            auto dummy = builder.CreateString(rttr::type::get<DummyNodeType>().get_name().to_string());
 
             // make some sepcific flexbuffer and add it as data()
             namespace t = test;

@@ -63,22 +63,49 @@ namespace executionGraph
                 std::string type = logicNode.type()->str();
                 // Dispatch to the correct serialization read function
                 // the factory reads and returns the logic node
-                auto optNode = FactoryRead::create(rttr::type::get_by_name(type), logicNode);
+                auto rttrType = rttr::type::get_by_name(type);
+                auto optNode  = FactoryRead::create(rttrType, logicNode);
                 if(optNode)
                 {
                     return std::move(*optNode);
                 }
-                return nullptr;
+                else
+                {
+                    // try to construct over RTTR
+                    EXECGRAPH_THROW_EXCEPTION_IF(!rttrType.is_derived_from(rttr::type::get<NodeBaseType>()), "Type: " << type << "is not derived from NodeBaseType!"
+                                                                                                                                 "Did you correctly init RTTR?");
+
+                    rttr::variant instance;
+                    if(logicNode.name())
+                    {
+                        rttr::constructor ctor = rttrType.get_constructor({rttr::type::get<NodeId>(),
+                                                                           rttr::type::get<const std::string&>()});
+                        EXECGRAPH_THROW_EXCEPTION_IF(!ctor.is_valid(), "Ctor is invalid for type: " << type);
+                        instance = ctor.invoke(logicNode.id(), logicNode.name()->str());
+                    }
+                    else
+                    {
+                        rttr::constructor ctor = rttrType.get_constructor({rttr::type::get<NodeId>()});
+                        EXECGRAPH_THROW_EXCEPTION_IF(!ctor.is_valid(), "Ctor is invalid for type: " << type);
+                        instance = ctor.invoke(logicNode.id());
+                    }
+                    EXECGRAPH_LOG_DEBUG(instance.get_type().get_name().to_string());
+                    EXECGRAPH_THROW_EXCEPTION_IF(!instance.is_valid(), "Instance is not valid!");
+                    EXECGRAPH_THROW_EXCEPTION_IF(!instance.get_type().is_pointer(), "Instance type needs to be a pointer!");
+
+                    return std::unique_ptr<NodeBaseType>{instance.get_value<NodeBaseType*>()};  // Return the instance
+                }
             }
 
             //! Store a logic node by using the builder `builder`.
             static flatbuffers::Offset<serialization::LogicNode>
             write(flatbuffers::FlatBufferBuilder& builder, const NodeBaseType& node)
             {
-                NodeId id = node.getId();
+                NodeId id       = node.getId();
+                auto nameOffset = builder.CreateString(node.getName());
 
                 std::string type = rttr::type::get(node).get_name().to_string();
-                auto typeOffsets = builder.CreateString(type);
+                auto typeOffset  = builder.CreateString(type);
 
                 // Dispatch to the correct serialization write function.
                 // The factory writes the additional data of the flexbuffer `data` field
@@ -98,7 +125,8 @@ namespace executionGraph
                 // Build the logic node
                 LogicNodeBuilder lnBuilder(builder);
                 lnBuilder.add_id(id);
-                lnBuilder.add_type(typeOffsets);
+                lnBuilder.add_type(typeOffset);
+                lnBuilder.add_name(nameOffset);
                 if(optData)
                 {
                     lnBuilder.add_data(dataOffset);

@@ -15,18 +15,30 @@
 
 #include <executionGraph/common/TypeDefs.hpp>
 #include <executionGraph/config/Config.hpp>
-#include <rttr/type>
+#include <rttr/registration>
 
 //! Stupid dummy Node for testing.
 template<typename TConfig>
 class DummyNode : public TConfig::NodeBaseType
 {
 public:
-    using Config = TConfig;
-    using Base   = typename Config::NodeBaseType;
+    EXECGRAPH_TYPEDEF_CONFIG(TConfig);
+    using Base = typename Config::NodeBaseType;
 
 private:
     RTTR_ENABLE(Base)
+public:
+    struct AutoRegisterRTTR
+    {
+        AutoRegisterRTTR()
+        {
+            rttr::registration::class_<DummyNode>("DummyNode")
+                .template constructor<NodeId, const std::string&>()(
+                    rttr::policy::ctor::as_raw_ptr)
+                .template constructor<NodeId>()(
+                    rttr::policy::ctor::as_raw_ptr);
+        }
+    };
 
 public:
     enum Ins

@@ -64,6 +64,9 @@ namespace executionGraph
 
 #define EXECGRAPH_TYPEDEF_CONFIG(__CONFIG__)                                  \
     using Config                  = __CONFIG__;                               \
+    using NodeId                  = executionGraph::NodeId;                   \
+    using IndexType               = executionGraph::IndexType;                \
+    using SocketIndex             = executionGraph::SocketIndex;              \
     using SocketTypes             = typename Config::SocketTypes;             \
     using NodeBaseType            = typename Config::NodeBaseType;            \
     using SocketInputBaseType     = typename Config::SocketInputBaseType;     \

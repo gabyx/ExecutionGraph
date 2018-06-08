@@ -75,8 +75,10 @@ namespace executionGraph
 
     public:
         //! The basic constructor of a logic node.
-        LogicNode(NodeId id, std::string name = "")
-            : m_id(id), m_name(name.empty() ? std::to_string(id) : name) {}
+        LogicNode(NodeId id, const std::string& name = "")
+            : m_id(id), m_name(name.empty() ? std::to_string(id) : name)
+        {}
+
         LogicNode(const LogicNode&) = default;
         LogicNode(LogicNode&&)      = default;
 

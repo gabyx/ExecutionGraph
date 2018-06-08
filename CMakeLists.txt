@@ -47,7 +47,7 @@ set(ExecutionGraph_BUILD_GUI ON CACHE BOOL "Build Graphical User Interface for t
 set(ExecutionGraph_USE_CEF_DSYM_FILE ON CACHE BOOL "Use the CEF Debug Symbols")
 
 mark_as_advanced( ExecutionGraph_FORCE_MSGLOG_LEVEL)
-set(ExecutionGraph_FORCE_MSGLOG_LEVEL "TRACE" CACHE STRING "Force the message log level (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)")
+set(ExecutionGraph_FORCE_MSGLOG_LEVEL "DEBUG" CACHE STRING "Force the message log level (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)")
 
 mark_as_advanced(ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS)
 set(ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS ON CACHE BOOL "Force an exception if a bad socket cast happens! (if false, the exception is thrown only in Debug mode!)")
