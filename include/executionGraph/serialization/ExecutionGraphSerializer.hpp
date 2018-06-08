@@ -234,7 +234,7 @@ namespace executionGraph
                     std::unique_ptr<NodeBaseType> logicNode = m_nodeSerializer.read(*node);
                     if(logicNode)
                     {
-                        EXECGRAPH_LOG_DEBUG("Adding node with id: " << node->id() << " type: " << node->type()->str());
+                        EXECGRAPH_LOG_TRACE("Adding node with id: " << node->id() << " type: " << node->type()->str());
                         execGraph.addNode(std::move(logicNode));
                     }
                     else
@@ -250,6 +250,14 @@ namespace executionGraph
             {
                 for(auto link : links)
                 {
+                    if(link->isWriteLink())
+                    {
+                        execGraph.addWriteLink(link->outNodeId(), link->outSocketIdx(), link->inNodeId(), link->inSocketIdx());
+                    }
+                    else
+                    {
+                        execGraph.setGetLink(link->outNodeId(), link->outSocketIdx(), link->inNodeId(), link->inSocketIdx());
+                    }
                 }
             }
 
