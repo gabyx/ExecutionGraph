@@ -144,8 +144,8 @@ namespace executionGraph
         //! To circumvent that, use the const method.
         NodeBaseType* getNode(NodeId nodeId)
         {
-            auto it = m_nonConstNodes.find(nodeId);
-            if(it == m_nonConstNodes.end())
+            auto it = m_nodes.find(nodeId);
+            if(it == m_nodes.end())
             {
                 return nullptr;
             }
@@ -242,9 +242,9 @@ namespace executionGraph
         void setGetLink(NodeId outN, SocketIndex outS, NodeId inN, SocketIndex inS)
         {
             m_executionOrderUpToDate = false;
-            auto outNit              = m_nonConstNodes.find(outN);
-            auto inNit               = m_nonConstNodes.find(inN);
-            EXECGRAPH_THROW_EXCEPTION_IF(outNit == m_nonConstNodes.end() || inNit == m_nonConstNodes.end(),
+            auto outNit              = m_nodes.find(outN);
+            auto inNit               = m_nodes.find(inN);
+            EXECGRAPH_THROW_EXCEPTION_IF(outNit == m_nodes.end() || inNit == m_nodes.end(),
                                          "Node with id: " << outN << " or " << inN << " does not exist!")
             NodeBaseType::setGetLink(*outNit->second.m_node, outS, *inNit->second.m_node, inS);
         }
@@ -255,9 +255,9 @@ namespace executionGraph
         void addWriteLink(NodeId outN, SocketIndex outS, NodeId inN, SocketIndex inS)
         {
             m_executionOrderUpToDate = false;
-            auto outNit              = m_nonConstNodes.find(outN);
-            auto inNit               = m_nonConstNodes.find(inN);
-            if(outNit == m_nonConstNodes.end() || inNit == m_nonConstNodes.end())
+            auto outNit              = m_nodes.find(outN);
+            auto inNit               = m_nodes.find(inN);
+            if(outNit == m_nodes.end() || inNit == m_nodes.end())
             {
                 EXECGRAPH_THROW_EXCEPTION("Node: " << outN << " or " << inN << " does not exist!");
             }
