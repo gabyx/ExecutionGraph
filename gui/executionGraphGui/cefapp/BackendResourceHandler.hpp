@@ -86,7 +86,7 @@ private:
     ResponseFutureCef m_responseFuture;                      //!< The response future we await in the resource handler.
     ResponseFutureCef::Payload m_payload;                    //!< The moved payload from the future. (default = empty)
 
-    std::size_t m_bytesRead = 0;  // DEBUG ==========
+    std::size_t m_bytesRead = 0;  //!< @todo DEBUG
 
     //! CefRefCounted overrides
     //@{

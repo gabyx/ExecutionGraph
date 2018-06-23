@@ -24,16 +24,17 @@ namespace executionGraph
         /* ---------------------------------------------------------------------------------------*/
         /*!
             Serializer which loads a Logic Node.
-            `CreatorListWrite` and `CreatorListRead` needs to fullfill 
-            the requirements of the template parameter of `executionGrpah::StaticFactory`:
+            `NodeSerializerList` contains a type `Writer` and a type `Reader` which 
+            both need to fullfill the requirements for `Type` in 
+            `executionGrpah::StaticFactory<meta::list<Type,...>>`:
 
-            The CreatorListRead contains Creators with the following interface:
+            The `Reader` contains the following interface:
             @code
                 static std::unique_ptr<NodeBaseType>
                 create(const serialization::LogicNode& node)
             @endcode
 
-            The CreatorListWrite contains Creators with the following interface:
+            The `Writer` contains Creators with the following interface:
             @code
                 static std::pair<const uint8_t*, std::size_t>
                 create(flatbuffers::FlatBufferBuilder& builder, const NodeBaseType& node)
@@ -44,8 +45,7 @@ namespace executionGraph
         */
         /* ---------------------------------------------------------------------------------------*/
         template<typename TConfig,
-                 typename CreatorListWrite,
-                 typename CreatorListRead>
+                 typename NodeSerializerList>
         class LogicNodeSerializer final
         {
         public:
@@ -90,8 +90,8 @@ namespace executionGraph
                         instance = ctor.invoke(logicNode.id());
                     }
                     EXECGRAPH_LOG_DEBUG(instance.get_type().get_name().to_string());
-                    EXECGRAPH_THROW_EXCEPTION_IF(!instance.is_valid(), "Instance is not valid!");
-                    EXECGRAPH_THROW_EXCEPTION_IF(!instance.get_type().is_pointer(), "Instance type needs to be a pointer!");
+                    EXECGRAPH_THROW_EXCEPTION_IF(!instance.is_valid(), "Variant instance is not valid!");
+                    EXECGRAPH_THROW_EXCEPTION_IF(!instance.get_type().is_pointer(), "Variant instance type needs to be a pointer!");
 
                     return std::unique_ptr<NodeBaseType>{instance.get_value<NodeBaseType*>()};  // Return the instance
                 }
@@ -135,8 +135,14 @@ namespace executionGraph
             }
 
         private:
-            using FactoryWrite = StaticFactory<CreatorListWrite>;
-            using FactoryRead  = StaticFactory<CreatorListRead>;
+            template<typename T>
+            using writeExtractor = typename T::Writer;
+            template<typename T>
+            using readExtractor    = typename T::Reader;
+            using CreatorListWrite = meta::transform<NodeSerializerList, meta::quote<writeExtractor>>;
+            using CreatorListRead  = meta::transform<NodeSerializerList, meta::quote<readExtractor>>;
+            using FactoryWrite     = StaticFactory<CreatorListWrite>;
+            using FactoryRead      = StaticFactory<CreatorListRead>;
         };
     }  // namespace serialization
 }  // namespace executionGraph

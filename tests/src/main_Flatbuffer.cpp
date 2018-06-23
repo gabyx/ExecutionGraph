@@ -65,38 +65,45 @@ using GraphType     = executionGraph::ExecutionTreeInOut<Config>;
 using DummyNodeType = DummyNode<Config>;
 static const DummyNodeType::AutoRegisterRTTR autoRegisterRTTR;
 
-struct NodeSerializerWrite
+struct DummyNodeSerializer
 {
-    EXECGRAPH_TYPEDEF_CONFIG(Config);
-
-    using Key = DummyNodeType;
-
-    static std::pair<const uint8_t*, std::size_t>
-    create(flatbuffers::FlatBufferBuilder& builder, const NodeBaseType& node)
+    //! Factory functor which creates the serialized write buffer
+    //! for the DummyNode `node`.
+    struct Writer
     {
-        namespace t = test;
-        std::vector<t::Vec3> vecs(3, t::Vec3(1, 3, 4));
-        auto vecsOffsets = builder.CreateVectorOfStructs(vecs.data(), vecs.size());
-        auto testBuilder = t::TestBuilder(builder);
-        testBuilder.add_pos(vecsOffsets);
-        auto test = testBuilder.Finish();
+        EXECGRAPH_TYPEDEF_CONFIG(Config);
 
-        builder.Finish(test);
-        return {builder.GetBufferPointer(), builder.GetSize()};
-    }
-};
-struct NodeSerializerRead
-{
-    EXECGRAPH_TYPEDEF_CONFIG(Config);
+        using Key = DummyNodeType;
 
-    using Key = DummyNodeType;
+        static std::pair<const uint8_t*, std::size_t>
+        create(flatbuffers::FlatBufferBuilder& builder, const NodeBaseType& node)
+        {
+            namespace t = test;
+            std::vector<t::Vec3> vecs(3, t::Vec3(1, 3, 4));
+            auto vecsOffsets = builder.CreateVectorOfStructs(vecs.data(), vecs.size());
+            auto testBuilder = t::TestBuilder(builder);
+            testBuilder.add_pos(vecsOffsets);
+            auto test = testBuilder.Finish();
 
-    static std::unique_ptr<NodeBaseType>
-    create(const s::LogicNode& node)
+            builder.Finish(test);
+            return {builder.GetBufferPointer(), builder.GetSize()};
+        }
+    };
+    //! Factory functor which creates the DummyNode from a serialized
+    //! buffer `node`.
+    struct Reader
     {
-        executionGraph::NodeId id = node.id();
-        return std::make_unique<DummyNodeType>(id);
-    }
+        EXECGRAPH_TYPEDEF_CONFIG(Config);
+
+        using Key = DummyNodeType;
+
+        static std::unique_ptr<NodeBaseType>
+        create(const s::LogicNode& node)
+        {
+            executionGraph::NodeId id = node.id();
+            return std::make_unique<DummyNodeType>(id);
+        }
+    };
 };
 
 MY_TEST(FlatBuffer, Test2)
@@ -168,8 +175,7 @@ MY_TEST(FlatBuffer, Test2)
         EXECGRAPH_LOG_TRACE("Read graph by Serializer");
 
         using LogicNodeS = s::LogicNodeSerializer<Config,
-                                                  meta::list<NodeSerializerWrite>,
-                                                  meta::list<NodeSerializerRead>>;
+                                                  meta::list<DummyNodeSerializer>>;
         LogicNodeS nodeSerializer;
         s::ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(nodeSerializer);
         auto execGraph = serializer.read("myGraph.eg");
@@ -186,8 +192,7 @@ MY_TEST(FlatBuffer, Test3)
     EXECGRAPH_LOG_TRACE("Build graph");
     auto execGraph   = createRandomTree<GraphType, DummyNodeType>(3, 123456);
     using LogicNodeS = s::LogicNodeSerializer<Config,
-                                              meta::list<NodeSerializerWrite>,
-                                              meta::list<NodeSerializerRead>>;
+                                              meta::list<DummyNodeSerializer>>;
     LogicNodeS nodeSerializer;
     s::ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(nodeSerializer);
     EXECGRAPH_LOG_TRACE("Write graph by Serializer");

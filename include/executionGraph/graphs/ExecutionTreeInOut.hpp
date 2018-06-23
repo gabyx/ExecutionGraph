@@ -150,7 +150,7 @@ namespace executionGraph
                 return nullptr;
             }
             m_executionOrderUpToDate = false;
-            return it->second.m_node.get();
+            return it->second->m_node.get();
         }
         //! Get a specific node with id \p nodeId if it exists, nullptr otherwise.
         //! Does not invalidate execution order.
@@ -207,7 +207,7 @@ namespace executionGraph
                 // Constant node
                 pNode       = node.get();
                 auto p      = m_constNodes.emplace(id, NodeDataBase{std::move(node), type});
-                m_nodes[id] = p.first->second;
+                m_nodes[id] = &p.first->second;
                 // Add to classes
                 m_nodeClasses[type].emplace(pNode);
             }
@@ -216,7 +216,7 @@ namespace executionGraph
                 // Any other node
                 pNode       = node.get();
                 auto p      = m_nonConstNodes.emplace(id, NodeData{std::move(node), type});
-                m_nodes[id] = p.first->second;
+                m_nodes[id] = &p.first->second;
                 // Add to classes
                 m_nodeClasses[type].emplace(pNode);
                 // Add node to group
@@ -246,7 +246,7 @@ namespace executionGraph
             auto inNit               = m_nodes.find(inN);
             EXECGRAPH_THROW_EXCEPTION_IF(outNit == m_nodes.end() || inNit == m_nodes.end(),
                                          "Node with id: " << outN << " or " << inN << " does not exist!")
-            NodeBaseType::setGetLink(*outNit->second.m_node, outS, *inNit->second.m_node, inS);
+            NodeBaseType::setGetLink(*outNit->second->m_node, outS, *inNit->second->m_node, inS);
         }
 
         //! Constructs a Write-Link to write the data of output socket at index \p
@@ -261,7 +261,7 @@ namespace executionGraph
             {
                 EXECGRAPH_THROW_EXCEPTION("Node: " << outN << " or " << inN << " does not exist!");
             }
-            NodeBaseType::addWriteLink(*outNit->second.m_node, outS, *inNit->second.m_node, inS);
+            NodeBaseType::addWriteLink(*outNit->second->m_node, outS, *inNit->second->m_node, inS);
         }
 
         //! Reset all nodes in group with id: \p groupId.

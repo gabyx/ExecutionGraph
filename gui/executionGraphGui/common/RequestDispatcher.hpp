@@ -185,7 +185,7 @@ private:
 
                 if(it != m_d.m_specificHandlers.end())
                 {
-                    handler = it->m_handler;
+                    handler = it->second->m_handler;
                 }
             }  // Lock end
 
