@@ -137,7 +137,7 @@ if(OS_LINUX)
     # Additional Include Directories
     target_include_directories(ExecutionGraph-GUI PRIVATE ${ExecutionGraphGUI_INC_DIRS})
     add_dependencies(ExecutionGraph-GUI libcef_dll_wrapper)
-    target_link_libraries(ExecutionGraph-GUI libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ${ExecutionGraph_LINK_TARGETS_GUI_DEP} ExecutionGraph::Core)
+    target_link_libraries(ExecutionGraph-GUI libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ExecutionGraph::Core)
 
     # Set rpath so that libraries can be placed next to the executable.
     set_target_properties(ExecutionGraph-GUI PROPERTIES INSTALL_RPATH "$ORIGIN")
@@ -202,7 +202,7 @@ if(OS_MACOSX)
     # Additional Include Directories
     target_include_directories(ExecutionGraph-GUI PRIVATE ${ExecutionGraphGUI_INC_DIRS})
     add_dependencies(ExecutionGraph-GUI ExecutionGraphGUIHelper ${ExecutionGraphGUI_CLIENT_TARGET})
-    target_link_libraries(ExecutionGraph-GUI cefLib ${ExecutionGraph_LINK_TARGETS_GUI_DEP} ExecutionGraph::Core)
+    target_link_libraries(ExecutionGraph-GUI cefLib ExecutionGraph::Core)
     set_target_properties(ExecutionGraph-GUI PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/Info.plist"
                                                         OUTPUT_NAME "${ExecutionGraphGUI_TARGET_OUTPUTNAME}"
                                                         RUNTIME_OUTPUT_DIRECTORY "${ExecutionGraphGUI_TARGET_OUT_DIR}")
@@ -272,7 +272,7 @@ if(OS_WINDOWS)
     # Compile Options
     setTargetCompileOptionsExecutionGraph(ExecutionGraph-GUI ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
     add_dependencies(ExecutionGraph-GUI libcef_dll_wrapper)
-    target_link_libraries(ExecutionGraph-GUI libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ${ExecutionGraph_LINK_TARGETS_GUI_DEP} ExecutionGraph::Core)
+    target_link_libraries(ExecutionGraph-GUI libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ExecutionGraph::Core)
 
     if(USE_SANDBOX)
         # Logical target used to link the cef_sandbox library.

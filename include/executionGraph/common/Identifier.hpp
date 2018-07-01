@@ -55,7 +55,10 @@ namespace executionGraph
         const std::string& getName() const { return m_name; }
 
         //! Get full name of this identifier: "<name>-<guid>".
-        std::string getUniqueName() const { return m_name + "-" + std::string(m_guid); }
+        std::string getUniqueName() const
+        {
+            return m_name.empty() ? m_name + "-" + std::string(m_guid) : std::string(m_guid);
+        }
 
         //! Comparison operators.
         bool operator==(const Identifier& id) const { return m_guid == id.m_guid; }

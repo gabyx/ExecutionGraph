@@ -102,6 +102,12 @@ namespace executionGraph
 
         using LogicNodeDefaultOutputs = LogicNodeDefaultPool<TConfig>;
 
+        struct GraphDescription
+        {
+            std::unordered_set<std::string> m_nodeTypes;    //!< Type names of the available and creatable nodes on this graph.
+            std::unordered_set<std::string> m_socketTypes;  //!< Type names of the available sockets.
+        };
+
     public:
         ExecutionTreeInOut()
         {
@@ -109,6 +115,9 @@ namespace executionGraph
         }
 
         ~ExecutionTreeInOut() = default;
+
+        ExecutionTreeInOut(ExecutionTreeInOut&&) = default;
+        ExecutionTreeInOut& operator=(ExecutionTreeInOut&&) = default;
 
         //! Set the node class of a specific node id \p nodeId.
         //! Invalidates the execution order.

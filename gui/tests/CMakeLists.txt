@@ -15,7 +15,7 @@ set(INCLUDE_FILES
 
 #include directories
 set(INCLUDE_DIRS
-    ${PROJECT_SOURCE_DIR}/tests/include/
+    ${PROJECT_SOURCE_DIR}/tests/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_BINARY_DIR}/include
 )
@@ -28,10 +28,8 @@ function(defineCompileDefs target)
 
     setTargetCompileOptionsExecutionGraph(${target} ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
     target_include_directories(${target} PRIVATE ${INCLUDE_DIRS})
-    target_link_libraries(${target} ExecutionGraph::CoreForTests gtest gmock_main ${ExecutionGraph_LINK_TARGETS_GUI_DEP} cefLib)
+    target_link_libraries(${target} ExecutionGraph::CoreForTests gtest gmock_main cefLib)
     add_dependencies(build_and_test ${target})
-
-    set_target_properties(${target} PROPERTIES BUILD_WITH_INSTALL_RPATH FALSE)
 
     cotire(${target})
 
@@ -43,6 +41,7 @@ endfunction()
 
 # NodeTests
 # TaskQueue Test
+# you need to `ln -s "$(pwd)" "Frameworks"` in `buildExternal/cefbinaries/cefbinaries-src/Debug`
 set(EXEC_NAME ${PROJECT_NAME}GUITest-MemoryPool)
 add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_MemoryPool.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 defineCompileDefs(${EXEC_NAME})

@@ -13,7 +13,12 @@
 #ifndef executionGraphGui_backend_ExecutionGraphBackend_hpp
 #define executionGraphGui_backend_ExecutionGraphBackend_hpp
 
+#include <array>
+#include <executionGraph/common/Identifier.hpp>
+#include <executionGraph/graphs/ExecutionTreeInOut.hpp>
 #include <rttr/type>
+#include <string>
+#include <unordered_set>
 #include "backend/Backend.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
@@ -24,18 +29,50 @@
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
  */
 /* ---------------------------------------------------------------------------------------*/
-class ExecutionGraphBackend : public Backend
+class ExecutionGraphBackend final : public Backend
 {
     RTTR_ENABLE()
+
 public:
-    using Backend::Id;
+    using DefaultGraph = executionGraph::ExecutionTreeInOut<executionGraph::GeneralConfig<>>;
+    using Id           = executionGraph::Id;
 
 public:
     ExecutionGraphBackend()
         : Backend("ExecutionGraphBackend")
     {
     }
-    virtual ~ExecutionGraphBackend() override = default;
+    ~ExecutionGraphBackend() override = default;
+
+    //! Adding/removing graphs.
+    //@{
+    void addGraph(const Id& graphId,
+                  const Id& graphType);
+    void removeGraph(const Id& id);
+    void removeGraphs();
+    //@}
+
+    //! Information about graphs.
+    //@{
+public:
+    struct GraphDescription
+    {
+        std::unordered_set<std::string> m_nodeTypes;    //!< Type names of the available and creatable nodes on this graph.
+        std::unordered_set<std::string> m_socketTypes;  //!< Type names of the available sockets.
+    };
+
+private:
+    static const std::array<Id, 1> m_descriptionIds;                            //!< All IDs used for the graph description.
+    static const std::unordered_map<Id, GraphDescription> m_graphDescriptions;  //! All graph descriptions.
+
+public:
+    //! Get all graph descriptions identified by its id.
+    std::unordered_map<Id, GraphDescription> getGraphDescriptions() const { return m_graphDescriptions; }
+    //@}
+
+private:
+    //! Map of normal graphs identified by its id.
+    std::unordered_map<Id, DefaultGraph> m_graphs;
 };
 
 #endif
