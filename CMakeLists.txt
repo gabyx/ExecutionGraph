@@ -1,220 +1,263 @@
 #The CMake Minimum version that is required.
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 
-#Detect Build Type if Debug appears in CMAKE_BINARY_DIR path
-MESSAGE(STATUS "Binary dir:" ${CMAKE_BINARY_DIR})
-STRING(REGEX MATCH ".*(Debug|debug).*" DEBUG_MATCH ${CMAKE_BINARY_DIR} )
-IF(DEBUG_MATCH)
-    SET(CMAKE_BUILD_TYPE Debug CACHE STRING "The build type for makefile based generators")
-    SET(PROJECTNAMEPREFIX Debug)
-ELSE()
-    SET(CMAKE_BUILD_TYPE Release CACHE STRING "The build type for makefile based generators")
-    SET(PROJECTNAMEPREFIX Release)
-ENDIF()
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/external")
+message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
 
-SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_SOURCE_DIR}/additional/sanitizers-cmake/cmake" ${CMAKE_MODULE_PATH})
-MESSAGE(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
+# Define the Project ===============================================
+set(ExecutionGraphProjectName "ExecutionGraph")
+message(STATUS "Project name is: " ${ExecutionGraphProjectName})
+project(${ExecutionGraphProjectName})
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # Needed by VS Code for Intellisense
+
+if(OS_MACOSX)
+    if(NOT "${CMAKE_OSX_SYSROOT}" )
+        message(FATAL_ERROR "OSX_SYSROOT needs to be defined!")
+    endif()
+endif()
+
+#Optional Stuff ========================================================
+mark_as_advanced( CMAKE_DEBUG_POSTFIX )
+set(CMAKE_DEBUG_POSTFIX "-dbg" CACHE STRING "Debug postfix for library/executable")
+
+mark_as_advanced(ExecutionGraph_USE_LEAK_SANITIZER)
+set(ExecutionGraph_USE_LEAK_SANITIZER OFF CACHE BOOL "Use the leak sanitizer!" )
+mark_as_advanced(ExecutionGraph_USE_ADDRESS_SANITIZER)
+set(ExecutionGraph_USE_ADDRESS_SANITIZER OFF CACHE BOOL "Use the address sanitizer!" )
+
+mark_as_advanced(ExecutionGraph_BUILD_LIBRARY)
+set(ExecutionGraph_BUILD_LIBRARY ON CACHE BOOL "Build a shared library")
+
+mark_as_advanced(ExecutionGraph_BUILD_TESTS)
+set(ExecutionGraph_BUILD_TESTS ON CACHE BOOL "Build the tests")
+
+mark_as_advanced(ExecutionGraph_BUILD_BENCHMARKS)
+set(ExecutionGraph_BUILD_BENCHMARKS OFF CACHE BOOL "Build the benchmarks")
+
+mark_as_advanced(ExecutionGraph_BUILD_EXAMPLE)
+set(ExecutionGraph_BUILD_EXAMPLE OFF CACHE BOOL "Build the example, the library is automatically built if this is true")
+
+mark_as_advanced(ExecutionGraph_BUILD_GUI)
+set(ExecutionGraph_BUILD_GUI ON CACHE BOOL "Build Graphical User Interface for the Execution Graph")
+set(ExecutionGraph_USE_CEF_DSYM_FILE ON CACHE BOOL "Use the CEF Debug Symbols")
+
+mark_as_advanced( ExecutionGraph_FORCE_MSGLOG_LEVEL)
+set(ExecutionGraph_FORCE_MSGLOG_LEVEL "DEBUG" CACHE STRING "Force the message log level (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)")
+
+mark_as_advanced(ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS)
+set(ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS ON CACHE BOOL "Force an exception if a bad socket cast happens! (if false, the exception is thrown only in Debug mode!)")
+
+#mark_as_advanced( ExecutionGraph_USE_OPENMP)
+#set(ExecutionGraph_USE_OPENMP ON CACHE BOOL "Try to use OpenMp for parallel speedup")
+
+set(ExecutionGraph_EXTERNAL_BUILD_DIR_POSTFIX "external" CACHE STRING "Folder where all external shit is build!")
+set(ExecutionGraph_EXTERNAL_BUILD_DIR "${CMAKE_BINARY_DIR}/${ExecutionGraph_EXTERNAL_BUILD_DIR_POSTFIX}" )
+set(ExecutionGraph_EXTERNAL_INSTALL_DIR "${ExecutionGraph_EXTERNAL_BUILD_DIR}/install")
+#=======================================================================
+
+# Load print macros
+include(PrintMacros)
 # Load important modules
-INCLUDE(FirstCMakeRun)
+include(FirstCMakeRun)
 # Speed up the build
-INCLUDE(cotire) 
+include(cotire) 
 
-#The name of the project ===============================================
-SET(ExecutionGraphProjectName "ExecutionGraph")
-IF(${CMAKE_GENERATOR} MATCHES "Unix Makefiles")
-        SET(ExecutionGraphProjectName  "${ExecutionGraphProjectName}-${PROJECTNAMEPREFIX}")
-ENDIF()
-MESSAGE(STATUS "Project name is: " ${ExecutionGraphProjectName})
-PROJECT(${ExecutionGraphProjectName})
+# Define Install Directories
+# Install stuff (default location is not some where on the system! for safty reasons)
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE STRING "Install prefix (e.g. /usr/local/)" FORCE)
+endif()
+if(UNIX)
+    include(GNUInstallDirs)
+    set(ExecutionGraph_INC_INSTALL_DIR "${CMAKE_INSTALL_INCDIR}") 
+    set(ExecutionGraph_RUNTIME_INSTALL_DIR "${CMAKE_INSTALL_BINDIR}") 
+    set(ExecutionGraph_LIBRARY_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}")
+    set(ExecutionGraph_ARCHIVE_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}")
+    set(ExecutionGraph_FRAMEWORK_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}")
 
-SET(ExecutionGraph_BINARY_DIR ${PROJECT_BINARY_DIR})
-SET(ExecutionGraph_ROOT_DIR   ${PROJECT_SOURCE_DIR})
+    set(ExecutionGraph_INSTALL_FULL_LIBDIR "${CMAKE_INSTALL_FULL_LIBDIR}")
 
+    set(ExecutionGraph_CMAKE_CONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/executionGraph/cmake")
+    set(ExecutionGraph_ADDITIONAL_FILES_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/executionGraph")
+elseif(WINDOWS)
+    set(ExecutionGraph_INC_INSTALL_DIR "include") 
+    set(ExecutionGraph_RUNTIME_INSTALL_DIR "bin") 
+    set(ExecutionGraph_LIBRARY_INSTALL_DIR "bin")
+    set(ExecutionGraph_ARCHIVE_INSTALL_DIR "lib")
+    set(ExecutionGraph_FRAMEWORK_INSTALL_DIR "bin")
 
-MESSAGE(STATUS "Compiler ID is: " ${CMAKE_CXX_COMPILER_ID})
-IF(NOT MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL)
-	IF(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+    set(ExecutionGraph_CMAKE_CONFIG_INSTALL_DIR "cmake")
+    set(ExecutionGraph_ADDITIONAL_FILES_INSTALL_DIR "./")
+else()
+	message(FATAL_ERROR "Could not set install folders for this platform!")
+endif()
 
-		SET(MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL TRUE CACHE INTERNAL "x" FORCE)
-		MESSAGE(STATUS "Setting Values for GNU")
-		SET(CMAKE_C_FLAGS "-fmessage-length=0 -fmax-errors=50" CACHE STRING "Flags for C Compiler" FORCE)
-		SET(CMAKE_CXX_FLAGS "-std=c++14 -fmax-errors=50 -Werror=return-type" CACHE STRING "Flags for CXX Compiler" FORCE)
-		SET(CMAKE_CXX_FLAGS_DEBUG "-g -fno-omit-frame-pointer -fsanitize=leak -Wall -Wpedantic -Wno-char-subscripts" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
+# set the rpath for executables
+set(CMAKE_SKIP_BUILD_RPATH OFF)            # use, i.e. don't skip the full RPATH for the build tree
+set(CMAKE_BUILD_WITH_INSTALL_RPATH OFF)    # when building, don't use the install RPATH already (but later on when installing)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH OFF) # NO automatic rpath for INSTALL
+if(APPLE)
+  set(MACOSX_RPATH ON CACHE STRING "Set this to off if you dont want @rpath in install names") # uses a install name @rpath/... for libraries
+elseif(UNIX)
+elseif(WINDOWS)
+endif()
 
-    SET(ExecutionGraph_ASAN_OPTIONS_DBG "-fsanitize=leak")
+# Handle superbuild first ===============
+option (USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)
+if (USE_SUPERBUILD)
+  project (SUPERBUILD NONE)
+  # execute the superbuild (this script will be invoked again without the
+  # USE_SUPERBUILD option this time)
+  include (SuperBuild)
+  message("SuperBuild configured! -> exit...")
+  return()                      # stop processing this file further
+endif()
+# Set the superbuild off into the cache! super build should only run once!
+set(USE_SUPERBUILD OFF CACHE STRING "If a superbuild should be made (building all dependencies)" FORCE)
 
-	ELSEIF ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" )
+message(STATUS " =================================================================")
+message(STATUS "                   NORMAL BUILD CONFIGURE [START]                 ")
+message(STATUS " =================================================================")
 
-		MESSAGE(STATUS "Setting Values for Clang")
-		SET(MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL TRUE CACHE INTERNAL "x" FORCE)
-		SET(CMAKE_C_FLAGS                "" CACHE STRING "Flags for C Compiler" FORCE)
-		SET(CMAKE_C_FLAGS_DEBUG          "-g" CACHE STRING "Flags for C Compiler for debug builds" FORCE)
-		SET(CMAKE_C_FLAGS_MINSIZEREL     "-Os -DNDEBUG" CACHE STRING "Flags for C Compiler for release minsize builds" FORCE)
-		SET(CMAKE_C_FLAGS_RELEASE        "-O3 -DNDEBUG" CACHE STRING "Flags for C Compiler for release builds" FORCE)
-		SET(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g" CACHE STRING "Flags for C Compiler for release builds with debug info" FORCE)
+set(ExecutionGraph_BINARY_DIR ${PROJECT_BINARY_DIR})
+set(ExecutionGraph_ROOT_DIR   ${PROJECT_SOURCE_DIR})
 
-		SET(CMAKE_CXX_FLAGS                "-std=c++14 -ferror-limit=50 -Werror=return-type" CACHE STRING "Flags for CXX Compiler" FORCE)
-		SET(CMAKE_CXX_FLAGS_DEBUG          "-g3 -fno-omit-frame-pointer -fsanitize=leak -fsanitize=address -Weverything -Wpedantic -Wno-deprecated-register -Wno-documentation -Wno-old-style-cast -Wno-comment -Wno-float-equal -Wno-deprecated -Wno-c++98-compat-pedantic -Wno-undef -Wno-unused-macros" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
-		SET(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release minsize builds" FORCE)
-		SET(CMAKE_CXX_FLAGS_RELEASE        "-O3 -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release builds" FORCE)
-		SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g3" CACHE STRING "Flags for CXX Compiler for release builds with debug info" FORCE)
+# use CCACHE if possible
+find_program(CCACHE_FOUND ccache)
+if(CCACHE_FOUND)
+    set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
+endif(CCACHE_FOUND)
 
-    SET(ExecutionGraph_ASAN_OPTIONS_DBG "-fsanitize=leak" "-fsanitize=address")
+message("Default Compiler Flags: '${CMAKE_CXX_FLAGS}' | '${CMAKE_CXX_FLAGS_DEBUG}' | '${CMAKE_CXX_FLAGS_RELEASE}'")
+message("Default Linker Flags: '${CMAKE_EXE_LINKER_FLAGS}' | '${CMAKE_SHARED_LINKER_FLAGS}' | '${CMAKE_STATIC_LINKER_FLAGS}'")
 
-	ELSEIF ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel" )
-
-        MESSAGE(STATUS "Setting Values for Intel")
-		SET(MYPROJECT_DONTSET_COMPILER_FLAGS_INTERNAL TRUE CACHE INTERNAL "x" FORCE)
-		SET(CMAKE_C_FLAGS                "" CACHE STRING "Flags for C Compiler" FORCE)
-		SET(CMAKE_C_FLAGS_DEBUG          "-g -Wall" CACHE STRING "Flags for C Compiler for debug builds" FORCE)
-		SET(CMAKE_C_FLAGS_MINSIZEREL     "-Os -DNDEBUG" CACHE STRING "Flags for C Compiler for release minsize builds" FORCE)
-		SET(CMAKE_C_FLAGS_RELEASE        "-O3 -DNDEBUG" CACHE STRING "Flags for C Compiler for release builds" FORCE)
-		SET(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g" CACHE STRING "Flags for C Compiler for release builds with debug info" FORCE)
-
-		SET(CMAKE_CXX_FLAGS                "-std=c++14 " CACHE STRING "Flags for CXX Compiler" FORCE)
-		SET(CMAKE_CXX_FLAGS_DEBUG          "-g -Wall" CACHE STRING "Flags for CXX Compiler for debug builds" FORCE)
-		SET(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release minsize builds" FORCE)
-		SET(CMAKE_CXX_FLAGS_RELEASE        "-O3 -DNDEBUG" CACHE STRING "Flags for CXX Compiler for release builds" FORCE)
-		SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g" CACHE STRING "Flags for CXX Compiler for release builds with debug info" FORCE)
-
-  ELSEIF ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC" )
-    MESSAGE(ERROR "MSVC is not yet supported!")
-  ENDIF()
-
-ENDIF()
-
-
-#Add some multithreaded build support ==================================
-MARK_AS_ADVANCED(MULTITHREADED_BUILD)
-SET(MULTITHREADED_BUILD ON CACHE BOOL "Parallel build with as many threads as possible!")
-IF(MULTITHREADED_BUILD)
-	IF(${CMAKE_GENERATOR} MATCHES "Unix Makefiles")
-            FILE(COPY ${ExecutionGraph_ROOT_DIR}/cmake/parallelmake.sh DESTINATION ${PROJECT_BINARY_DIR}
+#Add some multithreaded build support 
+mark_as_advanced(MULTITHREADED_BUILD)
+set(MULTITHREADED_BUILD ON CACHE BOOL "Parallel build with as many threads as possible!")
+if(MULTITHREADED_BUILD)
+	if(${CMAKE_GENERATOR} MATCHES "Unix Makefiles")
+            file(COPY ${ExecutionGraph_ROOT_DIR}/cmake/parallelmake.sh DESTINATION ${PROJECT_BINARY_DIR}
                 FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
                 NO_SOURCE_PERMISSIONS
             )
-            SET(CMAKE_MAKE_PROGRAM "${PROJECT_BINARY_DIR}/parallelmake.sh")
-            MESSAGE(STATUS "Set make program to ${PROJECT_BINARY_DIR}/parallelmake.sh")
-    ELSEIF(MSVC)
-      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" "/MP")
-      MESSAGE(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-    ENDIF()
-ENDIF()
+            set(CMAKE_MAKE_PROGRAM "${PROJECT_BINARY_DIR}/parallelmake.sh")
+            message(STATUS "Set make program to ${PROJECT_BINARY_DIR}/parallelmake.sh")
+    elseif(MSVC)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" "/MP")
+      message(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+    endif()
+endif()
 # ======================================================================
 
-
-#Optional Stuff ========================================================
-
-MARK_AS_ADVANCED( CMAKE_DEBUG_POSTFIX )
-SET(CMAKE_DEBUG_POSTFIX "-dbg" CACHE STRING "Debug postfix for library/executable")
-
-MARK_AS_ADVANCED( ExecutionGraph_BUILD_LIBRARY )
-SET(ExecutionGraph_BUILD_LIBRARY ON CACHE BOOL "Build a shared library")
-
-MARK_AS_ADVANCED( ExecutionGraph_BUILD_TESTS)
-SET(ExecutionGraph_BUILD_TESTS ON CACHE BOOL "Build the tests")
-
-MARK_AS_ADVANCED( ExecutionGraph_BUILD_BENCHMARKS)
-SET(ExecutionGraph_BUILD_BENCHMARKS ON CACHE BOOL "Build the benchmarks")
-
-MARK_AS_ADVANCED( ExecutionGraph_BUILD_EXAMPLE )
-SET(ExecutionGraph_BUILD_EXAMPLE ON CACHE BOOL "Build the example, the library is automatically built if this is true")
-
-MARK_AS_ADVANCED( ExecutionGraph_FORCE_MSGLOG_LEVEL)
-SET(ExecutionGraph_FORCE_MSGLOG_LEVEL "DEBUG" CACHE STRING "Force the message log level (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)")
-
-MARK_AS_ADVANCED( ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS)
-SET(ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS ON CACHE BOOL "Force an exception if a bad socket cast happens! (if false, the exception is thrown only in Debug mode!)")
-
-#~ MARK_AS_ADVANCED( ExecutionGraph_USE_OPENMP)
-#~ SET(ExecutionGraph_USE_OPENMP ON CACHE BOOL "Try to use OpenMp for parallel speedup")
-#=======================================================================
 
 # Dependencies =========================================================
+add_library(ExecutionGraph::Core-Dependencies INTERFACE IMPORTED)
 # Define Eigen
-FIND_PACKAGE(Eigen3 REQUIRED)
-SET(EIGEN_INCLUDE_DIR ${EIGEN3_INCLUDE_DIR})
-LIST(APPEND ExecutionGraph_INC_DIRS_DEP ${EIGEN_INCLUDE_DIR})
-
+find_package(Eigen3Lib REQUIRED)
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "eigenLib")
 # Try to find Meta 
-FIND_PACKAGE(Meta REQUIRED)
-LIST(APPEND ExecutionGraph_INC_DIRS_DEP ${Meta_INCLUDE_DIR})
-SET(ExecutionGraph_DEPENDING_TARGETS_DEP ${Meta_TARGET})
+find_package(MetaLib REQUIRED)
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "metaLib")
 
-FIND_PACKAGE(PugiXML)
-IF(PUGIXML_FOUND)
-    LIST(APPEND ExecutionGraph_INC_DIRS_DEP ${PUGIXML_INCLUDE_DIR} )
-    LIST(APPEND ExecutionGraph_LIBRARIES_DEP ${PUGIXML_LIBRARIES})
-    SET(ExecutionGraph_SUPPORT_XML ON)
-ENDIF()
+# Try to find the spdlog
+find_package(SpdLogLib REQUIRED)
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "spdlogLib")
+# Try to find the Argumentparser
+find_package(ArgsLib REQUIRED)
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "argsLib")
+# Try to find the RTTR Library (use our own script)
+find_package(RTTRLib REQUIRED)
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "rttrLib")
+# Try to find the crossguid Library (use our own script)
+find_package(CrossGUIDLib REQUIRED)
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "crossguidLib")
+# Try to find the crossguid Library (use our own script)
+find_package(MemoryLib REQUIRED)
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "memoryLib")
+# Try find cereal
+# find_package(CerealLib REQUIRED)
+# list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "cerealLib")
+# Try find flatbuffer
+find_package(FlatBuffersLib REQUIRED)
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "flatbuffersLib")
 
-#~ IF(ExecutionGraph_USE_OPENMP)
+set_target_properties(ExecutionGraph::Core-Dependencies PROPERTIES INTERFACE_LINK_LIBRARIES "${ExecutionGraph_LINK_TARGETS_CORE_DEP}")
 
-  #~ include(ProcessorCount)
-  #~ ProcessorCount(NPROCESSES)
+if(ExecutionGraph_USE_OPENMP)
 
-  #~ FIND_PACKAGE(OpenMP)
-  #~ IF(OpenMP_FOUND)
-    #~ SET(MYPROJECT_CXX_FLAGS "${MYPROJECT_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    #~ SET(ExecutionGraph_OPENMP_SUPPORT ON)
+    include(ProcessorCount)
+    ProcessorCount(NPROCESSES)
 
-    #~ MARK_AS_ADVANCED( ExecutionGraph_OPENMP_USE_NTHREADS)
-    #~ SET(ExecutionGraph_OPENMP_USE_NTHREADS OFF CACHE BOOL "If the number of threads should be fixed, otherwise determined at runtime!")
+    find_package(OpenMP)
+    if(OpenMP_FOUND)
+        set(ExecutionGraph_OPENMP_SUPPORT ON)
 
-    #~ IF(ExecutionGraph_OPENMP_USE_NTHREADS)
-        #~ SET(ExecutionGraph_OPENMP_NTHREADS ${NPROCESSES} CACHE STRING "The number of threads to use.")
-        #~ MARK_AS_ADVANCED( ExecutionGraph_OPENMP_NTHREADS )
-    #~ ENDIF()
+        mark_as_advanced( ExecutionGraph_OPENMP_USE_NTHREADS)
+        set(ExecutionGraph_OPENMP_USE_NTHREADS OFF CACHE BOOL "If the number of threads should be fixed, otherwise determined at runtime!")
 
-  #~ ELSE()
-    #~ SET(ExecutionGraph_OPENMP_SUPPORT ON)
-  #~ ENDIF()
-#~ ENDIF()
+        if(ExecutionGraph_OPENMP_USE_NTHREADS)
+            set(ExecutionGraph_OPENMP_NTHREADS ${NPROCESSES} CACHE STRING "The number of threads to use.")
+            mark_as_advanced( ExecutionGraph_OPENMP_NTHREADS )
+        endif()
+
+    else()
+        set(ExecutionGraph_OPENMP_SUPPORT OFF)
+    endif()
+endif()
 # ======================================================================
 
-IF(ExecutionGraph_BUILD_EXAMPLE)
-  SET(ExecutionGraph_BUILD_LIBRARY On CACHE BOOL "Build a shared library" FORCE)
-ENDIF()
+# Get Version
+include(GetVersion)
+get_version_ExecutionGraph()
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MYPROJECT_CXX_FLAGS}")
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MYPROJECT_CXX_FLAGS}")
-MESSAGE(STATUS "Added '${MYPROJECT_CXX_FLAGS}' to CMAKE_CXX and CMAKE_C_FLAGS: ${CMAKE_CXX_FLAGS} and ${CMAKE_C_FLAGS}")
-
-# Define all MVBB Source files
-INCLUDE(DefineExecutionGraphSources)
-
-SET(ExecutionGraph_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include/ExecutionGraph")
-SET(ExecutionGraph_EXTERNAL_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/external/")
+# Define all ExecutionGraph Source files
+include(DefineExecutionGraphSources)
+set(ExecutionGraph_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include/ExecutionGraph")
+set(ExecutionGraph_EXTERNAL_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/external/")
 
 #Include all relevant sources
-INCLUDE_ALL_ExecutionGraph_SOURCE(ExecutionGraph_SRC
+include_all_source_ExecutionGraph(ExecutionGraph_SRC
                                   ExecutionGraph_INC
                                   ExecutionGraph_INC_DIRS
                                   ExecutionGraph_DEPENDING_TARGETS
                                   ${PROJECT_SOURCE_DIR} ${ExecutionGraph_BINARY_DIR} )
 
-LIST(APPEND ExecutionGraph_INC_DIRS ${ExecutionGraph_INC_DIRS_DEP})
-SET(ExecutionGraph_LINK_LIBS ${ExecutionGraph_LIBRARIES_DEP})
-#LIST(APPEND ${ExecutionGraph_DEPENDING_TARGETS} ${ExecutionGraph_DEPENDING_TARGETS_DEP})
+set(ExecutionGraph_LICENSE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set(ExecutionGraph_README_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 
-IF(ExecutionGraph_BUILD_LIBRARY)
-    ADD_SUBDIRECTORY(lib)
-ENDIF()
+if( ${ExecutionGraph_BUILD_EXAMPLE} OR ${ExecutionGraph_BUILD_TESTS} OR ${ExecutionGraph_BUILD_GUI} OR ${ExecutionGraph_BUILD_BENCHMARKS})
+  set(ExecutionGraph_BUILD_LIBRARY On CACHE BOOL "Build a shared library" FORCE)
+endif()
 
-IF(ExecutionGraph_BUILD_TESTS)
+if(ExecutionGraph_BUILD_LIBRARY)
+    add_subdirectory(lib)
+endif()
+
+if(ExecutionGraph_BUILD_TESTS)
     enable_testing()
     add_custom_target(build_and_test ${CMAKE_CTEST_COMMAND} -V)
-    ADD_SUBDIRECTORY(tests)
-ENDIF()
+    add_subdirectory(tests)
+endif()
 
-#IF(ExecutionGraph_BUILD_BENCHMARKS)
-    #enable_testing()
-    #add_custom_target(build_and_benchmark ${CMAKE_CTEST_COMMAND} -V)
-    #ADD_SUBDIRECTORY(benchmarks)
-#ENDIF()
+if(ExecutionGraph_BUILD_BENCHMARKS)
+    enable_testing()
+    add_custom_target(build_and_benchmark ${CMAKE_CTEST_COMMAND} -V)
+    add_subdirectory(benchmarks)
+endif()
 
+if(ExecutionGraph_BUILD_EXAMPLE)
+    add_subdirectory(examples)
+endif()
 
-IF(ExecutionGraph_BUILD_EXAMPLE)
-    ADD_SUBDIRECTORY(examples)
-ENDIF()
+if(ExecutionGraph_BUILD_GUI)
+    add_subdirectory(gui)
+endif()
+
+message(STATUS "=================================================================")
+message(STATUS "                   NORMAL BUILD CONFIGURE [DONE ]                ")
+message(STATUS "=================================================================")

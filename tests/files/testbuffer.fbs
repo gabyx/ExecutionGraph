@@ -1,0 +1,14 @@
+namespace test;
+
+struct Vec3 {
+  x:float;
+  y:float;
+  z:float;
+}
+
+table Test {
+  pos:[Vec3] (id:0);
+  pos2:[Vec3] (id:1);
+}
+
+root_type Test;

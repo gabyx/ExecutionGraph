@@ -1,113 +1,88 @@
-#The name of the project ====================================================================
-PROJECT("ExecutionGraphTests")
 
+# Add googletest
+find_package(GoogleTestLib)
 
-# Add GoogleTests ===========================================================================
-if (CMAKE_VERSION VERSION_LESS 3.2)
-    set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
-else()
-    set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
-endif()
-
-include(DownloadProject)
-download_project(PROJ                googletest
-                 GIT_REPOSITORY      https://github.com/google/googletest.git
-                 GIT_TAG             master
-                 ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-)
-
-# Prevent GoogleTest from overriding our compiler/linker options
-# when building with Visual Studio
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-
-add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
-
-# When using CMake 2.8.11 or later, header path dependencies
-# are automatically added to the gtest and gmock targets.
-# For earlier CMake versions, we have to explicitly add the
-# required directories to the header search path ourselves.
-#if (CMAKE_VERSION VERSION_LESS 2.8.11)
-    #include_directories("${gtest_SOURCE_DIR}/include"
-                        #"${gmock_SOURCE_DIR}/include")
-#endif()
-# ==============================================================================================
-
-SET(ExecutionGraph_TESTS_OUTPUT_FILES_DIR "${PROJECT_BINARY_DIR}")
-SET(ExecutionGraph_TESTS_INPUT_FILES_DIR "${PROJECT_SOURCE_DIR}/files")
-SET(ExecutionGraph_TESTS_INPUT_FILES_ADD_DIR "${ExecutionGraph_ROOT_DIR}/additional/tests/files")
-SET(ExecutionGraph_TESTS_VALIDATION_FILES_DIR "${ExecutionGraph_ROOT_DIR}/additional/tests/files/validation")
+set(ExecutionGraph_TESTS_OUTPUT_FILES_DIR "${PROJECT_BINARY_DIR}")
+set(ExecutionGraph_TESTS_INPUT_FILES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/files")
+set(ExecutionGraph_TESTS_INPUT_FILES_ADD_DIR "${ExecutionGraph_ROOT_DIR}/additional/tests/files")
+set(ExecutionGraph_TESTS_VALIDATION_FILES_DIR "${ExecutionGraph_ROOT_DIR}/additional/tests/files/validation")
 
 # WRITE CONFIGURATION FILE
 configure_file (
-  "${PROJECT_SOURCE_DIR}/include/TestConfig.hpp.in.cmake"
-  ${PROJECT_BINARY_DIR}/include/TestConfig.hpp
+  "${CMAKE_CURRENT_SOURCE_DIR}/include/TestConfig.hpp.in.cmake"
+  ${CMAKE_CURRENT_BINARY_DIR}/include/TestConfig.hpp
 )
 #=========================
 
-
-SET(SOURCE_FILES
-    ${ExecutionGraph_SRC}
-    ${PROJECT_SOURCE_DIR}/include/TestFunctions.hpp
+set(INCLUDE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/TestFunctions.hpp
 )
 
-SET(INCLUDE_FILES
-    ${ExecutionGraph_INC}
-    ${PROJECT_SOURCE_DIR}/src/TestFunctions.cpp
+set(SOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/TestFunctions.cpp
 )
-
 
 #include directories
 set(INCLUDE_DIRS
-    ${ExecutionGraph_INC_DIRS}
-    ${PROJECT_SOURCE_DIR}/include/
-    ${PROJECT_BINARY_DIR}/include/
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_BINARY_DIR}/include
 )
 
-include_directories(${INCLUDE_DIRS})
-
 # Define function to define compile definitions for all tests
-function(defineCompileDefs Target)
-    IF(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-        target_compile_options(${Target} PRIVATE -DExecutionGraph_BUILD_TESTS )
-    ELSE()
-        target_compile_options(${Target} PRIVATE /DExecutionGraph_BUILD_TESTS )
-    ENDIF()
+function(defineCompileDefs target)
+
+    message(STATUS "====================================================")
+    message(STATUS "Configuring target: ${target}")
+
+    setTargetCompileOptionsExecutionGraph(${target} ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
+    target_include_directories(${target} PRIVATE ${INCLUDE_DIRS})
+    target_link_libraries(${target} ExecutionGraph::CoreForTests gtest gmock_main)
+    add_dependencies(build_and_test ${target})
+
+    cotire(${target})
+
+    print_target_properties(${target})
+
+    add_test(NAME ${target} COMMAND ${target})
+
 endfunction()
 
 # NodeTests
-SET(EXEC_NAME1 ${PROJECT_NAME}-LogicNodes)
-ADD_EXECUTABLE(${EXEC_NAME1}  ${PROJECT_SOURCE_DIR}/src/main_LogicNode.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-TARGET_LINK_LIBRARIES(${EXEC_NAME1} ExecutionGraphForTestsOnly gtest gmock_main)
-ADD_DEPENDENCIES(build_and_test ${EXEC_NAME1})
-if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
-    ADD_DEPENDENCIES(${EXEC_NAME1} ${ExecutionGraph_DEPENDING_TARGETS})
-endif()
-defineCompileDefs(${EXEC_NAME1})
-cotire(${EXEC_NAME1})
+set(EXEC_NAME ${PROJECT_NAME}Test-LogicNodes)
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_LogicNode.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME})
 
 #ExecutionTree Test
-SET(EXEC_NAME2 ${PROJECT_NAME}-ExecutionTree)
-ADD_EXECUTABLE(${EXEC_NAME2}  ${PROJECT_SOURCE_DIR}/src/main_ExecutionTree.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-TARGET_LINK_LIBRARIES(${EXEC_NAME2} ExecutionGraphForTestsOnly gtest gmock_main)
-ADD_DEPENDENCIES(build_and_test ${EXEC_NAME2})
-if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
-    ADD_DEPENDENCIES(${EXEC_NAME2} ${ExecutionGraph_DEPENDING_TARGETS})
-endif()
-defineCompileDefs(${EXEC_NAME2})
-cotire(${EXEC_NAME2})
+set(EXEC_NAME ${PROJECT_NAME}Test-ExecutionTree)
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_ExecutionTree.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME})
 
 #ExecutionTree Test
-SET(EXEC_NAME3 ${PROJECT_NAME}-CustomSocketTypes)
-ADD_EXECUTABLE(${EXEC_NAME3}  ${PROJECT_SOURCE_DIR}/src/main_CustomSocketTypes.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-TARGET_LINK_LIBRARIES(${EXEC_NAME3} ExecutionGraphForTestsOnly gtest gmock_main)
-ADD_DEPENDENCIES(build_and_test ${EXEC_NAME3})
-if( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
-    ADD_DEPENDENCIES(${EXEC_NAME3} ${ExecutionGraph_DEPENDING_TARGETS})
-endif()
-defineCompileDefs(${EXEC_NAME3})
-cotire(${EXEC_NAME3})
+set(EXEC_NAME ${PROJECT_NAME}Test-CustomSocketTypes)
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_CustomSocketTypes.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME})
 
-add_test(NAME    ${EXEC_NAME1} COMMAND ${EXEC_NAME1})
-add_test(NAME    ${EXEC_NAME2} COMMAND ${EXEC_NAME2})
-add_test(NAME    ${EXEC_NAME3} COMMAND ${EXEC_NAME3})
+#Factory Test
+set(EXEC_NAME ${PROJECT_NAME}Test-Factory)
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Factory.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME})
+
+# JSON Test
+set(EXEC_NAME ${PROJECT_NAME}Test-Json)
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Json.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME})
+
+# TaskQueue Test
+set(EXEC_NAME ${PROJECT_NAME}Test-TaskQueue)
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_TaskQueue.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME})
+
+# TaskQueue Test
+set(EXEC_NAME ${PROJECT_NAME}Test-MemoryPool)
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_MemoryPool.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME})
+
+# Flatbuffer Test
+set(EXEC_NAME ${PROJECT_NAME}Test-Flatbuffer)
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Flatbuffer.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME})

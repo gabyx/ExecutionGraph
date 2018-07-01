@@ -1,0 +1,44 @@
+// =========================================================================================
+//  ExecutionGraph
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+// 
+//  @date Sat Apr 28 2018
+//  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+// 
+//  This Source Code Form is subject to the terms of the Mozilla Public
+//  License, v. 2.0. If a copy of the MPL was not distributed with this
+//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// =========================================================================================
+
+include "LogicNode.fbs";
+include "SocketLink.fbs";
+
+include "GraphVisualization.fbs";
+
+namespace executionGraph.serialization;
+
+enum NodeClassification:byte
+{
+    NormalNode   = 0,
+    InputNode    = 1,
+    OutputNode   = 2,
+    ConstantNode = 3
+}
+
+table ExecutionGraphNodeProperties
+{
+    nodeId:uint64 (id:0);
+    classification:NodeClassification (id:1);
+    groups:[uint64] (id:2);
+}
+
+table ExecutionGraph 
+{
+    nodes:[LogicNode] (id:0);
+    links:[SocketLink] (id:1);
+    nodeProperties:[ExecutionGraphNodeProperties] (id:2);
+    visualization:GraphVisualization (id:3);
+}
+
+file_identifier "EXGR";
+root_type ExecutionGraph;

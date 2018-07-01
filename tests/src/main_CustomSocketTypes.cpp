@@ -1,17 +1,21 @@
-// ========================================================================================
-//  ExecutionGraph
-//  Copyright (C) 2017 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>//
-//  This Source Code Form is subject to the terms of the Mozilla Public
-//  License, v. 2.0. If a copy of the MPL was not distributed with this
-//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
-// ========================================================================================
+//! ========================================================================================
+//!  ExecutionGraph
+//!  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+//!
+//!  @date Mon Jan 08 2018
+//!  @author Gabriel Nützi, <gnuetzi (at) gmail (døt) com>
+//!
+//!  This Source Code Form is subject to the terms of the Mozilla Public
+//!  License, v. 2.0. If a copy of the MPL was not distributed with this
+//!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//! ========================================================================================
 #include "TestFunctions.hpp"
 
 #include <memory>
 #include <meta/meta.hpp>
-#include "ExecutionGraph/graphs/ExecutionTreeInOut.hpp"
-#include "ExecutionGraph/nodes/LogicNode.hpp"
-#include "ExecutionGraph/nodes/LogicSocket.hpp"
+#include "executionGraph/graphs/ExecutionTreeInOut.hpp"
+#include "executionGraph/nodes/LogicNode.hpp"
+#include "executionGraph/nodes/LogicSocket.hpp"
 
 using namespace executionGraph;
 
@@ -41,7 +45,7 @@ using SocketTypes = meta::list<double, std::shared_ptr<A>>;
 using Config      = GeneralConfig<SocketTypes>;
 
 template<typename TConfig>
-class IntegerNode : public TConfig::NodeBaseType
+class CustomDummyNode : public TConfig::NodeBaseType
 {
 public:
     using Config = TConfig;
@@ -56,18 +60,18 @@ public:
     {
         Result1,
     };
-    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
+    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs)
 
     using InSockets = InSocketDeclList<InSocketDecl<Value1, std::shared_ptr<A>>,
                                        InSocketDecl<Value2, std::shared_ptr<A>>>;
 
     using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, std::shared_ptr<A>>>;
 
-    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME();
-    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets);
+    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME()
+    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
 
     template<typename... Args>
-    IntegerNode(Args&&... args)
+    CustomDummyNode(Args&&... args)
         : Base(std::forward<Args>(args)...)
     {
         // Add all sockets
@@ -92,16 +96,16 @@ public:
 MY_TEST(ExecutionTree_Test, Int_Int)
 {
     // Integer node connection (wrong connection)
-    auto node1a = std::make_unique<IntegerNode<Config>>(0u);
-    auto node1b = std::make_unique<IntegerNode<Config>>(1u);
+    auto node1a = std::make_unique<CustomDummyNode<Config>>(0u);
+    auto node1b = std::make_unique<CustomDummyNode<Config>>(1u);
 
-    auto node2a = std::make_unique<IntegerNode<Config>>(2u);
-    auto node2b = std::make_unique<IntegerNode<Config>>(3u);
+    auto node2a = std::make_unique<CustomDummyNode<Config>>(2u);
+    auto node2b = std::make_unique<CustomDummyNode<Config>>(3u);
 
-    auto node3a = std::make_unique<IntegerNode<Config>>(4u);
-    auto node3b = std::make_unique<IntegerNode<Config>>(5u);
+    auto node3a = std::make_unique<CustomDummyNode<Config>>(4u);
+    auto node3b = std::make_unique<CustomDummyNode<Config>>(5u);
 
-    auto node4a     = std::make_unique<IntegerNode<Config>>(6u);
+    auto node4a     = std::make_unique<CustomDummyNode<Config>>(6u);
     auto resultNode = node4a.get();
 
     try
@@ -149,8 +153,8 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 
     execTree.execute(0);
 
-    EXECGRAPH_LOG_TRACE("Result : " << resultNode->getOutVal<IntegerNode<Config>::Result1>()->memory[1]);
-    EXECGRAPH_THROW_EXCEPTION_IF(resultNode->getOutVal<IntegerNode<Config>::Result1>()->memory[1] != 30, "wrong result");
+    EXECGRAPH_LOG_TRACE("Result : " << resultNode->getOutVal<CustomDummyNode<Config>::Result1>()->memory[1]);
+    EXECGRAPH_THROW_EXCEPTION_IF(resultNode->getOutVal<CustomDummyNode<Config>::Result1>()->memory[1] != 30, "wrong result");
 }
 
 int main(int argc, char** argv)

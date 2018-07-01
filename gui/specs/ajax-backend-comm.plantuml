@@ -1,0 +1,70 @@
+@startuml
+participant client as "client js"
+
+box "CEF [IO-Thread]" #LightGrey
+participant CEF
+
+participant backendHandlerFactory << BackendSchemeHandlerFactory >>
+participant backendResourceHandler << BackendResourceHandler >>
+end box
+
+box "backend [Dispatcher-Thread]" #LightGrey
+    participant requestDispatcher <<BackendRequestDispatcher>>
+	participant requestHandler <<BackendRequestHandler>>
+    participant backend <<ExecutionGraphBackend>>
+end box
+
+client -> CEF : REST Request:\nhttp://executiongraph-backend/<requestType>\n[request type e.g. "addNode"]
+activate CEF
+
+    CEF -> backendHandlerFactory : ""Create(...)"" 
+    activate backendHandlerFactory
+        backendHandlerFactory -> backendResourceHandler : ""create (from pool)""
+        activate backendResourceHandler
+        backendHandlerFactory <-- backendResourceHandler : ""backendResourceHandler""
+        deactivate backendResourceHandler
+        CEF <-- backendHandlerFactory : ""backendResourceHandler""
+    deactivate backendHandlerFactory
+
+    CEF -> backendResourceHandler : ""ProcessRequest(request, callback)""
+    activate backendResourceHandler
+        backendResourceHandler -> backendResourceHandler : initRequest()
+        CEF <-- backendResourceHandler : ""false"" [error happened]
+        hnote over backendResourceHandler : handling request\n[or SetError]
+        backendResourceHandler -> requestDispatcher : ""addRequest(requestCef,responsePromiseCef)""\n[response contains callback: response headers ready]
+        activate requestDispatcher
+        backendResourceHandler <-- requestDispatcher :
+        deactivate requestDispatcher
+        CEF <-- backendResourceHandler : ""true""
+    deactivate backendResourceHandler
+
+    
+    activate requestDispatcher
+        requestDispatcher -> requestHandler : ""handleRequest(request, responsePromise)""\n[optional threaded]
+        activate requestHandler
+            hnote over requestHandler: ""deserialize(request)""
+            requestHandler -> backend : do work, e.g. ""addNode(...)""
+            activate backend
+                requestHandler <-- backend : completed
+            deactivate backend
+            hnote over requestHandler: ""serialize(response)""
+            requestDispatcher <-- requestHandler
+        deactivate requestHandler
+    hnote over requestDispatcher: ""response.ready()""\n[or ""cancel("could not add node")""]
+
+    CEF -> backendResourceHandler : ""GetResponseHeaders(response, responseLength, redirectUrl)""
+    deactivate requestDispatcher 
+    activate backendResourceHandler
+        hnote over backendResourceHandler: set MIME type and response length \n[or ""SetError()""]
+        CEF <- backendResourceHandler
+    deactivate backendResourceHandler
+
+    CEF -> backendResourceHandler : ""ReadResponse(dataOut, bytesToRead, bytesRead, callback)""
+    activate backendResourceHandler
+        hnote over backendResourceHandler: copy data to dataOut
+        CEF <- backendResourceHandler : ""true, bytesRead = 512""
+    deactivate backendResourceHandler
+
+    CEF -> client : REST Response
+deactivate CEF
+@enduml

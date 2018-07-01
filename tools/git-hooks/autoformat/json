@@ -1,0 +1,23 @@
+#!/bin/bash
+# format all JSON files in the repository
+# to use this tool install: npm install -g json-fmt
+
+REPO_DIR="$(git rev-parse --show-toplevel)"
+
+set -e
+
+function formatFile() {
+    file=$1
+    echo "formatting file: $file"
+    fileTmp=$(mktemp)
+    json-fmt $file -p -o $fileTmp || (echo 'fatal: `json-fmt` failed for:' "$file" >&2; exit 1)
+    mv $fileTmp $file
+}
+export -f formatFile
+
+function formatJSON() {
+
+    find "$1" \( -ipath "$2*" \) | xargs -I {} bash -c 'formatFile "${@}"' _ {}
+}
+
+formatJSON "$1" "$REPO_DIR/gui"

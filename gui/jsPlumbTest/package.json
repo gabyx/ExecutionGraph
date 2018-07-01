@@ -1,0 +1,15 @@
+{
+  "name": "jsPlumbTest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "graphs.js",
+  "dependencies": {
+    "jsplumb": "^2.5.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

@@ -32,7 +32,132 @@
         "cstdint": "cpp",
         "unordered_map": "cpp",
         "unordered_set": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "__config": "cpp",
+        "__nullptr": "cpp",
+        "initializer_list": "cpp",
+        "algorithm": "cpp",
+        "__locale": "cpp",
+        "ios": "cpp",
+        "__string": "cpp",
+        "regex": "cpp",
+        "string": "cpp",
+        "string_view": "cpp",
+        "__bit_reference": "cpp",
+        "__hash_table": "cpp",
+        "__split_buffer": "cpp",
+        "__tree": "cpp",
+        "array": "cpp",
+        "deque": "cpp",
+        "hash_map": "cpp",
+        "hash_set": "cpp",
+        "forward_list": "cpp",
+        "iterator": "cpp",
+        "list": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "vector": "cpp",
+        "filesystem": "cpp",
+        "valarray": "cpp",
+        "*.ipp": "cpp",
+        "*.icc": "cpp",
+        "*.hpp": "cpp",
+        "*.cpp": "cpp"
     },
-    "cmake.useCMakeServer": true
+    "cmake.useCMakeServer": true,
+    "cmake.preferredGenerators": [
+        "Unix Makefiles",
+        "Ninja"
+    ],
+    // "C_Cpp.clang_format_fallbackStyle": "none",
+    // "C_Cpp.clang_format_style": "file",
+    "editor.formatOnSave": false,
+    "fileHeaderComment.parameter": {
+        "*": {
+            "commentbegin": "// ",
+            "commentprefix": "// ",
+            "commentend": "// ",
+            "bar": "=========================================================================================",
+            "barComment": "/* ---------------------------------------------------------------------------------------*/",
+            "header": [
+                " ExecutionGraph",
+                " Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>"
+            ],
+            "license": [
+                " This Source Code Form is subject to the terms of the Mozilla Public",
+                " License, v. 2.0. If a copy of the MPL was not distributed with this",
+                " file, You can obtain one at http://mozilla.org/MPL/2.0/."
+            ]
+        }
+    },
+    "fileHeaderComment.template": {
+        "*": [
+            "${commentbegin}${bar}",
+            "${commentbegin}${header}",
+            "${commentbegin}",
+            "${commentbegin} @date ${date}",
+            "${commentbegin} @author ${authorName}, ${authorEmail}",
+            "${commentbegin}",
+            "${commentbegin}${license}",
+            "${commentbegin}${bar}"
+        ],
+        "funcDoc" : [
+            "//! Description",
+            "//! ",
+            "//! @return  ReturnValue",
+            "//!"
+        ],
+        "classDoc" : [
+            "${barComment}",
+            "/*!",
+            "    Description",
+            "",
+            "    @date ${date}",
+            "    @author ${authorName}, ${authorEmail}",
+            " */",
+            "${barComment}",
+        ],
+        "cpp&tsHeader": [
+            "${commentbegin}${bar}",
+            "${commentbegin}${header}",
+            "${commentbegin}",
+            "${commentbegin} @date ${date}",
+            "${commentbegin} @author ${authorName}, ${authorEmail}",
+            "${commentbegin}",
+            "${commentbegin}${license}",
+            "${commentbegin}${bar}"
+        ]
+    },
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+        "**/bower_components": true,
+        "**/jspm_packages": true,
+        "**/node_modules": true,
+    },
+    "files.watcherExclude": {
+        "**/.git/**": true,
+        "**/node_modules/**": true,
+        "**/build/**" : true,
+        "**/buildExternal/**" : true,
+        "**/dist/**" : true
+    },
+    "search.exclude": {
+        "**/build/**" : true,
+        "**/buildExternal/**" : true,
+        "**/dist/**" : true
+    },
+    "cmake.configureArgs": ["-DExecutionGraph_BUILD_TESTS=ON",
+                            "-DExecutionGraph_BUILD_GUI=ON",
+                            "-DExecutionGraph_EXTERNAL_BUILD_DIR_POSTFIX=../buildExternal",
+                            "-DExecutionGraph_USE_CEF_DSYM_FILE=ON"   
+                            ],
+    "plantuml.exportFormat": "svg",
+    "plantuml.exportSubFolder": false,
+    "markdown-preview-enhanced.previewTheme": "github-dark.css",
+    "C_Cpp.clang_format_fallbackStyle": "none",
+    "C_Cpp.loggingLevel": "Information",
+    "git.ignoreLimitWarning": true,
 }

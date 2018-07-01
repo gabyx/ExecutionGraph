@@ -1,0 +1,48 @@
+<mat-toolbar>
+  <mat-toolbar-row>
+    <h1>Execution Graph</h1>
+    <mat-menu #fileMenu="matMenu">
+      <button mat-menu-item>
+        <mat-icon>add</mat-icon>
+        <span>Create new</span>
+      </button>
+      <button mat-menu-item>
+        <mat-icon>mode_edit</mat-icon> 
+        <span>Open</span>
+      </button>
+      <button mat-menu-item [matMenuTriggerFor]="openRecentMenu">
+        <span>Open recent</span>
+      </button>
+    </mat-menu>
+    
+    <mat-menu #openRecentMenu="matMenu">
+      <button mat-menu-item>Some file a</button>
+      <button mat-menu-item>Some file b</button>
+      <button mat-menu-item>Some file c</button>
+    </mat-menu>
+    
+    <mat-menu #executionMenu="matMenu">
+      <button mat-menu-item>
+        <mat-icon>play_circle_filled</mat-icon> 
+        <span>Run</span>
+      </button>
+      <button mat-menu-item>
+        <mat-icon>play_circle_outline</mat-icon> 
+        <span>Debug</span>
+      </button>
+    </mat-menu>
+    
+    <button mat-button [matMenuTriggerFor]="fileMenu">
+      <mat-icon>insert_drive_file</mat-icon> File
+    </button>
+    <button mat-button [matMenuTriggerFor]="executionMenu">
+      <mat-icon>play_arrow</mat-icon> Execution
+    </button>
+    <button mat-button (click)="test()">
+      <mat-icon>play_arrow</mat-icon> Test
+    </button>
+
+    <p>Test response: {{ testResponse }}</p>
+    
+  </mat-toolbar-row>
+</mat-toolbar>

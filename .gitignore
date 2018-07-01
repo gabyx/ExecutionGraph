@@ -1,9 +1,31 @@
 CMakeFiles
-.DS_Store
-.AppleDouble
-.LSOverride
+
+# Build stuff
 __pycache__
 .ipynb_checkpoints
-build
-.vscode/.*
-.vscode/c_cpp_properties.json
+.pre-commit-changed
+build*
+out
+*.eg
+
+GPUCache
+install
+gui/client/dist
+gui/client/node_modules
+*.log
+
+
+# Dependencies
+*/node_modules
+*/extern
+
+# IDE - VSCode
+.vscode
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# System Files
+.DS_Store
+Thumbs.db

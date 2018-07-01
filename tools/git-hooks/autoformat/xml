@@ -1,0 +1,23 @@
+#!/bin/bash
+# format all XML (HTML) files in the repository
+# to use this tool install: npm install -g xmllint
+
+set -e
+
+REPO_DIR="$(git rev-parse --show-toplevel)"
+owndir="$(cd "$(dirname "$0")"; pwd -P)"
+
+function formatFile() {
+    file=$1
+    echo "formatting html file: $file"
+    echo "file: $file" >> tidy.log
+    tidy -config "$2" -xml -m $file 2>/dev/null || (echo 'fatal: `tidy` failed for:' "$file" >&2 ; exit 1)
+}
+export -f formatFile
+
+function formatXML() {
+
+    find "$1" \( -ipath "$2*" \) | xargs -I {} bash -c 'formatFile "${@}"' _ {} "$owndir/tidy.conf"
+}
+
+formatXML "$1" "$REPO_DIR/gui"

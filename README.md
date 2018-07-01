@@ -3,9 +3,12 @@ This library is in alpha and still under development. First usable version will 
 # ExecutionGraph [![Build Status](https://travis-ci.org/gabyx/ExecutionGraph.svg?branch=master)](https://travis-ci.org/gabyx/ExecutionGraph)
 Fast Execution Graph consisting of Execution Nodes
 
-
 Be able to design and run such input/output graphs, such as this one used in [http://gabyx.github.io/GRSFramework/#videos] :
 ![Execution Graphs like this](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)
+
+## Contributors
+- Gabriel Nützi (graph)
+- Simon Spörri (gui, graph)
 
 ## Installing and Dependencies
 To build the library, the tests and the example you need the build tool [cmake](
@@ -14,27 +17,117 @@ This library has these dependencies:
 
 - [Eigen](http://eigen.tuxfamily.org) at least version 3, 
 - [meta](https://github.com/ericniebler/meta)
-- [googletest](https://github.com/google/googletest)
+- [googletest](https://github.com/google/googletest) (for tests)
+- [benchmark](https://github.com/google/benchmark) {benchmarks}
+- [crossguid](https://github.com/graeme-hill/crossguid) (guid implementation)
+- [args](https://github.com/Taywee/args) (argument parser)
+- [memory](https://github.com/foonathan/memory.git) (memory allocators)
+- [CEF](https://github.com/chromiumembedded/cef-project) (chrome embedded framwork, for GUI only)
+- [rttr](https://github.com/rttrorg/rttr) (runtime type information, for GUI only)
+- [spdlog](https://github.com/gabime/spdlog) (logs, for GUI only)
 
-The library `Eigen` needs to be installed, `meta` and `googletest` are installed as external projects when configuring this library!
+The library `Eigen`, `meta`, `rttr`, `memory` can be installed in some system specific location. However, all dependencies are searched, downloaded and build if not found, during the first super build run.
 
 ### OS X
+Install `clang` with [homebrew](https://brew.sh) by **updateing your xcode installation**, 
+installing a [code-sign certificate](https://llvm.org/svn/llvm-project/lldb/trunk/docs/code-signing.txt)
+for lldb and then running:
 ```bash
+    brew install --HEAD llvm --with-toolchain --with-lldb
     brew install eigen
 ```
+We install the latest llvm build, since clang5.0.1 has problems showing `std::string` correctly while using `-fsanitize=address`.
+With Clang 7.0 no problems have been detected.
 
-### Development Setup
-If you start developing, install the pre-commit hook with:
+Set the `CXX` and `CC` variables in your `~/.bash_profile` or similar to 
 ```bash
-    cp tools/pre-commit .git/hooks/
+export OLD_PATH="$PATH"
+function enableCompiler(){
+  comp="$1"
+  if [[ ${comp} == "clang" ]] ; then
+    echo "enabling clang7.0"
+    export PATH="/usr/local/opt/llvm/bin:$OLD_PATH"
+    export CC="/usr/local/opt/llvm/bin/clang"
+    export CXX="${CC}++"
+    export LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
+    export CPPFLAGS="-I/usr/local/opt/llvm/include -I/usr/local/opt/llvm/include/c++/v1/"
+    export CXXFLAGS="$CPPFLAGS"
+  elif [[ ${comp} == "clang6" ]] ; then
+    echo "enabling clang6"
+     export PATH="/usr/local/opt/myllvm6.0rc1/bin:$OLD_PATH"
+    export CC="/usr/local/opt/myllvm6.0rc1/bin/clang"
+    export CXX="${CC}++"
+    export LDFLAGS="-L/usr/local/opt/myllvm6.0rc1/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
+    export CPPFLAGS="-I/usr/local/opt/myllvm6.0rc1/include -I/usr/local/opt/myllvm6.0rc1/include/c++/v1/"
+    export CXXFLAGS="$CPPFLAGS"
+  elif [[ ${comp} == "gcc" ]] ; then
+    echo "enabling gcc7.2"
+    export PATH="/usr/local/opt/$comp/bin:$OLD_PATH"
+    export CC="/usr/local/opt/$comp/bin/gcc-7"
+    export CXX="/usr/local/opt/$comp/bin/g++-7"
+    export LDFLAGS="-L/usr/local/opt/$comp/lib/gcc/7 -Wl,-rpath,/usr/local/opt/$comp/lib/gcc/7"
+    export CPPFLAGS="-I/usr/local/opt/$comp/include -I/usr/local/opt/$comp/include/c++/7.2.0"
+    export CXXFLAGS="$CPPFLAGS"
+  elif [[ ${comp} == "gcc@4.9" ]] ; then
+    echo "enabling gcc@4.9"
+    export PATH="/usr/local/opt/$comp/bin:$OLD_PATH"
+    export CC="/usr/local/opt/$comp/bin/gcc-4.9"
+    export CXX="/usr/local/opt/$comp/bin/g++-4.9"
+    export LDFLAGS="-L/usr/local/opt/$comp/lib/gcc/4.9 -Wl,-rpath,/usr/local/opt/$comp/lib/gcc/4.9"
+    export CPPFLAGS="-I/usr/local/opt/$comp/include -I/usr/local/opt/$comp/include/c++/4.9.4/"
+    export CXXFLAGS="$CPPFLAGS"
+  else
+    echo "enabling no compiler"
+    export PATH="$OLD_PATH"
+    export CC=
+    export CXX=
+    export LDFLAGS=
+    export CPPFLAGS=
+    export CXXFLAGS=
+  fi
+}
+export -f enableCompiler
+
+enableCompiler "clang"
 ```
-#### On OS X
+Use the `enableCompiler` function to quickly switch to another compiler, e.g. `gcc`.
+Restart VS Code if you reconfigured!
+Now you should be ready to configure with cmake:
+
+## Buidling
+```bash
+    cd <pathToRepo>
+    mkdir build
+    cd build
+    # configuring the superbuild
+    cmake .. -DUSE_SUPERBUILD=ON
+    # building the superbuild configuration 
+    make -j all
+    # configuring the actual build
+    cmake ..
+    # building the library/gui
+    make -j <targetName>
+```
+We use a super build setup. The first cmake configure and build by using `-DUSE_SUPERBUILD=ON` (automatically set at first run) will download every dependency and build the ones which need installing (currently [rttr](http://www.rttr.org/), [memory](https://github.com/foonathan/memory.git), [crossguid](https://github.com/graeme-hill/crossguid)). See the path `build/external`. The path `build/external/install` is used for all built dependencies during the super build. If you configure cmake in VS Code with the extension, the external build path is set to `buildFolder` for convenience to be able to quickly delete certain dependencies without deleting the normal build folder `build`).   
+After the super build, the cmake cache file `CMakeCache.txt` is setup with all necessary variables, that **later** cmake *configure* invocations will find all dependencies 
+and configure the actual project. This works also with VS Code and the cmake extension.
+
+## General Development Setup
+If you start developing, install the pre-commit/post-commit hooks with:
+```bash
+    npm install -g typescript-formatter json-fmt xmllint
+    brew install plantuml
+    cd .git && mv hooks hooks.old && ln -s ../tools/git-hooks hooks
+```
+
+### Codeformatting
+``` 
+    tools/formatAll.sh
+```
+
+### On OS X
 Install XCode and the CommandLine Tools from [Apple](https://developer.apple.com/download/more/)  
 Install [Visual Studio Code](https://code.visualstudio.com/)  
-Install `clang` with [homebrew](https://brew.sh) by
-```bash
-    brew install clang
-```
 Install the following extensions for VS Code:
 - [C++ Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
 - [CMake Language Ext.](https://marketplace.visualstudio.com/items?itemName=twxs.cmake)
@@ -42,6 +135,18 @@ Install the following extensions for VS Code:
 - [CMake Tool Helper Ext.](https://marketplace.visualstudio.com/items?itemName=vector-of-bool.cmake-tools)
 
 **Note:** Dont use the [multi-root workspaces](https://code.visualstudio.com/docs/editor/multi-root-workspaces) feature in VS Code since the C++ Extension does not yet support this and code completion won't work properly.
+
+## GUI Development Setup
+The UI is made up of an [Angular](https://angular.io) application that uses the [Angular CLI](https://cli.angular.io) to create the web assets that are ultimately displayed in a [CEF](https://bitbucket.org/chromiumembedded/cef) browser.
+Please visit the Angular CLI website for its prerequisites (node.js and npm respectively, also a globally installed Angular CLI aka `ng` ).
+Once you installed the prerequisites build the client application by navigating to the client directory and starting the build process.
+
+```bash
+cd gui/client
+npm run build
+```
+
+For more information about the development of the client application please refer to the dedicated [client documentation](gui/client/README.md)
 
 ## Introduction
 

@@ -1,0 +1,97 @@
+
+@startuml
+set namespaceSeparator ::
+skinparam shadowing false
+
+class CefMessageRouterBrowserSide
+class Handler as "CefMessageRouterBrowserSide::Handler"
+
+class CefResourceHandler {
+    + Cancel(...) {abstract} 
+    + GetResponseHeaders(...) {abstract} 
+    + ProcessRequest(...) {abstract} 
+    + ReadResponse(...) {abstract}
+}
+
+namespace cefapp{
+    class App{
+        + OnContextInitialized()
+        - m_appHandler
+    }
+    class AppHandler #D3D3D3{
+        + OnAfterCreated()
+        + OnBeforeCloses()
+        - m_router
+        - m_requestDispatcher
+    }
+
+    class BackendRequestDispatcher {
+        + addHandler(...)
+        + removeHandler(...)
+        + addRequest(request, response)
+        + start()
+        + stop()
+        - m_generalHandlers
+        - m_specificHandlers
+        - m_handlerMap
+    }
+    class BackendRequestDispatcherAdapterCef {
+        - m_dispatcher
+    }
+
+    class ClientSchemeHandlerFactory {
+        + Create(...)
+    }
+    class BackendSchemeHandlerFactory {
+        + Create(...)
+        - m_dispatcher
+    }
+    class BackendResourceHandler {
+        - m_dispatcher
+    }
+}
+
+cefapp::App ..> cefapp::AppHandler : creates
+cefapp::App ..> cefapp::ClientSchemeHandlerFactory : registers
+cefapp::App ..> cefapp::BackendSchemeHandlerFactory : registers
+cefapp::App .right.> backend::BackendFactory : uses
+
+cefapp::BackendSchemeHandlerFactory ..> cefapp::BackendResourceHandler : creates
+cefapp::BackendResourceHandler "1" *-- cefapp::BackendRequestDispatcher : uses
+
+cefapp::BackendRequestDispatcherAdapterCef "1" *-- cefapp::BackendRequestDispatcher
+cefapp::BackendRequestDispatcherAdapterCef -down-|> Handler
+cefapp::BackendSchemeHandlerFactory "1" *-- cefapp::BackendRequestDispatcher
+cefapp::BackendRequestDispatcher "1..*" *-up- backend::BackendRequestHandler
+
+cefapp::AppHandler "1" *-left- Handler
+cefapp::AppHandler "1" *-left- CefMessageRouterBrowserSide
+cefapp::BackendResourceHandler -left-|> CefResourceHandler
+
+namespace backend {
+    class Backend #D3D3D3
+    class BackendRequestHandler #D3D3D3 {
+        + handleRequest(request, responsePromise) {abstract} 
+    }
+
+    class BackendFactory {
+        + BackendData Create() {static}
+    }
+
+    class DummyBackendRequestHandler
+}
+
+namespace executionGraph {
+    class StaticFactory<T...>
+}
+
+backend::ExecutionGraphBackend --|> backend::Backend
+backend::DummyBackendRequestHandler --|> backend::BackendRequestHandler
+
+backend::BackendFactory ..> backend::ExecutionGraphBackend : creates
+backend::BackendFactory ..> backend::DummyBackendRequestHandler : creates
+
+backend::DummyBackendRequestHandler "1" *-- backend::ExecutionGraphBackend
+
+backend::BackendFactory ..> executionGraph::StaticFactory : uses
+@enduml

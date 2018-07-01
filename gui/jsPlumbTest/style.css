@@ -1,0 +1,172 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #434343;    
+    background-size: 75px 75px;
+    background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent);
+} 
+
+/* Workspace
+========================================= */ 
+#workspace {
+    width:100%;
+    height:100%;
+    position:absolute;
+    z-index: 0;
+    background-color: transparent;
+    background-size: 15px 15px;
+    background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent);
+}
+
+/* Node Style
+========================================= */ 
+#workspace .node {
+    position: absolute;
+    border: 0.2em solid #00253d;
+    box-shadow: 2px 2px 19px #aaa;
+    -o-box-shadow: 2px 2px 19px #aaa;
+    -webkit-box-shadow: 2px 2px 19px #aaa;
+    -moz-box-shadow: 2px 2px 19px #aaa;
+    -moz-border-radius: 0.5em;
+    border-radius: 7px;
+    opacity: 0.8;
+    width: 17em;
+    z-index: 20;
+    background-color: #eeeeef;
+    color: black;
+    font-family: helvetica, sans-serif;
+    padding: 0.0em;
+    -webkit-transition: -webkit-box-shadow 0.15s ease-in;
+    -moz-transition: -moz-box-shadow 0.15s ease-in;
+    -o-transition: -o-box-shadow 0.15s ease-in;
+    transition: box-shadow 0.15s ease-in;
+    white-space: nowrap;
+  }
+  
+#workspace .node .title {
+    font-weight: bold;
+    text-align: center;
+    padding-bottom: 0.3em;
+    margin-top: 0.5em;
+    border-bottom: 0.15em solid grey;
+    cursor: move;
+}
+
+#workspace .sockets {
+    display: flex; 
+    margin-bottom: 0.25em;
+}
+
+#workspace .outputs,
+#workspace .inputs {
+    flex: 1 1 50%;
+}
+
+#workspace .node .separator {
+    flex: 0 0 0.15em;
+    background: grey;
+}
+
+/* Node Hover Style 
+========================================= */ 
+#workspace .node:hover {
+    box-shadow: 2px 2px 19px #444;
+    -o-box-shadow: 2px 2px 19px #444;
+    -webkit-box-shadow: 2px 2px 19px #444;
+    -moz-box-shadow: 2px 2px 19px #444;
+    opacity: 0.6;
+}
+
+/* Socket Styles
+========================================= */ 
+#workspace .socketTitle {
+  border: 0.07em solid rgb(182, 182, 182);
+  padding-bottom: 0.3em;
+  border-radius: 5px;
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+  padding-top: 0.3em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
+#workspace  .outputs .socketTitle {
+  text-align: right;
+}
+
+#workspace .inputs .socketTitle{
+  text-align: left;
+}
+
+#workspace .socket 
+{
+    border: 1px dashed black;
+}
+
+
+/* Hover Style in Workspace 
+========================================= */ 
+#workspace .hover {
+    border: 1px normal rgb(0, 204, 255);
+}
+
+/* Node Placement
+========================================= */ 
+#workspace #n1 {
+    top: 34em;
+    left: 10em;
+}
+#workspace #n2{
+    top: 7em;
+    left: 36em;
+}
+
+/* Start and EndPoints
+========================================= */
+#workspace .jtk-connector {
+    z-index: 4;
+}
+#workspace .jtk-endpoint, .endpointTargetLabel, .endpointSourceLabel {
+    z-index: 21;
+    cursor: pointer;
+}
+
+/* Overlay Styles                          
+========================================= */ 
+.jtk-overlay {
+    background-color:transparent;
+}
+#workspace .label-overlay {
+    background-color: white;
+    padding: 0.4em;
+    font: 12px sans-serif;
+    color: #444;
+    z-index: 21;
+    border: 1px dotted gray;
+    opacity: 0.8;
+    cursor: pointer;
+}
+#workspace .label-overlay.jtk-hover {
+    background-color: #5C96BC;
+    color: white;
+    border: 1px solid white;
+}
+
+
+/* Other Shit I could not determine...                         
+========================================= */ 
+
+path, .jtk-endpoint {
+    cursor: pointer;
+}
+
+.sourceEndpointStyle {
+    display: block;
+}

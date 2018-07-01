@@ -1,0 +1,37 @@
+// =========================================================================================
+//  ExecutionGraph
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+// 
+//  @date Sat Apr 28 2018
+//  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+// 
+//  This Source Code Form is subject to the terms of the Mozilla Public
+//  License, v. 2.0. If a copy of the MPL was not distributed with this
+//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// =========================================================================================
+
+struct Vector2f
+{
+    x:float32;
+    y:float32;
+}
+
+struct Vector2d
+{
+    x:float64;
+    y:float64;
+}
+
+struct Vector3d
+{
+    x:float64;
+    y:float64;
+    z:float64;
+}
+
+struct Box2f
+{
+    positionMin:Vector2f (id:0);
+    positionMax:Vector2f (id:1);
+}
+

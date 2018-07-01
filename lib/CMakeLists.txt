@@ -1,175 +1,115 @@
-
-
-#The name of the library project ====================================================================
-PROJECT("ExecutionGraphLib")
-
 # Options ==============================================================
-MARK_AS_ADVANCED( ExecutionGraph_BUILD_LIBRARY_STATIC  )
-SET(ExecutionGraph_BUILD_LIBRARY_STATIC OFF CACHE BOOL "Build a static library")
+mark_as_advanced( ExecutionGraph_BUILD_LIBRARY_STATIC  )
+set(ExecutionGraph_BUILD_LIBRARY_STATIC OFF CACHE BOOL "Build a static library")
 
-MARK_AS_ADVANCED(ExecutionGraph_LIB_INSTALL_DIR ExecutionGraph_INCLUDE_INSTALL_DIR )
-# ======================================================================
+################################
+# Make Target: Library 
+################################
 
-SET(SOURCE_FILES
-    ${ExecutionGraph_SRC}
-)
+macro(add_ExecutionGraph_lib STATICorSHARED TARGETNAME EXPORTNAME DOINSTALL)
+    # Add the real library
+    add_library(${TARGETNAME} ${STATICorSHARED} ${ExecutionGraph_SRC} ${ExecutionGraph_INC})
+    target_include_directories(${TARGETNAME} PUBLIC ${ExecutionGraph_INC_DIRS} $<INSTALL_INTERFACE:include>)
+    target_link_libraries(${TARGETNAME} PUBLIC ExecutionGraph::Core-Dependencies)
+    add_library("ExecutionGraph::${EXPORTNAME}" ALIAS ${TARGETNAME})
 
-SET(INCLUDE_FILES
-    ${ExecutionGraph_INC}
-)
-
-#include directories
-SET(INCLUDE_DIRS
-    ${EIGEN_INCLUDE_DIR}
-    ${ExecutionGraph_INC_DIRS}
-)
-MESSAGE(STATUS "${INCLUDE_DIRS}")
-INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
-
-SET(LINK_LIBS ${ExecutionGraph_LINK_LIBS})
-
-# Make targets library shared/static ============================================
-IF(ExecutionGraph_BUILD_LIBRARY_STATIC)
-ADD_LIBRARY(ExecutionGraph STATIC ${SOURCE_FILES} ${INCLUDE_FILES})
-SET_TARGET_PROPERTIES(ExecutionGraph PROPERTIES OUTPUT_NAME ExecutionGraphStatic)
-ELSE()
-ADD_LIBRARY(ExecutionGraph SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
-ENDIF()
-
-IF( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
-    ADD_DEPENDENCIES(ExecutionGraph ${ExecutionGraph_DEPENDING_TARGETS})
-ENDIF()
-
-TARGET_LINK_LIBRARIES(ExecutionGraph ${LINK_LIBS})
-SET_TARGET_PROPERTIES(ExecutionGraph PROPERTIES
-    VERSION ${ExecutionGraph_VERSION_STRING} SOVERSION ${ExecutionGraph_VERSION_STRING}
-)
-
-# set build flag, for import/export specifiers in platform.hpp
-# Building a library means we only export the symbols which have ExecutionGraph_EXPORT set in the Platform.hpp file
-# We define all other symbols to be hidden by default as suggested by https://gcc.gnu.org/wiki/Visibility
-IF(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-    target_compile_options(ExecutionGraph PRIVATE -DExecutionGraph_BUILD_LIBRARY -fvisibility=hidden)
-ELSE()
-    target_compile_options(ExecutionGraph PRIVATE /DExecutionGraph_BUILD_LIBRARY)
-ENDIF()
-# ======================================================================
-
-# Make target library for tests ================================================
-IF(ExecutionGraph_BUILD_TESTS)
-  IF(ExecutionGraph_BUILD_LIBRARY_STATIC)
-  ADD_LIBRARY(ExecutionGraphForTestsOnly STATIC ${SOURCE_FILES} ${INCLUDE_FILES})
-  SET_TARGET_PROPERTIES(ExecutionGraphForTestsOnly PROPERTIES OUTPUT_NAME ExecutionGraphForTestsOnlyStatic)
-  ELSE()
-  ADD_LIBRARY(ExecutionGraphForTestsOnly SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
-  ENDIF()
-
-  IF( NOT "${ExecutionGraph_DEPENDING_TARGETS}" STREQUAL "")
-      ADD_DEPENDENCIES(ExecutionGraphForTestsOnly ${ExecutionGraph_DEPENDING_TARGETS})
-  ENDIF()
-
-  TARGET_LINK_LIBRARIES(ExecutionGraphForTestsOnly ${LINK_LIBS})
-  SET_TARGET_PROPERTIES(ExecutionGraphForTestsOnly PROPERTIES
-      VERSION ${ExecutionGraph_VERSION_STRING} SOVERSION ${ExecutionGraph_VERSION_STRING}
-  )
-
-  # set build flag, for import/export specifiers in platform.hpp
-  # Building a library means we only export the symbols which have ExecutionGraph_EXPORT set in the Platform.hpp file
-  # We define all other symbols to be hidden by default as suggested by https://gcc.gnu.org/wiki/Visibility
-  IF(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-      target_compile_options(ExecutionGraphForTestsOnly PRIVATE -DExecutionGraph_BUILD_LIBRARY -DExecutionGraph_BUILD_TESTS -fvisibility=hidden)
-  ELSE()
-      target_compile_options(ExecutionGraphForTestsOnly PRIVATE /DExecutionGraph_BUILD_LIBRARY /DExecutionGraph_BUILD_TESTS)
-  ENDIF()
-ENDIF()
-# ======================================================================
-
-SET(ExecutionGraph_LIBRARY_NAME_REL "ExecutionGraph")                       # used for cmake config
-SET(ExecutionGraph_LIBRARY_NAME_DBG "ExecutionGraph${CMAKE_DEBUG_POSTFIX}") # used for cmake config
-SET(ExecutionGraph_INCLUDE_CHARATERISTIC_HEADER ${ExecutionGraph/config/Config.hpp})
-
-# Install stuff (default location is not some where on the system! for safty reasons
-IF(FIRST_CMAKE_RUN)
-    SET(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/../install" CACHE STRING "Install prefix (e.g. /usr/local/)" FORCE)
-ENDIF()
-
-# Set install directories (if changed CMAKE_INSTALL_PREFIX adjust values)
-SET(ExecutionGraph_LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib CACHE STRING "Install dir library")
-SET(ExecutionGraph_INC_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include/ExecutionGraph CACHE STRING "Install dir includes")
+    # Add library for headers only
+    add_library("${TARGETNAME}-Headers" INTERFACE)
+    add_library("ExecutionGraph::${EXPORTNAME}-Headers" ALIAS "${TARGETNAME}-Headers")
+    target_include_directories("${TARGETNAME}-Headers" INTERFACE ${ExecutionGraph_INC_DIRS} $<INSTALL_INTERFACE:include>)
 
 
-IF(NOT( CMAKE_INSTALL_PREFIX STREQUAL INSTALL_PREFIX_LAST_VALUE ) )
-    SET(INSTALL_PREFIX_LAST_VALUE ${CMAKE_INSTALL_PREFIX} CACHE INTERNAL "Last install prefix value")
-    MESSAGE(WARNING "Check install dir! They have been changed!")
-    UNSET(ExecutionGraph_LIB_INSTALL_DIR)
-    UNSET(ExecutionGraph_INCLUDE_INSTALL_DIR)
-    SET(ExecutionGraph_LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib CACHE STRING "Install dir library" FORCE)
-    SET(ExecutionGraph_INC_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include CACHE STRING "Install dir includes" FORCE)
-    MARK_AS_ADVANCED(FORCE ExecutionGraph_LIB_INSTALL_DIR ExecutionGraph_INC_INSTALL_DIR )
-ENDIF()
+    set_target_properties(${TARGETNAME} 
+        PROPERTIES
+        VERSION ${ExecutionGraph_VERSION_STRING} SOVERSION ${ExecutionGraph_VERSION_STRING}
+        DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
+        EXPORT_NAME ${EXPORTNAME})
 
-# INSTALLING FILES ================================================================================================================================
-MESSAGE( STATUS "Installing library to " "${ExecutionGraph_LIB_INSTALL_DIR}")
-INSTALL(TARGETS ExecutionGraph
-        LIBRARY DESTINATION ${ExecutionGraph_LIB_INSTALL_DIR}
-        ARCHIVE DESTINATION ${ExecutionGraph_LIB_INSTALL_DIR})
+    setTargetCompileOptionsExecutionGraph(${TARGETNAME} ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
+    
+    # set build flag, for import/export specifiers in platform.hpp
+    # Building a library means we only export the symbols which have ExecutionGraph_EXPORT set in the Platform.hpp file
+    # We define all other symbols to be hidden by default as suggested by https://gcc.gnu.org/wiki/Visibility
+    if( ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR 
+        ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR 
+        ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
+        target_compile_options(${TARGETNAME} PRIVATE -DExecutionGraph_BUILD_LIBRARY -fvisibility=hidden)
+    elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MVCC")
+        target_compile_options(${TARGETNAME} PRIVATE /DExecutionGraph_BUILD_LIBRARY)
+    else()
+        message(FATAL_ERROR "Could not set compile options for compiler id: '${CMAKE_CXX_COMPILER_ID}'")
+    endif()
 
-MESSAGE( STATUS "Installing include folders:" ${ExecutionGraph_INCLUDE_DIR} " to ${ExecutionGraph_INC_INSTALL_DIR}")
+    if(${DOINSTALL})
+        install(TARGETS ${TARGETNAME} EXPORT ExecutionGraphTargets
+                RUNTIME       DESTINATION ${ExecutionGraph_RUNTIME_INSTALL_DIR}
+                LIBRARY       DESTINATION ${ExecutionGraph_LIBRARY_INSTALL_DIR}
+                ARCHIVE       DESTINATION ${ExecutionGraph_ARCHIVE_INSTALL_DIR}
+                FRAMEWORK     DESTINATION ${ExecutionGraph_FRAMEWORK_INSTALL_DIR})
+    endif()
 
-INSTALL(DIRECTORY  ${ExecutionGraph_INCLUDE_DIR}  DESTINATION ${ExecutionGraph_INC_INSTALL_DIR}
-        FILE_PERMISSIONS      OWNER_READ OWNER_WRITE               GROUP_READ               WORLD_READ
-        DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-        FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" PATTERN "*.cmake" EXCLUDE)
+endmacro()
 
+message(STATUS "====================================================")
+message(STATUS "Configuring target: ExecutionGraph::Core")
+add_ExecutionGraph_lib("SHARED" "ExecutionGraph-Core" "Core" ON)
+print_target_properties(ExecutionGraph::Core)
 
-MESSAGE( STATUS "Installing external include folders:" ${ExecutionGraph_EXTERNAL_INCLUDE_DIRS} " to ${ExecutionGraph_INC_INSTALL_DIR}/ExecutionGraph")
-INSTALL(DIRECTORY  ${ExecutionGraph_EXTERNAL_INCLUDE_DIRS}
-        DESTINATION "${ExecutionGraph_INC_INSTALL_DIR}/ExecutionGraph"
-        FILE_PERMISSIONS      OWNER_READ OWNER_WRITE               GROUP_READ               WORLD_READ
-        DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-        FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" PATTERN "*.cmake" EXCLUDE)
+if(ExecutionGraph_BUILD_LIBRARY_STATIC)
+    message(STATUS "====================================================")
+    message(STATUS "Configuring target: ExecutionGraph::CoreS")
+    add_ExecutionGraph_lib("STATIC" "ExecutionGraph-CoreS" "CoreS" ON)
+    print_target_properties(ExecutionGraph::CoreS)
+endif()
 
-MESSAGE( STATUS "Installing configuration dependend files:" ${ExecutionGraph_BINARY_DIR}/include/ExecutionGraph " to ${ExecutionGraph_INC_INSTALL_DIR}")
-INSTALL(DIRECTORY  ${ExecutionGraph_BINARY_DIR}/include/ExecutionGraph
-        DESTINATION ${ExecutionGraph_INC_INSTALL_DIR}
-        FILE_PERMISSIONS      OWNER_READ OWNER_WRITE               GROUP_READ               WORLD_READ
-        DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+################################
+# Make Target: Library for tests
+################################
 
+if(ExecutionGraph_BUILD_TESTS)
+    
+    message(STATUS "====================================================")
+    message(STATUS "Configuring target: ExecutionGraph::CoreForTests")
+    
+    add_ExecutionGraph_lib("SHARED" "ExecutionGraph-CoreForTests" "CoreForTests" OFF)
 
+    # set build flag, for import/export specifiers in platform.hpp
+    # Building a library means we only export the symbols which have ExecutionGraph_EXPORT set in the Platform.hpp file
+    # We define all other symbols to be hidden by default as suggested by https://gcc.gnu.org/wiki/Visibility
+    if( ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR 
+        ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR 
+        ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
+        target_compile_options(ExecutionGraph-CoreForTests PRIVATE -DExecutionGraph_BUILD_TESTS)
+    elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MVCC")
+        target_compile_options(ExecutionGraph-CoreForTests PRIVATE /DExecutionGraph_BUILD_TESTS)
+    else()
+        message(FATAL_ERROR "Could not set compile options for compiler id: '${CMAKE_CXX_COMPILER_ID}'")
+    endif()
 
-# Make configuration files for cmake ============================================================================
+    print_target_properties(ExecutionGraph::CoreForTests)
+endif()
 
-SET(CMAKE_CONFIG_FOLDER ${ExecutionGraph_LIB_INSTALL_DIR}/cmake/ExecutionGraph-${ExecutionGraph_VERSION_STRING})
+# Configuring Installstep
+#########################
 
-#=========================
-# Generate ExecutionGraph-config.cmake file which needs to be installed afterwards
-SET(ExecutionGraph_LIBRARY_NAME $<TARGET_FILE_NAME:ExecutionGraph>)
-SET(ExecutionGraph_CMAKE_CONFIG_FILE "${PROJECT_BINARY_DIR}/executiongraph-config.cmake")
-CONFIGURE_FILE(
-  ${PROJECT_SOURCE_DIR}/executiongraph-config.cmake.in
-  ${ExecutionGraph_CMAKE_CONFIG_FILE} @ONLY
-)
-#=========================
-# Generate ExecutionGraph-config-version.cmake file which needs to be installed afterwards
-SET(ExecutionGraph_LIBRARY_NAME $<TARGET_FILE_NAME:ExecutionGraph>)
-SET(ExecutionGraph_CMAKE_CONFIG_VERSION_FILE "${PROJECT_BINARY_DIR}/executiongraph-config-version.cmake")
-CONFIGURE_FILE(
-  ${PROJECT_SOURCE_DIR}/executiongraph-config-version.cmake.in
-  ${ExecutionGraph_CMAKE_CONFIG_VERSION_FILE} @ONLY
-)
-#=========================
+# Make cmake config files
+install(EXPORT  ExecutionGraphTargets
+                DESTINATION ${ExecutionGraph_CMAKE_CONFIG_INSTALL_DIR}
+                NAMESPACE ExecutionGraph::
+                FILE executiongraph-config.cmake)
 
+# Write/install version file
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/cmake/executiongraph-config-version.cmake"
+                                 VERSION ${ExecutionGraph_VERSION_STRING}
+                                 COMPATIBILITY AnyNewerVersion)
 
-MESSAGE( STATUS "Installing cmake config files to ${CMAKE_CONFIG_FOLDER}")
-INSTALL(FILES  ${ExecutionGraph_CMAKE_CONFIG_FILE} ${ExecutionGraph_CMAKE_CONFIG_VERSION_FILE}
-        DESTINATION ${CMAKE_CONFIG_FOLDER}
-        PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/cmake/executiongraph-config-version.cmake"
+        DESTINATION ${ExecutionGraph_CMAKE_CONFIG_INSTALL_DIR}
+        COMPONENT Devel)
 
-MESSAGE( STATUS "Installing dependency cmake find scripts for 'eigen3,meta,pugixml' to ${CMAKE_CONFIG_FOLDER}")
-INSTALL(FILES  ${ExecutionGraph_ROOT_DIR}/cmake/FindEigen3.cmake
-               ${ExecutionGraph_ROOT_DIR}/cmake/FindMeta.cmake
-               ${ExecutionGraph_ROOT_DIR}/cmake/FindPugiXML.cmake
-        DESTINATION ${CMAKE_CONFIG_FOLDER}
-        PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
+# Install readme and license
+install(FILES "${ExecutionGraph_LICENSE_FILE}" "${ExecutionGraph_README_FILE}"
+        DESTINATION ${ExecutionGraph_ADDITIONAL_FILES_INSTALL_DIR}
+        PERMISSIONS OWNER_READ)
 
-# ==================================================================================================================

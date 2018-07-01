@@ -1,69 +1,30 @@
+// =========================================================================================
+//  ExecutionGraph
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+//
+//  @date Wed Jun 06 2018
+//  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+//
+//  This Source Code Form is subject to the terms of the Mozilla Public
+//  License, v. 2.0. If a copy of the MPL was not distributed with this
+//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// =========================================================================================
 
-#include "TestFunctions.hpp"
-
+#include <executionGraph/nodes/LogicNode.hpp>
+#include <executionGraph/nodes/LogicSocket.hpp>
 #include <meta/meta.hpp>
-#include "ExecutionGraph/nodes/LogicNode.hpp"
-#include "ExecutionGraph/nodes/LogicSocket.hpp"
+#include "DummyNode.hpp"
+#include "TestFunctions.hpp"
 
 using namespace executionGraph;
 
 using Config = GeneralConfig<>;
 
-template<typename TConfig>
-class IntegerNode : public TConfig::NodeBaseType
-{
-public:
-    using Config = TConfig;
-    using Base   = typename Config::NodeBaseType;
-
-    enum Ins
-    {
-        Value1,
-        Value2
-    };
-    enum Outs
-    {
-        Result1,
-    };
-    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
-
-    using InSockets = InSocketDeclList<InSocketDecl<Value1, int>,
-                                       InSocketDecl<Value2, int>>;
-
-    using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, int>>;
-
-    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME();
-    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets);
-
-    template<typename... Args>
-    IntegerNode(Args&&... args)
-        : Base(std::forward<Args>(args)...)
-    {
-        // Add all sockets
-        this->template addSockets<InSockets>();
-        this->template addSockets<OutSockets>(std::make_tuple(0));
-    }
-
-    void reset() override{};
-
-    void compute() override
-    {
-        // ugly syntax due to template shit
-        //  this->template getValue<typename OutSockets::template Get<Result1>>() =
-        //      this->template getValue<typename InSockets::template Get<Value1>>() +
-        //      this->template getValue<typename InSockets::template Get<Value2>>();
-        //
-        // The macro: EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS defines some useful
-        // nicer syntax!
-        getOutVal<Result1>() = getInVal<Value1>() + getInVal<Value2>();
-    }
-};
-
 MY_TEST(Node_Test, Int_Int)
 {
     // Integer node connection (wrong connection)
-    IntegerNode<Config> node1(1);
-    IntegerNode<Config> node2(2);
+    DummyNode<Config> node1(1);
+    DummyNode<Config> node2(2);
 
     node1.addWriteLink(0, node2, 1);  // Correct connection!
 
@@ -83,8 +44,8 @@ MY_TEST(Node_Test, Int_Int)
 MY_TEST(Node_Test, Int_Int2)
 {
     // Integer node connection (wrong connection)
-    IntegerNode<Config> node1(1);
-    IntegerNode<Config> node2(2);
+    DummyNode<Config> node1(1);
+    DummyNode<Config> node2(2);
 
     node1.addWriteLink(0, node2, 0);
     node1.addWriteLink(0, node2, 1);

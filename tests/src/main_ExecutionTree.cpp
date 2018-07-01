@@ -1,71 +1,30 @@
-// ========================================================================================
-//  ExecutionGraph
-//  Copyright (C) 2017 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>//
-//  This Source Code Form is subject to the terms of the Mozilla Public
-//  License, v. 2.0. If a copy of the MPL was not distributed with this
-//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
-// ========================================================================================
-#include "TestFunctions.hpp"
+//! ========================================================================================
+//!  ExecutionGraph
+//!  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+//!
+//!  @date Mon Jan 08 2018
+//!  @author Gabriel Nützi, <gnuetzi (at) gmail (døt) com>
+//!
+//!  This Source Code Form is subject to the terms of the Mozilla Public
+//!  License, v. 2.0. If a copy of the MPL was not distributed with this
+//!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//! ========================================================================================
 
+#include <executionGraph/graphs/ExecutionTreeInOut.hpp>
+#include <executionGraph/nodes/LogicNode.hpp>
+#include <executionGraph/nodes/LogicSocket.hpp>
 #include <meta/meta.hpp>
-#include "ExecutionGraph/graphs/ExecutionTreeInOut.hpp"
-#include "ExecutionGraph/nodes/LogicNode.hpp"
-#include "ExecutionGraph/nodes/LogicSocket.hpp"
+#include "DummyNode.hpp"
+#include "GraphGenerator.hpp"
+#include "TestFunctions.hpp"
 
 using namespace executionGraph;
 
 using Config = GeneralConfig<>;
 
-template<typename TConfig>
-class IntegerNode : public TConfig::NodeBaseType
-{
-public:
-    using Config = TConfig;
-    using Base   = typename Config::NodeBaseType;
-
-    enum Ins
-    {
-        Value1,
-        Value2
-    };
-    enum Outs
-    {
-        Result1,
-    };
-    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
-
-    using InSockets = InSocketDeclList<InSocketDecl<Value1, int>,
-                                       InSocketDecl<Value2, int>>;
-
-    using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, int>>;
-
-    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME();
-    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets);
-
-    template<typename... Args>
-    IntegerNode(Args&&... args)
-        : Base(std::forward<Args>(args)...)
-    {
-        // Add all sockets
-        this->template addSockets<InSockets>();
-        this->template addSockets<OutSockets>(std::make_tuple(0));
-    }
-
-    void reset() override{};
-
-    void compute() override
-    {
-        // ugly syntax due to template shit
-        //        this->template getValue<typename OutSockets::template Get<Result1>>() =
-        //            this->template getValue<typename InSockets::template Get<Value1>>() +
-        //            this->template getValue<typename InSockets::template Get<Value2>>();
-        getOutVal<Result1>() = getInVal<Value1>() + getInVal<Value2>();
-    }
-};
-
 MY_TEST(ExecutionTree_Test, Int_Int)
 {
-    using IntNode = IntegerNode<Config>;
+    using IntNode = DummyNode<Config>;
     auto node1a   = std::make_unique<IntNode>(0, "1a");
     auto node1b   = std::make_unique<IntNode>(1, "1b");
 
@@ -127,104 +86,27 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 
     execTree.execute(0);
 
-    EXECGRAPH_LOG_TRACE("Result : " << resultNode->getOutVal<IntegerNode<Config>::Result1>());
+    EXECGRAPH_LOG_TRACE("Result : " << resultNode->getOutVal<DummyNode<Config>::Result1>());
 
-    EXECGRAPH_THROW_EXCEPTION_IF(resultNode->getOutVal<IntegerNode<Config>::Result1>() != 16, "wrong result");
+    EXECGRAPH_THROW_EXCEPTION_IF(resultNode->getOutVal<DummyNode<Config>::Result1>() != 16, "wrong result");
 }
 
 MY_TEST(ExecutionTree_Test, IntBig)
 {
-    using IntNode = IntegerNode<Config>;
+    using IntNode = DummyNode<Config>;
     int nNodes    = 500;
 
     for(int seed = 0; seed < 10; ++seed)
     {
-        std::mt19937 gen(seed);  //Standard mersenne_twister_engine seeded with rd()
-        std::uniform_int_distribution<> dis(0, nNodes - 1);
-
-        auto buildTree = [&](ExecutionTreeInOut<Config>& execTree, bool makeCycle) {
-
-            std::vector<std::unique_ptr<IntNode>> vec(nNodes);
-
-            execTree.getDefaultOuputPool().setDefaultValue<int>(2);
-            for(int i = 0; i < nNodes; ++i)
-            {
-                vec[i] = std::move(std::make_unique<IntNode>(i));
-                // EXECGRAPH_LOG_TRACE_NE(vec[i]->getId() <<",");
-            }
-            // EXECGRAPH_LOG_TRACE("")
-
-            // Links
-            std::vector<int> idWithConnectionToZero;
-            idWithConnectionToZero.assign(nNodes, false);
-            idWithConnectionToZero[0] = true;
-            for(int i = 1; i < nNodes; ++i)
-            {
-                // Make link from input 1
-                int id = (dis(gen) / ((double)nNodes)) * (i - 1);
-                //EXECGRAPH_LOG_TRACE(id << "-->" << i <<"[0]");
-                vec[i]->setGetLink(*vec[id], 0, 0);
-
-                if(idWithConnectionToZero[id])
-                {
-                    idWithConnectionToZero[i] = true;
-                }
-
-                // Make link from input 2
-
-                id = (dis(gen) / ((double)nNodes)) * (i - 1);
-                //EXECGRAPH_LOG_TRACE(id << "-->" << i <<"[1]");
-                vec[i]->setGetLink(*vec[id], 0, 1);
-
-                if(idWithConnectionToZero[id])
-                {
-                    idWithConnectionToZero[i] = true;
-                }
-            }
-
-            if(makeCycle)
-            {
-                auto it = std::find(idWithConnectionToZero.rbegin()++, idWithConnectionToZero.rend(), true);
-                // Make a cycle
-                vec[*it]->addWriteLink(0, *vec[0], 0);
-            }
-
-            std::shuffle(vec.begin(), vec.end(), gen);
-
-            for(int i = 0; i < nNodes; ++i)
-            {
-                execTree.addNode(std::move(vec[i]));
-            }
-
-            for(int i = 0; i < nNodes; ++i)
-            {
-                auto* node = execTree.getNode(i);
-
-                // EXECGRAPH_LOG_TRACE("id: " << i << " has " << node->getConnectedInputCount() <<" connected inputs.");
-                // EXECGRAPH_LOG_TRACE("id: " << i << " has " << node->getConnectedOutputCount() <<" connected output.");
-                if(node->getConnectedInputCount() == 0)
-                {
-                    execTree.setNodeClass(*node, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-                }
-
-                if(node->getConnectedOutputCount() == 0)
-                {
-                    execTree.setNodeClass(*node, ExecutionTreeInOut<Config>::NodeClassification::OutputNode);
-                }
-            }
-        };
-
         {
-            ExecutionTreeInOut<Config> execTree;
-            buildTree(execTree, false);
-            execTree.setup(true);
+            auto execTree = createRandomTree<ExecutionTreeInOut<Config>, IntNode>(nNodes, seed, false, false);
+            execTree->setup(true);
         }
         {
-            ExecutionTreeInOut<Config> execTree;
-            buildTree(execTree, true);
+            auto execTree = createRandomTree<ExecutionTreeInOut<Config>, IntNode>(nNodes, seed, true, true);
             try
             {
-                execTree.setup(true);
+                execTree->setup(true);
             }
             catch(ExecutionGraphCycleException& e)
             {

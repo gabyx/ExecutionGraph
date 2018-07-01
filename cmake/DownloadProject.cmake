@@ -1,7 +1,12 @@
+# Distributed under the OSI-approved MIT License.  See accompanying
+# file LICENSE or https://github.com/Crascit/DownloadProject for details.
+#
 # MODULE:   DownloadProject
 #
 # PROVIDES:
 #   download_project( PROJ projectName
+#                    [PREFIX prefixDir]
+#                    [DOWNLOAD_DIR downloadDir]
 #                    [SOURCE_DIR srcDir]
 #                    [BINARY_DIR binDir]
 #                    [QUIET]
@@ -28,6 +33,14 @@
 #       projectName_SOURCE_DIR and projectName_BINARY_DIR will be populated with the
 #       locations used whether you provide SOURCE_DIR/BINARY_DIR or not.
 #
+#       The DOWNLOAD_DIR argument does not normally need to be set. It controls the
+#       location of the temporary CMake build used to perform the download.
+#
+#       The PREFIX argument can be provided to change the base location of the default
+#       values of DOWNLOAD_DIR, SOURCE_DIR and BINARY_DIR. If all of those three arguments
+#       are provided, then PREFIX will have no effect. The default value for PREFIX is
+#       CMAKE_BINARY_DIR.
+#
 #       The QUIET option can be given if you do not want to show the output associated
 #       with downloading the specified project.
 #
@@ -49,11 +62,21 @@
 #       prevent a check at the remote end for changes every time CMake is run
 #       after the first successful download. See the documentation of the ExternalProject
 #       module for more information. It is likely you will want to use this option if it
-#       is available to you.
+#       is available to you. Note, however, that the ExternalProject implementation contains
+#       bugs which result in incorrect handling of the UPDATE_DISCONNECTED option when
+#       using the URL download method or when specifying a SOURCE_DIR with no download
+#       method. Fixes for these have been created, the last of which is scheduled for
+#       inclusion in CMake 3.8.0. Details can be found here:
+#
+#           https://gitlab.kitware.com/cmake/cmake/commit/bdca68388bd57f8302d3c1d83d691034b7ffa70c
+#           https://gitlab.kitware.com/cmake/cmake/issues/16428
+#
+#       If you experience build errors related to the update step, consider avoiding
+#       the use of UPDATE_DISCONNECTED.
 #
 # EXAMPLE USAGE:
 #
-#   include(download_project.cmake)
+#   include(DownloadProject)
 #   download_project(PROJ                googletest
 #                    GIT_REPOSITORY      https://github.com/google/googletest.git
 #                    GIT_TAG             master
@@ -61,7 +84,7 @@
 #                    QUIET
 #   )
 #
-#   add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
+#   add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
 #
 #========================================================================================
 
@@ -75,9 +98,10 @@ function(download_project)
     set(options QUIET)
     set(oneValueArgs
         PROJ
+        PREFIX
+        DOWNLOAD_DIR
         SOURCE_DIR
         BINARY_DIR
-        DEFAULT_PARENT_DIR
         # Prevent the following from being passed through
         CONFIGURE_COMMAND
         BUILD_COMMAND
@@ -95,35 +119,64 @@ function(download_project)
         unset(OUTPUT_QUIET)
         message(STATUS "Downloading/updating ${DL_ARGS_PROJ}")
     endif()
-    
-    if(NOT DEFAULT_PARENT_DIR)
-       set(DEFAULT_PARENT_DIR  "${CMAKE_BINARY_DIR}/thirdparty" )
+
+    # Set up where we will put our temporary CMakeLists.txt file and also
+    # the base point below which the default source and binary dirs will be.
+    # The prefix must always be an absolute path.
+    if (NOT DL_ARGS_PREFIX)
+        set(DL_ARGS_PREFIX "${CMAKE_BINARY_DIR}")
+    else()
+        get_filename_component(DL_ARGS_PREFIX "${DL_ARGS_PREFIX}" ABSOLUTE
+                               BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
     endif()
-    
+    if (NOT DL_ARGS_DOWNLOAD_DIR)
+        set(DL_ARGS_DOWNLOAD_DIR "${DL_ARGS_PREFIX}/${DL_ARGS_PROJ}-download")
+    endif()
+
     # Ensure the caller can know where to find the source and build directories
     if (NOT DL_ARGS_SOURCE_DIR)
-        set(DL_ARGS_SOURCE_DIR "${DEFAULT_PARENT_DIR}/${DL_ARGS_PROJ}-src")
+        set(DL_ARGS_SOURCE_DIR "${DL_ARGS_PREFIX}/${DL_ARGS_PROJ}-src")
     endif()
     if (NOT DL_ARGS_BINARY_DIR)
-        set(DL_ARGS_BINARY_DIR "${DEFAULT_PARENT_DIR}/${DL_ARGS_PROJ}-build")
+        set(DL_ARGS_BINARY_DIR "${DL_ARGS_PREFIX}/${DL_ARGS_PROJ}-build")
     endif()
     set(${DL_ARGS_PROJ}_SOURCE_DIR "${DL_ARGS_SOURCE_DIR}" PARENT_SCOPE)
     set(${DL_ARGS_PROJ}_BINARY_DIR "${DL_ARGS_BINARY_DIR}" PARENT_SCOPE)
 
-    
+    # The way that CLion manages multiple configurations, it causes a copy of
+    # the CMakeCache.txt to be copied across due to it not expecting there to
+    # be a project within a project.  This causes the hard-coded paths in the
+    # cache to be copied and builds to fail.  To mitigate this, we simply
+    # remove the cache if it exists before we configure the new project.  It
+    # is safe to do so because it will be re-generated.  Since this is only
+    # executed at the configure step, it should not cause additional builds or
+    # downloads.
+    file(REMOVE "${DL_ARGS_DOWNLOAD_DIR}/CMakeCache.txt")
 
     # Create and build a separate CMake project to carry out the download.
     # If we've already previously done these steps, they will not cause
     # anything to be updated, so extra rebuilds of the project won't occur.
+    # Make sure to pass through CMAKE_MAKE_PROGRAM in case the main project
+    # has this set to something not findable on the PATH.
     configure_file("${_DownloadProjectDir}/DownloadProject.CMakeLists.cmake.in"
-                   ${DEFAULT_PARENT_DIR}/${DL_ARGS_PROJ}-download/CMakeLists.txt)
-    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+                   "${DL_ARGS_DOWNLOAD_DIR}/CMakeLists.txt")
+    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
+                        -D "CMAKE_MAKE_PROGRAM:FILE=${CMAKE_MAKE_PROGRAM}"
+                        .
+                    RESULT_VARIABLE result
                     ${OUTPUT_QUIET}
-                    WORKING_DIRECTORY "${DEFAULT_PARENT_DIR}/${DL_ARGS_PROJ}-download"
+                    WORKING_DIRECTORY "${DL_ARGS_DOWNLOAD_DIR}"
     )
+    if(result)
+        message(FATAL_ERROR "CMake step for ${DL_ARGS_PROJ} failed: ${result}")
+    endif()
     execute_process(COMMAND ${CMAKE_COMMAND} --build .
+                    RESULT_VARIABLE result
                     ${OUTPUT_QUIET}
-                    WORKING_DIRECTORY "${DEFAULT_PARENT_DIR}/${DL_ARGS_PROJ}-download"
+                    WORKING_DIRECTORY "${DL_ARGS_DOWNLOAD_DIR}"
     )
+    if(result)
+        message(FATAL_ERROR "Build step for ${DL_ARGS_PROJ} failed: ${result}")
+    endif()
 
 endfunction()

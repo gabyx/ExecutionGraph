@@ -1,0 +1,30 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceRoot}/include",
+                "${workspaceRoot}/gui/executionGraphGui",
+                "${workspaceRoot}/gui/executionGraphGui/client",
+                "${workspaceRoot}/build/include",
+                "${workspaceRoot}/tests/include"
+            ],
+            "defines": [],
+            "browse": {
+                "path": [
+                    "${workspaceRoot}/include",
+                    "${workspaceRoot}/gui/executionGraphGui",
+                    "${workspaceRoot}/build/include",
+                    "${workspaceRoot}/tests/include"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "$[workspaceRoot}/.vscode/browse.vc.db"
+            },
+            "intelliSenseMode": "clang-x64",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "compilerPath": "/usr/bin/clang"
+        }
+    ],
+    "version": 4
+}

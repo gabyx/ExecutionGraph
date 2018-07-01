@@ -1,0 +1,66 @@
+
+@startuml
+set namespaceSeparator ::
+skinparam shadowing false
+
+namespace common {
+    class BinaryBuffer<BufferPool> {
+        - m_allocator
+        - m_data
+        - m_nBytes
+    }
+    class BinaryPayload {
+        - m_buffer
+        - mimeType
+    }
+
+    class BufferPool
+    class Request #33cc33 {
+        + getRequestURL()
+        + getPayload() {abstract}
+        - m_id
+        - m_requestURL
+    }
+    class ResponsePromise #ff6600 {
+        + setCancel(what)
+        + setReady(payload)
+        # setReadyImpl() {abstract}
+        # setCancleImpl(...) {abstract}
+        # setResolveOnDestruction()
+        - m_promisePayload
+        - m_requestId
+        - m_state
+        - m_bCancelOnDestruction
+    }
+    class ResponseFuture #00ccff {
+        + getFuture()
+        - m_requestId
+    }
+}
+
+namespace cefapp {
+    class RequestCef #33cc33
+    class ResponsePromiseCef #ff6600 {
+        # setReadyImpl()
+        # setCancleImpl(...)
+        - m_cbResponseHeaderReady
+    }
+    class ResponseFutureCef #00ccff
+}
+
+namespace std {
+    class promise<BinaryPayload>
+    class future<BinaryPayload>
+}
+
+cefapp::RequestCef --|> common::Request
+cefapp::ResponsePromiseCef --|> common::ResponsePromise
+common::ResponsePromise "1" *-- std::promise
+cefapp::ResponseFutureCef --|> common::ResponseFuture
+common::ResponseFuture "1" *-- std::future
+
+common::Request .right.> common::BinaryPayload : uses
+cefapp::RequestCef "0...1" *--  common::BinaryPayload
+common::BinaryPayload "1" *-right- common::BinaryBuffer
+common::BinaryBuffer "1" *-right- common::BufferPool
+@enduml

@@ -17,9 +17,24 @@ brew tap homebrew/versions || echo "suppress failures in order to ignore warning
 
 # eigen3 needs gfortran
 brew install gcc || echo "suppress failures in order to ignore warnings"
+brew link --overwrite --dry-run gcc
+brew link --overwrite gcc
+
+#install angular (https://gist.github.com/DanHerbert/9520689)
+brew install node || echo "suppress failures in order to ignore warnings"
+brew upgrade node
+npm install -g @angular/cli
+
+if [[ ${USE_APPLE_CLANG} == "OFF" ]]; then
+    brew install llvm --HEAD llvm --with-toolchain --with-lldb || echo "suppress failures in order to ignore warnings"
+    brew link --overwrite --dry-run llvm
+    brew link --overwrite llvm
+    export PATH="/usr/local/opt/llvm/bin:$PATH"
+fi
 
 # Cmake
 brew install cmake || echo "suppress failures in order to ignore warnings"
+brew upgrade cmake
 
 echo "Path set to ${PATH}"
 echo "CXX set to ${CXX}"

@@ -4,12 +4,11 @@
     // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
             "name": "(lldb) ExecutionGraphTests-ExecutionTree",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/tests/ExecutionGraphTests-ExecutionTree",
+            "program": "${workspaceFolder}/build/tests/ExecutionGraphTest-ExecutionTree",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -21,13 +20,80 @@
             "name": "(lldb) ExecutionGraphTests-CustomSocketTypes",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/tests/ExecutionGraphTests-CustomSocketTypes",
+            "program": "${workspaceFolder}/build/tests/ExecutionGraphTest-CustomSocketTypes",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "lldb"
+        },
+        {
+            "name": "(lldb) ExecutionGraphTests-TaskQueue",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/tests/ExecutionGraphTest-TaskQueue",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
+            "name": "(lldb) ExecutionGraphTests-Flatbuffer",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/tests/ExecutionGraphTest-Flatbuffer",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
+            "name": "(lldb) ExecutionGraphTests-CEFSimple",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/gui/cefsimple/Debug/cefsimple.app/Contents/MacOS/cefsimple",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
+            "name": "(lldb) ExecutionGraphGUI (client src from build folder)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
+            "args": ["--clientSourcePath", "${workspaceFolder}/build/gui/executionGraphGui/client/build/client/", "--logPath", "${workspaceFolder}/build"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
+            "name": "(lldb) ExecutionGraphGUI (client src from dist folder)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
+            "args": ["--clientSourcePath", "${workspaceFolder}/gui/executionGraphGui/client/dist/apps/eg", "--logPath", "${workspaceFolder}/build"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
+            "name": "Launch ExecutionGraphGUI client (ng serve)",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:4200/#",
+            "webRoot": "${workspaceRoot}"
         }
     ]
 }
