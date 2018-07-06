@@ -18,8 +18,9 @@
 #include <executionGraph/graphs/ExecutionTreeInOut.hpp>
 #include <rttr/type>
 #include <string>
-#include <unordered_set>
+#include <vector>
 #include "backend/Backend.hpp"
+#include "backend/nodes/NodeTypeDescription.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -57,8 +58,8 @@ public:
 public:
     struct GraphDescription
     {
-        std::unordered_set<std::string> m_nodeTypes;    //!< Type names of the available and creatable nodes on this graph.
-        std::unordered_set<std::string> m_socketTypes;  //!< Type names of the available sockets.
+        std::vector<NodeTypeDescription> m_NodeTypeDescriptions;      //!< Type names of the available and creatable nodes on this graph.
+        std::vector<SocketTypeDescription> m_SocketTypeDescriptions;  //!< Type names of the available sockets.
     };
 
 private:

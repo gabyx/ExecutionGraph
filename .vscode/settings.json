@@ -62,7 +62,20 @@
         "*.ipp": "cpp",
         "*.icc": "cpp",
         "*.hpp": "cpp",
-        "*.cpp": "cpp"
+        "*.cpp": "cpp",
+        "cfenv": "cpp",
+        "cinttypes": "cpp",
+        "__functional_base": "cpp",
+        "atomic": "cpp",
+        "bitset": "cpp",
+        "chrono": "cpp",
+        "optional": "cpp",
+        "locale": "cpp",
+        "random": "cpp",
+        "ratio": "cpp",
+        "system_error": "cpp",
+        "queue": "cpp",
+        "stack": "cpp"
     },
     "cmake.useCMakeServer": true,
     "cmake.preferredGenerators": [

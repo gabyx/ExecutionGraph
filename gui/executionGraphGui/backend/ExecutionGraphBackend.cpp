@@ -11,6 +11,7 @@
 //! ========================================================================================
 
 #include "backend/ExecutionGraphBackend.hpp"
+#include "backend/ExecutionGraphBackendDefs.hpp"
 
 using Id                 = ExecutionGraphBackend::Id;
 using GraphDescription   = ExecutionGraphBackend::GraphDescription;
@@ -19,48 +20,27 @@ using DefaultGraphConfig = typename DefaultGraph::Config;
 
 namespace
 {
-    //! Return a set of rtti strings.
-    template<typename T>
-    struct makeTypeSet;
-
-    //! Spezialization for `meta::list<...>`.
-    template<typename... Args>
-    struct makeTypeSet<meta::list<Args...>>
-    {
-        auto operator()()
-        {
-            return std::unordered_set<std::string>{{rttr::type::get<Args>().get_name().to_string()...}};
-        }
-    };
-
     //! Return a graph description.
     template<typename Config>
-    struct makeGraphDescription;
-
-    //! Spezialization for `DefaultGraphConfig`.
-    template<>
-    struct makeGraphDescription<DefaultGraphConfig>
+    GraphDescription makeGraphDescription()
     {
-        auto operator()()
-        {
-            GraphDescription description;
-            // All node types
-            //!@todo
+        GraphDescription description;
+        // All node types
+        description.m_NodeTypeDescriptions = ExecutionGraphBackendDefs<DefaultGraphConfig>::NodeTypeDescriptions;
+        // All socket types
+        description.m_SocketTypeDescriptions = ExecutionGraphBackendDefs<DefaultGraphConfig>::SocketTypeDescriptions;
 
-            // All socket types
-            description.m_socketTypes = makeTypeSet<typename DefaultGraphConfig::SocketTypes>{}();
-
-            return description;
-        }
+        return description;
     };
 }  // namespace
 
+//! Definde all description Ids for the different graphs.
 const std::array<Id, 1> ExecutionGraphBackend::m_descriptionIds = {Id{"DefaultGraph",
                                                                       std::string("2992ebff-c950-4184-8876-5fe6ac029aa5")}};
-
+//! Define all graph types in this Backend
+//! Currently only the DefaultGraphConfig is added.
 const std::unordered_map<Id, GraphDescription>
-    ExecutionGraphBackend::m_graphDescriptions = {std::make_pair(m_descriptionIds[0],
-                                                                 makeGraphDescription<DefaultGraphConfig>{}())};
+    ExecutionGraphBackend::m_graphDescriptions = {std::make_pair(m_descriptionIds[0], makeGraphDescription<DefaultGraphConfig>())};
 
 //! Add a graph of type `graphType` with id `graphId` to the backend.
 void ExecutionGraphBackend::addGraph(const Id& graphId,
