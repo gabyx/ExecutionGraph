@@ -10,7 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "backend/DummyBackendRequestHandler.hpp"
+#include "backend/requestHandlers/DummyRequestHandler.hpp"
 #include <chrono>
 #include <common/Loggers.hpp>
 
@@ -20,23 +20,24 @@ namespace
     const std::unordered_set<std::string> c_requestTypes = {"general/dummyRequest"};
 }  // namespace
 
-const std::unordered_set<std::string>& DummyBackendRequestHandler::getRequestTypes() const
+const std::unordered_set<std::string>& DummyRequestHandler::getRequestTypes() const
 {
     return c_requestTypes;
 }
 
-void DummyBackendRequestHandler::handleRequest(const Request& m_request, ResponsePromise& m_response)
+void DummyRequestHandler::handleRequest(const Request& request, ResponsePromise& response)
 {
-    EXECGRAPHGUI_BACKENDLOG_INFO("DummyBackendRequestHandler::handleRequest");
+    EXECGRAPHGUI_BACKENDLOG_INFO("DummyRequestHandler::handleRequest");
     using namespace std::chrono_literals;
 
-    EXECGRAPHGUI_BACKENDLOG_INFO("DummyBackendRequestHandler: Computing started [1sec] ...");
+    EXECGRAPHGUI_BACKENDLOG_INFO("DummyRequestHandler: Computing started [1sec] ...");
     std::this_thread::sleep_for(1.0s);
-    EXECGRAPHGUI_BACKENDLOG_INFO("DummyBackendRequestHandler: Computing finished!");
+    EXECGRAPHGUI_BACKENDLOG_INFO("DummyRequestHandler: Computing finished!");
 
-    EXECGRAPH_THROW_EXCEPTION_IF(std::rand() % 2 == 0, "DummyBackendRequestHandler: Spontanously deciced to throw a meaningless exception! Because its fun!")
+    EXECGRAPH_THROW_EXCEPTION_IF(std::rand() % 2 == 0,
+                                 "DummyRequestHandler: Spontanously deciced to throw a meaningless exception! Because its fun!")
 
-    BinaryBuffer<BufferPool> buffer(c_debugResponse.size(), m_response.getAllocator());
+    BinaryBuffer<BufferPool> buffer(c_debugResponse.size(), response.getAllocator());
 
     auto it = buffer.begin();
     for(const char& v : c_debugResponse)
@@ -44,8 +45,8 @@ void DummyBackendRequestHandler::handleRequest(const Request& m_request, Respons
         *it = v;
         ++it;
     }
-    EXECGRAPHGUI_BACKENDLOG_INFO("DummyBackendRequestHandler: Allocated Payload");
+    EXECGRAPHGUI_BACKENDLOG_INFO("DummyRequestHandler: Allocated Payload");
 
     // Set the response ready!
-    m_response.setReady(ResponsePromise::Payload{std::move(buffer), "application/octet-stream"});
+    response.setReady(ResponsePromise::Payload{std::move(buffer), "application/octet-stream"});
 }

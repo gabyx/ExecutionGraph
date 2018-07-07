@@ -78,7 +78,7 @@ namespace backend {
         + BackendData Create() {static}
     }
 
-    class DummyBackendRequestHandler
+    class DummyRequestHandler
 }
 
 namespace executionGraph {
@@ -86,12 +86,12 @@ namespace executionGraph {
 }
 
 backend::ExecutionGraphBackend --|> backend::Backend
-backend::DummyBackendRequestHandler --|> backend::BackendRequestHandler
+backend::DummyRequestHandler --|> backend::BackendRequestHandler
 
 backend::BackendFactory ..> backend::ExecutionGraphBackend : creates
-backend::BackendFactory ..> backend::DummyBackendRequestHandler : creates
+backend::BackendFactory ..> backend::DummyRequestHandler : creates
 
-backend::DummyBackendRequestHandler "1" *-- backend::ExecutionGraphBackend
+backend::DummyRequestHandler "1" *-- backend::ExecutionGraphBackend
 
 backend::BackendFactory ..> executionGraph::StaticFactory : uses
 @enduml

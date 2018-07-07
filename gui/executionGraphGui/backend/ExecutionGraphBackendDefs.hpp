@@ -18,6 +18,7 @@
 #include <rttr/type>
 #include "backend/nodes/DummyNode.hpp"
 #include "backend/nodes/NodeTypeDescription.hpp"
+#include "backend/nodes/SocketTypeDescription.hpp"
 
 template<typename TConfig>
 class ExecutionGraphBackendDefs;

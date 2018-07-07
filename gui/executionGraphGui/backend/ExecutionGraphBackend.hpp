@@ -21,6 +21,7 @@
 #include <vector>
 #include "backend/Backend.hpp"
 #include "backend/nodes/NodeTypeDescription.hpp"
+#include "backend/nodes/SocketTypeDescription.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -56,19 +57,19 @@ public:
     //! Information about graphs.
     //@{
 public:
-    struct GraphDescription
+    struct GraphTypeDescription
     {
-        std::vector<NodeTypeDescription> m_NodeTypeDescriptions;      //!< Type names of the available and creatable nodes on this graph.
-        std::vector<SocketTypeDescription> m_SocketTypeDescriptions;  //!< Type names of the available sockets.
+        std::vector<NodeTypeDescription> m_nodeTypeDescription;      //!< Type names of the available and creatable nodes on this graph.
+        std::vector<SocketTypeDescription> m_socketTypeDescription;  //!< Type names of the available sockets.
     };
 
 private:
-    static const std::array<Id, 1> m_descriptionIds;                            //!< All IDs used for the graph description.
-    static const std::unordered_map<Id, GraphDescription> m_graphDescriptions;  //! All graph descriptions.
+    static const std::array<Id, 1> m_graphTypeDescriptionIds;                          //!< All IDs used for the graph description.
+    static const std::unordered_map<Id, GraphTypeDescription> m_graphTypeDescription;  //! All graph descriptions.
 
 public:
     //! Get all graph descriptions identified by its id.
-    std::unordered_map<Id, GraphDescription> getGraphDescriptions() const { return m_graphDescriptions; }
+    std::unordered_map<Id, GraphTypeDescription> getGraphTypeDescriptions() const { return m_graphTypeDescription; }
     //@}
 
 private:

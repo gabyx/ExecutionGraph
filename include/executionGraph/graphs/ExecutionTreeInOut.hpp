@@ -102,7 +102,7 @@ namespace executionGraph
 
         using LogicNodeDefaultOutputs = LogicNodeDefaultPool<TConfig>;
 
-        struct GraphDescription
+        struct GraphTypeDescription
         {
             std::unordered_set<std::string> m_nodeTypes;    //!< Type names of the available and creatable nodes on this graph.
             std::unordered_set<std::string> m_socketTypes;  //!< Type names of the available sockets.

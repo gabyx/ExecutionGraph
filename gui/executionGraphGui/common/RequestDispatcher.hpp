@@ -10,8 +10,8 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef cefapp_RequestDispatcher_h
-#define cefapp_RequestDispatcher_h
+#ifndef common_RequestDispatcher_hpp
+#define common_RequestDispatcher_hpp
 
 #include <executionGraph/common/Assert.hpp>
 #include <executionGraph/common/ThreadPool.hpp>
@@ -178,7 +178,7 @@ private:
             {  // Lock start
                 std::scoped_lock<std::mutex> lock(m_d.m_access);
                 // Get the request type
-                const std::string requestType = m_request->getRequestURL().string();
+                const std::string requestType = m_request->getURL().string();
 
                 // Find handler
                 auto it = m_d.m_specificHandlers.find(requestType);
@@ -243,7 +243,7 @@ private:
             {  // Lock start
                 std::scoped_lock<std::mutex> lock(m_d.m_access);
                 // Get the request type
-                const std::string requestType = m_request->getRequestURL().string();
+                const std::string requestType = m_request->getURL().string();
 
                 // Find handler
                 auto it = m_d.m_specificHandlers.find(requestType);

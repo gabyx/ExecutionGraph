@@ -10,14 +10,14 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef cefapp_Request_h
-#define cefapp_Request_h
+#ifndef common_Request_hpp
+#define common_Request_hpp
 
+#include <executionGraph/common/FileSystem.hpp>
 #include <executionGraph/common/IObjectID.hpp>
 #include <rttr/type>
 #include <string>
-#include "common/BinaryPayload.hpp"
-#include "common/Response.hpp"
+class BinaryPayload;
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -55,9 +55,9 @@ public:
 
 public:
     //! Get the request url describing this message.
-    const std::path& getRequestURL() { return m_requestURL; }
+    const std::path& getURL() const { return m_requestURL; }
     //! Set the request url describing this message.
-    void setRequestURL(const std::path& requestURL) { m_requestURL = requestURL; }
+    void setURL(const std::path& requestURL) { m_requestURL = requestURL; }
 
 public:
     //! Get the payload of this request. Nullptr if there is no payload for this request.

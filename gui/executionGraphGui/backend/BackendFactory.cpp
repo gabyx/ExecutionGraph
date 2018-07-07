@@ -12,15 +12,20 @@
 
 #include "backend/BackendFactory.hpp"
 #include <utility>
-#include "backend/DummyBackendRequestHandler.hpp"
+#include "backend/requestHandlers/DummyRequestHandler.hpp"
+#include "backend/requestHandlers/GraphInfoRequestHandler.hpp"
 
 BackendFactory::BackendData
 BackendFactory::CreatorExecutionGraphBackend::create()
 {
-    // create the executionGraph backend
+    // Create the executionGraph backend
     auto backend = std::make_shared<ExecutionGraphBackend>();
 
-    // create a simple dummy handler
-    auto dummyHandler = std::make_shared<DummyBackendRequestHandler>(backend);
-    return BackendData{backend, {dummyHandler}};
+    // Create a simple dummy handler
+    auto dummyHandler = std::make_shared<DummyRequestHandler>(backend);
+
+    // Create a graph handler (add/remove graphs, graph info etc.)
+    auto graphHandler = std::make_shared<GraphInfoRequestHandler>(backend);
+
+    return BackendData{backend, {dummyHandler, graphHandler}};
 }

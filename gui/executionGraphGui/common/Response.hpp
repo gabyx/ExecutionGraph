@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef cefapp_Response_hpp
-#define cefapp_Response_hpp
+#ifndef common_Response_hpp
+#define common_Response_hpp
 
 #include <executionGraph/common/Identifier.hpp>
 #include <future>

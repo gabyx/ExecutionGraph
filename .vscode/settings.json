@@ -75,7 +75,11 @@
         "ratio": "cpp",
         "system_error": "cpp",
         "queue": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "__functional_base_03": "cpp",
+        "__tuple": "cpp",
+        "typeindex": "cpp",
+        "__functional_03": "cpp"
     },
     "cmake.useCMakeServer": true,
     "cmake.preferredGenerators": [

@@ -16,7 +16,7 @@ namespace common {
 
     class BufferPool
     class Request #33cc33 {
-        + getRequestURL()
+        + getURL()
         + getPayload() {abstract}
         - m_id
         - m_requestURL

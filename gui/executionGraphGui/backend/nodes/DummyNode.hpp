@@ -32,9 +32,9 @@ public:
     //! Class which is used as a static, for RTTR Registration
     struct AutoRegisterRTTR
     {
-        AutoRegisterRTTR(const std::string& rttiSuffix)
+        AutoRegisterRTTR(const std::string& rttiPostFix)
         {
-            rttr::registration::class_<DummyNode>("DummyNode-" + rttiSuffix)
+            rttr::registration::class_<DummyNode>("DummyNode-" + rttiPostFix)
                 .template constructor<NodeId, const std::string&>()(
                     rttr::policy::ctor::as_raw_ptr)
                 .template constructor<NodeId>()(
