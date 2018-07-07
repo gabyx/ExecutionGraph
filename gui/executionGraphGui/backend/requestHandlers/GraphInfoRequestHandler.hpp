@@ -18,6 +18,18 @@
 
 class ExecutionGraphBackend;
 
+/* ---------------------------------------------------------------------------------------*/
+/*!
+    Request Handler for information on graphs in the backend.
+
+    Handles the request URLs: 
+        - "general/getAllGraphTypeDescriptions"
+
+    @date Sat Jul 07 2018
+    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+ */
+/* ---------------------------------------------------------------------------------------*/
+
 class GraphInfoRequestHandler final : public BackendRequestHandler
 {
     RTTR_ENABLE(BackendRequestHandler)
