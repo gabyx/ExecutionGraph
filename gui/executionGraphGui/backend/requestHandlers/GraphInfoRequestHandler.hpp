@@ -36,7 +36,9 @@ class GraphInfoRequestHandler final : public BackendRequestHandler
 
 public:
     using Id       = BackendRequestHandler::Id;
-    using Function = std::function<void(GraphInfoRequestHandler&, const Request& request, ResponsePromise& response)>;
+    using Function = std::function<void(GraphInfoRequestHandler&,
+                                        const Request& request,
+                                        ResponsePromise& response)>;
 
 public:
     GraphInfoRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,

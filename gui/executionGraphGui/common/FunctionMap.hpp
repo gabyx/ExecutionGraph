@@ -27,7 +27,7 @@
  */
 /* ---------------------------------------------------------------------------------------*/
 template<typename TFunction>
-struct FunctionMap
+struct FunctionMap final
 {
     using Function = TFunction;
     using Map      = std::unordered_map<std::string, Function>;

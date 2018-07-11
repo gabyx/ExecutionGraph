@@ -15,6 +15,9 @@
 #include <chrono>
 #include <common/Loggers.hpp>
 #include <messages/schemas/GraphInfoMessages_generated.h>
+#include "common/AllocatorProxyFlatBuffer.hpp"
+
+using namespace executionGraphGUI::serialization;
 
 //! Init the function mapping.
 FunctionMap<GraphInfoRequestHandler::Function> GraphInfoRequestHandler::initFunctionMap()
@@ -55,9 +58,16 @@ void GraphInfoRequestHandler::handleRequest(const Request& request,
     }
 }
 
+//! Handle the "GetAllGraphTypeDescriptions"
 void GraphInfoRequestHandler::handleGetAllGraphTypeDescriptions(const Request& request,
                                                                 ResponsePromise& response)
 {
     EXECGRAPH_THROW_EXCEPTION_IF(request.getPayload() == nullptr,
-                                 "There should not be any request payload for this request")
+                                 "There should not be any request payload for this request");
+    using Allocator = ResponsePromise::Allocator;
+    AllocatorProxyFlatBuffer<Allocator> allocator(*response.getAllocator());
+    flatbuffers::FlatBufferBuilder builder(1024, &allocator);
+
+    // Serialize the response
+    GetAllGraphTypeDescriptionsResponseBuilder rspBuilder(builder);
 }

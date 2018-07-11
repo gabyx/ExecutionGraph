@@ -27,7 +27,7 @@
  */
 /* ---------------------------------------------------------------------------------------*/
 template<typename RawAllocator>
-class BinaryBuffer
+class BinaryBuffer final
 {
 private:
     using Deleter = foonathan::memory::allocator_deleter<uint8_t[], RawAllocator>;

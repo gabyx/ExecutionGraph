@@ -29,7 +29,8 @@ private:
     using Base = foonathan::memory::heap_allocator;
 
 private:
-    static_assert(foonathan::memory::is_thread_safe_allocator<Base>::value, "A thread-safe allocator is required here!");
+    static_assert(foonathan::memory::is_thread_safe_allocator<Base>::value,
+                  "A thread-safe allocator is required here!");
 
 public:
     BufferPool()          = default;

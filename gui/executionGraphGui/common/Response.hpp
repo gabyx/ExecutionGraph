@@ -49,12 +49,13 @@ private:
     };
 
 public:
-    using Payload = BinaryPayload;
-    using Id      = executionGraph::Id;
+    using Payload   = BinaryPayload;
+    using Allocator = BufferPool;
+    using Id        = executionGraph::Id;
 
 protected:
     ResponsePromise(Id requestId,
-                    std::shared_ptr<BufferPool> allocator,
+                    std::shared_ptr<Allocator> allocator,
                     bool bCancelOnDestruction = true)
         : m_requestId(requestId)
         , m_allocator(allocator)
@@ -141,7 +142,7 @@ private:
     // todo: Up to now: Hand over the buffer to Dispatcher thread, it will be used in the FlatBufferBuilder
     // The dispatcher creats the flatbuffer, returns a DetachedBuffer which ends up somehow in the payload promise
     // and gets deleted (over the same instance m_allocator) in the BackendRequestHandler ...
-    std::shared_ptr<BufferPool> m_allocator;  //! Thread-safe allocator which allocates a buffer for us.
+    std::shared_ptr<Allocator> m_allocator;  //! Thread-safe allocator which allocates a buffer for us.
 
     State m_state               = State::Nothing;  //!< The state of this promise
     bool m_bCancelOnDestruction = false;           //!< If the promise should be cancled on destruction.
