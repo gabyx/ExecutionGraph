@@ -59,6 +59,7 @@ public:
 public:
     struct GraphTypeDescription
     {
+        Id m_id;                                                     //!< The id of this graph type.
         std::vector<NodeTypeDescription> m_nodeTypeDescription;      //!< Type names of the available and creatable nodes on this graph.
         std::vector<SocketTypeDescription> m_socketTypeDescription;  //!< Type names of the available sockets.
     };

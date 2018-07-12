@@ -37,7 +37,7 @@ void DummyRequestHandler::handleRequest(const Request& request, ResponsePromise&
     EXECGRAPH_THROW_EXCEPTION_IF(std::rand() % 2 == 0,
                                  "DummyRequestHandler: Spontanously deciced to throw a meaningless exception! Because its fun!")
 
-    BinaryBuffer<BufferPool> buffer(c_debugResponse.size(), response.getAllocator());
+    auto buffer = makeBinaryBuffer(response.getAllocator(), c_debugResponse.size());
 
     auto it = buffer.begin();
     for(const char& v : c_debugResponse)

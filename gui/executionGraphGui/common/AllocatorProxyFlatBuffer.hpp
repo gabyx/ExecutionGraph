@@ -19,7 +19,8 @@
 /* ---------------------------------------------------------------------------------------*/
 /*!
     A ligthweight proxy allocator which forwards to another 
-    foonathan::RawAllocator. 
+    foonathan::RawAllocator. It is compatible with BinaryBuffer, since it allocates
+    over `allocate_array`.
 
     @date Thu Mar 08 2018
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
@@ -39,16 +40,23 @@ public:
 
 public:
     //! Allocate `size` bytes of memory.
-    virtual uint8_t* allocate(std::size_t size) override
+    virtual uint8_t* allocate(std::size_t bytes) override
     {
         // we dont get alignment requirement, its not important.
-        return static_cast<uint8_t*>(m_allocator.allocate_node(size, alignof(char)));
+        return static_cast<uint8_t*>(foonathan::memory::allocator_traits<Allocator>::allocate_array(m_allocator,
+                                                                                                    bytes,
+                                                                                                    sizeof(uint8_t),
+                                                                                                    alignof(uint8_t)));
     }
 
     // Deallocate `size` bytes of memory at `p` allocated by this allocator.
-    virtual void deallocate(uint8_t* p, size_t size) override
+    virtual void deallocate(uint8_t* p, size_t bytes) override
     {
-        m_allocator.deallocate_node(p, size, alignof(char));
+        foonathan::memory::allocator_traits<Allocator>::deallocate_array(m_allocator,
+                                                                         p,
+                                                                         bytes,
+                                                                         sizeof(uint8_t),
+                                                                         alignof(uint8_t));
     }
 
 private:

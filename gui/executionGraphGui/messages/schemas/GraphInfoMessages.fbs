@@ -14,14 +14,21 @@ namespace executionGraphGUI.serialization;
 
 //! Describing a node type.
 table NodeTypeDescription {
-    name: string (id:0); //!< The readable name of the node.
-    type: string (id:1); //!< The unqiue RTTI name of the node.
+    name:string (id:0, required); //!< The readable name of the node.
+    type:string (id:1, required); //!< The unqiue RTTI name of the node.
 }
 
 //! Describing a socket type.
 table SocketTypeDescription {
-    name: string (id:0); //!< The readable name of the node.
-    type: string (id:1); //!< The unqiue RTTI name of the node.
+    name:string (id:0, required); //!< The readable name of the node.
+    type:string (id:1, required); //!< The unqiue RTTI name of the node.
+}
+
+table GraphTypeDescription {
+    name:string (id:0, required);   //!< The readable name of this graph type.
+    id:string (id:1, required);     //!< The unique id of this graph type.
+    nodeTypeDescriptions:[NodeTypeDescription] (id:2);      //!< Node descriptions
+    socketTypeDescriptions:[SocketTypeDescription] (id:3);  //!< Socket descriptions
 }
 
 //! ======================================================================
@@ -33,9 +40,7 @@ table SocketTypeDescription {
 
 //! Describing the response data
 table GetAllGraphTypeDescriptionsResponse {
-    id:string (id:0); //!< The unique id of this graph description.
-    nodeTypeDescriptions:[NodeTypeDescription] (id:1); //!< Node descriptions
-    socketTypeDescriptions:[SocketTypeDescription] (id:2); //!< Socket descriptions
+    graphsTypes:[GraphTypeDescription] (id:0);
 }
 
 //! ======================================================================

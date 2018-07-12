@@ -26,9 +26,9 @@ namespace
     {
         GraphTypeDescription description;
         //! All node types
-        description.m_nodeTypeDescription = ExecutionGraphBackendDefs<DefaultGraphConfig>::NodeTypeDescriptions;
+        description.m_nodeTypeDescription = ExecutionGraphBackendDefs<Config>::NodeTypeDescriptions;
         //! All socket types
-        description.m_socketTypeDescription = ExecutionGraphBackendDefs<DefaultGraphConfig>::SocketTypeDescriptions;
+        description.m_socketTypeDescription = ExecutionGraphBackendDefs<Config>::SocketTypeDescriptions;
 
         return description;
     };

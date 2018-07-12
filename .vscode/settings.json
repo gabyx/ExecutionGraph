@@ -79,7 +79,8 @@
         "__functional_base_03": "cpp",
         "__tuple": "cpp",
         "typeindex": "cpp",
-        "__functional_03": "cpp"
+        "__functional_03": "cpp",
+        "thread": "cpp"
     },
     "cmake.useCMakeServer": true,
     "cmake.preferredGenerators": [

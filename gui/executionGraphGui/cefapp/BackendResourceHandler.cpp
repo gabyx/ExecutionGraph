@@ -65,7 +65,7 @@ namespace
             }
 
             // Allocate BinaryBuffer
-            BinaryBuffer<BufferPool> buffer(element->GetBytesCount(), allocator);
+            BinaryBuffer<BufferPool> buffer(allocator, element->GetBytesCount());
             element->GetBytes(buffer.getSize(), static_cast<void*>(buffer.getData()));
             EXECGRAPHGUI_LOGCODE_DEBUG(printPostData(buffer));
             EXECGRAPHGUI_APPLOG_DEBUG("BackendResourceHandler: Read last post data element: bytes: {0}.", element->GetBytesCount());

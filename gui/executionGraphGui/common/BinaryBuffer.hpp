@@ -41,10 +41,21 @@ public:
     //! Constructor for an empty buffer!
     BinaryBuffer() = default;
 
-    //! Constructor for a meaningful buffer!
-    BinaryBuffer(std::size_t bytes, std::shared_ptr<RawAllocator> allocator)
+    //! Constructor for a meaningful buffer with size `bytes` allocated by `allocator`.
+    BinaryBuffer(std::shared_ptr<RawAllocator> allocator,
+                 std::size_t bytes)
         : m_allocator(allocator)
         , m_data(foonathan::memory::allocate_unique<uint8_t[]>(*allocator, bytes))
+        , m_bytes(bytes)
+    {
+    }
+
+    //! Constructor for handing over a buffer `data` which was 'array-like'-allocated by `allocator`.
+    explicit BinaryBuffer(std::shared_ptr<RawAllocator> allocator,
+                          uint8_t data[],
+                          std::size_t bytes)
+        : m_allocator(allocator)
+        , m_data(data, Deleter{foonathan::memory::make_allocator_reference(*allocator), bytes})
         , m_bytes(bytes)
     {
     }
@@ -87,5 +98,13 @@ private:
 
     std::size_t m_bytes = 0;  //!< Number of bytes.
 };
+
+//! Helper to quickly make a BinaryBuffer, forwards to the constructor.
+template<typename RawAllocator, typename... Args>
+BinaryBuffer<RawAllocator> makeBinaryBuffer(const std::shared_ptr<RawAllocator>& allocator,
+                                            Args&&... args)
+{
+    return BinaryBuffer<RawAllocator>{allocator, std::forward<Args>(args)...};
+}
 
 #endif
