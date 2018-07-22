@@ -178,4 +178,5 @@
     "C_Cpp.clang_format_fallbackStyle": "none",
     "C_Cpp.loggingLevel": "Information",
     "git.ignoreLimitWarning": true,
+    "cmake.configureOnOpen": false,
 }
