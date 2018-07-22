@@ -7,29 +7,31 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/first';
 import * as ab2s from 'arraybuffer-to-string';
 
+
 @Injectable()
 export class CefBinaryRouterService {
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) { }
 
-  public async execute<T>(requestURL: string, payload: any): Promise<void> {
-    console.log('[CefBinaryRouterService] send()');
-    await this.testSend(
-      `http://executiongraph-backend/${requestURL}`,
-      this.createBinaryData(payload),
+  // Send the request, and get a the response payload as a ArrayBuffer promise.
+  public async sendRequest(requestUrl: string, payload: Uint8Array): Promise<HttpResponse<ArrayBuffer>> {
+    return this.sendRequestImpl(
+      `http://executiongraph-backend/${requestUrl}`,
+      payload,
       'application/octet-stream'
     );
   }
 
-  private async testSend(url: string, payload: Uint8Array, mimeType: string): Promise<void> {
+  private async sendRequestImpl(url: string, payload: Uint8Array, mimeType: string): Promise<HttpResponse<ArrayBuffer>> {
     const data = payload.buffer as ArrayBuffer;
 
     console.info(
       `[CefBinaryRouterService]: sending data: bytes: '${data.byteLength}' with MIME type '${mimeType}' to '${url}'!`
     );
     // Create a post request that returns an observable, which is kind of a stream of response events
-    let httpRequest: Observable<ArrayBuffer> = this.httpClient.post(url, data, {
+    let httpRequest: Observable<HttpResponse<ArrayBuffer>> = this.httpClient.post(url, data, {
       responseType: 'arraybuffer',
-      headers: new HttpHeaders({ 'Content-Type': mimeType })
+      headers: new HttpHeaders({ 'Content-Type': mimeType }),
+      observe: 'response'
     });
     // Add a callback function that is executed whenever there is a new event in the request stream
     httpRequest = httpRequest.do(() => console.log(`[CefBinaryRouterService] success`));
@@ -49,13 +51,10 @@ export class CefBinaryRouterService {
     // here, which is why we would need to await the promise in order to get to the resopnse data...
     // Note: The await keyword leaves the current function, so the Event-Loop can continue, until the awaiting (Promise) is resolved, and
     // the function continues after the `await` keyword.
-    const responseData: ArrayBuffer = await requestPromise;
+    const response: HttpResponse<ArrayBuffer> = await requestPromise;
     console.debug(
-      `[CefBinaryRouterService] : response: size: ${responseData.byteLength} : '${ab2s(responseData, 'utf-8')}'`
+      `[CefBinaryRouterService] : response: size: ${response.body.byteLength}`
     );
-  }
-
-  private createBinaryData(data: any): Uint8Array {
-    return new Uint8Array([0x81, 0xa3, 0x66, 0x6f, 0x6f, 0xa3, 0x62, 0x61, 0x72]);
+    return response;
   }
 }
