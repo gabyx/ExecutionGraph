@@ -1,8 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Testability } from '@angular/core';
 import { ExecutionService } from './ExecutionService';
 import { CefMessageRouterService } from './CefMessageRouterService';
 import { CefBinaryRouterService } from './CefBinaryRouterService';
-import { HttpResponse } from '@angular/common/http'
+import { HttpResponse } from '@angular/common/http' 
+import { resolve } from 'url';
+import 'flatbuffers';
 
 @Injectable()
 export class CefExecutionService extends ExecutionService {
@@ -10,17 +12,17 @@ export class CefExecutionService extends ExecutionService {
     super();
   }
 
-  public execute(): Promise<void> {
+  public async execute(): Promise<void> {
 
     let requestUrl = 'general/DummyRequest';
-    return this.messageRouter.sendRequest(requestUrl, this.createBinaryData(null))
-      .then((response: HttpResponse<ArrayBuffer>) => {
-        console.debug(`[CefExecutionService] : response: size: ${response.body.byteLength}`);
-      })
-      .catch((error: any) => {
-        console.error(`[CefExecutionService] : Request '${requestUrl}' errored with '${error}'!`);
-      });
-    //return this.messageRouter.sendRequest('general/getAllGraphTypeDescriptions', null);
+    try {
+      const result = await this.messageRouter.sendRequest(requestUrl, this.createBinaryData(null));
+
+      let buf = new flatbuffers.ByteBuffer(result);
+      console.debug(`[CefExecutionService] : response: size: ${result.byteLength}`);
+    } catch(error) {
+      console.error(`[CefExecutionService] : Request '${requestUrl}' errored with '${error}'!`);
+    }
   }
 
   private createBinaryData(data: any): Uint8Array {

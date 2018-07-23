@@ -13,7 +13,7 @@ export class CefBinaryRouterService {
   constructor(private httpClient: HttpClient) { }
 
   // Send the request, and get a the response payload as a ArrayBuffer promise.
-  public async sendRequest(requestUrl: string, payload: Uint8Array): Promise<HttpResponse<ArrayBuffer>> {
+  public async sendRequest(requestUrl: string, payload: Uint8Array): Promise<Uint8Array> {
     return this.sendRequestImpl(
       `http://executiongraph-backend/${requestUrl}`,
       payload,
@@ -21,17 +21,16 @@ export class CefBinaryRouterService {
     );
   }
 
-  private async sendRequestImpl(url: string, payload: Uint8Array, mimeType: string): Promise<HttpResponse<ArrayBuffer>> {
+  private async sendRequestImpl(url: string, payload: Uint8Array, mimeType: string): Promise<Uint8Array> {
     const data = payload.buffer as ArrayBuffer;
 
     console.info(
       `[CefBinaryRouterService]: sending data: bytes: '${data.byteLength}' with MIME type '${mimeType}' to '${url}'!`
     );
     // Create a post request that returns an observable, which is kind of a stream of response events
-    let httpRequest: Observable<HttpResponse<ArrayBuffer>> = this.httpClient.post(url, data, {
+    let httpRequest: Observable<ArrayBuffer> = this.httpClient.post(url, data, {
       responseType: 'arraybuffer',
-      headers: new HttpHeaders({ 'Content-Type': mimeType }),
-      observe: 'response'
+      headers: new HttpHeaders({ 'Content-Type': mimeType })
     });
     // Add a callback function that is executed whenever there is a new event in the request stream
     httpRequest = httpRequest.do(() => console.log(`[CefBinaryRouterService] success`));
@@ -51,10 +50,8 @@ export class CefBinaryRouterService {
     // here, which is why we would need to await the promise in order to get to the resopnse data...
     // Note: The await keyword leaves the current function, so the Event-Loop can continue, until the awaiting (Promise) is resolved, and
     // the function continues after the `await` keyword.
-    const response: HttpResponse<ArrayBuffer> = await requestPromise;
-    console.debug(
-      `[CefBinaryRouterService] : response: size: ${response.body.byteLength}`
-    );
-    return response;
+    const responseData = await requestPromise;
+    console.debug(`[CefBinaryRouterService] : response: size: ${responseData.byteLength}`);
+    return new Uint8Array(responseData);
   }
 }
