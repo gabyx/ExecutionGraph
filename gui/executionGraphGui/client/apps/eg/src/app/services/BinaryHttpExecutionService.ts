@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { _throw } from 'rxjs/observable/throw';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/first';
-import 'flatbuffers';
+import { flatbuffers } from 'flatbuffers';
 
 import { ExecutionService } from './ExecutionService';
 
@@ -20,7 +20,7 @@ export class BinaryHttpExecutionService extends ExecutionService {
   }
 
   public async execute(): Promise<void> {
-    const result = await this.postBinary('general/DummyRequest', this.createBinaryData(null));
+    const result = await this.postBinary('execution', this.createBinaryData(null));
     let buf = new flatbuffers.ByteBuffer(result);
   }
 
