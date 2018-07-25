@@ -23,4 +23,8 @@ describe('GraphComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should throw when adding a connection to an inexistant port', () => {
+    expect(() => component.registerConnection('foo', 'bar')).toThrow();
+  })
 });

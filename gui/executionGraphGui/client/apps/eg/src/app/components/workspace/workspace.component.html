@@ -1,12 +1,20 @@
 <ngcs-graph id="graph-1">
-    <div id="sourceNode" class="node ngcs-node" ngcsDraggable>
-        Source node
-        <ngcs-port id="sourcePort" class="right middle"></ngcs-port>
-    </div>
+    <ng-container *ngFor="let node of nodes">
+        <div class="node ngcs-node" [attr.id]="node.id" [style.left]="node.uiProps.x+'px'" [style.top]="node.uiProps.y+'px'"
+         ngcsDraggable (dragged)="updateNodePosition(node, $event)">
+            {{ node.name }}
+            <ngcs-port [attr.id]="node.id+'-port'" class="right middle"></ngcs-port>
+        </div>
+    </ng-container>
 
     <div id="targetNode" class="node ngcs-node" ngcsDraggable>
         Target node
-        <ngcs-port id="targetPort" class="left middle" ></ngcs-port>
+        <ngcs-port id="sourcePort" class="left middle"></ngcs-port>
+    </div>
+
+    <div id="thirdNode" class="node ngcs-node" ngcsDraggable>
+        Third node
+        <ngcs-port id="targetPort" class="left middle"></ngcs-port>
     </div>
 
     <ngcs-connection from="sourcePort" to="targetPort"></ngcs-connection>

@@ -10,7 +10,7 @@ import 'rxjs/add/operator/takeUntil';
 })
 export class DraggableDirective {
   
-  @Output() dragged = new EventEmitter<void>();
+  @Output() dragged = new EventEmitter<Point>();
 
   private readonly mousePressed = new EventEmitter<MouseEvent>();
   private readonly mouseMoved = new EventEmitter<MouseEvent>();
@@ -22,12 +22,6 @@ export class DraggableDirective {
 
   constructor(private element: ElementRef) {
     this.mousePressed
-      .do(() => console.log("Start dragging..."))
-      .do(e => {
-        console.log(e);
-        console.log(this.nativeElement.getBoundingClientRect());
-        // console.log(this.nativeElement.cl);
-      })
       .map(event => ({
         startDragPoint: {
           x: event.clientX,// - this.nativeElement.getBoundingClientRect().left,
@@ -39,6 +33,10 @@ export class DraggableDirective {
         }
       }))
       .switchMap(start => this.mouseMoved
+        .do(e => {
+          console.log(this.nativeElement.getBoundingClientRect());
+          // console.log(this.nativeElement.cl);
+        })
         .map(moveEvent => ({
           x: moveEvent.clientX,
           y: moveEvent.clientY
@@ -52,8 +50,9 @@ export class DraggableDirective {
         this.nativeElement.style.left = `${point.x}px`;
         this.nativeElement.style.top  = `${point.y}px`;
       })
+      .do(point => this.dragged.emit(point))
       .takeUntil(this.mouseReleased))
-      .subscribe(() => this.dragged.emit());
+      .subscribe(() => void 0);
   }
 
   @HostListener('mousedown', ['$event']) onMouseDown(event: MouseEvent) {

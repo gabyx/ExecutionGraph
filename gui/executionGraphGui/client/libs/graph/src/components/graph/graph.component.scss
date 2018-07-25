@@ -10,6 +10,7 @@
         position: absolute;
         background: white;
         border: 1px solid black;
+        cursor: pointer;
         z-index: 1000;
     }
     ::ng-deep svg {

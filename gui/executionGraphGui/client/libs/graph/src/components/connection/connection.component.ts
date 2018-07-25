@@ -2,6 +2,8 @@ import { Component, Inject, OnInit, OnChanges, Input, SimpleChanges, SimpleChang
 
 import { GraphComponent } from '../graph/graph.component';
 import { Point } from '../../model/Point';
+import { ConnectionDrawStyle } from '../../model/ConnectionDrawStyle';
+import { BezierConnectionDrawStyle } from '../../model/BezierConnectionDrawStyle';
 
 @Component({
   selector: 'ngcs-connection',
@@ -13,9 +15,19 @@ export class ConnectionComponent implements OnInit, OnChanges {
 
   @Input() to: string;
 
-  get polyLinePoints(): string {
-    const points = this.manhattenLine(this.startPoint, this.endPoint)
-    return points.map(p => `${p.x},${p.y}`).join(' ')
+  @Input() drawStyle: ConnectionDrawStyle = new BezierConnectionDrawStyle();
+
+  get pathDescription(): string {
+    let path = this.drawStyle.getPath(this.startPoint, this.endPoint);
+    if (typeof path !== 'string')
+    {
+      if (path.length<2) {
+        return ``;
+      }
+      const first = path.shift();
+      path = `M${first.x} ${first.y} ${path.map(p => `L${p.x} ${p.y}`).join(' ')}`;
+    }
+    return path;
   }
 
   get startPoint(): Point {
@@ -35,9 +47,6 @@ export class ConnectionComponent implements OnInit, OnChanges {
     }
   }
 
-  private directLine(start: Point, end: Point): Point[] {
-    return [start, end];
-  }
 
   private manhattenLine(start: Point, end: Point): Point[] {
     const rangeX = end.x - start.x;
