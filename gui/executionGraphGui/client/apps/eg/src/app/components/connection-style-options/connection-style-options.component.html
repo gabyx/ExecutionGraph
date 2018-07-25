@@ -1,0 +1,11 @@
+<mat-button-toggle-group [value]="drawStyleName" (change)="drawStyle=$event.value">
+  <mat-button-toggle value="direct">
+    <mat-icon>border_bottom</mat-icon>
+  </mat-button-toggle>
+  <mat-button-toggle value="manhatten">
+    <mat-icon>border_all</mat-icon>
+  </mat-button-toggle>
+  <mat-button-toggle value="bezier">
+    <mat-icon>border_inner</mat-icon>
+  </mat-button-toggle>
+</mat-button-toggle-group>

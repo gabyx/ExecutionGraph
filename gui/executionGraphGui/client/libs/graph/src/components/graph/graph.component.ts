@@ -1,54 +1,211 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChildren, QueryList, HostListener, ContentChildren, ChangeDetectionStrategy, ChangeDetectorRef, AfterViewInit, NgZone, Input, AfterViewChecked } from '@angular/core';
 import { PortComponent } from '../port/port.component';
+import { DraggableDirective, DragEvent } from '@eg/graph/src/directives/draggable.directive';
+import { ConnectionComponent } from '@eg/graph/src/components/connection/connection.component';
+import { Point } from '../../model/Point';
 
 @Component({
   selector: 'ngcs-graph',
   templateUrl: './graph.component.html',
   styleUrls: ['./graph.component.scss']
 })
-export class GraphComponent implements OnInit {
-  
-  private readonly ports: {[id: string]: PortComponent } = {};
+export class GraphComponent implements OnInit, AfterViewChecked {
 
-  constructor(private element: ElementRef) {}
+  @ContentChildren(PortComponent, { descendants: true }) ports: QueryList<PortComponent>;
 
-  ngOnInit() {}
+  @ContentChildren(ConnectionComponent, { descendants: true }) connections: QueryList<ConnectionComponent>;
 
-  public getPositionOfChildById(id: string) {
-    let element: HTMLElement = this.element.nativeElement.querySelector(`#${id}`);
-    if (element) {
-      let offsetLeft = element.offsetLeft + element.offsetWidth / 2;
-      let offsetTop = element.offsetTop + element.offsetHeight / 2;
+  public get transformSvg() {
+    return `translate(${this.pan.x} ${this.pan.y})`;
+  }
 
-      while (element.parentElement !== this.element.nativeElement) {
-        element = element.parentElement;
-        offsetLeft += element.offsetLeft;
-        offsetTop += element.offsetTop;
+  public get transformCss() {
+    return `translate(${this.pan.x}px, ${this.pan.y}px)`;
+  }
+
+  public get scaleTransform() {
+    // return this.sanitizer.bypassSecurityTrustStyle(`scale(${this.zoomFactor})`);
+    return `scale(${this.zoomFactor})`;
+  }
+
+  public zoomFactor: number = 1;
+
+  public pan: Point = { x: 0, y: 0 };
+
+  private panStart: Point;
+
+  private dragging: DraggableDirective = null;
+
+  constructor(private element: ElementRef, private cdr: ChangeDetectorRef, private zone: NgZone) {}
+
+  ngOnInit() {
+    this.zone.runOutsideAngular(() => {
+      window.document.addEventListener('mousemove', this.onMouseMove.bind(this));
+    });
+  }
+
+  ngAfterViewChecked() {
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Handles mouse button down events for drag starts
+   * @param event 
+   */
+  @HostListener('mousedown', ['$event']) onMouseDown(event: MouseEvent) {
+    event.preventDefault();
+
+    let draggable: DraggableDirective = event.target['draggableElement'];
+    
+    if(draggable)
+    {
+      this.dragging = draggable;
+      event.preventDefault();
+      event.cancelBubble = true;
+      this.dragging.onMouseDown({
+        elementPosition: this.getRelativePosition(this.dragging.nativeElement),
+        mousePosition: { x: event.clientX, y: event.clientY }
+      });
+    }
+  }
+
+  /**
+   * Handles Mouse Button releases for drag ends
+   * @param event Mouse Event
+   */
+  @HostListener('document:mouseup', ['$event']) onMouseUp(event: MouseEvent) {
+    event.preventDefault();
+    if(this.dragging) {
+      event.cancelBubble = true;
+      this.dragging.onMouseUp({
+        elementPosition: this.getRelativePosition(this.dragging.nativeElement),
+        mousePosition: {x: event.clientX, y: event.clientY}
+      });
+      this.dragging = null;
+    }
+  }
+
+  /**
+   * Handles mouse movement for dragging
+   * @param event Mouse move event
+   */
+  onMouseMove(event: MouseEvent) {
+    if(this.dragging)
+    {
+      event.preventDefault();
+      event.cancelBubble = true;
+      this.zone.run(() => this.dragging.onMouseMove({
+        elementPosition: this.getRelativePosition(this.dragging.nativeElement),
+        mousePosition: { x: event.clientX, y: event.clientY }
+      }));
+    }
+  }
+
+  /**
+   * Handles scrolling for scaling
+   * @param e Scroll event
+   */
+  @HostListener('mousewheel', ['$event']) onWindowScroll(e: MouseWheelEvent) {
+    e.preventDefault();
+    e.cancelBubble = true;
+    if (e.wheelDelta < 0) {
+      this.zoomFactor *= 0.95;
+    }
+    else {
+      this.zoomFactor /= 0.95;
+    }
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Prevent context menu
+   * @param e Event
+   */
+  @HostListener('contextmenu', ['$event']) onContextMenu(e: any) {
+    e.preventDefault();
+  }
+
+  /**
+   * Create an SVG Path description for the given connection
+   * @param connection Connection to create a path for
+   */
+  public getPathDescription(connection: ConnectionComponent): string {
+    const startPoint = this.getPortPosition(connection.from);
+    const endPoint = this.getPortPosition(connection.to);
+    // console.log("Updating path");
+    let path = connection.drawStyle.getPath(startPoint, endPoint);
+    if (typeof path !== 'string') {
+      if (path.length < 2) {
+        return ``;
       }
+      const first = path.shift();
+      path = `M${first.x} ${first.y} ${path.map(p => `L${p.x} ${p.y}`).join(' ')}`;
+    }
+    return path;
+  }
 
-      return {
-        x: offsetLeft,
-        y: offsetTop
-      };
+  /**
+   * Provides the position of the port with the given ID
+   * @param id ID of the port
+   */
+  public getPortPosition(id: string) {
+    const port = this.getPort(id);
+    if (port) {
+      let element: HTMLElement = port.element.nativeElement;
+
+      let position = this.getRelativePosition(element);
+      position.x += element.offsetWidth / 2;
+      position.y += element.offsetHeight / 2;
+      return position;
     }
     return { x: 0, y: 0 };
   }
 
-  public registerPort(id: string, port: PortComponent) {
-    this.ports[id] = port;
-  }
-
-  public unregisterPort(id: string) {
-    delete this.ports[id];
-  }
-
-  public registerConnection(fromPortId: string, toPortId: string) {
-    const sourcePort = this.ports[fromPortId];
-    const targetPort = this.ports[toPortId];
-    
-    if(sourcePort && targetPort) {
-      sourcePort.connectTo(targetPort);
-      targetPort.connectTo(sourcePort);
+  /**
+   * Provides the port with the given iD
+   * @param id ID of the port
+   */
+  public getPort(id: string): PortComponent {
+    if (!this.ports) {
+      return null;
     }
+    return this.ports.find(p => p.id === id);
+  }
+
+  /**
+   * Handles the start event of the panning (mouse down)
+   * @param p Current position
+   */
+  public onStartPan(p: DragEvent) {
+    this.panStart = {
+      x: this.pan.x - p.dragElementPosition.x,
+      y: this.pan.y - p.dragElementPosition.y
+    };
+  }
+
+  /**
+   * Handles panning events
+   * @param p Current position
+   */
+  public onPan(p: DragEvent) {
+    this.pan.x = p.dragElementPosition.x + this.panStart.x;
+    this.pan.y = p.dragElementPosition.y + this.panStart.y;
+    // console.log(`[WorkspaceComponent] Panning ${this.pan.x}:${this.pan.y}`);
+  }
+
+  private getRelativePosition(element: HTMLElement): Point {
+    let offsetLeft = element.offsetLeft; //+ element.offsetWidth / 2;
+    let offsetTop = element.offsetTop;// + element.offsetHeight / 2;
+
+    while (element.offsetParent && element.offsetParent !== this.element.nativeElement) {
+      element = element.offsetParent as HTMLElement;
+      offsetLeft += element.offsetLeft;
+      offsetTop += element.offsetTop;
+    }
+
+    return {
+      x: offsetLeft,
+      y: offsetTop
+    };
   }
 }

@@ -1,21 +1,39 @@
-<ngcs-graph id="graph-1">
+<eg-connection-style-options #connectionStyleOptions></eg-connection-style-options>
+
+<ngcs-graph id="graph-1" >
     <ng-container *ngFor="let node of nodes">
-        <div class="node ngcs-node" [attr.id]="node.id" [style.left]="node.uiProps.x+'px'" [style.top]="node.uiProps.y+'px'"
-         ngcsDraggable (dragged)="updateNodePosition(node, $event)">
-            {{ node.name }}
-            <ngcs-port [attr.id]="node.id+'-port'" class="right middle"></ngcs-port>
+        <div #theNode class="node ngcs-node" [attr.id]="node.id" [style.left]="node.uiProps.x+'px'" [style.top]="node.uiProps.y+'px'">
+            <span class="header" ngcsDraggable [dragElement]="theNode" (dragContinued)="updateNodePosition(node, $event)">
+                {{ node.name }}
+            </span>
+            <div class="sockets">
+                <div class="inputs">
+                    <span class="socket" *ngFor="let socket of node.inputs">
+                        {{ socket.name }}
+                        <ngcs-port [id]="socket.id" class="left middle"></ngcs-port>
+                    </span>
+                </div>
+                <div class="outputs">
+                    <span class="socket" *ngFor="let socket of node.outputs"
+                    ngcsDraggable (dragStarted)="initConnectionFrom(socket, $event)" (dragContinued)="movingConnection($event)" (dragEnded)="createConnection()"
+                    >
+                        {{ socket.name }}
+                        <ngcs-port [id]="socket.id" class="right middle"></ngcs-port>
+                    </span>
+                </div>
+            </div>
         </div>
     </ng-container>
 
-    <div id="targetNode" class="node ngcs-node" ngcsDraggable>
-        Target node
-        <ngcs-port id="sourcePort" class="left middle"></ngcs-port>
-    </div>
-
-    <div id="thirdNode" class="node ngcs-node" ngcsDraggable>
-        Third node
-        <ngcs-port id="targetPort" class="left middle"></ngcs-port>
-    </div>
-
-    <ngcs-connection from="sourcePort" to="targetPort"></ngcs-connection>
+    <ng-container *ngFor="let connection of connections">
+        <ngcs-connection [from]="connection.sourceId" [to]="connection.targetId" [drawStyle]="connectionStyleOptions.connectionDrawStyle"></ngcs-connection>
+    </ng-container>
+    
+    <ng-container *ngIf="newConnection">
+        <ngcs-connection [from]="newConnection.sourceId" [to]="newConnection.targetId" [drawStyle]="connectionStyleOptions.connectionDrawStyle"></ngcs-connection>
+        <div style="position: absolute"
+         [style.left]="newConnectionEndpoint.x+'px'" [style.top]="newConnectionEndpoint.y+'px'">
+            <ngcs-port [id]="newConnection.targetId" class="right middle" ></ngcs-port>
+        </div>
+    </ng-container>
 </ngcs-graph>

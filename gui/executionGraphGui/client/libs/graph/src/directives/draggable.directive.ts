@@ -1,74 +1,96 @@
-import { Directive, ElementRef, HostListener, EventEmitter, Output } from '@angular/core';
+import { Directive, ElementRef, HostListener, EventEmitter, Output, Input } from '@angular/core';
 import { Point } from '../model/Point';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/takeUntil';
 
+export type DragMouseEvent = {
+  elementPosition: Point,
+  mousePosition: Point
+}
+
+
+export type DragEvent = {
+  dragElementPosition: Point,
+  mousePosition: Point,
+  mouseToElementOffset: Point
+}
+
 @Directive({
   selector: '[ngcsDraggable]'
 })
 export class DraggableDirective {
   
-  @Output() dragged = new EventEmitter<Point>();
+  @Output() dragStarted = new EventEmitter<DragEvent>();
+  @Output() dragContinued = new EventEmitter<DragEvent>();
+  @Output() dragEnded = new EventEmitter<DragEvent>();
 
-  private readonly mousePressed = new EventEmitter<MouseEvent>();
-  private readonly mouseMoved = new EventEmitter<MouseEvent>();
-  private readonly mouseReleased = new EventEmitter<MouseEvent>();
+  @Input() set dragElement(value: HTMLElement) {
+    this._nativeElement = value;
+    this._nativeElement["draggableElement"] = this;
+  };
+
+  private readonly mousePressed = new EventEmitter<DragMouseEvent>();
+  private readonly mouseMoved = new EventEmitter<DragMouseEvent>();
+  private readonly mouseReleased = new EventEmitter<DragMouseEvent>();
   
-  private get nativeElement(): HTMLElement {
-    return this.element.nativeElement;
+  private _nativeElement: HTMLElement;
+
+  public get nativeElement(): HTMLElement {
+
+    return this._nativeElement;
   }
 
   constructor(private element: ElementRef) {
+    this.dragElement = element.nativeElement;
+    //Hack for faster access to the component from events
+
     this.mousePressed
-      .map(event => ({
-        startDragPoint: {
-          x: event.clientX,// - this.nativeElement.getBoundingClientRect().left,
-          y: event.clientY,// - this.nativeElement.getBoundingClientRect().top
-        },
-        startPosition: {
-          x: (event.target as HTMLElement).offsetLeft,
-          y: (event.target as HTMLElement).offsetTop
-        }
-      }))
-      .switchMap(start => this.mouseMoved
-        .do(e => {
-          console.log(this.nativeElement.getBoundingClientRect());
-          // console.log(this.nativeElement.cl);
+      .do(dragStartEvent => console.log(`Started at Element: ${dragStartEvent.elementPosition.x}:${dragStartEvent.elementPosition.y}, Mouse: ${dragStartEvent.mousePosition.x}:${dragStartEvent.mousePosition.y}`))
+      .do(dragStartEvent => this.dragStarted.emit(this.calculateDragEvent(dragStartEvent, dragStartEvent)))
+      .switchMap(dragStartEvent => this.mouseMoved
+        .map(dragMoveEvent => this.calculateDragEvent(dragStartEvent, dragMoveEvent))
+        // .do(e => console.log(`Now at ${e.dragElementPosition.x}:${e.dragElementPosition.y}`))
+        .do(point => {
+          // this.nativeElement.style.left = `${point.x}px`;
+          // this.nativeElement.style.top  = `${point.y}px`;
         })
-        .map(moveEvent => ({
-          x: moveEvent.clientX,
-          y: moveEvent.clientY
-        }))
-        .map(movePoint => ({
-          x: start.startPosition.x + (movePoint.x - start.startDragPoint.x), 
-          y: start.startPosition.y + (movePoint.y - start.startDragPoint.y)
-        }))
-      //.do(p => console.log(`Started at ${startPoint.x}:${startPoint.y}, Now at ${p.x}:${p.y}`))
-      .do(point => {
-        this.nativeElement.style.left = `${point.x}px`;
-        this.nativeElement.style.top  = `${point.y}px`;
-      })
-      .do(point => this.dragged.emit(point))
-      .takeUntil(this.mouseReleased))
+        .do(point => this.dragContinued.emit(point))
+        .takeUntil(
+          this.mouseReleased
+            .map(dragEndEvent => this.calculateDragEvent(dragStartEvent, dragEndEvent))
+            // .do(p => console.log(`Ended at ${p.x}:${p.y}`))
+            .do(p => this.dragEnded.emit(p))))
       .subscribe(() => void 0);
   }
 
-  @HostListener('mousedown', ['$event']) onMouseDown(event: MouseEvent) {
-    event.preventDefault();
+  onMouseDown(event: DragMouseEvent) {
     this.mousePressed.emit(event);
   }
 
-  @HostListener('document:mouseup', ['$event']) onMouseUp(event: MouseEvent) {
-    event.preventDefault();
+  onMouseUp(event: DragMouseEvent) {
     this.mouseReleased.emit(event);
   }
 
-  @HostListener('document:mousemove', ['$event']) onMouseMove(event: MouseEvent) {
-    event.preventDefault();
+  onMouseMove(event: DragMouseEvent) {
     this.mouseMoved.emit(event);
   }
 
-
+  private calculateDragEvent(startEvent: DragMouseEvent, currentEvent: DragMouseEvent): DragEvent {
+    const clientRect = this.nativeElement.getBoundingClientRect();
+    let scale = clientRect.width / this.nativeElement.offsetWidth;
+    const result = {
+      dragElementPosition: {
+        x: startEvent.elementPosition.x + (currentEvent.mousePosition.x - startEvent.mousePosition.x) / scale,
+        y: startEvent.elementPosition.y + (currentEvent.mousePosition.y - startEvent.mousePosition.y) / scale
+      },
+      mouseToElementOffset: {
+        x: (startEvent.mousePosition.x - clientRect.left) / scale,
+        y: (startEvent.mousePosition.y - clientRect.top) / scale
+      },
+      mousePosition: currentEvent.mousePosition
+    };
+    return result;
+  }
 }

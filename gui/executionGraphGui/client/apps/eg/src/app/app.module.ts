@@ -3,7 +3,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatIconModule, MatToolbarModule, MatMenuModule, MatButtonModule, MatCheckboxModule } from '@angular/material';
+import { MatIconModule, MatToolbarModule, MatMenuModule, MatButtonModule, MatCheckboxModule, MatButtonToggleModule } from '@angular/material';
 
 import { GraphModule } from '@eg/graph';
 
@@ -18,9 +18,10 @@ import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
 
 import { environment } from '../environments/environment';
+import { ConnectionStyleOptionsComponent } from './components/connection-style-options/connection-style-options.component';
 
 @NgModule({
-  declarations: [AppComponent, ToolbarComponent, WorkspaceComponent],
+  declarations: [AppComponent, ToolbarComponent, WorkspaceComponent, ConnectionStyleOptionsComponent],
   imports: [
     HttpClientModule,
     BrowserModule,
@@ -29,6 +30,7 @@ import { environment } from '../environments/environment';
     MatToolbarModule,
     MatMenuModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatCheckboxModule,
     GraphModule
   ],
