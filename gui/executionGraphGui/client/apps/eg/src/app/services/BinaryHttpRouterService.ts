@@ -5,7 +5,7 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/first';
 
 /**
- * Router which sends Binary Payload over HTTP Request to the Backend.
+ * Router which sends binary payload to the backend using HTTP requests.
  */
 @Injectable()
 export class BinaryHttpRouterService {
