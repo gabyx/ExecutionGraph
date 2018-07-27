@@ -93,7 +93,7 @@
             "type": "chrome",
             "request": "launch",
             "url": "http://localhost:4200/#",
-            "webRoot": "${workspaceRoot}"
+            "webRoot": "${workspaceRoot}/gui/executionGraphGui/client"
         }
     ]
 }

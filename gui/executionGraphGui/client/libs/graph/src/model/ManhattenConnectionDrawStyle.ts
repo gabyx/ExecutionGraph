@@ -1,5 +1,5 @@
-import { ConnectionDrawStyle } from "./ConnectionDrawStyle";
-import { Point } from "./Point";
+import { ConnectionDrawStyle } from "@eg/graph/src/model/ConnectionDrawStyle";
+import { Point } from "@eg/graph/src/model/Point";
 
 export class ManhattenConnectionDrawStyle extends ConnectionDrawStyle {
     getPath(start: Point, end: Point): Point[] {

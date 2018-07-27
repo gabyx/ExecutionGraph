@@ -1,8 +1,8 @@
 import { Component, OnInit, ElementRef, ViewChildren, QueryList, HostListener, ContentChildren, ChangeDetectionStrategy, ChangeDetectorRef, AfterViewInit, NgZone, Input, AfterViewChecked } from '@angular/core';
-import { PortComponent } from '../port/port.component';
+import { PortComponent } from '@eg/graph/src/components/port/port.component';
 import { DraggableDirective, DragEvent } from '@eg/graph/src/directives/draggable.directive';
 import { ConnectionComponent } from '@eg/graph/src/components/connection/connection.component';
-import { Point } from '../../model/Point';
+import { Point } from '@eg/graph/src/model/Point';
 
 @Component({
   selector: 'ngcs-graph',

@@ -1,21 +1,21 @@
 import { TestBed, async, getTestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { BinaryHttpExecutionService } from './BinaryHttpExecutionService';
+import { ExecutionServiceBinaryHttp } from './ExecutionServiceBinaryHttp';
 
-describe('BinaryHttpExecutionService', () => {
+describe('ExecutionServiceBinaryHttp', () => {
     let injector: TestBed;
-    let service: BinaryHttpExecutionService;
+    let service: ExecutionServiceBinaryHttp;
     let httpMock: HttpTestingController;
-    
+
     // Create a new service and mock before each test case
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule],
-            providers: [BinaryHttpExecutionService]
+            providers: [ExecutionServiceBinaryHttp]
         });
         injector = getTestBed();
-        service = injector.get(BinaryHttpExecutionService);
+        service = injector.get(ExecutionServiceBinaryHttp);
         httpMock = injector.get(HttpTestingController);
     });
     // Verify that there are no outstanding requests
@@ -38,7 +38,7 @@ describe('BinaryHttpExecutionService', () => {
 
             req.flush(responseData);
 
-            
+
         })
     );
 });

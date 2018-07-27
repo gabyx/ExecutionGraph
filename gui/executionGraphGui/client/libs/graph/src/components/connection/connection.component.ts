@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 
-import { ConnectionDrawStyle } from '../../model/ConnectionDrawStyle';
-import { BezierConnectionDrawStyle } from '../../model/BezierConnectionDrawStyle';
+import { ConnectionDrawStyle } from '@eg/graph/src/model/ConnectionDrawStyle';
+import { BezierConnectionDrawStyle } from '@eg/graph/src/model/BezierConnectionDrawStyle';
 
 @Component({
   selector: 'ngcs-connection',

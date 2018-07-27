@@ -3,7 +3,7 @@ import { MatToolbarModule, MatMenuModule, MatIconModule } from '@angular/materia
 
 import { ToolbarComponent } from './toolbar.component';
 import { ExecutionService } from '../../services/ExecutionService';
-import { DummyExecutionService } from '../../services/DummyExecutionService';
+import { ExecutionServiceDummy } from '../../services/ExecutionServiceDummy';
 
 describe('ToolbarComponent', () => {
   let component: ToolbarComponent;
@@ -14,7 +14,7 @@ describe('ToolbarComponent', () => {
       TestBed.configureTestingModule({
         imports: [MatToolbarModule, MatMenuModule, MatIconModule],
         declarations: [ToolbarComponent],
-        providers: [{ provide: ExecutionService, useClass: DummyExecutionService}]
+        providers: [{ provide: ExecutionService, useClass: ExecutionServiceDummy}]
       }).compileComponents();
     })
   );

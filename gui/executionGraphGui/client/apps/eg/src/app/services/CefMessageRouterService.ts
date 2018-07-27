@@ -12,6 +12,10 @@ type CefWindow = {
   cefQuery: (request: CefRequest) => void;
 };
 
+/**
+ * Router which sends JSON Payload (string) to the Backend by using
+ * the registered `cefQuery` callback of the window instance.
+ */
 @Injectable()
 export class CefMessageRouterService {
   private readonly cef: CefWindow;

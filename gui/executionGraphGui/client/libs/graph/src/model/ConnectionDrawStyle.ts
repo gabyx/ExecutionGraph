@@ -1,4 +1,4 @@
-import { Point } from "./Point";
+import { Point } from "@eg/graph/src/model/Point";
 
 export abstract class ConnectionDrawStyle {
 

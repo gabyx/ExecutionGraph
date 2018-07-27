@@ -10,8 +10,12 @@ import { GraphModule } from '@eg/graph';
 import { CefMessageRouterService } from './services/CefMessageRouterService';
 
 import { ExecutionService } from './services/ExecutionService';
-import { BinaryHttpExecutionService } from './services/BinaryHttpExecutionService';
-import { DummyExecutionService } from './services/DummyExecutionService';
+import { ExecutionServiceBinaryHttp } from './services/ExecutionServiceBinaryHttp';
+import { ExecutionServiceDummy } from './services/ExecutionServiceDummy';
+
+import { GraphInfoService } from './services/GraphInfoService';
+import { GraphInfoServiceDummy } from './services/GraphInfoServiceDummy';
+import { GraphInfoServiceBinaryHttp } from './services/GraphInfoServiceBinaryHttp';
 
 import { AppComponent } from './app.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
@@ -36,7 +40,8 @@ import { ConnectionStyleOptionsComponent } from './components/connection-style-o
   ],
   providers: [
     CefMessageRouterService,
-    { provide: ExecutionService, useClass: environment.production ? BinaryHttpExecutionService : DummyExecutionService }
+    { provide: ExecutionService, useClass: environment.production ? ExecutionServiceBinaryHttp : ExecutionServiceDummy },
+    { provide: GraphInfoService, useClass: environment.production ? GraphInfoServiceBinaryHttp : GraphInfoServiceDummy }
   ],
   bootstrap: [AppComponent]
 })

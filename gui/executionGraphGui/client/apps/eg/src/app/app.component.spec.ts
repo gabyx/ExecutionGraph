@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
 import { ExecutionService } from './services/ExecutionService';
-import { DummyExecutionService } from './services/DummyExecutionService';
+import { ExecutionServiceDummy } from './services/ExecutionServiceDummy';
 
 describe('AppComponent', () => {
   beforeEach(
@@ -14,7 +14,7 @@ describe('AppComponent', () => {
       TestBed.configureTestingModule({
         imports: [GraphModule, MatIconModule, MatToolbarModule, MatMenuModule, MatCardModule],
         declarations: [AppComponent, ToolbarComponent, WorkspaceComponent],
-        providers: [{ provide: ExecutionService, useClass: DummyExecutionService }]
+        providers: [{ provide: ExecutionService, useClass: ExecutionServiceDummy }]
       }).compileComponents();
     })
   );

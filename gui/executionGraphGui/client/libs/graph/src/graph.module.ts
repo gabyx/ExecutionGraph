@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GraphComponent } from './components/graph/graph.component';
-import { PortComponent } from './components/port/port.component';
-import { ConnectionComponent } from './components/connection/connection.component';
-import { DraggableDirective } from './directives/draggable.directive';
+import { GraphComponent } from '@eg/graph/src/components/graph/graph.component';
+import { PortComponent } from '@eg/graph/src/components/port/port.component';
+import { ConnectionComponent } from '@eg/graph/src/components/connection/connection.component';
+import { DraggableDirective } from '@eg/graph/src/directives/draggable.directive';
 
 @NgModule({
   imports: [CommonModule],

@@ -1,5 +1,5 @@
 import { Directive, ElementRef, HostListener, EventEmitter, Output, Input } from '@angular/core';
-import { Point } from '../model/Point';
+import { Point } from '@eg/graph/src/model/Point';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/switchMap';

@@ -2,9 +2,9 @@ import { async, ComponentFixture, TestBed, getTestBed } from '@angular/core/test
 import { Component } from '@angular/core';
 import { By } from '@angular/platform-browser';
 
-import { GraphComponent } from './graph.component';
-import { PortComponent } from '../port/port.component';
-import { ConnectionComponent } from '../connection/connection.component';
+import { GraphComponent } from '@eg/graph/src/components/graph/graph.component';
+import { PortComponent } from '@eg/graph/src/components/port/port.component';
+import { ConnectionComponent } from '@eg/graph/src/components/connection/connection.component';
 
 @Component({
   selector: 'test',

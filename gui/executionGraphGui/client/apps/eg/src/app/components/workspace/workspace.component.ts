@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, ElementRef, HostListener, Injectable } from '@angular/core';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 
 import { Point } from '@eg/graph';
@@ -6,8 +6,9 @@ import { Node } from '../../model/Node';
 import { Connection } from '../../model/Connection';
 import { Socket } from '../../model/Socket';
 import { DragEvent } from '@eg/graph';
+import { GraphInfoService } from '../../services/GraphInfoService';
 
-@Component({
+@Injectable() @Component({
   selector: 'eg-workspace',
   templateUrl: './workspace.component.html',
   styleUrls: ['./workspace.component.scss']
@@ -19,15 +20,17 @@ export class WorkspaceComponent implements OnInit {
   public connections: Connection[] = [];
 
   public newConnection: Connection = null;
-  public newConnectionEndpoint: Point = {x: 0, y: 0};
+  public newConnectionEndpoint: Point = { x: 0, y: 0 };
 
-  constructor(private elementRef: ElementRef, private sanitizer: DomSanitizer) {}
+  constructor(
+    private elementRef: ElementRef,
+    private sanitizer: DomSanitizer,
+    private readonly graphInfoService: GraphInfoService) { }
 
   ngOnInit() {
     const NODES = 10;
 
-    for (let i = 0; i < NODES;i++)
-    {
+    for (let i = 0; i < NODES; i++) {
       this.generateNode(i);
     }
 
@@ -41,6 +44,10 @@ export class WorkspaceComponent implements OnInit {
     // this.nodes.push(n2);
 
     // this.connections.push(new Connection(n1.outputs[0].id, n2.inputs[0].id));
+
+    // Get some graph info (nicht awaiten ist ja scheissegal zum testen...)
+    this.graphInfoService.getAllGraphTypeDescriptions();
+
   }
 
   public updateNodePosition(node: Node, event: DragEvent) {
@@ -71,16 +78,15 @@ export class WorkspaceComponent implements OnInit {
   }
 
   private generateNode(id: number) {
-    const x = Math.random() * this.elementRef.nativeElement.offsetWidth /2;
-    const y = Math.random() * this.elementRef.nativeElement.offsetHeight /2;
-    this.nodes.push(new Node(`n${id}`, `Some test node ${id}`, [new Socket(`n-${id}-i-1`, "Some Input")], [new Socket(`n-${id}-o-1`, "Some Output with text that is too long")], {x: x, y: y}));
+    const x = Math.random() * this.elementRef.nativeElement.offsetWidth / 2;
+    const y = Math.random() * this.elementRef.nativeElement.offsetHeight / 2;
+    this.nodes.push(new Node(`n${id}`, `Some test node ${id}`, [new Socket(`n-${id}-i-1`, "Some Input")], [new Socket(`n-${id}-o-1`, "Some Output with text that is too long")], { x: x, y: y }));
   }
 
   private generateRandomConnection() {
-    let source = this.nodes[Math.round(Math.random() * (this.nodes.length-1))].outputs[0];
-    let target = this.nodes[Math.round(Math.random() * (this.nodes.length-1))].inputs[0];
-    if(source!==target)
-    {
+    let source = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].outputs[0];
+    let target = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].inputs[0];
+    if (source !== target) {
       this.connections.push(new Connection(source.id, target.id));
     }
   }

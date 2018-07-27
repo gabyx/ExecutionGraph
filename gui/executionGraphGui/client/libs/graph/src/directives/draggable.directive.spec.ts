@@ -1,5 +1,5 @@
-import { DraggableDirective } from './draggable.directive';
-import { ElementRef } from '../../../../node_modules/@angular/core';
+import { DraggableDirective } from '@eg/graph/src/directives/draggable.directive';
+import { ElementRef } from '@angular/core';
 
 describe('DraggableDirective', () => {
   it('should create an instance', () => {
