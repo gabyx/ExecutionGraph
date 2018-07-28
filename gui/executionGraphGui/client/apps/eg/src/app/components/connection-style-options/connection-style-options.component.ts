@@ -16,41 +16,27 @@ const drawStyles = {
 })
 export class ConnectionStyleOptionsComponent implements OnInit {
 
+  private drawStyleName: ConnectionDrawStyleName;
+
   @Output()
   connectionDrawStyleChanged = new EventEmitter<ConnectionDrawStyle>();
   @Input()
-  connectionDrawStyle: ConnectionDrawStyle = new DirectConnectionDrawStyle();
+  connectionDrawStyle: ConnectionDrawStyle = drawStyles['direct'];
 
   get drawStyle(): ConnectionDrawStyleName {
     return this.drawStyleName;
   }
   set drawStyle(drawStyleName: ConnectionDrawStyleName) {
     this.drawStyleName = drawStyleName;
-    switch(this.drawStyleName)
-    {
-      case 'direct':
-        this.connectionDrawStyle = new DirectConnectionDrawStyle();
-        break;
-      case 'manhatten':
-        this.connectionDrawStyle = new ManhattenConnectionDrawStyle();
-        break;
-      case 'bezier':
-        this.connectionDrawStyle = new BezierConnectionDrawStyle();
-        break;
-    }
+    this.connectionDrawStyle = drawStyles[this.drawStyleName];
     console.log(`[ConnectionStyleOptionsComponent] Draw Style changed to ${this.drawStyleName}`);
     this.connectionDrawStyleChanged.emit(this.connectionDrawStyle);
   }
-
-  private drawStyleName: ConnectionDrawStyleName;
-  
 
   constructor() {
     this.drawStyle = 'direct';
   }
 
-
   ngOnInit() {
   }
-
 }
