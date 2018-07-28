@@ -17,7 +17,7 @@ export class ExecutionServiceBinaryHttp extends ExecutionService {
   }
 
   public async execute(): Promise<void> {
-    const result = await this.binaryRouter.postBinary('execute', this.createBinaryData(null));
+    const result = await this.binaryRouter.post('graph/execute', this.createBinaryData(null));
     let buf = new flatbuffers.ByteBuffer(result);
   }
 

@@ -174,11 +174,11 @@ private:
         void runTask(std::thread::id threadId)
         {
             std::shared_ptr<HandlerType> handler;
-
+            std::string requestType;
             {  // Lock start
                 std::scoped_lock<std::mutex> lock(m_d.m_access);
                 // Get the request type
-                const std::string requestType = m_request->getURL().string();
+                requestType = m_request->getURL().string();
 
                 // Find handler
                 auto it = m_d.m_specificHandlers.find(requestType);
@@ -193,24 +193,26 @@ private:
             if(handler)
             {
                 handler->handleRequest(*m_request, *m_response);
-                if(m_response->isResolved())
+                if(!m_response->isResolved())
                 {
-                    return;  // Handled correctly, return
+                    EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: Request id: '{0}' (url: '{1}') has not been handled correctly, it will be cancled!",
+                                                 m_request->getId().getUniqueName(),
+                                                 requestType);
                 }
-                EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: Request id: '{0}' has not been handled correctly, it will be cancled!",
-                                             m_request->getId().getUniqueName());
             }
             else
             {
-                EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: No handler found for request id: '{0}'!, it will be cancled!",
-                                             m_request->getId().getUniqueName());
+                EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: No handler found for request id: '{0}' (url: '{1}')!, it will be cancled!",
+                                             m_request->getId().getUniqueName(),
+                                             requestType);
             }
         };
 
         void onTaskException(std::exception_ptr e)
         {
-            EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: Request id: '{0}' has thrown exception, it will be cancled!",
-                                         m_request->getId().getUniqueName());
+            EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: Request id: '{0}' (url: '{1}') has thrown exception, it will be cancled!",
+                                         m_request->getId().getUniqueName(),
+                                         m_request->getURL().string());
             m_response->setCanceled(e);
         };
 

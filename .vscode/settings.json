@@ -80,7 +80,8 @@
         "__tuple": "cpp",
         "typeindex": "cpp",
         "__functional_03": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "future": "cpp"
     },
     "cmake.useCMakeServer": true,
     "cmake.preferredGenerators": [

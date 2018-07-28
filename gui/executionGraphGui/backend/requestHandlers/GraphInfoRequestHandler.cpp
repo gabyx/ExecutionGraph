@@ -64,11 +64,11 @@ void GraphInfoRequestHandler::handleRequest(const Request& request,
 void GraphInfoRequestHandler::handleGetAllGraphTypeDescriptions(const Request& request,
                                                                 ResponsePromise& response)
 {
-    EXECGRAPH_THROW_EXCEPTION_IF(request.getPayload() == nullptr,
+    EXECGRAPH_THROW_EXCEPTION_IF(request.getPayload() != nullptr,
                                  "There should not be any request payload for this request");
     using Allocator = ResponsePromise::Allocator;
 
-    AllocatorProxyFlatBuffer<Allocator> allocator(*response.getAllocator());
+    AllocatorProxyFlatBuffer<Allocator> allocator(response.getAllocator());
     flatbuffers::FlatBufferBuilder builder(1024, &allocator);
 
     // Serialize the response
@@ -108,8 +108,8 @@ void GraphInfoRequestHandler::handleGetAllGraphTypeDescriptions(const Request& r
     builder.Finish(offset);
 
     // Set the response.
-    response.setReady(ResponsePromise::Payload{makeBinaryBuffer(response.getAllocator(),
-                                                                builder.GetBufferPointer(),
-                                                                builder.GetSize()),
+    auto detachedBuffer = builder.Release();
+    response.setReady(ResponsePromise::Payload{makeBinaryBuffer(std::move(allocator),
+                                                                std::move(detachedBuffer)),
                                                "application/octet-stream"});
 }

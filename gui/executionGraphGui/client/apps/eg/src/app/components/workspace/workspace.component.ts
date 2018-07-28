@@ -46,7 +46,9 @@ export class WorkspaceComponent implements OnInit {
     // this.connections.push(new Connection(n1.outputs[0].id, n2.inputs[0].id));
 
     // Get some graph info (nicht awaiten ist ja scheissegal zum testen...)
+    console.debug("Get all graph type descirptions...")
     this.graphInfoService.getAllGraphTypeDescriptions();
+    console.debug("Get all graph type descirptions [done]")
 
   }
 

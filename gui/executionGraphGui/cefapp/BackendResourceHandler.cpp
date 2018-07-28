@@ -46,10 +46,8 @@ namespace
                       std::optional<RequestCef::Payload>& payload,
                       std::shared_ptr<RawAllocator> allocator)
     {
-        if(mimeType.empty())
-        {
-            return false;
-        }
+        EXECGRAPHGUI_ASSERT(!mimeType.empty(), "No MIME-type!");
+
         // Read post data
         if(postData && postData->GetElementCount() != 0)
         {
@@ -151,7 +149,7 @@ bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
     // Read the response into a buffer (if existing)
     ////////////////////////////////////////////////
     std::optional<RequestCef::Payload> payload;
-    if(!readPostData(request->GetPostData(), m_mimeType, payload, m_allocator))
+    if(!m_mimeType.empty() && !readPostData(request->GetPostData(), m_mimeType, payload, m_allocator))
     {
         finish();
         return false;
@@ -234,6 +232,7 @@ bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
     // Extract MIME type
     CefRequest::HeaderMap headerMap;
     request->GetHeaderMap(headerMap);
+    m_mimeType.clear();
     auto it = headerMap.find("Content-Type");
     if(it != headerMap.end())
     {
@@ -247,11 +246,8 @@ bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
             return false;
         }
     }
-    else
-    {
-        EXECGRAPHGUI_APPLOG_WARN("No 'Content-Type' header received -> post data will not be loaded!");
-    }
 
+    // No 'Content-Type' header received -> post data will not be loaded!
     return true;
 }
 
