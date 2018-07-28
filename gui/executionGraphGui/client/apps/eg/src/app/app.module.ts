@@ -7,6 +7,7 @@ import { MatIconModule, MatToolbarModule, MatMenuModule, MatButtonModule, MatChe
 
 import { GraphModule } from '@eg/graph';
 
+import { BinaryHttpRouterService } from './services/BinaryHttpRouterService';
 import { CefMessageRouterService } from './services/CefMessageRouterService';
 
 import { ExecutionService } from './services/ExecutionService';
@@ -39,6 +40,7 @@ import { ConnectionStyleOptionsComponent } from './components/connection-style-o
     GraphModule
   ],
   providers: [
+    BinaryHttpRouterService,
     CefMessageRouterService,
     { provide: ExecutionService, useClass: environment.production ? ExecutionServiceBinaryHttp : ExecutionServiceDummy },
     { provide: GraphInfoService, useClass: environment.production ? GraphInfoServiceBinaryHttp : GraphInfoServiceDummy }
