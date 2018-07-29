@@ -23,7 +23,8 @@
             "intelliSenseMode": "clang-x64",
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "compilerPath": "/usr/bin/clang"
+            "compilerPath": "/usr/bin/clang",
+            "configurationProvider": "vector-of-bool.cmake-tools"
         }
     ],
     "version": 4

@@ -18,6 +18,9 @@
     "paths": {
       "@eg/*": [
         "libs/*"
+      ],
+      "@messages/*": [
+        "../messages/schemas/*"
       ]
     }
   },

@@ -1,18 +1,30 @@
 :host {
-    // background: gray;
     display: block;
     margin: 0px;
-    overflow: hidden;
+    // border: 1px solid red;
+    overflow: visible;
     position: relative;
+
+    .container {
+        position: absolute;
+        // display: block;
+        // width: 100%;
+        // height: 100%;
+        z-index: 50;
+        top: 0;
+        left: 0;
+    }
 
     ::ng-deep .ngcs-node {
         display: inline-block;
         position: absolute;
         background: white;
         border: 1px solid black;
+        cursor: pointer;
         z-index: 1000;
     }
     ::ng-deep svg {
         z-index: 100;
+        pointer-events: none
     }
 }

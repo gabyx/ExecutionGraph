@@ -10,8 +10,8 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef cefapp_Logger_h
-#define cefapp_Logger_h
+#ifndef common_Logger_hpp
+#define common_Logger_hpp
 
 #include <executionGraph/common/FileSystem.hpp>
 #include <executionGraph/common/Log.hpp>
@@ -121,7 +121,7 @@ private:
 #    define EXECGRAPH_STRINGIFY(x) #    x
 #    define EXECGRAPH_TOSTRING(x) EXECGRAPH_STRINGIFY(x)
 
-#    define EXECGRAPHGUI_ASSERTMSG(condition, ...)                                                        \
+#    define EXECGRAPHGUI_ASSERT(condition, ...)                                                           \
         {                                                                                                 \
             if(!(condition))                                                                              \
             {                                                                                             \

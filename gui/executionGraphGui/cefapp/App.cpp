@@ -28,6 +28,7 @@
 #include "cefapp/BackendSchemeHandlerFactory.hpp"
 #include "cefapp/ClientSchemeHandlerFactory.hpp"
 #include "cefapp/SchemeHandlerHelper.hpp"
+#include "common/Exception.hpp"
 
 namespace
 {
@@ -36,10 +37,10 @@ namespace
     class SimpleWindowDelegate : public CefWindowDelegate
     {
     public:
-        explicit SimpleWindowDelegate(CefRefPtr<CefBrowserView> browser_view)
-            : browser_view_(browser_view) {}
+        explicit SimpleWindowDelegate(CefRefPtr<CefBrowserView> browserView)
+            : browser_view_(browserView) {}
 
-        void OnWindowCreated(CefRefPtr<CefWindow> window) OVERRIDE
+        void OnWindowCreated(CefRefPtr<CefWindow> window) override
         {
             // Add the browser view and show the window.
             window->AddChildView(browser_view_);
@@ -49,12 +50,12 @@ namespace
             browser_view_->RequestFocus();
         }
 
-        void OnWindowDestroyed(CefRefPtr<CefWindow> window) OVERRIDE
+        void OnWindowDestroyed(CefRefPtr<CefWindow> window) override
         {
             browser_view_ = nullptr;
         }
 
-        bool CanClose(CefRefPtr<CefWindow> window) OVERRIDE
+        bool CanClose(CefRefPtr<CefWindow> window) override
         {
             // Allow the window to close if the browser says it's OK.
             CefRefPtr<CefBrowser> browser = browser_view_->GetBrowser();
@@ -110,7 +111,7 @@ namespace
 
     //! Setup tht CEF Browser
     template<typename Dispatcher>
-    void setupBrowser(std::shared_ptr<Dispatcher> requestDispatcher)
+    CefRefPtr<AppHandler> setupBrowser(std::shared_ptr<Dispatcher> requestDispatcher)
     {
         CefRefPtr<CefCommandLine> command_line = CefCommandLine::GetGlobalCommandLine();
 
@@ -126,36 +127,38 @@ namespace
 
         // AppHandler implements browser-level callbacks.
         auto dispatcherAdapter = std::make_shared<BackendRequestDispatcherAdapterCef>(requestDispatcher);
-        auto appHandler        = CefRefPtr<AppHandler>(new AppHandler(dispatcherAdapter, useViews));
+        CefRefPtr<AppHandler> appHandler(std::make_unique<AppHandler>(dispatcherAdapter, useViews).release());
 
         // Specify CEF browser settings here.
-        CefBrowserSettings browser_settings;
+        CefBrowserSettings browserSettings;
         // Disable security, such that http:// XHRequests do not trigger a CORS Preflight Request (if special headers are used)
-        browser_settings.web_security = cef_state_t::STATE_DISABLED;
-        CefString url                 = "client://executiongraph/index.html";
+        browserSettings.web_security = cef_state_t::STATE_DISABLED;
+        CefString url                = "client://executiongraph/index.html";
 
         if(useViews)
         {
             // Create the BrowserView.
-            CefRefPtr<CefBrowserView> browser_view = CefBrowserView::CreateBrowserView(appHandler, url, browser_settings, nullptr, nullptr);
+            CefRefPtr<CefBrowserView> browserView = CefBrowserView::CreateBrowserView(appHandler, url, browserSettings, nullptr, nullptr);
 
             // Create the Window. It will show itself after creation.
-            CefWindow::CreateTopLevelWindow(new SimpleWindowDelegate(browser_view));
+            CefWindow::CreateTopLevelWindow(new SimpleWindowDelegate(browserView));
         }
         else
         {
             // Information used when creating the native window.
-            CefWindowInfo window_info;
+            CefWindowInfo windowInfo;
 
 #if defined(OS_WIN)
             // On Windows we need to specify certain flags that will be passed to
             // CreateWindowEx().
-            window_info.SetAsPopup(nullptr, "ExecutionGraphGui");
+            windowInfo.SetAsPopup(nullptr, "ExecutionGraphGui");
 #endif
 
             // Create the first browser window.
-            CefBrowserHost::CreateBrowser(window_info, appHandler, url, browser_settings, nullptr);
+            CefBrowserHost::CreateBrowser(windowInfo, appHandler, url, browserSettings, nullptr);
         }
+
+        return appHandler;
     }
 
 }  // namespace
@@ -175,7 +178,7 @@ void App::OnContextInitialized()
     setupBackends(requestDispatcher);
 
     // Setup the browser
-    setupBrowser(requestDispatcher);
+    m_appHandler = setupBrowser(requestDispatcher);
 }
 
 void App::OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)

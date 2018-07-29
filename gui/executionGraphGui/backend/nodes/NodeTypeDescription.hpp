@@ -13,17 +13,20 @@
 #ifndef executionGraphGui_backend_nodes_NodeTypeDescription_hpp
 #define executionGraphGui_backend_nodes_NodeTypeDescription_hpp
 
+#include <string>
+
 //! A simple node description, describing a LogicNode.
 struct NodeTypeDescription
 {
-    std::string m_name;
-    std::string m_rtti;
-};
+    NodeTypeDescription(const std::string& rtti)
+        : m_rtti(rtti), m_name(m_rtti)
+    {}
+    NodeTypeDescription(const std::string& rtti, const std::string& name)
+        : m_rtti(rtti), m_name(name)
+    {}
 
-//! A simple node description, describing a LogicSocket.
-struct SocketTypeDescription
-{
-    std::string m_rtti;
+    std::string m_rtti;  //!< The unique RTTI name of the node
+    std::string m_name;  //!< The readable name of the node.
 };
 
 #endif

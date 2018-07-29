@@ -75,7 +75,13 @@
         "ratio": "cpp",
         "system_error": "cpp",
         "queue": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "__functional_base_03": "cpp",
+        "__tuple": "cpp",
+        "typeindex": "cpp",
+        "__functional_03": "cpp",
+        "thread": "cpp",
+        "future": "cpp"
     },
     "cmake.useCMakeServer": true,
     "cmake.preferredGenerators": [
@@ -173,4 +179,5 @@
     "C_Cpp.clang_format_fallbackStyle": "none",
     "C_Cpp.loggingLevel": "Information",
     "git.ignoreLimitWarning": true,
+    "cmake.configureOnOpen": false,
 }

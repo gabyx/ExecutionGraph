@@ -147,6 +147,8 @@ cd gui/client
 npm run build
 ```
 
+[Screenshot](doc/ExecutionGraphGui.png)
+
 For more information about the development of the client application please refer to the dedicated [client documentation](gui/client/README.md)
 
 ## Introduction

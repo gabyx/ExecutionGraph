@@ -10,13 +10,13 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_backend_DummyBackendRequestHandler_hpp
-#define executionGraphGui_backend_DummyBackendRequestHandler_hpp
+#ifndef executionGraphGui_backend_requestHandlers_DummyRequestHandler_hpp
+#define executionGraphGui_backend_requestHandlers_DummyRequestHandler_hpp
 
-#include "backend/BackendRequestHandler.hpp"
-#include "backend/ExecutionGraphBackend.hpp"
+#include <backend/BackendRequestHandler.hpp>
+#include <backend/ExecutionGraphBackend.hpp>
 
-class DummyBackendRequestHandler final : public BackendRequestHandler
+class DummyRequestHandler final : public BackendRequestHandler
 {
     RTTR_ENABLE(BackendRequestHandler)
 
@@ -24,14 +24,14 @@ public:
     using Id = BackendRequestHandler::Id;
 
 public:
-    DummyBackendRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,
-                               const Id& id = "DummyBackendRequestHandler")
+    DummyRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,
+                        const Id& id = "DummyRequestHandler")
         : BackendRequestHandler(id)
     {
     }
 
 public:
-    void handleRequest(const Request& m_request, ResponsePromise& m_response) override;
+    void handleRequest(const Request& request, ResponsePromise& response) override;
 
 public:
     const std::unordered_set<std::string>& getRequestTypes() const override;

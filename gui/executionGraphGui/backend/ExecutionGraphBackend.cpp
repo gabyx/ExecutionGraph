@@ -13,42 +13,43 @@
 #include "backend/ExecutionGraphBackend.hpp"
 #include "backend/ExecutionGraphBackendDefs.hpp"
 
-using Id                 = ExecutionGraphBackend::Id;
-using GraphDescription   = ExecutionGraphBackend::GraphDescription;
-using DefaultGraph       = ExecutionGraphBackend::DefaultGraph;
-using DefaultGraphConfig = typename DefaultGraph::Config;
+using Id                   = ExecutionGraphBackend::Id;
+using GraphTypeDescription = ExecutionGraphBackend::GraphTypeDescription;
+using DefaultGraph         = ExecutionGraphBackend::DefaultGraph;
+using DefaultGraphConfig   = typename DefaultGraph::Config;
 
 namespace
 {
     //! Return a graph description.
     template<typename Config>
-    GraphDescription makeGraphDescription()
+    GraphTypeDescription makeGraphTypeDescription()
     {
-        GraphDescription description;
-        // All node types
-        description.m_NodeTypeDescriptions = ExecutionGraphBackendDefs<DefaultGraphConfig>::NodeTypeDescriptions;
-        // All socket types
-        description.m_SocketTypeDescriptions = ExecutionGraphBackendDefs<DefaultGraphConfig>::SocketTypeDescriptions;
+        GraphTypeDescription description;
+        //! All node types
+        description.m_nodeTypeDescription = ExecutionGraphBackendDefs<Config>::NodeTypeDescriptions;
+        //! All socket types
+        description.m_socketTypeDescription = ExecutionGraphBackendDefs<Config>::SocketTypeDescriptions;
 
         return description;
     };
 }  // namespace
 
-//! Definde all description Ids for the different graphs.
-const std::array<Id, 1> ExecutionGraphBackend::m_descriptionIds = {Id{"DefaultGraph",
-                                                                      std::string("2992ebff-c950-4184-8876-5fe6ac029aa5")}};
+//! Define all description Ids for the different graphs.
+//! Default graph type has always this unique id!
+const std::array<Id, 1> ExecutionGraphBackend::m_graphTypeDescriptionIds = {Id{"DefaultGraph",
+                                                                               std::string("2992ebff-c950-4184-8876-5fe6ac029aa5")}};
 //! Define all graph types in this Backend
 //! Currently only the DefaultGraphConfig is added.
-const std::unordered_map<Id, GraphDescription>
-    ExecutionGraphBackend::m_graphDescriptions = {std::make_pair(m_descriptionIds[0], makeGraphDescription<DefaultGraphConfig>())};
+const std::unordered_map<Id, GraphTypeDescription>
+    ExecutionGraphBackend::m_graphTypeDescription = {std::make_pair(m_graphTypeDescriptionIds[0],
+                                                                    makeGraphTypeDescription<DefaultGraphConfig>())};
 
 //! Add a graph of type `graphType` with id `graphId` to the backend.
-void ExecutionGraphBackend::addGraph(const Id& graphId,
-                                     const Id& graphType)
+void ExecutionGraphBackend::addGraph(const Id& graphId, const Id& graphType)
 {
-    static_assert(m_descriptionIds.size() == 1, "You need to expand this functionality here!");
+    static_assert(m_graphTypeDescriptionIds.size() == 1, "You need to expand this functionality here!");
 
-    if(graphType == m_descriptionIds[0])
+    if(graphType == m_graphTypeDescriptionIds[0])
     {
         EXECGRAPH_THROW_EXCEPTION_IF(m_graphs.find(graphId) != m_graphs.end(),
                                      "Graph id '" << std::string(graphId) << "' already exists!");
@@ -69,6 +70,7 @@ void ExecutionGraphBackend::removeGraph(const Id& id)
     EXECGRAPH_THROW_EXCEPTION_IF(nErased == 0,
                                  "No such graph with id: '" << std::string(id) << "' removed!");
 }
+
 //! Remove all graphs from the backend.
 void ExecutionGraphBackend::removeGraphs()
 {

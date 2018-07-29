@@ -10,5 +10,6 @@
         "msjsdiag.debugger-for-chrome",
         "doi.fileheadercomment",
         "gaborv.flatbuffers",
+        "eamodio.gitlens",
     ]
 }

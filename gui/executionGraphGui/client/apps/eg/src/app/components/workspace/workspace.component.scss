@@ -1,18 +1,48 @@
 #graph-1 {
+    
     height: 100%;
-
     .node {
-        padding: 10px;
-    }
+        font-family: Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace; 
+        width: 20em;
+        background: rgba(255, 255, 255, 0.8);
 
-    #sourceNode {
-        left: 100px;
-        top: 100px;
-    }
+        .header {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 1em;
+        }
+        .sockets {
+            display: flex;
+            font-size: 0.8em;
+        }
 
-    #targetNode {
-        left: 300px;
-        top: 200px;
+        .inputs, .outputs {
+            display: inline-block;
+            width: 50%;
+            min-width: 50%;
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            
+            .socket {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+                position: relative;
+                padding: 0 1em;
+                border-top: 1px solid black;
+            }
+        }
+        .inputs {
+            border-right: 1px solid black;
+        }
+
+        .socket, .header {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
     }
 }
 :host {
@@ -22,5 +52,6 @@
 
     display: block;
     height: 100%;
-    padding: 20px;
+    overflow: hidden;
+    padding: 0;
 }
