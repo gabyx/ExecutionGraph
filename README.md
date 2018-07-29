@@ -7,9 +7,16 @@ Fast Execution Graph consisting of Execution Nodes
 Be able to design and run such input/output graphs, such as this one used in [http://gabyx.github.io/GRSFramework/#videos] :
 ![Execution Graphs like this](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)
 
-## Contributors
-- Gabriel Nützi (graph)
-- Simon Spörri (gui, graph)
+* [Installing and Dependencies](#installing-and-dependencies)
+    * [OS X](#os-x)
+* [Buidling](#buidling)
+* [General Development Setup](#general-development-setup)
+    * [Codeformatting](#codeformatting)
+    * [On OS X](#on-os-x)
+* [GUI Development Setup](#gui-development-setup)
+* [Introduction](#introduction)
+* [Example 1:](#example-1)
+* [Contributors](#contributors)
 
 ## Installing and Dependencies
 To build the library, the tests and the example you need the build tool [cmake](
@@ -346,3 +353,7 @@ Execution order for group id: 0
          6  |         0  |  IntegerNode<executionGraph::GeneralConfig<...> >*
     ------  |  --------  |  --------  
 ```
+
+## Contributors
+- Gabriel Nützi (graph)
+- Simon Spörri (gui, graph)
