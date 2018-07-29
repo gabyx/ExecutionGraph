@@ -42,8 +42,12 @@ public:
     virtual void OnContextInitialized() override;
     //@}
 
+    //! Returns this application handler, if already existing.
+    CefRefPtr<AppHandler> GetAppHandler() { return m_appHandler; }
+
 private:
-    std::path m_clientSourcePath;  //!< Client source path.
+    CefRefPtr<AppHandler> m_appHandler;  //!< The application handler.
+    std::path m_clientSourcePath;        //!< Client source path.
 };
 
 #endif

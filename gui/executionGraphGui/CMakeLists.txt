@@ -85,18 +85,13 @@ append_platform_sources(ExecutionGraphGUI_HELPER_SRCS)
 
 # App Resources.
 # -------------
-set(ExecutionGraphGUI_RESOURCES_MAC_SRCS_MACOSX
+set(ExecutionGraphGUI_RESOURCES_SRCS_MACOSX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/Info.plist
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/App.icns
-)
-append_platform_sources(ExecutionGraphGUI_RESOURCES_MAC_SRCS)
-set(ExecutionGraphGUI_RESOURCES_MAC_ENGLISH_LPROJ_SRCS_MACOSX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/English.lproj/InfoPlist.strings
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/English.lproj/MainMenu.xib
 )
-append_platform_sources(ExecutionGraphGUI_RESOURCES_MAC_ENGLISH_LPROJ_SRCS)
-
-set(ExecutionGraphGUI_RESOURCES_SRCS ${ExecutionGraphGUI_RESOURCES_MAC_SRCS} ${ExecutionGraphGUI_RESOURCES_MAC_ENGLISH_LPROJ_SRCS})
+append_platform_sources(ExecutionGraphGUI_RESOURCES_SRCS)
 # -------------
 
 

@@ -44,7 +44,10 @@ namespace executionGraph
         {
             static Creator s(static_cast<T*>(this));  //!< First thread initializes the pointer! (Thread-Safe -> "magic statics")
         }
-        ~Singleton() = default;
+        ~Singleton()
+        {
+            Creator::instance = nullptr;
+        }
 
         //! deleted copy constructor. This is a forbidden operation.
         Singleton(const Singleton<T>&) = delete;
@@ -57,6 +60,11 @@ namespace executionGraph
         {
             EXECGRAPH_ASSERT(Creator::instance, "Singleton not instanciated!");
             return *Creator::instance;
+        }
+
+        static T* getInstancePtr(void)
+        {
+            return Creator::instance;
         }
     };
 

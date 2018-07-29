@@ -20,28 +20,34 @@
 #include <wrapper/cef_closure_task.h>
 #include <wrapper/cef_helpers.h>
 #include "cefapp/PlatformTitleChanger.hpp"
+#include "common/DevFlags.hpp"
+#include "common/Loggers.hpp"
 
 namespace
 {
-    AppHandler* g_instance = nullptr;
-}
+    class DevToolsClient : public CefClient
+    {
+        IMPLEMENT_REFCOUNTING(DevToolsClient)
+    };
+
+    //! Show the Developer Tools
+    bool showDevTools(CefRefPtr<CefBrowser> browser)
+    {
+        CefWindowInfo windowInfo;
+        CefBrowserSettings settings;
+#if defined(OS_WIN)
+        windowInfo.SetAsPopup(browser->GetHost()->GetWindowHandle(), "DevTools");
+#endif
+        CefRefPtr<CefClient> client(std::make_unique<DevToolsClient>().release());
+        browser->GetHost()->ShowDevTools(windowInfo, client, settings, CefPoint{});
+        return true;
+    }
+
+}  // namespace
 
 AppHandler::AppHandler(std::shared_ptr<CefMessageRouterBrowserSide::Handler> requestDispatcher, bool useViews)
     : m_requestDispatcher(requestDispatcher), m_useViews(useViews), m_isClosing(false)
 {
-    DCHECK(!g_instance);
-    g_instance = this;
-}
-
-AppHandler::~AppHandler()
-{
-    g_instance = nullptr;
-}
-
-// static
-AppHandler* AppHandler::GetInstance()
-{
-    return g_instance;
 }
 
 void AppHandler::OnTitleChange(CefRefPtr<CefBrowser> browser,
@@ -81,6 +87,11 @@ void AppHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
         m_router = CefMessageRouterBrowserSide::Create(config);
         m_router->AddHandler(m_requestDispatcher.get(), true);
     }
+
+    if(devFlags::showDevTools)
+    {
+        showDevTools(browser);
+    }
 }
 
 bool AppHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
@@ -115,12 +126,12 @@ void AppHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
     CEF_REQUIRE_UI_THREAD();
 
     // Remove from the list of existing browsers.
-    BrowserList::iterator bit = m_browserList.begin();
-    for(; bit != m_browserList.end(); ++bit)
+    auto bIt = m_browserList.begin();
+    for(; bIt != m_browserList.end(); ++bIt)
     {
-        if((*bit)->IsSame(browser))
+        if((*bIt)->IsSame(browser))
         {
-            m_browserList.erase(bit);
+            bIt = m_browserList.erase(bIt);
             break;
         }
     }
@@ -158,12 +169,13 @@ void AppHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
     frame->LoadString(ss.str(), failedUrl);
 }
 
-void AppHandler::CloseAllBrowsers(bool force_close)
+//! Request that all existing browser windows close.
+void AppHandler::CloseAllBrowsers(bool forceClose)
 {
     if(!CefCurrentlyOn(TID_UI))
     {
         // Execute on the UI thread.
-        CefPostTask(TID_UI, base::Bind(&AppHandler::CloseAllBrowsers, this, force_close));
+        CefPostTask(TID_UI, base::Bind(&AppHandler::CloseAllBrowsers, this, forceClose));
         return;
     }
 
@@ -172,5 +184,14 @@ void AppHandler::CloseAllBrowsers(bool force_close)
 
     BrowserList::const_iterator it = m_browserList.begin();
     for(; it != m_browserList.end(); ++it)
-        (*it)->GetHost()->CloseBrowser(force_close);
+        (*it)->GetHost()->CloseBrowser(forceClose);
+}
+
+//! Show Developer Tools for every browser
+void AppHandler::ShowDeveloperTools()
+{
+    for(auto browser : m_browserList)
+    {
+        showDevTools(browser);
+    }
 }
