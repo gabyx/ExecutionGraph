@@ -1,3 +1,15 @@
+// =========================================================================================
+//  ExecutionGraph
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+//
+//  @date Sun Jul 29 2018
+//  @author Simon Spoerri, simon (døt) spoerri (at) gmail (døt) com
+//
+//  This Source Code Form is subject to the terms of the Mozilla Public
+//  License, v. 2.0. If a copy of the MPL was not distributed with this
+//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// =========================================================================================
+
 import { Component, OnInit, ElementRef, ViewChildren, QueryList, HostListener, ContentChildren, ChangeDetectionStrategy, ChangeDetectorRef, AfterViewInit, NgZone, Input, AfterViewChecked } from '@angular/core';
 import { PortComponent } from '@eg/graph/src/components/port/port.component';
 import { DraggableDirective, DragEvent } from '@eg/graph/src/directives/draggable.directive';
@@ -50,13 +62,13 @@ export class GraphComponent implements OnInit, AfterViewChecked {
 
   /**
    * Handles mouse button down events for drag starts
-   * @param event 
+   * @param event
    */
   @HostListener('mousedown', ['$event']) onMouseDown(event: MouseEvent) {
     event.preventDefault();
 
     let draggable: DraggableDirective = event.target['draggableElement'];
-    
+
     if(draggable)
     {
       this.dragging = draggable;

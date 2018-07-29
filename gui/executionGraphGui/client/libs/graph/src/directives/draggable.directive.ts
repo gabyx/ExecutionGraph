@@ -1,3 +1,15 @@
+// =========================================================================================
+//  ExecutionGraph
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+//
+//  @date Sun Jul 29 2018
+//  @author Simon Spoerri, simon (døt) spoerri (at) gmail (døt) com
+//
+//  This Source Code Form is subject to the terms of the Mozilla Public
+//  License, v. 2.0. If a copy of the MPL was not distributed with this
+//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// =========================================================================================
+
 import { Directive, ElementRef, HostListener, EventEmitter, Output, Input } from '@angular/core';
 import { Point } from '@eg/graph/src/model/Point';
 import 'rxjs/add/operator/do';
@@ -21,7 +33,7 @@ export type DragEvent = {
   selector: '[ngcsDraggable]'
 })
 export class DraggableDirective {
-  
+
   @Output() dragStarted = new EventEmitter<DragEvent>();
   @Output() dragContinued = new EventEmitter<DragEvent>();
   @Output() dragEnded = new EventEmitter<DragEvent>();
@@ -34,7 +46,7 @@ export class DraggableDirective {
   private readonly mousePressed = new EventEmitter<DragMouseEvent>();
   private readonly mouseMoved = new EventEmitter<DragMouseEvent>();
   private readonly mouseReleased = new EventEmitter<DragMouseEvent>();
-  
+
   private _nativeElement: HTMLElement;
 
   public get nativeElement(): HTMLElement {
