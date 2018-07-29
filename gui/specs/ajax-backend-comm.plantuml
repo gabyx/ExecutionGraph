@@ -55,7 +55,7 @@ activate CEF
     CEF -> backendResourceHandler : ""GetResponseHeaders(response, responseLength, redirectUrl)""
     deactivate requestDispatcher 
     activate backendResourceHandler
-        hnote over backendResourceHandler: set MIME type and response length \n[or ""SetError()""]
+        hnote over backendResourceHandler: copy MIME type and response length \n[or ""SetError()""]
         CEF <- backendResourceHandler
     deactivate backendResourceHandler
 

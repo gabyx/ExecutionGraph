@@ -23,74 +23,43 @@ During communication, a processed request by an instanciated `BackendResourceHan
 
 ![Request-Reponse-Inheritance](request-response.svg "Request and response promise/future objects.")
 
-## Overview of MessageHandler Types
-We need one message handlers for each of the following grouped functionalities:
+## Serilaization of Messages
+The messages get serialized and deserialized with [FlatBuffers](https://google.github.io/flatbuffers/).
+The schemas can be found in `gui/executionGraphGui/messages/schemas`. The serialization of specific components of an execution graph are located in `include/executionGraph/serialization`.
 
--   Graph Creation Queries:
-    * Add graph with id `graphId`
-    * Delete graph with id `graphId`
+## Message Types
+One message handlers is associated for each of the following grouped functionalities:
+The base template url of the backend is `http://executiongraph-backend/${requestUrl}` and all HTTP requests are sent to this url.
 
--   Graph Info Queries :
-    * Get info of all available socket types.
-    * Get info of all addable node types.
-    * Info query on node(s).
-    * Info query on connection(s).
+-   **Graph Creation Queries**:
+    * Add graph:
+    * Delete graph:
 
--   Serialization Functionalities:
-    * Load a graph from a `.json` file into the backend and send a validated (possibly modified) graph summary info + the client `.json` back to the client such that it can visualize it.
+-   **General Info Queries** :
 
-    * Serialize a graph to a `.json` file. Corresponging of a serialization of the client data (gui visualization data) and backend data.
+    * Get info of all available socket types and node types (of a graph):
+        - url: `requestUrl = "general/getAllGraphTypeDescriptions"`
+        - request method: `GET`
+        - schema: `gui/executionGraphGui/messages/schemas/GraphInfoMessages.fbs`
+        - response: `GetAllGraphTypeDescriptionsResponse`
 
--   Graph Manipulation Queries:
-    * Add/Remove node(s)
-    * Add/Remove connection(s)
+-   **Graph Info Queries**:
+    * Info query on node(s):
+    * Info query on connection(s):
 
-    * Set/Get node settings (`group id`, possible other custom node specific settings)
+-   **Serialization Functionalities**:
+    * Load a graph from a `.eg` file into the backend and send a validated (possibly modified) graph summary info + the client serialization back to the client such that it can visualize it:
 
-- Graph Execution Functionalities:
-    * Run graph
-    * Stop graph
+    * Serialize a graph to a `.eg` file. Corresponging of a serialization of the client data (gui visualization data) and graph data from the backend:
 
-## How To Serialize
-I strongly think we should try to use FlatBuffers
-as it is C++ and has JS wrappers to =), Awesomeness has arrived :-)!
-https://google.github.io/flatbuffers/flatbuffers_guide_use_javascript.html 
-or Protocol Buffers (which would be more supported I think...)
-https://github.com/dcodeIO/ProtoBuf.js/
+-   **Graph Manipulation Queries**:
+    * Add/Remove node(s):
+    * Add/Remove connection(s):
 
+    * Set/Get node settings (`group id`, possible other custom node specific settings):
 
-## Message Specification: Graph Manipulation Queries
-### Adding Node:
-*Message*
-```json
-{
-    "requestId" : "addNode",
-    "payload" : {
-        "version" : 0,
-        "graphId" : ${guid},
-        "nodeType" : "${nodeTypeName}",
-        "constructorArgs" : ${args} 
-    }
-}
-```
+- **Graph Execution Functionalities**:
+    * Run graph:
+    * Stop graph:
 
-*Success-Response*:
-```json
-{
-    "responseId" : "addNode",
-    "payload" : {
-        "version" : 0,
-        "nodeId" : 3
-    }
-}
-```
-
-*Failure-Response*:
-```json
-{
-    "responseId" : "addNode",
-    "payload" : {
-        "exception" : "..."
-    }
-}
 ```

@@ -60,7 +60,7 @@ cefapp::ResponseFutureCef --|> common::ResponseFuture
 common::ResponseFuture "1" *-- std::future
 
 common::Request .right.> common::BinaryPayload : uses
-cefapp::RequestCef "0...1" *--  common::BinaryPayload
+cefapp::RequestCef "1" *--  common::BinaryPayload
 common::BinaryPayload "1" *-right- common::BinaryBuffer
 common::BinaryBuffer "1" *-right- common::BufferPool
 @enduml
