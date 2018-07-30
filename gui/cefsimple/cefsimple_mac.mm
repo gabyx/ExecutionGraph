@@ -17,24 +17,28 @@
 @end
 
 // Provide the CefAppProtocol implementation required by CEF.
-@interface SimpleApplication : NSApplication<CefAppProtocol> {
- @private
-  BOOL handlingSendEvent_;
+@interface SimpleApplication : NSApplication<CefAppProtocol>
+{
+@private
+    BOOL handlingSendEvent_;
 }
 @end
 
 @implementation SimpleApplication
-- (BOOL)isHandlingSendEvent {
-  return handlingSendEvent_;
+- (BOOL)isHandlingSendEvent
+{
+    return handlingSendEvent_;
 }
 
-- (void)setHandlingSendEvent:(BOOL)handlingSendEvent {
-  handlingSendEvent_ = handlingSendEvent;
+- (void)setHandlingSendEvent:(BOOL)handlingSendEvent
+{
+    handlingSendEvent_ = handlingSendEvent;
 }
 
-- (void)sendEvent:(NSEvent*)event {
-  CefScopedSendingEvent sendingEventScoper;
-  [super sendEvent:event];
+- (void)sendEvent:(NSEvent*)event
+{
+    CefScopedSendingEvent sendingEventScoper;
+    [super sendEvent:event];
 }
 
 // |-terminate:| is the entry point for orderly "quit" operations in Cocoa. This
@@ -74,17 +78,19 @@
 //
 // The standard |-applicationShouldTerminate:| is not supported, and code paths
 // leading to it must be redirected.
-- (void)terminate:(id)sender {
-  SimpleAppDelegate* delegate =
-      static_cast<SimpleAppDelegate*>([NSApp delegate]);
-  [delegate tryToTerminateApplication:self];
-  // Return, don't exit. The application is responsible for exiting on its own.
+- (void)terminate:(id)sender
+{
+    SimpleAppDelegate* delegate =
+        static_cast<SimpleAppDelegate*>([NSApp delegate]);
+    [delegate tryToTerminateApplication:self];
+    // Return, don't exit. The application is responsible for exiting on its own.
 }
 @end
 
 @implementation SimpleAppDelegate
-  // Create the application on the UI thread.
-  - (void)createApplication:(id)object {
+// Create the application on the UI thread.
+- (void)createApplication:(id)object
+{
     [NSApplication sharedApplication];
     [[NSBundle mainBundle] loadNibNamed:@"MainMenu"
                                   owner:NSApp
@@ -92,60 +98,63 @@
 
     // Set the delegate for application events.
     [[NSApplication sharedApplication] setDelegate:self];
-  }
+}
 
-  - (void)tryToTerminateApplication:(NSApplication*)app {
+- (void)tryToTerminateApplication:(NSApplication*)app
+{
     SimpleHandler* handler = SimpleHandler::GetInstance();
-    if (handler && !handler->IsClosing())
-      handler->CloseAllBrowsers(false);
-  }
+    if(handler && !handler->IsClosing())
+        handler->CloseAllBrowsers(false);
+}
 
-  - (NSApplicationTerminateReply)applicationShouldTerminate:
-      (NSApplication*)sender {
+- (NSApplicationTerminateReply)applicationShouldTerminate:
+    (NSApplication*)sender
+{
     return NSTerminateNow;
-  }
+}
 @end
 
 // Entry point function for the browser process.
-int main(int argc, char* argv[]) {
-  // Provide CEF with command-line arguments.
-  CefMainArgs main_args(argc, argv);
+int main(int argc, char* argv[])
+{
+    // Provide CEF with command-line arguments.
+    CefMainArgs main_args(argc, argv);
 
-  // Initialize the AutoRelease pool.
-  NSAutoreleasePool* autopool = [[NSAutoreleasePool alloc] init];
+    // Initialize the AutoRelease pool.
+    NSAutoreleasePool* autopool = [[NSAutoreleasePool alloc] init];
 
-  // Initialize the SimpleApplication instance.
-  [SimpleApplication sharedApplication];
+    // Initialize the SimpleApplication instance.
+    [SimpleApplication sharedApplication];
 
-  // Specify CEF global settings here.
-  CefSettings settings;
+    // Specify CEF global settings here.
+    CefSettings settings;
 
-  // SimpleApp implements application-level callbacks for the browser process.
-  // It will create the first browser instance in OnContextInitialized() after
-  // CEF has initialized.
-  CefRefPtr<SimpleApp> app(new SimpleApp);
+    // SimpleApp implements application-level callbacks for the browser process.
+    // It will create the first browser instance in OnContextInitialized() after
+    // CEF has initialized.
+    CefRefPtr<SimpleApp> app(new SimpleApp);
 
-  // Initialize CEF for the browser process.
-  CefInitialize(main_args, settings, app.get(), NULL);
+    // Initialize CEF for the browser process.
+    CefInitialize(main_args, settings, app.get(), NULL);
 
-  // Create the application delegate.
-  NSObject* delegate = [[SimpleAppDelegate alloc] init];
-  [delegate performSelectorOnMainThread:@selector(createApplication:)
-                             withObject:nil
-                          waitUntilDone:NO];
+    // Create the application delegate.
+    NSObject* delegate = [[SimpleAppDelegate alloc] init];
+    [delegate performSelectorOnMainThread:@selector(createApplication:)
+                               withObject:nil
+                            waitUntilDone:NO];
 
-  // Run the CEF message loop. This will block until CefQuitMessageLoop() is
-  // called.
-  CefRunMessageLoop();
+    // Run the CEF message loop. This will block until CefQuitMessageLoop() is
+    // called.
+    CefRunMessageLoop();
 
-  // Shut down CEF.
-  CefShutdown();
+    // Shut down CEF.
+    CefShutdown();
 
-  // Release the delegate.
-  [delegate release];
+    // Release the delegate.
+    [delegate release];
 
-  // Release the AutoRelease pool.
-  [autopool release];
+    // Release the AutoRelease pool.
+    [autopool release];
 
-  return 0;
+    return 0;
 }

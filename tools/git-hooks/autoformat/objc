@@ -1,0 +1,25 @@
+#!/bin/bash
+# format all .cpp|.hpp files in the repository
+
+set -e
+
+REPO_DIR="$(git rev-parse --show-toplevel)"
+
+function formatFile() {
+    cd "${REPO_DIR}"
+    file=$1
+    echo "formatting file: $file"
+    clang-format -style="file" -assume-filename="" -fallback-style=none -i ${file} || (echo 'fatal: `clang-format` failed for:' "$file"; exit 1)
+}
+export -f formatFile
+
+function formatCpp() {
+    find "$1" -ipath "$2*" | xargs -I {} bash -c 'formatFile "${@}"' _ {}
+}
+
+formatCpp "$1" "$REPO_DIR/include"  
+formatCpp "$1" "$REPO_DIR/src" 
+formatCpp "$1" "$REPO_DIR/examples" 
+formatCpp "$1" "$REPO_DIR/tests" 
+formatCpp "$1" "$REPO_DIR/gui"
+formatCpp "$1" "$REPO_DIR/benchmarks"
