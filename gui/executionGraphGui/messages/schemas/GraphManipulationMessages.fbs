@@ -1,0 +1,62 @@
+// =========================================================================================
+//  ExecutionGraph
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+// 
+//  @date Sat Jul 07 2018
+//  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+// 
+//  This Source Code Form is subject to the terms of the Mozilla Public
+//  License, v. 2.0. If a copy of the MPL was not distributed with this
+//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// =========================================================================================
+
+include "DataTypes.fbs";
+include "NodeDescription.fbs";
+
+namespace executionGraphGUI.serialization;
+
+table NodeConstructionInfo {
+    type:string (id: 0, required);          //!< The rtti of the logic node.
+    name:string (id: 1);                    //!< The name of the logic node.
+    constructor:[ConstructorKV] (id: 2);    //!< Key-value pairs for the cosntructor.
+}
+
+//! ======================================================================
+//! Message "graph/addNodes"
+//! ======================================================================
+//! Request data:
+table AddNodesRequest {
+    nodes:[NodeConstructionInfo] (id:0); //!< List of logic node construction infos.
+}
+//! Response data:
+//! Rollback semantics are guaranteed: 
+//!  - if `AddNodesResponse` data with `nodes` containing as many `LogicNodeInfos` 
+//!    as in the request data => success.
+//!  - if no `AddNodesResponse` data => no success: 
+//!    error string in response header:
+//!      - error: see error description in status text        => backend consistency guarantee
+//!      - fatal: if status code 500 : internal backend error => no backend consistency guarantee
+table AddNodesResponse {
+    nodes:[NodeDescription] (id:0, required);
+}
+//! ======================================================================
+
+//! ======================================================================
+//! Message "graph/removeNodes"
+//! ======================================================================
+//! Request data:
+//! Exception if `ids` is not a unique set of ids.
+table RemoveNodesRequest {
+    ids:[uint64] (id:0, required); //!< Set of logic node ids to remove from the graph.
+}
+//! Response data:
+//!  - if `RemoveNodesResponse` data with `ids` containing as many entries
+//!    as in the request data => success.
+//!  - if no `RemoveNodesResponse` data => no success: 
+//!    error string in response header:
+//!      - error: see error description in status text        => backend consistency guarantee
+//!      - fatal: if status code 500 : internal backend error => no backend consistency guarantee
+table RemoveNodesResponse {
+    ids:[uint64] (id:0);
+}
+//! ======================================================================

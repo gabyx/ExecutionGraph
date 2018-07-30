@@ -12,9 +12,9 @@
 
 #include "cefapp/AppCLArgs.hpp"
 #include <cstdlib>
+#include <executionGraph/common/StringFormat.hpp>
 #include <iostream>
-#include "executionGraph/common/Exception.hpp"
-#include "executionGraph/common/StringFormat.hpp"
+#include "common/Exception.hpp"
 
 AppCLArgs::AppCLArgs(int argc, char* argv[])
     : executionGraph::CommandLineArguments(argc, argv, "ExecutionGUI Application", "No detailed description")
@@ -55,8 +55,8 @@ AppCLArgs::AppCLArgs(int argc, char* argv[])
     }
     catch(args::ParseError e)
     {
-        EXECGRAPH_THROW_EXCEPTION("Parser Error: " << e.what() << std::endl
-                                                   << m_parser)
+        EXECGRAPHGUI_THROW_EXCEPTION("Parser Error: " << e.what() << std::endl
+                                                      << m_parser)
     }
 }
 

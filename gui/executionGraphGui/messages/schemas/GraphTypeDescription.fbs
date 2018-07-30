@@ -10,19 +10,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
+include "NodeTypeDescription.fbs";
+include "SocketTypeDescription.fbs";
+
 namespace executionGraphGUI.serialization;
-
-//! Describing a node type.
-table NodeTypeDescription {
-    name:string (id:0, required); //!< The readable name of the node.
-    type:string (id:1, required); //!< The unqiue RTTI name of the node.
-}
-
-//! Describing a socket type.
-table SocketTypeDescription {
-    name:string (id:0, required); //!< The readable name of the node.
-    type:string (id:1, required); //!< The unqiue RTTI name of the node.
-}
 
 table GraphTypeDescription {
     name:string (id:0, required);   //!< The readable name of this graph type.
@@ -30,17 +21,3 @@ table GraphTypeDescription {
     nodeTypeDescriptions:[NodeTypeDescription] (id:2);      //!< Node descriptions
     socketTypeDescriptions:[SocketTypeDescription] (id:3);  //!< Socket descriptions
 }
-
-//! ======================================================================
-//! Message "general/getAllGraphTypeDescriptions"
-//! ======================================================================
-
-//! Describing the request data 
-//! -> empty data
-
-//! Describing the response data
-table GetAllGraphTypeDescriptionsResponse {
-    graphsTypes:[GraphTypeDescription] (id:0);
-}
-
-//! ======================================================================

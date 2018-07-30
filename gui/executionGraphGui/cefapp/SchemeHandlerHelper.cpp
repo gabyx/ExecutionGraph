@@ -11,8 +11,8 @@
 //! ========================================================================================
 
 #include "cefapp/SchemeHandlerHelper.hpp"
-#include <executionGraph/common/Exception.hpp>
 #include <executionGraph/common/FileSystem.hpp>
+#include "common/Exception.hpp"
 
 namespace schemeHandlerHelper
 {
@@ -22,14 +22,14 @@ namespace schemeHandlerHelper
     {
         for(auto& scheme : getCustomSchemes())
         {
-            EXECGRAPH_THROW_EXCEPTION_IF(!registrar->AddCustomScheme(scheme,
-                                                                     true /* is standart*/,
-                                                                     false /* is local */,
-                                                                     false /* is display_isolated */,
-                                                                     true /* is secure */,
-                                                                     false /* is cors enabled*/,
-                                                                     false /* is_csp_bypassing*/),
-                                         "Scheme not registered!");
+            EXECGRAPHGUI_THROW_EXCEPTION_IF(!registrar->AddCustomScheme(scheme,
+                                                                        true /* is standart*/,
+                                                                        false /* is local */,
+                                                                        false /* is display_isolated */,
+                                                                        true /* is secure */,
+                                                                        false /* is cors enabled*/,
+                                                                        false /* is_csp_bypassing*/),
+                                            "Scheme not registered!");
         }
     }
 

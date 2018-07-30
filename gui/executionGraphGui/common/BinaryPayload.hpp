@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef common_BinaryPayload_hpp
-#define common_BinaryPayload_hpp
+#ifndef executionGraphGui_common_BinaryPayload_hpp
+#define executionGraphGui_common_BinaryPayload_hpp
 
 #include <string>
 #include "common/BinaryBuffer.hpp"

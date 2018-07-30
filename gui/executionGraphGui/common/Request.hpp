@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef common_Request_hpp
-#define common_Request_hpp
+#ifndef executionGraphGui_common_Request_hpp
+#define executionGraphGui_common_Request_hpp
 
 #include <executionGraph/common/FileSystem.hpp>
 #include <executionGraph/common/IObjectID.hpp>

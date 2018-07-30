@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef common_BinaryBuffer_hpp
-#define common_BinaryBuffer_hpp
+#ifndef executionGraphGui_common_BinaryBuffer_hpp
+#define executionGraphGui_common_BinaryBuffer_hpp
 
 #include <cstdint>
 #include <foonathan/memory/smart_ptr.hpp>

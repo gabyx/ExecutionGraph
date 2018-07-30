@@ -10,47 +10,48 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "backend/requestHandlers/GraphInfoRequestHandler.hpp"
-#include <backend/ExecutionGraphBackend.hpp>
+#include "backend/requestHandlers/GeneralInfoRequestHandler.hpp"
 #include <chrono>
-#include <common/Loggers.hpp>
-#include <messages/schemas/GraphInfoMessages_generated.h>
 #include <vector>
+#include "backend/ExecutionGraphBackend.hpp"
 #include "common/AllocatorProxyFlatBuffer.hpp"
+#include "common/Exception.hpp"
+#include "common/Loggers.hpp"
+#include "messages/schemas/GeneralInfoMessages_generated.h"
 
 namespace fl = flatbuffers;
 namespace s  = executionGraphGUI::serialization;
 
 //! Init the function mapping.
-FunctionMap<GraphInfoRequestHandler::Function> GraphInfoRequestHandler::initFunctionMap()
+FunctionMap<GeneralInfoRequestHandler::Function> GeneralInfoRequestHandler::initFunctionMap()
 {
     using Entry = typename FunctionMap<Function>::Entry;
     auto r      = {Entry{"general/getAllGraphTypeDescriptions",
-                    Function{&GraphInfoRequestHandler::handleGetAllGraphTypeDescriptions}}};
+                    Function{&GeneralInfoRequestHandler::handleGetAllGraphTypeDescriptions}}};
     return {r};
 }
 
 //! Static handler map: request to handler function mapping.
-const FunctionMap<GraphInfoRequestHandler::Function> GraphInfoRequestHandler::m_functionMap = GraphInfoRequestHandler::initFunctionMap();
+const FunctionMap<GeneralInfoRequestHandler::Function> GeneralInfoRequestHandler::m_functionMap = GeneralInfoRequestHandler::initFunctionMap();
 
 //! Konstructor.
-GraphInfoRequestHandler::GraphInfoRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,
-                                                 const Id& id)
+GeneralInfoRequestHandler::GeneralInfoRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,
+                                                     const Id& id)
     : BackendRequestHandler(id)
 {
 }
 
 //! Get the request types for which this handler is registered.
-const std::unordered_set<std::string>& GraphInfoRequestHandler::getRequestTypes() const
+const std::unordered_set<std::string>& GeneralInfoRequestHandler::getRequestTypes() const
 {
     return m_functionMap.m_keys;
 }
 
 //! Handle the request.
-void GraphInfoRequestHandler::handleRequest(const Request& request,
-                                            ResponsePromise& response)
+void GeneralInfoRequestHandler::handleRequest(const Request& request,
+                                              ResponsePromise& response)
 {
-    EXECGRAPHGUI_BACKENDLOG_INFO("GraphInfoRequestHandler::handleRequest");
+    EXECGRAPHGUI_BACKENDLOG_INFO("GeneralInfoRequestHandler::handleRequest");
 
     // Dispatch to the correct function
     auto it = m_functionMap.m_map.find(request.getURL().string());
@@ -61,11 +62,11 @@ void GraphInfoRequestHandler::handleRequest(const Request& request,
 }
 
 //! Handle the "GetAllGraphTypeDescriptions"
-void GraphInfoRequestHandler::handleGetAllGraphTypeDescriptions(const Request& request,
-                                                                ResponsePromise& response)
+void GeneralInfoRequestHandler::handleGetAllGraphTypeDescriptions(const Request& request,
+                                                                  ResponsePromise& response)
 {
-    EXECGRAPH_THROW_EXCEPTION_IF(request.getPayload() != nullptr,
-                                 "There should not be any request payload for this request");
+    EXECGRAPHGUI_THROW_EXCEPTION_IF(request.getPayload() != nullptr,
+                                    "There should not be any request payload for this request");
     using Allocator = ResponsePromise::Allocator;
 
     AllocatorProxyFlatBuffer<Allocator> allocator(response.getAllocator());

@@ -13,8 +13,8 @@
 #ifndef executionGraphGui_backend_requestHandlers_DummyRequestHandler_hpp
 #define executionGraphGui_backend_requestHandlers_DummyRequestHandler_hpp
 
-#include <backend/BackendRequestHandler.hpp>
-#include <backend/ExecutionGraphBackend.hpp>
+#include "backend/BackendRequestHandler.hpp"
+#include "backend/ExecutionGraphBackend.hpp"
 
 class DummyRequestHandler final : public BackendRequestHandler
 {

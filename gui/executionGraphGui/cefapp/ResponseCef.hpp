@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef cefapp_ResponseCef_h
-#define cefapp_ResponseCef_h
+#ifndef executionGraphGui_cefapp_ResponseCef_h
+#define executionGraphGui_cefapp_ResponseCef_h
 
 #include <cef_base.h>
 #include <cef_request.h>

@@ -12,6 +12,7 @@
 
 #include "backend/ExecutionGraphBackend.hpp"
 #include "backend/ExecutionGraphBackendDefs.hpp"
+#include "common/Exception.hpp"
 
 using Id                   = ExecutionGraphBackend::Id;
 using GraphTypeDescription = ExecutionGraphBackend::GraphTypeDescription;
@@ -51,15 +52,15 @@ void ExecutionGraphBackend::addGraph(const Id& graphId, const Id& graphType)
 
     if(graphType == m_graphTypeDescriptionIds[0])
     {
-        EXECGRAPH_THROW_EXCEPTION_IF(m_graphs.find(graphId) != m_graphs.end(),
-                                     "Graph id '" << std::string(graphId) << "' already exists!");
+        EXECGRAPHGUI_THROW_EXCEPTION_IF(m_graphs.find(graphId) != m_graphs.end(),
+                                        "Graph id '" << std::string(graphId) << "' already exists!");
 
         m_graphs.emplace(std::make_pair(graphId, DefaultGraph{}));
     }
     else
     {
-        EXECGRAPH_THROW_EXCEPTION("Graph type '" << std::string(graphType)
-                                                 << "' not available for adding!");
+        EXECGRAPHGUI_THROW_EXCEPTION("Graph type '" << std::string(graphType)
+                                                    << "' not available for adding!");
     }
 }
 
@@ -67,8 +68,8 @@ void ExecutionGraphBackend::addGraph(const Id& graphId, const Id& graphType)
 void ExecutionGraphBackend::removeGraph(const Id& id)
 {
     auto nErased = m_graphs.erase(id);
-    EXECGRAPH_THROW_EXCEPTION_IF(nErased == 0,
-                                 "No such graph with id: '" << std::string(id) << "' removed!");
+    EXECGRAPHGUI_THROW_EXCEPTION_IF(nErased == 0,
+                                    "No such graph with id: '" << std::string(id) << "' removed!");
 }
 
 //! Remove all graphs from the backend.

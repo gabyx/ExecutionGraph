@@ -1,21 +1,23 @@
 // =========================================================================================
 //  ExecutionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
-//
-//  @date Sun Jul 29 2018
+// 
+//  @date Mon Jul 30 2018
 //  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
-//
+// 
 //  This Source Code Form is subject to the terms of the Mozilla Public
 //  License, v. 2.0. If a copy of the MPL was not distributed with this
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_common_DevFlags_hpp
-#define executionGraphGui_common_DevFlags_hpp
+include "executionGraph/serialization/schemas/LogicNode.fbs";
+include "SocketTypeDescription.fbs";
 
-namespace devFlags
-{
-    static constexpr bool showDevTools = true;  //!< If the DeveloperTools are shown on start up of the browser.
+namespace executionGraphGUI.serialization;
+
+//! Information about a node.
+table NodeDescription {
+    node:executionGraph.serialization.LogicNode (id:0, required); //!< The node.
+    inputSockets:[SocketTypeDescription] (id:1);                  //!< Info for the input sockets.
+    outputSockets:[SocketTypeDescription] (id:2);                 //!< Info for the output sockets.
 }
-
-#endif

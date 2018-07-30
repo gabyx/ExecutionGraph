@@ -10,8 +10,8 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef APP_H
-#define APP_H
+#ifndef cefapp_App_hpp
+#define cefapp_App_hpp
 
 #include <cef_app.h>
 #include <memory>

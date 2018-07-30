@@ -10,8 +10,8 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef cefapp_BackendResourceHandler_h
-#define cefapp_BackendResourceHandler_h
+#ifndef executionGraphGui_cefapp_BackendResourceHandler_h
+#define executionGraphGui_cefapp_BackendResourceHandler_h
 
 #include <cef_base.h>
 #include <cef_resource_handler.h>

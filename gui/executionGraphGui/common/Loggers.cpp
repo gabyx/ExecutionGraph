@@ -11,6 +11,7 @@
 //! ========================================================================================
 
 #include "common/Loggers.hpp"
+#include "common/Exception.hpp"
 
 Loggers::Loggers(const std::path& logPath)
 {
@@ -36,6 +37,6 @@ Loggers::Loggers(const std::path& logPath)
     }
     catch(const spdlog::spdlog_ex& ex)
     {
-        EXECGRAPH_THROW_EXCEPTION("Log initialization failed: " << ex.what());
+        EXECGRAPHGUI_THROW_EXCEPTION("Log initialization failed: " << ex.what());
     }
 }

@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef common_FunctionMap_hpp
-#define common_FunctionMap_hpp
+#ifndef executionGraphGui_common_FunctionMap_hpp
+#define executionGraphGui_common_FunctionMap_hpp
 
 #include <functional>
 #include <string>

@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef cefapp_BackendRequestDispatcher_hpp
-#define cefapp_BackendRequestDispatcher_hpp
+#ifndef executionGraphGui_cefapp_BackendRequestDispatcher_hpp
+#define executionGraphGui_cefapp_BackendRequestDispatcher_hpp
 
 #include "backend/BackendRequestHandler.hpp"
 #include "cefapp/RequestCef.hpp"

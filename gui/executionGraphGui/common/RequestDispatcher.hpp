@@ -10,8 +10,8 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef common_RequestDispatcher_hpp
-#define common_RequestDispatcher_hpp
+#ifndef executionGraphGui_common_RequestDispatcher_hpp
+#define executionGraphGui_common_RequestDispatcher_hpp
 
 #include <executionGraph/common/Assert.hpp>
 #include <executionGraph/common/ThreadPool.hpp>
@@ -19,6 +19,7 @@
 #include <meta/meta.hpp>
 #include <unordered_set>
 #include <vector>
+#include "common/Exception.hpp"
 #include "common/Loggers.hpp"
 #include "common/Request.hpp"
 #include "common/Response.hpp"
@@ -83,18 +84,18 @@ public:
         std::scoped_lock<std::mutex> lock(m_access);
 
         const auto& requestTypes = handler->getRequestTypes();
-        EXECGRAPH_THROW_EXCEPTION_IF(!handler || requestTypes.size() == 0, "nullptr or no requestTypes");
+        EXECGRAPHGUI_THROW_EXCEPTION_IF(!handler || requestTypes.size() == 0, "nullptr or no requestTypes");
 
         Id id = handler->getId();
-        EXECGRAPH_THROW_EXCEPTION_IF(m_handlerStorage.find(id) != m_handlerStorage.end(),
-                                     "MessageHandler with id: " << id.getUniqueName() << " already exists!");
+        EXECGRAPHGUI_THROW_EXCEPTION_IF(m_handlerStorage.find(id) != m_handlerStorage.end(),
+                                        "MessageHandler with id: " << id.getUniqueName() << " already exists!");
 
         auto p = m_handlerStorage.emplace(id, HandlerData{requestTypes, handler});
 
         for(auto& requestType : requestTypes)
         {
-            EXECGRAPH_THROW_EXCEPTION_IF(m_specificHandlers.find(requestType) != m_specificHandlers.end(),
-                                         "Handler for request type:" << requestType << "already registered");
+            EXECGRAPHGUI_THROW_EXCEPTION_IF(m_specificHandlers.find(requestType) != m_specificHandlers.end(),
+                                            "Handler for request type:" << requestType << "already registered");
             m_specificHandlers[requestType] = &(p.first->second);
         }
     }

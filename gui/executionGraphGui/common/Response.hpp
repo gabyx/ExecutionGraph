@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef common_Response_hpp
-#define common_Response_hpp
+#ifndef executionGraphGui_common_Response_hpp
+#define executionGraphGui_common_Response_hpp
 
 #include <executionGraph/common/Identifier.hpp>
 #include <future>

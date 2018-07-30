@@ -10,8 +10,8 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef cefapp_RenderApp_h
-#define cefapp_RenderApp_h
+#ifndef executionGraphGui_cefapp_RenderApp_h
+#define executionGraphGui_cefapp_RenderApp_h
 
 #include <cef_app.h>
 

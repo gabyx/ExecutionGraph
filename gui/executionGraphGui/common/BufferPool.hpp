@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef common_BufferPool_hpp
-#define common_BufferPool_hpp
+#ifndef executionGraphGui_common_BufferPool_hpp
+#define executionGraphGui_common_BufferPool_hpp
 
 #include <foonathan/memory/heap_allocator.hpp>
 

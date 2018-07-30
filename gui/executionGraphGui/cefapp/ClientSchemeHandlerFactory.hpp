@@ -10,8 +10,8 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef cefapp_ClientSchemeHandlerFactory_hpp
-#define cefapp_ClientSchemeHandlerFactory_hpp
+#ifndef executionGraphGui_cefapp_ClientSchemeHandlerFactory_hpp
+#define executionGraphGui_cefapp_ClientSchemeHandlerFactory_hpp
 
 #include <cef_scheme.h>
 #include <executionGraph/common/FileSystem.hpp>

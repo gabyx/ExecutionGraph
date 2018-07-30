@@ -16,7 +16,6 @@
 #include <cef_parser.h>
 #include <chrono>
 #include <executionGraph/common/Assert.hpp>
-#include <executionGraph/common/Exception.hpp>
 #include <thread>
 #include <wrapper/cef_closure_task.h>
 #include <wrapper/cef_helpers.h>
@@ -24,6 +23,7 @@
 #include "cefapp/RequestCef.hpp"
 #include "cefapp/ResponseCef.hpp"
 #include "common/BinaryBuffer.hpp"
+#include "common/Exception.hpp"
 #include "common/Loggers.hpp"
 
 namespace
@@ -102,7 +102,7 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
 
     try
     {
-        EXECGRAPH_THROW_EXCEPTION_IF(!future.valid(), "Future is invalid!");
+        EXECGRAPHGUI_THROW_EXCEPTION_IF(!future.valid(), "Future is invalid!");
 
         m_payload = future.get();  // Set the payload!
 
@@ -113,10 +113,18 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
 
         m_bytesRead = 0;
     }
+    catch(const InternalBackendError& e)
+    {
+        // Exception while processing the request -> abort!
+        EXECGRAPHGUI_APPLOG_FATAL("BackendResourceHandler: Internal backend error: '{0}", e.what());
+        response->SetStatusText(e.what());
+        response->SetStatus(500);  // http status code: 500 : Internal server error!
+        response->SetError(cef_errorcode_t::ERR_FAILED);
+    }
     catch(const std::exception& e)
     {
         // Exception while processing the request -> abort!
-        EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler: Exception in GetResponseHeaders:'{0}", e.what());
+        EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler: Error processing request: '{0}'", e.what());
         response->SetStatusText(e.what());
         response->SetStatus(400);  // http status code: 400 : Bad request!
         response->SetError(cef_errorcode_t::ERR_FAILED);
@@ -126,7 +134,7 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
         // Exception while processing the request -> abort!
         EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler: Unknown exception in GetResponseHeaders");
         response->SetStatusText("Unknown Exception!");
-        response->SetStatus(400);  // http status code: 400 : Bad request!
+        response->SetStatus(500);  // http status code: 400 : Internal server error!
         response->SetError(cef_errorcode_t::ERR_FAILED);
     }
 }
