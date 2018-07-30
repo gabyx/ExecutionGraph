@@ -32,7 +32,7 @@ if(NOT EXISTS ${CEF_ROOT})
                         PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/cefbinaries"
                         URL                 ${CEF_DSYM_URL}
                         UPDATE_DISCONNECTED 1)
-        set(CEF_DSYM_FILE "cefbinaries-dsym_SOURCE_DIR}/Chromium Embedded Framework.dSYM" CACHE PATH "CEF dSYM file" FORCE)
+        set(CEF_DSYM_FILE "${cefbinaries-dsym_SOURCE_DIR}/Chromium Embedded Framework.dSYM" CACHE PATH "CEF dSYM file" FORCE)
     endif()
 endif()
 

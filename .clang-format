@@ -1,5 +1,6 @@
 ---
 Language:        Cpp
+Language:        ObjC
 # BasedOnStyle:  Google
 AccessModifierOffset: -4
 AlignAfterOpenBracket: Align
@@ -65,7 +66,7 @@ IncludeCategories:
     Priority:        2
   - Regex:           '.*'
     Priority:        3
-IncludeIsMainRegex: '([-_](test|unittest))?$'
+IncludeIsMainRegex: '$'
 IndentCaseLabels: true
 IndentPPDirectives: AfterHash
 IndentWidth:     4

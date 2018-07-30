@@ -25,7 +25,7 @@ During communication, a processed request by an instanciated `BackendResourceHan
 
 ## Serilaization of Messages
 The messages get serialized and deserialized with [FlatBuffers](https://google.github.io/flatbuffers/).
-The schemas can be found in `gui/executionGraphGui/messages/schemas`. The serialization of specific components of an execution graph are located in `include/executionGraph/serialization`.
+The schemas can be found in `gui/executionGraphGUI/messages/schemas`. The serialization of specific components of an execution graph are located in `include/executionGraph/serialization`.
 
 ## Message Types
 One message handlers is associated for each of the following grouped functionalities:
@@ -40,7 +40,7 @@ The base template url of the backend is `http://executiongraph-backend/${request
     * Get info of all available socket types and node types (of a graph):
         - url: `requestUrl = "general/getAllGraphTypeDescriptions"`
         - request method: `GET`
-        - schema: `gui/executionGraphGui/messages/schemas/GraphInfoMessages.fbs`
+        - schema: `gui/executionGraphGUI/messages/schemas/GraphInfoMessages.fbs`
         - response: `GetAllGraphTypeDescriptionsResponse`
 
 -   **Graph Info Queries**:

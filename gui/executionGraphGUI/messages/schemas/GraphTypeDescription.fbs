@@ -1,0 +1,23 @@
+// =========================================================================================
+//  ExecutionGraph
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+// 
+//  @date Sat Jul 07 2018
+//  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+// 
+//  This Source Code Form is subject to the terms of the Mozilla Public
+//  License, v. 2.0. If a copy of the MPL was not distributed with this
+//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// =========================================================================================
+
+include "NodeTypeDescription.fbs";
+include "SocketTypeDescription.fbs";
+
+namespace executionGraphGUI.serialization;
+
+table GraphTypeDescription {
+    name:string (id:0, required);   //!< The readable name of this graph type.
+    id:string (id:1, required);     //!< The unique id of this graph type.
+    nodeTypeDescriptions:[NodeTypeDescription] (id:2);      //!< Node descriptions
+    socketTypeDescriptions:[SocketTypeDescription] (id:3);  //!< Socket descriptions
+}
