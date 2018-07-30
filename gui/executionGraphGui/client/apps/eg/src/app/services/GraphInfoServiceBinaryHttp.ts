@@ -17,7 +17,7 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/first';
 
 import { flatbuffers } from 'flatbuffers';
-import { GraphInfoService, Messages, sz } from './GraphInfoService';
+import { GraphInfoService, GraphInfoMessages } from './GraphInfoService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 
 @Injectable()
@@ -27,10 +27,10 @@ export class GraphInfoServiceBinaryHttp extends GraphInfoService {
     super();
   }
 
-  public async getAllGraphTypeDescriptions(): Promise<Messages.GetAllGraphTypeDescriptionsResponse> {
+  public async getAllGraphTypeDescriptions(): Promise<GraphInfoMessages.GetAllGraphTypeDescriptionsResponse> {
     const result = await this.binaryRouter.get('general/getAllGraphTypeDescriptions');
     let buf = new flatbuffers.ByteBuffer(result);
-    let response = Messages.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
+    let response = GraphInfoMessages.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
     console.log(`[GraphInfoServiceBinaryHttp] Received: Number of Graph types: ${response.graphsTypesLength()}`)
 
     let graphDesc = response.graphsTypes(0);

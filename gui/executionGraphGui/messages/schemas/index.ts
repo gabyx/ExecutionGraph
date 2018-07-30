@@ -1,7 +1,3 @@
-import { executionGraphGUI } from '@messages/GraphInfoMessages_generated'
+import { executionGraphGUI } from './GraphInfoMessages_generated';
 
-export var sz = executionGraphGUI.serialization;
-
-export namespace GraphInfoMessages {
-    export import GetAllGraphTypeDescriptionsResponse = executionGraphGUI.serialization.GetAllGraphTypeDescriptionsResponse;
-}
+export import GraphInfoMessages = executionGraphGUI.serialization;

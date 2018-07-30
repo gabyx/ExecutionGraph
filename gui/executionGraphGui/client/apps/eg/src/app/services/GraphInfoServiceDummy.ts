@@ -11,7 +11,7 @@
 // =========================================================================================
 
 import { Injectable, Testability } from '@angular/core';
-import { GraphInfoService, Messages, sz } from './GraphInfoService';
+import { GraphInfoMessages, GraphInfoService } from './GraphInfoService';
 import { flatbuffers } from 'flatbuffers';
 
 @Injectable()
@@ -21,46 +21,46 @@ export class GraphInfoServiceDummy extends GraphInfoService {
     super();
   }
 
-  public async getAllGraphTypeDescriptions(): Promise<Messages.GetAllGraphTypeDescriptionsResponse> {
+  public async getAllGraphTypeDescriptions(): Promise<GraphInfoMessages.GetAllGraphTypeDescriptionsResponse> {
     let builder = new flatbuffers.Builder(1024);
 
     // NodeType Description machen
     let offName = builder.createString("DummyNode");
     let offType = builder.createString("DummyNode<int>");
-    sz.NodeTypeDescription.startNodeTypeDescription(builder);
-    sz.NodeTypeDescription.addName(builder, offName);
-    sz.NodeTypeDescription.addType(builder, offType);
-    let offN = sz.NodeTypeDescription.endNodeTypeDescription(builder);
+    GraphInfoMessages.NodeTypeDescription.startNodeTypeDescription(builder);
+    GraphInfoMessages.NodeTypeDescription.addName(builder, offName);
+    GraphInfoMessages.NodeTypeDescription.addType(builder, offType);
+    let offN = GraphInfoMessages.NodeTypeDescription.endNodeTypeDescription(builder);
 
     // SocketType Description machen
     offName = builder.createString("Integral Socket");
     offType = builder.createString("int");
-    sz.SocketTypeDescription.startSocketTypeDescription(builder);
-    sz.SocketTypeDescription.addName(builder, offName);
-    sz.SocketTypeDescription.addType(builder, offType);
-    let offS = sz.SocketTypeDescription.endSocketTypeDescription(builder);
+    GraphInfoMessages.SocketTypeDescription.startSocketTypeDescription(builder);
+    GraphInfoMessages.SocketTypeDescription.addName(builder, offName);
+    GraphInfoMessages.SocketTypeDescription.addType(builder, offType);
+    let offS = GraphInfoMessages.SocketTypeDescription.endSocketTypeDescription(builder);
 
     // GraphType Description machen
     let offId = builder.createString("2992ebff-c950-4184-8876-5fe6ac029aa5");
     offName = builder.createString("DefaultGraph");
-    let offNodes = sz.GraphTypeDescription.createNodeTypeDescriptionsVector(builder, [offN]);
-    let offSockets = sz.GraphTypeDescription.createSocketTypeDescriptionsVector(builder, [offS]);
-    sz.GraphTypeDescription.startGraphTypeDescription(builder);
-    sz.GraphTypeDescription.addId(builder, offId);
-    sz.GraphTypeDescription.addName(builder, offName);
-    sz.GraphTypeDescription.addNodeTypeDescriptions(builder, offNodes);
-    sz.GraphTypeDescription.addSocketTypeDescriptions(builder, offSockets);
-    let offGT = sz.GraphTypeDescription.endGraphTypeDescription(builder);
+    let offNodes = GraphInfoMessages.GraphTypeDescription.createNodeTypeDescriptionsVector(builder, [offN]);
+    let offSockets = GraphInfoMessages.GraphTypeDescription.createSocketTypeDescriptionsVector(builder, [offS]);
+    GraphInfoMessages.GraphTypeDescription.startGraphTypeDescription(builder);
+    GraphInfoMessages.GraphTypeDescription.addId(builder, offId);
+    GraphInfoMessages.GraphTypeDescription.addName(builder, offName);
+    GraphInfoMessages.GraphTypeDescription.addNodeTypeDescriptions(builder, offNodes);
+    GraphInfoMessages.GraphTypeDescription.addSocketTypeDescriptions(builder, offSockets);
+    let offGT = GraphInfoMessages.GraphTypeDescription.endGraphTypeDescription(builder);
 
     // GraphType Descriptions machen
-    let offGTs = sz.GetAllGraphTypeDescriptionsResponse.createGraphsTypesVector(builder, [offGT]);
-    Messages.GetAllGraphTypeDescriptionsResponse.startGetAllGraphTypeDescriptionsResponse(builder);
-    Messages.GetAllGraphTypeDescriptionsResponse.addGraphsTypes(builder, offGTs);
-    let offResp = Messages.GetAllGraphTypeDescriptionsResponse.endGetAllGraphTypeDescriptionsResponse(builder);
+    let offGTs = GraphInfoMessages.GetAllGraphTypeDescriptionsResponse.createGraphsTypesVector(builder, [offGT]);
+    GraphInfoMessages.GetAllGraphTypeDescriptionsResponse.startGetAllGraphTypeDescriptionsResponse(builder);
+    GraphInfoMessages.GetAllGraphTypeDescriptionsResponse.addGraphsTypes(builder, offGTs);
+    let offResp = GraphInfoMessages.GetAllGraphTypeDescriptionsResponse.endGetAllGraphTypeDescriptionsResponse(builder);
     builder.finish(offResp);
 
     let buf = new flatbuffers.ByteBuffer(builder.asUint8Array());
-    let response = Messages.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
+    let response = GraphInfoMessages.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
 
     console.debug(`[GraphInfoServiceBinaryHttp] Received: Number of Graph types: ${response.graphsTypesLength()}`)
     return response;

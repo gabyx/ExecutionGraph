@@ -10,10 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { GraphInfoMessages, sz } from '@messages/index';
-
-export { sz as sz };
-export { GraphInfoMessages as Messages };
+import { GraphInfoMessages } from '@messages/index';
+export import GraphInfoMessages = GraphInfoMessages;
 
 export abstract class GraphInfoService {
 
