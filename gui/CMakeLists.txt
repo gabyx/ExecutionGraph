@@ -28,7 +28,7 @@ message(STATUS "cef standart libs: ${CEF_STANDARD_LIBS}")
 ###########################################################
 
 add_subdirectory(cefsimple)
-add_subdirectory(executionGraphGui)
+add_subdirectory(executionGraphGUI)
 
 if(ExecutionGraph_BUILD_TESTS)
     add_subdirectory(tests)
