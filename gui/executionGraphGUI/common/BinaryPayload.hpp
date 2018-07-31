@@ -14,8 +14,8 @@
 #define executionGraphGUI_common_BinaryPayload_hpp
 
 #include <string>
-#include "common/BinaryBuffer.hpp"
-#include "common/BufferPool.hpp"
+#include "executionGraphGUI/common/BinaryBuffer.hpp"
+#include "executionGraphGUI/common/BufferPool.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!

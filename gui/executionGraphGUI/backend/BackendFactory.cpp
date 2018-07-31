@@ -10,10 +10,10 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "backend/BackendFactory.hpp"
+#include "executionGraphGUI/backend/BackendFactory.hpp"
 #include <utility>
-#include "backend/requestHandlers/DummyRequestHandler.hpp"
-#include "backend/requestHandlers/GeneralInfoRequestHandler.hpp"
+#include "executionGraphGUI/backend/requestHandlers/DummyRequestHandler.hpp"
+#include "executionGraphGUI/backend/requestHandlers/GeneralInfoRequestHandler.hpp"
 
 BackendFactory::BackendData
 BackendFactory::CreatorExecutionGraphBackend::create()

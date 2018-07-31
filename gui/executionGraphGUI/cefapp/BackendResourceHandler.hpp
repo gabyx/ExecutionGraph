@@ -19,7 +19,7 @@
 #include <executionGraph/common/IObjectID.hpp>
 #include <functional>
 #include <wrapper/cef_helpers.h>
-#include "cefapp/ResponseCef.hpp"
+#include "executionGraphGUI/cefapp/ResponseCef.hpp"
 class BackendRequestDispatcher;
 class BufferPool;
 
@@ -34,7 +34,7 @@ class BufferPool;
 class BackendResourceHandler final : public CefResourceHandler,
                                      public executionGraph::IObjectID
 {
-    EXECGRAPH_OBJECT_ID_DECLARATION
+    EXECGRAPH_NAMED_OBJECT_ID_DECLARATION
 
 public:
     template<typename Deleter>

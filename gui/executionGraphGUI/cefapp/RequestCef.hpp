@@ -16,7 +16,7 @@
 #include <cef_base.h>
 #include <cef_request.h>
 #include <optional>
-#include "common/Request.hpp"
+#include "executionGraphGUI/common/Request.hpp"
 
 class RequestCef final : public Request
 {

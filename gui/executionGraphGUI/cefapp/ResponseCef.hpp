@@ -15,7 +15,7 @@
 
 #include <cef_base.h>
 #include <cef_request.h>
-#include "common/Response.hpp"
+#include "executionGraphGUI/common/Response.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!

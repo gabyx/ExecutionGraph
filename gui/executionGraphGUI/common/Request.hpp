@@ -46,7 +46,7 @@ public:
 
 protected:
     Request(const std::path& requestURL)
-        : m_id("Request-" + requestURL.string())
+        : m_id()
         , m_requestURL(requestURL)
     {}
 

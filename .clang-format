@@ -1,6 +1,5 @@
 ---
 Language:        Cpp
-Language:        ObjC
 # BasedOnStyle:  Google
 AccessModifierOffset: -4
 AlignAfterOpenBracket: Align
@@ -111,3 +110,5 @@ Standard:        Cpp11
 TabWidth:        4
 UseTab:          Never
 JavaScriptQuotes: Leave
+---
+Language:        ObjC

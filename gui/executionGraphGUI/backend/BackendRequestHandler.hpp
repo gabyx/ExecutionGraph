@@ -17,17 +17,17 @@
 #include <memory>
 #include <rttr/type>
 #include <unordered_set>
-#include "backend/Backend.hpp"
-#include "common/Request.hpp"
-#include "common/Response.hpp"
+#include "executionGraphGUI/backend/Backend.hpp"
+#include "executionGraphGUI/common/Request.hpp"
+#include "executionGraphGUI/common/Response.hpp"
 
 class BackendRequestHandler : public executionGraph::IObjectID
 {
     RTTR_ENABLE()
-    EXECGRAPH_OBJECT_ID_DECLARATION
+    EXECGRAPH_NAMED_OBJECT_ID_DECLARATION
 
 public:
-    BackendRequestHandler(const Id& id)
+    BackendRequestHandler(const IdNamed& id)
         : m_id(id) {}
 
     BackendRequestHandler(const BackendRequestHandler&) = delete;

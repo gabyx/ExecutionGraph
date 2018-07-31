@@ -13,8 +13,8 @@
 #ifndef executionGraphGUI_backend_requestHandlers_GeneralInfoRequestHandler_hpp
 #define executionGraphGUI_backend_requestHandlers_GeneralInfoRequestHandler_hpp
 
-#include "backend/BackendRequestHandler.hpp"
-#include "common/FunctionMap.hpp"
+#include "executionGraphGUI/backend/BackendRequestHandler.hpp"
+#include "executionGraphGUI/common/FunctionMap.hpp"
 
 class ExecutionGraphBackend;
 
@@ -35,14 +35,14 @@ class GeneralInfoRequestHandler final : public BackendRequestHandler
     RTTR_ENABLE(BackendRequestHandler)
 
 public:
-    using Id       = BackendRequestHandler::Id;
+    using IdNamed  = BackendRequestHandler::IdNamed;
     using Function = std::function<void(GeneralInfoRequestHandler&,
                                         const Request& request,
                                         ResponsePromise& response)>;
 
 public:
     GeneralInfoRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,
-                              const Id& id = "GeneralInfoRequestHandler");
+                              const IdNamed& id = IdNamed("GeneralInfoRequestHandler"));
 
     void handleRequest(const Request& request, ResponsePromise& response) override;
     const std::unordered_set<std::string>& getRequestTypes() const override;

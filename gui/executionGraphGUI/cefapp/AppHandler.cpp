@@ -19,9 +19,9 @@
 #include <views/cef_window.h>
 #include <wrapper/cef_closure_task.h>
 #include <wrapper/cef_helpers.h>
-#include "cefapp/PlatformTitleChanger.hpp"
-#include "common/DevFlags.hpp"
-#include "common/Loggers.hpp"
+#include "executionGraphGUI/cefapp/PlatformTitleChanger.hpp"
+#include "executionGraphGUI/common/DevFlags.hpp"
+#include "executionGraphGUI/common/Loggers.hpp"
 
 namespace
 {

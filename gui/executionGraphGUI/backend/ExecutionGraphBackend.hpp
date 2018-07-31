@@ -19,9 +19,9 @@
 #include <rttr/type>
 #include <string>
 #include <vector>
-#include "backend/Backend.hpp"
-#include "backend/nodes/NodeTypeDescription.hpp"
-#include "backend/nodes/SocketTypeDescription.hpp"
+#include "executionGraphGUI/backend/Backend.hpp"
+#include "executionGraphGUI/backend/nodes/NodeTypeDescription.hpp"
+#include "executionGraphGUI/backend/nodes/SocketTypeDescription.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -38,10 +38,11 @@ class ExecutionGraphBackend final : public Backend
 public:
     using DefaultGraph = executionGraph::ExecutionTreeInOut<executionGraph::GeneralConfig<>>;
     using Id           = executionGraph::Id;
+    using IdNamed      = executionGraph::IdNamed;
 
 public:
     ExecutionGraphBackend()
-        : Backend("ExecutionGraphBackend")
+        : Backend(IdNamed("ExecutionGraphBackend"))
     {
     }
     ~ExecutionGraphBackend() override = default;
@@ -50,7 +51,7 @@ public:
     //@{
     void addGraph(const Id& graphId,
                   const Id& graphType);
-    void removeGraph(const Id& id);
+    void removeGraph(const Id& graphId);
     void removeGraphs();
     //@}
 
@@ -59,14 +60,14 @@ public:
 public:
     struct GraphTypeDescription
     {
-        Id m_id;                                                     //!< The id of this graph type.
+        IdNamed m_id;                                                //!< The id of this graph type.
         std::vector<NodeTypeDescription> m_nodeTypeDescription;      //!< Type names of the available and creatable nodes on this graph.
         std::vector<SocketTypeDescription> m_socketTypeDescription;  //!< Type names of the available sockets.
     };
 
 private:
-    static const std::array<Id, 1> m_graphTypeDescriptionIds;                          //!< All IDs used for the graph description.
-    static const std::unordered_map<Id, GraphTypeDescription> m_graphTypeDescription;  //! All graph descriptions.
+    static const std::array<IdNamed, 1> m_graphTypeDescriptionIds;                     //!< All IDs used for the graph description.
+    static const std::unordered_map<Id, GraphTypeDescription> m_graphTypeDescription;  //!< All graph descriptions.
 
 public:
     //! Get all graph descriptions identified by its id.

@@ -10,11 +10,11 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "cefapp/AppCLArgs.hpp"
+#include "executionGraphGUI/cefapp/AppCLArgs.hpp"
 #include <cstdlib>
 #include <executionGraph/common/StringFormat.hpp>
 #include <iostream>
-#include "common/Exception.hpp"
+#include "executionGraphGUI/common/Exception.hpp"
 
 AppCLArgs::AppCLArgs(int argc, char* argv[])
     : executionGraph::CommandLineArguments(argc, argv, "ExecutionGUI Application", "No detailed description")

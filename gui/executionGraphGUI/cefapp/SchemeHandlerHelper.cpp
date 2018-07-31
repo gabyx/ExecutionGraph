@@ -10,9 +10,9 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "cefapp/SchemeHandlerHelper.hpp"
+#include "executionGraphGUI/cefapp/SchemeHandlerHelper.hpp"
 #include <executionGraph/common/FileSystem.hpp>
-#include "common/Exception.hpp"
+#include "executionGraphGUI/common/Exception.hpp"
 
 namespace schemeHandlerHelper
 {

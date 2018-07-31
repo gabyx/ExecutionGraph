@@ -14,10 +14,10 @@
 #include <foonathan/memory/heap_allocator.hpp>
 #include <foonathan/memory/smart_ptr.hpp>
 #include <memory>
-#include "cefapp/BackendRequestDispatcher.hpp"
-#include "cefapp/BackendResourceHandler.hpp"
-#include "common/BufferPool.hpp"
-#include "common/Loggers.hpp"
+#include "executionGraphGUI/cefapp/BackendRequestDispatcher.hpp"
+#include "executionGraphGUI/cefapp/BackendResourceHandler.hpp"
+#include "executionGraphGUI/common/BufferPool.hpp"
+#include "executionGraphGUI/common/Loggers.hpp"
 
 using namespace foonathan::memory;
 

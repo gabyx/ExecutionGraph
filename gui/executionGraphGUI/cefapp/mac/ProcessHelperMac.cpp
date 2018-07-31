@@ -12,7 +12,7 @@
 
 #include <cef_app.h>
 #include <iostream>
-#include "cefapp/RendererApp.hpp"
+#include "executionGraphGUI/cefapp/RendererApp.hpp"
 
 namespace
 {

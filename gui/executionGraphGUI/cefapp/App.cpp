@@ -19,16 +19,16 @@
 #include <views/cef_browser_view.h>
 #include <views/cef_window.h>
 #include <wrapper/cef_helpers.h>
-#include "backend/BackendFactory.hpp"
-#include "backend/ExecutionGraphBackend.hpp"
-#include "cefapp/AppHandler.hpp"
-#include "cefapp/BackendRequestDispatcher.hpp"
-#include "cefapp/BackendRequestDispatcherAdapterCef.hpp"
-#include "cefapp/BackendResourceHandler.hpp"
-#include "cefapp/BackendSchemeHandlerFactory.hpp"
-#include "cefapp/ClientSchemeHandlerFactory.hpp"
-#include "cefapp/SchemeHandlerHelper.hpp"
-#include "common/Exception.hpp"
+#include "executionGraphGUI/backend/BackendFactory.hpp"
+#include "executionGraphGUI/backend/ExecutionGraphBackend.hpp"
+#include "executionGraphGUI/cefapp/AppHandler.hpp"
+#include "executionGraphGUI/cefapp/BackendRequestDispatcher.hpp"
+#include "executionGraphGUI/cefapp/BackendRequestDispatcherAdapterCef.hpp"
+#include "executionGraphGUI/cefapp/BackendResourceHandler.hpp"
+#include "executionGraphGUI/cefapp/BackendSchemeHandlerFactory.hpp"
+#include "executionGraphGUI/cefapp/ClientSchemeHandlerFactory.hpp"
+#include "executionGraphGUI/cefapp/SchemeHandlerHelper.hpp"
+#include "executionGraphGUI/common/Exception.hpp"
 
 namespace
 {

@@ -10,4 +10,4 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "backend/BackendRequestHandler.hpp"
+#include "executionGraphGUI/backend/BackendRequestHandler.hpp"

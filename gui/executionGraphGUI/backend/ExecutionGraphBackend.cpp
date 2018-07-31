@@ -10,11 +10,12 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "backend/ExecutionGraphBackend.hpp"
-#include "backend/ExecutionGraphBackendDefs.hpp"
-#include "common/Exception.hpp"
+#include "executionGraphGUI/backend/ExecutionGraphBackend.hpp"
+#include "executionGraphGUI/backend/ExecutionGraphBackendDefs.hpp"
+#include "executionGraphGUI/common/Exception.hpp"
 
 using Id                   = ExecutionGraphBackend::Id;
+using IdNamed              = ExecutionGraphBackend::IdNamed;
 using GraphTypeDescription = ExecutionGraphBackend::GraphTypeDescription;
 using DefaultGraph         = ExecutionGraphBackend::DefaultGraph;
 using DefaultGraphConfig   = typename DefaultGraph::Config;
@@ -37,8 +38,8 @@ namespace
 
 //! Define all description Ids for the different graphs.
 //! Default graph type has always this unique id!
-const std::array<Id, 1> ExecutionGraphBackend::m_graphTypeDescriptionIds = {Id{"DefaultGraph",
-                                                                               std::string("2992ebff-c950-4184-8876-5fe6ac029aa5")}};
+const std::array<IdNamed, 1> ExecutionGraphBackend::m_graphTypeDescriptionIds = {IdNamed{"DefaultGraph",
+                                                                                         std::string("2992ebff-c950-4184-8876-5fe6ac029aa5")}};
 //! Define all graph types in this Backend
 //! Currently only the DefaultGraphConfig is added.
 const std::unordered_map<Id, GraphTypeDescription>
@@ -53,23 +54,23 @@ void ExecutionGraphBackend::addGraph(const Id& graphId, const Id& graphType)
     if(graphType == m_graphTypeDescriptionIds[0])
     {
         EXECGRAPHGUI_THROW_EXCEPTION_IF(m_graphs.find(graphId) != m_graphs.end(),
-                                        "Graph id '" << std::string(graphId) << "' already exists!");
+                                        "Graph id '" << graphId.toString() << "' already exists!");
 
         m_graphs.emplace(std::make_pair(graphId, DefaultGraph{}));
     }
     else
     {
-        EXECGRAPHGUI_THROW_EXCEPTION("Graph type '" << std::string(graphType)
+        EXECGRAPHGUI_THROW_EXCEPTION("Graph type '" << graphType.toString()
                                                     << "' not available for adding!");
     }
 }
 
 //! Remove a graph with id `graphId` from the backend.
-void ExecutionGraphBackend::removeGraph(const Id& id)
+void ExecutionGraphBackend::removeGraph(const Id& graphId)
 {
-    auto nErased = m_graphs.erase(id);
+    auto nErased = m_graphs.erase(graphId);
     EXECGRAPHGUI_THROW_EXCEPTION_IF(nErased == 0,
-                                    "No such graph with id: '" << std::string(id) << "' removed!");
+                                    "No such graph with id: '" << graphId.toString() << "' removed!");
 }
 
 //! Remove all graphs from the backend.

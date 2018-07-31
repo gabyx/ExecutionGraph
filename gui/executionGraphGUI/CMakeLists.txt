@@ -114,7 +114,7 @@ endif()
 
 
 set(ExecutionGraphGUI_INC_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../
 )
 
 # Configure the client application

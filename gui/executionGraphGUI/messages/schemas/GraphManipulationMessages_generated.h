@@ -17,13 +17,11 @@ namespace serialization {
 
 struct NodeConstructionInfo;
 
-struct AddNodesRequest;
+struct AddNodeRequest;
 
-struct AddNodesResponse;
+struct AddNodeResponse;
 
-struct RemoveNodesRequest;
-
-struct RemoveNodesResponse;
+struct RemoveNodeRequest;
 
 struct NodeConstructionInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
@@ -102,204 +100,172 @@ inline flatbuffers::Offset<NodeConstructionInfo> CreateNodeConstructionInfoDirec
       constructor ? _fbb.CreateVector<flatbuffers::Offset<ConstructorKV>>(*constructor) : 0);
 }
 
-struct AddNodesRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+struct AddNodeRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_NODES = 4
+    VT_GRAPHID = 4,
+    VT_NODE = 6
   };
-  const flatbuffers::Vector<flatbuffers::Offset<NodeConstructionInfo>> *nodes() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<NodeConstructionInfo>> *>(VT_NODES);
+  const flatbuffers::String *graphId() const {
+    return GetPointer<const flatbuffers::String *>(VT_GRAPHID);
+  }
+  const NodeConstructionInfo *node() const {
+    return GetPointer<const NodeConstructionInfo *>(VT_NODE);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_NODES) &&
-           verifier.Verify(nodes()) &&
-           verifier.VerifyVectorOfTables(nodes()) &&
+           VerifyOffsetRequired(verifier, VT_GRAPHID) &&
+           verifier.Verify(graphId()) &&
+           VerifyOffsetRequired(verifier, VT_NODE) &&
+           verifier.VerifyTable(node()) &&
            verifier.EndTable();
   }
 };
 
-struct AddNodesRequestBuilder {
+struct AddNodeRequestBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_nodes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<NodeConstructionInfo>>> nodes) {
-    fbb_.AddOffset(AddNodesRequest::VT_NODES, nodes);
+  void add_graphId(flatbuffers::Offset<flatbuffers::String> graphId) {
+    fbb_.AddOffset(AddNodeRequest::VT_GRAPHID, graphId);
   }
-  explicit AddNodesRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  void add_node(flatbuffers::Offset<NodeConstructionInfo> node) {
+    fbb_.AddOffset(AddNodeRequest::VT_NODE, node);
+  }
+  explicit AddNodeRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  AddNodesRequestBuilder &operator=(const AddNodesRequestBuilder &);
-  flatbuffers::Offset<AddNodesRequest> Finish() {
+  AddNodeRequestBuilder &operator=(const AddNodeRequestBuilder &);
+  flatbuffers::Offset<AddNodeRequest> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<AddNodesRequest>(end);
+    auto o = flatbuffers::Offset<AddNodeRequest>(end);
+    fbb_.Required(o, AddNodeRequest::VT_GRAPHID);
+    fbb_.Required(o, AddNodeRequest::VT_NODE);
     return o;
   }
 };
 
-inline flatbuffers::Offset<AddNodesRequest> CreateAddNodesRequest(
+inline flatbuffers::Offset<AddNodeRequest> CreateAddNodeRequest(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<NodeConstructionInfo>>> nodes = 0) {
-  AddNodesRequestBuilder builder_(_fbb);
-  builder_.add_nodes(nodes);
+    flatbuffers::Offset<flatbuffers::String> graphId = 0,
+    flatbuffers::Offset<NodeConstructionInfo> node = 0) {
+  AddNodeRequestBuilder builder_(_fbb);
+  builder_.add_node(node);
+  builder_.add_graphId(graphId);
   return builder_.Finish();
 }
 
-inline flatbuffers::Offset<AddNodesRequest> CreateAddNodesRequestDirect(
+inline flatbuffers::Offset<AddNodeRequest> CreateAddNodeRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<flatbuffers::Offset<NodeConstructionInfo>> *nodes = nullptr) {
-  return executionGraphGUI::serialization::CreateAddNodesRequest(
+    const char *graphId = nullptr,
+    flatbuffers::Offset<NodeConstructionInfo> node = 0) {
+  return executionGraphGUI::serialization::CreateAddNodeRequest(
       _fbb,
-      nodes ? _fbb.CreateVector<flatbuffers::Offset<NodeConstructionInfo>>(*nodes) : 0);
+      graphId ? _fbb.CreateString(graphId) : 0,
+      node);
 }
 
-struct AddNodesResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+struct AddNodeResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_NODES = 4
+    VT_NODE = 4
   };
-  const flatbuffers::Vector<flatbuffers::Offset<NodeDescription>> *nodes() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<NodeDescription>> *>(VT_NODES);
+  const NodeDescription *node() const {
+    return GetPointer<const NodeDescription *>(VT_NODE);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffsetRequired(verifier, VT_NODES) &&
-           verifier.Verify(nodes()) &&
-           verifier.VerifyVectorOfTables(nodes()) &&
+           VerifyOffsetRequired(verifier, VT_NODE) &&
+           verifier.VerifyTable(node()) &&
            verifier.EndTable();
   }
 };
 
-struct AddNodesResponseBuilder {
+struct AddNodeResponseBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_nodes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<NodeDescription>>> nodes) {
-    fbb_.AddOffset(AddNodesResponse::VT_NODES, nodes);
+  void add_node(flatbuffers::Offset<NodeDescription> node) {
+    fbb_.AddOffset(AddNodeResponse::VT_NODE, node);
   }
-  explicit AddNodesResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  explicit AddNodeResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  AddNodesResponseBuilder &operator=(const AddNodesResponseBuilder &);
-  flatbuffers::Offset<AddNodesResponse> Finish() {
+  AddNodeResponseBuilder &operator=(const AddNodeResponseBuilder &);
+  flatbuffers::Offset<AddNodeResponse> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<AddNodesResponse>(end);
-    fbb_.Required(o, AddNodesResponse::VT_NODES);
+    auto o = flatbuffers::Offset<AddNodeResponse>(end);
+    fbb_.Required(o, AddNodeResponse::VT_NODE);
     return o;
   }
 };
 
-inline flatbuffers::Offset<AddNodesResponse> CreateAddNodesResponse(
+inline flatbuffers::Offset<AddNodeResponse> CreateAddNodeResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<NodeDescription>>> nodes = 0) {
-  AddNodesResponseBuilder builder_(_fbb);
-  builder_.add_nodes(nodes);
+    flatbuffers::Offset<NodeDescription> node = 0) {
+  AddNodeResponseBuilder builder_(_fbb);
+  builder_.add_node(node);
   return builder_.Finish();
 }
 
-inline flatbuffers::Offset<AddNodesResponse> CreateAddNodesResponseDirect(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<flatbuffers::Offset<NodeDescription>> *nodes = nullptr) {
-  return executionGraphGUI::serialization::CreateAddNodesResponse(
-      _fbb,
-      nodes ? _fbb.CreateVector<flatbuffers::Offset<NodeDescription>>(*nodes) : 0);
-}
-
-struct RemoveNodesRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+struct RemoveNodeRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_IDS = 4
+    VT_GRAPHID = 4,
+    VT_ID = 6
   };
-  const flatbuffers::Vector<uint64_t> *ids() const {
-    return GetPointer<const flatbuffers::Vector<uint64_t> *>(VT_IDS);
+  const flatbuffers::String *graphId() const {
+    return GetPointer<const flatbuffers::String *>(VT_GRAPHID);
+  }
+  uint64_t id() const {
+    return GetField<uint64_t>(VT_ID, 0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffsetRequired(verifier, VT_IDS) &&
-           verifier.Verify(ids()) &&
+           VerifyOffsetRequired(verifier, VT_GRAPHID) &&
+           verifier.Verify(graphId()) &&
+           VerifyField<uint64_t>(verifier, VT_ID) &&
            verifier.EndTable();
   }
 };
 
-struct RemoveNodesRequestBuilder {
+struct RemoveNodeRequestBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_ids(flatbuffers::Offset<flatbuffers::Vector<uint64_t>> ids) {
-    fbb_.AddOffset(RemoveNodesRequest::VT_IDS, ids);
+  void add_graphId(flatbuffers::Offset<flatbuffers::String> graphId) {
+    fbb_.AddOffset(RemoveNodeRequest::VT_GRAPHID, graphId);
   }
-  explicit RemoveNodesRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  void add_id(uint64_t id) {
+    fbb_.AddElement<uint64_t>(RemoveNodeRequest::VT_ID, id, 0);
+  }
+  explicit RemoveNodeRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  RemoveNodesRequestBuilder &operator=(const RemoveNodesRequestBuilder &);
-  flatbuffers::Offset<RemoveNodesRequest> Finish() {
+  RemoveNodeRequestBuilder &operator=(const RemoveNodeRequestBuilder &);
+  flatbuffers::Offset<RemoveNodeRequest> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<RemoveNodesRequest>(end);
-    fbb_.Required(o, RemoveNodesRequest::VT_IDS);
+    auto o = flatbuffers::Offset<RemoveNodeRequest>(end);
+    fbb_.Required(o, RemoveNodeRequest::VT_GRAPHID);
     return o;
   }
 };
 
-inline flatbuffers::Offset<RemoveNodesRequest> CreateRemoveNodesRequest(
+inline flatbuffers::Offset<RemoveNodeRequest> CreateRemoveNodeRequest(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<uint64_t>> ids = 0) {
-  RemoveNodesRequestBuilder builder_(_fbb);
-  builder_.add_ids(ids);
+    flatbuffers::Offset<flatbuffers::String> graphId = 0,
+    uint64_t id = 0) {
+  RemoveNodeRequestBuilder builder_(_fbb);
+  builder_.add_id(id);
+  builder_.add_graphId(graphId);
   return builder_.Finish();
 }
 
-inline flatbuffers::Offset<RemoveNodesRequest> CreateRemoveNodesRequestDirect(
+inline flatbuffers::Offset<RemoveNodeRequest> CreateRemoveNodeRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<uint64_t> *ids = nullptr) {
-  return executionGraphGUI::serialization::CreateRemoveNodesRequest(
+    const char *graphId = nullptr,
+    uint64_t id = 0) {
+  return executionGraphGUI::serialization::CreateRemoveNodeRequest(
       _fbb,
-      ids ? _fbb.CreateVector<uint64_t>(*ids) : 0);
-}
-
-struct RemoveNodesResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
-    VT_IDS = 4
-  };
-  const flatbuffers::Vector<uint64_t> *ids() const {
-    return GetPointer<const flatbuffers::Vector<uint64_t> *>(VT_IDS);
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_IDS) &&
-           verifier.Verify(ids()) &&
-           verifier.EndTable();
-  }
-};
-
-struct RemoveNodesResponseBuilder {
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_ids(flatbuffers::Offset<flatbuffers::Vector<uint64_t>> ids) {
-    fbb_.AddOffset(RemoveNodesResponse::VT_IDS, ids);
-  }
-  explicit RemoveNodesResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  RemoveNodesResponseBuilder &operator=(const RemoveNodesResponseBuilder &);
-  flatbuffers::Offset<RemoveNodesResponse> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<RemoveNodesResponse>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<RemoveNodesResponse> CreateRemoveNodesResponse(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<uint64_t>> ids = 0) {
-  RemoveNodesResponseBuilder builder_(_fbb);
-  builder_.add_ids(ids);
-  return builder_.Finish();
-}
-
-inline flatbuffers::Offset<RemoveNodesResponse> CreateRemoveNodesResponseDirect(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<uint64_t> *ids = nullptr) {
-  return executionGraphGUI::serialization::CreateRemoveNodesResponse(
-      _fbb,
-      ids ? _fbb.CreateVector<uint64_t>(*ids) : 0);
+      graphId ? _fbb.CreateString(graphId) : 0,
+      id);
 }
 
 }  // namespace serialization

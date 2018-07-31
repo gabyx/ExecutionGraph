@@ -19,10 +19,10 @@
 #include <meta/meta.hpp>
 #include <unordered_set>
 #include <vector>
-#include "common/Exception.hpp"
-#include "common/Loggers.hpp"
-#include "common/Request.hpp"
-#include "common/Response.hpp"
+#include "executionGraphGUI/common/Exception.hpp"
+#include "executionGraphGUI/common/Loggers.hpp"
+#include "executionGraphGUI/common/Request.hpp"
+#include "executionGraphGUI/common/Response.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -86,9 +86,9 @@ public:
         const auto& requestTypes = handler->getRequestTypes();
         EXECGRAPHGUI_THROW_EXCEPTION_IF(!handler || requestTypes.size() == 0, "nullptr or no requestTypes");
 
-        Id id = handler->getId();
+        const Id& id = handler->getId();
         EXECGRAPHGUI_THROW_EXCEPTION_IF(m_handlerStorage.find(id) != m_handlerStorage.end(),
-                                        "MessageHandler with id: " << id.getUniqueName() << " already exists!");
+                                        "MessageHandler with id: " << id.toString() << " already exists!");
 
         auto p = m_handlerStorage.emplace(id, HandlerData{requestTypes, handler});
 
@@ -197,14 +197,14 @@ private:
                 if(!m_response->isResolved())
                 {
                     EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: Request id: '{0}' (url: '{1}') has not been handled correctly, it will be cancled!",
-                                                 m_request->getId().getUniqueName(),
+                                                 m_request->getId().toString(),
                                                  requestType);
                 }
             }
             else
             {
                 EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: No handler found for request id: '{0}' (url: '{1}')!, it will be cancled!",
-                                             m_request->getId().getUniqueName(),
+                                             m_request->getId().toString(),
                                              requestType);
             }
         };
@@ -212,7 +212,7 @@ private:
         void onTaskException(std::exception_ptr e)
         {
             EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: Request id: '{0}' (url: '{1}') has thrown exception, it will be cancled!",
-                                         m_request->getId().getUniqueName(),
+                                         m_request->getId().toString(),
                                          m_request->getURL().string());
             m_response->setCanceled(e);
         };
@@ -265,7 +265,7 @@ private:
             else
             {
                 EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: No handler found for request id: '{0}'!, it will be cancled!",
-                                             m_request->getId().getUniqueName());
+                                             m_request->getId().toString());
             }
         }
 

@@ -18,9 +18,9 @@
 #include <memory>
 #include <rttr/type>
 #include <string>
-#include "common/BinaryPayload.hpp"
-#include "common/BufferPool.hpp"
-#include "common/Loggers.hpp"
+#include "executionGraphGUI/common/BinaryPayload.hpp"
+#include "executionGraphGUI/common/BufferPool.hpp"
+#include "executionGraphGUI/common/Loggers.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -54,7 +54,7 @@ public:
     using Id        = executionGraph::Id;
 
 protected:
-    ResponsePromise(Id requestId,
+    ResponsePromise(const Id& requestId,
                     std::shared_ptr<Allocator> allocator,
                     bool bCancelOnDestruction = true)
         : m_requestId(requestId)
@@ -90,7 +90,7 @@ public:
     {
         if(m_state != State::Nothing)
         {
-            EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', is already set to a state!", m_requestId.getUniqueName());
+            EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', is already set to a state!", m_requestId.toString());
             return;
         }
         m_state = State::Ready;
@@ -103,7 +103,7 @@ public:
     {
         if(m_state != State::Nothing)
         {
-            EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', is already set to a state!", m_requestId.getUniqueName());
+            EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', is already set to a state!", m_requestId.toString());
             return;
         }
         m_state = State::Canceled;
@@ -128,7 +128,7 @@ protected:
         {
             if(m_bCancelOnDestruction)
             {
-                EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', has not been resolved. It will be cancled!", m_requestId.getUniqueName());
+                EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', has not been resolved. It will be cancled!", m_requestId.toString());
                 setCanceled(std::make_exception_ptr(std::runtime_error("Cancled promise on destruction, because not handled properly!")));
             }
         }

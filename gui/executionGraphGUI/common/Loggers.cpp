@@ -10,8 +10,8 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "common/Loggers.hpp"
-#include "common/Exception.hpp"
+#include "executionGraphGUI/common/Loggers.hpp"
+#include "executionGraphGUI/common/Exception.hpp"
 
 Loggers::Loggers(const std::path& logPath)
 {

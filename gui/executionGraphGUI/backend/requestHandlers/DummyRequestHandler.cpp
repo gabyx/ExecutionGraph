@@ -10,10 +10,10 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "backend/requestHandlers/DummyRequestHandler.hpp"
+#include "executionGraphGUI/backend/requestHandlers/DummyRequestHandler.hpp"
 #include <chrono>
-#include "common/Exception.hpp"
-#include "common/Loggers.hpp"
+#include "executionGraphGUI/common/Exception.hpp"
+#include "executionGraphGUI/common/Loggers.hpp"
 
 namespace
 {

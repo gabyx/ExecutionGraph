@@ -10,14 +10,14 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "backend/requestHandlers/GeneralInfoRequestHandler.hpp"
+#include "executionGraphGUI/backend/requestHandlers/GeneralInfoRequestHandler.hpp"
 #include <chrono>
 #include <vector>
-#include "backend/ExecutionGraphBackend.hpp"
-#include "common/AllocatorProxyFlatBuffer.hpp"
-#include "common/Exception.hpp"
-#include "common/Loggers.hpp"
-#include "messages/schemas/GeneralInfoMessages_generated.h"
+#include "executionGraphGUI/backend/ExecutionGraphBackend.hpp"
+#include "executionGraphGUI/common/AllocatorProxyFlatBuffer.hpp"
+#include "executionGraphGUI/common/Exception.hpp"
+#include "executionGraphGUI/common/Loggers.hpp"
+#include "executionGraphGUI/messages/schemas/GeneralInfoMessages_generated.h"
 
 namespace fl = flatbuffers;
 namespace s  = executionGraphGUI::serialization;
@@ -36,7 +36,7 @@ const FunctionMap<GeneralInfoRequestHandler::Function> GeneralInfoRequestHandler
 
 //! Konstructor.
 GeneralInfoRequestHandler::GeneralInfoRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,
-                                                     const Id& id)
+                                                     const IdNamed& id)
     : BackendRequestHandler(id)
 {
 }
@@ -77,7 +77,6 @@ void GeneralInfoRequestHandler::handleGetAllGraphTypeDescriptions(const Request&
 
     for(auto& kV : m_backend->getGraphTypeDescriptions())
     {
-        auto& id                                          = kV.first;
         ExecutionGraphBackend::GraphTypeDescription& desc = kV.second;
 
         // Node descriptions
@@ -99,8 +98,8 @@ void GeneralInfoRequestHandler::handleGetAllGraphTypeDescriptions(const Request&
         }
 
         graphs.emplace_back(s::CreateGraphTypeDescriptionDirect(builder,
-                                                                id.getName().c_str(),
-                                                                id.getUniqueName().c_str(),
+                                                                desc.m_id.getShortName().c_str(),
+                                                                desc.m_id.toString().c_str(),
                                                                 &nodes,
                                                                 &sockets));
     }

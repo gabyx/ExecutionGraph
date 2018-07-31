@@ -15,8 +15,8 @@
 
 #include <flatbuffers/flatbuffers.h>
 #include <memory>
-#include "common/BufferPool.hpp"
-#include "common/Exception.hpp"
+#include "executionGraphGUI/common/BufferPool.hpp"
+#include "executionGraphGUI/common/Exception.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!

@@ -18,45 +18,44 @@ namespace executionGraphGUI.serialization;
 table NodeConstructionInfo {
     type:string (id: 0, required);          //!< The rtti of the logic node.
     name:string (id: 1);                    //!< The name of the logic node.
-    constructor:[ConstructorKV] (id: 2);    //!< Key-value pairs for the cosntructor.
+    constructor:[ConstructorKV] (id: 2);    //!< Key-value pairs for the cosntructor. (not yet used)
 }
 
 //! ======================================================================
-//! Message "graph/addNodes"
+//! Message "graph/addNode"
 //! ======================================================================
 //! Request data:
-table AddNodesRequest {
-    nodes:[NodeConstructionInfo] (id:0); //!< List of logic node construction infos.
+table AddNodeRequest {
+    graphId:string (id:0, required);            //!< The graph guid.
+    node:NodeConstructionInfo (id:1, required); //!< Node construction infos.
 }
 //! Response data:
-//! Rollback semantics are guaranteed: 
-//!  - if `AddNodesResponse` data with `nodes` containing as many `LogicNodeInfos` 
-//!    as in the request data => success.
-//!  - if no `AddNodesResponse` data => no success: 
-//!    error string in response header:
-//!      - error: see error description in status text        => backend consistency guarantee
-//!      - fatal: if status code 500 : internal backend error => no backend consistency guarantee
-table AddNodesResponse {
-    nodes:[NodeDescription] (id:0, required);
+//! Success: 
+//    - status code: 200 (OK)
+//! Valid Errors:
+//!   - status code: 400 (Bad Request)
+//!     - graph id is not found
+//!     - type not valid
+//!     - bad constructor arguments
+table AddNodeResponse {
+    node:NodeDescription (id:0, required);
 }
 //! ======================================================================
 
 //! ======================================================================
-//! Message "graph/removeNodes"
+//! Message "graph/removeNode"
 //! ======================================================================
-//! Request data:
-//! Exception if `ids` is not a unique set of ids.
-table RemoveNodesRequest {
-    ids:[uint64] (id:0, required); //!< Set of logic node ids to remove from the graph.
+//! Request data: 
+table RemoveNodeRequest {
+    graphId:string (id:0, required);  //!< The graph guid.
+    id:uint64 (id:1);                 //!< The node id to remove from the graph.
 }
-//! Response data:
-//!  - if `RemoveNodesResponse` data with `ids` containing as many entries
-//!    as in the request data => success.
-//!  - if no `RemoveNodesResponse` data => no success: 
-//!    error string in response header:
-//!      - error: see error description in status text        => backend consistency guarantee
-//!      - fatal: if status code 500 : internal backend error => no backend consistency guarantee
-table RemoveNodesResponse {
-    ids:[uint64] (id:0);
-}
+
+//! Response data: none
+//! Success: 
+//    - status code: 204 (No Content)
+//! Valid Errors:
+//!   - status code: 400 (Bad Request)
+//!     - node id is not found
+//!     - graph id is not found
 //! ======================================================================

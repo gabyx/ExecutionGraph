@@ -16,9 +16,9 @@
 #include <executionGraph/nodes/LogicCommon.hpp>
 #include <meta/meta.hpp>
 #include <rttr/type>
-#include "backend/nodes/DummyNode.hpp"
-#include "backend/nodes/NodeTypeDescription.hpp"
-#include "backend/nodes/SocketTypeDescription.hpp"
+#include "executionGraphGUI/backend/nodes/DummyNode.hpp"
+#include "executionGraphGUI/backend/nodes/NodeTypeDescription.hpp"
+#include "executionGraphGUI/backend/nodes/SocketTypeDescription.hpp"
 
 template<typename TConfig>
 class ExecutionGraphBackendDefs;
