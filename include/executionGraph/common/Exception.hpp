@@ -11,6 +11,8 @@
 #define executionGraph_Common_Exception_hpp
 
 #include <exception>
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -22,11 +24,41 @@
 
 namespace executionGraph
 {
+    namespace details
+    {
+        template<typename Type, typename Message, typename... Args>
+        void throwException(Message&& message, Args&&... args)
+        {
+            if constexpr(sizeof...(Args) > 0)
+            {
+                throw Type(fmt::format(message, std::forward<Args>(args)...));
+            }
+            else
+            {
+                throw Type(message);
+            }
+        }
+    }  // namespace details
+}  // namespace executionGraph
+
+#define EXECGRAPH_THROW_EXCEPTION_TYPE(Type, ...) executionGraph::details::throwException<Type>(__VA_ARGS__);
+
+#define EXECGRAPH_THROW_EXCEPTION_TYPE_IF(condition, Type, ...)     \
+    if(condition)                                                   \
+    {                                                               \
+        executionGraph::details::throwException<Type>(__VA_ARGS__); \
+    }
+
+#define EXECGRAPH_THROW_EXCEPTION(...) EXECGRAPH_THROW_EXCEPTION_TYPE(executionGraph::Exception, __VA_ARGS__)
+#define EXECGRAPH_THROW_EXCEPTION_IF(condition, ...) EXECGRAPH_THROW_EXCEPTION_TYPE_IF(condition, executionGraph::Exception, __VA_ARGS__)
+
+namespace executionGraph
+{
     class Exception : public std::runtime_error
     {
     public:
-        Exception(const std::stringstream& ss)
-            : std::runtime_error(ss.str()) {}
+        Exception(const std::string& s)
+            : std::runtime_error(s) {}
         // we dont need a virtual dtor, the std destroys the exception correctly.
         // https://stackoverflow.com/questions/28353708/exception-with-non-virtual-destructor-c
     };
@@ -34,47 +66,27 @@ namespace executionGraph
     class NodeConnectionException final : public Exception
     {
     public:
-        NodeConnectionException(const std::stringstream& ss)
-            : Exception(ss) {}
+        NodeConnectionException(const std::string& s)
+            : Exception(s) {}
     };
 
     class ExecutionGraphCycleException final : public Exception
     {
     public:
-        ExecutionGraphCycleException(const std::stringstream& ss)
-            : Exception(ss) {}
+        ExecutionGraphCycleException(const std::string& s)
+            : Exception(s) {}
     };
 
     class BadSocketCastException final : public Exception
     {
     public:
-        BadSocketCastException(const std::stringstream& ss)
-            : Exception(ss) {}
+        BadSocketCastException(const std::string& s)
+            : Exception(s) {}
     };
 }  // namespace executionGraph
 
-// clang-format off
-#define EXECGRAPH_THROW_EXCEPTION_TYPE(message, type)                         \
-    {                                                                         \
-        std::stringstream ___s___;                                            \
-        ___s___ << message << std::endl                                       \
-                << " @ " << __FILE__ << " (" << __LINE__ << ")" << std::endl; \
-        throw executionGraph::type(___s___);                                  \
-    }
-
-#define EXECGRAPH_THROW_EXCEPTION_TYPE_IF(condition, message, type) \
-    if(condition)                                                   \
-    {                                                               \
-        EXECGRAPH_THROW_EXCEPTION_TYPE(message, type);              \
-    }
-
-#define EXECGRAPH_THROW_EXCEPTION(message) EXECGRAPH_THROW_EXCEPTION_TYPE(message, Exception)
-#define EXECGRAPH_THROW_EXCEPTION_IF(condition, message) EXECGRAPH_THROW_EXCEPTION_TYPE_IF(condition, message, Exception)
-
-
-#ifdef __clang__
-#   pragma clang diagnostic pop
-#endif
-// clang-format on
+#    ifdef __clang__
+#        pragma clang diagnostic pop
+#    endif
 
 #endif

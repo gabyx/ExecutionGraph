@@ -108,7 +108,7 @@ int main()
     execTree.setup();
     EXECGRAPH_LOG_INFO(execTree.getExecutionOrderInfo());
     // Execute the default group 0
-    execTree.execute(0);
+    execTree.runExecute(0);
 
     EXECGRAPH_LOG_INFO("Result : " << resultNode->getOutVal<IntegerNode<Config>::Result1>());
 }

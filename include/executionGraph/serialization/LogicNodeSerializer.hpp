@@ -56,38 +56,46 @@ namespace executionGraph
             ~LogicNodeSerializer() = default;
 
         public:
-            //! Load a logic node from a `flatbuffers::Offset`.
+            //! Main load function for a logic node.
+            //! It first tries to construct it by the factory
+            //! and uses RTTR construction as a fallback.
             static std::unique_ptr<NodeBaseType>
-            read(const serialization::LogicNode& logicNode)
+            read(const std::string& type,
+                 NodeId nodeId,
+                 flatbuffers::Vector<uint8_t>* additionalData = nullptr)
             {
-                std::string type = logicNode.type()->str();
                 // Dispatch to the correct serialization read function
                 // the factory reads and returns the logic node
                 auto rttrType = rttr::type::get_by_name(type);
-                auto optNode  = FactoryRead::create(rttrType, logicNode);
+                auto optNode  = FactoryRead::create(rttrType, nodeId, additionalData);
                 if(optNode)
                 {
                     return std::move(*optNode);
                 }
                 else
                 {
+                    EXECGRAPH_THROW_EXCEPTION_IF(additionalData != nullptr,
+                                                 "Cannot construct type: '{0}' without ReadFactory (add data!)!",
+                                                 type)
                     // try to construct over RTTR
-                    EXECGRAPH_THROW_EXCEPTION_IF(!rttrType.is_derived_from(rttr::type::get<NodeBaseType>()), "Type: " << type << "is not derived from NodeBaseType!"
-                                                                                                                                 "Did you correctly init RTTR?");
+                    EXECGRAPH_THROW_EXCEPTION_IF(!rttrType.is_derived_from(rttr::type::get<NodeBaseType>()),
+                                                 "Type: '{0}' is not derived from NodeBaseType!"
+                                                 "Did you correctly init RTTR?",
+                                                 type);
 
                     rttr::variant instance;
                     if(logicNode.name())
                     {
                         rttr::constructor ctor = rttrType.get_constructor({rttr::type::get<NodeId>(),
                                                                            rttr::type::get<const std::string&>()});
-                        EXECGRAPH_THROW_EXCEPTION_IF(!ctor.is_valid(), "Ctor is invalid for type: " << type);
-                        instance = ctor.invoke(logicNode.id(), logicNode.name()->str());
+                        EXECGRAPH_THROW_EXCEPTION_IF(!ctor.is_valid(), "Ctor is invalid for type: {0}", type);
+                        instance = ctor.invoke(nodeId, logicNode.name()->str());
                     }
                     else
                     {
                         rttr::constructor ctor = rttrType.get_constructor({rttr::type::get<NodeId>()});
-                        EXECGRAPH_THROW_EXCEPTION_IF(!ctor.is_valid(), "Ctor is invalid for type: " << type);
-                        instance = ctor.invoke(logicNode.id());
+                        EXECGRAPH_THROW_EXCEPTION_IF(!ctor.is_valid(), "Ctor is invalid for type: {0}" << type);
+                        instance = ctor.invoke(nodeId);
                     }
                     EXECGRAPH_LOG_DEBUG(instance.get_type().get_name().to_string());
                     EXECGRAPH_THROW_EXCEPTION_IF(!instance.is_valid(), "Variant instance is not valid!");
@@ -95,6 +103,13 @@ namespace executionGraph
 
                     return std::unique_ptr<NodeBaseType>{instance.get_value<NodeBaseType*>()};  // Return the instance
                 }
+            }
+
+            //! Load a logic node from a `serialization::LogicNode`.
+            static std::unique_ptr<NodeBaseType>
+            read(const serialization::LogicNode& logicNode)
+            {
+                return read(logicNode.type()->str(), logicNode.type()->str(), logicNode.data());
             }
 
             //! Store a logic node by using the builder `builder`.

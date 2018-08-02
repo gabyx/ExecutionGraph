@@ -18,8 +18,6 @@
 #    include <memory>
 #endif
 
-#include <regex>
-
 namespace executionGraph
 {
     namespace details

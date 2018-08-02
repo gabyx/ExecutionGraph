@@ -34,6 +34,7 @@ namespace
 
         return description;
     };
+
 }  // namespace
 
 //! Define all description Ids for the different graphs.
@@ -53,15 +54,18 @@ void ExecutionGraphBackend::addGraph(const Id& graphId, const Id& graphType)
 
     if(graphType == m_graphTypeDescriptionIds[0])
     {
-        EXECGRAPHGUI_THROW_EXCEPTION_IF(m_graphs.find(graphId) != m_graphs.end(),
-                                        "Graph id '" << graphId.toString() << "' already exists!");
+        EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(m_graphs.find(graphId) != m_graphs.end(),
+                                             BadRequestError
+                                             "Graph id '{0}' already exists!",
+                                             graphId.toString());
 
         m_graphs.emplace(std::make_pair(graphId, DefaultGraph{}));
     }
     else
     {
-        EXECGRAPHGUI_THROW_EXCEPTION("Graph type '" << graphType.toString()
-                                                    << "' not available for adding!");
+        EXECGRAPHGUI_THROW_EXCEPTION_TYPE(BadRequestError,
+                                          "Graph type: '{0}' not known!",
+                                          graphType.toString());
     }
 }
 
@@ -69,12 +73,29 @@ void ExecutionGraphBackend::addGraph(const Id& graphId, const Id& graphType)
 void ExecutionGraphBackend::removeGraph(const Id& graphId)
 {
     auto nErased = m_graphs.erase(graphId);
-    EXECGRAPHGUI_THROW_EXCEPTION_IF(nErased == 0,
-                                    "No such graph with id: '" << graphId.toString() << "' removed!");
+    EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(nErased == 0,
+                                         BadRequestError
+                                         "No such graph id: '{0}' removed!",
+                                         graphId.toString());
 }
 
 //! Remove all graphs from the backend.
 void ExecutionGraphBackend::removeGraphs()
 {
     m_graphs.clear();
+}
+
+//! Add a node with type `type` to the graph with id `graphId`.
+void addNode(const Id& graphId,
+             const std::string& type)
+{
+    auto graphIt = m_graphs.find(graphId);
+    EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(graphIt == m_graphs.end(),
+                                         BadRequestError,
+                                         "Graph id: '{0}' does not exist!",
+                                         graphId);
+}
+//! Remove a node with type `type` from the graph with id `graphId`.
+void removeNode(const Id& graphId, NodeId id)
+{
 }

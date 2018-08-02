@@ -22,14 +22,14 @@ namespace schemeHandlerHelper
     {
         for(auto& scheme : getCustomSchemes())
         {
-            EXECGRAPHGUI_THROW_EXCEPTION_IF(!registrar->AddCustomScheme(scheme,
-                                                                        true /* is standart*/,
-                                                                        false /* is local */,
-                                                                        false /* is display_isolated */,
-                                                                        true /* is secure */,
-                                                                        false /* is cors enabled*/,
-                                                                        false /* is_csp_bypassing*/),
-                                            "Scheme not registered!");
+            bool result = registrar->AddCustomScheme(scheme,
+                                                     true /* is standart*/,
+                                                     false /* is local */,
+                                                     false /* is display_isolated */,
+                                                     true /* is secure */,
+                                                     false /* is cors enabled*/,
+                                                     false /* is_csp_bypassing*/);
+            EXECGRAPHGUI_THROW_EXCEPTION_IF(!result, "Scheme not registered!");
         }
     }
 

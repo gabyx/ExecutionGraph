@@ -14,9 +14,11 @@
 #define executionGraphGUI_backend_ExecutionGraphBackendDefs_hpp
 
 #include <executionGraph/nodes/LogicCommon.hpp>
+#include <executionGraph/serialization/LogicNodeSerializer.hpp>
 #include <meta/meta.hpp>
 #include <rttr/type>
 #include "executionGraphGUI/backend/nodes/DummyNode.hpp"
+#include "executionGraphGUI/backend/nodes/DummyNodeSerializer.hpp"
 #include "executionGraphGUI/backend/nodes/NodeTypeDescription.hpp"
 #include "executionGraphGUI/backend/nodes/SocketTypeDescription.hpp"
 
@@ -57,15 +59,21 @@ namespace details
 
 }  // namespace details
 
-//! Definitions for default configuration
+//! Definitions for a graph with default configuration
 template<>
 class ExecutionGraphBackendDefs<executionGraph::GeneralConfig<>>
 {
 public:
+    //! The configuration traits.
     using Config = executionGraph::GeneralConfig<>;
-    //! All Nodes
+
+    //! List of all nodes available in this graph.
     using Nodes                         = meta::list<DummyNode<Config>>;
     static const std::size_t nNodeTypes = meta::size<Nodes>::value;
+
+    //! Node serializer for this graph.
+    using NodeSerializers = meta::list<DummyNodeSerializer>;
+    using NodeSerializer  = executionGraph::serialization::LogicNodeSerializer<Config, NodeSerializers>;
 
 private:
     static std::vector<NodeTypeDescription> initAllNodeTypeDescription()

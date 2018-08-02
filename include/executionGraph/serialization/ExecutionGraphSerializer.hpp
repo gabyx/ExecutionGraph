@@ -49,7 +49,8 @@ namespace executionGraph
 
         public:
             //! Read an execution graph from a file `filePath`.
-            std::unique_ptr<GraphType> read(const std::path& filePath) noexcept(false)
+            std::unique_ptr<GraphType>
+            read(const std::path& filePath) noexcept(false)
             {
                 m_filePath = filePath;
                 // Memory mapping the file
@@ -57,20 +58,25 @@ namespace executionGraph
                 const uint8_t* buffer = nullptr;
                 std::size_t size;
                 std::tie(buffer, size) = mapper.getData();
-                EXECGRAPH_ASSERT(buffer != nullptr, "FileMapper returned nullptr for file '" << m_filePath << "'");
+                EXECGRAPH_ASSERT(buffer != nullptr,
+                                 "FileMapper returned nullptr for file '{0}'",
+                                 m_filePath);
 
                 // Deserialize
                 EXECGRAPH_THROW_EXCEPTION_IF(!ExecutionGraphBufferHasIdentifier(buffer),
-                                             "File identifier in '" << m_filePath << "' not found!");
+                                             "File identifier in '{0}' not found!",
+                                             filePath);
 
                 flatbuffers::Verifier verifier(buffer, size, 64, 1000000000);
                 EXECGRAPH_THROW_EXCEPTION_IF(!VerifyExecutionGraphBuffer(verifier),
-                                             "Buffer in '" << m_filePath << "' could not be verified!");
+                                             "Buffer in '{0}' could not be verified!",
+                                             filePath);
 
                 auto graph = GetExecutionGraph(buffer);
 
                 EXECGRAPH_THROW_EXCEPTION_IF(graph == nullptr,
-                                             "Deserialization from '" << m_filePath << "' is invalid!");
+                                             "Deserialization from '{0}' is invalid!",
+                                             filePath);
 
                 auto execGraph = std::make_unique<GraphType>();
                 readGraph(*execGraph, *graph);
@@ -78,7 +84,9 @@ namespace executionGraph
             }
 
             //! Write an execution graph to the file `filePath`.
-            void write(const GraphType& execGraph, const std::path& filePath, bool bOverwrite = false) noexcept(false)
+            void write(const GraphType& execGraph,
+                       const std::path& filePath,
+                       bool bOverwrite = false) noexcept(false)
             {
                 flatbuffers::FlatBufferBuilder builder;
                 auto graphOffset = writeGraph(builder, execGraph);
@@ -86,7 +94,8 @@ namespace executionGraph
 
                 std::ofstream file;
                 EXECGRAPH_THROW_EXCEPTION_IF(!bOverwrite && std::filesystem::exists(filePath),
-                                             "File '" << filePath << "' already exists!");
+                                             "File '{0}' already exists!",
+                                             filePath);
 
                 file.open(filePath.string(), std::ios_base::trunc | std::ios_base::binary | std::ios_base::in);
                 file.write(reinterpret_cast<const char*>(builder.GetBufferPointer()), builder.GetSize());
@@ -96,7 +105,8 @@ namespace executionGraph
         private:
             //! Serialize a graph `graph` and return the offsets.
             flatbuffers::Offset<ExecutionGraph>
-            writeGraph(flatbuffers::FlatBufferBuilder& builder, const GraphType& execGraph) const
+            writeGraph(flatbuffers::FlatBufferBuilder& builder,
+                       const GraphType& execGraph) const
             {
                 flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<LogicNode>>> nodesOffset;
                 flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<ExecutionGraphNodeProperties>>> nodePropertiesOffset;
@@ -239,7 +249,7 @@ namespace executionGraph
                     }
                     else
                     {
-                        EXECGRAPH_THROW_EXCEPTION("Could not load node with id: " << node->id());
+                        EXECGRAPH_THROW_EXCEPTION("Could not load node with id: {0}", node->id());
                     }
                 }
             }

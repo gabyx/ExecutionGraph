@@ -53,9 +53,9 @@ namespace executionGraph
             }
             else
             {
-                EXECGRAPH_THROW_EXCEPTION_TYPE("Default output socket id: " << defaultOutSocketID
-                                                                            << "does not exist in default output socket pool!",
-                                               NodeConnectionException);
+                EXECGRAPH_THROW_EXCEPTION_TYPE(NodeConnectionException,
+                                               "Default output socket id: {0} does not exist in default output socket pool!",
+                                               defaultOutSocketID);
             }
         }
 

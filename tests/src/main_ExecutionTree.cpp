@@ -84,7 +84,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 
     EXECGRAPH_LOG_TRACE(execTree.getExecutionOrderInfo());
 
-    execTree.execute(0);
+    execTree.runExecute(0);
 
     EXECGRAPH_LOG_TRACE("Result : " << resultNode->getOutVal<DummyNode<Config>::Result1>());
 

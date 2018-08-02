@@ -167,6 +167,10 @@ list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "metaLib")
 # Try to find the spdlog
 find_package(SpdLogLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "spdlogLib")
+# Try to find the fmt library
+find_package(FmtLib REQUIRED)
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "fmtLib")
+
 # Try to find the Argumentparser
 find_package(ArgsLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "argsLib")

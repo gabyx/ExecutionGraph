@@ -19,6 +19,7 @@ if(NOT EXISTS "${cereal_INCLUDE_DIR}")
                     PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/cereal"
                     GIT_REPOSITORY      "${URL}"
                     GIT_TAG             master
+                    GIT_SHALLOW         ON
                     UPDATE_DISCONNECTED 1
     )
   
