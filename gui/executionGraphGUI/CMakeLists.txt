@@ -180,7 +180,7 @@ if(OS_MACOSX)
                                                      OUTPUT_NAME "${ExecutionGraphGUI_HELPER_TARGET_OUTPUTNAME}"
                                                      RUNTIME_OUTPUT_DIRECTORY "${ExecutionGraphGUI_TARGET_OUT_DIR}")
 
-    target_link_libraries(ExecutionGraphGUIHelper cefLib ExecutionGraph::Core-Headers ExecutionGraph::Core-Dependencies)
+    target_link_libraries(ExecutionGraphGUIHelper cefLib ExecutionGraph::Core-Headers fmtLib)
     
     # Fix the framework rpath in the helper executable.
     # The helper is in $app_name.app/Contents/Frameworks/$app_name Helper.app/Contents/MacOS/
