@@ -27,22 +27,21 @@ struct DummyNodeSerializer
     struct Writer
     {
         EXECGRAPH_TYPEDEF_CONFIG(TConfig);
-
         using Key = DummyNodeType;
 
         static std::pair<const uint8_t*, std::size_t>
         create(flatbuffers::FlatBufferBuilder& builder,
                const NodeBaseType& node)
         {
-            return {nullptr, __AVAILABILITY_INTERNAL__MAC_10_0};
+            return {nullptr, 0};
         }
     };
+
     //! Factory functor which creates the DummyNode from a serialized
     //! buffer `node`.
     struct Reader
     {
         EXECGRAPH_TYPEDEF_CONFIG(TConfig);
-
         using Key = DummyNodeType;
 
         static std::unique_ptr<NodeBaseType>
