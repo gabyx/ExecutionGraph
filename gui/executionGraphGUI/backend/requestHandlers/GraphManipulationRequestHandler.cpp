@@ -67,9 +67,15 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
                                                     ResponsePromise& response)
 {
     // Request validation
-    EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(request->getPayload() == nullptr,
-                                         "Request data is null!",
-                                         BadRequestError);
+    auto* payload = request->getPayload();
+    EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(payload == nullptr,
+                                         BadRequestError,
+                                         "Request data is null!", );
+
+    auto nodeReq = getRootOfPayloadAndVerify<s::AddNodeRequest>(*payload);
+
+    backend->addNode(Id{nodeReq->graphId().str()},
+                     nodeReq->type().str());
 }
 
 //! Handle the "graph/removeNode"
@@ -77,7 +83,10 @@ void GraphManipulationRequestHandler::handleRemoveNode(const Request& request,
                                                        ResponsePromise& response)
 {
     // Request validation
-    EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(request->getPayload() == nullptr,
-                                         "Request data is null!",
-                                         BadRequestError);
+    auto* payload = request->getPayload();
+    EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(payload == nullptr,
+                                         BadRequestError,
+                                         "Request data is null!", );
+
+    auto nodeReq = getRootOfPayloadAndVerify<s::AddNodeRequest>(*payload);
 }

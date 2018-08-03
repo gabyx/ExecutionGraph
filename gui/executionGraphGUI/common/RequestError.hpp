@@ -26,8 +26,8 @@
 class BadRequestError final : public executionGraph::Exception
 {
 public:
-    BadRequestError(const std::stringstream& ss)
-        : executionGraph::Exception(ss) {}
+    BadRequestError(const std::string& s)
+        : executionGraph::Exception(s) {}
 };
 
 #endif

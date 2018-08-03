@@ -45,6 +45,6 @@ if(TARGET "foonathan_memory")
     add_library(memoryLib INTERFACE IMPORTED)
     set_property(TARGET memoryLib PROPERTY INTERFACE_LINK_LIBRARIES foonathan_memory)
 
-    message(STATUS "memory library found! Config File: ${memory_CONFIG}")
+    message(STATUS "memory library found! Config File: ${foonathan_memory_CONFIG}")
     message(STATUS "memory library added targets: memoryLib")
 endif()

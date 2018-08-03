@@ -41,21 +41,26 @@ namespace executionGraph
         // Map the file into memory
 
         auto fileDescriptor = ::open(m_filePath.c_str(), O_RDONLY);
-        EXECGRAPH_THROW_EXCEPTION_IF(fileDescriptor == -1, "File '" << m_filePath << "' could not be opened!");
+        EXECGRAPH_THROW_EXCEPTION_IF(fileDescriptor == -1, "File '{0}' could not be opened!", m_filePath);
 
         struct stat sb;
         EXECGRAPH_THROW_EXCEPTION_IF(::fstat(fileDescriptor, &sb) == -1,
-                                     "Could not read file stats '" << m_filePath << "'");
-        EXECGRAPH_THROW_EXCEPTION_IF(!S_ISREG(sb.st_mode), "File '" << m_filePath << "' is not a file!");
+                                     "Could not read file stats '{0}",
+                                     m_filePath);
+        EXECGRAPH_THROW_EXCEPTION_IF(!S_ISREG(sb.st_mode),
+                                     "File '{0}' is not a file!",
+                                     m_filePath);
 
         m_mappedBytes   = sb.st_size;  // Map the whole file!
         m_offset        = 0;
         m_mappedAddress = ::mmap(0, m_mappedBytes, PROT_READ, MAP_SHARED, fileDescriptor, m_offset);
         EXECGRAPH_THROW_EXCEPTION_IF(m_mappedAddress == MAP_FAILED,
-                                     "File '" << m_filePath << "' could not be mapped in memory!");
+                                     "File '{0}' could not be mapped in memory!",
+                                     m_filePath);
 
         EXECGRAPH_THROW_EXCEPTION_IF(::close(fileDescriptor) == -1,
-                                     "Unused file descriptor '" << m_filePath << "' could not be closed!");
+                                     "Unused file descriptor '{0}' could not be closed!",
+                                     m_filePath);
     }
 
     //! Close the mapped file.

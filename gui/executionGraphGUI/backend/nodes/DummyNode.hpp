@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGUI_backend_nodes_DummyNodes_hpp
-#define executionGraphGUI_backend_nodes_DummyNodes_hpp
+#ifndef executionGraphGUI_backend_nodes_DummyNode_hpp
+#define executionGraphGUI_backend_nodes_DummyNode_hpp
 
 #include <executionGraph/nodes/LogicCommon.hpp>
 #include <rttr/registration>

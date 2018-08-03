@@ -180,4 +180,5 @@
     "C_Cpp.loggingLevel": "Information",
     "git.ignoreLimitWarning": true,
     "cmake.configureOnOpen": false,
+    "C_Cpp.configurationWarnings": "Disabled",
 }

@@ -66,7 +66,7 @@ public:
 
 private:
     //! The request URL (it will get adjusted during request forwarding)
-    //! e.g. "graph/6fdb1cb9-2d2b-46ba-93b5-0b7083ea28c3/addNode"
+    //! e.g. "graph/addNode"
     //! e.g. "general/addGraph"
     std::path m_requestURL;
 };

@@ -4,7 +4,7 @@
             "name": "Mac",
             "includePath": [
                 "${workspaceRoot}/include",
-                "${workspaceRoot}/gui/executionGraphGui",
+                "${workspaceRoot}/gui",
                 "${workspaceRoot}/gui/executionGraphGui/client",
                 "${workspaceRoot}/build/include",
                 "${workspaceRoot}/tests/include"
@@ -13,7 +13,7 @@
             "browse": {
                 "path": [
                     "${workspaceRoot}/include",
-                    "${workspaceRoot}/gui/executionGraphGui",
+                    "${workspaceRoot}/gui",
                     "${workspaceRoot}/build/include",
                     "${workspaceRoot}/tests/include"
                 ],

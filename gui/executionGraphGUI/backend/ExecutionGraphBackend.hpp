@@ -18,6 +18,7 @@
 #include <executionGraph/graphs/ExecutionTreeInOut.hpp>
 #include <rttr/type>
 #include <string>
+#include <variant>
 #include <vector>
 #include "executionGraphGUI/backend/Backend.hpp"
 #include "executionGraphGUI/backend/nodes/NodeTypeDescription.hpp"
@@ -40,6 +41,8 @@ public:
     using Id           = executionGraph::Id;
     using IdNamed      = executionGraph::IdNamed;
 
+    using NodeId = executionGraph::NodeId;
+
 public:
     ExecutionGraphBackend()
         : Backend(IdNamed("ExecutionGraphBackend"))
@@ -53,6 +56,13 @@ public:
                   const Id& graphType);
     void removeGraph(const Id& graphId);
     void removeGraphs();
+    //@}
+
+    //! Adding/removing nodes.
+    //@{
+    void addNode(const Id& graphId,
+                 const std::string& type);
+    void removeNode(const Id& graphId, NodeId id);
     //@}
 
     //! Information about graphs.
@@ -75,8 +85,9 @@ public:
     //@}
 
 private:
+    using GraphVariant = std::variant<DefaultGraph>;
     //! Map of normal graphs identified by its id.
-    std::unordered_map<Id, DefaultGraph> m_graphs;
+    std::unordered_map<Id, GraphVariant> m_graphs;
 };
 
 #endif

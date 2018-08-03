@@ -34,7 +34,7 @@ public:
     explicit BackendRequestDispatcherAdapterCef(std::shared_ptr<BackendRequestDispatcher> dispatcher)
         : m_dispatcher(dispatcher)
     {
-        EXECGRAPH_ASSERT(m_dispatcher, "nullptr!");
+        EXECGRAPHGUI_ASSERT(m_dispatcher, "nullptr!");
     }
 
     virtual ~BackendRequestDispatcherAdapterCef() = default;
