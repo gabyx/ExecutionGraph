@@ -13,7 +13,7 @@
 import { GraphInfoMessages } from '@messages/index';
 export import GraphInfoMessages = GraphInfoMessages;
 
-export abstract class GraphInfoService {
+export abstract class GeneralInfoService {
 
   public abstract async getAllGraphTypeDescriptions(): Promise<GraphInfoMessages.GetAllGraphTypeDescriptionsResponse>;
 }

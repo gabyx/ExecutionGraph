@@ -17,11 +17,11 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/first';
 
 import { flatbuffers } from 'flatbuffers';
-import { GraphInfoService, GraphInfoMessages } from './GraphInfoService';
+import { GeneralInfoService, GraphInfoMessages } from './GeneralInfoService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 
 @Injectable()
-export class GraphInfoServiceBinaryHttp extends GraphInfoService {
+export class GraphInfoServiceBinaryHttp extends GeneralInfoService {
 
   constructor(private readonly binaryRouter: BinaryHttpRouterService) {
     super();

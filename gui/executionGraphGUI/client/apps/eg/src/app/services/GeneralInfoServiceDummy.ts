@@ -11,11 +11,11 @@
 // =========================================================================================
 
 import { Injectable, Testability } from '@angular/core';
-import { GraphInfoMessages, GraphInfoService } from './GraphInfoService';
+import { GraphInfoMessages, GeneralInfoService } from './GeneralInfoService';
 import { flatbuffers } from 'flatbuffers';
 
 @Injectable()
-export class GraphInfoServiceDummy extends GraphInfoService {
+export class GraphInfoServiceDummy extends GeneralInfoService {
 
   constructor() {
     super();

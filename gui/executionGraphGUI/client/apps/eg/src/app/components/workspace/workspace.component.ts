@@ -18,7 +18,7 @@ import { Node } from '../../model/Node';
 import { Connection } from '../../model/Connection';
 import { Socket } from '../../model/Socket';
 import { DragEvent } from '@eg/graph';
-import { GraphInfoService } from '../../services/GraphInfoService';
+import { GeneralInfoService } from '../../services/GeneralInfoService';
 
 @Injectable() @Component({
   selector: 'eg-workspace',
@@ -37,7 +37,7 @@ export class WorkspaceComponent implements OnInit {
   constructor(
     private elementRef: ElementRef,
     private sanitizer: DomSanitizer,
-    private readonly graphInfoService: GraphInfoService) { }
+    private readonly graphInfoService: GeneralInfoService) { }
 
   ngOnInit() {
     const NODES = 10;

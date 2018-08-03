@@ -26,7 +26,7 @@ import { ExecutionService } from './services/ExecutionService';
 import { ExecutionServiceBinaryHttp } from './services/ExecutionServiceBinaryHttp';
 import { ExecutionServiceDummy } from './services/ExecutionServiceDummy';
 
-import { GraphInfoService } from './services/GraphInfoService';
+import { GeneralInfoService } from './services/GeneralInfoService';
 import { GraphInfoServiceDummy } from './services/GraphInfoServiceDummy';
 import { GraphInfoServiceBinaryHttp } from './services/GraphInfoServiceBinaryHttp';
 
@@ -55,7 +55,7 @@ import { ConnectionStyleOptionsComponent } from './components/connection-style-o
     BinaryHttpRouterService,
     CefMessageRouterService,
     { provide: ExecutionService, useClass: environment.production ? ExecutionServiceBinaryHttp : ExecutionServiceDummy },
-    { provide: GraphInfoService, useClass: environment.production ? GraphInfoServiceBinaryHttp : GraphInfoServiceDummy }
+    { provide: GeneralInfoService, useClass: environment.production ? GraphInfoServiceBinaryHttp : GraphInfoServiceDummy }
   ],
   bootstrap: [AppComponent]
 })
