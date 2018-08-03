@@ -65,36 +65,6 @@ inline flatbuffers::Offset<GetAllGraphTypeDescriptionsResponse> CreateGetAllGrap
       graphsTypes ? _fbb.CreateVector<flatbuffers::Offset<GraphTypeDescription>>(*graphsTypes) : 0);
 }
 
-inline const executionGraphGUI::serialization::GetAllGraphTypeDescriptionsResponse *GetGetAllGraphTypeDescriptionsResponse(const void *buf) {
-  return flatbuffers::GetRoot<executionGraphGUI::serialization::GetAllGraphTypeDescriptionsResponse>(buf);
-}
-
-inline const executionGraphGUI::serialization::GetAllGraphTypeDescriptionsResponse *GetSizePrefixedGetAllGraphTypeDescriptionsResponse(const void *buf) {
-  return flatbuffers::GetSizePrefixedRoot<executionGraphGUI::serialization::GetAllGraphTypeDescriptionsResponse>(buf);
-}
-
-inline bool VerifyGetAllGraphTypeDescriptionsResponseBuffer(
-    flatbuffers::Verifier &verifier) {
-  return verifier.VerifyBuffer<executionGraphGUI::serialization::GetAllGraphTypeDescriptionsResponse>(nullptr);
-}
-
-inline bool VerifySizePrefixedGetAllGraphTypeDescriptionsResponseBuffer(
-    flatbuffers::Verifier &verifier) {
-  return verifier.VerifySizePrefixedBuffer<executionGraphGUI::serialization::GetAllGraphTypeDescriptionsResponse>(nullptr);
-}
-
-inline void FinishGetAllGraphTypeDescriptionsResponseBuffer(
-    flatbuffers::FlatBufferBuilder &fbb,
-    flatbuffers::Offset<executionGraphGUI::serialization::GetAllGraphTypeDescriptionsResponse> root) {
-  fbb.Finish(root);
-}
-
-inline void FinishSizePrefixedGetAllGraphTypeDescriptionsResponseBuffer(
-    flatbuffers::FlatBufferBuilder &fbb,
-    flatbuffers::Offset<executionGraphGUI::serialization::GetAllGraphTypeDescriptionsResponse> root) {
-  fbb.FinishSizePrefixed(root);
-}
-
 }  // namespace serialization
 }  // namespace executionGraphGUI
 

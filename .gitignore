@@ -4,7 +4,7 @@ CMakeFiles
 __pycache__
 .ipynb_checkpoints
 .pre-commit-changed
-build*
+build*/
 out
 *.eg
 

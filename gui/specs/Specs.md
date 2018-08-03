@@ -40,7 +40,7 @@ The base template url of the backend is `http://executiongraph-backend/${request
     * Get info of all available socket types and node types (of a graph):
         - url: `requestUrl = "general/getAllGraphTypeDescriptions"`
         - request method: `GET`
-        - schema: `gui/executionGraphGUI/messages/schemas/GraphInfoMessages.fbs`
+        - schema: `gui/executionGraphGUI/messages/schemas/GeneralInfoMessages.fbs`
         - response: `GetAllGraphTypeDescriptionsResponse`
 
 -   **Graph Info Queries**:

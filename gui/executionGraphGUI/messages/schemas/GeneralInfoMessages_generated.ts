@@ -98,13 +98,5 @@ static endGetAllGraphTypeDescriptionsResponse(builder:flatbuffers.Builder):flatb
   return offset;
 };
 
-/**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} offset
- */
-static finishGetAllGraphTypeDescriptionsResponseBuffer(builder:flatbuffers.Builder, offset:flatbuffers.Offset) {
-  builder.finish(offset);
-};
-
 }
 }

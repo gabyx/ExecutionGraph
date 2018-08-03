@@ -37,7 +37,7 @@ export class WorkspaceComponent implements OnInit {
   constructor(
     private elementRef: ElementRef,
     private sanitizer: DomSanitizer,
-    private readonly graphInfoService: GeneralInfoService) { }
+    private readonly GeneralInfoService: GeneralInfoService) { }
 
   ngOnInit() {
     const NODES = 10;
@@ -59,7 +59,7 @@ export class WorkspaceComponent implements OnInit {
 
     // Get some graph info (nicht awaiten ist ja scheissegal zum testen...)
     console.debug("Get all graph type descirptions...")
-    this.graphInfoService.getAllGraphTypeDescriptions();
+    this.GeneralInfoService.getAllGraphTypeDescriptions();
     console.debug("Get all graph type descirptions [done]")
 
   }
