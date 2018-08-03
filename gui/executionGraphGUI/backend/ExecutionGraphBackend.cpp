@@ -13,12 +13,14 @@
 #include "executionGraphGUI/backend/ExecutionGraphBackend.hpp"
 #include "executionGraphGUI/backend/ExecutionGraphBackendDefs.hpp"
 #include "executionGraphGUI/common/Exception.hpp"
+#include "executionGraphGUI/common/RequestError.hpp"
 
 using Id                   = ExecutionGraphBackend::Id;
 using IdNamed              = ExecutionGraphBackend::IdNamed;
 using GraphTypeDescription = ExecutionGraphBackend::GraphTypeDescription;
 using DefaultGraph         = ExecutionGraphBackend::DefaultGraph;
 using DefaultGraphConfig   = typename DefaultGraph::Config;
+using NodeId               = ExecutionGraphBackend::NodeId;
 
 namespace
 {
@@ -55,7 +57,7 @@ void ExecutionGraphBackend::addGraph(const Id& graphId, const Id& graphType)
     if(graphType == m_graphTypeDescriptionIds[0])
     {
         EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(m_graphs.find(graphId) != m_graphs.end(),
-                                             BadRequestError
+                                             BadRequestError,
                                              "Graph id '{0}' already exists!",
                                              graphId.toString());
 
@@ -74,7 +76,7 @@ void ExecutionGraphBackend::removeGraph(const Id& graphId)
 {
     auto nErased = m_graphs.erase(graphId);
     EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(nErased == 0,
-                                         BadRequestError
+                                         BadRequestError,
                                          "No such graph id: '{0}' removed!",
                                          graphId.toString());
 }
@@ -86,16 +88,16 @@ void ExecutionGraphBackend::removeGraphs()
 }
 
 //! Add a node with type `type` to the graph with id `graphId`.
-void addNode(const Id& graphId,
-             const std::string& type)
+void ExecutionGraphBackend::addNode(const Id& graphId,
+                                    const std::string& type)
 {
     auto graphIt = m_graphs.find(graphId);
     EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(graphIt == m_graphs.end(),
                                          BadRequestError,
                                          "Graph id: '{0}' does not exist!",
-                                         graphId);
+                                         graphId.toString());
 }
 //! Remove a node with type `type` from the graph with id `graphId`.
-void removeNode(const Id& graphId, NodeId id)
+void ExecutionGraphBackend::removeNode(const Id& graphId, NodeId id)
 {
 }

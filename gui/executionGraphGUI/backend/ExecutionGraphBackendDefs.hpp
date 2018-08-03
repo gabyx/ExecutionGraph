@@ -72,7 +72,7 @@ public:
     static const std::size_t nNodeTypes = meta::size<Nodes>::value;
 
     //! Node serializer for this graph.
-    using NodeSerializers = meta::list<DummyNodeSerializer>;
+    using NodeSerializers = meta::list<DummyNodeSerializer<Config>>;
     using NodeSerializer  = executionGraph::serialization::LogicNodeSerializer<Config, NodeSerializers>;
 
 private:

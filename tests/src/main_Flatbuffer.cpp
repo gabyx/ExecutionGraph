@@ -98,10 +98,11 @@ struct DummyNodeSerializer
         using Key = DummyNodeType;
 
         static std::unique_ptr<NodeBaseType>
-        create(const executionGraph::NodeId& nodeId,
-               flatbuffers::Vector<uint8_t>* additionalData = nullptr)
+        create(executionGraph::NodeId nodeId,
+               const std::string& name,
+               const flatbuffers::Vector<uint8_t>* additionalData = nullptr)
         {
-            return std::make_unique<DummyNodeType>(nodeId);
+            return std::make_unique<DummyNodeType>(nodeId, name);
         }
     };
 };

@@ -262,11 +262,17 @@ namespace executionGraph
                 {
                     if(link->isWriteLink())
                     {
-                        execGraph.addWriteLink(link->outNodeId(), link->outSocketIdx(), link->inNodeId(), link->inSocketIdx());
+                        execGraph.addWriteLink(link->outNodeId(),
+                                               link->outSocketIdx(),
+                                               link->inNodeId(),
+                                               link->inSocketIdx());
                     }
                     else
                     {
-                        execGraph.setGetLink(link->outNodeId(), link->outSocketIdx(), link->inNodeId(), link->inSocketIdx());
+                        execGraph.setGetLink(link->outNodeId(),
+                                             link->outSocketIdx(),
+                                             link->inNodeId(),
+                                             link->inSocketIdx());
                     }
                 }
             }

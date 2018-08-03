@@ -30,8 +30,8 @@
 #else
 // Debug!
 #    define EXECGRAPH_DEBUG_ONLY(code) code
-#    define EXECGRAPH_ASSERT(condition, ...) EXECGRAPH_ASSERT_TYPE(condition, Exception, __VA_ARGS__)
-#    define EXECGRAPH_ASSERT_TYPE(condition, Type, ...) EXECGRAPH_THROW_EXCEPTION_TYPE_IF(condition, Type, __VA_ARGS__)
+#    define EXECGRAPH_ASSERT(condition, ...) EXECGRAPH_ASSERT_TYPE(condition, executionGraph::Exception, __VA_ARGS__)
+#    define EXECGRAPH_ASSERT_TYPE(condition, Type, ...) EXECGRAPH_THROW_EXCEPTION_TYPE_IF(!(condition), Type, __VA_ARGS__)
 #endif
 
 //! Some warning macro.

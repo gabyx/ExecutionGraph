@@ -17,43 +17,40 @@
 #include <executionGraphGUI/backend/nodes/DummyNode.hpp>
 #include <flatbuffers/flatbuffers.h>
 
+template<typename TConfig>
 struct DummyNodeSerializer
 {
+    using DummyNodeType = DummyNode<TConfig>;
+
     //! Factory functor which creates the serialized write buffer
     //! for the DummyNode `node`.
     struct Writer
     {
-        EXECGRAPH_TYPEDEF_CONFIG(Config);
+        EXECGRAPH_TYPEDEF_CONFIG(TConfig);
 
         using Key = DummyNodeType;
 
         static std::pair<const uint8_t*, std::size_t>
-        create(flatbuffers::FlatBufferBuilder& builder, const NodeBaseType& node)
+        create(flatbuffers::FlatBufferBuilder& builder,
+               const NodeBaseType& node)
         {
-            namespace t = test;
-            std::vector<t::Vec3> vecs(3, t::Vec3(1, 3, 4));
-            auto vecsOffsets = builder.CreateVectorOfStructs(vecs.data(), vecs.size());
-            auto testBuilder = t::TestBuilder(builder);
-            testBuilder.add_pos(vecsOffsets);
-            auto test = testBuilder.Finish();
-
-            builder.Finish(test);
-            return {builder.GetBufferPointer(), builder.GetSize()};
+            return {nullptr, __AVAILABILITY_INTERNAL__MAC_10_0};
         }
     };
     //! Factory functor which creates the DummyNode from a serialized
     //! buffer `node`.
     struct Reader
     {
-        EXECGRAPH_TYPEDEF_CONFIG(Config);
+        EXECGRAPH_TYPEDEF_CONFIG(TConfig);
 
         using Key = DummyNodeType;
 
         static std::unique_ptr<NodeBaseType>
-        create(const executionGraph::NodeId& nodeId,
-               flatbuffers::Vector<uint8_t>* additionalData = nullptr)
+        create(executionGraph::NodeId nodeId,
+               const std::string& name,
+               const flatbuffers::Vector<uint8_t>* additionalData = nullptr)
         {
-            return std::make_unique<DummyNodeType>(nodeId);
+            return std::make_unique<DummyNodeType>(nodeId, name);
         }
     };
 };

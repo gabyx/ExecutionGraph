@@ -18,7 +18,7 @@ if(NOT EXISTS spdlog_INCLUDE_DIR)
     download_project(PROJ               spdlog
                     PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/spdlog"
                     GIT_REPOSITORY      ${URL}
-                    GIT_TAG             master
+                    GIT_TAG             "v1.x"
                     GIT_SHALLOW         ON
                     UPDATE_DISCONNECTED 1)
 
@@ -34,5 +34,6 @@ mark_as_advanced(spdlog_INCLUDE_DIR)
 
 add_library(spdlogLib INTERFACE IMPORTED)
 set_property(TARGET spdlogLib PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${spdlog_INCLUDE_DIR})
+set_property(TARGET spdlogLib PROPERTY INTERFACE_COMPILE_DEFINITIONS "SPDLOG_FMT_EXTERNAL")
 
 message(STATUS "spdlog library added target: spdlogLib")

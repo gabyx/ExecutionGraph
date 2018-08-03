@@ -18,6 +18,7 @@
 #include <executionGraph/graphs/ExecutionTreeInOut.hpp>
 #include <rttr/type>
 #include <string>
+#include <variant>
 #include <vector>
 #include "executionGraphGUI/backend/Backend.hpp"
 #include "executionGraphGUI/backend/nodes/NodeTypeDescription.hpp"

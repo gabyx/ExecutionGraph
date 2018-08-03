@@ -86,3 +86,8 @@ defineCompileDefs(${EXEC_NAME})
 set(EXEC_NAME ${PROJECT_NAME}Test-Flatbuffer)
 add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Flatbuffer.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 defineCompileDefs(${EXEC_NAME})
+
+# MetaProgramming Test
+set(EXEC_NAME ${PROJECT_NAME}Test-MetaProgramming)
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_MetaProg.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME})
