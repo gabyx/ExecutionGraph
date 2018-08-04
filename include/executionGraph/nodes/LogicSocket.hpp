@@ -312,7 +312,7 @@ namespace executionGraph
         const DataType& getValue() const
         {
             EXECGRAPH_ASSERT(m_data,
-                             "Input socket: {0} of logic node id: {1} not connected",
+                             "Input socket: '{0}' of logic node id: '{1}' not connected",
                              this->getName(),
                              this->getParent().getId());
             return *static_cast<const DataType*>(m_data);
@@ -405,14 +405,14 @@ namespace executionGraph
     {
         EXECGRAPH_THROW_EXCEPTION_TYPE_IF(inputSocket.getParent().getId() == this->getParent().getId(),
                                           NodeConnectionException,
-                                          "No Write-Link connection to our input slot! (node id: {0})",
+                                          "No Write-Link connection to our input slot! (node id: '{0}')",
                                           this->getParent().getId());
 
         EXECGRAPH_THROW_EXCEPTION_TYPE_IF(this->getType() != inputSocket.getType(),
                                           NodeConnectionException,
-                                          "Output socket: {1} of node id: {2} "
-                                          "has not the same type as input socket {3}"
-                                          "of node id: {4}",
+                                          "Output socket: '{1}' of node id: '{2}' "
+                                          "has not the same type as input socket '{3}'"
+                                          "of node id: '{4}'",
                                           this->getName(),
                                           this->getParent().getId(),
                                           inputSocket.getName(),
@@ -420,8 +420,8 @@ namespace executionGraph
 
         EXECGRAPH_THROW_EXCEPTION_TYPE_IF(m_getterChilds.find(&inputSocket) != m_getterChilds.end(),
                                           NodeConnectionException,
-                                          "Cannot add Write-Link from output socket: {0} of node id: {1} to {2}"
-                                          "of node id: {3} because input already has a Get-Link to this output.",
+                                          "Cannot add Write-Link from output socket: '{0}' of node id: '{1}' to '{2}'"
+                                          "of node id: '{3}' because input already has a Get-Link to this output.",
                                           this->getName(),
                                           this->getParent().getId(),
                                           inputSocket.getName(),
@@ -439,12 +439,12 @@ namespace executionGraph
     {
         EXECGRAPH_THROW_EXCEPTION_TYPE_IF(outputSocket.getParent().getId() == this->getParent().getId(),
                                           NodeConnectionException,
-                                          "No Get-Link connection to our output slot! (node id: {0})",
+                                          "No Get-Link connection to our output slot! (node id: '{0}')",
                                           this->getParent().getId());
 
         EXECGRAPH_THROW_EXCEPTION_TYPE_IF(this->getType() != outputSocket.getType(),
                                           NodeConnectionException,
-                                          "Output socket: {0} of node id: {1} has not the same type as input socket: {2} of node id: {3}",
+                                          "Output socket: '{0}' of node id: '{1}' has not the same type as input socket: '{2}' of node id: '{3}'",
                                           outputSocket.getName(),
                                           outputSocket.getParent().getId(),
                                           this->getName(),
@@ -452,7 +452,7 @@ namespace executionGraph
 
         EXECGRAPH_THROW_EXCEPTION_TYPE_IF(m_writingParents.find(&outputSocket) != m_writingParents.end(),
                                           NodeConnectionException,
-                                          "Cannot add Get-Link from input socket: {0} of node id: {1} to {2} of node id: {3}"
+                                          "Cannot add Get-Link from input socket: '{0}' of node id: '{1}' to '{2}' of node id: '{3}'"
                                           "because output already has a Write-Link to this input.",
                                           this->getName(),
                                           this->getParent().getId(),

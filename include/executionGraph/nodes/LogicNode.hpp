@@ -361,8 +361,8 @@ namespace executionGraph
     {
         EXECGRAPH_THROW_EXCEPTION_TYPE_IF(outS >= outN.getOutputs().size() || inS >= inN.getInputs().size(),
                                           NodeConnectionException,
-                                          "Wrong socket indices:  outNode: {0} outSocketIdx: {1} "
-                                          "inNode: {2} inSocketIdx: {3}",
+                                          "Wrong socket indices:  outNode: '{0}' outSocketIdx: '{1}' "
+                                          "inNode: '{2}' inSocketIdx: '{3}'",
                                           outN.getId(),
                                           outS,
                                           inN.getId(),
@@ -376,8 +376,8 @@ namespace executionGraph
     {
         EXECGRAPH_THROW_EXCEPTION_TYPE_IF(outS >= outN.getOutputs().size() || inS >= inN.getInputs().size(),
                                           NodeConnectionException,
-                                          "Wrong socket indices:  outNode: {0} outSocketIdx: {1} "
-                                          "inNode: {2} inSocketIdx: {3} (nOuts: {4}, nIns: {5} )",
+                                          "Wrong socket indices:  outNode: '{0}' outSocketIdx: '{1}' "
+                                          "inNode: '{2}' inSocketIdx: '{3}' (nOuts: '{4}', nIns: '{5}' )",
                                           outN.getId(),
                                           outS,
                                           inN.getId(),

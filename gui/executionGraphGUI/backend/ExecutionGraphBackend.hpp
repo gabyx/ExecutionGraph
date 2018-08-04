@@ -61,8 +61,13 @@ public:
     //! Adding/removing nodes.
     //@{
     void addNode(const Id& graphId,
-                 const std::string& type);
-    void removeNode(const Id& graphId, NodeId id);
+                 const std::string& type,
+                 const std::string& nodeName,
+                 const std::function<void()>& responseCreator);
+
+    void removeNode(const Id& graphId,
+                    NodeId id,
+                    const std::function<void()>& responseCreator);
     //@}
 
     //! Information about graphs.

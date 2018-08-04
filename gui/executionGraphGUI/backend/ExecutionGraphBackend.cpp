@@ -89,15 +89,54 @@ void ExecutionGraphBackend::removeGraphs()
 
 //! Add a node with type `type` to the graph with id `graphId`.
 void ExecutionGraphBackend::addNode(const Id& graphId,
-                                    const std::string& type)
+                                    const std::string& type,
+                                    const std::string& nodeName,
+                                    const std::function<void()>& responseCreator)
 {
     auto graphIt = m_graphs.find(graphId);
     EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(graphIt == m_graphs.end(),
                                          BadRequestError,
                                          "Graph id: '{0}' does not exist!",
                                          graphId.toString());
+    GraphVariant& graphVar = graphIt->second;
+
+    auto addNodeLambda = [&](auto& graph) {
+        using GraphType    = decltype(graph);
+        using Config       = typename GraphType::Config;
+        using NodeBaseType = typename Config::NodeBaseType;
+
+        typename ExecutionGraphBackendDefs<Config>::NodeSerializer serializer;
+
+        // Cosntruct Node with the Serializer
+        NodeId id          = graph.generateNodeId();
+        NodeBaseType* node = nullptr;
+
+        try
+        {
+            auto n = serializer.read(type, id, nodeName);
+            node   = graph->addNode(std::move(n));
+        }
+        catch(executionGraph::Exception& e)
+        {
+            EXECGRAPHGUI_THROW_EXCEPTION_TYPE(BadRequestError,
+                                              "Construction of node '{0}' with type: '{1}' for graph id '{2}' failed: '{3}'",
+                                              nodeName,
+                                              type,
+                                              graphId,
+                                              e.what());
+        }
+
+        EXECGRAPH_ASSERT(node != nullptr, "Node is nullptr!!?");
+
+        // Create the response
+        responseCreator(graph, *node);
+    };
+
+    std::visit(addNodeLambda, graphVar);
 }
 //! Remove a node with type `type` from the graph with id `graphId`.
-void ExecutionGraphBackend::removeNode(const Id& graphId, NodeId id)
+void ExecutionGraphBackend::removeNode(const Id& graphId,
+                                       NodeId id,
+                                       const std::function<void()>& responseCreator)
 {
 }

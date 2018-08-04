@@ -135,6 +135,7 @@ static startConstructorVector(builder:flatbuffers.Builder, numElems:number) {
 static endNodeConstructionInfo(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // type
+  builder.requiredField(offset, 6); // name
   return offset;
 };
 

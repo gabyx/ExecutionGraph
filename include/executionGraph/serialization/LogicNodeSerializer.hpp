@@ -71,6 +71,9 @@ namespace executionGraph
                 auto optNode  = FactoryRead::create(rttrType, nodeId, nodeName, additionalData);
                 if(optNode)
                 {
+                    EXECGRAPH_THROW_EXCEPTION_IF(*optNode == nullptr,
+                                                 "FactoryRead::create provided nullptr for type '{0}'!",
+                                                 type)
                     return std::move(*optNode);
                 }
                 else
@@ -89,16 +92,15 @@ namespace executionGraph
                     {
                         rttr::constructor ctor = rttrType.get_constructor({rttr::type::get<NodeId>(),
                                                                            rttr::type::get<const std::string&>()});
-                        EXECGRAPH_THROW_EXCEPTION_IF(!ctor.is_valid(), "Ctor is invalid for type: {0}", type);
+                        EXECGRAPH_THROW_EXCEPTION_IF(!ctor.is_valid(), "Ctor is invalid for type: '{0}'", type);
                         instance = ctor.invoke(nodeId, nodeName);
                     }
                     else
                     {
                         rttr::constructor ctor = rttrType.get_constructor({rttr::type::get<NodeId>()});
-                        EXECGRAPH_THROW_EXCEPTION_IF(!ctor.is_valid(), "Ctor is invalid for type: {0}", type);
+                        EXECGRAPH_THROW_EXCEPTION_IF(!ctor.is_valid(), "Ctor is invalid for type: '{0}'", type);
                         instance = ctor.invoke(nodeId);
                     }
-                    EXECGRAPH_LOG_DEBUG(instance.get_type().get_name().to_string());
                     EXECGRAPH_THROW_EXCEPTION_IF(!instance.is_valid(), "Variant instance is not valid!");
                     EXECGRAPH_THROW_EXCEPTION_IF(!instance.get_type().is_pointer(), "Variant instance type needs to be a pointer!");
 
@@ -118,7 +120,9 @@ namespace executionGraph
 
             //! Store a logic node by using the builder `builder`.
             static flatbuffers::Offset<serialization::LogicNode>
-            write(flatbuffers::FlatBufferBuilder& builder, const NodeBaseType& node)
+            write(flatbuffers::FlatBufferBuilder& builder,
+                  const NodeBaseType& node,
+                  bool serializeAdditionalData = true)
             {
                 NodeId id       = node.getId();
                 auto nameOffset = builder.CreateString(node.getName());
@@ -132,14 +136,16 @@ namespace executionGraph
                 flatbuffers::Offset<flatbuffers::Vector<uint8_t>> dataOffset;
 
                 // Write the data (optional because the factory might not have a writer)
-                std::optional<std::pair<const uint8_t*, std::size_t>>
-                    optData = FactoryWrite::create(rttr::type::get(node),
-                                                   builderData,
-                                                   node);
-
-                if(optData && optData->second != 0)
+                if(serializeAdditionalData)
                 {
-                    dataOffset = builder.CreateVector(optData->first, optData->second);
+                    std::optional<std::pair<const uint8_t*, std::size_t>>
+                        optData = FactoryWrite::create(rttr::type::get(node),
+                                                       builderData,
+                                                       node);
+                    if(optData && optData->second != 0)
+                    {
+                        dataOffset = builder.CreateVector(optData->first, optData->second);
+                    }
                 }
 
                 // Build the logic node

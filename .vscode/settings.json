@@ -181,4 +181,13 @@
     "git.ignoreLimitWarning": true,
     "cmake.configureOnOpen": false,
     "C_Cpp.configurationWarnings": "Disabled",
+    "gitlens.advanced.messages": {
+        "suppressShowKeyBindingsNotice": true
+    },
+    "gitlens.historyExplorer.enabled": true,
+    "gitlens.codeLens.enabled": false,
+    "gitlens.currentLine.enabled": false,
+    "gitlens.hovers.currentLine.over": "line",
+    "gitlens.hovers.enabled": false,
+    "gitlens.mode.active": "review",
 }

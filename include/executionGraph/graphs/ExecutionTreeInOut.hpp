@@ -127,7 +127,7 @@ namespace executionGraph
 
             auto it = m_nonConstNodes.find(nodeId);
             EXECGRAPH_THROW_EXCEPTION_IF(it == m_nonConstNodes.end(),
-                                         "Node with id: {0} does not exist in tree!",
+                                         "Node with id: '{0}' does not exist in tree!",
                                          nodeId);
 
             NodeClassification& currType = it->second.m_class;
@@ -150,6 +150,13 @@ namespace executionGraph
             setNodeClass(node.getId(), newType);
         }
 
+        //! Generate a new unique node id (not yet contained in the graph).
+        NodeId generateNodeId()
+        {
+            EXECGRAPH_ASSERT(m_maxCurrentNodeId + 1 == std::numeric_limits<NodeId>::max(),
+                             "Maximal node count reached! (max() reserved for defaultOutputPool)");
+            return m_maxCurrentNodeId + 1;
+        }
         //! Get a specific node with id \p nodeId if it exists, nullptr otherwise.
         //! This invalidates the execution order, since we cannot guarantee that the caller added other links.
         //! To circumvent that, use the const method.
@@ -184,7 +191,7 @@ namespace executionGraph
         {
             auto it = m_nodeGroups.find(groupId);
             EXECGRAPH_THROW_EXCEPTION_IF(it == m_nodeGroups.end(),
-                                         "Group with id: {0} is not part of the tree!",
+                                         "Group with id: '{0}' is not part of the tree!",
                                          groupId);
             return it->second;
         }
@@ -203,22 +210,23 @@ namespace executionGraph
                               GroupId groupId         = 0)
         {
             EXECGRAPH_THROW_EXCEPTION_IF(node == nullptr, "Nullptr added!");
-            auto id             = node->getId();
-            NodeBaseType* pNode = nullptr;
+            auto id = node->getId();
 
             EXECGRAPH_THROW_EXCEPTION_IF(m_nodes.find(id) != m_nodes.end(),
-                                         "Node id: {0} already added in tree!",
+                                         "Node id: '{0}' already added in tree!",
                                          id);
+
+            m_maxCurrentNodeId = std::max(m_maxCurrentNodeId, id);
 
             if(type != NodeClassification::ConstantNode)
             {
                 m_executionOrderUpToDate = false;
             }
 
+            NodeBaseType* pNode = node.get();
             if(type == NodeClassification::ConstantNode)
             {
                 // Constant node
-                pNode       = node.get();
                 auto p      = m_constNodes.emplace(id, NodeDataBase{std::move(node), type});
                 m_nodes[id] = &p.first->second;
                 // Add to classes
@@ -227,7 +235,6 @@ namespace executionGraph
             else
             {
                 // Any other node
-                pNode       = node.get();
                 auto p      = m_nonConstNodes.emplace(id, NodeData{std::move(node), type});
                 m_nodes[id] = &p.first->second;
                 // Add to classes
@@ -243,7 +250,7 @@ namespace executionGraph
         {
             auto it = m_nonConstNodes.find(nodeId);
             EXECGRAPH_THROW_EXCEPTION_IF(it == m_nonConstNodes.end(),
-                                         "Node with id: {0} does not exist in tree!",
+                                         "Node with id: '{0}' does not exist in tree!",
                                          nodeId);
             // Add node to the group
             it->second.m_groups.emplace(groupId);
@@ -259,7 +266,7 @@ namespace executionGraph
             auto outNit = m_nodes.find(outN);
             auto inNit  = m_nodes.find(inN);
             EXECGRAPH_THROW_EXCEPTION_IF(outNit == m_nodes.end() || inNit == m_nodes.end(),
-                                         "Node with id: {0} or {1} does not exist!",
+                                         "Node with id: '{0}' or '{1}' does not exist!",
                                          outN,
                                          inN)
             NodeBaseType::setGetLink(*outNit->second->m_node, outS, *inNit->second->m_node, inS);
@@ -275,7 +282,7 @@ namespace executionGraph
             auto inNit  = m_nodes.find(inN);
             if(outNit == m_nodes.end() || inNit == m_nodes.end())
             {
-                EXECGRAPH_THROW_EXCEPTION("Node with id: {0} or {1} does not exist!", outN, inN);
+                EXECGRAPH_THROW_EXCEPTION("Node with id: '{0}' or '{1}' does not exist!", outN, inN);
             }
             NodeBaseType::addWriteLink(*outNit->second->m_node, outS, *inNit->second->m_node, inS);
             m_executionOrderUpToDate = false;
@@ -289,7 +296,7 @@ namespace executionGraph
             // Execute in determined order!
             auto it = m_groupExecList.find(groupId);
             EXECGRAPH_THROW_EXCEPTION_IF(it == m_groupExecList.end(),
-                                         "ExecutionTree does not contain a group with id: {0}",
+                                         "ExecutionTree does not contain a group with id: '{0}'",
                                          groupId);
             executePrioritySet(it->second, [](NodeBaseType& node) { node.reset(); });
         }
@@ -308,7 +315,7 @@ namespace executionGraph
             // Execute in determined order!
             auto it = m_groupExecList.find(groupId);
             EXECGRAPH_THROW_EXCEPTION_IF(it == m_groupExecList.end(),
-                                         "ExecutionTree does not contain a group with id: {0}",
+                                         "ExecutionTree does not contain a group with id: '{0}'",
                                          groupId);
             executePrioritySet(it->second, [](NodeBaseType& node) { node.compute(); });
         }
@@ -433,7 +440,7 @@ namespace executionGraph
                     {
                         EXECGRAPH_THROW_EXCEPTION_TYPE_IF(m_defaultOutputSockets == nullptr,
                                                           NodeConnectionException,
-                                                          "Input socket index: {0} of node: {1} is dangling and cannot be connected to default output, since it is not set!",
+                                                          "Input socket index: '{0}' of node: '{1}' is dangling and cannot be connected to default output, since it is not set!",
                                                           inSocket->getIndex(),
                                                           nodeData.m_node->getId());
                         m_defaultOutputSockets->connect(*inSocket);
@@ -457,13 +464,13 @@ namespace executionGraph
 
                     auto itParent = nodes.find(parentNode.getId());
                     EXECGRAPH_THROW_EXCEPTION_IF(itParent == nodes.end(),
-                                                 "Node with id: {0} has not been added to the execution tree!",
+                                                 "Node with id: '{0}' has not been added to the execution tree!",
                                                  parentNode.getId());
                     const NodeData& parentNodeData = itParent->second;
 
                     EXECGRAPH_THROW_EXCEPTION_IF(parentNodeData.m_priority <= nodeDataWithLowerPrio.m_priority,
-                                                 "Parent node id: {0} [prio: {1} ]"
-                                                 "has not a higher priority as node id: {2} "
+                                                 "Parent node id: '{0}' [prio: '{1}' ]"
+                                                 "has not a higher priority as node id: '{2}' "
                                                  "which is wrong!",
                                                  parentNodeData.m_node->getId(),
                                                  parentNodeData.m_priority,
@@ -552,7 +559,7 @@ namespace executionGraph
                         ++it;
                     }
                     EXECGRAPH_ASSERT(std::distance(itStart, it) <= static_cast<typename decltype(m_dfrStack)::difference_type>(m_dfrStack.size()),
-                                     "Removing: {0} from {1}",
+                                     "Removing: '{0}' from '{1}'",
                                      std::distance(itStart, it),
                                      m_dfrStack.size());
                     // Convert backward iterator to forward
@@ -596,7 +603,7 @@ namespace executionGraph
                         EXECGRAPH_THROW_EXCEPTION_TYPE_IF(currentNode->isFlagSet(NodeData::OnCurrentDFRPath),
                                                           ExecutionGraphCycleException,
                                                           "Your execution logic graph contains a cycle! "
-                                                          "Current traversal stack: {0}");
+                                                          "Current traversal stack: '{0}'");
 
                         visit(*currentNode);  // Visits neighbors and add them to m_dfrStack
 
@@ -681,7 +688,7 @@ namespace executionGraph
                     if(itParent == m_nonConstNodes.end())
                     {
                         EXECGRAPH_ASSERT(this->m_constNodes.find(parentNode.getId()) != this->m_constNodes.end(),
-                                         "Parent node with id: {0} is not a constant node!",
+                                         "Parent node with id: '{0}' is not a constant node!",
                                          parentNode.getId());
                         return;
                     }
@@ -776,7 +783,7 @@ namespace executionGraph
                         ++it;
                     }
                     EXECGRAPH_ASSERT(std::distance(itStart, it) <= m_dfrStack.size(),
-                                     "Removing: {0} from {1}",
+                                     "Removing: '{0}' from '{1}'",
                                      std::distance(itStart, it),
                                      m_dfrStack.size());
                     // Convert backward iterator to forward
@@ -814,7 +821,7 @@ namespace executionGraph
                         EXECGRAPH_THROW_EXCEPTION_TYPE_IF(currentNode->isFlagSet(NodeData::OnCurrentDFRPath),
                                                           ExecutionGraphCycleException,
                                                           "Your execution logic graph contains a cycle! "
-                                                          "Current traversal stack: {0}",
+                                                          "Current traversal stack: '{0}'",
                                                           getTraversalInfo());
 
                         currentNode->setFlag(NodeData::OnCurrentDFRPath);
@@ -905,7 +912,7 @@ namespace executionGraph
                     if(itParent == m_nonConstNodes.end())
                     {
                         EXECGRAPH_ASSERT(this->m_constNodes.find(parentNode.getId()) != this->m_constNodes.end(),
-                                         "Parent node with id: {0} is not a constant node!",
+                                         "Parent node with id: '{0}' is not a constant node!",
                                          parentNode.getId());
                         return;
                     }
@@ -944,7 +951,7 @@ namespace executionGraph
                     auto& parentNode = socket->getParent();
                     auto itParent    = m_nonConstNodes.find(parentNode.getId());
                     EXECGRAPH_THROW_EXCEPTION_IF(itParent == m_nonConstNodes.end(),
-                                                 "Node with id: {0} has not been added to the execution tree!",
+                                                 "Node with id: '{0}' has not been added to the execution tree!",
                                                  parentNode.getId());
                     NodeData* parentNodeData = &itParent->second;
 
@@ -1049,6 +1056,8 @@ namespace executionGraph
         bool m_executionOrderUpToDate = false;  //!< Dirty flag which denotes that the execution order is not up to date!
 
         LogicNodeDefaultOutputs* m_nodeDefaultOutputPool;  //!< Default Pool with output sockets, to which all not connected input sockets are connected!
+
+        NodeId m_maxCurrentNodeId = 0;  //!< Maximal current node id, to generate a new node id.
     };
 }  // namespace executionGraph
 

@@ -14,6 +14,7 @@
 #include <chrono>
 #include <vector>
 #include "executionGraphGUI/backend/ExecutionGraphBackend.hpp"
+#include "executionGraphGUI/backend/ExecutionGraphBackendDefs.hpp"
 #include "executionGraphGUI/common/AllocatorProxyFlatBuffer.hpp"
 #include "executionGraphGUI/common/Loggers.hpp"
 #include "executionGraphGUI/common/RequestError.hpp"
@@ -74,8 +75,29 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
 
     auto nodeReq = getRootOfPayloadAndVerify<s::AddNodeRequest>(*payload);
 
+    // Callback to create the response
+    auto responseCreator = [&response](auto& graph, auto& node) {
+        AllocatorProxyFlatBuffer<Allocator> allocator(response.getAllocator());
+        flatbuffers::FlatBufferBuilder builder(1024, &allocator);
+
+        using GraphType = decltype(graph);
+        using Config    = typenema GraphType::Config;
+
+        ExecutionGraphBackendDefs<Config>::NodeSerializer serializer;
+        auto nodeOffset = serializer.write(builder, node);
+
+        // Set the response.
+        auto detachedBuffer = builder.Release();
+        response.setReady(ResponsePromise::Payload{makeBinaryBuffer(std::move(allocator),
+                                                                    std::move(detachedBuffer)),
+                                                   "application/octet-stream"});
+    };
+
+    // Execute the request
     backend->addNode(Id{nodeReq->graphId().str()},
-                     nodeReq->type().str());
+                     nodeReq->node()->type().str(),
+                     nodeReq->node()->name().str(),
+                     responseCreator);
 }
 
 //! Handle the "graph/removeNode"

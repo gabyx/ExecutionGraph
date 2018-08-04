@@ -42,7 +42,7 @@ struct NodeConstructionInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_TYPE) &&
            verifier.Verify(type()) &&
-           VerifyOffset(verifier, VT_NAME) &&
+           VerifyOffsetRequired(verifier, VT_NAME) &&
            verifier.Verify(name()) &&
            VerifyOffset(verifier, VT_CONSTRUCTOR) &&
            verifier.Verify(constructor()) &&
@@ -72,6 +72,7 @@ struct NodeConstructionInfoBuilder {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<NodeConstructionInfo>(end);
     fbb_.Required(o, NodeConstructionInfo::VT_TYPE);
+    fbb_.Required(o, NodeConstructionInfo::VT_NAME);
     return o;
   }
 };

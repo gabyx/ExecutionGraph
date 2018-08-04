@@ -249,7 +249,7 @@ namespace executionGraph
                     }
                     else
                     {
-                        EXECGRAPH_THROW_EXCEPTION("Could not load node with id: {0}", node->id());
+                        EXECGRAPH_THROW_EXCEPTION("Could not load node with id: '{0}'", node->id());
                     }
                 }
             }

@@ -67,7 +67,7 @@ namespace
             BinaryBuffer<BufferPool> buffer(allocator, element->GetBytesCount());
             element->GetBytes(buffer.getSize(), static_cast<void*>(buffer.getData()));
             EXECGRAPHGUI_LOGCODE_DEBUG(printPostData(buffer));
-            EXECGRAPHGUI_APPLOG_DEBUG("BackendResourceHandler: Read last post data element: bytes: {0}.", element->GetBytesCount());
+            EXECGRAPHGUI_APPLOG_DEBUG("BackendResourceHandler: Read last post data element: bytes: '{0}'.", element->GetBytesCount());
             payload = RequestCef::Payload{std::move(buffer), mimeType};
             return true;  // continue
         }
@@ -99,8 +99,8 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
 {
     CEF_REQUIRE_IO_THREAD();
 
-    auto& future = m_responseFuture.getFuture();
-
+    auto& future      = m_responseFuture.getFuture();
+    std::string error = "Unknown Exception";
     try
     {
         EXECGRAPHGUI_THROW_EXCEPTION_IF(!future.valid(), "Future is invalid!");
@@ -113,6 +113,7 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
         response->SetStatus(200);  // http status code: 200 := The request has been handled! (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
 
         m_bytesRead = 0;
+        return;
     }
     catch(const BadRequestError& e)
     {
@@ -120,21 +121,23 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
         response->SetStatusText(e.what());
         response->SetStatus(400);  // http status code: 400 : Bad request!
         response->SetError(cef_errorcode_t::ERR_FAILED);
+        return;
     }
+    // Every other Exception is an internal server error!
+    // and is fatal!
     catch(const InternalBackendError& e)
     {
-        EXECGRAPHGUI_APPLOG_FATAL("BackendResourceHandler: Internal backend error: '{0}", e.what());
-        response->SetStatusText(e.what());
-        response->SetStatus(500);  // http status code: 500 : Internal server error!
-        response->SetError(cef_errorcode_t::ERR_FAILED);
+        error = e.what();
     }
-    catch(...)
+    catch(std::exception& e)
     {
-        EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler: Unknown exception in GetResponseHeaders");
-        response->SetStatusText("Unknown Exception!");
-        response->SetStatus(500);  // http status code: 500 : Internal server error!
-        response->SetError(cef_errorcode_t::ERR_FAILED);
+        error = e.what();
     }
+
+    EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler: Exception in GetResponseHeaders");
+    response->SetStatusText(error);
+    response->SetStatus(500);  // http status code: 500 : Internal server error!
+    response->SetError(cef_errorcode_t::ERR_FAILED);
 }
 
 //! Process the request (see: http://magpcss.org/ceforum/apidocs3/projects/(default)/CefResourceHandler.html)
