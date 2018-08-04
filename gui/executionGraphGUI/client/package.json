@@ -8,6 +8,7 @@
     "build": "ng build",
     "build-prod": "ng build --prod",
     "build-prod-watch": "ng build --prod --watch",
+    "build-prod-app-eg": "ng build --prod --app=eg",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",

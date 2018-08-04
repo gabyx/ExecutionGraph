@@ -216,10 +216,13 @@ if(OS_MACOSX)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
                 "${CEF_BINARY_DIR}/Chromium Embedded Framework.framework"
                 "${CEF_APP}/Contents/Frameworks/Chromium Embedded Framework.framework"
-        # Copy the Client Application into the Frameworks directory.
+        # Copy the client application into the Contents directory.
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+                "${CEF_APP}/Contents/client"
         COMMAND ${CMAKE_COMMAND} -E copy_directory
                 "${ExecutionGraphGUI_CLIENT_TARGET_OUT_DIR}"
-                "${CEF_APP}/Contents"
+                "${CEF_APP}/Contents/client"
+        # Copy libraries into the Contents/libs folder
         COMMAND ${CMAKE_COMMAND} -E make_directory
                 "${CEF_APP}/Contents/libs"
         COMMAND ${CMAKE_COMMAND} -E copy
