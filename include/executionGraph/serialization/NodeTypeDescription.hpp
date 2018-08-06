@@ -10,23 +10,23 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGUI_backend_nodes_SocketTypeDescription_hpp
-#define executionGraphGUI_backend_nodes_SocketTypeDescription_hpp
+#ifndef executionGraph_serialization_NodeTypeDescription_hpp
+#define executionGraph_serialization_NodeTypeDescription_hpp
 
 #include <string>
 
-//! A simple node description, describing a LogicSocket.
-struct SocketTypeDescription
+//! A simple node description, describing a LogicNode.
+struct NodeTypeDescription
 {
-    SocketTypeDescription(const std::string& rtti)
+    NodeTypeDescription(const std::string& rtti)
         : m_rtti(rtti), m_name(m_rtti)
     {}
-    SocketTypeDescription(const std::string& rtti, const std::string& name)
+    NodeTypeDescription(const std::string& rtti, const std::string& name)
         : m_rtti(rtti), m_name(name)
     {}
 
-    std::string m_rtti;  //!< The unique RTTI name of the socket
-    std::string m_name;  //!< The readable name of the socket
+    std::string m_rtti;  //!< The unique RTTI name of the node
+    std::string m_name;  //!< The readable name of the node.
 };
 
 #endif

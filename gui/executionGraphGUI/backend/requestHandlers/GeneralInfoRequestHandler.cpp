@@ -65,8 +65,8 @@ void GeneralInfoRequestHandler::handleRequest(const Request& request,
 void GeneralInfoRequestHandler::handleGetAllGraphTypeDescriptions(const Request& request,
                                                                   ResponsePromise& response)
 {
-    EXECGRAPHGUI_THROW_IF(request.getPayload() != nullptr,
-                          "There should not be any request payload for this request");
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(request.getPayload() != nullptr,
+                                      "There should not be any request payload for this request");
     using Allocator = ResponsePromise::Allocator;
 
     AllocatorProxyFlatBuffer<Allocator> allocator(response.getAllocator());

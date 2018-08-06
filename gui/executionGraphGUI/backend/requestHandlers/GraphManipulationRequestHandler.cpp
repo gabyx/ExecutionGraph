@@ -69,22 +69,45 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
 {
     // Request validation
     auto* payload = request->getPayload();
-    EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(payload == nullptr,
-                                         BadRequestError,
-                                         "Request data is null!", );
+    EXECGRAPHGUI_THROW_TYPE_IF(payload == nullptr,
+                               BadRequestError,
+                               "Request data is null!", );
 
     auto nodeReq = getRootOfPayloadAndVerify<s::AddNodeRequest>(*payload);
 
+    Id graphID = {nodeReq->graphId().str()};
+
     // Callback to create the response
-    auto responseCreator = [&response](auto& graph, auto& node) {
+    auto responseCreator = [&response, graphID](auto& graph, auto& node) {
         AllocatorProxyFlatBuffer<Allocator> allocator(response.getAllocator());
         flatbuffers::FlatBufferBuilder builder(1024, &allocator);
 
         using GraphType = decltype(graph);
         using Config    = typenema GraphType::Config;
+        EXECGRAPH_TYPEDEF_CONFIG(Config);
+        using NodeSerializer = ExecutionGraphBackendDefs<Config>::NodeSerializer;
 
-        ExecutionGraphBackendDefs<Config>::NodeSerializer serializer;
+        // Serialize the response
+        NodeSerializer serializer;
         auto nodeOffset = serializer.write(builder, node);
+
+        // Get Socket Infos
+        auto& graphDesc = m_backend->getGraphTypeDescriptions();
+        auto descIt     = graphDesc.find(graphId);
+        EXECGRAPH_ASSERT(descIt == graphDesc.end(),
+                         "GraphId '{0}' does not exist!",
+                         graphID.toString());
+        for(auto outputSocket : node->getOutputs())
+        {
+            std::string rtti = descIt->getSocketRTTI(outputSocket.getType());
+            builder.CreateString(
+        }
+
+        s::NodeDescriptionBuilder nodeDesc(builder);
+        nodeDesc.add_node(nodeOffset);
+
+        s::AddNodeResponseBuilder addResponse(builder);
+        addResponse.add_nodeDescription(nodeDesc);
 
         // Set the response.
         auto detachedBuffer = builder.Release();
@@ -94,7 +117,7 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
     };
 
     // Execute the request
-    backend->addNode(Id{nodeReq->graphId().str()},
+    backend->addNode(graphID,
                      nodeReq->node()->type().str(),
                      nodeReq->node()->name().str(),
                      responseCreator);
@@ -106,9 +129,9 @@ void GraphManipulationRequestHandler::handleRemoveNode(const Request& request,
 {
     // Request validation
     auto* payload = request->getPayload();
-    EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(payload == nullptr,
-                                         BadRequestError,
-                                         "Request data is null!", );
+    EXECGRAPHGUI_THROW_TYPE_IF(payload == nullptr,
+                               BadRequestError,
+                               "Request data is null!", );
 
     auto nodeReq = getRootOfPayloadAndVerify<s::AddNodeRequest>(*payload);
 }

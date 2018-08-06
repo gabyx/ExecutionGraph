@@ -16,7 +16,7 @@
 #include <flatbuffers/flatbuffers.h>
 #include "executionGraphGUI/common/BinaryPayload.hpp"
 #include "executionGraphGUI/common/DevFlags.hpp"
-#include "executionGraphGUI/common/Exception.hpp"
+#include "executionGraphGUI/common/RequestError.hpp"
 
 template<typename MessageType, bool verifyBuffer = devFlags::verifyAllFlatbufferMessages>
 auto getRootOfPayloadAndVerify(const BinaryPayload& payload)
@@ -27,9 +27,8 @@ auto getRootOfPayloadAndVerify(const BinaryPayload& payload)
     if(verifyBuffer)
     {
         flatbuffers::Verifier v(buffer->getData(), buffer->getSize());
-        EXECGRAPHGUI_THROW_TYPE_IF(request->Verify(v),
-                                   BadRequestError,
-                                   "Flatbuffer corrupt!", );
+        EXECGRAPHGUI_THROW_BAD_REQUEST(request->Verify(v),
+                                       "Flatbuffer corrupt!");
     }
     return request;
 }

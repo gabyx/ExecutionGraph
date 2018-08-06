@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-include "DataTypes.fbs";
-include "NodeDescription.fbs";
+include "executionGraphGUI/messages/schemas/DataTypes.fbs";
+include "executionGraph/serialization/schemas/LogicNode.fbs";
 
 namespace executionGraphGUI.serialization;
 
@@ -38,7 +38,7 @@ table AddNodeRequest {
 //!     - type not valid
 //!     - bad constructor arguments
 table AddNodeResponse {
-    node:NodeDescription (id:0, required);
+    node:executionGraph.serialization.LogicNode (id:0, required);
 }
 //! ======================================================================
 

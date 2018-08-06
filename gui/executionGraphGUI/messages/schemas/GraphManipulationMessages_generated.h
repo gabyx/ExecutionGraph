@@ -7,10 +7,9 @@
 #include "flatbuffers/flatbuffers.h"
 #include "flatbuffers/flexbuffers.h"
 
-#include "LogicNode_generated.h"
 #include "DataTypes_generated.h"
-#include "NodeDescription_generated.h"
-#include "SocketTypeDescription_generated.h"
+#include "LogicNode_generated.h"
+#include "LogicSocket_generated.h"
 
 namespace executionGraphGUI {
 namespace serialization {
@@ -169,8 +168,8 @@ struct AddNodeResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_NODE = 4
   };
-  const NodeDescription *node() const {
-    return GetPointer<const NodeDescription *>(VT_NODE);
+  const executionGraph::serialization::LogicNode *node() const {
+    return GetPointer<const executionGraph::serialization::LogicNode *>(VT_NODE);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -183,7 +182,7 @@ struct AddNodeResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct AddNodeResponseBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_node(flatbuffers::Offset<NodeDescription> node) {
+  void add_node(flatbuffers::Offset<executionGraph::serialization::LogicNode> node) {
     fbb_.AddOffset(AddNodeResponse::VT_NODE, node);
   }
   explicit AddNodeResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -201,7 +200,7 @@ struct AddNodeResponseBuilder {
 
 inline flatbuffers::Offset<AddNodeResponse> CreateAddNodeResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<NodeDescription> node = 0) {
+    flatbuffers::Offset<executionGraph::serialization::LogicNode> node = 0) {
   AddNodeResponseBuilder builder_(_fbb);
   builder_.add_node(node);
   return builder_.Finish();

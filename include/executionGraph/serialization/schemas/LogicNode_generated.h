@@ -7,6 +7,8 @@
 #include "flatbuffers/flatbuffers.h"
 #include "flatbuffers/flexbuffers.h"
 
+#include "LogicSocket_generated.h"
+
 namespace executionGraph {
 namespace serialization {
 
@@ -17,7 +19,9 @@ struct LogicNode FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_ID = 4,
     VT_TYPE = 6,
     VT_NAME = 8,
-    VT_DATA = 10
+    VT_INPUTSOCKETS = 10,
+    VT_OUTPUTSOCKETS = 12,
+    VT_DATA = 14
   };
   uint64_t id() const {
     return GetField<uint64_t>(VT_ID, 0);
@@ -27,6 +31,12 @@ struct LogicNode FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const flatbuffers::String *name() const {
     return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<LogicSocket>> *inputSockets() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<LogicSocket>> *>(VT_INPUTSOCKETS);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<LogicSocket>> *outputSockets() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<LogicSocket>> *>(VT_OUTPUTSOCKETS);
   }
   const flatbuffers::Vector<uint8_t> *data() const {
     return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_DATA);
@@ -42,6 +52,12 @@ struct LogicNode FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.Verify(type()) &&
            VerifyOffset(verifier, VT_NAME) &&
            verifier.Verify(name()) &&
+           VerifyOffset(verifier, VT_INPUTSOCKETS) &&
+           verifier.Verify(inputSockets()) &&
+           verifier.VerifyVectorOfTables(inputSockets()) &&
+           VerifyOffset(verifier, VT_OUTPUTSOCKETS) &&
+           verifier.Verify(outputSockets()) &&
+           verifier.VerifyVectorOfTables(outputSockets()) &&
            VerifyOffset(verifier, VT_DATA) &&
            verifier.Verify(data()) &&
            verifier.EndTable();
@@ -59,6 +75,12 @@ struct LogicNodeBuilder {
   }
   void add_name(flatbuffers::Offset<flatbuffers::String> name) {
     fbb_.AddOffset(LogicNode::VT_NAME, name);
+  }
+  void add_inputSockets(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<LogicSocket>>> inputSockets) {
+    fbb_.AddOffset(LogicNode::VT_INPUTSOCKETS, inputSockets);
+  }
+  void add_outputSockets(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<LogicSocket>>> outputSockets) {
+    fbb_.AddOffset(LogicNode::VT_OUTPUTSOCKETS, outputSockets);
   }
   void add_data(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> data) {
     fbb_.AddOffset(LogicNode::VT_DATA, data);
@@ -81,10 +103,14 @@ inline flatbuffers::Offset<LogicNode> CreateLogicNode(
     uint64_t id = 0,
     flatbuffers::Offset<flatbuffers::String> type = 0,
     flatbuffers::Offset<flatbuffers::String> name = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<LogicSocket>>> inputSockets = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<LogicSocket>>> outputSockets = 0,
     flatbuffers::Offset<flatbuffers::Vector<uint8_t>> data = 0) {
   LogicNodeBuilder builder_(_fbb);
   builder_.add_id(id);
   builder_.add_data(data);
+  builder_.add_outputSockets(outputSockets);
+  builder_.add_inputSockets(inputSockets);
   builder_.add_name(name);
   builder_.add_type(type);
   return builder_.Finish();
@@ -95,12 +121,16 @@ inline flatbuffers::Offset<LogicNode> CreateLogicNodeDirect(
     uint64_t id = 0,
     const char *type = nullptr,
     const char *name = nullptr,
+    const std::vector<flatbuffers::Offset<LogicSocket>> *inputSockets = nullptr,
+    const std::vector<flatbuffers::Offset<LogicSocket>> *outputSockets = nullptr,
     const std::vector<uint8_t> *data = nullptr) {
   return executionGraph::serialization::CreateLogicNode(
       _fbb,
       id,
       type ? _fbb.CreateString(type) : 0,
       name ? _fbb.CreateString(name) : 0,
+      inputSockets ? _fbb.CreateVector<flatbuffers::Offset<LogicSocket>>(*inputSockets) : 0,
+      outputSockets ? _fbb.CreateVector<flatbuffers::Offset<LogicSocket>>(*outputSockets) : 0,
       data ? _fbb.CreateVector<uint8_t>(*data) : 0);
 }
 

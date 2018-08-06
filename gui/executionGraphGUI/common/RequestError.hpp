@@ -30,4 +30,7 @@ public:
         : executionGraph::Exception(s) {}
 };
 
+#    define EXECGRAPHGUI_THROW_BAD_REQUEST_IF(condition, ...) EXECGRAPHGGUI_THROW_TYPE_IF(condition, BadRequestError, __VA_ARGS__)
+#    define EXECGRAPHGUI_THROW_BAD_REQUEST(...) EXECGRAPHGGUI_THROW_TYPE(BadRequestError, __VA_ARGS__)
+
 #endif

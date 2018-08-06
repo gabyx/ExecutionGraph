@@ -10,11 +10,17 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
+include "executionGraph/serialization/schemas/LogicSocket.fbs";
+
 namespace executionGraph.serialization;
 
 table LogicNode {
     id:uint64 (id:0);                   //!< The unique logic node id.
     type:string (id: 1, required);      //!< The rtti of the logic node.
     name:string (id: 2);                //!< The name of the logic node.
-    data:[uint8] (id: 3, flexbuffer);   //!< The additional data for this node.
+
+    inputSockets:[LogicSocket] (id:3);  //!< The input logic sockets.
+    outputSockets:[LogicSocket] (id:4); //!< The output logic sockets.
+
+    data:[uint8] (id: 5, flexbuffer);   //!< The additional data for this node.
 }

@@ -17,31 +17,16 @@
 #include <executionGraph/serialization/LogicNodeSerializer.hpp>
 #include <meta/meta.hpp>
 #include <rttr/type>
+#include "executionGraph/serialization/NodeTypeDescription.hpp"
+#include "executionGraph/serialization/SocketTypeDescription.hpp"
 #include "executionGraphGUI/backend/nodes/DummyNode.hpp"
 #include "executionGraphGUI/backend/nodes/DummyNodeSerializer.hpp"
-#include "executionGraphGUI/backend/nodes/NodeTypeDescription.hpp"
-#include "executionGraphGUI/backend/nodes/SocketTypeDescription.hpp"
 
 template<typename TConfig>
 class ExecutionGraphBackendDefs;
 
 namespace details
 {
-    //! Return a set of rtti strings.
-    template<typename T>
-    struct MakeRTTIs;
-
-    //! Spezialization for `meta::list<...>`.
-    template<typename... NodeType>
-    struct MakeRTTIs<meta::list<NodeType...>>
-    {
-        template<typename T>
-        static std::vector<T> eval()
-        {
-            return {{T{rttr::type::get<NodeType>().get_name().to_string()}...}};
-        }
-    };
-
     template<typename T>
     struct RegisterAllRTTR;
 
@@ -71,12 +56,25 @@ public:
     using Nodes                         = meta::list<DummyNode<Config>>;
     static const std::size_t nNodeTypes = meta::size<Nodes>::value;
 
+    using NodeTypeDescription   = executionGraph::NodeTypeDescription;
+    using SocketTypeDescription = executionGraph::SocketTypeDescription;
+
     //! Node serializer for this graph.
     using NodeSerializers = meta::list<DummyNodeSerializer<Config>>;
     using NodeSerializer  = executionGraph::serialization::LogicNodeSerializer<Config, NodeSerializers>;
 
+    //! The node descriptions for this default configuration.
+    static const std::vector<NodeTypeDescription>& getNodeDescriptions()
+    {
+        //! The static node description for this default configuration
+        static const std::vector<NodeTypeDescription> m_nodeTypeDescriptions = initAllNodeTypeDescriptions();
+        return m_nodeDescritptions;
+    }
+    //! The socket descriptions for this default configuration.
+    static const std::vector<SocketTypeDescription>& getNodeDescriptions() { return executionGraph::getSocketDescriptions<Config>(); }
+
 private:
-    static std::vector<NodeTypeDescription> initAllNodeTypeDescription()
+    static std::vector<NodeTypeDescription> initAllNodeTypeDescriptions()
     {
         // Register all types
         details::RegisterAllRTTR<Nodes>::eval("DefaultGraph");
@@ -86,7 +84,7 @@ private:
         static_assert(nNodeTypes == nodeNames.size(), "You need a name for each type in NodeTypes");
 
         // All rtti names
-        const auto nodeRTTIs = details::MakeRTTIs<Nodes>::eval<std::string>();
+        const auto nodeRTTIs = executionGraph::details::MakeRTTIs<Nodes>::eval<std::string>();
 
         std::vector<NodeTypeDescription> description;
         for(std::size_t idx = 0; idx < nodeNames.size(); ++idx)
@@ -95,24 +93,6 @@ private:
         }
         return description;
     }
-
-    static std::vector<SocketTypeDescription> initAllSocketTypeDescription()
-    {
-        return details::MakeRTTIs<typename Config::SocketTypes>::eval<SocketTypeDescription>();
-    }
-
-public:
-    //! The static node description for this default configuration
-    static const std::vector<NodeTypeDescription> NodeTypeDescriptions;
-    //! The static socket description for this default configuration
-    static const std::vector<SocketTypeDescription> SocketTypeDescriptions;
 };
-
-//! Static definitions
-const std::vector<NodeTypeDescription> ExecutionGraphBackendDefs<executionGraph::GeneralConfig<>>::NodeTypeDescriptions =
-    ExecutionGraphBackendDefs<executionGraph::GeneralConfig<>>::initAllNodeTypeDescription();
-
-const std::vector<SocketTypeDescription> ExecutionGraphBackendDefs<executionGraph::GeneralConfig<>>::SocketTypeDescriptions =
-    ExecutionGraphBackendDefs<executionGraph::GeneralConfig<>>::initAllSocketTypeDescription();
 
 #endif

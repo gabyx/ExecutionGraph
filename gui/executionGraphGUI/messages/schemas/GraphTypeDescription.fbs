@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-include "NodeTypeDescription.fbs";
-include "SocketTypeDescription.fbs";
+include "executionGraphGUI/messages/schemas/NodeTypeDescription.fbs";
+include "executionGraphGUI/messages/schemas/SocketTypeDescription.fbs";
 
 namespace executionGraphGUI.serialization;
 

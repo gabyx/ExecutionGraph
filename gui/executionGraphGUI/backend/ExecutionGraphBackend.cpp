@@ -107,7 +107,7 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
 
         typename ExecutionGraphBackendDefs<Config>::NodeSerializer serializer;
 
-        // Cosntruct Node with the Serializer
+        // Construct the node with the Serializer
         NodeId id          = graph.generateNodeId();
         NodeBaseType* node = nullptr;
 

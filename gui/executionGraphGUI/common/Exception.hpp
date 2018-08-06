@@ -40,4 +40,7 @@ public:
         : executionGraph::Exception(s) {}
 };
 
+#    define EXECGRAPHGUI_THROW_BACKEND_ERROR_IF(condition, ...) EXECGRAPHGGUI_THROW_TYPE_IF(condition, InternalBackendError, __VA_ARGS__)
+#    define EXECGRAPHGUI_THROW_BACKEND_ERROR(...) EXECGRAPHGGUI_THROW_TYPE(InternalBackendError, __VA_ARGS__)
+
 #endif

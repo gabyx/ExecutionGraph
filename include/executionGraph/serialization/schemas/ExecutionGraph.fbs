@@ -10,10 +10,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-include "LogicNode.fbs";
-include "SocketLink.fbs";
+include "executionGraph/serialization/schemas/LogicNode.fbs";
+include "executionGraph/serialization/schemas/SocketLink.fbs";
 
-include "GraphVisualization.fbs";
+include "executionGraph/serialization/schemas/GraphVisualization.fbs";
 
 namespace executionGraph.serialization;
 

@@ -15,6 +15,7 @@
 
 #include <meta/meta.hpp>
 #include "executionGraph/common/Factory.hpp"
+#include "executionGraph/serialization/SocketTypeDescription.hpp"
 #include "executionGraph/serialization/schemas/LogicNode_generated.h"
 
 namespace executionGraph
@@ -135,6 +136,12 @@ namespace executionGraph
                 flatbuffers::FlatBufferBuilder builderData;
                 flatbuffers::Offset<flatbuffers::Vector<uint8_t>> dataOffset;
 
+                // Build all input/output sockets
+                std::vector<flatbuffers::Offset<LogicSocket>> inputSockets;
+                std::vector<flatbuffers::Offset<LogicSocket>> outputSockets;
+
+                std::tie(outputSockets, inputSockets) = writeSockets(builder, node);
+
                 // Write the data (optional because the factory might not have a writer)
                 if(serializeAdditionalData)
                 {
@@ -153,11 +160,72 @@ namespace executionGraph
                 lnBuilder.add_id(id);
                 lnBuilder.add_type(typeOffset);
                 lnBuilder.add_name(nameOffset);
+                lnBuilder.add_inputSockets(inputSockets);
+                lnBuilder.add_outputSockets(inputSockets);
                 if(!dataOffset.IsNull())
                 {
                     lnBuilder.add_data(dataOffset);
                 }
                 return lnBuilder.Finish();
+            }
+
+        private:
+            //! Write all input/output sockets.
+            static std::pair<std::vector<flatbuffers::Offset<serialization::LogicSocket>>,
+                             std::vector<flatbuffers::Offset<serialization::LogicSocket>>>
+            writeSockets(flatbuffers::FlatBufferBuilder& builder,
+                         const NodeBaseType& node)
+            {
+                auto& socketDescriptions = getSocketDescriptions<Config>();
+
+                auto write = [&](const auto& sockets) {
+                    std::vector<flatbuffers::Offset<LogicSocket>> socketOffs;
+                    for(auto socket : sockets)
+                    {
+                        auto nameOff = builder.CreateString(socket->getName());
+
+                        EXECGRAPH_ASSERT(socket->m_type < socketDescriptions.size(), "Socket type wrong!");
+                        auto typeOff = builder.CreateString(socketDescriptions[socket->getType()].m_rtti);
+
+                        LogicSocketBuilder soBuilder(builder);
+                        soBuilder.add_type(typeOff);
+                        soBuilder.add_index(socket->getIndex());
+                        soBuilder.add_name(nameOff);
+                        socketOffs.emplace_back(soBuilder.Finish());
+                    }
+                    return socketOffs;
+                };
+
+                return {write(node->getInputs()),
+                        write(node->getOutputs())};
+            }
+
+            //! Read all sockets for LogicNode `node`.
+            //! This eventually asserts that all sockets are installed.
+            static void
+            readSockets(NodeBaseType& node,
+                        const serialization::LogicNode& logicNode)
+            {
+                auto read = [&](flatbuffers::Vector<flatbuffers::Offset<LogicSocket>>* sockets, bool addInput) {
+                    if(sockets == nullptr)
+                    {
+                        return;
+                    }
+
+                    for(auto socketOff : *sockets)
+                    {
+                        if(addInput)
+                        {
+                            meta::visit<typename Config::SocketTypes, Func>(socketOff->index());
+                        }
+                        else
+                        {
+                        }
+                    }
+                }
+
+                read(logicNode->inputSockets(), true);
+                read(logicNode->outputSockets(), false);
             }
 
         private:

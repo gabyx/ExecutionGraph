@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-include "GraphTypeDescription.fbs";
+include "executionGraphGUI/messages/schemas/GraphTypeDescription.fbs";
 
 namespace executionGraphGUI.serialization;
 

@@ -10,6 +10,7 @@
 #include "DataTypes_generated.h"
 #include "GraphVisualization_generated.h"
 #include "LogicNode_generated.h"
+#include "LogicSocket_generated.h"
 #include "SocketLink_generated.h"
 
 namespace executionGraph {
