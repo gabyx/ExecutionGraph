@@ -40,7 +40,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     try
     {
         node1a->getISocket<double>(0);
-        EXECGRAPH_THROW_EXCEPTION("Should throw exception here!");
+        EXECGRAPH_THROW("Should throw exception here!");
     }
     catch(BadSocketCastException& e)
     {
@@ -48,7 +48,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     }
     catch(...)
     {
-        EXECGRAPH_THROW_EXCEPTION("Wrong Exception thrown!");
+        EXECGRAPH_THROW("Wrong Exception thrown!");
     }
 
     // Link
@@ -88,7 +88,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 
     EXECGRAPH_LOG_TRACE("Result : " << resultNode->getOutVal<DummyNode<Config>::Result1>());
 
-    EXECGRAPH_THROW_EXCEPTION_IF(resultNode->getOutVal<DummyNode<Config>::Result1>() != 16, "wrong result");
+    EXECGRAPH_THROW_IF(resultNode->getOutVal<DummyNode<Config>::Result1>() != 16, "wrong result");
 }
 
 MY_TEST(ExecutionTree_Test, IntBig)
@@ -115,9 +115,9 @@ MY_TEST(ExecutionTree_Test, IntBig)
             }
             catch(...)
             {
-                EXECGRAPH_THROW_EXCEPTION("Wrong Exception thrown!");
+                EXECGRAPH_THROW("Wrong Exception thrown!");
             }
-            EXECGRAPH_THROW_EXCEPTION("Added a Cycle but no exception has been thrown!");
+            EXECGRAPH_THROW("Added a Cycle but no exception has been thrown!");
         }
     }
 }

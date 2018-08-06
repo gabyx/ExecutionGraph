@@ -41,16 +41,16 @@ namespace executionGraph
     }  // namespace details
 }  // namespace executionGraph
 
-#define EXECGRAPH_THROW_EXCEPTION_TYPE(Type, ...) executionGraph::details::throwException<Type>(__VA_ARGS__);
+#define EXECGRAPH_THROW_TYPE(Type, ...) executionGraph::details::throwException<Type>(__VA_ARGS__);
 
-#define EXECGRAPH_THROW_EXCEPTION_TYPE_IF(condition, Type, ...)     \
+#define EXECGRAPH_THROW_TYPE_IF(condition, Type, ...)               \
     if(condition)                                                   \
     {                                                               \
         executionGraph::details::throwException<Type>(__VA_ARGS__); \
     }
 
-#define EXECGRAPH_THROW_EXCEPTION(...) EXECGRAPH_THROW_EXCEPTION_TYPE(executionGraph::Exception, __VA_ARGS__)
-#define EXECGRAPH_THROW_EXCEPTION_IF(condition, ...) EXECGRAPH_THROW_EXCEPTION_TYPE_IF(condition, executionGraph::Exception, __VA_ARGS__)
+#define EXECGRAPH_THROW(...) EXECGRAPH_THROW_TYPE(executionGraph::Exception, __VA_ARGS__)
+#define EXECGRAPH_THROW_IF(condition, ...) EXECGRAPH_THROW_TYPE_IF(condition, executionGraph::Exception, __VA_ARGS__)
 
 namespace executionGraph
 {

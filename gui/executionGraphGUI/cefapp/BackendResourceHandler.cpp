@@ -103,7 +103,7 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
     std::string error = "Unknown Exception";
     try
     {
-        EXECGRAPHGUI_THROW_EXCEPTION_IF(!future.valid(), "Future is invalid!");
+        EXECGRAPHGUI_THROW_IF(!future.valid(), "Future is invalid!");
 
         m_payload = future.get();  // Set the payload!
 

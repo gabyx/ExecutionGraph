@@ -71,38 +71,38 @@ namespace executionGraph
                 auto optNode  = FactoryRead::create(rttrType, nodeId, nodeName, additionalData);
                 if(optNode)
                 {
-                    EXECGRAPH_THROW_EXCEPTION_IF(*optNode == nullptr,
-                                                 "FactoryRead::create provided nullptr for type '{0}'!",
-                                                 type)
+                    EXECGRAPH_THROW_IF(*optNode == nullptr,
+                                       "FactoryRead::create provided nullptr for type '{0}'!",
+                                       type)
                     return std::move(*optNode);
                 }
                 else
                 {
-                    EXECGRAPH_THROW_EXCEPTION_IF(additionalData != nullptr,
-                                                 "Cannot construct type: '{0}' without ReadFactory (add data!)!",
-                                                 type)
+                    EXECGRAPH_THROW_IF(additionalData != nullptr,
+                                       "Cannot construct type: '{0}' without ReadFactory (add data!)!",
+                                       type)
                     // try to construct over RTTR
-                    EXECGRAPH_THROW_EXCEPTION_IF(!rttrType.is_derived_from(rttr::type::get<NodeBaseType>()),
-                                                 "Type: '{0}' is not derived from NodeBaseType!"
-                                                 "Did you correctly init RTTR?",
-                                                 type);
+                    EXECGRAPH_THROW_IF(!rttrType.is_derived_from(rttr::type::get<NodeBaseType>()),
+                                       "Type: '{0}' is not derived from NodeBaseType!"
+                                       "Did you correctly init RTTR?",
+                                       type);
 
                     rttr::variant instance;
                     if(!nodeName.empty())
                     {
                         rttr::constructor ctor = rttrType.get_constructor({rttr::type::get<NodeId>(),
                                                                            rttr::type::get<const std::string&>()});
-                        EXECGRAPH_THROW_EXCEPTION_IF(!ctor.is_valid(), "Ctor is invalid for type: '{0}'", type);
+                        EXECGRAPH_THROW_IF(!ctor.is_valid(), "Ctor is invalid for type: '{0}'", type);
                         instance = ctor.invoke(nodeId, nodeName);
                     }
                     else
                     {
                         rttr::constructor ctor = rttrType.get_constructor({rttr::type::get<NodeId>()});
-                        EXECGRAPH_THROW_EXCEPTION_IF(!ctor.is_valid(), "Ctor is invalid for type: '{0}'", type);
+                        EXECGRAPH_THROW_IF(!ctor.is_valid(), "Ctor is invalid for type: '{0}'", type);
                         instance = ctor.invoke(nodeId);
                     }
-                    EXECGRAPH_THROW_EXCEPTION_IF(!instance.is_valid(), "Variant instance is not valid!");
-                    EXECGRAPH_THROW_EXCEPTION_IF(!instance.get_type().is_pointer(), "Variant instance type needs to be a pointer!");
+                    EXECGRAPH_THROW_IF(!instance.is_valid(), "Variant instance is not valid!");
+                    EXECGRAPH_THROW_IF(!instance.get_type().is_pointer(), "Variant instance type needs to be a pointer!");
 
                     return std::unique_ptr<NodeBaseType>{instance.get_value<NodeBaseType*>()};  // Return the instance
                 }

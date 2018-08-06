@@ -24,10 +24,10 @@
 #    pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 
-#define EXECGRAPHGUI_THROW_EXCEPTION(...) EXECGRAPH_THROW_EXCEPTION(__VA_ARGS__)
-#define EXECGRAPHGUI_THROW_EXCEPTION_IF(condition, ...) EXECGRAPH_THROW_EXCEPTION_TYPE_IF(condition, executionGraph::Exception, __VA_ARGS__)
-#define EXECGRAPHGUI_THROW_EXCEPTION_TYPE(Type, ...) EXECGRAPH_THROW_EXCEPTION_TYPE(Type, __VA_ARGS__)
-#define EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(condition, Type, ...) EXECGRAPH_THROW_EXCEPTION_TYPE_IF(condition, Type, __VA_ARGS__)
+#define EXECGRAPHGUI_THROW(...) EXECGRAPH_THROW(__VA_ARGS__)
+#define EXECGRAPHGUI_THROW_IF(condition, ...) EXECGRAPH_THROW_TYPE_IF(condition, executionGraph::Exception, __VA_ARGS__)
+#define EXECGRAPHGUI_THROW_TYPE(Type, ...) EXECGRAPH_THROW_TYPE(Type, __VA_ARGS__)
+#define EXECGRAPHGUI_THROW_TYPE_IF(condition, Type, ...) EXECGRAPH_THROW_TYPE_IF(condition, Type, __VA_ARGS__)
 
 #ifdef __clang__
 #    pragma clang diagnostic pop

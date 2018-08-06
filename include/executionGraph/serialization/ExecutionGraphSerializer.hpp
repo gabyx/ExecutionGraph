@@ -63,20 +63,20 @@ namespace executionGraph
                                  m_filePath);
 
                 // Deserialize
-                EXECGRAPH_THROW_EXCEPTION_IF(!ExecutionGraphBufferHasIdentifier(buffer),
-                                             "File identifier in '{0}' not found!",
-                                             filePath);
+                EXECGRAPH_THROW_IF(!ExecutionGraphBufferHasIdentifier(buffer),
+                                   "File identifier in '{0}' not found!",
+                                   filePath);
 
                 flatbuffers::Verifier verifier(buffer, size, 64, 1000000000);
-                EXECGRAPH_THROW_EXCEPTION_IF(!VerifyExecutionGraphBuffer(verifier),
-                                             "Buffer in '{0}' could not be verified!",
-                                             filePath);
+                EXECGRAPH_THROW_IF(!VerifyExecutionGraphBuffer(verifier),
+                                   "Buffer in '{0}' could not be verified!",
+                                   filePath);
 
                 auto graph = GetExecutionGraph(buffer);
 
-                EXECGRAPH_THROW_EXCEPTION_IF(graph == nullptr,
-                                             "Deserialization from '{0}' is invalid!",
-                                             filePath);
+                EXECGRAPH_THROW_IF(graph == nullptr,
+                                   "Deserialization from '{0}' is invalid!",
+                                   filePath);
 
                 auto execGraph = std::make_unique<GraphType>();
                 readGraph(*execGraph, *graph);
@@ -93,9 +93,9 @@ namespace executionGraph
                 FinishExecutionGraphBuffer(builder, graphOffset);
 
                 std::ofstream file;
-                EXECGRAPH_THROW_EXCEPTION_IF(!bOverwrite && std::filesystem::exists(filePath),
-                                             "File '{0}' already exists!",
-                                             filePath);
+                EXECGRAPH_THROW_IF(!bOverwrite && std::filesystem::exists(filePath),
+                                   "File '{0}' already exists!",
+                                   filePath);
 
                 file.open(filePath.string(), std::ios_base::trunc | std::ios_base::binary | std::ios_base::in);
                 file.write(reinterpret_cast<const char*>(builder.GetBufferPointer()), builder.GetSize());
@@ -249,7 +249,7 @@ namespace executionGraph
                     }
                     else
                     {
-                        EXECGRAPH_THROW_EXCEPTION("Could not load node with id: '{0}'", node->id());
+                        EXECGRAPH_THROW("Could not load node with id: '{0}'", node->id());
                     }
                 }
             }

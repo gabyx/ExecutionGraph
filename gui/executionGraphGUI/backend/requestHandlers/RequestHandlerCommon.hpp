@@ -27,9 +27,9 @@ auto getRootOfPayloadAndVerify(const BinaryPayload& payload)
     if(verifyBuffer)
     {
         flatbuffers::Verifier v(buffer->getData(), buffer->getSize());
-        EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(request->Verify(v),
-                                             BadRequestError,
-                                             "Flatbuffer corrupt!", );
+        EXECGRAPHGUI_THROW_TYPE_IF(request->Verify(v),
+                                   BadRequestError,
+                                   "Flatbuffer corrupt!", );
     }
     return request;
 }

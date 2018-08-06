@@ -359,14 +359,14 @@ namespace executionGraph
     template<typename TConfig>
     void LogicNode<TConfig>::setGetLink(LogicNode& outN, SocketIndex outS, LogicNode& inN, SocketIndex inS)
     {
-        EXECGRAPH_THROW_EXCEPTION_TYPE_IF(outS >= outN.getOutputs().size() || inS >= inN.getInputs().size(),
-                                          NodeConnectionException,
-                                          "Wrong socket indices:  outNode: '{0}' outSocketIdx: '{1}' "
-                                          "inNode: '{2}' inSocketIdx: '{3}'",
-                                          outN.getId(),
-                                          outS,
-                                          inN.getId(),
-                                          inS);
+        EXECGRAPH_THROW_TYPE_IF(outS >= outN.getOutputs().size() || inS >= inN.getInputs().size(),
+                                NodeConnectionException,
+                                "Wrong socket indices:  outNode: '{0}' outSocketIdx: '{1}' "
+                                "inNode: '{2}' inSocketIdx: '{3}'",
+                                outN.getId(),
+                                outS,
+                                inN.getId(),
+                                inS);
 
         inN.getISocket(inS).setGetLink(outN.getOSocket(outS));
     }
@@ -374,16 +374,16 @@ namespace executionGraph
     template<typename TConfig>
     void LogicNode<TConfig>::addWriteLink(LogicNode& outN, SocketIndex outS, LogicNode& inN, SocketIndex inS)
     {
-        EXECGRAPH_THROW_EXCEPTION_TYPE_IF(outS >= outN.getOutputs().size() || inS >= inN.getInputs().size(),
-                                          NodeConnectionException,
-                                          "Wrong socket indices:  outNode: '{0}' outSocketIdx: '{1}' "
-                                          "inNode: '{2}' inSocketIdx: '{3}' (nOuts: '{4}', nIns: '{5}' )",
-                                          outN.getId(),
-                                          outS,
-                                          inN.getId(),
-                                          inS,
-                                          outN.getOutputs().size(),
-                                          inN.getInputs().size());
+        EXECGRAPH_THROW_TYPE_IF(outS >= outN.getOutputs().size() || inS >= inN.getInputs().size(),
+                                NodeConnectionException,
+                                "Wrong socket indices:  outNode: '{0}' outSocketIdx: '{1}' "
+                                "inNode: '{2}' inSocketIdx: '{3}' (nOuts: '{4}', nIns: '{5}' )",
+                                outN.getId(),
+                                outS,
+                                inN.getId(),
+                                inS,
+                                outN.getOutputs().size(),
+                                inN.getInputs().size());
 
         outN.getOSocket(outS).addWriteLink(inN.getISocket(inS));
     }

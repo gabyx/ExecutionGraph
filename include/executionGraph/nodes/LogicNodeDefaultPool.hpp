@@ -53,9 +53,9 @@ namespace executionGraph
             }
             else
             {
-                EXECGRAPH_THROW_EXCEPTION_TYPE(NodeConnectionException,
-                                               "Default output socket id: '{0}' does not exist in default output socket pool!",
-                                               defaultOutSocketID);
+                EXECGRAPH_THROW_TYPE(NodeConnectionException,
+                                     "Default output socket id: '{0}' does not exist in default output socket pool!",
+                                     defaultOutSocketID);
             }
         }
 
@@ -75,7 +75,7 @@ namespace executionGraph
         template<typename T>
         IndexType addNewDefaultValue(T&& defaultValue)
         {
-            EXECGRAPH_THROW_EXCEPTION("Needs implementation!");
+            EXECGRAPH_THROW("Needs implementation!");
         }
 
         void reset() {}

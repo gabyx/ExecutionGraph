@@ -44,9 +44,9 @@ public:
     //! Allocate `size` bytes of memory.
     virtual uint8_t* allocate(std::size_t bytes) override
     {
-        EXECGRAPHGUI_THROW_EXCEPTION_IF(m_buffer != nullptr,
-                                        "Another allocation from flatbuffers happened."
-                                        "Since we cache only one allocation here, this is going to get no good!")
+        EXECGRAPHGUI_THROW_IF(m_buffer != nullptr,
+                              "Another allocation from flatbuffers happened."
+                              "Since we cache only one allocation here, this is going to get no good!")
         m_allocatedBytes     = bytes;
         m_enableDeallocation = true;
         m_buffer             = static_cast<uint8_t*>(foonathan::memory::allocator_traits<RawAllocator>::allocate_array(*m_allocator,

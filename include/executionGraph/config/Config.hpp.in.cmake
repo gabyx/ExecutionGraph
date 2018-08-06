@@ -42,7 +42,7 @@ namespace executionGraph{
     #cmakedefine ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS
     #ifdef ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS
         #define EXECGRAPH_THROW_IF_BAD_SOCKET_CASTS
-        #define EXECGRAPH_THROW_BADSOCKETCAST_IF(cond, mess, ...) EXECGRAPH_THROW_EXCEPTION_TYPE_IF(cond, BadSocketCastException, mess, __VA_ARGS__)
+        #define EXECGRAPH_THROW_BADSOCKETCAST_IF(cond, mess, ...) EXECGRAPH_THROW_TYPE_IF(cond, BadSocketCastException, mess, __VA_ARGS__)
     #else
         #define EXECGRAPH_THROW_BADSOCKETCAST_IF(cond, mess, ...) EXECGRAPH_ASSERT_TYPE(cond, BadSocketCastException, mess, __VA_ARGS__)
     #endif

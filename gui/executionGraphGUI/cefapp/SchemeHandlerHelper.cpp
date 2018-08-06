@@ -29,7 +29,7 @@ namespace schemeHandlerHelper
                                                      true /* is secure */,
                                                      false /* is cors enabled*/,
                                                      false /* is_csp_bypassing*/);
-            EXECGRAPHGUI_THROW_EXCEPTION_IF(!result, "Scheme not registered!");
+            EXECGRAPHGUI_THROW_IF(!result, "Scheme not registered!");
         }
     }
 

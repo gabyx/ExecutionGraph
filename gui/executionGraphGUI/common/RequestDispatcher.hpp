@@ -84,20 +84,20 @@ public:
         std::scoped_lock<std::mutex> lock(m_access);
 
         const auto& requestTypes = handler->getRequestTypes();
-        EXECGRAPHGUI_THROW_EXCEPTION_IF(!handler || requestTypes.size() == 0, "nullptr or no requestTypes");
+        EXECGRAPHGUI_THROW_IF(!handler || requestTypes.size() == 0, "nullptr or no requestTypes");
 
         const Id& id = handler->getId();
-        EXECGRAPHGUI_THROW_EXCEPTION_IF(m_handlerStorage.find(id) != m_handlerStorage.end(),
-                                        "MessageHandler with id: '{0}' already exists!",
-                                        id.toString());
+        EXECGRAPHGUI_THROW_IF(m_handlerStorage.find(id) != m_handlerStorage.end(),
+                              "MessageHandler with id: '{0}' already exists!",
+                              id.toString());
 
         auto p = m_handlerStorage.emplace(id, HandlerData{requestTypes, handler});
 
         for(auto& requestType : requestTypes)
         {
-            EXECGRAPHGUI_THROW_EXCEPTION_IF(m_specificHandlers.find(requestType) != m_specificHandlers.end(),
-                                            "Handler for request type: '{0}' already registered!",
-                                            requestType);
+            EXECGRAPHGUI_THROW_IF(m_specificHandlers.find(requestType) != m_specificHandlers.end(),
+                                  "Handler for request type: '{0}' already registered!",
+                                  requestType);
             m_specificHandlers[requestType] = &(p.first->second);
         }
     }
