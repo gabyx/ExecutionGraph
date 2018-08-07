@@ -10,56 +10,74 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
+#include <array>
+#include <exception>
 #include <meta/meta.hpp>
+#include <string>
 #include <type_traits>
 #include <utility>
 #include "TestFunctions.hpp"
 
-struct A
+struct Functor
 {
-    using Writer = int;
+    template<typename T>
+    void invoke()
+    {
+        if constexpr(std::is_same<T, char>{})
+        {
+            std::cout << "char" << std::endl;
+        }
+        else if constexpr(std::is_same<T, double>{})
+        {
+            std::cout << "double" << std::endl;
+        }
+        else
+        {
+            std::cout << "default" << std::endl;
+        }
+    }
 };
 
-struct B
+namespace meta
 {
-    using Writer = double;
-};
+    namespace details
+    {
+        template<typename Func, typename List>
+        struct visitTraits;
 
-struct C
-{
-    using NoWriter = double;
-};
+        template<typename Func, typename... Args>
+        struct visitTraits<Func, meta::list<Args...>>
+        {
+            using MemberPtr = void (Func::*)(void);
 
-template<typename T>
-using filterWriter = std::is_same<typename T::Writer, int>;
+            static constexpr std::array<MemberPtr, sizeof...(Args)> makeMap()
+            {
+                return {&Func::template invoke<Args>...};  // Build member function pointers.
+            }
+        };
+    }  // namespace details
 
-template<typename T, typename = int>
-struct hasAlias : std::false_type
-{};
-
-template<typename T>
-struct hasAlias<T, decltype((void)typename T::Writer{}, 0)> : std::true_type
-{};
-
-template<typename T>
-using filterWriter = std::is_same<typename T::Writer, int>;
+    template<typename List, typename Func>
+    void visit(Func&& f, std::size_t index)
+    {
+        constexpr auto map = details::visitTraits<std::decay_t<Func>, List>::makeMap();
+        if(index < map.size())
+        {
+            (f.*map[index])();
+        }
+        else
+        {
+            throw std::out_of_range("Wrong index: " + std::to_string(index));
+        }
+    }
+}  // namespace meta
 
 MY_TEST(MetaProgramming, Test1)
 {
-    {
-        using List    = meta::list<A, B>;
-        using NewList = meta::filter<List, meta::quote<filterWriter>>;
-        static_assert(std::is_same<NewList, meta::list<A>>{});
-    }
-
-    {
-        using List = meta::list<A, C, B>;
-        static_assert(hasAlias<A>{}, "Has Writer");
-        static_assert(!hasAlias<C>{}, "Has Writer");
-
-        using NewList = meta::filter<List, meta::quote<hasAlias>>;
-        static_assert(std::is_same<NewList, meta::list<A, B>>{});
-    }
+    using List = meta::list<int, double, char>;
+    int index  = 2;
+    Functor func;
+    meta::visit<List>(func, index);
 }
 
 int main(int argc, char** argv)

@@ -22,7 +22,6 @@
 #include "executionGraph/common/EnumClassHelper.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
-#include "executionGraph/nodes/SocketTypeDescription.hpp"
 
 namespace executionGraph
 {

@@ -100,7 +100,7 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
         for(auto outputSocket : node->getOutputs())
         {
             std::string rtti = descIt->getSocketRTTI(outputSocket.getType());
-            builder.CreateString(
+            auto sOffset     = builder.CreateString(builder, rtti);
         }
 
         s::NodeDescriptionBuilder nodeDesc(builder);

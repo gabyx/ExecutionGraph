@@ -53,6 +53,18 @@
             "MIMode": "lldb"
         },
         {
+            "name": "(lldb) ExecutionGraphTests-MetaProgramming",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/tests/ExecutionGraphTest-MetaProgramming",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
             "name": "(lldb) ExecutionGraphTests-CEFSimple",
             "type": "cppdbg",
             "request": "launch",

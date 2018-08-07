@@ -14,6 +14,7 @@
 #define executionGraph_serializer_LogicNodeSerializer_hpp
 
 #include <meta/meta.hpp>
+#include <type_traits>
 #include "executionGraph/common/Factory.hpp"
 #include "executionGraph/serialization/SocketTypeDescription.hpp"
 #include "executionGraph/serialization/schemas/LogicNode_generated.h"
@@ -230,18 +231,18 @@ namespace executionGraph
 
         private:
             //! Type `T::Writer` detector
-            template<typename T, typename = int>
+            template<typename T, typename = void>
             struct hasWriter : std::false_type
             {};
             template<typename T>
-            struct hasWriter<T, decltype((void)typename T::Writer{}, 0)> : std::true_type
+            struct hasWriter<T, std::void_t<typename T::Writer>> : std::true_type
             {};
-            //! Type `T::Writer` detector
-            template<typename T, typename = int>
+            //! Type `T::Reader` detector
+            template<typename T, typename = void>
             struct hasReader : std::false_type
             {};
             template<typename T>
-            struct hasReader<T, decltype((void)typename T::Writer{}, 0)> : std::true_type
+            struct hasReader<T, std::void_t<typename T::Writer>> : std::true_type
             {};
 
             template<typename T>

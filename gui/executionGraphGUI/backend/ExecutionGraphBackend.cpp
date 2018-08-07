@@ -30,9 +30,9 @@ namespace
     {
         GraphTypeDescription description;
         //! All node types
-        description.m_nodeTypeDescription = ExecutionGraphBackendDefs<Config>::NodeTypeDescriptions;
+        description.m_nodeTypeDescription = ExecutionGraphBackendDefs<Config>::m_nodeTypeDescriptions;
         //! All socket types
-        description.m_socketTypeDescription = ExecutionGraphBackendDefs<Config>::SocketTypeDescriptions;
+        description.m_socketTypeDescription = ExecutionGraphBackendDefs<Config>::m_socketTypeDescriptions;
 
         return description;
     };
@@ -56,18 +56,16 @@ void ExecutionGraphBackend::addGraph(const Id& graphId, const Id& graphType)
 
     if(graphType == m_graphTypeDescriptionIds[0])
     {
-        EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(m_graphs.find(graphId) != m_graphs.end(),
-                                             BadRequestError,
-                                             "Graph id '{0}' already exists!",
-                                             graphId.toString());
+        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(m_graphs.find(graphId) != m_graphs.end(),
+                                          "Graph id '{0}' already exists!",
+                                          graphId.toString());
 
         m_graphs.emplace(std::make_pair(graphId, DefaultGraph{}));
     }
     else
     {
-        EXECGRAPHGUI_THROW_EXCEPTION_TYPE(BadRequestError,
-                                          "Graph type: '{0}' not known!",
-                                          graphType.toString());
+        EXECGRAPHGUI_THROW_BAD_REQUEST("Graph type: '{0}' not known!",
+                                       graphType.toString());
     }
 }
 
@@ -75,10 +73,9 @@ void ExecutionGraphBackend::addGraph(const Id& graphId, const Id& graphType)
 void ExecutionGraphBackend::removeGraph(const Id& graphId)
 {
     auto nErased = m_graphs.erase(graphId);
-    EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(nErased == 0,
-                                         BadRequestError,
-                                         "No such graph id: '{0}' removed!",
-                                         graphId.toString());
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(nErased == 0,
+                                      "No such graph id: '{0}' removed!",
+                                      graphId.toString());
 }
 
 //! Remove all graphs from the backend.
@@ -87,53 +84,6 @@ void ExecutionGraphBackend::removeGraphs()
     m_graphs.clear();
 }
 
-//! Add a node with type `type` to the graph with id `graphId`.
-void ExecutionGraphBackend::addNode(const Id& graphId,
-                                    const std::string& type,
-                                    const std::string& nodeName,
-                                    const std::function<void()>& responseCreator)
-{
-    auto graphIt = m_graphs.find(graphId);
-    EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(graphIt == m_graphs.end(),
-                                         BadRequestError,
-                                         "Graph id: '{0}' does not exist!",
-                                         graphId.toString());
-    GraphVariant& graphVar = graphIt->second;
-
-    auto addNodeLambda = [&](auto& graph) {
-        using GraphType    = decltype(graph);
-        using Config       = typename GraphType::Config;
-        using NodeBaseType = typename Config::NodeBaseType;
-
-        typename ExecutionGraphBackendDefs<Config>::NodeSerializer serializer;
-
-        // Construct the node with the Serializer
-        NodeId id          = graph.generateNodeId();
-        NodeBaseType* node = nullptr;
-
-        try
-        {
-            auto n = serializer.read(type, id, nodeName);
-            node   = graph->addNode(std::move(n));
-        }
-        catch(executionGraph::Exception& e)
-        {
-            EXECGRAPHGUI_THROW_EXCEPTION_TYPE(BadRequestError,
-                                              "Construction of node '{0}' with type: '{1}' for graph id '{2}' failed: '{3}'",
-                                              nodeName,
-                                              type,
-                                              graphId,
-                                              e.what());
-        }
-
-        EXECGRAPH_ASSERT(node != nullptr, "Node is nullptr!!?");
-
-        // Create the response
-        responseCreator(graph, *node);
-    };
-
-    std::visit(addNodeLambda, graphVar);
-}
 //! Remove a node with type `type` from the graph with id `graphId`.
 void ExecutionGraphBackend::removeNode(const Id& graphId,
                                        NodeId id,
