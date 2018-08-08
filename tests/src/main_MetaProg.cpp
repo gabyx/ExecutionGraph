@@ -18,66 +18,51 @@
 #include <utility>
 #include "TestFunctions.hpp"
 
+#include <executionGraph/common/MetaVisit.hpp>
+
 struct Functor
 {
     template<typename T>
-    void invoke()
+    void invoke(int b)
     {
         if constexpr(std::is_same<T, char>{})
         {
-            std::cout << "char" << std::endl;
+            std::cout << "char" << b << std::endl;
         }
         else if constexpr(std::is_same<T, double>{})
         {
-            std::cout << "double" << std::endl;
+            throw std::runtime_error("this should not be thrown!");
         }
         else
         {
-            std::cout << "default" << std::endl;
+            throw std::runtime_error("this should not be thrown!");
         }
     }
 };
 
-namespace meta
-{
-    namespace details
-    {
-        template<typename Func, typename List>
-        struct visitTraits;
-
-        template<typename Func, typename... Args>
-        struct visitTraits<Func, meta::list<Args...>>
-        {
-            using MemberPtr = void (Func::*)(void);
-
-            static constexpr std::array<MemberPtr, sizeof...(Args)> makeMap()
-            {
-                return {&Func::template invoke<Args>...};  // Build member function pointers.
-            }
-        };
-    }  // namespace details
-
-    template<typename List, typename Func>
-    void visit(Func&& f, std::size_t index)
-    {
-        constexpr auto map = details::visitTraits<std::decay_t<Func>, List>::makeMap();
-        if(index < map.size())
-        {
-            (f.*map[index])();
-        }
-        else
-        {
-            throw std::out_of_range("Wrong index: " + std::to_string(index));
-        }
-    }
-}  // namespace meta
-
 MY_TEST(MetaProgramming, Test1)
 {
     using List = meta::list<int, double, char>;
-    int index  = 2;
     Functor func;
-    meta::visit<List>(func, index);
+    meta::visit<List>(func, 2, 3);
+
+    try
+    {
+        meta::visit<List>(func, 1, 3);
+        throw std::runtime_error("no exception thrown!");
+    }
+    catch(...)
+    {
+    }
+
+    try
+    {
+        meta::visit<List>(func, 3, 3);
+        throw std::runtime_error("no exception thrown!");
+    }
+    catch(...)
+    {
+    }
 }
 
 int main(int argc, char** argv)

@@ -50,6 +50,9 @@ namespace executionGraph
         const NodeBaseType& getParent() const { return m_parent; }
         NodeBaseType& getParent() { return m_parent; }
 
+        template<typename T>
+        bool isType() const { return getType() == meta::find_index<typename Config::SocketTypes, T>::value; }
+
     protected:
         const IndexType m_type;     //!< The index in to the meta::list SocketTypes, which type this is!
         const SocketIndex m_index;  //!< The index of the slot at which this socket is installed in a LogicNode.
@@ -95,7 +98,7 @@ namespace executionGraph
         template<typename T>
         auto* castToType() const
         {
-            EXECGRAPH_THROW_BADSOCKETCAST_IF((this->m_type != meta::find_index<SocketTypes, T>::value),
+            EXECGRAPH_THROW_BADSOCKETCAST_IF(!this->template isType<T>(),
                                              "Casting socket index '{0}' with type '{1}' into "
                                              "'{2}' of node id: '{3}' which is wrong!",
                                              this->m_index,

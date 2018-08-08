@@ -20,7 +20,7 @@ namespace executionGraph
 {
     namespace serialization
     {
-        //! A simple node description, describing a LogicSocket.
+        //! A simple socket descriptio, describing a LogicSocket.
         struct SocketTypeDescription
         {
             SocketTypeDescription(const std::string& rtti)

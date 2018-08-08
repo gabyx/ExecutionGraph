@@ -109,61 +109,22 @@ namespace executionGraph
         //! Get the number of output sockets which are connected to other nodes.
         IndexType getConnectedOutputCount() const;
 
-        //! Add an input socket with default value from the default output socket \p defaultOutputSocketId.
-        template<typename TData>
-        void addISock(const std::string& name = "noname")
-        {
-            SocketIndex id = m_inputs.size();
+        bool hasISocket(SocketIndex idx) const { return idx < m_inputs.size(); }
+        bool hasOSocket(SocketIndex idx) const { return idx < m_outputs.size(); }
 
-            auto p = SocketPointer<SocketInputBaseType>(
-                new SocketInputType<TData>(id, *this, name),
-                [](SocketInputBaseType* s) { delete static_cast<SocketInputType<TData>*>(s); });
-            m_inputs.push_back(std::move(p));
+        //! Check if input socket at index `idx` has type `T`.
+        template<typename T>
+        bool hasISocketType(SocketIndex idx) const
+        {
+            return hasISocket(idx) && getISocket(idx).template isType<T>();
         }
 
-        //! Add an output socket with default value \p defaultValue.
-        template<typename TData, typename T>
-        void addOSock(T&& defaultValue,
-                      const std::string& name = "noname")
+        //! Check if output socket at index `idx` has type `T`.
+        template<typename T>
+        bool hasOSocketType(SocketIndex idx) const
         {
-            SocketIndex id = m_outputs.size();
-
-            auto p = SocketPointer<SocketOutputBaseType>(
-                new SocketOutputType<TData>(std::forward<T>(defaultValue), id, *this, name),
-                [](SocketOutputBaseType* s) { delete static_cast<SocketOutputType<TData>*>(s); });
-            m_outputs.push_back(std::move(p));
+            return hasOSocket(idx) && getOSocket(idx).template isType<T>();
         }
-
-        //! Add all input sockets defined in the type list \p SocketDeclList.
-        template<typename SocketDeclList,
-                 EXECGRAPH_SFINAE_ENABLE_IF((meta::is<SocketDeclList, details::InputSocketDeclarationList>::value))>
-        void addSockets()
-        {
-            auto add = [&](auto socketDeclaration) {
-                using SocketDeclaration = decltype(socketDeclaration);
-                this->template addISock<typename SocketDeclaration::DataType>();
-            };
-
-            meta::for_each(typename SocketDeclList::TypeList{}, add);
-        }
-
-        //! Add all output sockets defined in the type list \p SocketDeclList where each socket has
-        //! the corresponding default value in \p defaultValues.
-        template<typename SocketDeclList,
-                 typename... Args,
-                 EXECGRAPH_SFINAE_ENABLE_IF((meta::is<SocketDeclList, details::OutputSocketDeclarationList>::value))>
-        void addSockets(std::tuple<Args...>&& defaultValues)
-        {
-            auto add = [&](auto socketDeclaration) {
-                using SocketDeclaration = decltype(socketDeclaration);
-                this->template addOSock<typename SocketDeclaration::DataType>(std::move(std::get<SocketDeclaration::Index::value>(defaultValues)));
-            };
-
-            meta::for_each(typename SocketDeclList::TypeList{}, add);
-        }
-
-        bool hasISocket(SocketIndex idx) { return idx < m_inputs.size(); }
-        bool hasOSocket(SocketIndex idx) { return idx < m_outputs.size(); }
 
         //! Get the input socket at index \p idx.
         SocketInputBaseType& getISocket(SocketIndex idx)
@@ -171,11 +132,19 @@ namespace executionGraph
             EXECGRAPH_ASSERT(idx < m_inputs.size(), "Wrong index!");
             return *m_inputs[idx];
         }
-        //! Get the output socket at index \p index.
+        const SocketInputBaseType& getISocket(SocketIndex idx) const
+        {
+            return const_cast<LogicNode*>(this)->getISocket(idx);
+        }
+        //! Get the output socket at index \p idx.
         SocketOutputBaseType& getOSocket(SocketIndex idx)
         {
             EXECGRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
             return *m_outputs[idx];
+        }
+        const SocketOutputBaseType& getOSocket(SocketIndex idx) const
+        {
+            return const_cast<LogicNode*>(this)->getOSocket(idx);
         }
 
         //! Get the input socket of type \p T at index \p idx.
@@ -236,13 +205,71 @@ namespace executionGraph
             addWriteLink(*this, outS, inN, inS);
         }
 
-        virtual std::string getTypeName() { return shortenTemplateBrackets(demangle(this)); }
+        //! Adding of sockets is protected and should only be done in constructor!
+        //@{
+    protected:
+        //! Add an input socket with default value from the default output socket \p defaultOutputSocketId.
+        template<typename TData>
+        void addISock(const std::string& name = "noname")
+        {
+            SocketIndex id = m_inputs.size();
+
+            auto p = SocketPointer<SocketInputBaseType>(
+                new SocketInputType<TData>(id, *this, name),
+                [](SocketInputBaseType* s) { delete static_cast<SocketInputType<TData>*>(s); });
+            m_inputs.push_back(std::move(p));
+        }
+
+        //! Add an output socket with default value \p defaultValue.
+        template<typename TData, typename T>
+        void addOSock(T&& defaultValue,
+                      const std::string& name = "noname")
+        {
+            SocketIndex id = m_outputs.size();
+
+            auto p = SocketPointer<SocketOutputBaseType>(
+                new SocketOutputType<TData>(std::forward<T>(defaultValue), id, *this, name),
+                [](SocketOutputBaseType* s) { delete static_cast<SocketOutputType<TData>*>(s); });
+            m_outputs.push_back(std::move(p));
+        }
+
+        //! Add all input sockets defined in the type list \p SocketDeclList.
+        template<typename SocketDeclList,
+                 EXECGRAPH_SFINAE_ENABLE_IF((meta::is<SocketDeclList, details::InputSocketDeclarationList>::value))>
+        void addSockets()
+        {
+            auto add = [&](auto socketDeclaration) {
+                using SocketDeclaration = decltype(socketDeclaration);
+                this->template addISock<typename SocketDeclaration::DataType>();
+            };
+
+            meta::for_each(typename SocketDeclList::TypeList{}, add);
+        }
+
+        //! Add all output sockets defined in the type list \p SocketDeclList where each socket has
+        //! the corresponding default value in \p defaultValues.
+        template<typename SocketDeclList,
+                 typename... Args,
+                 EXECGRAPH_SFINAE_ENABLE_IF((meta::is<SocketDeclList, details::OutputSocketDeclarationList>::value))>
+        void addSockets(std::tuple<Args...>&& defaultValues)
+        {
+            auto add = [&](auto socketDeclaration) {
+                using SocketDeclaration = decltype(socketDeclaration);
+                this->template addOSock<typename SocketDeclaration::DataType>(std::move(std::get<SocketDeclaration::Index::value>(defaultValues)));
+            };
+
+            meta::for_each(typename SocketDeclList::TypeList{}, add);
+        }
+        //@}
+
+    public:
+        virtual std::string getTypeName() const { return shortenTemplateBrackets(demangle(this)); }
 
     protected:
-        const NodeId m_id;   //! The unique id of the logic node.
-        std::string m_name;  //! The name of the logic node.
-        SocketInputListType m_inputs;
-        SocketOutputListType m_outputs;
+        const NodeId m_id;               //!< The unique id of the logic node.
+        std::string m_name;              //!< The name of the logic node.
+        SocketInputListType m_inputs;    //!< The input sockets.
+        SocketOutputListType m_outputs;  //!< The output sockets.
     };
 
     template<typename TConfig>
@@ -390,23 +417,23 @@ namespace executionGraph
 
 //! Some handy macros to redefine getters to shortcut the following ugly syntax inside a derivation of LogicNode:
 //! Accessing the value in socket Result1 : this->template getValue<typename OutSockets::template Get<Result1>>();
-#define EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(InputEnum, InSocketDeclList, OutputEnum, OutSocketDeclList)                  \
-    template<InputEnum S>                                                                                                      \
-    inline auto& getInVal() const { return this->template getValue<typename InSocketDeclList::template Get<S>>(); }            \
-                                                                                                                               \
-    template<OutputEnum S>                                                                                                     \
-    inline auto& getOutVal() { return this->template getValue<typename OutSocketDeclList::template Get<S>>(); }                \
-                                                                                                                               \
-    template<OutputEnum S>                                                                                                     \
-    inline auto& getInVal() const { return this->template getValue<typename OutSocketDeclList::template Get<S>>(); }           \
-                                                                                                                               \
-    template<InputEnum S>                                                                                                      \
-    static constexpr const executionGraph::SocketIndex& getInIdx() { return InSocketDeclList::template Get<S>::Index::value; } \
-    template<OutputEnum S>                                                                                                     \
-    static constexpr const executionGraph::SocketIndex& getOutIdx() { return OutSocketDeclList::template Get<S>::Index::value; }
+#define EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(InputEnum, InSocketDeclList, OutputEnum, OutSocketDeclList)           \
+    template<InputEnum S>                                                                                               \
+    inline auto& getInVal() const { return this->template getValue<typename InSocketDeclList::template Get<S>>(); }     \
+                                                                                                                        \
+    template<OutputEnum S>                                                                                              \
+    inline auto& getOutVal() { return this->template getValue<typename OutSocketDeclList::template Get<S>>(); }         \
+                                                                                                                        \
+    template<OutputEnum S>                                                                                              \
+    inline auto& getInVal() const { return this->template getValue<typename OutSocketDeclList::template Get<S>>(); }    \
+                                                                                                                        \
+    template<InputEnum S>                                                                                               \
+    static constexpr executionGraph::SocketIndex getInIdx() { return InSocketDeclList::template Get<S>::Index::value; } \
+    template<OutputEnum S>                                                                                              \
+    static constexpr executionGraph::SocketIndex getOutIdx() { return OutSocketDeclList::template Get<S>::Index::value; }
 
 #define EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME() \
-    virtual std::string getTypeName() override { return executionGraph::shortenTemplateBrackets(demangle(this)); }
+    virtual std::string getTypeName() const override { return executionGraph::shortenTemplateBrackets(demangle(this)); }
 
 }  // namespace executionGraph
 
