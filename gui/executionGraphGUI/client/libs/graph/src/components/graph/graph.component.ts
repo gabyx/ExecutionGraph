@@ -15,6 +15,7 @@ import { PortComponent } from '@eg/graph/src/components/port/port.component';
 import { DraggableDirective, DragEvent } from '@eg/graph/src/directives/draggable.directive';
 import { ConnectionComponent } from '@eg/graph/src/components/connection/connection.component';
 import { Point } from '@eg/graph/src/model/Point';
+import { DroppableDirective } from '@eg/graph/src/directives/droppable.directive';
 
 @Component({
   selector: 'ngcs-graph',
@@ -26,6 +27,8 @@ export class GraphComponent implements OnInit, AfterViewChecked {
   @ContentChildren(PortComponent, { descendants: true }) ports: QueryList<PortComponent>;
 
   @ContentChildren(ConnectionComponent, { descendants: true }) connections: QueryList<ConnectionComponent>;
+
+  @ContentChildren(DroppableDirective, { descendants: true }) droppables: QueryList<DroppableDirective>;
 
   public get transformSvg() {
     return `translate(${this.pan.x} ${this.pan.y})`;
@@ -72,6 +75,9 @@ export class GraphComponent implements OnInit, AfterViewChecked {
     if(draggable)
     {
       this.dragging = draggable;
+
+      this.droppables.forEach(d => d.startTracking(this.dragging));
+
       event.preventDefault();
       event.cancelBubble = true;
       this.dragging.onMouseDown({
@@ -89,6 +95,7 @@ export class GraphComponent implements OnInit, AfterViewChecked {
     event.preventDefault();
     if(this.dragging) {
       event.cancelBubble = true;
+      this.droppables.forEach(d => d.stopTracking());
       this.dragging.onMouseUp({
         elementPosition: this.getRelativePosition(this.dragging.nativeElement),
         mousePosition: {x: event.clientX, y: event.clientY}
