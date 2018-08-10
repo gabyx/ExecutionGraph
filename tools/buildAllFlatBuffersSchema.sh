@@ -20,10 +20,11 @@ cd "$folder"
 folder="${REPO_DIR}/include/executionGraph/serialization/schemas"
 echo "Building schemas in ${folder} ..."
 cd "$folder"
-"$flatcCompiler" -I "${REPO_DIR}/include/" --cpp *.fbs
+"$flatcCompiler" -I "${REPO_DIR}/include/" -o "cpp" --cpp *.fbs
+"$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" -o "ts" --ts --no-fb-import *.fbs
 
 folder="${REPO_DIR}/gui/executionGraphGUI/messages/schemas"
 echo "Building schemas in ${folder} ..."
 cd "$folder"
-"$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" --cpp *.fbs
-"$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" --ts --no-fb-import *.fbs
+"$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" -o "cpp" --cpp *.fbs
+"$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" -o "ts" --ts --no-fb-import *.fbs

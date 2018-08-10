@@ -10,14 +10,14 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-include "executionGraphGUI/messages/schemas/NodeTypeDescription.fbs";
-include "executionGraphGUI/messages/schemas/SocketTypeDescription.fbs";
+include "executionGraph/serialization/schemas/NodeTypeDescription.fbs";
+include "executionGraph/serialization/schemas/SocketTypeDescription.fbs";
 
-namespace executionGraphGUI.serialization;
+namespace executionGraph.serialization;
 
 table GraphTypeDescription {
     name:string (id:0, required);   //!< The readable name of this graph type.
     id:string (id:1, required);     //!< The unique id of this graph type.
-    nodeTypeDescriptions:[NodeTypeDescription] (id:2);      //!< Node descriptions
-    socketTypeDescriptions:[SocketTypeDescription] (id:3);  //!< Socket descriptions
+    socketTypeDescriptions:[SocketTypeDescription] (id:2, required);  //!< Socket descriptions
+    nodeTypeDescriptions:[NodeTypeDescription] (id:3);      //!< Node descriptions
 }

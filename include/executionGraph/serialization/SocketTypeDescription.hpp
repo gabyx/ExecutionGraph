@@ -18,51 +18,47 @@
 
 namespace executionGraph
 {
-    namespace serialization
+    //! A simple socket descriptio, describing a LogicSocket.
+    struct SocketTypeDescription
     {
-        //! A simple socket descriptio, describing a LogicSocket.
-        struct SocketTypeDescription
-        {
-            SocketTypeDescription(const std::string& rtti)
-                : m_rtti(rtti), m_name(m_rtti)
-            {}
-            SocketTypeDescription(const std::string& rtti, const std::string& name)
-                : m_rtti(rtti), m_name(name)
-            {}
+        SocketTypeDescription(const std::string& rtti)
+            : m_rtti(rtti), m_name(m_rtti)
+        {}
+        SocketTypeDescription(const std::string& rtti, const std::string& name)
+            : m_rtti(rtti), m_name(name)
+        {}
 
-            std::string m_rtti;  //!< The unique RTTI name of the socket
-            std::string m_name;  //!< The readable name of the socket
-        };
+        std::string m_rtti;  //!< The unique RTTI name of the socket
+        std::string m_name;  //!< The readable name of the socket
+    };
 
-        namespace details
+    namespace details
+    {
+        //! Return a set of rtti strings.
+        template<typename T>
+        struct MakeRTTIs;
+
+        //! Spezialization for `meta::list<...>`.
+        template<typename... NodeType>
+        struct MakeRTTIs<meta::list<NodeType...>>
         {
-            //! Return a set of rtti strings.
             template<typename T>
-            struct MakeRTTIs;
-
-            //! Spezialization for `meta::list<...>`.
-            template<typename... NodeType>
-            struct MakeRTTIs<meta::list<NodeType...>>
+            static std::vector<T> eval()
             {
-                template<typename T>
-                static std::vector<T> eval()
-                {
-                    return {{T{rttr::type::get<NodeType>().get_name().to_string()}...}};
-                }
-            };
-        }  // namespace details
+                return {{T{rttr::type::get<NodeType>().get_name().to_string()}...}};
+            }
+        };
+    }  // namespace details
 
-        //! Get all socket descriptions for this config `TConfig`.
-        template<typename TConfig>
-        static const std::vector<SocketTypeDescription>& getSocketDescriptions()
-        {
-            //! The static socket description for this default configuration
-            static const std::vector<SocketTypeDescription> socketTypeDescriptions =
-                details::MakeRTTIs<typename TConfig::SocketTypes>::template eval<SocketTypeDescription>();
+    //! Get all socket descriptions for this config `TConfig`.
+    template<typename TConfig>
+    static const std::vector<SocketTypeDescription>& getSocketDescriptions()
+    {
+        //! The static socket description for this default configuration
+        static const std::vector<SocketTypeDescription> socketTypeDescriptions =
+            details::MakeRTTIs<typename TConfig::SocketTypes>::template eval<SocketTypeDescription>();
 
-            return socketTypeDescriptions;
-        }
-
-    }  // namespace serialization
+        return socketTypeDescriptions;
+    }
 }  // namespace executionGraph
 #endif

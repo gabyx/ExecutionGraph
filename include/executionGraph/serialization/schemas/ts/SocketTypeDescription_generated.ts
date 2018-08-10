@@ -3,8 +3,8 @@
 /**
  * @constructor
  */
-export namespace executionGraphGUI.serialization{
-export class NodeTypeDescription {
+export namespace executionGraph.serialization{
+export class SocketTypeDescription {
   /**
    * @type {flatbuffers.ByteBuffer}
    */
@@ -17,9 +17,9 @@ export class NodeTypeDescription {
 /**
  * @param {number} i
  * @param {flatbuffers.ByteBuffer} bb
- * @returns {NodeTypeDescription}
+ * @returns {SocketTypeDescription}
  */
-__init(i:number, bb:flatbuffers.ByteBuffer):NodeTypeDescription {
+__init(i:number, bb:flatbuffers.ByteBuffer):SocketTypeDescription {
   this.bb_pos = i;
   this.bb = bb;
   return this;
@@ -27,11 +27,11 @@ __init(i:number, bb:flatbuffers.ByteBuffer):NodeTypeDescription {
 
 /**
  * @param {flatbuffers.ByteBuffer} bb
- * @param {NodeTypeDescription=} obj
- * @returns {NodeTypeDescription}
+ * @param {SocketTypeDescription=} obj
+ * @returns {SocketTypeDescription}
  */
-static getRootAsNodeTypeDescription(bb:flatbuffers.ByteBuffer, obj?:NodeTypeDescription):NodeTypeDescription {
-  return (obj || new NodeTypeDescription).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+static getRootAsSocketTypeDescription(bb:flatbuffers.ByteBuffer, obj?:SocketTypeDescription):SocketTypeDescription {
+  return (obj || new SocketTypeDescription).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
@@ -59,7 +59,7 @@ type(optionalEncoding?:any):string|Uint8Array|null {
 /**
  * @param {flatbuffers.Builder} builder
  */
-static startNodeTypeDescription(builder:flatbuffers.Builder) {
+static startSocketTypeDescription(builder:flatbuffers.Builder) {
   builder.startObject(2);
 };
 
@@ -83,7 +83,7 @@ static addType(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset) {
  * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
-static endNodeTypeDescription(builder:flatbuffers.Builder):flatbuffers.Offset {
+static endSocketTypeDescription(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // name
   builder.requiredField(offset, 6); // type

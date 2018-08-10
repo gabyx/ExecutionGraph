@@ -8,10 +8,13 @@
 #include "flatbuffers/flexbuffers.h"
 
 #include "DataTypes_generated.h"
+#include "GraphTypeDescription_generated.h"
 #include "GraphVisualization_generated.h"
 #include "LogicNode_generated.h"
 #include "LogicSocket_generated.h"
+#include "NodeTypeDescription_generated.h"
 #include "SocketLink_generated.h"
+#include "SocketTypeDescription_generated.h"
 
 namespace executionGraph {
 namespace serialization {
@@ -130,11 +133,15 @@ inline flatbuffers::Offset<ExecutionGraphNodeProperties> CreateExecutionGraphNod
 
 struct ExecutionGraph FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_NODES = 4,
-    VT_LINKS = 6,
-    VT_NODEPROPERTIES = 8,
-    VT_VISUALIZATION = 10
+    VT_GRAPHDESCRIPTION = 4,
+    VT_NODES = 6,
+    VT_LINKS = 8,
+    VT_NODEPROPERTIES = 10,
+    VT_VISUALIZATION = 12
   };
+  const GraphTypeDescription *graphDescription() const {
+    return GetPointer<const GraphTypeDescription *>(VT_GRAPHDESCRIPTION);
+  }
   const flatbuffers::Vector<flatbuffers::Offset<LogicNode>> *nodes() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<LogicNode>> *>(VT_NODES);
   }
@@ -149,6 +156,8 @@ struct ExecutionGraph FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_GRAPHDESCRIPTION) &&
+           verifier.VerifyTable(graphDescription()) &&
            VerifyOffset(verifier, VT_NODES) &&
            verifier.Verify(nodes()) &&
            verifier.VerifyVectorOfTables(nodes()) &&
@@ -166,6 +175,9 @@ struct ExecutionGraph FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct ExecutionGraphBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_graphDescription(flatbuffers::Offset<GraphTypeDescription> graphDescription) {
+    fbb_.AddOffset(ExecutionGraph::VT_GRAPHDESCRIPTION, graphDescription);
+  }
   void add_nodes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<LogicNode>>> nodes) {
     fbb_.AddOffset(ExecutionGraph::VT_NODES, nodes);
   }
@@ -192,6 +204,7 @@ struct ExecutionGraphBuilder {
 
 inline flatbuffers::Offset<ExecutionGraph> CreateExecutionGraph(
     flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<GraphTypeDescription> graphDescription = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<LogicNode>>> nodes = 0,
     flatbuffers::Offset<flatbuffers::Vector<const SocketLink *>> links = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<ExecutionGraphNodeProperties>>> nodeProperties = 0,
@@ -201,17 +214,20 @@ inline flatbuffers::Offset<ExecutionGraph> CreateExecutionGraph(
   builder_.add_nodeProperties(nodeProperties);
   builder_.add_links(links);
   builder_.add_nodes(nodes);
+  builder_.add_graphDescription(graphDescription);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<ExecutionGraph> CreateExecutionGraphDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<GraphTypeDescription> graphDescription = 0,
     const std::vector<flatbuffers::Offset<LogicNode>> *nodes = nullptr,
     const std::vector<SocketLink> *links = nullptr,
     const std::vector<flatbuffers::Offset<ExecutionGraphNodeProperties>> *nodeProperties = nullptr,
     flatbuffers::Offset<GraphVisualization> visualization = 0) {
   return executionGraph::serialization::CreateExecutionGraph(
       _fbb,
+      graphDescription,
       nodes ? _fbb.CreateVector<flatbuffers::Offset<LogicNode>>(*nodes) : 0,
       links ? _fbb.CreateVectorOfStructs<SocketLink>(*links) : 0,
       nodeProperties ? _fbb.CreateVector<flatbuffers::Offset<ExecutionGraphNodeProperties>>(*nodeProperties) : 0,

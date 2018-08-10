@@ -13,7 +13,7 @@
 namespace executionGraph.serialization;
 
 table LogicSocket {
-    type:string (id: 1, required);      //!< The rtti of the logic socket.
-    index:uint64 (id:0);                //!< The unique logic node id.
-    name:string (id: 2);                //!< The name of the logic socket.
+    type:uint64 (id: 1); //!< The type index of this socket in the type list `Config::SocketTypes`.
+    index:uint64 (id:2); //!< The slot index of this socket.
+    name:string (id: 3); //!< The name of the logic socket.
 }

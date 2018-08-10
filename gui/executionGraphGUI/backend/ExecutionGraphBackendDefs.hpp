@@ -70,8 +70,6 @@ public:
         static const std::vector<NodeTypeDescription> m_nodeTypeDescriptions = initAllNodeTypeDescriptions();
         return m_nodeDescritptions;
     }
-    //! The socket descriptions for this default configuration.
-    static const std::vector<SocketTypeDescription>& getNodeDescriptions() { return executionGraph::getSocketDescriptions<Config>(); }
 
 private:
     static std::vector<NodeTypeDescription> initAllNodeTypeDescriptions()

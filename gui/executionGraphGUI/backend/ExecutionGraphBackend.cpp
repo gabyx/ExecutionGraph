@@ -24,19 +24,6 @@ using NodeId               = ExecutionGraphBackend::NodeId;
 
 namespace
 {
-    //! Return a graph description.
-    template<typename Config>
-    GraphTypeDescription makeGraphTypeDescription()
-    {
-        GraphTypeDescription description;
-        //! All node types
-        description.m_nodeTypeDescription = ExecutionGraphBackendDefs<Config>::m_nodeTypeDescriptions;
-        //! All socket types
-        description.m_socketTypeDescription = ExecutionGraphBackendDefs<Config>::m_socketTypeDescriptions;
-
-        return description;
-    };
-
 }  // namespace
 
 //! Define all description Ids for the different graphs.
@@ -47,7 +34,8 @@ const std::array<IdNamed, 1> ExecutionGraphBackend::m_graphTypeDescriptionIds = 
 //! Currently only the DefaultGraphConfig is added.
 const std::unordered_map<Id, GraphTypeDescription>
     ExecutionGraphBackend::m_graphTypeDescription = {std::make_pair(m_graphTypeDescriptionIds[0],
-                                                                    makeGraphTypeDescription<DefaultGraphConfig>())};
+                                                                    makeGraphTypeDescription<DefaultGraphConfig>(m_graphTypeDescriptionIds[0],
+                                                                                                                 ExecutionGraphBackendDefs<DefaultGraphConfig>::getNodeDescriptions()))};
 
 //! Add a graph of type `graphType` with id `graphId` to the backend.
 void ExecutionGraphBackend::addGraph(const Id& graphId, const Id& graphType)

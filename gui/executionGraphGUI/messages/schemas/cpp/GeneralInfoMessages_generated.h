@@ -19,8 +19,8 @@ struct GetAllGraphTypeDescriptionsResponse FLATBUFFERS_FINAL_CLASS : private fla
   enum {
     VT_GRAPHSTYPES = 4
   };
-  const flatbuffers::Vector<flatbuffers::Offset<GraphTypeDescription>> *graphsTypes() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<GraphTypeDescription>> *>(VT_GRAPHSTYPES);
+  const flatbuffers::Vector<flatbuffers::Offset<executionGraph::serialization::GraphTypeDescription>> *graphsTypes() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<executionGraph::serialization::GraphTypeDescription>> *>(VT_GRAPHSTYPES);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -34,7 +34,7 @@ struct GetAllGraphTypeDescriptionsResponse FLATBUFFERS_FINAL_CLASS : private fla
 struct GetAllGraphTypeDescriptionsResponseBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_graphsTypes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<GraphTypeDescription>>> graphsTypes) {
+  void add_graphsTypes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<executionGraph::serialization::GraphTypeDescription>>> graphsTypes) {
     fbb_.AddOffset(GetAllGraphTypeDescriptionsResponse::VT_GRAPHSTYPES, graphsTypes);
   }
   explicit GetAllGraphTypeDescriptionsResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -51,7 +51,7 @@ struct GetAllGraphTypeDescriptionsResponseBuilder {
 
 inline flatbuffers::Offset<GetAllGraphTypeDescriptionsResponse> CreateGetAllGraphTypeDescriptionsResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<GraphTypeDescription>>> graphsTypes = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<executionGraph::serialization::GraphTypeDescription>>> graphsTypes = 0) {
   GetAllGraphTypeDescriptionsResponseBuilder builder_(_fbb);
   builder_.add_graphsTypes(graphsTypes);
   return builder_.Finish();
@@ -59,10 +59,10 @@ inline flatbuffers::Offset<GetAllGraphTypeDescriptionsResponse> CreateGetAllGrap
 
 inline flatbuffers::Offset<GetAllGraphTypeDescriptionsResponse> CreateGetAllGraphTypeDescriptionsResponseDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<flatbuffers::Offset<GraphTypeDescription>> *graphsTypes = nullptr) {
+    const std::vector<flatbuffers::Offset<executionGraph::serialization::GraphTypeDescription>> *graphsTypes = nullptr) {
   return executionGraphGUI::serialization::CreateGetAllGraphTypeDescriptionsResponse(
       _fbb,
-      graphsTypes ? _fbb.CreateVector<flatbuffers::Offset<GraphTypeDescription>>(*graphsTypes) : 0);
+      graphsTypes ? _fbb.CreateVector<flatbuffers::Offset<executionGraph::serialization::GraphTypeDescription>>(*graphsTypes) : 0);
 }
 
 }  // namespace serialization

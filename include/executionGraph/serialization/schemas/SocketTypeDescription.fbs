@@ -10,10 +10,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
  
-namespace executionGraphGUI.serialization;
+namespace executionGraph.serialization;
 
-//! Describing a node type.
-table NodeTypeDescription {
+//! Describing a socket type.
+table SocketTypeDescription {
     name:string (id:0, required); //!< The readable name of the node.
     type:string (id:1, required); //!< The unqiue RTTI name of the node.
 }

@@ -17,10 +17,11 @@
 #include "executionGraphGUI/common/AllocatorProxyFlatBuffer.hpp"
 #include "executionGraphGUI/common/Exception.hpp"
 #include "executionGraphGUI/common/Loggers.hpp"
-#include "executionGraphGUI/messages/schemas/GeneralInfoMessages_generated.h"
+#include "executionGraphGUI/messages/schemas/cpp/GeneralInfoMessages_generated.h"
 
 namespace fl = flatbuffers;
-namespace s  = executionGraphGUI::serialization;
+namespace s  = executionGraph::serialization;
+namespace sG = executionGraphGUI::serialization;
 
 //! Init the function mapping.
 FunctionMap<GeneralInfoRequestHandler::Function> GeneralInfoRequestHandler::initFunctionMap()
@@ -104,7 +105,7 @@ void GeneralInfoRequestHandler::handleGetAllGraphTypeDescriptions(const Request&
                                                                 &sockets));
     }
 
-    auto offset = s::CreateGetAllGraphTypeDescriptionsResponseDirect(builder, &graphs);
+    auto offset = sG::CreateGetAllGraphTypeDescriptionsResponseDirect(builder, &graphs);
     builder.Finish(offset);
 
     // Set the response.

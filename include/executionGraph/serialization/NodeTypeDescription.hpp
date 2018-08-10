@@ -15,18 +15,20 @@
 
 #include <string>
 
-//! A simple node description, describing a LogicNode.
-struct NodeTypeDescription
+namespace executionGraph
 {
-    NodeTypeDescription(const std::string& rtti)
-        : m_rtti(rtti), m_name(m_rtti)
-    {}
-    NodeTypeDescription(const std::string& rtti, const std::string& name)
-        : m_rtti(rtti), m_name(name)
-    {}
+    //! A simple node description, describing a LogicNode.
+    struct NodeTypeDescription
+    {
+        NodeTypeDescription(const std::string& rtti)
+            : m_rtti(rtti), m_name(m_rtti)
+        {}
+        NodeTypeDescription(const std::string& rtti, const std::string& name)
+            : m_rtti(rtti), m_name(name)
+        {}
 
-    std::string m_rtti;  //!< The unique RTTI name of the node
-    std::string m_name;  //!< The readable name of the node.
-};
-
+        std::string m_rtti;  //!< The unique RTTI name of the node
+        std::string m_name;  //!< The readable name of the node.
+    };
+}  // namespace executionGraph
 #endif

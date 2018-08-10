@@ -18,7 +18,7 @@
 #include "executionGraphGUI/common/AllocatorProxyFlatBuffer.hpp"
 #include "executionGraphGUI/common/Loggers.hpp"
 #include "executionGraphGUI/common/RequestError.hpp"
-#include "executionGraphGUI/messages/schemas/GraphManipulationMessages_generated.h"
+#include "executionGraphGUI/messages/schemas/cpp/GraphManipulationMessages_generated.h"
 
 namespace fl = flatbuffers;
 namespace s  = executionGraphGUI::serialization;
