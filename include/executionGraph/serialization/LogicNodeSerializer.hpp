@@ -64,9 +64,9 @@ namespace executionGraph
         read(const std::string& type,
              NodeId nodeId,
              const std::string& nodeName,
-             const flatbuffers::Vector<flatbuffers::Offset<LogicSocket>>* inputSockets  = nullptr,
-             const flatbuffers::Vector<flatbuffers::Offset<LogicSocket>>* outputSockets = nullptr,
-             const flatbuffers::Vector<uint8_t>* additionalData                         = nullptr)
+             const flatbuffers::Vector<flatbuffers::Offset<serialization::LogicSocket>>* inputSockets  = nullptr,
+             const flatbuffers::Vector<flatbuffers::Offset<serialization::LogicSocket>>* outputSockets = nullptr,
+             const flatbuffers::Vector<uint8_t>* additionalData                                        = nullptr)
         {
             // Dispatch to the correct serialization read function
             // the factory reads and returns the logic node
@@ -136,6 +136,8 @@ namespace executionGraph
               const NodeBaseType& node,
               bool serializeAdditionalData = true)
         {
+            namespace s = serialization;
+            using namespace s;
             namespace fb = flatbuffers;
 
             NodeId id       = node.getId();
@@ -186,6 +188,9 @@ namespace executionGraph
         static auto writeSockets(flatbuffers::FlatBufferBuilder& builder,
                                  const NodeBaseType& node)
         {
+            namespace s = serialization;
+            using namespace s;
+
             auto& socketDescriptions = getSocketDescriptions<Config>();
 
             auto write = [&](const auto& sockets) {
@@ -242,6 +247,9 @@ namespace executionGraph
         checkSockets(NodeBaseType& node,
                      const serialization::LogicNode& logicNode)
         {
+            namespace s = serialization;
+            using namespace s;
+
             auto read = [&](flatbuffers::Vector<flatbuffers::Offset<LogicSocket>>* sockets,
                             auto&& checker) {
                 if(sockets == nullptr)

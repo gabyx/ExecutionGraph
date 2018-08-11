@@ -14,17 +14,18 @@
 #define executionGraph_serializer_GraphTypeDescriptionSerializer_hpp
 
 #include <flatbuffers/flatbuffers.h>
+#include "executionGraph/common/Platform.hpp"
 #include "executionGraph/serialization/GraphTypeDescription.hpp"
-#include "executionGraph/serialization/schemas/cpp/GraphTypeDescription_generated.hpp"
+#include "executionGraph/serialization/schemas/cpp/GraphTypeDescription_generated.h"
 
-namespace execcutionGraph
+namespace executionGraph
 {
-    class GraphTypeDescriptionSerializer
+    class EXECGRAPH_EXPORT GraphTypeDescriptionSerializer
     {
     public:
-        flatbuffers::Offset<serialization::GraphTypeDescription> write(flatbuffers::FlatBufferBuilder& builder,
-                                                                       const GraphTypeDescription& graphDescription);
+        static flatbuffers::Offset<serialization::GraphTypeDescription> write(flatbuffers::FlatBufferBuilder& builder,
+                                                                              const GraphTypeDescription& graphDescription);
     };
-}  // namespace execcutionGraph
+}  // namespace executionGraph
 
 #endif

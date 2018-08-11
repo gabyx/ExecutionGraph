@@ -15,25 +15,30 @@
 
 #include <string>
 #include <vector>
+#include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/Identifier.hpp"
+#include "executionGraph/nodes/LogicCommon.hpp"
 #include "executionGraph/serialization/NodeTypeDescription.hpp"
 #include "executionGraph/serialization/SocketTypeDescription.hpp"
 
-/* ---------------------------------------------------------------------------------------*/
-/*!
-    Data structure to store the description for a graph.
-
-    @date Fri Aug 10 2018
-    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
- */
-/* ---------------------------------------------------------------------------------------*/
-
 namespace executionGraph
 {
+    /* ---------------------------------------------------------------------------------------*/
+    /*!
+        Data structure to store the description for a graph.
+
+        @date Fri Aug 10 2018
+        @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+     */
+    /* ---------------------------------------------------------------------------------------*/
     class GraphTypeDescription
     {
     public:
-        GraphTypeDescription(const IdName& graphId, std::vector<SocketTypeDescription> socketTypeDescription)
+        using SocketTypeDescriptionList = std::vector<SocketTypeDescription>;
+        using NodeTypeDescriptionList   = std::vector<NodeTypeDescription>;
+
+    public:
+        GraphTypeDescription(const IdNamed& graphId, SocketTypeDescriptionList socketTypeDescription)
             : m_graphId(graphId), m_socketTypeDescription(std::move(socketTypeDescription))
         {}
 
@@ -41,18 +46,28 @@ namespace executionGraph
         //! Get the RTTI of the socket with type `type`.
         const std::string& getSocketRTTI(IndexType type)
         {
-            EXECGRAPH_ASSERT(type < m_socketTypeDescription.size());
+            EXECGRAPH_ASSERT(type < m_socketTypeDescription.size(),
+                             "Index type: '{0}' out of range!",
+                             type);
             return m_socketTypeDescription[type].m_rtti;
         }
 
-    public:
-        const IdNamed m_graphId;                                           //!< The id of this graph type.
-        const std::vector<SocketTypeDescription> m_socketTypeDescription;  //!< Type names of the available sockets (in order with the `Config::SocketTypes`)
+        //! Get the graph id.
+        const IdNamed& getGraphId() const { return m_graphId; }
+        //! Get the socket type descriptions.
+        const SocketTypeDescriptionList& getSocketTypeDescriptions() const { return m_socketTypeDescription; }
+        //! Get the node type descriptions.
+        const NodeTypeDescriptionList& getNodeTypeDescriptions() const { return m_nodeTypeDescription; }
+        NodeTypeDescriptionList& getNodeTypeDescriptions() { return m_nodeTypeDescription; }
 
-        std::vector<NodeTypeDescription> m_nodeTypeDescription;  //!< Type names of the available and creatable nodes on this graph.
+    public:
+        const IdNamed m_graphId;                                  //!< The id of this graph type.
+        const SocketTypeDescriptionList m_socketTypeDescription;  //!< Type names of the available sockets (in order with the `Config::SocketTypes`)
+        NodeTypeDescriptionList m_nodeTypeDescription;            //!< Type names of the available and creatable nodes on this graph.
     };
 
-    //! Return a graph description.
+    //! Return a graph description from a graph id `graphId` and
+    //! its node type descriptions `nodeTypeDescriptions`.
     template<typename Config>
     GraphTypeDescription makeGraphTypeDescription(const IdNamed& graphId,
                                                   std::vector<NodeTypeDescription> nodeTypeDescription = {})
@@ -60,7 +75,7 @@ namespace executionGraph
         GraphTypeDescription description(graphId, getSocketDescriptions<Config>());
 
         //! All node types
-        description.m_nodeTypeDescription = std::move(nodeTypeDescription);
+        description.getNodeTypeDescriptions() = std::move(nodeTypeDescription);
 
         return description;
     };

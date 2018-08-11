@@ -177,7 +177,7 @@
     "plantuml.exportSubFolder": false,
     "markdown-preview-enhanced.previewTheme": "github-dark.css",
     "C_Cpp.clang_format_fallbackStyle": "none",
-    "C_Cpp.loggingLevel": "Information",
+    "C_Cpp.loggingLevel": "Debug",
     "git.ignoreLimitWarning": true,
     "cmake.configureOnOpen": false,
     "C_Cpp.configurationWarnings": "Disabled",
@@ -190,4 +190,5 @@
     "gitlens.hovers.currentLine.over": "line",
     "gitlens.hovers.enabled": false,
     "gitlens.mode.active": "review",
+    "python.formatting.provider": "yapf",
 }

@@ -16,7 +16,7 @@
 #include <executionGraph/serialization/ExecutionGraphSerializer.hpp>
 #include <executionGraph/serialization/FileMapper.hpp>
 #include <executionGraph/serialization/LogicNodeSerializer.hpp>
-#include <executionGraph/serialization/schemas/ExecutionGraph_generated.h>
+#include <executionGraph/serialization/schemas/cpp/ExecutionGraph_generated.h>
 #include <flatbuffers/flatbuffers.h>
 #include <fstream>
 #include <vector>
@@ -111,6 +111,7 @@ struct DummyNodeSerializer
 
 MY_TEST(FlatBuffer, Test2)
 {
+    using namespace executionGraph;
     unsigned int nNodes = 500;
 
     auto makeLogicNodes = [&](auto& builder) {
@@ -177,14 +178,17 @@ MY_TEST(FlatBuffer, Test2)
     {
         EXECGRAPH_LOG_TRACE("Read graph by Serializer");
 
-        using LogicNodeS = s::LogicNodeSerializer<Config,
-                                                  meta::list<DummyNodeSerializer>>;
+        using LogicNodeS = LogicNodeSerializer<Config,
+                                               meta::list<DummyNodeSerializer>>;
         LogicNodeS nodeSerializer;
-        s::ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(nodeSerializer);
+        ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(nodeSerializer);
         auto execGraph = serializer.read("myGraph.eg");
 
         EXECGRAPH_LOG_TRACE("Write graph by Serializer");
-        serializer.write(*execGraph, "myGraph-out.eg", true);
+        serializer.write(*execGraph,
+                         makeGraphTypeDescription<Config>(IdNamed{"Graph1"}),
+                         "myGraph-out.eg",
+                         true);
     }
 
     std::filesystem::remove("myGraph.eg");
@@ -192,14 +196,19 @@ MY_TEST(FlatBuffer, Test2)
 
 MY_TEST(FlatBuffer, Test3)
 {
+    using namespace executionGraph;
+
     EXECGRAPH_LOG_TRACE("Build graph");
     auto execGraph   = createRandomTree<GraphType, DummyNodeType>(3, 123456);
-    using LogicNodeS = s::LogicNodeSerializer<Config,
-                                              meta::list<DummyNodeSerializer>>;
+    using LogicNodeS = LogicNodeSerializer<Config,
+                                           meta::list<DummyNodeSerializer>>;
     LogicNodeS nodeSerializer;
-    s::ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(nodeSerializer);
+    ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(nodeSerializer);
     EXECGRAPH_LOG_TRACE("Write graph by Serializer");
-    serializer.write(*execGraph, makeGraphTypeDescription(IdNamed{"Graph1"}), "myGraph.eg", true);
+    serializer.write(*execGraph,
+                     makeGraphTypeDescription<Config>(IdNamed{"Graph1"}),
+                     "myGraph.eg",
+                     true);
     auto graphRead = serializer.read("myGraph.eg");
 
     std::filesystem::remove("myGraph.eg");

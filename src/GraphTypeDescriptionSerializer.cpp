@@ -11,6 +11,7 @@
 // =========================================================================================
 
 #include "executionGraph/serialization/GraphTypeDescriptionSerializer.hpp"
+#include <flatbuffers/flatbuffers.h>
 #include <vector>
 #include "executionGraph/serialization/GraphTypeDescription.hpp"
 
@@ -23,7 +24,7 @@ namespace executionGraph
     {
         // Node descriptions
         std::vector<flatbuffers::Offset<s::NodeTypeDescription>> nodes;
-        for(auto& nD : desc.m_nodeTypeDescription)
+        for(auto& nD : graphDescription.getNodeTypeDescriptions())
         {
             nodes.emplace_back(s::CreateNodeTypeDescriptionDirect(builder,
                                                                   nD.m_name.c_str(),
@@ -32,16 +33,17 @@ namespace executionGraph
 
         // Socket descriptions
         std::vector<flatbuffers::Offset<s::SocketTypeDescription>> sockets;
-        for(auto& sD : desc.m_socketTypeDescription)
+        for(auto& sD : graphDescription.getSocketTypeDescriptions())
         {
             sockets.emplace_back(s::CreateSocketTypeDescriptionDirect(builder,
                                                                       sD.m_name.c_str(),
                                                                       sD.m_rtti.c_str()));
         }
 
-    return s::CreateGraphTypeDescriptionDirect(builder,desc.m_id.getShortName().c_str(),
-                                               desc.m_id.toString().c_str(),
-                                               &nodes,
-                                               &sockets));
+        return s::CreateGraphTypeDescriptionDirect(builder,
+                                                   graphDescription.getGraphId().getShortName().c_str(),
+                                                   graphDescription.getGraphId().toString().c_str(),
+                                                   &sockets,
+                                                   &nodes);
     }
 }  // namespace executionGraph

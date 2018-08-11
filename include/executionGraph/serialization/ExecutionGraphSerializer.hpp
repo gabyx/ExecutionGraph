@@ -51,6 +51,9 @@ namespace executionGraph
         std::unique_ptr<GraphType>
         read(const std::path& filePath) noexcept(false)
         {
+            namespace s = serialization;
+            using namespace s;
+
             m_filePath = filePath;
             // Memory mapping the file
             FileMapper mapper(m_filePath);
@@ -84,7 +87,7 @@ namespace executionGraph
 
         //! Write an execution graph to the file `filePath`.
         void write(const GraphType& execGraph,
-                   const GraphTypeDecscription& graphDescription,
+                   const GraphTypeDescription& graphDescription,
                    const std::path& filePath,
                    bool bOverwrite = false) noexcept(false)
         {
@@ -104,14 +107,18 @@ namespace executionGraph
 
     private:
         //! Serialize a graph `graph` and return the offsets.
-        flatbuffers::Offset<ExecutionGraph>
+        flatbuffers::Offset<serialization::ExecutionGraph>
         writeGraph(flatbuffers::FlatBufferBuilder& builder,
-                   const GraphType& execGraph const GraphTypeDecscription& graphDescription) const
+                   const GraphType& execGraph,
+                   const GraphTypeDescription& graphDescription) const
         {
-            flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<LogicNode>>> nodesOffset;
-            flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<ExecutionGraphNodeProperties>>> nodePropertiesOffset;
+            namespace s = serialization;
+            using namespace s;
 
-            auto graphDescOff                           = GraphTypeDescriptionSerializer::write(graphDescription);
+            flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<s::LogicNode>>> nodesOffset;
+            flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<s::ExecutionGraphNodeProperties>>> nodePropertiesOffset;
+
+            auto graphDescOff                           = GraphTypeDescriptionSerializer::write(builder, graphDescription);
             std::tie(nodesOffset, nodePropertiesOffset) = writeNodes(builder, execGraph);
             auto linksOffset                            = writeLinks(builder, execGraph);
 
@@ -126,8 +133,11 @@ namespace executionGraph
         //! Serialize all nodes of the graph `execGraph` and return the offsets.
         auto writeNodes(flatbuffers::FlatBufferBuilder& builder, const GraphType& execGraph) const
         {
-            std::vector<flatbuffers::Offset<ExecutionGraphNodeProperties>> nodeProps;
-            std::vector<flatbuffers::Offset<LogicNode>> nodes;
+            namespace s = serialization;
+            using namespace s;
+
+            std::vector<flatbuffers::Offset<s::ExecutionGraphNodeProperties>> nodeProps;
+            std::vector<flatbuffers::Offset<s::LogicNode>> nodes;
 
             auto pair              = execGraph.getNodes();
             auto& nonConstantNodes = pair.first;
@@ -186,6 +196,9 @@ namespace executionGraph
         //! Serialize all links of a graph `graph` and return the offsets.
         auto writeLinks(flatbuffers::FlatBufferBuilder& builder, const GraphType& execGraph) const
         {
+            namespace s = serialization;
+            using namespace s;
+
             std::vector<SocketLink> socketLinks;
 
             auto& nonConstantNodes = execGraph.getNodes().first;
@@ -222,7 +235,8 @@ namespace executionGraph
 
     private:
         //! Deserialize a graph `graph` into the internal graph.
-        void readGraph(GraphType& execGraph, const ExecutionGraph& graph)
+        void readGraph(GraphType& execGraph,
+                       const serialization::ExecutionGraph& graph)
         {
             auto nodes = graph.nodes();
             if(nodes)

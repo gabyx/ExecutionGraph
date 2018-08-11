@@ -12,6 +12,7 @@
 
 #include "executionGraphGUI/backend/requestHandlers/DummyRequestHandler.hpp"
 #include <chrono>
+#include "executionGraphGUI/common/BinaryBuffer.hpp"
 #include "executionGraphGUI/common/Loggers.hpp"
 #include "executionGraphGUI/common/RequestError.hpp"
 

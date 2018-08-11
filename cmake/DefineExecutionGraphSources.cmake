@@ -27,6 +27,9 @@ function(include_all_source_ExecutionGraph
 
         ${ExecutionGraph_ROOT_DIR}/src/FileMapper.cpp
 
+        # Serialization
+        ${ExecutionGraph_ROOT_DIR}/src/GraphTypeDescriptionSerializer.cpp
+
         PARENT_SCOPE
     )
 

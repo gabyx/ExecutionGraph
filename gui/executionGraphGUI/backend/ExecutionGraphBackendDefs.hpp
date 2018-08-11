@@ -61,14 +61,14 @@ public:
 
     //! Node serializer for this graph.
     using NodeSerializers = meta::list<DummyNodeSerializer<Config>>;
-    using NodeSerializer  = executionGraph::serialization::LogicNodeSerializer<Config, NodeSerializers>;
+    using NodeSerializer  = executionGraph::LogicNodeSerializer<Config, NodeSerializers>;
 
     //! The node descriptions for this default configuration.
     static const std::vector<NodeTypeDescription>& getNodeDescriptions()
     {
         //! The static node description for this default configuration
         static const std::vector<NodeTypeDescription> m_nodeTypeDescriptions = initAllNodeTypeDescriptions();
-        return m_nodeDescritptions;
+        return m_nodeTypeDescriptions;
     }
 
 private:

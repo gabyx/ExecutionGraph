@@ -16,13 +16,14 @@
 #include <array>
 #include <executionGraph/common/Identifier.hpp>
 #include <executionGraph/graphs/ExecutionTreeInOut.hpp>
+#include <executionGraph/serialization/GraphTypeDescription.hpp>
 #include <rttr/type>
 #include <string>
 #include <variant>
 #include <vector>
 #include "executionGraphGUI/backend/Backend.hpp"
-#include "executionGraphGUI/backend/nodes/NodeTypeDescription.hpp"
-#include "executionGraphGUI/backend/nodes/SocketTypeDescription.hpp"
+#include "executionGraphGUI/backend/ExecutionGraphBackendDefs.hpp"
+#include "executionGraphGUI/common/RequestError.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -37,11 +38,11 @@ class ExecutionGraphBackend final : public Backend
     RTTR_ENABLE()
 
 public:
-    using DefaultGraph = executionGraph::ExecutionTreeInOut<executionGraph::GeneralConfig<>>;
-    using Id           = executionGraph::Id;
-    using IdNamed      = executionGraph::IdNamed;
-
-    using NodeId = executionGraph::NodeId;
+    using DefaultGraph         = executionGraph::ExecutionTreeInOut<executionGraph::GeneralConfig<>>;
+    using Id                   = executionGraph::Id;
+    using IdNamed              = executionGraph::IdNamed;
+    using GraphTypeDescription = executionGraph::GraphTypeDescription;
+    using NodeId               = executionGraph::NodeId;
 
 public:
     ExecutionGraphBackend()
@@ -60,10 +61,11 @@ public:
 
     //! Adding/removing nodes.
     //@{
+    template<typename ResponseCreator>
     void addNode(const Id& graphId,
                  const std::string& type,
                  const std::string& nodeName,
-                 const std::function<void()>& responseCreator);
+                 ResponseCreator&& responseCreator);
 
     void removeNode(const Id& graphId,
                     NodeId id,
@@ -73,20 +75,6 @@ public:
     //! Information about graphs.
     //@{
 public:
-    struct GraphTypeDescription
-    {
-        IdNamed m_id;                                                //!< The id of this graph type.
-        std::vector<NodeTypeDescription> m_nodeTypeDescription;      //!< Type names of the available and creatable nodes on this graph.
-        std::vector<SocketTypeDescription> m_socketTypeDescription;  //!< Type names of the available sockets.
-
-        //! Get the RTTI of the socket with type `type`.
-        const std::string& getSocketRTTI(IndexType type)
-        {
-            EXECGRAPH_ASSERT(type < m_socketTypeDescription.size());
-            return m_socketTypeDescription[type].m_rtti;
-        }
-    };
-
 private:
     static const std::array<IdNamed, 1> m_graphTypeDescriptionIds;                     //!< All IDs used for the graph description.
     static const std::unordered_map<Id, GraphTypeDescription> m_graphTypeDescription;  //!< All graph descriptions.
@@ -95,7 +83,6 @@ public:
     //! Get all graph descriptions identified by its id.
     const std::unordered_map<Id, GraphTypeDescription>& getGraphTypeDescriptions() const { return m_graphTypeDescription; }
     //@}
-
 private:
     using GraphVariant = std::variant<DefaultGraph>;
     //! Map of normal graphs identified by its id.
@@ -110,9 +97,9 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
                                     ResponseCreator&& responseCreator)
 {
     auto graphIt = m_graphs.find(graphId);
-    EXECGRAPHGUI_THROW_BAD_REQUEST(graphIt == m_graphs.end(),
-                                   "Graph id: '{0}' does not exist!",
-                                   graphId.toString());
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(graphIt == m_graphs.end(),
+                                      "Graph id: '{0}' does not exist!",
+                                      graphId.toString());
     GraphVariant& graphVar = graphIt->second;
 
     auto addNodeLambda = [&](auto& graph) {

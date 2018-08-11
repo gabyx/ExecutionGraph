@@ -22,9 +22,7 @@ using DefaultGraph         = ExecutionGraphBackend::DefaultGraph;
 using DefaultGraphConfig   = typename DefaultGraph::Config;
 using NodeId               = ExecutionGraphBackend::NodeId;
 
-namespace
-{
-}  // namespace
+namespace e = executionGraph;
 
 //! Define all description Ids for the different graphs.
 //! Default graph type has always this unique id!
@@ -32,10 +30,10 @@ const std::array<IdNamed, 1> ExecutionGraphBackend::m_graphTypeDescriptionIds = 
                                                                                          std::string("2992ebff-c950-4184-8876-5fe6ac029aa5")}};
 //! Define all graph types in this Backend
 //! Currently only the DefaultGraphConfig is added.
-const std::unordered_map<Id, GraphTypeDescription>
+const std::unordered_map<Id, e::GraphTypeDescription>
     ExecutionGraphBackend::m_graphTypeDescription = {std::make_pair(m_graphTypeDescriptionIds[0],
-                                                                    makeGraphTypeDescription<DefaultGraphConfig>(m_graphTypeDescriptionIds[0],
-                                                                                                                 ExecutionGraphBackendDefs<DefaultGraphConfig>::getNodeDescriptions()))};
+                                                                    e::makeGraphTypeDescription<DefaultGraphConfig>(m_graphTypeDescriptionIds[0],
+                                                                                                                    ExecutionGraphBackendDefs<DefaultGraphConfig>::getNodeDescriptions()))};
 
 //! Add a graph of type `graphType` with id `graphId` to the backend.
 void ExecutionGraphBackend::addGraph(const Id& graphId, const Id& graphType)

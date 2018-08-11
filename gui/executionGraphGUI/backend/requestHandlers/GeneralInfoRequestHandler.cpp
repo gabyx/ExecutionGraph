@@ -12,6 +12,7 @@
 
 #include "executionGraphGUI/backend/requestHandlers/GeneralInfoRequestHandler.hpp"
 #include <chrono>
+#include <executionGraph/serialization/GraphTypeDescriptionSerializer.hpp>
 #include <vector>
 #include "executionGraphGUI/backend/ExecutionGraphBackend.hpp"
 #include "executionGraphGUI/common/AllocatorProxyFlatBuffer.hpp"
@@ -19,6 +20,7 @@
 #include "executionGraphGUI/common/Loggers.hpp"
 #include "executionGraphGUI/messages/schemas/cpp/GeneralInfoMessages_generated.h"
 
+using namespace executionGraph;
 namespace fl = flatbuffers;
 namespace s  = executionGraph::serialization;
 namespace sG = executionGraphGUI::serialization;
@@ -78,31 +80,8 @@ void GeneralInfoRequestHandler::handleGetAllGraphTypeDescriptions(const Request&
 
     for(auto& kV : m_backend->getGraphTypeDescriptions())
     {
-        ExecutionGraphBackend::GraphTypeDescription& desc = kV.second;
-
-        // Node descriptions
-        std::vector<flatbuffers::Offset<s::NodeTypeDescription>> nodes;
-        for(auto& nD : desc.m_nodeTypeDescription)
-        {
-            nodes.emplace_back(s::CreateNodeTypeDescriptionDirect(builder,
-                                                                  nD.m_name.c_str(),
-                                                                  nD.m_rtti.c_str()));
-        }
-
-        // Socket descriptions
-        std::vector<flatbuffers::Offset<s::SocketTypeDescription>> sockets;
-        for(auto& sD : desc.m_socketTypeDescription)
-        {
-            sockets.emplace_back(s::CreateSocketTypeDescriptionDirect(builder,
-                                                                      sD.m_name.c_str(),
-                                                                      sD.m_rtti.c_str()));
-        }
-
-        graphs.emplace_back(s::CreateGraphTypeDescriptionDirect(builder,
-                                                                desc.m_id.getShortName().c_str(),
-                                                                desc.m_id.toString().c_str(),
-                                                                &nodes,
-                                                                &sockets));
+        auto& graphDesc = kV.second;
+        graphs.emplace_back(GraphTypeDescriptionSerializer::write(builder, graphDesc));
     }
 
     auto offset = sG::CreateGetAllGraphTypeDescriptionsResponseDirect(builder, &graphs);
