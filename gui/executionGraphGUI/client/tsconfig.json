@@ -23,7 +23,7 @@
         "../messages/schemas/ts/*"
       ],
       "@serialization/*": [
-        "../../include/executionGraph/serialization/schemas/ts/*"
+        "../../../include/executionGraph/serialization/schemas/ts/*"
       ]
     }
   },

@@ -91,18 +91,6 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
         NodeSerializer serializer;
         auto nodeOffset = serializer.write(builder, node);
 
-        // Get Socket Infos
-        auto& graphDesc = m_backend->getGraphTypeDescriptions();
-        auto descIt     = graphDesc.find(graphId);
-        EXECGRAPH_ASSERT(descIt == graphDesc.end(),
-                         "GraphId '{0}' does not exist!",
-                         graphID.toString());
-        for(auto outputSocket : node->getOutputs())
-        {
-            std::string rtti = descIt->getSocketRTTI(outputSocket.getType());
-            auto sOffset     = builder.CreateString(builder, rtti);
-        }
-
         s::NodeDescriptionBuilder nodeDesc(builder);
         nodeDesc.add_node(nodeOffset);
 
