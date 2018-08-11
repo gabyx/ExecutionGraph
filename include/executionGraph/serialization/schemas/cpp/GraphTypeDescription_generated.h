@@ -6,8 +6,8 @@
 
 #include "flatbuffers/flatbuffers.h"
 
-#include "executionGraph/serialization/schemas/cpp/NodeTypeDescription_generated.h"
-#include "executionGraph/serialization/schemas/cpp/SocketTypeDescription_generated.h"
+#include "NodeTypeDescription_generated.h"
+#include "SocketTypeDescription_generated.h"
 
 namespace executionGraph {
 namespace serialization {
