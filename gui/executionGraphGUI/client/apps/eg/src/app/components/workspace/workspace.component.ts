@@ -40,7 +40,7 @@ export class WorkspaceComponent implements OnInit {
     private readonly GeneralInfoService: GeneralInfoService) { }
 
   ngOnInit() {
-    const NODES = 10;
+    const NODES = 3;
 
     for (let i = 0; i < NODES; i++) {
       this.generateNode(i);
@@ -87,8 +87,21 @@ export class WorkspaceComponent implements OnInit {
     // console.log(`Setting position to ${this.newConnectionEndpoint.x}:${this.newConnectionEndpoint.y}`)
   }
 
-  public createConnection() {
+  public abortConnection() {
     this.newConnection = null;
+  }
+
+  public createConnection(source: Socket, target: Socket) {
+    const connection = new Connection(source.id, target.id);
+    this.connections.push(connection);
+  }
+
+  public isOutputSocket(socket: Socket) {
+    return socket instanceof Socket && socket.id.indexOf("-o-") > 0;
+  }
+  
+  public isInputSocket(socket: Socket) {
+    return socket instanceof Socket && socket.id.indexOf("-i-") > 0;
   }
 
   private generateNode(id: number) {

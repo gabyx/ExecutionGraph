@@ -8,15 +8,17 @@
             </span>
             <div class="sockets">
                 <div class="inputs">
-                    <span class="socket" *ngFor="let socket of node.inputs">
+                    <span class="socket" *ngFor="let socket of node.inputs"
+                    [ngcsDraggable]="socket" (dragStarted)="initConnectionFrom(socket, $event)" (dragContinued)="movingConnection($event)" (dragEnded)="abortConnection()"
+                    [ngcsDroppable]="isOutputSocket" (draggableDropped)="createConnection(socket, $event)">
                         {{ socket.name }}
                         <ngcs-port [id]="socket.id" class="left middle"></ngcs-port>
                     </span>
                 </div>
                 <div class="outputs">
                     <span class="socket" *ngFor="let socket of node.outputs"
-                    ngcsDraggable (dragStarted)="initConnectionFrom(socket, $event)" (dragContinued)="movingConnection($event)" (dragEnded)="createConnection()"
-                    >
+                    [ngcsDraggable]="socket" (dragStarted)="initConnectionFrom(socket, $event)" (dragContinued)="movingConnection($event)" (dragEnded)="abortConnection()"
+                    [ngcsDroppable]="isInputSocket" (draggableDropped)="createConnection($event, socket)">
                         {{ socket.name }}
                         <ngcs-port [id]="socket.id" class="right middle"></ngcs-port>
                     </span>
