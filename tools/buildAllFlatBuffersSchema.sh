@@ -12,6 +12,8 @@ fi
 
 set -e # all errors are fatal
 
+$flatcCompiler --version
+
 # Tests
 folder="${REPO_DIR}/tests/files"
 echo "Building schemas in ${folder} ..."

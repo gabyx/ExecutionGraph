@@ -25,8 +25,7 @@ struct RemoveNodeRequest;
 struct NodeConstructionInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_TYPE = 4,
-    VT_NAME = 6,
-    VT_CONSTRUCTOR = 8
+    VT_NAME = 6
   };
   const flatbuffers::String *type() const {
     return GetPointer<const flatbuffers::String *>(VT_TYPE);
@@ -34,18 +33,12 @@ struct NodeConstructionInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table
   const flatbuffers::String *name() const {
     return GetPointer<const flatbuffers::String *>(VT_NAME);
   }
-  const flatbuffers::Vector<flatbuffers::Offset<ConstructorKV>> *constructor() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<ConstructorKV>> *>(VT_CONSTRUCTOR);
-  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_TYPE) &&
            verifier.Verify(type()) &&
            VerifyOffsetRequired(verifier, VT_NAME) &&
            verifier.Verify(name()) &&
-           VerifyOffset(verifier, VT_CONSTRUCTOR) &&
-           verifier.Verify(constructor()) &&
-           verifier.VerifyVectorOfTables(constructor()) &&
            verifier.EndTable();
   }
 };
@@ -58,9 +51,6 @@ struct NodeConstructionInfoBuilder {
   }
   void add_name(flatbuffers::Offset<flatbuffers::String> name) {
     fbb_.AddOffset(NodeConstructionInfo::VT_NAME, name);
-  }
-  void add_constructor(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<ConstructorKV>>> constructor) {
-    fbb_.AddOffset(NodeConstructionInfo::VT_CONSTRUCTOR, constructor);
   }
   explicit NodeConstructionInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -79,10 +69,8 @@ struct NodeConstructionInfoBuilder {
 inline flatbuffers::Offset<NodeConstructionInfo> CreateNodeConstructionInfo(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> type = 0,
-    flatbuffers::Offset<flatbuffers::String> name = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<ConstructorKV>>> constructor = 0) {
+    flatbuffers::Offset<flatbuffers::String> name = 0) {
   NodeConstructionInfoBuilder builder_(_fbb);
-  builder_.add_constructor(constructor);
   builder_.add_name(name);
   builder_.add_type(type);
   return builder_.Finish();
@@ -91,13 +79,11 @@ inline flatbuffers::Offset<NodeConstructionInfo> CreateNodeConstructionInfo(
 inline flatbuffers::Offset<NodeConstructionInfo> CreateNodeConstructionInfoDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *type = nullptr,
-    const char *name = nullptr,
-    const std::vector<flatbuffers::Offset<ConstructorKV>> *constructor = nullptr) {
+    const char *name = nullptr) {
   return executionGraphGUI::serialization::CreateNodeConstructionInfo(
       _fbb,
       type ? _fbb.CreateString(type) : 0,
-      name ? _fbb.CreateString(name) : 0,
-      constructor ? _fbb.CreateVector<flatbuffers::Offset<ConstructorKV>>(*constructor) : 0);
+      name ? _fbb.CreateString(name) : 0);
 }
 
 struct AddNodeRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {

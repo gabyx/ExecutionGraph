@@ -50,7 +50,7 @@ namespace executionGraph
     class LogicNodeSerializer final
     {
     public:
-        EXECGRAPH_TYPEDEF_CONFIG(TConfig);
+        EXECGRAPH_DEFINE_CONFIG(TConfig);
 
     public:
         LogicNodeSerializer()  = default;
@@ -200,10 +200,9 @@ namespace executionGraph
                     auto nameOff = builder.CreateString(socket->getName());
 
                     EXECGRAPH_ASSERT(socket->getType() < socketDescriptions.size(), "Socket type wrong!");
-                    auto typeOff = builder.CreateString(socketDescriptions[socket->getType()].m_rtti);
 
                     LogicSocketBuilder soBuilder(builder);
-                    soBuilder.add_type(typeOff);
+                    soBuilder.add_type(socket->getType());
                     soBuilder.add_index(socket->getIndex());
                     soBuilder.add_name(nameOff);
                     socketOffs.emplace_back(soBuilder.Finish());

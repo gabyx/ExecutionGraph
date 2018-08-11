@@ -25,7 +25,7 @@ namespace executionGraph
     class LogicNodeDefaultPool final : public TConfig::NodeBaseType
     {
     public:
-        EXECGRAPH_TYPEDEF_CONFIG(TConfig);
+        EXECGRAPH_DEFINE_CONFIG(TConfig);
         using Base = typename TConfig::NodeBaseType;
 
         template<typename... Args>

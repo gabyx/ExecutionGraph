@@ -29,34 +29,34 @@ export class GraphManipulationServiceHttp extends GraphManipulationService {
 
   public async addNode(graphId: string, type: string, name: string): Promise<sz.AddNodeResponse> {
 
-    // // Build the AddNode request
-    // let builder = new flatbuffers.Builder(128);
-    // let offGraphId = builder.createString(graphId);
-    // let offType = builder.createString(type);
-    // let offName = builder.createString(graphId);
+    // Build the AddNode request
+    let builder = new flatbuffers.Builder(128);
+    let offGraphId = builder.createString(graphId);
+    let offType = builder.createString(type);
+    let offName = builder.createString(graphId);
 
-    // sz.NodeConstructionInfo.startNodeConstructionInfo(builder);
-    // sz.NodeConstructionInfo.addName(builder, offName);
-    // sz.NodeConstructionInfo.addType(builder, offType);
-    // let off = sz.NodeConstructionInfo.endNodeConstructionInfo(builder);
+    sz.NodeConstructionInfo.startNodeConstructionInfo(builder);
+    sz.NodeConstructionInfo.addName(builder, offName);
+    sz.NodeConstructionInfo.addType(builder, offType);
+    let off = sz.NodeConstructionInfo.endNodeConstructionInfo(builder);
 
-    // sz.AddNodeRequest.startAddNodeRequest(builder);
-    // sz.AddNodeRequest.addGraphId(builder, offGraphId);
-    // sz.AddNodeRequest.addNode(builder, off);
-    // off = sz.AddNodeRequest.endAddNodeRequest(builder);
-    // builder.finish(off);
+    sz.AddNodeRequest.startAddNodeRequest(builder);
+    sz.AddNodeRequest.addGraphId(builder, offGraphId);
+    sz.AddNodeRequest.addNode(builder, off);
+    off = sz.AddNodeRequest.endAddNodeRequest(builder);
+    builder.finish(off);
 
-    // let requestPayload = builder.asUint8Array();
+    let requestPayload = builder.asUint8Array();
 
-    // // Send the request
-    // const result = await this.binaryRouter.post('graph/addNode', requestPayload);
-    // const buf = new flatbuffers.ByteBuffer(result);
-    // const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
+    // Send the request
+    const result = await this.binaryRouter.post('graph/addNode', requestPayload);
+    const buf = new flatbuffers.ByteBuffer(result);
+    const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
 
-    // let node = response.node();
-    // console.log(`[GraphManipulationServiceHttp] Added new node of type: '${node.type()}'
-    //               with name: '${node.name()}' [ins: ${node.inputSocketsLength()}, outs: ${node.outputSocketsLength()}`);
+    let node = response.node();
+    console.log(`[GraphManipulationServiceHttp] Added new node of type: '${node.type()}'
+                  with name: '${node.name()}' [ins: ${node.inputSocketsLength()}, outs: ${node.outputSocketsLength()}`);
 
-    // return response;
+    return response;
   }
 }

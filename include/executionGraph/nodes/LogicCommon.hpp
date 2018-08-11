@@ -19,6 +19,36 @@
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicSocketDefaultTypes.hpp"
 
+#define EXECGRAPH_DEFINE_TYPES(__CONFIG__)                                   \
+    using Config                  = __CONFIG__;                              \
+    using NodeId                  = executionGraph::NodeId;                  \
+    using IndexType               = executionGraph::IndexType;               \
+    using SocketIndex             = executionGraph::SocketIndex;             \
+    using SocketTypes             = typename Config::SocketTypes;            \
+    using NodeBaseType            = typename Config::NodeBaseType;           \
+    using SocketInputBaseType     = typename Config::SocketInputBaseType;    \
+    using SocketOutputBaseType    = typename Config::SocketOutputBaseType;   \
+    using SocketInputBasePointer  = typename Config::SocketInputBasePointer; \
+    using SocketOutputBasePointer = typename Config::SocketOutputBasePointer
+
+#define EXECGRAPH_DEFINE_CONFIG(__CONFIG__)                               \
+    EXECGRAPH_DEFINE_TYPES(__CONFIG__);                                   \
+    template<typename T>                                                  \
+    using SocketInputType = typename Config::template SocketInputType<T>; \
+    template<typename T>                                                  \
+    using SocketOutputType = typename Config::template SocketOutputType<T>
+
+//! Some handy macro to use when inheriting from LogicNode.
+#define EXECGRAPH_DEFINE_SOCKET_TRAITS(InputEnum, OutputEnum)                                                                       \
+    template<InputEnum id, typename TData>                                                                                          \
+    using InSocketDecl = executionGraph::details::InputSocketDeclarationBase<meta::size_t<executionGraph::enumToInt(id)>, TData>;   \
+    template<OutputEnum id, typename TData>                                                                                         \
+    using OutSocketDecl = executionGraph::details::OutputSocketDeclarationBase<meta::size_t<executionGraph::enumToInt(id)>, TData>; \
+    template<typename... TSockets>                                                                                                  \
+    using InSocketDeclList = executionGraph::details::InputSocketDeclarationList<InputEnum, TSockets...>;                           \
+    template<typename... TSockets>                                                                                                  \
+    using OutSocketDeclList = executionGraph::details::OutputSocketDeclarationList<OutputEnum, TSockets...>;
+
 namespace executionGraph
 {
     // Forward declarations
@@ -61,22 +91,6 @@ namespace executionGraph
         template<typename T>
         using SocketOutputType = LogicSocketOutput<T, GeneralConfig>;  //! This is the class template (T needs to be in TSocketTypes) for output sockets.
     };
-
-#define EXECGRAPH_TYPEDEF_CONFIG(__CONFIG__)                                  \
-    using Config                  = __CONFIG__;                               \
-    using NodeId                  = executionGraph::NodeId;                   \
-    using IndexType               = executionGraph::IndexType;                \
-    using SocketIndex             = executionGraph::SocketIndex;              \
-    using SocketTypes             = typename Config::SocketTypes;             \
-    using NodeBaseType            = typename Config::NodeBaseType;            \
-    using SocketInputBaseType     = typename Config::SocketInputBaseType;     \
-    using SocketOutputBaseType    = typename Config::SocketOutputBaseType;    \
-    using SocketInputBasePointer  = typename Config::SocketInputBasePointer;  \
-    using SocketOutputBasePointer = typename Config::SocketOutputBasePointer; \
-    template<typename T>                                                      \
-    using SocketInputType = typename Config::template SocketInputType<T>;     \
-    template<typename T>                                                      \
-    using SocketOutputType = typename Config::template SocketOutputType<T>
 
     //! Some type traits for input/output socket definitions in derived classes from GeneralConfig::NodeBaseType
     //! These metaprogramming tricks here, allow to smoothly define input/output sockets.
@@ -202,17 +216,6 @@ namespace executionGraph
         };
 
     }  // namespace details
-
-//! Some handy macro to use when inheriting from LogicNode.
-#define EXECGRAPH_DEFINE_SOCKET_TRAITS(InputEnum, OutputEnum)                                                                       \
-    template<InputEnum id, typename TData>                                                                                          \
-    using InSocketDecl = executionGraph::details::InputSocketDeclarationBase<meta::size_t<executionGraph::enumToInt(id)>, TData>;   \
-    template<OutputEnum id, typename TData>                                                                                         \
-    using OutSocketDecl = executionGraph::details::OutputSocketDeclarationBase<meta::size_t<executionGraph::enumToInt(id)>, TData>; \
-    template<typename... TSockets>                                                                                                  \
-    using InSocketDeclList = executionGraph::details::InputSocketDeclarationList<InputEnum, TSockets...>;                           \
-    template<typename... TSockets>                                                                                                  \
-    using OutSocketDeclList = executionGraph::details::OutputSocketDeclarationList<OutputEnum, TSockets...>;
 
 }  // namespace executionGraph
 

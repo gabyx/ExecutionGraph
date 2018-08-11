@@ -34,7 +34,7 @@ namespace executionGraph
     class ExecutionTreeInOut final
     {
     public:
-        EXECGRAPH_TYPEDEF_CONFIG(TConfig);
+        EXECGRAPH_DEFINE_CONFIG(TConfig);
 
         enum NodeClassification : unsigned char
         {

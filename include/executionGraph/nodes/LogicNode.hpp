@@ -68,7 +68,7 @@ namespace executionGraph
         RTTR_ENABLE()
 
     public:
-        EXECGRAPH_TYPEDEF_CONFIG(TConfig);
+        EXECGRAPH_DEFINE_CONFIG(TConfig);
 
         using SocketInputListType  = std::vector<SocketInputBasePointer>;
         using SocketOutputListType = std::vector<SocketOutputBasePointer>;

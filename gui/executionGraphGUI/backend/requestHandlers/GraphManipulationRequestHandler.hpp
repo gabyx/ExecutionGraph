@@ -10,8 +10,8 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGUI_backend_requestHandlers_GeneralInfoRequestHandler_hpp
-#define executionGraphGUI_backend_requestHandlers_GeneralInfoRequestHandler_hpp
+#ifndef executionGraphGUI_backend_requestHandlers_GraphManipulationRequestHandler_hpp
+#define executionGraphGUI_backend_requestHandlers_GraphManipulationRequestHandler_hpp
 
 #include "executionGraphGUI/backend/BackendRequestHandler.hpp"
 #include "executionGraphGUI/common/FunctionMap.hpp"

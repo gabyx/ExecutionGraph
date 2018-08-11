@@ -13,8 +13,10 @@
 #include "executionGraphGUI/backend/requestHandlers/GraphManipulationRequestHandler.hpp"
 #include <chrono>
 #include <vector>
+#include "executionGraph/nodes/LogicCommon.hpp"
 #include "executionGraphGUI/backend/ExecutionGraphBackend.hpp"
 #include "executionGraphGUI/backend/ExecutionGraphBackendDefs.hpp"
+#include "executionGraphGUI/backend/requestHandlers/RequestHandlerCommon.hpp"
 #include "executionGraphGUI/common/AllocatorProxyFlatBuffer.hpp"
 #include "executionGraphGUI/common/Loggers.hpp"
 #include "executionGraphGUI/common/RequestError.hpp"
@@ -34,7 +36,7 @@ FunctionMap<GraphManipulationRequestHandler::Function> GraphManipulationRequestH
 }
 
 //! Static handler map: request to handler function mapping.
-const FunctionMap<gandler::Function> GraphManipulationRequestHandler::m_functionMap = GraphManipulationRequestHandler::initFunctionMap();
+const FunctionMap<GraphManipulationRequestHandler::Function> GraphManipulationRequestHandler::m_functionMap = GraphManipulationRequestHandler::initFunctionMap();
 
 //! Konstructor.
 GraphManipulationRequestHandler::GraphManipulationRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,
@@ -68,34 +70,30 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
                                                     ResponsePromise& response)
 {
     // Request validation
-    auto* payload = request->getPayload();
-    EXECGRAPHGUI_THROW_TYPE_IF(payload == nullptr,
-                               BadRequestError,
-                               "Request data is null!", );
+    auto* payload = request.getPayload();
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == nullptr,
+                                      "Request data is null!");
 
     auto nodeReq = getRootOfPayloadAndVerify<s::AddNodeRequest>(*payload);
 
-    Id graphID = {nodeReq->graphId().str()};
+    Id graphID{nodeReq->graphId()->str()};
 
     // Callback to create the response
     auto responseCreator = [&response, graphID](auto& graph, auto& node) {
+        using Allocator = ResponsePromise::Allocator;
         AllocatorProxyFlatBuffer<Allocator> allocator(response.getAllocator());
         flatbuffers::FlatBufferBuilder builder(1024, &allocator);
 
-        using GraphType = decltype(graph);
-        using Config    = typenema GraphType::Config;
-        EXECGRAPH_TYPEDEF_CONFIG(Config);
-        using NodeSerializer = ExecutionGraphBackendDefs<Config>::NodeSerializer;
+        using GraphType      = std::remove_cv_t<std::remove_reference_t<decltype(graph)>>;
+        using Config         = typename GraphType::Config;
+        using NodeSerializer = typename ExecutionGraphBackendDefs<Config>::NodeSerializer;
 
         // Serialize the response
         NodeSerializer serializer;
         auto nodeOffset = serializer.write(builder, node);
 
-        s::NodeDescriptionBuilder nodeDesc(builder);
-        nodeDesc.add_node(nodeOffset);
-
         s::AddNodeResponseBuilder addResponse(builder);
-        addResponse.add_nodeDescription(nodeDesc);
+        addResponse.add_node(nodeOffset);
 
         // Set the response.
         auto detachedBuffer = builder.Release();
@@ -105,10 +103,10 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
     };
 
     // Execute the request
-    backend->addNode(graphID,
-                     nodeReq->node()->type().str(),
-                     nodeReq->node()->name().str(),
-                     responseCreator);
+    m_backend->addNode(graphID,
+                       nodeReq->node()->type()->str(),
+                       nodeReq->node()->name()->str(),
+                       responseCreator);
 }
 
 //! Handle the "graph/removeNode"
@@ -116,10 +114,9 @@ void GraphManipulationRequestHandler::handleRemoveNode(const Request& request,
                                                        ResponsePromise& response)
 {
     // Request validation
-    auto* payload = request->getPayload();
-    EXECGRAPHGUI_THROW_TYPE_IF(payload == nullptr,
-                               BadRequestError,
-                               "Request data is null!", );
+    auto* payload = request.getPayload();
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == nullptr,
+                                      "Request data is null!");
 
     auto nodeReq = getRootOfPayloadAndVerify<s::AddNodeRequest>(*payload);
 }

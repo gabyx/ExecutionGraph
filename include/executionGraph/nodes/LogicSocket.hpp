@@ -30,7 +30,7 @@ namespace executionGraph
     class LogicSocketBase
     {
     public:
-        EXECGRAPH_TYPEDEF_CONFIG(TConfig);
+        EXECGRAPH_DEFINE_CONFIG(TConfig);
 
         LogicSocketBase(IndexType type,
                         SocketIndex index,
@@ -67,7 +67,7 @@ namespace executionGraph
     class LogicSocketInputBase : public LogicSocketBase<TConfig>
     {
     public:
-        EXECGRAPH_TYPEDEF_CONFIG(TConfig);
+        EXECGRAPH_DEFINE_CONFIG(TConfig);
         friend SocketOutputBaseType;
 
         static_assert(std::is_same<LogicSocketInputBase, SocketInputBaseType>::value,
@@ -181,7 +181,7 @@ namespace executionGraph
     class LogicSocketOutputBase : public LogicSocketBase<TConfig>
     {
     public:
-        EXECGRAPH_TYPEDEF_CONFIG(TConfig);
+        EXECGRAPH_DEFINE_CONFIG(TConfig);
         friend SocketInputBaseType;
 
         static_assert(std::is_same<LogicSocketOutputBase, SocketOutputBaseType>::value,
@@ -295,7 +295,7 @@ namespace executionGraph
         using LogicSocketInputBase<TConfig>::m_data;
 
     public:
-        EXECGRAPH_TYPEDEF_CONFIG(TConfig);
+        EXECGRAPH_DEFINE_CONFIG(TConfig);
         using DataType = TData;
 
         /** This assert fails if the type T of the LogicSocket is
@@ -346,7 +346,7 @@ namespace executionGraph
                                     public LogicSocketOutputBase<TConfig>
     {
     public:
-        EXECGRAPH_TYPEDEF_CONFIG(TConfig);
+        EXECGRAPH_DEFINE_CONFIG(TConfig);
         using DataStorage = LogicSocketData<TData>;
         using DataType    = TData;
 

@@ -38,7 +38,7 @@ namespace executionGraph
     public:
         using GraphType = TGraphType;
         using TConfig   = typename GraphType::Config;
-        EXECGRAPH_TYPEDEF_CONFIG(TConfig);
+        EXECGRAPH_DEFINE_CONFIG(TConfig);
         using LogicNodeSerializer = TLogicNodeSerializer;
 
         ExecutionGraphSerializer(LogicNodeSerializer& nodeSerializer)

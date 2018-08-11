@@ -12,15 +12,15 @@
 
 namespace executionGraphGUI.serialization;
 
-struct Bool {
-    value:bool;
-}
+// struct Bool {
+//     value:bool;
+// }
 
-union ConstructorValue { Bool }
+// union ConstructorValue { Bool }
 
-//! Constructor key-value pairs used for node creation.
-table ConstructorKV
-{
-    key:string (id:0, required);
-    value:[ConstructorValue] (id:2, required);
-}
+// //! Constructor key-value pairs used for node creation.
+// table ConstructorKV
+// {
+//     key:string (id:0, required);
+//     value:[ConstructorValue] (id:2, required);
+// }

@@ -102,8 +102,9 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
                                       graphId.toString());
     GraphVariant& graphVar = graphIt->second;
 
-    auto addNodeLambda = [&](auto& graph) {
-        using GraphType    = decltype(graph);
+    // Make a visitor to dispatch the "add" over the variant...
+    auto add = [&](auto& graph) {
+        using GraphType    = std::remove_cv_t<std::remove_reference_t<decltype(graph)>>;
         using Config       = typename GraphType::Config;
         using NodeBaseType = typename Config::NodeBaseType;
 
@@ -115,16 +116,15 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
         try
         {
             auto n = serializer.read(type, id, nodeName);
-            node   = graph->addNode(std::move(n));
+            node   = graph.addNode(std::move(n));
         }
         catch(executionGraph::Exception& e)
         {
-            EXECGRAPHGUI_THROW_TYPE(BadRequestError,
-                                    "Construction of node '{0}' with type: '{1}' for graph id '{2}' failed: '{3}'",
-                                    nodeName,
-                                    type,
-                                    graphId,
-                                    e.what());
+            EXECGRAPHGUI_THROW_BAD_REQUEST("Construction of node '{0}' with type: '{1}' for graph id '{2}' failed: '{3}'",
+                                           nodeName,
+                                           type,
+                                           graphId.toString(),
+                                           e.what());
         }
 
         EXECGRAPH_ASSERT(node != nullptr, "Node is nullptr!!?");
@@ -133,7 +133,7 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
         responseCreator(graph, *node);
     };
 
-    std::visit(addNodeLambda, graphVar);
+    std::visit(add, graphVar);
 }
 
 #endif

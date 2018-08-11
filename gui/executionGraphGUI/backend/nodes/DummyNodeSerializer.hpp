@@ -14,24 +14,25 @@
 #define executionGraphGUI_backend_nodes_DummyNodeSerializer_hpp
 
 #include <executionGraph/nodes/LogicCommon.hpp>
+#include <executionGraph/serialization/LogicNodeSerializer.hpp>
 #include <executionGraphGUI/backend/nodes/DummyNode.hpp>
 #include <flatbuffers/flatbuffers.h>
 
 template<typename TConfig>
 struct DummyNodeSerializer
 {
-    using DummyNodeType = DummyNode<TConfig>;
-
+    using DummyNodeType      = DummyNode<TConfig>;
+    using VectorOffsetSocket = flatbuffers::Vector<flatbuffers::Offset<executionGraph::
+                                                                           serialization::LogicSocket>>;
     //! Factory functor which creates the serialized write buffer
     //! for the DummyNode `node`.
     struct Writer
     {
-        EXECGRAPH_TYPEDEF_CONFIG(TConfig);
+        EXECGRAPH_DEFINE_CONFIG(TConfig);
         using Key = DummyNodeType;
 
         static std::pair<const uint8_t*, std::size_t>
-        create(flatbuffers::FlatBufferBuilder& builder,
-               const NodeBaseType& node)
+        create(flatbuffers::FlatBufferBuilder& builder, const NodeBaseType& node)
         {
             return {nullptr, 0};
         }
@@ -41,12 +42,14 @@ struct DummyNodeSerializer
     //! buffer `node`.
     struct Reader
     {
-        EXECGRAPH_TYPEDEF_CONFIG(TConfig);
+        EXECGRAPH_DEFINE_CONFIG(TConfig);
         using Key = DummyNodeType;
 
         static std::unique_ptr<NodeBaseType>
         create(executionGraph::NodeId nodeId,
                const std::string& name,
+               const VectorOffsetSocket* inputSockets             = nullptr,
+               const VectorOffsetSocket* outputSockets            = nullptr,
                const flatbuffers::Vector<uint8_t>* additionalData = nullptr)
         {
             return std::make_unique<DummyNodeType>(nodeId, name);
