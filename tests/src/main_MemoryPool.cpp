@@ -10,9 +10,9 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
+#include <vector>
 #include <foonathan/memory/memory_pool.hpp>
 #include <foonathan/memory/smart_ptr.hpp>
-#include <vector>
 #include "TestFunctions.hpp"
 
 using namespace foonathan::memory;

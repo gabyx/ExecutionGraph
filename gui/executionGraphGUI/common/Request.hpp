@@ -13,10 +13,10 @@
 #ifndef executionGraphGUI_common_Request_hpp
 #define executionGraphGUI_common_Request_hpp
 
+#include <string>
+#include <rttr/type>
 #include <executionGraph/common/FileSystem.hpp>
 #include <executionGraph/common/IObjectID.hpp>
-#include <rttr/type>
-#include <string>
 class BinaryPayload;
 
 /* ---------------------------------------------------------------------------------------*/

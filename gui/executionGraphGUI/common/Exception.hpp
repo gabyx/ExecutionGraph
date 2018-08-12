@@ -14,10 +14,10 @@
 #define executionGraphGUI_common_Exception_hpp
 
 #include <exception>
-#include <executionGraph/common/Exception.hpp>
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <executionGraph/common/Exception.hpp>
 
 #ifdef __clang__
 #    pragma clang diagnostic push

@@ -12,12 +12,12 @@
 #ifndef tests_TestFunctions_hpp
 #define tests_TestFunctions_hpp
 
+#include <random>
+#include <gtest/gtest.h>
 #include <executionGraph/common/Assert.hpp>
 #include <executionGraph/common/SfinaeMacros.hpp>
 #include <executionGraph/common/TypeDefs.hpp>
 #include <executionGraph/config/Config.hpp>
-#include <gtest/gtest.h>
-#include <random>
 
 #define DEFINE_RANDOM_GENERATOR_FUNC(seed)                \
     std::mt19937 rng(seed);                               \

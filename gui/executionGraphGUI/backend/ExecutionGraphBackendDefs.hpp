@@ -13,10 +13,10 @@
 #ifndef executionGraphGUI_backend_ExecutionGraphBackendDefs_hpp
 #define executionGraphGUI_backend_ExecutionGraphBackendDefs_hpp
 
-#include <executionGraph/nodes/LogicCommon.hpp>
-#include <executionGraph/serialization/LogicNodeSerializer.hpp>
 #include <meta/meta.hpp>
 #include <rttr/type>
+#include <executionGraph/nodes/LogicCommon.hpp>
+#include <executionGraph/serialization/LogicNodeSerializer.hpp>
 #include "executionGraph/serialization/NodeTypeDescription.hpp"
 #include "executionGraph/serialization/SocketTypeDescription.hpp"
 #include "executionGraphGUI/backend/nodes/DummyNode.hpp"

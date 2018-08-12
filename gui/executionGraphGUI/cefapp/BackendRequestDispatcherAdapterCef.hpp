@@ -14,9 +14,9 @@
 #define cefapp_RequestDispatcherAdapterCef_h
 
 #include <cef_base.h>
-#include <executionGraph/common/Assert.hpp>
 #include <memory>
 #include <wrapper/cef_message_router.h>
+#include <executionGraph/common/Assert.hpp>
 class BackendRequestDispatcher;
 
 /* ---------------------------------------------------------------------------------------*/

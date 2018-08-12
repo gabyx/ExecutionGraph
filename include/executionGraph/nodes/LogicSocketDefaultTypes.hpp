@@ -13,8 +13,8 @@
 #ifndef executionGraph_logic_LogicTypes_hpp
 #define executionGraph_logic_LogicTypes_hpp
 
-#include <meta/meta.hpp>
 #include <string>
+#include <meta/meta.hpp>
 
 #include "executionGraph/common/Exception.hpp"
 #include "executionGraph/common/TypeDefs.hpp"

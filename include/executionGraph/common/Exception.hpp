@@ -11,11 +11,11 @@
 #define executionGraph_Common_Exception_hpp
 
 #include <exception>
-#include <fmt/format.h>
-#include <fmt/ostream.h>
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 
 #ifdef __clang__
 #    pragma clang diagnostic push

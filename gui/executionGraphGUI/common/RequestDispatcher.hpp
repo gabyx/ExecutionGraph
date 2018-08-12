@@ -13,12 +13,12 @@
 #ifndef executionGraphGUI_common_RequestDispatcher_hpp
 #define executionGraphGUI_common_RequestDispatcher_hpp
 
-#include <executionGraph/common/Assert.hpp>
-#include <executionGraph/common/ThreadPool.hpp>
 #include <memory>
-#include <meta/meta.hpp>
 #include <unordered_set>
 #include <vector>
+#include <meta/meta.hpp>
+#include <executionGraph/common/Assert.hpp>
+#include <executionGraph/common/ThreadPool.hpp>
 #include "executionGraphGUI/common/Exception.hpp"
 #include "executionGraphGUI/common/Loggers.hpp"
 #include "executionGraphGUI/common/Request.hpp"

@@ -10,10 +10,10 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
+#include <meta/meta.hpp>
 #include <executionGraph/graphs/ExecutionTreeInOut.hpp>
 #include <executionGraph/nodes/LogicNode.hpp>
 #include <executionGraph/nodes/LogicSocket.hpp>
-#include <meta/meta.hpp>
 #include "DummyNode.hpp"
 #include "GraphGenerator.hpp"
 #include "TestFunctions.hpp"

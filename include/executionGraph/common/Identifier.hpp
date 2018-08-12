@@ -13,9 +13,9 @@
 #ifndef executionGraph_common_Identifier_hpp
 #define executionGraph_common_Identifier_hpp
 
-#include <crossguid/guid.hpp>
 #include <functional>
 #include <string>
+#include <crossguid/guid.hpp>
 #include "executionGraph/config/Config.hpp"
 
 namespace executionGraph

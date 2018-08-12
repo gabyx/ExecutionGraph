@@ -13,9 +13,9 @@
 #ifndef executionGraphGUI_backend_nodes_DummyNode_hpp
 #define executionGraphGUI_backend_nodes_DummyNode_hpp
 
-#include <executionGraph/nodes/LogicCommon.hpp>
 #include <rttr/registration>
 #include <rttr/type>
+#include <executionGraph/nodes/LogicCommon.hpp>
 
 //! Stupid dummy Node for testing.
 template<typename TConfig>

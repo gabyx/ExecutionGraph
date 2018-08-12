@@ -13,10 +13,10 @@
 #ifndef executionGraphGUI_backend_BackendRequestHandler_hpp
 #define executionGraphGUI_backend_BackendRequestHandler_hpp
 
-#include <executionGraph/common/IObjectID.hpp>
 #include <memory>
-#include <rttr/type>
 #include <unordered_set>
+#include <rttr/type>
+#include <executionGraph/common/IObjectID.hpp>
 #include "executionGraphGUI/backend/Backend.hpp"
 #include "executionGraphGUI/common/Request.hpp"
 #include "executionGraphGUI/common/Response.hpp"

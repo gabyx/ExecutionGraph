@@ -13,9 +13,9 @@
 #ifndef executionGraph_nodes_LogicSocket_hpp
 #define executionGraph_nodes_LogicSocket_hpp
 
-#include <meta/meta.hpp>
 #include <unordered_set>
 #include <vector>
+#include <meta/meta.hpp>
 
 #include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/DemangleTypes.hpp"

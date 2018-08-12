@@ -13,6 +13,7 @@
 #ifndef tests_GraphGenerator_hpp
 #define tests_GraphGenerator_hpp
 
+#include <random>
 #include <executionGraph/common/Assert.hpp>
 #include <executionGraph/common/Log.hpp>
 #include <executionGraph/common/TypeDefs.hpp>
@@ -20,7 +21,6 @@
 #include <executionGraph/graphs/ExecutionTreeInOut.hpp>
 #include <executionGraph/nodes/LogicNode.hpp>
 #include <executionGraph/nodes/LogicSocket.hpp>
-#include <random>
 
 //! Generates a random graph with nodes of type `NodeType`.
 //! @return  Instance of GraphType

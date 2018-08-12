@@ -14,8 +14,8 @@
 #define executionGraph_nodes_LogicNode_hpp
 
 #include <memory>
-#include <rttr/type>
 #include <vector>
+#include <rttr/type>
 #include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/DemangleTypes.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"

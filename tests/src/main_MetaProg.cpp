@@ -12,10 +12,10 @@
 
 #include <array>
 #include <exception>
-#include <meta/meta.hpp>
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <meta/meta.hpp>
 #include "TestFunctions.hpp"
 
 #include <executionGraph/common/MetaVisit.hpp>

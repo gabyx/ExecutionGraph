@@ -15,10 +15,10 @@
 #include <array>
 #include <cef_parser.h>
 #include <chrono>
-#include <executionGraph/common/Assert.hpp>
 #include <thread>
 #include <wrapper/cef_closure_task.h>
 #include <wrapper/cef_helpers.h>
+#include <executionGraph/common/Assert.hpp>
 #include "executionGraphGUI/cefapp/BackendRequestDispatcher.hpp"
 #include "executionGraphGUI/cefapp/RequestCef.hpp"
 #include "executionGraphGUI/cefapp/ResponseCef.hpp"

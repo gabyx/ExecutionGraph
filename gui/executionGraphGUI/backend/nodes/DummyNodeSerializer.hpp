@@ -13,10 +13,10 @@
 #ifndef executionGraphGUI_backend_nodes_DummyNodeSerializer_hpp
 #define executionGraphGUI_backend_nodes_DummyNodeSerializer_hpp
 
+#include <flatbuffers/flatbuffers.h>
 #include <executionGraph/nodes/LogicCommon.hpp>
 #include <executionGraph/serialization/LogicNodeSerializer.hpp>
 #include <executionGraphGUI/backend/nodes/DummyNode.hpp>
-#include <flatbuffers/flatbuffers.h>
 
 template<typename TConfig>
 struct DummyNodeSerializer

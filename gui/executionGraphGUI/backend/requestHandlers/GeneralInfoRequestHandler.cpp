@@ -12,8 +12,8 @@
 
 #include "executionGraphGUI/backend/requestHandlers/GeneralInfoRequestHandler.hpp"
 #include <chrono>
-#include <executionGraph/serialization/GraphTypeDescriptionSerializer.hpp>
 #include <vector>
+#include <executionGraph/serialization/GraphTypeDescriptionSerializer.hpp>
 #include "executionGraphGUI/backend/ExecutionGraphBackend.hpp"
 #include "executionGraphGUI/common/AllocatorProxyFlatBuffer.hpp"
 #include "executionGraphGUI/common/Exception.hpp"

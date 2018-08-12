@@ -13,10 +13,10 @@
 #ifndef executionGraphGUI_common_Logger_hpp
 #define executionGraphGUI_common_Logger_hpp
 
+#include <spdlog/spdlog.h>
 #include <executionGraph/common/FileSystem.hpp>
 #include <executionGraph/common/Log.hpp>
 #include <executionGraph/common/Singleton.hpp>
-#include <spdlog/spdlog.h>
 
 /* ---------------------------------------------------------------------------------------*/
 /*!

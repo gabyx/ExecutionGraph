@@ -13,9 +13,9 @@
 #ifndef executionGraph_serialization_SocketTypeDescription_hpp
 #define executionGraph_serialization_SocketTypeDescription_hpp
 
+#include <string>
 #include <meta/meta.hpp>
 #include <rttr/type>
-#include <string>
 
 namespace executionGraph
 {

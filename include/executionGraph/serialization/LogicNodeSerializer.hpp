@@ -13,8 +13,8 @@
 #ifndef executionGraph_serializer_LogicNodeSerializer_hpp
 #define executionGraph_serializer_LogicNodeSerializer_hpp
 
-#include <meta/meta.hpp>
 #include <type_traits>
+#include <meta/meta.hpp>
 #include "executionGraph/common/Factory.hpp"
 #include "executionGraph/common/MetaVisit.hpp"
 #include "executionGraph/serialization/SocketTypeDescription.hpp"

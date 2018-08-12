@@ -13,9 +13,9 @@
 #ifndef tests_DummmyNode_hpp
 #define tests_DummmyNode_hpp
 
+#include <rttr/registration>
 #include <executionGraph/common/TypeDefs.hpp>
 #include <executionGraph/config/Config.hpp>
-#include <rttr/registration>
 
 //! Stupid dummy Node for testing.
 template<typename TConfig>

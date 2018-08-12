@@ -10,6 +10,9 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 #define FLATBUFFERS_DEBUG_VERIFICATION_FAILURE 1
+#include <fstream>
+#include <vector>
+#include <flatbuffers/flatbuffers.h>
 #include <executionGraph/common/Log.hpp>
 #include <executionGraph/graphs/ExecutionTreeInOut.hpp>
 #include <executionGraph/nodes/LogicNode.hpp>
@@ -17,9 +20,6 @@
 #include <executionGraph/serialization/FileMapper.hpp>
 #include <executionGraph/serialization/LogicNodeSerializer.hpp>
 #include <executionGraph/serialization/schemas/cpp/ExecutionGraph_generated.h>
-#include <flatbuffers/flatbuffers.h>
-#include <fstream>
-#include <vector>
 #include "../files/testbuffer_generated.h"
 #include "DummyNode.hpp"
 #include "GraphGenerator.hpp"

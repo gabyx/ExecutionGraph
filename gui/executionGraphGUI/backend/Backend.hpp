@@ -13,8 +13,8 @@
 #ifndef executionGraphGUI_backend_Backend_hpp
 #define executionGraphGUI_backend_Backend_hpp
 
-#include <executionGraph/common/IObjectID.hpp>
 #include <rttr/type>
+#include <executionGraph/common/IObjectID.hpp>
 
 class Backend : public executionGraph::IObjectID
 {

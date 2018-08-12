@@ -10,15 +10,16 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "executionGraphGUI/cefapp/PlatformTitleChanger.hpp"
-#import <Cocoa/Cocoa.h>
 #include <cef_browser.h>
+#import <Cocoa/Cocoa.h>
+#include "executionGraphGUI/cefapp/PlatformTitleChanger.hpp"
 
 void PlatformTitleChanger::OnTitleChange(CefRefPtr<CefBrowser> browser,
-                                         const CefString &title) {
-  NSView *view = (NSView *)browser->GetHost()->GetWindowHandle();
-  NSWindow *window = [view window];
-  std::string titleStr(title);
-  NSString *str = [NSString stringWithUTF8String:titleStr.c_str()];
-  [window setTitle:str];
+                                         const CefString& title)
+{
+    NSView* view     = (NSView*)browser->GetHost()->GetWindowHandle();
+    NSWindow* window = [view window];
+    std::string titleStr(title);
+    NSString* str = [NSString stringWithUTF8String:titleStr.c_str()];
+    [window setTitle:str];
 }

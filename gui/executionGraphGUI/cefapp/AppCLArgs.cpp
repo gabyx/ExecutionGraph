@@ -12,8 +12,8 @@
 
 #include "executionGraphGUI/cefapp/AppCLArgs.hpp"
 #include <cstdlib>
-#include <executionGraph/common/StringFormat.hpp>
 #include <iostream>
+#include <executionGraph/common/StringFormat.hpp>
 #include "executionGraphGUI/common/Exception.hpp"
 
 AppCLArgs::AppCLArgs(int argc, char* argv[])

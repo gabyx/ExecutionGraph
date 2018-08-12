@@ -11,8 +11,8 @@
 // =========================================================================================
 
 #include "executionGraph/serialization/GraphTypeDescriptionSerializer.hpp"
-#include <flatbuffers/flatbuffers.h>
 #include <vector>
+#include <flatbuffers/flatbuffers.h>
 #include "executionGraph/serialization/GraphTypeDescription.hpp"
 
 namespace s = executionGraph::serialization;

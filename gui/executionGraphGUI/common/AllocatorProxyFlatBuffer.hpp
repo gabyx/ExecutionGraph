@@ -13,8 +13,8 @@
 #ifndef executionGraphGUI_common_AllocatorProxyFlatBuffer
 #define executionGraphGUI_common_AllocatorProxyFlatBuffer
 
-#include <flatbuffers/flatbuffers.h>
 #include <memory>
+#include <flatbuffers/flatbuffers.h>
 #include "executionGraphGUI/common/BufferPool.hpp"
 #include "executionGraphGUI/common/Exception.hpp"
 

@@ -13,11 +13,11 @@
 #ifndef executionGraphGUI_common_Response_hpp
 #define executionGraphGUI_common_Response_hpp
 
-#include <executionGraph/common/Identifier.hpp>
 #include <future>
 #include <memory>
-#include <rttr/type>
 #include <string>
+#include <rttr/type>
+#include <executionGraph/common/Identifier.hpp>
 #include "executionGraphGUI/common/BinaryPayload.hpp"
 #include "executionGraphGUI/common/BufferPool.hpp"
 #include "executionGraphGUI/common/Loggers.hpp"
