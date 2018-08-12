@@ -11,8 +11,6 @@
 //! ========================================================================================
 
 #include "executionGraphGUI/backend/requestHandlers/GraphManipulationRequestHandler.hpp"
-#include <chrono>
-#include <vector>
 #include "executionGraph/nodes/LogicCommon.hpp"
 #include "executionGraphGUI/backend/ExecutionGraphBackend.hpp"
 #include "executionGraphGUI/backend/ExecutionGraphBackendDefs.hpp"
