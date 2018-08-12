@@ -5,19 +5,13 @@
  */
 export namespace executionGraph.serialization{
 export class LogicSocket {
-  /**
-   * @type {flatbuffers.ByteBuffer}
-   */
   bb: flatbuffers.ByteBuffer|null = null;
 
-  /**
-   * @type {number}
-   */
   bb_pos:number = 0;
 /**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {LogicSocket}
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns LogicSocket
  */
 __init(i:number, bb:flatbuffers.ByteBuffer):LogicSocket {
   this.bb_pos = i;
@@ -26,16 +20,16 @@ __init(i:number, bb:flatbuffers.ByteBuffer):LogicSocket {
 };
 
 /**
- * @param {flatbuffers.ByteBuffer} bb
- * @param {LogicSocket=} obj
- * @returns {LogicSocket}
+ * @param flatbuffers.ByteBuffer bb
+ * @param LogicSocket= obj
+ * @returns LogicSocket
  */
 static getRootAsLogicSocket(bb:flatbuffers.ByteBuffer, obj?:LogicSocket):LogicSocket {
   return (obj || new LogicSocket).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
- * @returns {flatbuffers.Long}
+ * @returns flatbuffers.Long
  */
 type():flatbuffers.Long {
   var offset = this.bb!.__offset(this.bb_pos, 4);
@@ -43,7 +37,7 @@ type():flatbuffers.Long {
 };
 
 /**
- * @returns {flatbuffers.Long}
+ * @returns flatbuffers.Long
  */
 index():flatbuffers.Long {
   var offset = this.bb!.__offset(this.bb_pos, 6);
@@ -51,8 +45,8 @@ index():flatbuffers.Long {
 };
 
 /**
- * @param {flatbuffers.Encoding=} optionalEncoding
- * @returns {string|Uint8Array|null}
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array|null
  */
 name():string|null
 name(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
@@ -62,39 +56,39 @@ name(optionalEncoding?:any):string|Uint8Array|null {
 };
 
 /**
- * @param {flatbuffers.Builder} builder
+ * @param flatbuffers.Builder builder
  */
 static startLogicSocket(builder:flatbuffers.Builder) {
   builder.startObject(3);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Long} type
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Long type
  */
 static addType(builder:flatbuffers.Builder, type:flatbuffers.Long) {
   builder.addFieldInt64(0, type, builder.createLong(0, 0));
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Long} index
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Long index
  */
 static addIndex(builder:flatbuffers.Builder, index:flatbuffers.Long) {
   builder.addFieldInt64(1, index, builder.createLong(0, 0));
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} nameOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset nameOffset
  */
 static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
   builder.addFieldOffset(2, nameOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @returns flatbuffers.Offset
  */
 static endLogicSocket(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();

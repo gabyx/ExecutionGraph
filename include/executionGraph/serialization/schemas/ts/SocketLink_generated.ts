@@ -5,19 +5,13 @@
  */
 export namespace executionGraph.serialization{
 export class SocketLink {
-  /**
-   * @type {flatbuffers.ByteBuffer}
-   */
   bb: flatbuffers.ByteBuffer|null = null;
 
-  /**
-   * @type {number}
-   */
   bb_pos:number = 0;
 /**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {SocketLink}
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns SocketLink
  */
 __init(i:number, bb:flatbuffers.ByteBuffer):SocketLink {
   this.bb_pos = i;
@@ -26,48 +20,48 @@ __init(i:number, bb:flatbuffers.ByteBuffer):SocketLink {
 };
 
 /**
- * @returns {flatbuffers.Long}
+ * @returns flatbuffers.Long
  */
 outNodeId():flatbuffers.Long {
   return this.bb!.readUint64(this.bb_pos);
 };
 
 /**
- * @returns {flatbuffers.Long}
+ * @returns flatbuffers.Long
  */
 outSocketIdx():flatbuffers.Long {
   return this.bb!.readUint64(this.bb_pos + 8);
 };
 
 /**
- * @returns {flatbuffers.Long}
+ * @returns flatbuffers.Long
  */
 inNodeId():flatbuffers.Long {
   return this.bb!.readUint64(this.bb_pos + 16);
 };
 
 /**
- * @returns {flatbuffers.Long}
+ * @returns flatbuffers.Long
  */
 inSocketIdx():flatbuffers.Long {
   return this.bb!.readUint64(this.bb_pos + 24);
 };
 
 /**
- * @returns {boolean}
+ * @returns boolean
  */
 isWriteLink():boolean {
   return !!this.bb!.readInt8(this.bb_pos + 32);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Long} outNodeId
- * @param {flatbuffers.Long} outSocketIdx
- * @param {flatbuffers.Long} inNodeId
- * @param {flatbuffers.Long} inSocketIdx
- * @param {boolean} isWriteLink
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Long outNodeId
+ * @param flatbuffers.Long outSocketIdx
+ * @param flatbuffers.Long inNodeId
+ * @param flatbuffers.Long inSocketIdx
+ * @param boolean isWriteLink
+ * @returns flatbuffers.Offset
  */
 static createSocketLink(builder:flatbuffers.Builder, outNodeId: flatbuffers.Long, outSocketIdx: flatbuffers.Long, inNodeId: flatbuffers.Long, inSocketIdx: flatbuffers.Long, isWriteLink: boolean):flatbuffers.Offset {
   builder.prep(8, 40);

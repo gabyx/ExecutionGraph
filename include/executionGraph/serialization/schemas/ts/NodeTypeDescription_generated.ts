@@ -5,19 +5,13 @@
  */
 export namespace executionGraph.serialization{
 export class NodeTypeDescription {
-  /**
-   * @type {flatbuffers.ByteBuffer}
-   */
   bb: flatbuffers.ByteBuffer|null = null;
 
-  /**
-   * @type {number}
-   */
   bb_pos:number = 0;
 /**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {NodeTypeDescription}
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns NodeTypeDescription
  */
 __init(i:number, bb:flatbuffers.ByteBuffer):NodeTypeDescription {
   this.bb_pos = i;
@@ -26,17 +20,17 @@ __init(i:number, bb:flatbuffers.ByteBuffer):NodeTypeDescription {
 };
 
 /**
- * @param {flatbuffers.ByteBuffer} bb
- * @param {NodeTypeDescription=} obj
- * @returns {NodeTypeDescription}
+ * @param flatbuffers.ByteBuffer bb
+ * @param NodeTypeDescription= obj
+ * @returns NodeTypeDescription
  */
 static getRootAsNodeTypeDescription(bb:flatbuffers.ByteBuffer, obj?:NodeTypeDescription):NodeTypeDescription {
   return (obj || new NodeTypeDescription).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
- * @param {flatbuffers.Encoding=} optionalEncoding
- * @returns {string|Uint8Array|null}
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array|null
  */
 name():string|null
 name(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
@@ -46,8 +40,8 @@ name(optionalEncoding?:any):string|Uint8Array|null {
 };
 
 /**
- * @param {flatbuffers.Encoding=} optionalEncoding
- * @returns {string|Uint8Array|null}
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array|null
  */
 type():string|null
 type(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
@@ -57,31 +51,31 @@ type(optionalEncoding?:any):string|Uint8Array|null {
 };
 
 /**
- * @param {flatbuffers.Builder} builder
+ * @param flatbuffers.Builder builder
  */
 static startNodeTypeDescription(builder:flatbuffers.Builder) {
   builder.startObject(2);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} nameOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset nameOffset
  */
 static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
   builder.addFieldOffset(0, nameOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} typeOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset typeOffset
  */
 static addType(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset) {
   builder.addFieldOffset(1, typeOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @returns flatbuffers.Offset
  */
 static endNodeTypeDescription(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();

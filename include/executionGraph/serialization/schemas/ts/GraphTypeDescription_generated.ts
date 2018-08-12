@@ -7,19 +7,13 @@ import * as NS2894054599977824968 from "@serialization/SocketTypeDescription_gen
  */
 export namespace executionGraph.serialization{
 export class GraphTypeDescription {
-  /**
-   * @type {flatbuffers.ByteBuffer}
-   */
   bb: flatbuffers.ByteBuffer|null = null;
 
-  /**
-   * @type {number}
-   */
   bb_pos:number = 0;
 /**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {GraphTypeDescription}
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns GraphTypeDescription
  */
 __init(i:number, bb:flatbuffers.ByteBuffer):GraphTypeDescription {
   this.bb_pos = i;
@@ -28,17 +22,17 @@ __init(i:number, bb:flatbuffers.ByteBuffer):GraphTypeDescription {
 };
 
 /**
- * @param {flatbuffers.ByteBuffer} bb
- * @param {GraphTypeDescription=} obj
- * @returns {GraphTypeDescription}
+ * @param flatbuffers.ByteBuffer bb
+ * @param GraphTypeDescription= obj
+ * @returns GraphTypeDescription
  */
 static getRootAsGraphTypeDescription(bb:flatbuffers.ByteBuffer, obj?:GraphTypeDescription):GraphTypeDescription {
   return (obj || new GraphTypeDescription).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
- * @param {flatbuffers.Encoding=} optionalEncoding
- * @returns {string|Uint8Array|null}
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array|null
  */
 name():string|null
 name(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
@@ -48,8 +42,8 @@ name(optionalEncoding?:any):string|Uint8Array|null {
 };
 
 /**
- * @param {flatbuffers.Encoding=} optionalEncoding
- * @returns {string|Uint8Array|null}
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array|null
  */
 id():string|null
 id(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
@@ -59,9 +53,9 @@ id(optionalEncoding?:any):string|Uint8Array|null {
 };
 
 /**
- * @param {number} index
- * @param {executionGraph.serialization.SocketTypeDescription=} obj
- * @returns {executionGraph.serialization.SocketTypeDescription}
+ * @param number index
+ * @param executionGraph.serialization.SocketTypeDescription= obj
+ * @returns executionGraph.serialization.SocketTypeDescription
  */
 socketTypeDescriptions(index: number, obj?:NS2894054599977824968.executionGraph.serialization.SocketTypeDescription):NS2894054599977824968.executionGraph.serialization.SocketTypeDescription|null {
   var offset = this.bb!.__offset(this.bb_pos, 8);
@@ -69,7 +63,7 @@ socketTypeDescriptions(index: number, obj?:NS2894054599977824968.executionGraph.
 };
 
 /**
- * @returns {number}
+ * @returns number
  */
 socketTypeDescriptionsLength():number {
   var offset = this.bb!.__offset(this.bb_pos, 8);
@@ -77,9 +71,9 @@ socketTypeDescriptionsLength():number {
 };
 
 /**
- * @param {number} index
- * @param {executionGraph.serialization.NodeTypeDescription=} obj
- * @returns {executionGraph.serialization.NodeTypeDescription}
+ * @param number index
+ * @param executionGraph.serialization.NodeTypeDescription= obj
+ * @returns executionGraph.serialization.NodeTypeDescription
  */
 nodeTypeDescriptions(index: number, obj?:NS9272066980085565115.executionGraph.serialization.NodeTypeDescription):NS9272066980085565115.executionGraph.serialization.NodeTypeDescription|null {
   var offset = this.bb!.__offset(this.bb_pos, 10);
@@ -87,7 +81,7 @@ nodeTypeDescriptions(index: number, obj?:NS9272066980085565115.executionGraph.se
 };
 
 /**
- * @returns {number}
+ * @returns number
  */
 nodeTypeDescriptionsLength():number {
   var offset = this.bb!.__offset(this.bb_pos, 10);
@@ -95,40 +89,40 @@ nodeTypeDescriptionsLength():number {
 };
 
 /**
- * @param {flatbuffers.Builder} builder
+ * @param flatbuffers.Builder builder
  */
 static startGraphTypeDescription(builder:flatbuffers.Builder) {
   builder.startObject(4);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} nameOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset nameOffset
  */
 static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
   builder.addFieldOffset(0, nameOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} idOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset idOffset
  */
 static addId(builder:flatbuffers.Builder, idOffset:flatbuffers.Offset) {
   builder.addFieldOffset(1, idOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} socketTypeDescriptionsOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset socketTypeDescriptionsOffset
  */
 static addSocketTypeDescriptions(builder:flatbuffers.Builder, socketTypeDescriptionsOffset:flatbuffers.Offset) {
   builder.addFieldOffset(2, socketTypeDescriptionsOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {Array.<flatbuffers.Offset>} data
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @param Array.<flatbuffers.Offset> data
+ * @returns flatbuffers.Offset
  */
 static createSocketTypeDescriptionsVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
   builder.startVector(4, data.length, 4);
@@ -139,25 +133,25 @@ static createSocketTypeDescriptionsVector(builder:flatbuffers.Builder, data:flat
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {number} numElems
+ * @param flatbuffers.Builder builder
+ * @param number numElems
  */
 static startSocketTypeDescriptionsVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(4, numElems, 4);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} nodeTypeDescriptionsOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset nodeTypeDescriptionsOffset
  */
 static addNodeTypeDescriptions(builder:flatbuffers.Builder, nodeTypeDescriptionsOffset:flatbuffers.Offset) {
   builder.addFieldOffset(3, nodeTypeDescriptionsOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {Array.<flatbuffers.Offset>} data
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @param Array.<flatbuffers.Offset> data
+ * @returns flatbuffers.Offset
  */
 static createNodeTypeDescriptionsVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
   builder.startVector(4, data.length, 4);
@@ -168,16 +162,16 @@ static createNodeTypeDescriptionsVector(builder:flatbuffers.Builder, data:flatbu
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {number} numElems
+ * @param flatbuffers.Builder builder
+ * @param number numElems
  */
 static startNodeTypeDescriptionsVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(4, numElems, 4);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @returns flatbuffers.Offset
  */
 static endGraphTypeDescription(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();

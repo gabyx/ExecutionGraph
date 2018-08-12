@@ -19,6 +19,7 @@ import { Connection } from '../../model/Connection';
 import { Socket } from '../../model/Socket';
 import { DragEvent } from '@eg/graph';
 import { GeneralInfoService } from '../../services/GeneralInfoService';
+import { GraphManipulationService } from '../../services/GraphManipulationService';
 
 @Injectable() @Component({
   selector: 'eg-workspace',
@@ -37,7 +38,8 @@ export class WorkspaceComponent implements OnInit {
   constructor(
     private elementRef: ElementRef,
     private sanitizer: DomSanitizer,
-    private readonly GeneralInfoService: GeneralInfoService) { }
+    private readonly generalInfoService: GeneralInfoService,
+    private readonly graphManipulationService: GraphManipulationService) { }
 
   ngOnInit() {
     const NODES = 3;
@@ -56,12 +58,6 @@ export class WorkspaceComponent implements OnInit {
     // this.nodes.push(n2);
 
     // this.connections.push(new Connection(n1.outputs[0].id, n2.inputs[0].id));
-
-    // Get some graph info (nicht awaiten ist ja scheissegal zum testen...)
-    console.debug("Get all graph type descirptions...")
-    this.GeneralInfoService.getAllGraphTypeDescriptions();
-    console.debug("Get all graph type descirptions [done]")
-
   }
 
   public updateNodePosition(node: Node, event: DragEvent) {
@@ -99,7 +95,7 @@ export class WorkspaceComponent implements OnInit {
   public isOutputSocket(socket: Socket) {
     return socket instanceof Socket && socket.id.indexOf("-o-") > 0;
   }
-  
+
   public isInputSocket(socket: Socket) {
     return socket instanceof Socket && socket.id.indexOf("-i-") > 0;
   }

@@ -48,12 +48,12 @@ table AddNodeResponse {
 //! Request data: 
 table RemoveNodeRequest {
     graphId:string (id:0, required);  //!< The graph guid.
-    id:uint64 (id:1);                 //!< The node id to remove from the graph.
+    nodeId:uint64 (id:1);                 //!< The node id to remove from the graph.
 }
 
 //! Response data: none
 //! Success: 
-//    - status code: 204 (No Content)
+//    - status code: 200 (OK)
 //! Valid Errors:
 //!   - status code: 400 (Bad Request)
 //!     - node id is not found

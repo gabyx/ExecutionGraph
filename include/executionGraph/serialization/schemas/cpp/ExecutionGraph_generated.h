@@ -78,7 +78,7 @@ struct ExecutionGraphNodeProperties FLATBUFFERS_FINAL_CLASS : private flatbuffer
            VerifyField<uint64_t>(verifier, VT_NODEID) &&
            VerifyField<int8_t>(verifier, VT_CLASSIFICATION) &&
            VerifyOffset(verifier, VT_GROUPS) &&
-           verifier.Verify(groups()) &&
+           verifier.VerifyVector(groups()) &&
            verifier.EndTable();
   }
 };
@@ -159,12 +159,12 @@ struct ExecutionGraph FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT_GRAPHDESCRIPTION) &&
            verifier.VerifyTable(graphDescription()) &&
            VerifyOffset(verifier, VT_NODES) &&
-           verifier.Verify(nodes()) &&
+           verifier.VerifyVector(nodes()) &&
            verifier.VerifyVectorOfTables(nodes()) &&
            VerifyOffset(verifier, VT_LINKS) &&
-           verifier.Verify(links()) &&
+           verifier.VerifyVector(links()) &&
            VerifyOffset(verifier, VT_NODEPROPERTIES) &&
-           verifier.Verify(nodeProperties()) &&
+           verifier.VerifyVector(nodeProperties()) &&
            verifier.VerifyVectorOfTables(nodeProperties()) &&
            VerifyOffset(verifier, VT_VISUALIZATION) &&
            verifier.VerifyTable(visualization()) &&

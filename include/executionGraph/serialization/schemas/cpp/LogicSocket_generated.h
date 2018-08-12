@@ -31,7 +31,7 @@ struct LogicSocket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint64_t>(verifier, VT_TYPE) &&
            VerifyField<uint64_t>(verifier, VT_INDEX) &&
            VerifyOffset(verifier, VT_NAME) &&
-           verifier.Verify(name()) &&
+           verifier.VerifyString(name()) &&
            verifier.EndTable();
   }
 };

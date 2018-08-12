@@ -182,10 +182,10 @@ struct GraphVisualization FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT_WORKSPACEVISUALIZATION) &&
            verifier.VerifyTable(workspaceVisualization()) &&
            VerifyOffset(verifier, VT_NODEVISUALIZATION) &&
-           verifier.Verify(nodeVisualization()) &&
+           verifier.VerifyVector(nodeVisualization()) &&
            verifier.VerifyVectorOfTables(nodeVisualization()) &&
            VerifyOffset(verifier, VT_LINKVISUALIZATION) &&
-           verifier.Verify(linkVisualization()) &&
+           verifier.VerifyVector(linkVisualization()) &&
            verifier.VerifyVectorOfTables(linkVisualization()) &&
            verifier.EndTable();
   }

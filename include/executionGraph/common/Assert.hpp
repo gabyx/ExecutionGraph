@@ -26,11 +26,13 @@
 #ifdef NDEBUG
 #    define EXECGRAPH_DEBUG_ONLY(code)
 #    define EXECGRAPH_ASSERT(condition, ...)
+#    define EXECGRAPH_VERIFY(condition, ...) condition;
 #    define EXECGRAPH_ASSERT_TYPE(condition, type, ...)
 #else
-    // Debug!
+// Debug!
 #    define EXECGRAPH_DEBUG_ONLY(code) code
-#    define EXECGRAPH_ASSERT(condition, ...) EXECGRAPH_ASSERT_TYPE(condition, executionGraph::Exception, __VA_ARGS__)
+#    define EXECGRAPH_VERIFY(condition, ...) EXECGRAPH_ASSERT(condition, __VA_ARGS__)
+#    define EXECGRAPH_ASSERT(condition, ...) EXECGRAPH_ASSERT_TYPE(condition, executionGraph::ExceptionFatal, __VA_ARGS__)
 #    define EXECGRAPH_ASSERT_TYPE(condition, Type, ...) EXECGRAPH_THROW_TYPE_IF(!(condition), Type, __VA_ARGS__)
 #endif
 

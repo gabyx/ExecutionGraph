@@ -25,9 +25,9 @@ struct NodeTypeDescription FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table 
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_NAME) &&
-           verifier.Verify(name()) &&
+           verifier.VerifyString(name()) &&
            VerifyOffsetRequired(verifier, VT_TYPE) &&
-           verifier.Verify(type()) &&
+           verifier.VerifyString(type()) &&
            verifier.EndTable();
   }
 };

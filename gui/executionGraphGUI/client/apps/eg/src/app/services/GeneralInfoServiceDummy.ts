@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable, Testability } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { GeneralInfoService, sz} from './GeneralInfoService';
 import { flatbuffers } from 'flatbuffers';
 

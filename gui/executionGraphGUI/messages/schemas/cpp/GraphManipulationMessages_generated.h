@@ -36,9 +36,9 @@ struct NodeConstructionInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_TYPE) &&
-           verifier.Verify(type()) &&
+           verifier.VerifyString(type()) &&
            VerifyOffsetRequired(verifier, VT_NAME) &&
-           verifier.Verify(name()) &&
+           verifier.VerifyString(name()) &&
            verifier.EndTable();
   }
 };
@@ -100,7 +100,7 @@ struct AddNodeRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_GRAPHID) &&
-           verifier.Verify(graphId()) &&
+           verifier.VerifyString(graphId()) &&
            VerifyOffsetRequired(verifier, VT_NODE) &&
            verifier.VerifyTable(node()) &&
            verifier.EndTable();
@@ -195,19 +195,19 @@ inline flatbuffers::Offset<AddNodeResponse> CreateAddNodeResponse(
 struct RemoveNodeRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_GRAPHID = 4,
-    VT_ID = 6
+    VT_NODEID = 6
   };
   const flatbuffers::String *graphId() const {
     return GetPointer<const flatbuffers::String *>(VT_GRAPHID);
   }
-  uint64_t id() const {
-    return GetField<uint64_t>(VT_ID, 0);
+  uint64_t nodeId() const {
+    return GetField<uint64_t>(VT_NODEID, 0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_GRAPHID) &&
-           verifier.Verify(graphId()) &&
-           VerifyField<uint64_t>(verifier, VT_ID) &&
+           verifier.VerifyString(graphId()) &&
+           VerifyField<uint64_t>(verifier, VT_NODEID) &&
            verifier.EndTable();
   }
 };
@@ -218,8 +218,8 @@ struct RemoveNodeRequestBuilder {
   void add_graphId(flatbuffers::Offset<flatbuffers::String> graphId) {
     fbb_.AddOffset(RemoveNodeRequest::VT_GRAPHID, graphId);
   }
-  void add_id(uint64_t id) {
-    fbb_.AddElement<uint64_t>(RemoveNodeRequest::VT_ID, id, 0);
+  void add_nodeId(uint64_t nodeId) {
+    fbb_.AddElement<uint64_t>(RemoveNodeRequest::VT_NODEID, nodeId, 0);
   }
   explicit RemoveNodeRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -237,9 +237,9 @@ struct RemoveNodeRequestBuilder {
 inline flatbuffers::Offset<RemoveNodeRequest> CreateRemoveNodeRequest(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> graphId = 0,
-    uint64_t id = 0) {
+    uint64_t nodeId = 0) {
   RemoveNodeRequestBuilder builder_(_fbb);
-  builder_.add_id(id);
+  builder_.add_nodeId(nodeId);
   builder_.add_graphId(graphId);
   return builder_.Finish();
 }
@@ -247,11 +247,11 @@ inline flatbuffers::Offset<RemoveNodeRequest> CreateRemoveNodeRequest(
 inline flatbuffers::Offset<RemoveNodeRequest> CreateRemoveNodeRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *graphId = nullptr,
-    uint64_t id = 0) {
+    uint64_t nodeId = 0) {
   return executionGraphGUI::serialization::CreateRemoveNodeRequest(
       _fbb,
       graphId ? _fbb.CreateString(graphId) : 0,
-      id);
+      nodeId);
 }
 
 }  // namespace serialization

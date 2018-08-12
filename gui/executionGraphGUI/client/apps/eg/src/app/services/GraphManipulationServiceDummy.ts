@@ -11,7 +11,7 @@
 // =========================================================================================
 
 import { Injectable, Testability } from '@angular/core';
-import { GraphManipulationService, sz} from './GraphManipulationService';
+import { GraphManipulationService, sz } from './GraphManipulationService';
 import { flatbuffers } from 'flatbuffers';
 
 @Injectable()
@@ -22,12 +22,50 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
   }
 
   public async addNode(graphId: string, type: string, name: string): Promise<sz.AddNodeResponse> {
-    let builder = new flatbuffers.Builder(1024);
+    // Build the AddNode request
+    let builder = new flatbuffers.Builder(345);
+    let offGraphId = builder.createString(graphId);
+    let offType = builder.createString(type);
+    let offName = builder.createString(name);
 
-    console.debug(`[GeneralInfoServiceBinaryHttp] Not implemented!`)
+    sz.NodeConstructionInfo.startNodeConstructionInfo(builder);
+    sz.NodeConstructionInfo.addName(builder, offName);
+    sz.NodeConstructionInfo.addType(builder, offType);
+    let off = sz.NodeConstructionInfo.endNodeConstructionInfo(builder);
 
-    let buf = new flatbuffers.ByteBuffer(builder.asUint8Array());
-    let response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
+    sz.AddNodeRequest.startAddNodeRequest(builder);
+    sz.AddNodeRequest.addGraphId(builder, offGraphId);
+    sz.AddNodeRequest.addNode(builder, off);
+    off = sz.AddNodeRequest.endAddNodeRequest(builder);
+    builder.finish(off);
+
+    let requestPayload = builder.asUint8Array();
+
+
+    // Build a dummy result
+    builder = new flatbuffers.Builder(1024);
+    let nameOff = builder.createString(name)
+    let typeOff = builder.createString(type)
+    sz.LogicNode.startLogicNode(builder);
+    sz.LogicNode.addId(builder, builder.createLong(13,13));
+    sz.LogicNode.addName(builder, nameOff);
+    sz.LogicNode.addType(builder, typeOff);
+    let nodeOff = sz.LogicNode.endLogicNode(builder);
+
+    sz.AddNodeResponse.startAddNodeResponse(builder);
+    sz.AddNodeResponse.addNode(builder, nodeOff);
+    let respOff = sz.AddNodeResponse.endAddNodeResponse(builder);
+    builder.finish(respOff);
+    let result = builder.asUint8Array();
+
+    const buf = new flatbuffers.ByteBuffer(result);
+    const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
+
+    let node = response.node();
+    console.log(`[GraphManipulationServiceDummy] Added new node of type: '${node.type()}'
+                  with name: '${node.name()}' [ins: ${node.inputSocketsLength()},
+                  outs: ${node.outputSocketsLength()}`);
+
     return response;
   }
 

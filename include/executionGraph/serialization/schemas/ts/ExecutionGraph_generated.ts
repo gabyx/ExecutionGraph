@@ -20,19 +20,13 @@ export enum NodeClassification{
  */
 export namespace executionGraph.serialization{
 export class ExecutionGraphNodeProperties {
-  /**
-   * @type {flatbuffers.ByteBuffer}
-   */
   bb: flatbuffers.ByteBuffer|null = null;
 
-  /**
-   * @type {number}
-   */
   bb_pos:number = 0;
 /**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {ExecutionGraphNodeProperties}
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns ExecutionGraphNodeProperties
  */
 __init(i:number, bb:flatbuffers.ByteBuffer):ExecutionGraphNodeProperties {
   this.bb_pos = i;
@@ -41,16 +35,16 @@ __init(i:number, bb:flatbuffers.ByteBuffer):ExecutionGraphNodeProperties {
 };
 
 /**
- * @param {flatbuffers.ByteBuffer} bb
- * @param {ExecutionGraphNodeProperties=} obj
- * @returns {ExecutionGraphNodeProperties}
+ * @param flatbuffers.ByteBuffer bb
+ * @param ExecutionGraphNodeProperties= obj
+ * @returns ExecutionGraphNodeProperties
  */
 static getRootAsExecutionGraphNodeProperties(bb:flatbuffers.ByteBuffer, obj?:ExecutionGraphNodeProperties):ExecutionGraphNodeProperties {
   return (obj || new ExecutionGraphNodeProperties).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
- * @returns {flatbuffers.Long}
+ * @returns flatbuffers.Long
  */
 nodeId():flatbuffers.Long {
   var offset = this.bb!.__offset(this.bb_pos, 4);
@@ -58,16 +52,16 @@ nodeId():flatbuffers.Long {
 };
 
 /**
- * @returns {executionGraph.serialization.NodeClassification}
+ * @returns executionGraph.serialization.NodeClassification
  */
 classification():executionGraph.serialization.NodeClassification {
   var offset = this.bb!.__offset(this.bb_pos, 6);
-  return offset ? /** @type {executionGraph.serialization.NodeClassification} */ (this.bb!.readInt8(this.bb_pos + offset)) : executionGraph.serialization.NodeClassification.NormalNode;
+  return offset ? /**  */ (this.bb!.readInt8(this.bb_pos + offset)) : executionGraph.serialization.NodeClassification.NormalNode;
 };
 
 /**
- * @param {number} index
- * @returns {flatbuffers.Long}
+ * @param number index
+ * @returns flatbuffers.Long
  */
 groups(index: number):flatbuffers.Long|null {
   var offset = this.bb!.__offset(this.bb_pos, 8);
@@ -75,7 +69,7 @@ groups(index: number):flatbuffers.Long|null {
 };
 
 /**
- * @returns {number}
+ * @returns number
  */
 groupsLength():number {
   var offset = this.bb!.__offset(this.bb_pos, 8);
@@ -83,40 +77,40 @@ groupsLength():number {
 };
 
 /**
- * @param {flatbuffers.Builder} builder
+ * @param flatbuffers.Builder builder
  */
 static startExecutionGraphNodeProperties(builder:flatbuffers.Builder) {
   builder.startObject(3);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Long} nodeId
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Long nodeId
  */
 static addNodeId(builder:flatbuffers.Builder, nodeId:flatbuffers.Long) {
   builder.addFieldInt64(0, nodeId, builder.createLong(0, 0));
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {executionGraph.serialization.NodeClassification} classification
+ * @param flatbuffers.Builder builder
+ * @param executionGraph.serialization.NodeClassification classification
  */
 static addClassification(builder:flatbuffers.Builder, classification:executionGraph.serialization.NodeClassification) {
   builder.addFieldInt8(1, classification, executionGraph.serialization.NodeClassification.NormalNode);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} groupsOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset groupsOffset
  */
 static addGroups(builder:flatbuffers.Builder, groupsOffset:flatbuffers.Offset) {
   builder.addFieldOffset(2, groupsOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {Array.<flatbuffers.Long>} data
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @param Array.<flatbuffers.Long> data
+ * @returns flatbuffers.Offset
  */
 static createGroupsVector(builder:flatbuffers.Builder, data:flatbuffers.Long[]):flatbuffers.Offset {
   builder.startVector(8, data.length, 8);
@@ -127,16 +121,16 @@ static createGroupsVector(builder:flatbuffers.Builder, data:flatbuffers.Long[]):
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {number} numElems
+ * @param flatbuffers.Builder builder
+ * @param number numElems
  */
 static startGroupsVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(8, numElems, 8);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @returns flatbuffers.Offset
  */
 static endExecutionGraphNodeProperties(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
@@ -150,19 +144,13 @@ static endExecutionGraphNodeProperties(builder:flatbuffers.Builder):flatbuffers.
  */
 export namespace executionGraph.serialization{
 export class ExecutionGraph {
-  /**
-   * @type {flatbuffers.ByteBuffer}
-   */
   bb: flatbuffers.ByteBuffer|null = null;
 
-  /**
-   * @type {number}
-   */
   bb_pos:number = 0;
 /**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {ExecutionGraph}
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns ExecutionGraph
  */
 __init(i:number, bb:flatbuffers.ByteBuffer):ExecutionGraph {
   this.bb_pos = i;
@@ -171,25 +159,25 @@ __init(i:number, bb:flatbuffers.ByteBuffer):ExecutionGraph {
 };
 
 /**
- * @param {flatbuffers.ByteBuffer} bb
- * @param {ExecutionGraph=} obj
- * @returns {ExecutionGraph}
+ * @param flatbuffers.ByteBuffer bb
+ * @param ExecutionGraph= obj
+ * @returns ExecutionGraph
  */
 static getRootAsExecutionGraph(bb:flatbuffers.ByteBuffer, obj?:ExecutionGraph):ExecutionGraph {
   return (obj || new ExecutionGraph).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {boolean}
+ * @param flatbuffers.ByteBuffer bb
+ * @returns boolean
  */
 static bufferHasIdentifier(bb:flatbuffers.ByteBuffer):boolean {
   return bb.__has_identifier('EXGR');
 };
 
 /**
- * @param {executionGraph.serialization.GraphTypeDescription=} obj
- * @returns {executionGraph.serialization.GraphTypeDescription|null}
+ * @param executionGraph.serialization.GraphTypeDescription= obj
+ * @returns executionGraph.serialization.GraphTypeDescription|null
  */
 graphDescription(obj?:NS8554603841823681307.executionGraph.serialization.GraphTypeDescription):NS8554603841823681307.executionGraph.serialization.GraphTypeDescription|null {
   var offset = this.bb!.__offset(this.bb_pos, 4);
@@ -197,9 +185,9 @@ graphDescription(obj?:NS8554603841823681307.executionGraph.serialization.GraphTy
 };
 
 /**
- * @param {number} index
- * @param {executionGraph.serialization.LogicNode=} obj
- * @returns {executionGraph.serialization.LogicNode}
+ * @param number index
+ * @param executionGraph.serialization.LogicNode= obj
+ * @returns executionGraph.serialization.LogicNode
  */
 nodes(index: number, obj?:NS6979572382460661179.executionGraph.serialization.LogicNode):NS6979572382460661179.executionGraph.serialization.LogicNode|null {
   var offset = this.bb!.__offset(this.bb_pos, 6);
@@ -207,7 +195,7 @@ nodes(index: number, obj?:NS6979572382460661179.executionGraph.serialization.Log
 };
 
 /**
- * @returns {number}
+ * @returns number
  */
 nodesLength():number {
   var offset = this.bb!.__offset(this.bb_pos, 6);
@@ -215,9 +203,9 @@ nodesLength():number {
 };
 
 /**
- * @param {number} index
- * @param {executionGraph.serialization.SocketLink=} obj
- * @returns {executionGraph.serialization.SocketLink}
+ * @param number index
+ * @param executionGraph.serialization.SocketLink= obj
+ * @returns executionGraph.serialization.SocketLink
  */
 links(index: number, obj?:NS6732539591744924236.executionGraph.serialization.SocketLink):NS6732539591744924236.executionGraph.serialization.SocketLink|null {
   var offset = this.bb!.__offset(this.bb_pos, 8);
@@ -225,7 +213,7 @@ links(index: number, obj?:NS6732539591744924236.executionGraph.serialization.Soc
 };
 
 /**
- * @returns {number}
+ * @returns number
  */
 linksLength():number {
   var offset = this.bb!.__offset(this.bb_pos, 8);
@@ -233,9 +221,9 @@ linksLength():number {
 };
 
 /**
- * @param {number} index
- * @param {executionGraph.serialization.ExecutionGraphNodeProperties=} obj
- * @returns {executionGraph.serialization.ExecutionGraphNodeProperties}
+ * @param number index
+ * @param executionGraph.serialization.ExecutionGraphNodeProperties= obj
+ * @returns executionGraph.serialization.ExecutionGraphNodeProperties
  */
 nodeProperties(index: number, obj?:executionGraph.serialization.ExecutionGraphNodeProperties):executionGraph.serialization.ExecutionGraphNodeProperties|null {
   var offset = this.bb!.__offset(this.bb_pos, 10);
@@ -243,7 +231,7 @@ nodeProperties(index: number, obj?:executionGraph.serialization.ExecutionGraphNo
 };
 
 /**
- * @returns {number}
+ * @returns number
  */
 nodePropertiesLength():number {
   var offset = this.bb!.__offset(this.bb_pos, 10);
@@ -251,8 +239,8 @@ nodePropertiesLength():number {
 };
 
 /**
- * @param {executionGraph.serialization.GraphVisualization=} obj
- * @returns {executionGraph.serialization.GraphVisualization|null}
+ * @param executionGraph.serialization.GraphVisualization= obj
+ * @returns executionGraph.serialization.GraphVisualization|null
  */
 visualization(obj?:NS1062210652789845474.executionGraph.serialization.GraphVisualization):NS1062210652789845474.executionGraph.serialization.GraphVisualization|null {
   var offset = this.bb!.__offset(this.bb_pos, 12);
@@ -260,32 +248,32 @@ visualization(obj?:NS1062210652789845474.executionGraph.serialization.GraphVisua
 };
 
 /**
- * @param {flatbuffers.Builder} builder
+ * @param flatbuffers.Builder builder
  */
 static startExecutionGraph(builder:flatbuffers.Builder) {
   builder.startObject(5);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} graphDescriptionOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset graphDescriptionOffset
  */
 static addGraphDescription(builder:flatbuffers.Builder, graphDescriptionOffset:flatbuffers.Offset) {
   builder.addFieldOffset(0, graphDescriptionOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} nodesOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset nodesOffset
  */
 static addNodes(builder:flatbuffers.Builder, nodesOffset:flatbuffers.Offset) {
   builder.addFieldOffset(1, nodesOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {Array.<flatbuffers.Offset>} data
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @param Array.<flatbuffers.Offset> data
+ * @returns flatbuffers.Offset
  */
 static createNodesVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
   builder.startVector(4, data.length, 4);
@@ -296,41 +284,41 @@ static createNodesVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[])
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {number} numElems
+ * @param flatbuffers.Builder builder
+ * @param number numElems
  */
 static startNodesVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(4, numElems, 4);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} linksOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset linksOffset
  */
 static addLinks(builder:flatbuffers.Builder, linksOffset:flatbuffers.Offset) {
   builder.addFieldOffset(2, linksOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {number} numElems
+ * @param flatbuffers.Builder builder
+ * @param number numElems
  */
 static startLinksVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(40, numElems, 8);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} nodePropertiesOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset nodePropertiesOffset
  */
 static addNodeProperties(builder:flatbuffers.Builder, nodePropertiesOffset:flatbuffers.Offset) {
   builder.addFieldOffset(3, nodePropertiesOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {Array.<flatbuffers.Offset>} data
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @param Array.<flatbuffers.Offset> data
+ * @returns flatbuffers.Offset
  */
 static createNodePropertiesVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
   builder.startVector(4, data.length, 4);
@@ -341,24 +329,24 @@ static createNodePropertiesVector(builder:flatbuffers.Builder, data:flatbuffers.
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {number} numElems
+ * @param flatbuffers.Builder builder
+ * @param number numElems
  */
 static startNodePropertiesVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(4, numElems, 4);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} visualizationOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset visualizationOffset
  */
 static addVisualization(builder:flatbuffers.Builder, visualizationOffset:flatbuffers.Offset) {
   builder.addFieldOffset(4, visualizationOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @returns flatbuffers.Offset
  */
 static endExecutionGraph(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
@@ -366,8 +354,8 @@ static endExecutionGraph(builder:flatbuffers.Builder):flatbuffers.Offset {
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} offset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset offset
  */
 static finishExecutionGraphBuffer(builder:flatbuffers.Builder, offset:flatbuffers.Offset) {
   builder.finish(offset, 'EXGR');

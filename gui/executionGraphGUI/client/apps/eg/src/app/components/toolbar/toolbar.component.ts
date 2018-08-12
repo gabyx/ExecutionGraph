@@ -13,6 +13,8 @@
 import { Component, OnInit } from '@angular/core';
 
 import { ExecutionService } from '../../services/ExecutionService';
+import { GraphManipulationService } from '../../services/GraphManipulationService';
+import { GeneralInfoService } from '../../services/GeneralInfoService';
 
 @Component({
   selector: 'eg-toolbar',
@@ -22,19 +24,33 @@ import { ExecutionService } from '../../services/ExecutionService';
 export class ToolbarComponent implements OnInit {
   public testResponse: any;
 
-  constructor(private readonly executionService: ExecutionService) {}
+  constructor(
+    private readonly executionService: ExecutionService,
+    private readonly generalInfoService: GeneralInfoService,
+    private readonly graphManipulationService: GraphManipulationService) { }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   public test() {
-    console.log('Testing');
-    this.executionService.execute().then(
-      result => {
-        this.testResponse = result;
-      },
-      error => {
-        this.testResponse = error;
-      }
-    );
+    console.log('Testing AddNode');
+    this.debugAddNode();
   }
+
+  /**
+   * Add some node for debugging purposes
+   */
+  private async debugAddNode() {
+    // Get the graph infos
+    console.debug("Get all graph type descriptions...")
+    var graphInfos = await this.generalInfoService.getAllGraphTypeDescriptions();
+
+    // Add a node to the first graph
+    let graphInfo = graphInfos.graphsTypes(0);
+    let graphId = graphInfo.id();
+    let nodeType = graphInfo.nodeTypeDescriptions(0).type();
+
+    // Add the node.
+    this.graphManipulationService.addNode(graphId, nodeType, "MySuperDuperNode");
+  }
+
 }

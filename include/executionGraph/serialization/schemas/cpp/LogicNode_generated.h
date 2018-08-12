@@ -42,24 +42,23 @@ struct LogicNode FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_DATA);
   }
   flexbuffers::Reference data_flexbuffer_root() const {
-    auto v = data();
-    return flexbuffers::GetRoot(v->Data(), v->size());
+    return flexbuffers::GetRoot(data()->Data(), data()->size());
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_ID) &&
            VerifyOffsetRequired(verifier, VT_TYPE) &&
-           verifier.Verify(type()) &&
+           verifier.VerifyString(type()) &&
            VerifyOffset(verifier, VT_NAME) &&
-           verifier.Verify(name()) &&
+           verifier.VerifyString(name()) &&
            VerifyOffset(verifier, VT_INPUTSOCKETS) &&
-           verifier.Verify(inputSockets()) &&
+           verifier.VerifyVector(inputSockets()) &&
            verifier.VerifyVectorOfTables(inputSockets()) &&
            VerifyOffset(verifier, VT_OUTPUTSOCKETS) &&
-           verifier.Verify(outputSockets()) &&
+           verifier.VerifyVector(outputSockets()) &&
            verifier.VerifyVectorOfTables(outputSockets()) &&
            VerifyOffset(verifier, VT_DATA) &&
-           verifier.Verify(data()) &&
+           verifier.VerifyVector(data()) &&
            verifier.EndTable();
   }
 };

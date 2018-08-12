@@ -68,8 +68,7 @@ public:
                  ResponseCreator&& responseCreator);
 
     void removeNode(const Id& graphId,
-                    NodeId id,
-                    const std::function<void()>& responseCreator);
+                    NodeId id);
     //@}
 
     //! Information about graphs.

@@ -1,8 +1,8 @@
 
 
 // Export everything which is needed for GeneralInfoMessages (into a namespace!)
-import { executionGraphGUI as exec1 } from './GeneralInfoMessages_generated';
-import * as serialization from '@serialization/index';
+import { executionGraphGUI as exec1 } from '@messages/GeneralInfoMessages_generated';
+import * as serialization from '../../../../../include/executionGraph/serialization/schemas/ts';
 export namespace GeneralInfoMessages {
     export import GetAllGraphTypeDescriptionsResponse = exec1.serialization.GetAllGraphTypeDescriptionsResponse;
     export import GraphTypeDescription = serialization.GraphTypeDescription;
@@ -11,7 +11,7 @@ export namespace GeneralInfoMessages {
 }
 
 // Export everything which is needed for GeneralInfoMessages (into a namespace!) 
-import { executionGraphGUI as exec2 } from './GraphManipulationMessages_generated';
+import { executionGraphGUI as exec2 } from '@messages/GraphManipulationMessages_generated';
 export namespace GraphManipulationMessages {
     export import AddNodeRequest = exec2.serialization.AddNodeRequest;
     export import AddNodeResponse = exec2.serialization.AddNodeResponse;

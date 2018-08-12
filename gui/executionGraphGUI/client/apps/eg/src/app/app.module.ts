@@ -30,12 +30,17 @@ import { GeneralInfoService } from './services/GeneralInfoService';
 import { GeneralInfoServiceDummy } from './services/GeneralInfoServiceDummy';
 import { GeneralInfoServiceBinaryHttp } from './services/GeneralInfoServiceBinaryHttp';
 
+import { GraphManipulationService } from './services/GraphManipulationService';
+import { GraphManipulationServiceBinaryHttp } from './services/GraphManipulationServiceBinaryHttp';
+import { GraphManipulationServiceDummy } from './services/GraphManipulationServiceDummy';
+
 import { AppComponent } from './app.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
 
 import { environment } from '../environments/environment';
 import { ConnectionStyleOptionsComponent } from './components/connection-style-options/connection-style-options.component';
+
 
 @NgModule({
   declarations: [AppComponent, ToolbarComponent, WorkspaceComponent, ConnectionStyleOptionsComponent],
@@ -55,8 +60,29 @@ import { ConnectionStyleOptionsComponent } from './components/connection-style-o
     BinaryHttpRouterService,
     CefMessageRouterService,
     { provide: ExecutionService, useClass: environment.production ? ExecutionServiceBinaryHttp : ExecutionServiceDummy },
-    { provide: GeneralInfoService, useClass: environment.production ? GeneralInfoServiceBinaryHttp : GeneralInfoServiceDummy }
+    {
+      provide: GeneralInfoService,
+      useFactory: (service : BinaryHttpRouterService) => {
+        if (environment.production) {
+          return new GeneralInfoServiceBinaryHttp(service, environment.logReponsesVerbose);
+        } else {
+          return new GeneralInfoServiceDummy();
+        }
+      },
+      deps: [BinaryHttpRouterService]
+    },
+    {
+      provide: GraphManipulationService,
+      useFactory: (service : BinaryHttpRouterService) => {
+        if (environment.production) {
+          return new GraphManipulationServiceBinaryHttp(service, environment.logReponsesVerbose);
+        } else {
+          return new GraphManipulationServiceDummy();
+        }
+      },
+      deps: [BinaryHttpRouterService]
+    }
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }

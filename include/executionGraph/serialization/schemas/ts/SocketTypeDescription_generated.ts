@@ -5,19 +5,13 @@
  */
 export namespace executionGraph.serialization{
 export class SocketTypeDescription {
-  /**
-   * @type {flatbuffers.ByteBuffer}
-   */
   bb: flatbuffers.ByteBuffer|null = null;
 
-  /**
-   * @type {number}
-   */
   bb_pos:number = 0;
 /**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {SocketTypeDescription}
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns SocketTypeDescription
  */
 __init(i:number, bb:flatbuffers.ByteBuffer):SocketTypeDescription {
   this.bb_pos = i;
@@ -26,17 +20,17 @@ __init(i:number, bb:flatbuffers.ByteBuffer):SocketTypeDescription {
 };
 
 /**
- * @param {flatbuffers.ByteBuffer} bb
- * @param {SocketTypeDescription=} obj
- * @returns {SocketTypeDescription}
+ * @param flatbuffers.ByteBuffer bb
+ * @param SocketTypeDescription= obj
+ * @returns SocketTypeDescription
  */
 static getRootAsSocketTypeDescription(bb:flatbuffers.ByteBuffer, obj?:SocketTypeDescription):SocketTypeDescription {
   return (obj || new SocketTypeDescription).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
- * @param {flatbuffers.Encoding=} optionalEncoding
- * @returns {string|Uint8Array|null}
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array|null
  */
 name():string|null
 name(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
@@ -46,8 +40,8 @@ name(optionalEncoding?:any):string|Uint8Array|null {
 };
 
 /**
- * @param {flatbuffers.Encoding=} optionalEncoding
- * @returns {string|Uint8Array|null}
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array|null
  */
 type():string|null
 type(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
@@ -57,31 +51,31 @@ type(optionalEncoding?:any):string|Uint8Array|null {
 };
 
 /**
- * @param {flatbuffers.Builder} builder
+ * @param flatbuffers.Builder builder
  */
 static startSocketTypeDescription(builder:flatbuffers.Builder) {
   builder.startObject(2);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} nameOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset nameOffset
  */
 static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
   builder.addFieldOffset(0, nameOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} typeOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset typeOffset
  */
 static addType(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset) {
   builder.addFieldOffset(1, typeOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @returns flatbuffers.Offset
  */
 static endSocketTypeDescription(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();

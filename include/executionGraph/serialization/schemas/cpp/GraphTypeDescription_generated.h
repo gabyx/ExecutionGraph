@@ -36,14 +36,14 @@ struct GraphTypeDescription FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_NAME) &&
-           verifier.Verify(name()) &&
+           verifier.VerifyString(name()) &&
            VerifyOffsetRequired(verifier, VT_ID) &&
-           verifier.Verify(id()) &&
+           verifier.VerifyString(id()) &&
            VerifyOffsetRequired(verifier, VT_SOCKETTYPEDESCRIPTIONS) &&
-           verifier.Verify(socketTypeDescriptions()) &&
+           verifier.VerifyVector(socketTypeDescriptions()) &&
            verifier.VerifyVectorOfTables(socketTypeDescriptions()) &&
            VerifyOffset(verifier, VT_NODETYPEDESCRIPTIONS) &&
-           verifier.Verify(nodeTypeDescriptions()) &&
+           verifier.VerifyVector(nodeTypeDescriptions()) &&
            verifier.VerifyVectorOfTables(nodeTypeDescriptions()) &&
            verifier.EndTable();
   }

@@ -53,9 +53,9 @@ struct Test FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_POS) &&
-           verifier.Verify(pos()) &&
+           verifier.VerifyVector(pos()) &&
            VerifyOffset(verifier, VT_POS2) &&
-           verifier.Verify(pos2()) &&
+           verifier.VerifyVector(pos2()) &&
            verifier.EndTable();
   }
 };

@@ -35,7 +35,7 @@ MY_TEST(FlatBuffer, Test1)
     unsigned int n = 100;
     namespace t    = test;
 
-    flatbuffers::FlatBufferBuilder builder;
+    flatbuffers::FlatBufferBuilder builder(2500);
     std::vector<t::Vec3> vecs(n, t::Vec3(1, 3, 4));
     auto vecsOffsets  = builder.CreateVectorOfStructs(vecs.data(), vecs.size());
     auto vecsOffsets2 = builder.CreateVectorOfStructs(vecs.data(), vecs.size());

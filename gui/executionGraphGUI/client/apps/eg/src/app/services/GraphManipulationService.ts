@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { GraphManipulationMessages } from '@messages/index';
+import { GraphManipulationMessages } from '../../../../../../messages/schemas/ts';
 export import sz = GraphManipulationMessages;
 
 export abstract class GraphManipulationService {

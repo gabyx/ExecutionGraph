@@ -39,7 +39,7 @@ const FunctionMap<GraphManipulationRequestHandler::Function> GraphManipulationRe
 //! Konstructor.
 GraphManipulationRequestHandler::GraphManipulationRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,
                                                                  const IdNamed& id)
-    : BackendRequestHandler(id)
+    : BackendRequestHandler(id), m_backend(backend)
 {
 }
 
@@ -116,5 +116,11 @@ void GraphManipulationRequestHandler::handleRemoveNode(const Request& request,
     EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == nullptr,
                                       "Request data is null!");
 
-    auto nodeReq = getRootOfPayloadAndVerify<s::AddNodeRequest>(*payload);
+    auto nodeReq = getRootOfPayloadAndVerify<s::RemoveNodeRequest>(*payload);
+
+    Id graphID{nodeReq->graphId()->str()};
+
+    // Execute the request
+    m_backend->removeNode(graphID,
+                          nodeReq->nodeId());
 }

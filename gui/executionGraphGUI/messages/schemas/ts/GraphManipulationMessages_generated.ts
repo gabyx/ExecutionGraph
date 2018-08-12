@@ -6,19 +6,13 @@ import * as NS6979572382460661179 from "@serialization/LogicNode_generated";
  */
 export namespace executionGraphGUI.serialization{
 export class NodeConstructionInfo {
-  /**
-   * @type {flatbuffers.ByteBuffer}
-   */
   bb: flatbuffers.ByteBuffer|null = null;
 
-  /**
-   * @type {number}
-   */
   bb_pos:number = 0;
 /**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {NodeConstructionInfo}
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns NodeConstructionInfo
  */
 __init(i:number, bb:flatbuffers.ByteBuffer):NodeConstructionInfo {
   this.bb_pos = i;
@@ -27,17 +21,17 @@ __init(i:number, bb:flatbuffers.ByteBuffer):NodeConstructionInfo {
 };
 
 /**
- * @param {flatbuffers.ByteBuffer} bb
- * @param {NodeConstructionInfo=} obj
- * @returns {NodeConstructionInfo}
+ * @param flatbuffers.ByteBuffer bb
+ * @param NodeConstructionInfo= obj
+ * @returns NodeConstructionInfo
  */
 static getRootAsNodeConstructionInfo(bb:flatbuffers.ByteBuffer, obj?:NodeConstructionInfo):NodeConstructionInfo {
   return (obj || new NodeConstructionInfo).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
- * @param {flatbuffers.Encoding=} optionalEncoding
- * @returns {string|Uint8Array|null}
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array|null
  */
 type():string|null
 type(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
@@ -47,8 +41,8 @@ type(optionalEncoding?:any):string|Uint8Array|null {
 };
 
 /**
- * @param {flatbuffers.Encoding=} optionalEncoding
- * @returns {string|Uint8Array|null}
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array|null
  */
 name():string|null
 name(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
@@ -58,31 +52,31 @@ name(optionalEncoding?:any):string|Uint8Array|null {
 };
 
 /**
- * @param {flatbuffers.Builder} builder
+ * @param flatbuffers.Builder builder
  */
 static startNodeConstructionInfo(builder:flatbuffers.Builder) {
   builder.startObject(2);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} typeOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset typeOffset
  */
 static addType(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset) {
   builder.addFieldOffset(0, typeOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} nameOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset nameOffset
  */
 static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
   builder.addFieldOffset(1, nameOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @returns flatbuffers.Offset
  */
 static endNodeConstructionInfo(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
@@ -98,19 +92,13 @@ static endNodeConstructionInfo(builder:flatbuffers.Builder):flatbuffers.Offset {
  */
 export namespace executionGraphGUI.serialization{
 export class AddNodeRequest {
-  /**
-   * @type {flatbuffers.ByteBuffer}
-   */
   bb: flatbuffers.ByteBuffer|null = null;
 
-  /**
-   * @type {number}
-   */
   bb_pos:number = 0;
 /**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {AddNodeRequest}
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns AddNodeRequest
  */
 __init(i:number, bb:flatbuffers.ByteBuffer):AddNodeRequest {
   this.bb_pos = i;
@@ -119,17 +107,17 @@ __init(i:number, bb:flatbuffers.ByteBuffer):AddNodeRequest {
 };
 
 /**
- * @param {flatbuffers.ByteBuffer} bb
- * @param {AddNodeRequest=} obj
- * @returns {AddNodeRequest}
+ * @param flatbuffers.ByteBuffer bb
+ * @param AddNodeRequest= obj
+ * @returns AddNodeRequest
  */
 static getRootAsAddNodeRequest(bb:flatbuffers.ByteBuffer, obj?:AddNodeRequest):AddNodeRequest {
   return (obj || new AddNodeRequest).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
- * @param {flatbuffers.Encoding=} optionalEncoding
- * @returns {string|Uint8Array|null}
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array|null
  */
 graphId():string|null
 graphId(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
@@ -139,8 +127,8 @@ graphId(optionalEncoding?:any):string|Uint8Array|null {
 };
 
 /**
- * @param {executionGraphGUI.serialization.NodeConstructionInfo=} obj
- * @returns {executionGraphGUI.serialization.NodeConstructionInfo|null}
+ * @param executionGraphGUI.serialization.NodeConstructionInfo= obj
+ * @returns executionGraphGUI.serialization.NodeConstructionInfo|null
  */
 node(obj?:executionGraphGUI.serialization.NodeConstructionInfo):executionGraphGUI.serialization.NodeConstructionInfo|null {
   var offset = this.bb!.__offset(this.bb_pos, 6);
@@ -148,31 +136,31 @@ node(obj?:executionGraphGUI.serialization.NodeConstructionInfo):executionGraphGU
 };
 
 /**
- * @param {flatbuffers.Builder} builder
+ * @param flatbuffers.Builder builder
  */
 static startAddNodeRequest(builder:flatbuffers.Builder) {
   builder.startObject(2);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} graphIdOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset graphIdOffset
  */
 static addGraphId(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset) {
   builder.addFieldOffset(0, graphIdOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} nodeOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset nodeOffset
  */
 static addNode(builder:flatbuffers.Builder, nodeOffset:flatbuffers.Offset) {
   builder.addFieldOffset(1, nodeOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @returns flatbuffers.Offset
  */
 static endAddNodeRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
@@ -188,19 +176,13 @@ static endAddNodeRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
  */
 export namespace executionGraphGUI.serialization{
 export class AddNodeResponse {
-  /**
-   * @type {flatbuffers.ByteBuffer}
-   */
   bb: flatbuffers.ByteBuffer|null = null;
 
-  /**
-   * @type {number}
-   */
   bb_pos:number = 0;
 /**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {AddNodeResponse}
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns AddNodeResponse
  */
 __init(i:number, bb:flatbuffers.ByteBuffer):AddNodeResponse {
   this.bb_pos = i;
@@ -209,17 +191,17 @@ __init(i:number, bb:flatbuffers.ByteBuffer):AddNodeResponse {
 };
 
 /**
- * @param {flatbuffers.ByteBuffer} bb
- * @param {AddNodeResponse=} obj
- * @returns {AddNodeResponse}
+ * @param flatbuffers.ByteBuffer bb
+ * @param AddNodeResponse= obj
+ * @returns AddNodeResponse
  */
 static getRootAsAddNodeResponse(bb:flatbuffers.ByteBuffer, obj?:AddNodeResponse):AddNodeResponse {
   return (obj || new AddNodeResponse).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
- * @param {executionGraph.serialization.LogicNode=} obj
- * @returns {executionGraph.serialization.LogicNode|null}
+ * @param executionGraph.serialization.LogicNode= obj
+ * @returns executionGraph.serialization.LogicNode|null
  */
 node(obj?:NS6979572382460661179.executionGraph.serialization.LogicNode):NS6979572382460661179.executionGraph.serialization.LogicNode|null {
   var offset = this.bb!.__offset(this.bb_pos, 4);
@@ -227,23 +209,23 @@ node(obj?:NS6979572382460661179.executionGraph.serialization.LogicNode):NS697957
 };
 
 /**
- * @param {flatbuffers.Builder} builder
+ * @param flatbuffers.Builder builder
  */
 static startAddNodeResponse(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} nodeOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset nodeOffset
  */
 static addNode(builder:flatbuffers.Builder, nodeOffset:flatbuffers.Offset) {
   builder.addFieldOffset(0, nodeOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @returns flatbuffers.Offset
  */
 static endAddNodeResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
@@ -258,19 +240,13 @@ static endAddNodeResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
  */
 export namespace executionGraphGUI.serialization{
 export class RemoveNodeRequest {
-  /**
-   * @type {flatbuffers.ByteBuffer}
-   */
   bb: flatbuffers.ByteBuffer|null = null;
 
-  /**
-   * @type {number}
-   */
   bb_pos:number = 0;
 /**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {RemoveNodeRequest}
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns RemoveNodeRequest
  */
 __init(i:number, bb:flatbuffers.ByteBuffer):RemoveNodeRequest {
   this.bb_pos = i;
@@ -279,17 +255,17 @@ __init(i:number, bb:flatbuffers.ByteBuffer):RemoveNodeRequest {
 };
 
 /**
- * @param {flatbuffers.ByteBuffer} bb
- * @param {RemoveNodeRequest=} obj
- * @returns {RemoveNodeRequest}
+ * @param flatbuffers.ByteBuffer bb
+ * @param RemoveNodeRequest= obj
+ * @returns RemoveNodeRequest
  */
 static getRootAsRemoveNodeRequest(bb:flatbuffers.ByteBuffer, obj?:RemoveNodeRequest):RemoveNodeRequest {
   return (obj || new RemoveNodeRequest).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
- * @param {flatbuffers.Encoding=} optionalEncoding
- * @returns {string|Uint8Array|null}
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array|null
  */
 graphId():string|null
 graphId(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
@@ -299,39 +275,39 @@ graphId(optionalEncoding?:any):string|Uint8Array|null {
 };
 
 /**
- * @returns {flatbuffers.Long}
+ * @returns flatbuffers.Long
  */
-id():flatbuffers.Long {
+nodeId():flatbuffers.Long {
   var offset = this.bb!.__offset(this.bb_pos, 6);
   return offset ? this.bb!.readUint64(this.bb_pos + offset) : this.bb!.createLong(0, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
+ * @param flatbuffers.Builder builder
  */
 static startRemoveNodeRequest(builder:flatbuffers.Builder) {
   builder.startObject(2);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} graphIdOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset graphIdOffset
  */
 static addGraphId(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset) {
   builder.addFieldOffset(0, graphIdOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Long} id
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Long nodeId
  */
-static addId(builder:flatbuffers.Builder, id:flatbuffers.Long) {
-  builder.addFieldInt64(1, id, builder.createLong(0, 0));
+static addNodeId(builder:flatbuffers.Builder, nodeId:flatbuffers.Long) {
+  builder.addFieldInt64(1, nodeId, builder.createLong(0, 0));
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @returns flatbuffers.Offset
  */
 static endRemoveNodeRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();

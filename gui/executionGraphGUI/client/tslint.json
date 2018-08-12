@@ -4,6 +4,7 @@
     "node_modules/@nrwl/schematics/src/tslint"
   ],
   "rules": {
+    "align": [true, "parameters", "statements", "members", "arguments", "elements"],
     "arrow-return-shorthand": true,
     "callable-types": true,
     "class-name": true,

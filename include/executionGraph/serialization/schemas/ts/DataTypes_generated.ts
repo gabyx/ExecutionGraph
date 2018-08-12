@@ -4,19 +4,13 @@
  * @constructor
  */
 export class Vector2f {
-  /**
-   * @type {flatbuffers.ByteBuffer}
-   */
   bb: flatbuffers.ByteBuffer|null = null;
 
-  /**
-   * @type {number}
-   */
   bb_pos:number = 0;
 /**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {Vector2f}
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns Vector2f
  */
 __init(i:number, bb:flatbuffers.ByteBuffer):Vector2f {
   this.bb_pos = i;
@@ -25,24 +19,24 @@ __init(i:number, bb:flatbuffers.ByteBuffer):Vector2f {
 };
 
 /**
- * @returns {number}
+ * @returns number
  */
 x():number {
   return this.bb!.readFloat32(this.bb_pos);
 };
 
 /**
- * @returns {number}
+ * @returns number
  */
 y():number {
   return this.bb!.readFloat32(this.bb_pos + 4);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {number} x
- * @param {number} y
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @param number x
+ * @param number y
+ * @returns flatbuffers.Offset
  */
 static createVector2f(builder:flatbuffers.Builder, x: number, y: number):flatbuffers.Offset {
   builder.prep(4, 8);
@@ -56,19 +50,13 @@ static createVector2f(builder:flatbuffers.Builder, x: number, y: number):flatbuf
  * @constructor
  */
 export class Vector2d {
-  /**
-   * @type {flatbuffers.ByteBuffer}
-   */
   bb: flatbuffers.ByteBuffer|null = null;
 
-  /**
-   * @type {number}
-   */
   bb_pos:number = 0;
 /**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {Vector2d}
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns Vector2d
  */
 __init(i:number, bb:flatbuffers.ByteBuffer):Vector2d {
   this.bb_pos = i;
@@ -77,24 +65,24 @@ __init(i:number, bb:flatbuffers.ByteBuffer):Vector2d {
 };
 
 /**
- * @returns {number}
+ * @returns number
  */
 x():number {
   return this.bb!.readFloat64(this.bb_pos);
 };
 
 /**
- * @returns {number}
+ * @returns number
  */
 y():number {
   return this.bb!.readFloat64(this.bb_pos + 8);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {number} x
- * @param {number} y
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @param number x
+ * @param number y
+ * @returns flatbuffers.Offset
  */
 static createVector2d(builder:flatbuffers.Builder, x: number, y: number):flatbuffers.Offset {
   builder.prep(8, 16);
@@ -108,19 +96,13 @@ static createVector2d(builder:flatbuffers.Builder, x: number, y: number):flatbuf
  * @constructor
  */
 export class Vector3d {
-  /**
-   * @type {flatbuffers.ByteBuffer}
-   */
   bb: flatbuffers.ByteBuffer|null = null;
 
-  /**
-   * @type {number}
-   */
   bb_pos:number = 0;
 /**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {Vector3d}
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns Vector3d
  */
 __init(i:number, bb:flatbuffers.ByteBuffer):Vector3d {
   this.bb_pos = i;
@@ -129,32 +111,32 @@ __init(i:number, bb:flatbuffers.ByteBuffer):Vector3d {
 };
 
 /**
- * @returns {number}
+ * @returns number
  */
 x():number {
   return this.bb!.readFloat64(this.bb_pos);
 };
 
 /**
- * @returns {number}
+ * @returns number
  */
 y():number {
   return this.bb!.readFloat64(this.bb_pos + 8);
 };
 
 /**
- * @returns {number}
+ * @returns number
  */
 z():number {
   return this.bb!.readFloat64(this.bb_pos + 16);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {number} x
- * @param {number} y
- * @param {number} z
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @param number x
+ * @param number y
+ * @param number z
+ * @returns flatbuffers.Offset
  */
 static createVector3d(builder:flatbuffers.Builder, x: number, y: number, z: number):flatbuffers.Offset {
   builder.prep(8, 24);
@@ -169,19 +151,13 @@ static createVector3d(builder:flatbuffers.Builder, x: number, y: number, z: numb
  * @constructor
  */
 export class Box2f {
-  /**
-   * @type {flatbuffers.ByteBuffer}
-   */
   bb: flatbuffers.ByteBuffer|null = null;
 
-  /**
-   * @type {number}
-   */
   bb_pos:number = 0;
 /**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {Box2f}
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns Box2f
  */
 __init(i:number, bb:flatbuffers.ByteBuffer):Box2f {
   this.bb_pos = i;
@@ -190,28 +166,28 @@ __init(i:number, bb:flatbuffers.ByteBuffer):Box2f {
 };
 
 /**
- * @param {Vector2f=} obj
- * @returns {Vector2f|null}
+ * @param Vector2f= obj
+ * @returns Vector2f|null
  */
 positionMin(obj?:Vector2f):Vector2f|null {
   return (obj || new Vector2f).__init(this.bb_pos, this.bb!);
 };
 
 /**
- * @param {Vector2f=} obj
- * @returns {Vector2f|null}
+ * @param Vector2f= obj
+ * @returns Vector2f|null
  */
 positionMax(obj?:Vector2f):Vector2f|null {
   return (obj || new Vector2f).__init(this.bb_pos + 8, this.bb!);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {number} positionMin_x
- * @param {number} positionMin_y
- * @param {number} positionMax_x
- * @param {number} positionMax_y
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @param number positionMin_x
+ * @param number positionMin_y
+ * @param number positionMax_x
+ * @param number positionMax_y
+ * @returns flatbuffers.Offset
  */
 static createBox2f(builder:flatbuffers.Builder, positionMin_x: number, positionMin_y: number, positionMax_x: number, positionMax_y: number):flatbuffers.Offset {
   builder.prep(4, 16);

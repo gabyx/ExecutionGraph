@@ -138,9 +138,9 @@ namespace executionGraph
 
             NodeBaseType* node = it->second.m_node.get();
 
-            m_nodeClasses[currType].erase(node);    // Remove from class.
-            currType = newType;                     // Set new classification
-            m_nodeClasses[currType].emplace(node);  // Add to class.
+            m_nodeClassifications[currType].erase(node);    // Remove from class.
+            currType = newType;                             // Set new classification
+            m_nodeClassifications[currType].emplace(node);  // Add to class.
         }
 
         //! Set the node class of a specific \p node.
@@ -184,7 +184,7 @@ namespace executionGraph
         LogicNodeDefaultOutputs& getDefaultOuputPool() { return *m_nodeDefaultOutputPool; }
 
         //! Get all nodes classified as \p type.
-        const NodeDataSet& getNodes(NodeClassification type) const { return m_nodeClasses[type]; }
+        const NodeDataSet& getNodes(NodeClassification type) const { return m_nodeClassifications[type]; }
 
         //! Get all nodes in the group with id \p groupId.
         const NodeDataSet& getNodes(GroupId groupId) const
@@ -204,7 +204,8 @@ namespace executionGraph
             return {m_nonConstNodes, m_constNodes};
         }
 
-        //! Adds a node to the execution tree and classifies it as \p type.
+        //! Adds a node to the execution graph and classifies it as `type`
+        //! corresponding to group id `groupId` (ignored for constant nodes!).
         NodeBaseType* addNode(NodePointer node,
                               NodeClassification type = NodeClassification::NormalNode,
                               GroupId groupId         = 0)
@@ -229,20 +230,74 @@ namespace executionGraph
                 // Constant node
                 auto p      = m_constNodes.emplace(id, NodeDataBase{std::move(node), type});
                 m_nodes[id] = &p.first->second;
-                // Add to classes
-                m_nodeClasses[type].emplace(pNode);
             }
             else
             {
                 // Any other node
                 auto p      = m_nonConstNodes.emplace(id, NodeData{std::move(node), type});
                 m_nodes[id] = &p.first->second;
-                // Add to classes
-                m_nodeClasses[type].emplace(pNode);
                 // Add node to group
                 addNodeToGroup(id, groupId);
             }
+
+            // Add to classes
+            m_nodeClassifications[type].emplace(pNode);
+
             return pNode;
+        }
+
+        //! Remove an node with id `nodeId` from the graph.
+        //! A programming error is fatal ==> UB.
+        NodePointer removeNode(NodeId nodeId)
+        {
+            auto nodeIt = m_nodes.find(nodeId);
+            if(nodeIt == m_nodes.end())
+            {
+                return nullptr;
+            }
+
+            NodeDataBase* nodeDataBase = nodeIt->second;
+
+            // Erase from the classifications.
+            EXECGRAPH_VERIFY(m_nodeClassifications[nodeDataBase->m_class].erase(nodeDataBase->m_node.get()),
+                             "Programming error!");
+
+            // Move the node out!
+            NodePointer node = std::move(nodeDataBase->m_node);
+
+            if(nodeDataBase->m_class == NodeClassification::ConstantNode)
+            {
+                // Remove from constant nodes.
+                EXECGRAPH_VERIFY(m_constNodes.erase(nodeId), "Programming error!");
+            }
+            else
+            {
+                auto* nodeData = static_cast<NodeData*>(nodeDataBase);
+
+                // Remove from groups.
+                for(auto groupId : nodeData->m_groups)
+                {
+                    auto groupIt = m_nodeGroups.find(groupId);
+                    EXECGRAPH_ASSERT(groupIt != m_nodeGroups.end(), "Programming error!");
+                    m_nodeGroups.erase(groupIt);
+                }
+
+                // Remove from non-constant nodes.
+                EXECGRAPH_VERIFY(m_nonConstNodes.erase(nodeId), "Programming error!");
+            }
+            // Erase from nodes.
+            m_nodes.erase(nodeIt);
+
+            // Decrement max current node id.
+            if(nodeId == m_maxCurrentNodeId && m_maxCurrentNodeId > 0)
+            {
+                --m_maxCurrentNodeId;
+            }
+
+            // Execution order is not up-to-date.
+            m_executionOrderUpToDate = false;
+
+            return std::move(node);
         }
 
         //! Add the node with id \p nodeId to the group with id \p groupId.
@@ -335,7 +390,7 @@ namespace executionGraph
             // Allways check results in Debug mode.
             EXECGRAPH_DEBUG_ONLY(checkResults = true;)
 
-            if(m_nodeClasses[NodeClassification::OutputNode].size() == 0)
+            if(m_nodeClassifications[NodeClassification::OutputNode].size() == 0)
             {
                 EXECGRAPH_THROW("No output nodes specified!");
             }
@@ -349,11 +404,11 @@ namespace executionGraph
 
             // Check if each output node reaches at least one input, if not print warning!
             ReachNodeCheck c;
-            for(auto* outNode : m_nodeClasses[NodeClassification::OutputNode])
+            for(auto* outNode : m_nodeClassifications[NodeClassification::OutputNode])
             {
                 bool outputReachedInput = false;
 
-                for(auto* inNode : m_nodeClasses[NodeClassification::InputNode])
+                for(auto* inNode : m_nodeClassifications[NodeClassification::InputNode])
                 {
                     if(c.check(outNode, inNode))
                     {
@@ -1043,7 +1098,7 @@ namespace executionGraph
             NodeBaseType* m_start = nullptr;
         };
 
-        std::set<NodeBaseType*> m_nodeClasses[m_nNodeClasses];  //!< The classification set for each node class.
+        std::set<NodeBaseType*> m_nodeClassifications[m_nNodeClasses];  //!< The classification set for each node class.
 
         NodeDataMap m_nodes;                   //!< All nodes in the execution tree
         NodeDataStorage m_nonConstNodes;       //!< All nodes in the execution tree (main storage) except for constant nodes.

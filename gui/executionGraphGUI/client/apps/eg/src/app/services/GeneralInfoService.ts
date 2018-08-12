@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { GeneralInfoMessages } from '@messages/index';
+import { GeneralInfoMessages } from '../../../../../../messages/schemas/ts';
 export import sz = GeneralInfoMessages;
 
 export abstract class GeneralInfoService {

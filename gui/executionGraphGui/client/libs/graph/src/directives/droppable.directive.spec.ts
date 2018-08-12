@@ -1,4 +1,4 @@
-import { DroppableDirective } from './droppable.directive';
+import { DroppableDirective } from '@eg/graph/src/directives/droppable.directive';
 
 describe('DroppableDirective', () => {
   it('should create an instance', () => {

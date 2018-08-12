@@ -56,7 +56,9 @@ export class BinaryHttpRouterService {
    * @param payload The request payload.
    */
   public post(requestUrl: string, payload: Uint8Array): Promise<Uint8Array> {
-    const data = payload.buffer as ArrayBuffer;
+    // @todo: This .slice is horribly inefficient, how to convert a payload with byteOffset != 0
+    // to a ArrayBuffer -> its stupidly impossible...
+    const data = payload.slice().buffer as ArrayBuffer;
     const url = `${this.baseUrl}/${requestUrl}`
 
     console.info(`[BinaryHttpRouterService] Sending data to '${url}': (Bytes: '${data.byteLength}',  MIME-Type: '${this.binaryMimeType}')`);

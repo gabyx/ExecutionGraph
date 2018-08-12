@@ -6,19 +6,13 @@ import * as NS8554603841823681307 from "@serialization/GraphTypeDescription_gene
  */
 export namespace executionGraphGUI.serialization{
 export class GetAllGraphTypeDescriptionsResponse {
-  /**
-   * @type {flatbuffers.ByteBuffer}
-   */
   bb: flatbuffers.ByteBuffer|null = null;
 
-  /**
-   * @type {number}
-   */
   bb_pos:number = 0;
 /**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {GetAllGraphTypeDescriptionsResponse}
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns GetAllGraphTypeDescriptionsResponse
  */
 __init(i:number, bb:flatbuffers.ByteBuffer):GetAllGraphTypeDescriptionsResponse {
   this.bb_pos = i;
@@ -27,18 +21,18 @@ __init(i:number, bb:flatbuffers.ByteBuffer):GetAllGraphTypeDescriptionsResponse 
 };
 
 /**
- * @param {flatbuffers.ByteBuffer} bb
- * @param {GetAllGraphTypeDescriptionsResponse=} obj
- * @returns {GetAllGraphTypeDescriptionsResponse}
+ * @param flatbuffers.ByteBuffer bb
+ * @param GetAllGraphTypeDescriptionsResponse= obj
+ * @returns GetAllGraphTypeDescriptionsResponse
  */
 static getRootAsGetAllGraphTypeDescriptionsResponse(bb:flatbuffers.ByteBuffer, obj?:GetAllGraphTypeDescriptionsResponse):GetAllGraphTypeDescriptionsResponse {
   return (obj || new GetAllGraphTypeDescriptionsResponse).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
- * @param {number} index
- * @param {executionGraph.serialization.GraphTypeDescription=} obj
- * @returns {executionGraph.serialization.GraphTypeDescription}
+ * @param number index
+ * @param executionGraph.serialization.GraphTypeDescription= obj
+ * @returns executionGraph.serialization.GraphTypeDescription
  */
 graphsTypes(index: number, obj?:NS8554603841823681307.executionGraph.serialization.GraphTypeDescription):NS8554603841823681307.executionGraph.serialization.GraphTypeDescription|null {
   var offset = this.bb!.__offset(this.bb_pos, 4);
@@ -46,7 +40,7 @@ graphsTypes(index: number, obj?:NS8554603841823681307.executionGraph.serializati
 };
 
 /**
- * @returns {number}
+ * @returns number
  */
 graphsTypesLength():number {
   var offset = this.bb!.__offset(this.bb_pos, 4);
@@ -54,24 +48,24 @@ graphsTypesLength():number {
 };
 
 /**
- * @param {flatbuffers.Builder} builder
+ * @param flatbuffers.Builder builder
  */
 static startGetAllGraphTypeDescriptionsResponse(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} graphsTypesOffset
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset graphsTypesOffset
  */
 static addGraphsTypes(builder:flatbuffers.Builder, graphsTypesOffset:flatbuffers.Offset) {
   builder.addFieldOffset(0, graphsTypesOffset, 0);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {Array.<flatbuffers.Offset>} data
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @param Array.<flatbuffers.Offset> data
+ * @returns flatbuffers.Offset
  */
 static createGraphsTypesVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
   builder.startVector(4, data.length, 4);
@@ -82,16 +76,16 @@ static createGraphsTypesVector(builder:flatbuffers.Builder, data:flatbuffers.Off
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @param {number} numElems
+ * @param flatbuffers.Builder builder
+ * @param number numElems
  */
 static startGraphsTypesVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(4, numElems, 4);
 };
 
 /**
- * @param {flatbuffers.Builder} builder
- * @returns {flatbuffers.Offset}
+ * @param flatbuffers.Builder builder
+ * @returns flatbuffers.Offset
  */
 static endGetAllGraphTypeDescriptionsResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();

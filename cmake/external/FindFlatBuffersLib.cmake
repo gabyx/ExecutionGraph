@@ -44,7 +44,7 @@ endif()
 if(TARGET "flatbuffers::flatbuffers")
     add_library(flatbuffersLib INTERFACE IMPORTED)
     set_property(TARGET flatbuffersLib PROPERTY INTERFACE_LINK_LIBRARIES flatbuffers::flatbuffers)
-
+    set_property(TARGET flatbuffersLib PROPERTY INTERFACE_COMPILE_DEFINITIONS "$<$<CONFIG:Debug>:FLATBUFFERS_DEBUG_VERIFICATION_FAILURE>")
     message(STATUS "flatbuffers library found! Config File: ${FlatBuffers_CONFIG}")
     message(STATUS "flatbuffers library added targets: flatbufferLib")
 endif()

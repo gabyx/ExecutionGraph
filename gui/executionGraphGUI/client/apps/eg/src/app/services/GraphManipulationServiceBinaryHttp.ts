@@ -10,9 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable, Testability } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http'
-import { _throw } from 'rxjs/observable/throw';
+import { Inject } from '@angular/core';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/first';
 
@@ -20,20 +18,20 @@ import { flatbuffers } from 'flatbuffers';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 
-@Injectable()
-export class GraphManipulationServiceHttp extends GraphManipulationService {
 
-  constructor(private readonly binaryRouter: BinaryHttpRouterService) {
+export class GraphManipulationServiceBinaryHttp extends GraphManipulationService {
+
+  constructor(@Inject(BinaryHttpRouterService) private readonly binaryRouter: BinaryHttpRouterService, private readonly verboseLog = true) {
     super();
   }
 
   public async addNode(graphId: string, type: string, name: string): Promise<sz.AddNodeResponse> {
 
     // Build the AddNode request
-    let builder = new flatbuffers.Builder(128);
+    let builder = new flatbuffers.Builder(356);
     let offGraphId = builder.createString(graphId);
     let offType = builder.createString(type);
-    let offName = builder.createString(graphId);
+    let offName = builder.createString(name);
 
     sz.NodeConstructionInfo.startNodeConstructionInfo(builder);
     sz.NodeConstructionInfo.addName(builder, offName);
@@ -54,8 +52,9 @@ export class GraphManipulationServiceHttp extends GraphManipulationService {
     const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
 
     let node = response.node();
-    console.log(`[GraphManipulationServiceHttp] Added new node of type: '${node.type()}'
-                  with name: '${node.name()}' [ins: ${node.inputSocketsLength()}, outs: ${node.outputSocketsLength()}`);
+    console.log(`[GraphManipulationServiceBinaryHttp] Added new node of type: '${node.type()}'
+                  with name: '${node.name()}' [ins: ${node.inputSocketsLength()},
+                  outs: ${node.outputSocketsLength()}`);
 
     return response;
   }

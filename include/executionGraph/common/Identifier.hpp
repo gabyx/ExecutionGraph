@@ -107,7 +107,6 @@ namespace executionGraph
 //! Specialize std::hash for executionGraph::Id
 namespace std
 {
-#define EXECGRAPH_DEFINE_HASHER(Type)
     template<>
     class hash<executionGraph::Id>
     {

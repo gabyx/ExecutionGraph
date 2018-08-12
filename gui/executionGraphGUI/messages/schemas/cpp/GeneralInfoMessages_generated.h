@@ -25,7 +25,7 @@ struct GetAllGraphTypeDescriptionsResponse FLATBUFFERS_FINAL_CLASS : private fla
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_GRAPHSTYPES) &&
-           verifier.Verify(graphsTypes()) &&
+           verifier.VerifyVector(graphsTypes()) &&
            verifier.VerifyVectorOfTables(graphsTypes()) &&
            verifier.EndTable();
   }

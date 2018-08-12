@@ -72,7 +72,27 @@ void ExecutionGraphBackend::removeGraphs()
 
 //! Remove a node with type `type` from the graph with id `graphId`.
 void ExecutionGraphBackend::removeNode(const Id& graphId,
-                                       NodeId id,
-                                       const std::function<void()>& responseCreator)
+                                       NodeId nodeId)
 {
+    auto graphIt = m_graphs.find(graphId);
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(graphIt == m_graphs.end(),
+                                      "Graph id: '{0}' does not exist!",
+                                      graphId.toString());
+    GraphVariant& graphVar = graphIt->second;
+
+    // Make a visitor to dispatch the "add" over the variant...
+    auto remove = [&](auto& graph) {
+        using GraphType = std::remove_cv_t<std::remove_reference_t<decltype(graph)>>;
+        using Config    = typename GraphType::Config;
+
+        // Remove the node (gets destroyed right here after this scope!)
+        auto node = graph.removeNode(nodeId);
+
+        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(node == nullptr,
+                                          "Node with id '{0}' does not exist in graph with id '{1}'",
+                                          nodeId,
+                                          graphId.toString());
+    };
+
+    std::visit(remove, graphVar);
 }

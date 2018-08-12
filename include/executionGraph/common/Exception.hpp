@@ -54,6 +54,17 @@ namespace executionGraph
 
 namespace executionGraph
 {
+    //! Special exception to denote a fatal programming error.
+    class ExceptionFatal : public std::runtime_error
+    {
+    public:
+        ExceptionFatal(const std::string& s)
+            : std::runtime_error(s) {}
+        // we dont need a virtual dtor, the std destroys the exception correctly.
+        // https://stackoverflow.com/questions/28353708/exception-with-non-virtual-destructor-c
+    };
+
+    //! Base class for all exceptions.
     class Exception : public std::runtime_error
     {
     public:
