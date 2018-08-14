@@ -11,12 +11,12 @@
 // =========================================================================================
 
 import { IIdentifier } from "@eg/comon/Identifier"
-import { GeneralInfoMessages } from '../../../../../../messages/schemas/ts';
-export import sz = GeneralInfoMessages;
+import { GraphManagementMessages } from '../../../../../../messages/schemas/ts';
+export import sz = GraphManagementMessages;
 
-export abstract class GeneralInfoService extends IIdentifier {
-
-  public abstract async getAllGraphTypeDescriptions(): Promise<sz.GetAllGraphTypeDescriptionsResponse>;
+export abstract class GraphManagementService extends IIdentifier {
+  public abstract async addGraph(graphTypeId: string): Promise<string>;
+  public abstract async removeGraph(graphId: string): Promise<void>;
 }
 
 

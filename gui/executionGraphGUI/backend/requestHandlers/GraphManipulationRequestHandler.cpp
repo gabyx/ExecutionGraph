@@ -63,7 +63,7 @@ void GraphManipulationRequestHandler::handleRequest(const Request& request,
     }
 }
 
-//! Handle the "graph/addNode"
+//! Handle the operation of adding a node.
 void GraphManipulationRequestHandler::handleAddNode(const Request& request,
                                                     ResponsePromise& response)
 {
@@ -80,7 +80,7 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
     auto responseCreator = [&response, graphID](auto& graph, auto& node) {
         using Allocator = ResponsePromise::Allocator;
         AllocatorProxyFlatBuffer<Allocator> allocator(response.getAllocator());
-        flatbuffers::FlatBufferBuilder builder(1024, &allocator);
+        flatbuffers::FlatBufferBuilder builder(512, &allocator);
 
         using GraphType      = std::remove_cv_t<std::remove_reference_t<decltype(graph)>>;
         using Config         = typename GraphType::Config;
@@ -92,6 +92,8 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
 
         s::AddNodeResponseBuilder addResponse(builder);
         addResponse.add_node(nodeOffset);
+        auto resOff = addResponse.Finish();
+        builder.Finish(resOff);
 
         // Set the response.
         auto detachedBuffer = builder.Release();
@@ -107,7 +109,7 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
                        responseCreator);
 }
 
-//! Handle the "graph/removeNode"
+//! Handle the operation of removing a node.
 void GraphManipulationRequestHandler::handleRemoveNode(const Request& request,
                                                        ResponsePromise& response)
 {

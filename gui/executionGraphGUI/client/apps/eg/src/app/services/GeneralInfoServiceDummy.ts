@@ -11,7 +11,8 @@
 // =========================================================================================
 
 import { Injectable } from '@angular/core';
-import { GeneralInfoService, sz} from './GeneralInfoService';
+import { GeneralInfoService, sz } from './GeneralInfoService';
+import { Identifier } from "@eg/comon/Identifier"
 import { flatbuffers } from 'flatbuffers';
 
 @Injectable()
@@ -20,6 +21,9 @@ export class GeneralInfoServiceDummy extends GeneralInfoService {
   constructor() {
     super();
   }
+
+  private readonly _id = new Identifier("GeneralInfoServiceDummy");
+  public get id() { return this._id; }
 
   public async getAllGraphTypeDescriptions(): Promise<sz.GetAllGraphTypeDescriptionsResponse> {
     let builder = new flatbuffers.Builder(1024);
@@ -62,7 +66,7 @@ export class GeneralInfoServiceDummy extends GeneralInfoService {
     let buf = new flatbuffers.ByteBuffer(builder.asUint8Array());
     let response = sz.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
 
-    console.debug(`[GeneralInfoServiceBinaryHttp] Received: Number of Graph types: ${response.graphsTypesLength()}`)
+    console.debug(`[${this.id.name}] Received: Number of Graph types: ${response.graphsTypesLength()}`)
     return response;
   }
 

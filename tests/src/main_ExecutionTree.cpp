@@ -88,7 +88,15 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 
     EXECGRAPH_LOG_TRACE("Result : " << resultNode->getOutVal<DummyNode<Config>::Result1>());
 
-    EXECGRAPH_THROW_IF(resultNode->getOutVal<DummyNode<Config>::Result1>() != 16, "wrong result");
+    ASSERT_EQ(resultNode->getOutVal<DummyNode<Config>::Result1>(), 16) << "wrong result";
+
+    execTree.removeNode(5);
+    execTree.setup();
+    execTree.runExecute(0);
+    execTree.removeNode(4);
+    execTree.setup();
+    execTree.runExecute(0);
+    ASSERT_EQ(resultNode->getOutVal<DummyNode<Config>::Result1>(), 4) << "wrong result";
 }
 
 MY_TEST(ExecutionTree_Test, IntBig)

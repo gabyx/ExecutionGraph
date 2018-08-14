@@ -11,20 +11,26 @@
 // =========================================================================================
 
 import { Injectable } from '@angular/core';
-import { ExecutionService } from './ExecutionService';
 import { Identifier } from "@eg/comon/Identifier"
+import { GraphManagementService, sz } from './GraphManagementService';
+import { flatbuffers } from 'flatbuffers';
 
 @Injectable()
-export class ExecutionServiceDummy extends ExecutionService {
+export class GraphManagementServiceDummy extends GraphManagementService {
+
   constructor() {
     super();
   }
 
-  private readonly _id = new Identifier("ExecutionServiceDummy");
+  private readonly _id = new Identifier("GraphManipulationServiceDummy");
   public get id(): Identifier { return this._id; }
 
-  public execute(): Promise<void> {
-    console.log(`[${this.id.name}] execute()`);
-    return Promise.resolve();
+  public async addGraph(graphTypeId: string): Promise<string> {
+    console.error(`[${this.id.name}] Not implemented yet!`);
+    return "HERE 16byte GUID"
+  }
+
+  public async removeGraph(graphId: string): Promise<void> {
+    console.error(`[${this.id.name}] Not implemented yet!`);
   }
 }

@@ -279,7 +279,7 @@ namespace executionGraph
                 {
                     auto groupIt = m_nodeGroups.find(groupId);
                     EXECGRAPH_ASSERT(groupIt != m_nodeGroups.end(), "Programming error!");
-                    m_nodeGroups.erase(groupIt);
+                    EXECGRAPH_VERIFY(groupIt->second.erase(nodeData), "Programming error!");
                 }
 
                 // Remove from non-constant nodes.

@@ -20,7 +20,7 @@ class ExecutionGraphBackend;
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
-    Request Handler for information on graphs in the backend.
+    Request handler for manipulation operations on graphs in the backend.
 
     Handles the request URLs: 
         - "graph/addNodes"

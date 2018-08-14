@@ -10,6 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-export abstract class ExecutionService {
+import { IIdentifier } from "@eg/comon/Identifier";
+
+export abstract class ExecutionService extends IIdentifier {
   public abstract execute(): Promise<void>;
 }

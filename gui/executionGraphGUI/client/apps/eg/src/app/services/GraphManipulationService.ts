@@ -10,11 +10,15 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { GraphManipulationMessages } from '../../../../../../messages/schemas/ts';
+import { IIdentifier } from "@eg/comon/Identifier"
+import * as D from "@eg/comon/DataTypes";
+import { GraphManipulationMessages } from '@messages/index';
+
 export import sz = GraphManipulationMessages;
 
-export abstract class GraphManipulationService {
+export abstract class GraphManipulationService extends IIdentifier {
   public abstract async addNode(graphId: string, type: string, name: string): Promise<sz.AddNodeResponse>;
+  public abstract async removeNode(graphId: string, nodeId: D.NodeId): Promise<void>;
 }
 
 

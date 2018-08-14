@@ -13,6 +13,8 @@
 import { Injectable, Testability } from '@angular/core';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { flatbuffers } from 'flatbuffers';
+import { Identifier } from '@eg/comon/Identifier';
+import * as D from '@eg/comon/DataTypes';
 
 @Injectable()
 export class GraphManipulationServiceDummy extends GraphManipulationService {
@@ -20,6 +22,9 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
   constructor() {
     super();
   }
+
+  private readonly _id = new Identifier("GraphManipulationServiceDummy");
+  public get id(): Identifier { return this._id; }
 
   public async addNode(graphId: string, type: string, name: string): Promise<sz.AddNodeResponse> {
     // Build the AddNode request
@@ -47,7 +52,7 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
     let nameOff = builder.createString(name)
     let typeOff = builder.createString(type)
     sz.LogicNode.startLogicNode(builder);
-    sz.LogicNode.addId(builder, builder.createLong(13,13));
+    sz.LogicNode.addId(builder, builder.createLong(13, 13));
     sz.LogicNode.addName(builder, nameOff);
     sz.LogicNode.addType(builder, typeOff);
     let nodeOff = sz.LogicNode.endLogicNode(builder);
@@ -62,12 +67,14 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
     const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
 
     let node = response.node();
-    console.log(`[GraphManipulationServiceDummy] Added new node of type: '${node.type()}'
+    console.log(`[${this.id.name}] Added new node of type: '${node.type()}'
                   with name: '${node.name()}' [ins: ${node.inputSocketsLength()},
                   outs: ${node.outputSocketsLength()}`);
 
     return response;
   }
 
-
+  public async removeNode(graphId: string, nodeId: D.NodeId): Promise<void> {
+    console.error(`[${this.id.name}] Not implemented yet!`)
+  }
 }

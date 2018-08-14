@@ -19,6 +19,7 @@ import 'rxjs/add/operator/first';
 import { flatbuffers } from 'flatbuffers';
 import { GeneralInfoService, sz } from './GeneralInfoService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
+import { Identifier } from "@eg/comon/Identifier"
 
 export class GeneralInfoServiceBinaryHttp extends GeneralInfoService {
 
@@ -28,6 +29,10 @@ export class GeneralInfoServiceBinaryHttp extends GeneralInfoService {
   ) {
     super();
   }
+
+  private readonly _id = new Identifier("GeneralInfoServiceBinaryHttp");
+  public get id() { return this._id; }
+
 
   public async getAllGraphTypeDescriptions(): Promise<sz.GetAllGraphTypeDescriptionsResponse> {
     const result = await this.binaryRouter.get('general/getAllGraphTypeDescriptions');

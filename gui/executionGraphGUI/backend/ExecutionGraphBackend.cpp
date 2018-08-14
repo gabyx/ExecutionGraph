@@ -35,24 +35,22 @@ const std::unordered_map<Id, e::GraphTypeDescription>
                                                                     e::makeGraphTypeDescription<DefaultGraphConfig>(m_graphTypeDescriptionIds[0],
                                                                                                                     ExecutionGraphBackendDefs<DefaultGraphConfig>::getNodeDescriptions()))};
 
-//! Add a graph of type `graphType` with id `graphId` to the backend.
-void ExecutionGraphBackend::addGraph(const Id& graphId, const Id& graphType)
+//! Add a new graph of type `graphType` to the backend.
+Id ExecutionGraphBackend::addGraph(const Id& graphType)
 {
     static_assert(m_graphTypeDescriptionIds.size() == 1, "You need to expand this functionality here!");
+    Id newId;
 
     if(graphType == m_graphTypeDescriptionIds[0])
     {
-        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(m_graphs.find(graphId) != m_graphs.end(),
-                                          "Graph id '{0}' already exists!",
-                                          graphId.toString());
-
-        m_graphs.emplace(std::make_pair(graphId, DefaultGraph{}));
+        m_graphs.emplace(std::make_pair(newId, DefaultGraph{}));
     }
     else
     {
         EXECGRAPHGUI_THROW_BAD_REQUEST("Graph type: '{0}' not known!",
                                        graphType.toString());
     }
+    return newId;
 }
 
 //! Remove a graph with id `graphId` from the backend.
@@ -80,14 +78,10 @@ void ExecutionGraphBackend::removeNode(const Id& graphId,
                                       graphId.toString());
     GraphVariant& graphVar = graphIt->second;
 
-    // Make a visitor to dispatch the "add" over the variant...
+    // Make a visitor to dispatch the "remove" over the variant...
     auto remove = [&](auto& graph) {
-        using GraphType = std::remove_cv_t<std::remove_reference_t<decltype(graph)>>;
-        using Config    = typename GraphType::Config;
-
         // Remove the node (gets destroyed right here after this scope!)
         auto node = graph.removeNode(nodeId);
-
         EXECGRAPHGUI_THROW_BAD_REQUEST_IF(node == nullptr,
                                           "Node with id '{0}' does not exist in graph with id '{1}'",
                                           nodeId,

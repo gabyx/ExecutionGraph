@@ -1,26 +1,29 @@
 // =========================================================================================
 //  ExecutionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
-// 
-//  @date Mon Jul 30 2018
+//
+//  @date Tue Aug 14 2018
 //  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
-// 
+//
 //  This Source Code Form is subject to the terms of the Mozilla Public
 //  License, v. 2.0. If a copy of the MPL was not distributed with this
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-namespace executionGraphGUI.serialization;
+import { Guid } from "guid-typescript";
 
-struct Bool {
-    value:bool;
+export class Identifier {
+  private readonly _id: Guid;
+
+  constructor(private readonly _name: string) {
+    this._id = Guid.create();
+  }
+
+  public get guid(): Guid { return this._id; }
+  public get name(): string { return `${this._name}-${this.guid.toString()}`; }
+  public get shortName(): string { return this._name; }
 }
 
-union ConstructorValue { Bool }
-
-//! Constructor key-value pairs used for node creation.
-table ConstructorKV
-{
-    key:string (id:0, required);
-    value:[ConstructorValue] (id:2, required);
+export abstract class IIdentifier {
+  public abstract get id(): Identifier;
 }

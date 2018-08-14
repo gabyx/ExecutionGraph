@@ -62,7 +62,7 @@ void GeneralInfoRequestHandler::handleRequest(const Request& request,
     }
 }
 
-//! Handle the "GetAllGraphTypeDescriptions"
+//! Handle the operation of getting all graph type descriptions.
 void GeneralInfoRequestHandler::handleGetAllGraphTypeDescriptions(const Request& request,
                                                                   ResponsePromise& response)
 {

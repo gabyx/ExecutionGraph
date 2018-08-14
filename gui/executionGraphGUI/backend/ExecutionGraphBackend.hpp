@@ -53,8 +53,7 @@ public:
 
     //! Adding/removing graphs.
     //@{
-    void addGraph(const Id& graphId,
-                  const Id& graphType);
+    Id addGraph(const Id& graphType);
     void removeGraph(const Id& graphId);
     void removeGraphs();
     //@}

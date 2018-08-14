@@ -17,13 +17,17 @@ import 'rxjs/add/operator/first';
 import { flatbuffers } from 'flatbuffers';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-
+import { Identifier } from '@eg/comon/Identifier';
+import * as D from "@eg/comon/DataTypes"
 
 export class GraphManipulationServiceBinaryHttp extends GraphManipulationService {
 
   constructor(@Inject(BinaryHttpRouterService) private readonly binaryRouter: BinaryHttpRouterService, private readonly verboseLog = true) {
     super();
   }
+
+  private readonly _id = new Identifier("GraphManipulationServiceBinaryHttp");
+  public get id(): Identifier { return this._id; }
 
   public async addNode(graphId: string, type: string, name: string): Promise<sz.AddNodeResponse> {
 
@@ -52,10 +56,28 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
 
     let node = response.node();
-    console.log(`[GraphManipulationServiceBinaryHttp] Added new node of type: '${node.type()}'
+    console.log(`[${this.id.name}] Added new node of type: '${node.type()}'
                   with name: '${node.name()}' [ins: ${node.inputSocketsLength()},
                   outs: ${node.outputSocketsLength()}`);
 
     return response;
+  }
+
+  public async removeNode(graphId: string, nodeId: D.NodeId): Promise<void> {
+
+    // Build the RemoveNode request
+    let builder = new flatbuffers.Builder(356);
+    let offGraphId = builder.createString(graphId);
+    sz.RemoveNodeRequest.startRemoveNodeRequest(builder);
+    sz.RemoveNodeRequest.addGraphId(builder, offGraphId);
+    sz.RemoveNodeRequest.addNodeId(builder, builder.createLong(nodeId.lower, nodeId.higher));
+    let reqOff = sz.RemoveNodeRequest.endRemoveNodeRequest(builder);
+    builder.finish(reqOff);
+
+    let requestPayload = builder.asUint8Array();
+
+    // Send the request
+    await this.binaryRouter.post('graph/removeNode', requestPayload);
+
   }
 }

@@ -19,14 +19,17 @@ import { flatbuffers } from 'flatbuffers';
 
 import { ExecutionService } from './ExecutionService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
+import { Identifier } from "@eg/comon/Identifier"
 
 @Injectable()
 export class ExecutionServiceBinaryHttp extends ExecutionService {
 
-  constructor(private readonly binaryRouter: BinaryHttpRouterService)
-  {
+  constructor(private readonly binaryRouter: BinaryHttpRouterService) {
     super();
   }
+
+  private readonly _id = new Identifier("GeneralInfoServiceDummy");
+  public get id(): Identifier { return this._id; }
 
   public async execute(): Promise<void> {
     const result = await this.binaryRouter.post('graph/execute', this.createBinaryData(null));
