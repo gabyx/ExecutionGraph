@@ -2,7 +2,7 @@
 //  ExecutionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 //
-//  @date Tue Aug 14 2018
+//  @date Wed Aug 15 2018
 //  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
 //
 //  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,20 +10,12 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Guid } from "guid-typescript";
-
-export class Identifier {
-  private readonly _id: Guid;
-
-  constructor(private readonly _name: string) {
-    this._id = Guid.create();
-  }
-
-  public get guid(): Guid { return this._id; }
-  public get name(): string { return `${this._name}-${this.guid.toString()}`; }
-  public get shortName(): string { return this._name; }
-}
-
-export abstract class IIdentifier {
-  public abstract get id(): Identifier;
+/**
+ * The logger interface.
+ */
+export interface ILogger {
+  logDebug(message: string): void;
+  logInfo(message: string): void;
+  logWarn(message: string): void;
+  logError(message: string): void;
 }

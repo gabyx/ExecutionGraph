@@ -11,14 +11,14 @@
 // =========================================================================================
 
 import { IIdentifier } from "@eg/comon/Identifier"
-import * as D from "@eg/comon/DataTypes";
+import { NodeId } from "@eg/common";
 import { GraphManipulationMessages } from '@messages/index';
 
 export import sz = GraphManipulationMessages;
 
 export abstract class GraphManipulationService extends IIdentifier {
   public abstract async addNode(graphId: string, type: string, name: string): Promise<sz.AddNodeResponse>;
-  public abstract async removeNode(graphId: string, nodeId: D.NodeId): Promise<void>;
+  public abstract async removeNode(graphId: string, nodeId: NodeId): Promise<void>;
 }
 
 

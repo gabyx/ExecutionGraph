@@ -10,23 +10,24 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Inject } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/first';
 
 import { flatbuffers } from 'flatbuffers';
 import { GraphManagementService, sz } from './GraphManagementService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import { Identifier } from "@eg/comon/Identifier";
+import { ILogger, ILoggerFactory } from '@eg/logger'
 
+@Injectable()
 export class GraphManagementServiceBinaryHttp extends GraphManagementService {
 
-  constructor(@Inject(BinaryHttpRouterService) private readonly binaryRouter: BinaryHttpRouterService, private readonly verboseLog = true) {
-    super();
-  }
+  private logger: ILogger;
 
-  private readonly _id = new Identifier("GraphManagementServiceBinaryHttp");
-  public get id(): Identifier { return this._id; }
+  constructor(@Inject("ServiceLoggerFactoryToken") loggerFactory: ILoggerFactory, private readonly binaryRouter: BinaryHttpRouterService, private readonly verboseLog = true) {
+    super();
+    this.logger = loggerFactory.create("GraphManagementServiceBinaryHttp");
+  }
 
   public async addGraph(graphTypeId: string): Promise<string> {
 
@@ -47,7 +48,7 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     const response = sz.AddGraphResponse.getRootAsAddGraphResponse(buf);
 
     let graphId = response.graphId();
-    console.log(`[${this.id.name}] Added new graph with id: '${graphId}' and type id: '${graphTypeId}'`);
+    this.logger.logInfo(`Added new graph with id: '${graphId}' and type id: '${graphTypeId}'`);
 
     return graphId;
   }
@@ -68,6 +69,6 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     // Send the request
     await this.binaryRouter.post('general/removeGraph', requestPayload);
 
-    console.log(`[${this.id.name}] Removed graph with id: '${graphId}'`);
+    this.logger.logInfo(`Removed graph with id: '${graphId}'`);
   }
 }

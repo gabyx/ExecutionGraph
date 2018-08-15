@@ -17,17 +17,17 @@ import 'rxjs/add/operator/first';
 import { flatbuffers } from 'flatbuffers';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import { Identifier } from '@eg/comon/Identifier';
-import * as D from "@eg/comon/DataTypes"
+import { NodeId } from "@eg/common";
+import { ILogger, ILoggerFactory } from '@eg/logger'
 
 export class GraphManipulationServiceBinaryHttp extends GraphManipulationService {
 
-  constructor(@Inject(BinaryHttpRouterService) private readonly binaryRouter: BinaryHttpRouterService, private readonly verboseLog = true) {
-    super();
-  }
+  private logger: ILogger;
 
-  private readonly _id = new Identifier("GraphManipulationServiceBinaryHttp");
-  public get id(): Identifier { return this._id; }
+  constructor(@Inject("ServiceLoggerFactoryToken") loggerFactory: ILoggerFactory, private readonly binaryRouter: BinaryHttpRouterService, private readonly verboseLog = true) {
+    super();
+    this.logger = loggerFactory.create("GraphManipulationServiceBinaryHttp");
+  }
 
   public async addNode(graphId: string, type: string, name: string): Promise<sz.AddNodeResponse> {
 
@@ -56,14 +56,14 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
 
     let node = response.node();
-    console.log(`[${this.id.name}] Added new node of type: '${node.type()}'
+    this.logger.logInfo(`Added new node of type: '${node.type()}'
                   with name: '${node.name()}' [ins: ${node.inputSocketsLength()},
                   outs: ${node.outputSocketsLength()}`);
 
     return response;
   }
 
-  public async removeNode(graphId: string, nodeId: D.NodeId): Promise<void> {
+  public async removeNode(graphId: string, nodeId: NodeId): Promise<void> {
 
     // Build the RemoveNode request
     let builder = new flatbuffers.Builder(356);

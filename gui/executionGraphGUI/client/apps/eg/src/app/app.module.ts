@@ -18,6 +18,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatIconModule, MatToolbarModule, MatMenuModule, MatButtonModule, MatCheckboxModule, MatButtonToggleModule } from '@angular/material';
 
 import { GraphModule } from '@eg/graph';
+import { SimpleConsoleLoggerFactory, ILoggerFactory } from '@eg/logger';
 
 import { BinaryHttpRouterService } from './services/BinaryHttpRouterService';
 import { CefMessageRouterService } from './services/CefMessageRouterService';
@@ -34,6 +35,10 @@ import { GraphManipulationService } from './services/GraphManipulationService';
 import { GraphManipulationServiceBinaryHttp } from './services/GraphManipulationServiceBinaryHttp';
 import { GraphManipulationServiceDummy } from './services/GraphManipulationServiceDummy';
 
+import { GraphManagementService } from './services/GraphManagementService';
+import { GraphManagementServiceBinaryHttp } from './services/GraphManagementServiceBinaryHttp';
+import { GraphManagementServiceDummy } from './services/GraphManagementServiceDummy';
+
 import { AppComponent } from './app.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
@@ -41,6 +46,8 @@ import { WorkspaceComponent } from './components/workspace/workspace.component';
 import { environment } from '../environments/environment';
 import { ConnectionStyleOptionsComponent } from './components/connection-style-options/connection-style-options.component';
 
+// @todo muss weg hier -> irgendwie als token und provider ??
+let loggerFactory = new SimpleConsoleLoggerFactory()
 
 @NgModule({
   declarations: [AppComponent, ToolbarComponent, WorkspaceComponent, ConnectionStyleOptionsComponent],
@@ -62,22 +69,33 @@ import { ConnectionStyleOptionsComponent } from './components/connection-style-o
     { provide: ExecutionService, useClass: environment.production ? ExecutionServiceBinaryHttp : ExecutionServiceDummy },
     {
       provide: GeneralInfoService,
-      useFactory: (service : BinaryHttpRouterService) => {
+      useFactory: (service: BinaryHttpRouterService) => {
         if (environment.production) {
-          return new GeneralInfoServiceBinaryHttp(service, environment.logReponsesVerbose);
+          return new GeneralInfoServiceBinaryHttp(loggerFactory, service, environment.logReponsesVerbose);
         } else {
-          return new GeneralInfoServiceDummy();
+          return new GeneralInfoServiceDummy(loggerFactory);
         }
       },
       deps: [BinaryHttpRouterService]
     },
     {
       provide: GraphManipulationService,
-      useFactory: (service : BinaryHttpRouterService) => {
+      useFactory: (service: BinaryHttpRouterService) => {
         if (environment.production) {
-          return new GraphManipulationServiceBinaryHttp(service, environment.logReponsesVerbose);
+          return new GraphManipulationServiceBinaryHttp(loggerFactory, service, environment.logReponsesVerbose);
         } else {
-          return new GraphManipulationServiceDummy();
+          return new GraphManipulationServiceDummy(loggerFactory);
+        }
+      },
+      deps: [BinaryHttpRouterService]
+    },
+    {
+      provide: GraphManagementService,
+      useFactory: (service: BinaryHttpRouterService) => {
+        if (environment.production) {
+          return new GraphManagementServiceBinaryHttp(loggerFactory, service, environment.logReponsesVerbose);
+        } else {
+          return new GraphManagementServiceDummy(loggerFactory);
         }
       },
       deps: [BinaryHttpRouterService]

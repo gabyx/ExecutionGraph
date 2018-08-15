@@ -10,21 +10,21 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable, Testability } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { flatbuffers } from 'flatbuffers';
-import { Identifier } from '@eg/comon/Identifier';
-import * as D from '@eg/comon/DataTypes';
+import { NodeId } from "@eg/common";
+import { ILogger, ILoggerFactory } from "@eg/logger"
 
 @Injectable()
 export class GraphManipulationServiceDummy extends GraphManipulationService {
 
-  constructor() {
-    super();
-  }
+  private logger: ILogger;
 
-  private readonly _id = new Identifier("GraphManipulationServiceDummy");
-  public get id(): Identifier { return this._id; }
+  constructor(@Inject(ServiceLoggerFactoryToken) loggerFactory: ILoggerFactory) {
+    super();
+    this.logger = loggerFactory.create("GeneralInfoServiceBinaryHttp");
+  }
 
   public async addNode(graphId: string, type: string, name: string): Promise<sz.AddNodeResponse> {
     // Build the AddNode request
@@ -67,14 +67,14 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
     const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
 
     let node = response.node();
-    console.log(`[${this.id.name}] Added new node of type: '${node.type()}'
+    this.logger.logInfo(`Added new node of type: '${node.type()}'
                   with name: '${node.name()}' [ins: ${node.inputSocketsLength()},
                   outs: ${node.outputSocketsLength()}`);
 
     return response;
   }
 
-  public async removeNode(graphId: string, nodeId: D.NodeId): Promise<void> {
-    console.error(`[${this.id.name}] Not implemented yet!`)
+  public async removeNode(graphId: string, nodeId: NodeId): Promise<void> {
+    this.logger.logError(`Not implemented yet!`)
   }
 }

@@ -12,7 +12,6 @@
 
 import { Injectable } from '@angular/core';
 import { ExecutionService } from './ExecutionService';
-import { Identifier } from "@eg/comon/Identifier"
 
 @Injectable()
 export class ExecutionServiceDummy extends ExecutionService {
@@ -20,11 +19,8 @@ export class ExecutionServiceDummy extends ExecutionService {
     super();
   }
 
-  private readonly _id = new Identifier("ExecutionServiceDummy");
-  public get id(): Identifier { return this._id; }
-
   public execute(): Promise<void> {
-    console.log(`[${this.id.name}] execute()`);
+    console.log(`execute()`);
     return Promise.resolve();
   }
 }

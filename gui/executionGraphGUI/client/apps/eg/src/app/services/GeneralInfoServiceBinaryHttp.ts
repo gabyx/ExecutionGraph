@@ -19,41 +19,38 @@ import 'rxjs/add/operator/first';
 import { flatbuffers } from 'flatbuffers';
 import { GeneralInfoService, sz } from './GeneralInfoService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import { Identifier } from "@eg/comon/Identifier"
+import { ILogger, ILoggerFactory } from "@eg/logger"
 
+@Injectable()
 export class GeneralInfoServiceBinaryHttp extends GeneralInfoService {
 
-  constructor(
-    @Inject(BinaryHttpRouterService) private readonly binaryRouter: BinaryHttpRouterService,
-    private readonly verboseLog?: boolean,
-  ) {
+  private logger: ILogger;
+
+  constructor(@Inject("ServiceLoggerFactoryToken") loggerFactory: ILoggerFactory, private readonly binaryRouter: BinaryHttpRouterService, private readonly verboseResponseLog = true) {
     super();
+    this.logger = loggerFactory.create("GeneralInfoServiceBinaryHttp");
   }
-
-  private readonly _id = new Identifier("GeneralInfoServiceBinaryHttp");
-  public get id() { return this._id; }
-
 
   public async getAllGraphTypeDescriptions(): Promise<sz.GetAllGraphTypeDescriptionsResponse> {
     const result = await this.binaryRouter.get('general/getAllGraphTypeDescriptions');
     let buf = new flatbuffers.ByteBuffer(result);
     let response = sz.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
-    console.log(`[GeneralInfoServiceBinaryHttp] Received: Number of Graph types: ${response.graphsTypesLength()}`)
+    this.logger.logInfo(`[GeneralInfoServiceBinaryHttp] Received: Number of Graph types: ${response.graphsTypesLength()}`)
 
     // Verbose logging the response if enabled
-    if (this.verboseLog) {
+    if (this.verboseResponseLog) {
       for (let g = 0; g < response.graphsTypesLength(); ++g) {
         let graphDesc = response.graphsTypes(g);
-        console.log(`Infos for graph '${graphDesc.name()}' with id '${graphDesc.id()}' :`);
-        console.log("Sockets:");
+        this.logger.logInfo(`Infos for graph '${graphDesc.name()}' with id '${graphDesc.id()}' :`);
+        this.logger.logInfo("Sockets:");
         for (let i = 0; i < graphDesc.socketTypeDescriptionsLength(); ++i) {
           let socketDesc = graphDesc.socketTypeDescriptions(i);
-          console.log(`Socket: ${socketDesc.name()} [${socketDesc.type()}]`);
+          this.logger.logInfo(`Socket: ${socketDesc.name()} [${socketDesc.type()}]`);
         }
-        console.log("Nodes:");
+        this.logger.logInfo("Nodes:");
         for (let i = 0; i < graphDesc.nodeTypeDescriptionsLength(); ++i) {
           let nodeDesc = graphDesc.nodeTypeDescriptions(i);
-          console.log(`Node: ${nodeDesc.name()} [${nodeDesc.type()}]`);
+          this.logger.logInfo(`Node: ${nodeDesc.name()} [${nodeDesc.type()}]`);
         }
       }
     }

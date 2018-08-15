@@ -10,27 +10,27 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable } from '@angular/core';
-import { Identifier } from "@eg/comon/Identifier"
+import { Injectable, Inject } from '@angular/core';
 import { GraphManagementService, sz } from './GraphManagementService';
 import { flatbuffers } from 'flatbuffers';
+import { ILogger, ILoggerFactory } from "@eg/logger"
 
 @Injectable()
 export class GraphManagementServiceDummy extends GraphManagementService {
 
-  constructor() {
+  private logger: ILogger;
+
+  constructor(@Inject("ServiceLoggerFactoryToken") loggerFactory: ILoggerFactory) {
     super();
+    this.logger = loggerFactory.create("GeneralInfoServiceBinaryHttp");
   }
 
-  private readonly _id = new Identifier("GraphManipulationServiceDummy");
-  public get id(): Identifier { return this._id; }
-
   public async addGraph(graphTypeId: string): Promise<string> {
-    console.error(`[${this.id.name}] Not implemented yet!`);
+    this.logger.logError(`Not implemented yet!`);
     return "HERE 16byte GUID"
   }
 
   public async removeGraph(graphId: string): Promise<void> {
-    console.error(`[${this.id.name}] Not implemented yet!`);
+    this.logger.logError(`Not implemented yet!`);
   }
 }
