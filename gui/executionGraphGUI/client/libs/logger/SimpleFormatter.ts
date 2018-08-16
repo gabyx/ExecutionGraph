@@ -1,8 +1,9 @@
+
 // =========================================================================================
 //  ExecutionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 //
-//  @date Wed Aug 15 2018
+//  @date Thu Aug 16 2018
 //  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
 //
 //  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,12 +11,11 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-/**
- * The logger interface.
- */
-export interface ILogger {
-  debug(...data: any[])
-  info(...data: any[])
-  warn(...data: any[])
-  error(...data: any[])
+import { IFormatter } from "./IFormatter";
+import { LogEvent } from "./LogEvent"
+
+export class SimpleFormatter implements IFormatter {
+  public format(event: LogEvent): string {
+    return `[${event.level.toString()}]: ` + event.data.reduce( (a:any, b:string) => {`${a}` + b}, "");
+  }
 }

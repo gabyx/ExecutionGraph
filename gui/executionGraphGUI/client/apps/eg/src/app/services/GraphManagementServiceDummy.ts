@@ -26,11 +26,11 @@ export class GraphManagementServiceDummy extends GraphManagementService {
   }
 
   public async addGraph(graphTypeId: string): Promise<string> {
-    this.logger.logError(`Not implemented yet!`);
+    this.logger.error(`Not implemented yet!`);
     return "HERE 16byte GUID"
   }
 
   public async removeGraph(graphId: string): Promise<void> {
-    this.logger.logError(`Not implemented yet!`);
+    this.logger.error(`Not implemented yet!`);
   }
 }

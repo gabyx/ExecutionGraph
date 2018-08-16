@@ -12,18 +12,18 @@
 
 import { LoggerFactory } from "./ILoggerFactory";
 import { MultiSinkLogger } from "./MultiSinkLogger";
-import { ConsoleAppender} from "./ConsoleAppender"
-
+import { ConsoleSink } from "./ConsoleSink";
+import { SimpleFormatter } from "./SimpleFormatter";
+import { ILogger } from "./ILogger";
 /**
  * A simple factory which creates a console logger.
  */
 export class SimpleConsoleLoggerFactory extends LoggerFactory {
-  create(name: string) {
+  create(name: string) : ILogger {
+    let formatter = new SimpleFormatter();
     return new MultiSinkLogger(name,
       [
-        {
-          type: ConsoleAppender, level: ["debug", "info", "trace"]
-        }
+        new ConsoleSink(formatter)
         // @todo: here could we introduce another appender which sends to the backend (other factory of course)
       ]);
   }

@@ -11,7 +11,7 @@
 // =========================================================================================
 
 import { NodeId } from "@eg/common";
-import { GraphManipulationMessages } from '@messages/index';
+import { GraphManipulationMessages } from '../../../../../../messages/schemas/ts';
 
 export import sz = GraphManipulationMessages;
 

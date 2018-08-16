@@ -10,8 +10,17 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Logger } from "ts-log-debug";
+import { Logger, Appender, Log4js } from "log4js";
 import { ILogger } from "./ILogger";
+import { ISink } from "./ISink";
+import { LogLevel, logLevels } from "./LogLevel"
+import { LogEvent } from "./LogEvent"
+
+function prepend(value, array) {
+  var newArray = array.slice();
+  newArray.unshift(value);
+  return newArray;
+}
 
 /**
  * Multi-sink logger implementing the ILogger interface.
@@ -20,33 +29,26 @@ export class MultiSinkLogger implements ILogger {
 
   private logger: Logger;
 
-  constructor(name: string, appenderConfigs: any[], log?: Logger) {
-    if (!log) {
-      this.logger = new Logger(name);
-    }
-    else {
-      this.logger = log;
-    }
+  constructor(private name: string, private sinks: ISink[]) { }
 
-    // Adding the appenders to the logger
-    for (let i = 0; i < appenderConfigs.length; ++i) {
-      this.logger.appenders.set(`appender-${i}`,
-        appenderConfigs[i]
-      );
-    }
+  public debug(...data: any[]) {
+    this.write(logLevels.DEBUG, data);
+  }
+  public info(...data: any[]) {
+    this.write(logLevels.INFO, data);
+  }
+  public warn(...data: any[]) {
+    this.write(logLevels.WARN, data);
+  }
+  public error(...data: any[]) {
+    this.write(logLevels.ERROR, data);
   }
 
-  logDebug(message: string) {
-    this.logger.debug(message);
-  }
-  logInfo(message: string) {
-    this.logger.info(message);
-  }
-  logWarn(message: string) {
-    this.logger.warn(message);
-  }
-  logError(message: string) {
-    this.logger.error(message);
+  private write(level: LogLevel, data: any[]) {
+    let logEvent = new LogEvent(level, prepend(`[${this.name}]`, data));
+    for (let sink of this.sinks) {
+      sink.write(logEvent);
+    }
   }
 }
 

@@ -49,7 +49,7 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     const response = sz.AddGraphResponse.getRootAsAddGraphResponse(buf);
 
     let graphId = response.graphId();
-    this.logger.logInfo(`Added new graph with id: '${graphId}' and type id: '${graphTypeId}'`);
+    this.logger.info(`Added new graph with id: '${graphId}' and type id: '${graphTypeId}'`);
 
     return graphId;
   }
@@ -70,6 +70,6 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     // Send the request
     await this.binaryRouter.post('general/removeGraph', requestPayload);
 
-    this.logger.logInfo(`Removed graph with id: '${graphId}'`);
+    this.logger.info(`Removed graph with id: '${graphId}'`);
   }
 }

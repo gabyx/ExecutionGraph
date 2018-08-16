@@ -57,7 +57,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
 
     let node = response.node();
-    this.logger.logInfo(`Added new node of type: '${node.type()}'
+    this.logger.info(`Added new node of type: '${node.type()}'
                   with name: '${node.name()}' [ins: ${node.inputSocketsLength()},
                   outs: ${node.outputSocketsLength()}`);
 

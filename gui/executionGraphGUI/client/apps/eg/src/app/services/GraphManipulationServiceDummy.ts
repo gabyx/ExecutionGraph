@@ -67,7 +67,7 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
     const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
 
     let node = response.node();
-    this.logger.logInfo(`Added new node of type: '${node.type()}'
+    this.logger.info(`Added new node of type: '${node.type()}'
                   with name: '${node.name()}' [ins: ${node.inputSocketsLength()},
                   outs: ${node.outputSocketsLength()}`);
 
@@ -75,6 +75,6 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
   }
 
   public async removeNode(graphId: string, nodeId: NodeId): Promise<void> {
-    this.logger.logError(`Not implemented yet!`)
+    this.logger.error(`Not implemented yet!`)
   }
 }
