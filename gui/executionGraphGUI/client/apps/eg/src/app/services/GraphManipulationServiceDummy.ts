@@ -13,17 +13,16 @@
 import { Injectable, Inject } from '@angular/core';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { flatbuffers } from 'flatbuffers';
-import { NodeId } from "@eg/common";
-import { ILogger, LoggerFactory } from "@eg/logger"
+import { NodeId } from '@eg/common';
+import { ILogger, LoggerFactory } from '@eg/logger';
 
 @Injectable()
 export class GraphManipulationServiceDummy extends GraphManipulationService {
-
   private logger: ILogger;
 
   constructor(loggerFactory: LoggerFactory) {
     super();
-    this.logger = loggerFactory.create("GeneralInfoServiceBinaryHttp");
+    this.logger = loggerFactory.create('GeneralInfoServiceBinaryHttp');
   }
 
   public async addNode(graphId: string, type: string, name: string): Promise<sz.AddNodeResponse> {
@@ -46,11 +45,10 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
 
     let requestPayload = builder.asUint8Array();
 
-
     // Build a dummy result
     builder = new flatbuffers.Builder(1024);
-    let nameOff = builder.createString(name)
-    let typeOff = builder.createString(type)
+    let nameOff = builder.createString(name);
+    let typeOff = builder.createString(type);
     sz.LogicNode.startLogicNode(builder);
     sz.LogicNode.addId(builder, builder.createLong(13, 13));
     sz.LogicNode.addName(builder, nameOff);
@@ -75,6 +73,6 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
   }
 
   public async removeNode(graphId: string, nodeId: NodeId): Promise<void> {
-    this.logger.error(`Not implemented yet!`)
+    this.logger.error(`Not implemented yet!`);
   }
 }

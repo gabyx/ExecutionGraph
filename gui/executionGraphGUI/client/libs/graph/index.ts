@@ -10,10 +10,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-export { GraphModule } from '@eg/graph/src/graph.module';
-export { Point } from '@eg/graph/src/model/Point';
-export { DragEvent } from '@eg/graph/src/directives/draggable.directive';
-export { ConnectionDrawStyle } from '@eg/graph/src/model/ConnectionDrawStyle';
-export { BezierConnectionDrawStyle } from '@eg/graph/src/model/BezierConnectionDrawStyle';
-export { ManhattenConnectionDrawStyle } from '@eg/graph/src/model/ManhattenConnectionDrawStyle';
-export { DirectConnectionDrawStyle } from '@eg/graph/src/model/DirectConnectionDrawStyle';
+export { GraphModule } from './src/graph.module';
+export { Point } from './src/model/Point';
+export { DragEvent } from './src/directives/draggable.directive';
+export { ConnectionDrawStyle } from './src/model/ConnectionDrawStyle';
+export { BezierConnectionDrawStyle } from './src/model/BezierConnectionDrawStyle';
+export { ManhattenConnectionDrawStyle } from './src/model/ManhattenConnectionDrawStyle';
+export { DirectConnectionDrawStyle } from './src/model/DirectConnectionDrawStyle';

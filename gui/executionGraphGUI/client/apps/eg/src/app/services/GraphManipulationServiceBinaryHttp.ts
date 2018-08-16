@@ -17,21 +17,23 @@ import 'rxjs/add/operator/first';
 import { flatbuffers } from 'flatbuffers';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import { NodeId } from "@eg/common";
-import { ILogger, LoggerFactory } from '@eg/logger'
+import { NodeId } from '@eg/common';
+import { ILogger, LoggerFactory } from '@eg/logger';
 import { VERBOSE_LOG_TOKEN } from '../tokens';
 
 export class GraphManipulationServiceBinaryHttp extends GraphManipulationService {
-
   private logger: ILogger;
 
-  constructor(loggerFactory: LoggerFactory, private readonly binaryRouter: BinaryHttpRouterService, @Inject(VERBOSE_LOG_TOKEN) private readonly verboseLog = true) {
+  constructor(
+    loggerFactory: LoggerFactory,
+    private readonly binaryRouter: BinaryHttpRouterService,
+    @Inject(VERBOSE_LOG_TOKEN) private readonly verboseLog = true
+  ) {
     super();
-    this.logger = loggerFactory.create("GraphManipulationServiceBinaryHttp");
+    this.logger = loggerFactory.create('GraphManipulationServiceBinaryHttp');
   }
 
   public async addNode(graphId: string, type: string, name: string): Promise<sz.AddNodeResponse> {
-
     // Build the AddNode request
     let builder = new flatbuffers.Builder(356);
     let offGraphId = builder.createString(graphId);
@@ -65,7 +67,6 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
   }
 
   public async removeNode(graphId: string, nodeId: NodeId): Promise<void> {
-
     // Build the RemoveNode request
     let builder = new flatbuffers.Builder(356);
     let offGraphId = builder.createString(graphId);
@@ -79,6 +80,5 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
 
     // Send the request
     await this.binaryRouter.post('graph/removeNode', requestPayload);
-
   }
 }

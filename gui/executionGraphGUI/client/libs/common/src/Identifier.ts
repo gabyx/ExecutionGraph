@@ -10,23 +10,28 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Guid, } from "guid-typescript";
+import { Guid } from 'guid-typescript';
 
 export class Id {
   private readonly _id: Guid;
 
   constructor(id?: string) {
     if (id) {
-      this._id = Guid.parse(id)
-    }
-    else {
+      this._id = Guid.parse(id);
+    } else {
       this._id = Guid.create();
     }
   }
-  public get name(): string { return this.guid.toString(); }
-  public get guid(): Guid { return this._id; }
+  public get name(): string {
+    return this.guid.toString();
+  }
+  public get guid(): Guid {
+    return this._id;
+  }
 
-  protected getName(): string { return this.name; }
+  protected getName(): string {
+    return this.name;
+  }
 }
 
 export class IdNamed extends Id {
@@ -34,6 +39,10 @@ export class IdNamed extends Id {
     super(id);
   }
 
-  public get name(): string { return `${this._name}-${super.getName()}`; }
-  public get shortName(): string { return this._name; }
+  public get name(): string {
+    return `${this._name}-${super.getName()}`;
+  }
+  public get shortName(): string {
+    return this._name;
+  }
 }

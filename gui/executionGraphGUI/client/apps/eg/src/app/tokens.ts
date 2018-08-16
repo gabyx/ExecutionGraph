@@ -10,6 +10,6 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { InjectionToken } from "@angular/core"
+import { InjectionToken } from '@angular/core';
 
-export const VERBOSE_LOG_TOKEN = new InjectionToken<boolean>("VERBOSE_LOG_TOKEN");
+export const VERBOSE_LOG_TOKEN = new InjectionToken<boolean>('VERBOSE_LOG_TOKEN');

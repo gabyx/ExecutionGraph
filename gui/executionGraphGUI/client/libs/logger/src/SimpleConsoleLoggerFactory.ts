@@ -10,21 +10,20 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { LoggerFactory } from "./ILoggerFactory";
-import { MultiSinkLogger } from "./MultiSinkLogger";
-import { ConsoleSink } from "./ConsoleSink";
-import { SimpleFormatter } from "./SimpleFormatter";
-import { ILogger } from "./ILogger";
+import { LoggerFactory } from './ILoggerFactory';
+import { MultiSinkLogger } from './MultiSinkLogger';
+import { ConsoleSink } from './ConsoleSink';
+import { SimpleFormatter } from './SimpleFormatter';
+import { ILogger } from './ILogger';
 /**
  * A simple factory which creates a console logger.
  */
 export class SimpleConsoleLoggerFactory extends LoggerFactory {
-  create(name: string) : ILogger {
+  create(name: string): ILogger {
     let formatter = new SimpleFormatter();
-    return new MultiSinkLogger(name,
-      [
-        new ConsoleSink(formatter)
-        // @todo: here could we introduce another appender which sends to the backend (other factory of course)
-      ]);
+    return new MultiSinkLogger(name, [
+      new ConsoleSink(formatter)
+      // @todo: here could we introduce another appender which sends to the backend (other factory of course)
+    ]);
   }
 }

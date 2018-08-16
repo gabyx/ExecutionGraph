@@ -11,15 +11,20 @@
 // =========================================================================================
 
 import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
-import { ConnectionDrawStyle, DirectConnectionDrawStyle, ManhattenConnectionDrawStyle, BezierConnectionDrawStyle } from '@eg/graph';
+import {
+  ConnectionDrawStyle,
+  DirectConnectionDrawStyle,
+  ManhattenConnectionDrawStyle,
+  BezierConnectionDrawStyle
+} from '@eg/graph';
 
 type ConnectionDrawStyleName = 'direct' | 'manhatten' | 'bezier';
 
 const drawStyles = {
-  'direct': new DirectConnectionDrawStyle(),
-  'manhatten': new ManhattenConnectionDrawStyle(),
-  'bezier': new BezierConnectionDrawStyle(),
-}
+  direct: new DirectConnectionDrawStyle(),
+  manhatten: new ManhattenConnectionDrawStyle(),
+  bezier: new BezierConnectionDrawStyle()
+};
 
 @Component({
   selector: 'eg-connection-style-options',
@@ -27,13 +32,10 @@ const drawStyles = {
   styleUrls: ['./connection-style-options.component.css']
 })
 export class ConnectionStyleOptionsComponent implements OnInit {
-
   private drawStyleName: ConnectionDrawStyleName;
 
-  @Output()
-  connectionDrawStyleChanged = new EventEmitter<ConnectionDrawStyle>();
-  @Input()
-  connectionDrawStyle: ConnectionDrawStyle = drawStyles['direct'];
+  @Output() connectionDrawStyleChanged = new EventEmitter<ConnectionDrawStyle>();
+  @Input() connectionDrawStyle: ConnectionDrawStyle = drawStyles['direct'];
 
   get drawStyle(): ConnectionDrawStyleName {
     return this.drawStyleName;
@@ -49,6 +51,5 @@ export class ConnectionStyleOptionsComponent implements OnInit {
     this.drawStyle = 'direct';
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 }

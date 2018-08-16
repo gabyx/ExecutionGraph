@@ -2,7 +2,7 @@
 //  ExecutionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 //
-//  @date Tue Aug 14 2018
+//  @date Thu Aug 16 2018
 //  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
 //
 //  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +10,15 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-export class NodeId {
-  constructor(private readonly lowerBits: number, private readonly higherBits: number) { }
-  public get lower() { return this.lowerBits; }
-  public get higher() { return this.higherBits; }
+import { LogLevel } from './LogLevel';
+
+export class LogEvent {
+  constructor(public _level: LogLevel, public _data: any[]) {}
+
+  public get level() {
+    return this._level;
+  }
+  public get data() {
+    return this._data;
+  }
 }

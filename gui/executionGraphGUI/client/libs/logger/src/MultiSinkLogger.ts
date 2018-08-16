@@ -10,11 +10,11 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Logger, Appender, Log4js } from "log4js";
-import { ILogger } from "./ILogger";
-import { ISink } from "./ISink";
-import { LogLevel, logLevels } from "./LogLevel"
-import { LogEvent } from "./LogEvent"
+import { Logger, Appender, Log4js } from 'log4js';
+import { ILogger } from './ILogger';
+import { ISink } from './ISink';
+import { LogLevel, logLevels } from './LogLevel';
+import { LogEvent } from './LogEvent';
 
 function prepend(value, array) {
   var newArray = array.slice();
@@ -26,10 +26,9 @@ function prepend(value, array) {
  * Multi-sink logger implementing the ILogger interface.
  */
 export class MultiSinkLogger implements ILogger {
-
   private logger: Logger;
 
-  constructor(private name: string, private sinks: ISink[]) { }
+  constructor(private name: string, private sinks: ISink[]) {}
 
   public debug(...data: any[]) {
     this.write(logLevels.DEBUG, data);
@@ -51,5 +50,3 @@ export class MultiSinkLogger implements ILogger {
     }
   }
 }
-
-

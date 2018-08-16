@@ -17,5 +17,3 @@ export abstract class GraphManagementService {
   public abstract async addGraph(graphTypeId: string): Promise<string>;
   public abstract async removeGraph(graphId: string): Promise<void>;
 }
-
-

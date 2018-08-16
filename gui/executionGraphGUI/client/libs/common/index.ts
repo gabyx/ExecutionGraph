@@ -1,3 +1,2 @@
-
-export * from "@eg/common/DataTypes"
-export * from "@eg/common/Identifier"
+export * from './src/DataTypes';
+export * from './src/Identifier';

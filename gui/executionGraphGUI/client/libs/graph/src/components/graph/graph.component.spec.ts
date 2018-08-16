@@ -26,9 +26,9 @@ import { ConnectionComponent } from '@eg/graph/src/components/connection/connect
   <ngcs-port id="t"></ngcs-port>
   <ngcs-connection from="s" to="t"></ngcs-connection>
 </ngcs-graph>
-`})
+`
+})
 export class TestComponent {}
-
 
 describe('GraphComponent', () => {
   let component: TestComponent;
@@ -49,9 +49,8 @@ describe('GraphComponent', () => {
   });
 
   it('should draw a line when adding a connection', () => {
-
     let pathElement = fixture.debugElement.query(By.css('path'));
     expect(pathElement).toBeDefined();
-    expect(pathElement.nativeElement.attributes.d.value).toBe("M0,0 C0,0 0,0 0,0");
-  })
+    expect(pathElement.nativeElement.attributes.d.value).toBe('M0,0 C0,0 0,0 0,0');
+  });
 });

@@ -14,8 +14,5 @@ import { GeneralInfoMessages } from '../../../../../../messages/schemas/ts';
 export import sz = GeneralInfoMessages;
 
 export abstract class GeneralInfoService {
-
   public abstract async getAllGraphTypeDescriptions(): Promise<sz.GetAllGraphTypeDescriptionsResponse>;
 }
-
-

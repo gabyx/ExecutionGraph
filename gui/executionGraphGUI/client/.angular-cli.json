@@ -56,8 +56,20 @@
       }
     },
     {
+      "name": "common",
+      "root": "libs/common/src",
+      "test": "../../../test.js",
+      "appRoot": ""
+    },
+    {
       "name": "graph",
       "root": "libs/graph/src",
+      "test": "../../../test.js",
+      "appRoot": ""
+    },
+    {
+      "name": "logger",
+      "root": "libs/logger/src",
       "test": "../../../test.js",
       "appRoot": ""
     },

@@ -13,21 +13,20 @@
 import { Injectable, Inject } from '@angular/core';
 import { GraphManagementService, sz } from './GraphManagementService';
 import { flatbuffers } from 'flatbuffers';
-import { ILogger, LoggerFactory } from "@eg/logger"
+import { ILogger, LoggerFactory } from '@eg/logger';
 
 @Injectable()
 export class GraphManagementServiceDummy extends GraphManagementService {
-
   private logger: ILogger;
 
   constructor(loggerFactory: LoggerFactory) {
     super();
-    this.logger = loggerFactory.create("GeneralInfoServiceBinaryHttp");
+    this.logger = loggerFactory.create('GeneralInfoServiceBinaryHttp');
   }
 
   public async addGraph(graphTypeId: string): Promise<string> {
     this.logger.error(`Not implemented yet!`);
-    return "HERE 16byte GUID"
+    return 'HERE 16byte GUID';
   }
 
   public async removeGraph(graphId: string): Promise<void> {

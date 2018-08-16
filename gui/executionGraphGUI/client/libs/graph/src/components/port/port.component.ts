@@ -18,11 +18,7 @@ import { Component, ElementRef, Input } from '@angular/core';
   styleUrls: ['./port.component.scss']
 })
 export class PortComponent {
+  @Input() public id: string;
 
-  @Input()
-  public id: string;
-
-  constructor(public element: ElementRef) {
-  }
-
+  constructor(public element: ElementRef) {}
 }

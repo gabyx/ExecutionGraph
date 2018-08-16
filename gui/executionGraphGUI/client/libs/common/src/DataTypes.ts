@@ -2,7 +2,7 @@
 //  ExecutionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 //
-//  @date Thu Aug 16 2018
+//  @date Tue Aug 14 2018
 //  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
 //
 //  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,11 +10,12 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { LogEvent } from "./LogEvent"
-
-/**
- * The sink interface.
- */
-export interface ISink {
-  write(event: LogEvent);
+export class NodeId {
+  constructor(private readonly lowerBits: number, private readonly higherBits: number) {}
+  public get lower() {
+    return this.lowerBits;
+  }
+  public get higher() {
+    return this.higherBits;
+  }
 }

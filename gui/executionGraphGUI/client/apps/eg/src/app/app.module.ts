@@ -15,7 +15,14 @@ import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatIconModule, MatToolbarModule, MatMenuModule, MatButtonModule, MatCheckboxModule, MatButtonToggleModule } from '@angular/material';
+import {
+  MatIconModule,
+  MatToolbarModule,
+  MatMenuModule,
+  MatButtonModule,
+  MatCheckboxModule,
+  MatButtonToggleModule
+} from '@angular/material';
 
 import { VERBOSE_LOG_TOKEN } from './tokens';
 
@@ -48,7 +55,6 @@ import { WorkspaceComponent } from './components/workspace/workspace.component';
 import { environment } from '../environments/environment';
 import { ConnectionStyleOptionsComponent } from './components/connection-style-options/connection-style-options.component';
 
-
 @NgModule({
   declarations: [AppComponent, ToolbarComponent, WorkspaceComponent, ConnectionStyleOptionsComponent],
   imports: [
@@ -68,11 +74,23 @@ import { ConnectionStyleOptionsComponent } from './components/connection-style-o
     CefMessageRouterService,
     { provide: VERBOSE_LOG_TOKEN, useValue: environment.logReponsesVerbose },
     { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory },
-    { provide: ExecutionService, useClass: environment.production ? ExecutionServiceBinaryHttp : ExecutionServiceDummy },
-    { provide: GeneralInfoService, useClass: environment.production ? GeneralInfoServiceBinaryHttp : GeneralInfoServiceDummy },
-    { provide: GraphManipulationService, useClass: environment.production ? GraphManipulationServiceBinaryHttp : GraphManipulationServiceDummy },
-    { provide: GraphManagementService, useClass: environment.production ? GraphManagementServiceBinaryHttp : GraphManagementServiceDummy }
+    {
+      provide: ExecutionService,
+      useClass: environment.production ? ExecutionServiceBinaryHttp : ExecutionServiceDummy
+    },
+    {
+      provide: GeneralInfoService,
+      useClass: environment.production ? GeneralInfoServiceBinaryHttp : GeneralInfoServiceDummy
+    },
+    {
+      provide: GraphManipulationService,
+      useClass: environment.production ? GraphManipulationServiceBinaryHttp : GraphManipulationServiceDummy
+    },
+    {
+      provide: GraphManagementService,
+      useClass: environment.production ? GraphManagementServiceBinaryHttp : GraphManagementServiceDummy
+    }
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

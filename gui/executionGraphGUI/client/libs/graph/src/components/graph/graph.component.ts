@@ -10,7 +10,21 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, OnInit, ElementRef, ViewChildren, QueryList, HostListener, ContentChildren, ChangeDetectionStrategy, ChangeDetectorRef, AfterViewInit, NgZone, Input, AfterViewChecked } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ElementRef,
+  ViewChildren,
+  QueryList,
+  HostListener,
+  ContentChildren,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  AfterViewInit,
+  NgZone,
+  Input,
+  AfterViewChecked
+} from '@angular/core';
 import { PortComponent } from '@eg/graph/src/components/port/port.component';
 import { DraggableDirective, DragEvent } from '@eg/graph/src/directives/draggable.directive';
 import { ConnectionComponent } from '@eg/graph/src/components/connection/connection.component';
@@ -23,12 +37,14 @@ import { DroppableDirective } from '@eg/graph/src/directives/droppable.directive
   styleUrls: ['./graph.component.scss']
 })
 export class GraphComponent implements OnInit, AfterViewChecked {
+  @ContentChildren(PortComponent, { descendants: true })
+  ports: QueryList<PortComponent>;
 
-  @ContentChildren(PortComponent, { descendants: true }) ports: QueryList<PortComponent>;
+  @ContentChildren(ConnectionComponent, { descendants: true })
+  connections: QueryList<ConnectionComponent>;
 
-  @ContentChildren(ConnectionComponent, { descendants: true }) connections: QueryList<ConnectionComponent>;
-
-  @ContentChildren(DroppableDirective, { descendants: true }) droppables: QueryList<DroppableDirective>;
+  @ContentChildren(DroppableDirective, { descendants: true })
+  droppables: QueryList<DroppableDirective>;
 
   public get transformSvg() {
     return `translate(${this.pan.x} ${this.pan.y})`;
@@ -67,13 +83,13 @@ export class GraphComponent implements OnInit, AfterViewChecked {
    * Handles mouse button down events for drag starts
    * @param event
    */
-  @HostListener('mousedown', ['$event']) onMouseDown(event: MouseEvent) {
+  @HostListener('mousedown', ['$event'])
+  onMouseDown(event: MouseEvent) {
     event.preventDefault();
 
     let draggable: DraggableDirective = event.target['draggableElement'];
 
-    if(draggable)
-    {
+    if (draggable) {
       this.dragging = draggable;
 
       this.droppables.forEach(d => d.startTracking(this.dragging));
@@ -91,14 +107,15 @@ export class GraphComponent implements OnInit, AfterViewChecked {
    * Handles Mouse Button releases for drag ends
    * @param event Mouse Event
    */
-  @HostListener('document:mouseup', ['$event']) onMouseUp(event: MouseEvent) {
+  @HostListener('document:mouseup', ['$event'])
+  onMouseUp(event: MouseEvent) {
     event.preventDefault();
-    if(this.dragging) {
+    if (this.dragging) {
       event.cancelBubble = true;
       this.droppables.forEach(d => d.stopTracking());
       this.dragging.onMouseUp({
         elementPosition: this.getRelativePosition(this.dragging.nativeElement),
-        mousePosition: {x: event.clientX, y: event.clientY}
+        mousePosition: { x: event.clientX, y: event.clientY }
       });
       this.dragging = null;
     }
@@ -109,14 +126,15 @@ export class GraphComponent implements OnInit, AfterViewChecked {
    * @param event Mouse move event
    */
   onMouseMove(event: MouseEvent) {
-    if(this.dragging)
-    {
+    if (this.dragging) {
       event.preventDefault();
       event.cancelBubble = true;
-      this.zone.run(() => this.dragging.onMouseMove({
-        elementPosition: this.getRelativePosition(this.dragging.nativeElement),
-        mousePosition: { x: event.clientX, y: event.clientY }
-      }));
+      this.zone.run(() =>
+        this.dragging.onMouseMove({
+          elementPosition: this.getRelativePosition(this.dragging.nativeElement),
+          mousePosition: { x: event.clientX, y: event.clientY }
+        })
+      );
     }
   }
 
@@ -124,13 +142,13 @@ export class GraphComponent implements OnInit, AfterViewChecked {
    * Handles scrolling for scaling
    * @param e Scroll event
    */
-  @HostListener('mousewheel', ['$event']) onWindowScroll(e: MouseWheelEvent) {
+  @HostListener('mousewheel', ['$event'])
+  onWindowScroll(e: MouseWheelEvent) {
     e.preventDefault();
     e.cancelBubble = true;
     if (e.wheelDelta < 0) {
       this.zoomFactor *= 0.95;
-    }
-    else {
+    } else {
       this.zoomFactor /= 0.95;
     }
     this.cdr.detectChanges();
@@ -140,7 +158,8 @@ export class GraphComponent implements OnInit, AfterViewChecked {
    * Prevent context menu
    * @param e Event
    */
-  @HostListener('contextmenu', ['$event']) onContextMenu(e: any) {
+  @HostListener('contextmenu', ['$event'])
+  onContextMenu(e: any) {
     e.preventDefault();
   }
 
@@ -214,7 +233,7 @@ export class GraphComponent implements OnInit, AfterViewChecked {
 
   private getRelativePosition(element: HTMLElement): Point {
     let offsetLeft = element.offsetLeft; //+ element.offsetWidth / 2;
-    let offsetTop = element.offsetTop;// + element.offsetHeight / 2;
+    let offsetTop = element.offsetTop; // + element.offsetHeight / 2;
 
     while (element.offsetParent && element.offsetParent !== this.element.nativeElement) {
       element = element.offsetParent as HTMLElement;

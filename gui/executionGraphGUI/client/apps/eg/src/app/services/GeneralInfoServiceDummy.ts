@@ -13,40 +13,39 @@
 import { Injectable, Inject } from '@angular/core';
 import { GeneralInfoService, sz } from './GeneralInfoService';
 import { flatbuffers } from 'flatbuffers';
-import { ILogger, LoggerFactory } from "@eg/logger"
+import { ILogger, LoggerFactory } from '@eg/logger';
 
 @Injectable()
 export class GeneralInfoServiceDummy extends GeneralInfoService {
-
   private logger: ILogger;
 
   constructor(loggerFactory: LoggerFactory) {
     super();
-    this.logger = loggerFactory.create("GeneralInfoServiceBinaryHttp");
+    this.logger = loggerFactory.create('GeneralInfoServiceBinaryHttp');
   }
 
   public async getAllGraphTypeDescriptions(): Promise<sz.GetAllGraphTypeDescriptionsResponse> {
     let builder = new flatbuffers.Builder(1024);
 
     // NodeType Description machen
-    let offName = builder.createString("DummyNode");
-    let offType = builder.createString("DummyNode<int>");
+    let offName = builder.createString('DummyNode');
+    let offType = builder.createString('DummyNode<int>');
     sz.NodeTypeDescription.startNodeTypeDescription(builder);
     sz.NodeTypeDescription.addName(builder, offName);
     sz.NodeTypeDescription.addType(builder, offType);
     let offN = sz.NodeTypeDescription.endNodeTypeDescription(builder);
 
     // SocketType Description machen
-    offName = builder.createString("Integral Socket");
-    offType = builder.createString("int");
+    offName = builder.createString('Integral Socket');
+    offType = builder.createString('int');
     sz.SocketTypeDescription.startSocketTypeDescription(builder);
     sz.SocketTypeDescription.addName(builder, offName);
     sz.SocketTypeDescription.addType(builder, offType);
     let offS = sz.SocketTypeDescription.endSocketTypeDescription(builder);
 
     // GraphType Description machen
-    let offId = builder.createString("2992ebff-c950-4184-8876-5fe6ac029aa5");
-    offName = builder.createString("DefaultGraph");
+    let offId = builder.createString('2992ebff-c950-4184-8876-5fe6ac029aa5');
+    offName = builder.createString('DefaultGraph');
     let offNodes = sz.GraphTypeDescription.createNodeTypeDescriptionsVector(builder, [offN]);
     let offSockets = sz.GraphTypeDescription.createSocketTypeDescriptionsVector(builder, [offS]);
     sz.GraphTypeDescription.startGraphTypeDescription(builder);
@@ -66,9 +65,7 @@ export class GeneralInfoServiceDummy extends GeneralInfoService {
     let buf = new flatbuffers.ByteBuffer(builder.asUint8Array());
     let response = sz.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
 
-    console.debug(`Received: Number of Graph types: ${response.graphsTypesLength()}`)
+    console.debug(`Received: Number of Graph types: ${response.graphsTypesLength()}`);
     return response;
   }
-
-
 }

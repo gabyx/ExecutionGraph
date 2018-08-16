@@ -17,21 +17,23 @@ import 'rxjs/add/operator/first';
 import { flatbuffers } from 'flatbuffers';
 import { GraphManagementService, sz } from './GraphManagementService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import { ILogger, LoggerFactory } from '@eg/logger'
+import { ILogger, LoggerFactory } from '@eg/logger';
 import { VERBOSE_LOG_TOKEN } from '../tokens';
 
 @Injectable()
 export class GraphManagementServiceBinaryHttp extends GraphManagementService {
-
   private logger: ILogger;
 
-  constructor(loggerFactory: LoggerFactory, private readonly binaryRouter: BinaryHttpRouterService, @Inject(VERBOSE_LOG_TOKEN) private readonly verboseLog = true) {
+  constructor(
+    loggerFactory: LoggerFactory,
+    private readonly binaryRouter: BinaryHttpRouterService,
+    @Inject(VERBOSE_LOG_TOKEN) private readonly verboseLog = true
+  ) {
     super();
-    this.logger = loggerFactory.create("GraphManagementServiceBinaryHttp");
+    this.logger = loggerFactory.create('GraphManagementServiceBinaryHttp');
   }
 
   public async addGraph(graphTypeId: string): Promise<string> {
-
     // Build the AddGraph request
     let builder = new flatbuffers.Builder(16);
     let offGraphTypeId = builder.createString(graphTypeId);
@@ -55,7 +57,6 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
   }
 
   public async removeGraph(graphId: string): Promise<void> {
-
     // Build the RemoveGraph request
     let builder = new flatbuffers.Builder(16);
     let offGraphId = builder.createString(graphId);

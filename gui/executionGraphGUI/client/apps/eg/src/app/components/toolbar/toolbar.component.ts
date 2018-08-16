@@ -27,9 +27,10 @@ export class ToolbarComponent implements OnInit {
   constructor(
     private readonly executionService: ExecutionService,
     private readonly generalInfoService: GeneralInfoService,
-    private readonly graphManipulationService: GraphManipulationService) { }
+    private readonly graphManipulationService: GraphManipulationService
+  ) {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   public test() {
     console.log('Testing AddNode');
@@ -41,7 +42,7 @@ export class ToolbarComponent implements OnInit {
    */
   private async debugAddNode() {
     // Get the graph infos
-    console.debug("Get all graph type descriptions...")
+    console.debug('Get all graph type descriptions...');
     var graphInfos = await this.generalInfoService.getAllGraphTypeDescriptions();
 
     // Add a node to the first graph
@@ -50,7 +51,6 @@ export class ToolbarComponent implements OnInit {
     let nodeType = graphInfo.nodeTypeDescriptions(0).type();
 
     // Add the node.
-    this.graphManipulationService.addNode(graphId, nodeType, "MySuperDuperNode");
+    this.graphManipulationService.addNode(graphId, nodeType, 'MySuperDuperNode');
   }
-
 }
