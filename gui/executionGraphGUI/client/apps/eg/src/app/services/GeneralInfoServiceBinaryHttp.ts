@@ -11,22 +11,21 @@
 // =========================================================================================
 
 import { Injectable, Inject, Testability } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http'
-import { _throw } from 'rxjs/observable/throw';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/first';
 
 import { flatbuffers } from 'flatbuffers';
 import { GeneralInfoService, sz } from './GeneralInfoService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import { ILogger, ILoggerFactory } from "@eg/logger"
+import { ILogger, LoggerFactory } from "@eg/logger"
+import { VERBOSE_LOG_TOKEN } from '../tokens';
 
 @Injectable()
 export class GeneralInfoServiceBinaryHttp extends GeneralInfoService {
 
   private logger: ILogger;
 
-  constructor(@Inject("ServiceLoggerFactoryToken") loggerFactory: ILoggerFactory, private readonly binaryRouter: BinaryHttpRouterService, private readonly verboseResponseLog = true) {
+  constructor(loggerFactory: LoggerFactory, private readonly binaryRouter: BinaryHttpRouterService, @Inject(VERBOSE_LOG_TOKEN) private readonly verboseResponseLog = true) {
     super();
     this.logger = loggerFactory.create("GeneralInfoServiceBinaryHttp");
   }

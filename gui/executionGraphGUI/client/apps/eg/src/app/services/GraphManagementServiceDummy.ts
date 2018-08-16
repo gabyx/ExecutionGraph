@@ -13,14 +13,14 @@
 import { Injectable, Inject } from '@angular/core';
 import { GraphManagementService, sz } from './GraphManagementService';
 import { flatbuffers } from 'flatbuffers';
-import { ILogger, ILoggerFactory } from "@eg/logger"
+import { ILogger, LoggerFactory } from "@eg/logger"
 
 @Injectable()
 export class GraphManagementServiceDummy extends GraphManagementService {
 
   private logger: ILogger;
 
-  constructor(@Inject("ServiceLoggerFactoryToken") loggerFactory: ILoggerFactory) {
+  constructor(loggerFactory: LoggerFactory) {
     super();
     this.logger = loggerFactory.create("GeneralInfoServiceBinaryHttp");
   }

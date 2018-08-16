@@ -14,14 +14,14 @@ import { Injectable, Inject } from '@angular/core';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { flatbuffers } from 'flatbuffers';
 import { NodeId } from "@eg/common";
-import { ILogger, ILoggerFactory } from "@eg/logger"
+import { ILogger, LoggerFactory } from "@eg/logger"
 
 @Injectable()
 export class GraphManipulationServiceDummy extends GraphManipulationService {
 
   private logger: ILogger;
 
-  constructor(@Inject(ServiceLoggerFactoryToken) loggerFactory: ILoggerFactory) {
+  constructor(loggerFactory: LoggerFactory) {
     super();
     this.logger = loggerFactory.create("GeneralInfoServiceBinaryHttp");
   }

@@ -10,19 +10,19 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { ILoggerFactory } from "@eg/logger/ILoggerFactory";
-import { MultiSinkLogger } from "@eg/logger/MultiSinkLogger";
-import "./ConsoleAppender"
+import { LoggerFactory } from "./ILoggerFactory";
+import { MultiSinkLogger } from "./MultiSinkLogger";
+import { ConsoleAppender} from "./ConsoleAppender"
 
 /**
  * A simple factory which creates a console logger.
  */
-export class SimpleConsoleLoggerFactory implements ILoggerFactory {
+export class SimpleConsoleLoggerFactory extends LoggerFactory {
   create(name: string) {
     return new MultiSinkLogger(name,
       [
         {
-          type: "console", level: ["debug", "info", "trace"]
+          type: ConsoleAppender, level: ["debug", "info", "trace"]
         }
         // @todo: here could we introduce another appender which sends to the backend (other factory of course)
       ]);

@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Appender, BaseAppender, LogEvent, Logger } from "ts-log-debug";
-import { ILogger } from "@eg/logger/ILogger";
+import { Logger } from "ts-log-debug";
+import { ILogger } from "./ILogger";
 
 /**
  * Multi-sink logger implementing the ILogger interface.

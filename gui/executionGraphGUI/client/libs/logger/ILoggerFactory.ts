@@ -10,11 +10,11 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { ILogger } from "@eg/logger/ILogger";
+import { ILogger } from "./ILogger";
 
 /**
  * A logger factory intraface.
  */
-export interface ILoggerFactory {
-  create(name: string): ILogger
+export abstract class LoggerFactory {
+  abstract create(name: string): ILogger
 }

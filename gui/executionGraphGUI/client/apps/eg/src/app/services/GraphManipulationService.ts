@@ -10,13 +10,12 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { IIdentifier } from "@eg/comon/Identifier"
 import { NodeId } from "@eg/common";
 import { GraphManipulationMessages } from '@messages/index';
 
 export import sz = GraphManipulationMessages;
 
-export abstract class GraphManipulationService extends IIdentifier {
+export abstract class GraphManipulationService {
   public abstract async addNode(graphId: string, type: string, name: string): Promise<sz.AddNodeResponse>;
   public abstract async removeNode(graphId: string, nodeId: NodeId): Promise<void>;
 }

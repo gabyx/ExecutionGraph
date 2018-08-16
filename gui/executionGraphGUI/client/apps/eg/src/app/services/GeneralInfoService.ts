@@ -10,11 +10,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { IIdentifier } from "@eg/comon/Identifier"
 import { GeneralInfoMessages } from '../../../../../../messages/schemas/ts';
 export import sz = GeneralInfoMessages;
 
-export abstract class GeneralInfoService extends IIdentifier {
+export abstract class GeneralInfoService {
 
   public abstract async getAllGraphTypeDescriptions(): Promise<sz.GetAllGraphTypeDescriptionsResponse>;
 }

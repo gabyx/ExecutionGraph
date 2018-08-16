@@ -11,5 +11,5 @@
 // =========================================================================================
 
 import { InjectionToken } from "@angular/core"
-import { ILoggerFactory } from "@eg/logger"
 
+export const VERBOSE_LOG_TOKEN = new InjectionToken<boolean>("VERBOSE_LOG_TOKEN");

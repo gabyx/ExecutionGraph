@@ -18,13 +18,14 @@ import { flatbuffers } from 'flatbuffers';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 import { NodeId } from "@eg/common";
-import { ILogger, ILoggerFactory } from '@eg/logger'
+import { ILogger, LoggerFactory } from '@eg/logger'
+import { VERBOSE_LOG_TOKEN } from '../tokens';
 
 export class GraphManipulationServiceBinaryHttp extends GraphManipulationService {
 
   private logger: ILogger;
 
-  constructor(@Inject("ServiceLoggerFactoryToken") loggerFactory: ILoggerFactory, private readonly binaryRouter: BinaryHttpRouterService, private readonly verboseLog = true) {
+  constructor(loggerFactory: LoggerFactory, private readonly binaryRouter: BinaryHttpRouterService, @Inject(VERBOSE_LOG_TOKEN) private readonly verboseLog = true) {
     super();
     this.logger = loggerFactory.create("GraphManipulationServiceBinaryHttp");
   }

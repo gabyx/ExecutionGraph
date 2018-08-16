@@ -1,5 +1,6 @@
 
 import { Appender, BaseAppender, LogEvent } from "ts-log-debug";
+
 const consoleLog = console.log.bind(console);
 
 @Appender({ name: "consoleAppender" })
