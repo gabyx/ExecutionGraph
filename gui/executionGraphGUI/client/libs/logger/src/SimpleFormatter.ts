@@ -16,10 +16,8 @@ import { LogEvent } from './LogEvent';
 export class SimpleFormatter implements IFormatter {
   public format(event: LogEvent): string {
     return (
-      `[${event.level.toString()}]: ` +
-      event.data.reduce((a: any, b: string) => {
-        `${a}` + b;
-      }, '')
+      `[${event.level.toString()}]:` +
+      event.data.reduce((a: any, b: string) => `${a} ${b}`, '')
     );
   }
 }

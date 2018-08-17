@@ -17,6 +17,7 @@ import {
   ManhattenConnectionDrawStyle,
   BezierConnectionDrawStyle
 } from '@eg/graph';
+import { ILogger, LoggerFactory } from '@eg/logger';
 
 type ConnectionDrawStyleName = 'direct' | 'manhatten' | 'bezier';
 
@@ -43,11 +44,14 @@ export class ConnectionStyleOptionsComponent implements OnInit {
   set drawStyle(drawStyleName: ConnectionDrawStyleName) {
     this.drawStyleName = drawStyleName;
     this.connectionDrawStyle = drawStyles[this.drawStyleName];
-    console.log(`[ConnectionStyleOptionsComponent] Draw Style changed to ${this.drawStyleName}`);
+    this.log.info(`Draw Style changed to ${this.drawStyleName}`);
     this.connectionDrawStyleChanged.emit(this.connectionDrawStyle);
   }
 
-  constructor() {
+  private readonly log: ILogger;
+  
+  constructor(loggerFactory: LoggerFactory) {
+    this.log = loggerFactory.create('ConnectionStyleOptionsComponent');
     this.drawStyle = 'direct';
   }
 
