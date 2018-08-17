@@ -20,7 +20,7 @@ export class GraphManagementServiceDummy extends GraphManagementService {
 
   constructor(loggerFactory: LoggerFactory) {
     super();
-    this.logger = loggerFactory.create('GeneralInfoServiceBinaryHttp');
+    this.logger = loggerFactory.create('GraphManagementServiceDummy');
   }
 
   public async addGraph(graphTypeId: string): Promise<string> {
