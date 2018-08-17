@@ -13,12 +13,12 @@
 import { Inject } from '@angular/core';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/first';
-
 import { flatbuffers } from 'flatbuffers';
+
+import { ILogger, LoggerFactory } from '@eg/logger';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import { NodeId } from '@eg/common';
-import { ILogger, LoggerFactory } from '@eg/logger';
+import { NodeId } from '../model/NodeId';
 import { VERBOSE_LOG_TOKEN } from '../tokens';
 
 export class GraphManipulationServiceBinaryHttp extends GraphManipulationService {

@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { NodeId } from '@eg/common';
+import { NodeId } from '../model/NodeId';
 import { GraphManipulationMessages } from '../../../../../../messages/schemas/ts';
 
 export import sz = GraphManipulationMessages;

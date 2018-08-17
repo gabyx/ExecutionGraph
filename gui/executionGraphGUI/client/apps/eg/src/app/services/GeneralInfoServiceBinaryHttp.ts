@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable, Inject, Testability } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/first';
 

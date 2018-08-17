@@ -12,7 +12,6 @@
 
 import { Injectable, Inject } from '@angular/core';
 import { GraphManagementService, sz } from './GraphManagementService';
-import { flatbuffers } from 'flatbuffers';
 import { ILogger, LoggerFactory } from '@eg/logger';
 
 @Injectable()

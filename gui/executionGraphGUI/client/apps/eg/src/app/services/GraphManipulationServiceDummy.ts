@@ -10,11 +10,12 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable, Inject } from '@angular/core';
-import { GraphManipulationService, sz } from './GraphManipulationService';
+import { Injectable } from '@angular/core';
 import { flatbuffers } from 'flatbuffers';
-import { NodeId } from '@eg/common';
 import { ILogger, LoggerFactory } from '@eg/logger';
+
+import { GraphManipulationService, sz } from './GraphManipulationService';
+import { NodeId } from '../model/NodeId';
 
 @Injectable()
 export class GraphManipulationServiceDummy extends GraphManipulationService {
