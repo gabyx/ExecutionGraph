@@ -11,7 +11,6 @@
 // =========================================================================================
 
 import { Component, OnInit, ElementRef, HostListener, Injectable } from '@angular/core';
-import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 
 import { Point } from '@eg/graph';
 import { Node } from '../../model/Node';
@@ -37,7 +36,6 @@ export class WorkspaceComponent implements OnInit {
 
   constructor(
     private elementRef: ElementRef,
-    private sanitizer: DomSanitizer,
     private readonly generalInfoService: GeneralInfoService,
     private readonly graphManipulationService: GraphManipulationService
   ) {}

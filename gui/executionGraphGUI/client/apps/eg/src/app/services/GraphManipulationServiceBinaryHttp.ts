@@ -11,23 +11,19 @@
 // =========================================================================================
 
 import { Inject } from '@angular/core';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/first';
 import { flatbuffers } from 'flatbuffers';
 
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 import { NodeId } from '../model/NodeId';
-import { VERBOSE_LOG_TOKEN } from '../tokens';
 
 export class GraphManipulationServiceBinaryHttp extends GraphManipulationService {
   private logger: ILogger;
 
   constructor(
     loggerFactory: LoggerFactory,
-    private readonly binaryRouter: BinaryHttpRouterService,
-    @Inject(VERBOSE_LOG_TOKEN) private readonly verboseLog = true
+    private readonly binaryRouter: BinaryHttpRouterService
   ) {
     super();
     this.logger = loggerFactory.create('GraphManipulationServiceBinaryHttp');

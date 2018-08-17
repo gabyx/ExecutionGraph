@@ -26,20 +26,20 @@ export class ConsoleSink implements ISink {
       return;
     }
 
-    let s = this.formatter.format(event);
+    const formattedMessage = this.formatter.format(event);
 
     switch (event.level) {
       case logLevels.DEBUG:
-        console.debug();
+        console.debug(formattedMessage);
         break;
       case logLevels.INFO:
-        console.debug(this.formatter.format(event));
+        console.log(formattedMessage);
         break;
       case logLevels.WARN:
-        console.warn(this.formatter.format(event));
+        console.warn(formattedMessage);
         break;
       case logLevels.ERROR:
-        console.error(this.formatter.format(event));
+        console.error(formattedMessage);
         break;
     }
   }

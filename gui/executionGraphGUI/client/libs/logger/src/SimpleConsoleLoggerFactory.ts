@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { LoggerFactory } from './ILoggerFactory';
+import { LoggerFactory } from './LoggerFactory';
 import { MultiSinkLogger } from './MultiSinkLogger';
 import { ConsoleSink } from './ConsoleSink';
 import { SimpleFormatter } from './SimpleFormatter';

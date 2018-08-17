@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable, Inject } from '@angular/core';
-import { GraphManagementService, sz } from './GraphManagementService';
+import { Injectable } from '@angular/core';
+import { GraphManagementService } from './GraphManagementService';
 import { ILogger, LoggerFactory } from '@eg/logger';
 
 @Injectable()
