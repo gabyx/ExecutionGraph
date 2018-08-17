@@ -28,7 +28,7 @@ set(CMAKE_DEBUG_POSTFIX "-dbg" CACHE STRING "Debug postfix for library/executabl
 mark_as_advanced(ExecutionGraph_USE_LEAK_SANITIZER)
 set(ExecutionGraph_USE_LEAK_SANITIZER OFF CACHE BOOL "Use the leak sanitizer!" )
 mark_as_advanced(ExecutionGraph_USE_ADDRESS_SANITIZER)
-set(ExecutionGraph_USE_ADDRESS_SANITIZER OFF CACHE BOOL "Use the address sanitizer!" )
+set(ExecutionGraph_USE_ADDRESS_SANITIZER ON CACHE BOOL "Use the address sanitizer!" )
 
 mark_as_advanced(ExecutionGraph_BUILD_LIBRARY)
 set(ExecutionGraph_BUILD_LIBRARY ON CACHE BOOL "Build a shared library")
