@@ -72,11 +72,11 @@ import { ConnectionStyleOptionsComponent } from './components/connection-style-o
     GraphModule
   ],
   providers: [
+    { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory },
     BinaryHttpRouterService,
     CefMessageRouterService,
     TestService,
     { provide: VERBOSE_LOG_TOKEN, useValue: environment.logReponsesVerbose },
-    { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory },
     {
       provide: ExecutionService,
       useClass: environment.production ? ExecutionServiceBinaryHttp : ExecutionServiceDummy

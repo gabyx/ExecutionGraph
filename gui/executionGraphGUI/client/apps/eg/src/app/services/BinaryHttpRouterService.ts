@@ -15,6 +15,7 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { _throw } from 'rxjs/observable/throw';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/first';
+import { LoggerFactory, ILogger } from '@eg/logger';
 
 /**
  * Router which sends binary payload to the backend using HTTP requests.
@@ -23,8 +24,11 @@ import 'rxjs/add/operator/first';
 export class BinaryHttpRouterService {
   public baseUrl: string = `http://executiongraph-backend`;
   public binaryMimeType: string = 'application/octet-stream';
+  private logger: ILogger;
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient, private loggerFactory: LoggerFactory) {
+    this.logger = loggerFactory.create("BinaryHttpRouterService");
+  }
 
   /**
    * Get the response payload as a Uint8Array.
@@ -38,12 +42,12 @@ export class BinaryHttpRouterService {
         .get(url, { responseType: 'arraybuffer' })
         // Add a callback function that is executed whenever there is a new event in the request stream
         .do(responseData =>
-          console.log(`[BinaryHttpRouterService] Received response (Bytes: ${responseData.byteLength})`)
+          this.logger.info(`Received response (Bytes: ${responseData.byteLength})`)
         )
         // In case of an error in the http event stream, catch it to log it and rethrow it, note that an error will only be actually thrown once
         // the observable is subscribed to, or in this case is converted into a promise and the promise is actually awaited.
         .catch((error: HttpErrorResponse) => {
-          console.error(`[BinaryHttpRouterService]: ${error.statusText}`);
+          this.logger.error(`${error.message} (status: ${error.status})`);
           return _throw(error);
         })
         // After the first successful event in the stream, unsubscribe from the event stream
@@ -62,13 +66,11 @@ export class BinaryHttpRouterService {
   public post(requestUrl: string, payload: Uint8Array): Promise<Uint8Array> {
     // @todo: This .slice is horribly inefficient, how to convert a payload with byteOffset != 0
     // to a ArrayBuffer -> its stupidly impossible...
-    const data = payload.slice().buffer as ArrayBuffer;
+    const data = ( payload.byteOffset > 0 ? payload.slice().buffer : payload.buffer ) as ArrayBuffer;
     const url = `${this.baseUrl}/${requestUrl}`;
 
-    console.info(
-      `[BinaryHttpRouterService] Sending data to '${url}': (Bytes: '${data.byteLength}',  MIME-Type: '${
-        this.binaryMimeType
-      }')`
+    this.logger.info(
+      `Sending data to '${url}': (Bytes: '${data.byteLength}',  MIME-Type: '${this.binaryMimeType}')`
     );
 
     // Create a post request that returns an observable, which is kind of a stream of response events
@@ -80,12 +82,12 @@ export class BinaryHttpRouterService {
         })
         // Add a callback function that is executed whenever there is a new event in the request stream
         .do(responseData =>
-          console.log(`[BinaryHttpRouterService] Received response (Bytes: ${responseData.byteLength})`)
+          this.logger.info(`Received response (Bytes: ${responseData.byteLength})`)
         )
         // In case of an error in the http event stream, catch it to log it and rethrow it, note that an error will only be actually thrown once
         // the observable is subscribed to, or in this case is converted into a promise and the promise is actually awaited.
         .catch((error: HttpErrorResponse) => {
-          console.error(`[BinaryHttpRouterService]: ${error.statusText}`);
+          this.logger.error(`${error.message} (status: ${error.status})`);
           return _throw(error);
         })
         // After the first successful event in the stream, unsubscribe from the event stream

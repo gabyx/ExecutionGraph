@@ -153,7 +153,7 @@ namespace executionGraph
         //! Generate a new unique node id (not yet contained in the graph).
         NodeId generateNodeId()
         {
-            EXECGRAPH_ASSERT(m_maxCurrentNodeId + 1 == std::numeric_limits<NodeId>::max(),
+            EXECGRAPH_ASSERT(m_maxCurrentNodeId + 1 != std::numeric_limits<NodeId>::max(),
                              "Maximal node count reached! (max() reserved for defaultOutputPool)");
             return m_maxCurrentNodeId + 1;
         }
