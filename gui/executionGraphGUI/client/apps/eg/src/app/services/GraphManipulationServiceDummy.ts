@@ -23,7 +23,7 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
 
   constructor(loggerFactory: LoggerFactory) {
     super();
-    this.logger = loggerFactory.create('GeneralInfoServiceBinaryHttp');
+    this.logger = loggerFactory.create('GraphManipulationServiceDummy');
   }
 
   public async addNode(graphId: string, type: string, name: string): Promise<sz.AddNodeResponse> {

@@ -21,7 +21,7 @@ export class GeneralInfoServiceDummy extends GeneralInfoService {
 
   constructor(loggerFactory: LoggerFactory) {
     super();
-    this.logger = loggerFactory.create('GeneralInfoServiceBinaryHttp');
+    this.logger = loggerFactory.create('GeneralInfoServiceDummy');
   }
 
   public async getAllGraphTypeDescriptions(): Promise<sz.GetAllGraphTypeDescriptionsResponse> {

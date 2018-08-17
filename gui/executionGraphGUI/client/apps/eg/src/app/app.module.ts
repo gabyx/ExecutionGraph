@@ -48,6 +48,8 @@ import { GraphManagementService } from './services/GraphManagementService';
 import { GraphManagementServiceBinaryHttp } from './services/GraphManagementServiceBinaryHttp';
 import { GraphManagementServiceDummy } from './services/GraphManagementServiceDummy';
 
+import { TestService } from './services/TestService';
+
 import { AppComponent } from './app.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
@@ -72,6 +74,7 @@ import { ConnectionStyleOptionsComponent } from './components/connection-style-o
   providers: [
     BinaryHttpRouterService,
     CefMessageRouterService,
+    TestService,
     { provide: VERBOSE_LOG_TOKEN, useValue: environment.logReponsesVerbose },
     { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory },
     {
