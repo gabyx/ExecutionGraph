@@ -78,7 +78,7 @@ private:
     bool initRequest(CefRefPtr<CefRequest> request);
 
 private:
-    void finish();
+    void reset();
 
 private:
     std::shared_ptr<BackendRequestDispatcher> m_dispatcher;  //!< The dispatcher to which request/response get dispatched.
@@ -86,7 +86,9 @@ private:
     ResponseFutureCef m_responseFuture;                      //!< The response future we await in the resource handler.
     ResponseFutureCef::Payload m_payload;                    //!< The moved payload from the future. (default = empty)
 
-    std::size_t m_bytesRead = 0;  //!< @todo DEBUG
+    uint8_t* m_buffer        = nullptr;
+    std::size_t m_bufferSize = 0;
+    std::size_t m_bytesRead  = 0;  //!< Number of bytes read.
 
     //! CefRefCounted overrides
     //@{
