@@ -4,6 +4,7 @@
     // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "Python: Current File",
             "type": "python",
@@ -87,6 +88,18 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
+            "name": "(lldb) ExecutionGraphGUI [Release] (macOS App)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/gui/executionGraphGui/Release/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
