@@ -40,20 +40,32 @@ namespace executionGraph
     };
 }  // namespace executionGraph
 
-    //! Macro to define the implementation.
-#    define EXECGRAPH_OBJECT_ID_DECLARATION                     \
-    public:                                                     \
-        using Id = executionGraph::Id;                          \
-        const Id& getId() const override final { return m_id; } \
-                                                                \
-    private:                                                    \
-        const Id m_id;
+// clang-format off
+#define EXECGRAPH_OBJECT_ID_DECLARATION_IMPL(TMemberId, OverrideKeyWord) \
+public:                                                                  \
+    using Id = executionGraph::Id;                                       \
+    const Id& getId() const OverrideKeyWord { return m_id; }       \
+                                                                         \
+private:                                                                 \
+    const executionGraph::TMemberId m_id;
 
-#    define EXECGRAPH_OBJECT_ID_NON_VIRTUAL_DECLARATION \
-    public:                                             \
-        using Id = executionGraph::Id;                  \
-        const Id& getId() const { return m_id; }        \
-                                                        \
-    private:                                            \
-        const Id m_id;
+#define EXECGRAPH_OBJECT_ID_DECLARATION \
+    EXECGRAPH_OBJECT_ID_DECLARATION_IMPL(Id, override final)
+#define EXECGRAPH_OBJECT_ID_NON_VIRTUAL_DECLARATION \
+    EXECGRAPH_OBJECT_ID_DECLARATION_IMPL(Id, )
+
+#define EXECGRAPH_NAMED_OBJECT_ID_DECLARATION_IMPL(OverrideKeyWord)              \
+    EXECGRAPH_OBJECT_ID_DECLARATION_IMPL(IdNamed, OverrideKeyWord)               \
+public:                                                                          \
+    using IdNamed = executionGraph::IdNamed;                                     \
+    std::string getName() const { return m_id.getName(); }                       \
+    const std::string& getShortName() const { return m_id.getShortName(); }
+
+#define EXECGRAPH_NAMED_OBJECT_ID_DECLARATION \
+    EXECGRAPH_NAMED_OBJECT_ID_DECLARATION_IMPL(override)
+#define EXECGRAPH_NAMED_OBJECT_ID_NON_VIRTUAL_DECLARATION \
+    EXECGRAPH_NAMED_OBJECT_ID_DECLARATION_IMPL()
+
+// clang-format on
+
 #endif

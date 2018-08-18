@@ -10,12 +10,12 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Socket } from "./Socket";
+import { Socket } from './Socket';
 
 export type UIProps = {
-  x: number,
-  y: number
-}
+  x: number;
+  y: number;
+};
 
 export class Node {
   constructor(
@@ -23,6 +23,6 @@ export class Node {
     public readonly name: string,
     public readonly inputs: Socket[],
     public readonly outputs: Socket[],
-    public readonly uiProps: UIProps = {x: 0, y: 0})
-  {}
+    public readonly uiProps: UIProps = { x: 0, y: 0 }
+  ) {}
 }

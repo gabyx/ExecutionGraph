@@ -13,16 +13,16 @@
 #ifndef executionGraphGUI_backend_Backend_hpp
 #define executionGraphGUI_backend_Backend_hpp
 
-#include <executionGraph/common/IObjectID.hpp>
 #include <rttr/type>
+#include <executionGraph/common/IObjectID.hpp>
 
 class Backend : public executionGraph::IObjectID
 {
     RTTR_ENABLE()
-    EXECGRAPH_OBJECT_ID_DECLARATION
+    EXECGRAPH_NAMED_OBJECT_ID_DECLARATION
 
 protected:
-    Backend(const Id& id)
+    Backend(const IdNamed& id)
         : m_id(id) {}
     virtual ~Backend() override = default;
 };

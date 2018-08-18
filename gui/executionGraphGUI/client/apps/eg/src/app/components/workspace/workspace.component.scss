@@ -32,6 +32,16 @@
                 position: relative;
                 padding: 0 1em;
                 border-top: 1px solid black;
+
+                &.dropping {
+                    font-weight: bold;
+                }
+                &.dropping-allowed {
+                    color: greenyellow;
+                }
+                &.dropping-forbidden {
+                    color: orangered;
+                }
             }
         }
         .inputs {

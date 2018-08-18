@@ -10,11 +10,11 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "cefapp/AppCLArgs.hpp"
+#include "executionGraphGUI/cefapp/AppCLArgs.hpp"
 #include <cstdlib>
-#include <executionGraph/common/StringFormat.hpp>
 #include <iostream>
-#include "common/Exception.hpp"
+#include <executionGraph/common/StringFormat.hpp>
+#include "executionGraphGUI/common/Exception.hpp"
 
 AppCLArgs::AppCLArgs(int argc, char* argv[])
     : executionGraph::CommandLineArguments(argc, argv, "ExecutionGUI Application", "No detailed description")
@@ -55,8 +55,7 @@ AppCLArgs::AppCLArgs(int argc, char* argv[])
     }
     catch(args::ParseError e)
     {
-        EXECGRAPHGUI_THROW_EXCEPTION("Parser Error: " << e.what() << std::endl
-                                                      << m_parser)
+        EXECGRAPHGUI_THROW("Parser Error: '{0}'\n{1}", e.what(), m_parser);
     }
 }
 

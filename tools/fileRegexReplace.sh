@@ -1,6 +1,13 @@
 #!/bin/bash
-#  Find and Replace Files inplace.
-#  fileRegexReplace -h for Help!
+# =============================================================================
+#
+#	Find and Replace Files inplace.
+#	
+#	@author Gabriel Nützi
+#	@date	02.05.2018
+#
+#	fileRegexReplace -h for Help!
+# =============================================================================
 
 function finish {
     info "FileRegexReplace done =============================================:"
@@ -19,10 +26,14 @@ INFONORMALFMT="\033[1m"
 CLEARFMT="\033[0m"
 
 function warning(){
-    echo -e "$WARNINGFMT$1$CLEARFMT"
+    echo -ne "$WARNINGFMT"
+    echo -En "$1"
+	echo -e "$CLEARFMT"
 }
 function info(){
-    echo -e "$INFOFMT$1$CLEARFMT"
+    echo -ne "$INFOFMT"
+    echo -En "$1"
+	echo -e "$CLEARFMT"
 }
 function infoVerbose(){
     echo -ne "$INFOFMT"
@@ -30,7 +41,9 @@ function infoVerbose(){
 	echo -e "$CLEARFMT"
 }
 function infoN(){
-    echo -e "$INFONORMALFMT$1$CLEARFMT"
+    echo -ne "$INFONORMALFMT"
+    echo -En "$1"
+	echo -e "$CLEARFMT"
 }
 function infoNVerbose(){
 	echo -ne "$INFONORMALFMT"
@@ -42,8 +55,7 @@ function join_by { local d=$1; shift; echo -n "$1"; shift; printf "%s" "${@/#/$d
 
 function replaceInFileAll(){
     file=$1
-    echo -e "${INFOFMT}Process file $file ..."
-    
+    info "Process file $file ..."
     allRegexes=$(join_by "; " "${regex[@]}")
     
     if [[ $Verbose == 'true' ]]; then
@@ -57,6 +69,7 @@ function replaceInFileAll(){
     else
         replaceInFile "$file" "$allRegexes"
     fi
+    
 }
 
 function printHelp(){
@@ -168,10 +181,18 @@ fi
 
 
 # Replace all files
-(
-find "${searchFolder}" -type f "${fileNameRegex[@]}" "${excludeDirs[@]}" -print0 | while read -d $'\0' -r file ; 
-do 
-    ((i=i%NJobs)); ((i++==0)) && wait
+i=1;
+declare -a pids
+
+while read -d $'\0' -r file ; 
+do  
     replaceInFileAll "$file" &
+    info "launched pid: $!"
+    pids[$i]=$!
+    ((i=i%NJobs)); ((i++==0)) && wait $!
+done < <(find "${searchFolder}" -type f "${fileNameRegex[@]}" "${excludeDirs[@]}" -print0)
+
+# wait for all pids
+for pid in ${pids[*]}; do
+    wait $pid
 done
-)

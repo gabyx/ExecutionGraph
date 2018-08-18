@@ -10,10 +10,11 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "backend/requestHandlers/DummyRequestHandler.hpp"
+#include "executionGraphGUI/backend/requestHandlers/DummyRequestHandler.hpp"
 #include <chrono>
-#include "common/Exception.hpp"
-#include "common/Loggers.hpp"
+#include "executionGraphGUI/common/BinaryBuffer.hpp"
+#include "executionGraphGUI/common/Loggers.hpp"
+#include "executionGraphGUI/common/RequestError.hpp"
 
 namespace
 {
@@ -35,8 +36,8 @@ void DummyRequestHandler::handleRequest(const Request& request, ResponsePromise&
     std::this_thread::sleep_for(1.0s);
     EXECGRAPHGUI_BACKENDLOG_INFO("DummyRequestHandler: Computing finished!");
 
-    EXECGRAPHGUI_THROW_EXCEPTION_IF(std::rand() % 2 == 0,
-                                    "DummyRequestHandler: Spontanously deciced to throw a meaningless exception! Because its fun!")
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(std::rand() % 2 == 0,
+                                      "DummyRequestHandler: Spontanously deciced to throw a meaningless exception! Because its fun!")
 
     auto buffer = makeBinaryBuffer(response.getAllocator(), c_debugResponse.size());
 

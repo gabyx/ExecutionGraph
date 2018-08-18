@@ -28,7 +28,7 @@ set(CMAKE_DEBUG_POSTFIX "-dbg" CACHE STRING "Debug postfix for library/executabl
 mark_as_advanced(ExecutionGraph_USE_LEAK_SANITIZER)
 set(ExecutionGraph_USE_LEAK_SANITIZER OFF CACHE BOOL "Use the leak sanitizer!" )
 mark_as_advanced(ExecutionGraph_USE_ADDRESS_SANITIZER)
-set(ExecutionGraph_USE_ADDRESS_SANITIZER OFF CACHE BOOL "Use the address sanitizer!" )
+set(ExecutionGraph_USE_ADDRESS_SANITIZER ON CACHE BOOL "Use the address sanitizer!" )
 
 mark_as_advanced(ExecutionGraph_BUILD_LIBRARY)
 set(ExecutionGraph_BUILD_LIBRARY ON CACHE BOOL "Build a shared library")
@@ -167,6 +167,10 @@ list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "metaLib")
 # Try to find the spdlog
 find_package(SpdLogLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "spdlogLib")
+# Try to find the fmt library
+find_package(FmtLib REQUIRED)
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "fmtLib")
+
 # Try to find the Argumentparser
 find_package(ArgsLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "argsLib")

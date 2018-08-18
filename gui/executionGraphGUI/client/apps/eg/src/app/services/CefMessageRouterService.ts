@@ -11,7 +11,6 @@
 // =========================================================================================
 
 import { Injectable } from '@angular/core';
-import * as msgpack from 'msgpack-lite';
 
 type CefRequest = {
   request: string;

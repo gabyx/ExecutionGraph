@@ -14,8 +14,8 @@
 #define executionGraphGUI_common_BinaryBuffer_hpp
 
 #include <cstdint>
-#include <foonathan/memory/smart_ptr.hpp>
 #include <memory>
+#include <foonathan/memory/smart_ptr.hpp>
 
 /* ---------------------------------------------------------------------------------------*/
 /*!

@@ -25,19 +25,15 @@
 
 #ifdef NDEBUG
 #    define EXECGRAPH_DEBUG_ONLY(code)
-#    define EXECGRAPH_ASSERT(condition, message)
-#    define EXECGRAPH_ASSERT_TYPE(condition, message, type)
+#    define EXECGRAPH_ASSERT(condition, ...)
+#    define EXECGRAPH_VERIFY(condition, ...) condition;
+#    define EXECGRAPH_ASSERT_TYPE(condition, type, ...)
 #else
 // Debug!
 #    define EXECGRAPH_DEBUG_ONLY(code) code
-#    define EXECGRAPH_ASSERT(condition, message) EXECGRAPH_ASSERT_TYPE(condition, message, Exception)
-#    define EXECGRAPH_ASSERT_TYPE(condition, message, type)   \
-        {                                                     \
-            if(!(condition))                                  \
-            {                                                 \
-                EXECGRAPH_THROW_EXCEPTION_TYPE(message, type) \
-            }                                                 \
-        }
+#    define EXECGRAPH_VERIFY(condition, ...) EXECGRAPH_ASSERT(condition, __VA_ARGS__)
+#    define EXECGRAPH_ASSERT(condition, ...) EXECGRAPH_ASSERT_TYPE(condition, executionGraph::ExceptionFatal, __VA_ARGS__)
+#    define EXECGRAPH_ASSERT_TYPE(condition, Type, ...) EXECGRAPH_THROW_TYPE_IF(!(condition), Type, __VA_ARGS__)
 #endif
 
 //! Some warning macro.

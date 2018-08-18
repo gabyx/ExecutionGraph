@@ -13,8 +13,8 @@
 #ifndef executionGraph_common_FileSystem_hpp
 #define executionGraph_common_FileSystem_hpp
 
-#include <experimental/filesystem>
 #include <optional>
+#include <experimental/filesystem>
 #include "executionGraph/common/Platform.hpp"
 #include "executionGraph/config/Config.hpp"
 

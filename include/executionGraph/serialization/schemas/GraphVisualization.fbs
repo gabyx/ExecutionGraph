@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-include "DataTypes.fbs";
-include "SocketLink.fbs";
+include "executionGraph/serialization/schemas/DataTypes.fbs";
+include "executionGraph/serialization/schemas/SocketLink.fbs";
 
 namespace executionGraph.serialization;
 

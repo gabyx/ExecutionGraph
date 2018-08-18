@@ -5,6 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}"
+        },
+        {
             "name": "(lldb) ExecutionGraphTests-ExecutionTree",
             "type": "cppdbg",
             "request": "launch",
@@ -53,10 +59,34 @@
             "MIMode": "lldb"
         },
         {
+            "name": "(lldb) ExecutionGraphTests-MetaProgramming",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/tests/ExecutionGraphTest-MetaProgramming",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
             "name": "(lldb) ExecutionGraphTests-CEFSimple",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/gui/cefsimple/Debug/cefsimple.app/Contents/MacOS/cefsimple",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
+            "name": "(lldb) ExecutionGraphGUI (macOS App)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

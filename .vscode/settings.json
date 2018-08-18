@@ -171,13 +171,25 @@
     "cmake.configureArgs": ["-DExecutionGraph_BUILD_TESTS=ON",
                             "-DExecutionGraph_BUILD_GUI=ON",
                             "-DExecutionGraph_EXTERNAL_BUILD_DIR_POSTFIX=../buildExternal",
-                            "-DExecutionGraph_USE_CEF_DSYM_FILE=ON"   
+                            "-DExecutionGraph_USE_CEF_DSYM_FILE=ON",
+                            "-DExecutionGraph_USE_ADDRESS_SANITIZER=ON"
                             ],
     "plantuml.exportFormat": "svg",
     "plantuml.exportSubFolder": false,
     "markdown-preview-enhanced.previewTheme": "github-dark.css",
     "C_Cpp.clang_format_fallbackStyle": "none",
-    "C_Cpp.loggingLevel": "Information",
+    "C_Cpp.loggingLevel": "Debug",
     "git.ignoreLimitWarning": true,
     "cmake.configureOnOpen": false,
+    "C_Cpp.configurationWarnings": "Disabled",
+    "gitlens.advanced.messages": {
+        "suppressShowKeyBindingsNotice": true
+    },
+    "gitlens.historyExplorer.enabled": true,
+    "gitlens.codeLens.enabled": false,
+    "gitlens.currentLine.enabled": false,
+    "gitlens.hovers.currentLine.over": "line",
+    "gitlens.hovers.enabled": false,
+    "gitlens.mode.active": "review",
+    "python.formatting.provider": "yapf",
 }

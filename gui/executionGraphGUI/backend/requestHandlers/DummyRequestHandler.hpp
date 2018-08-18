@@ -13,25 +13,26 @@
 #ifndef executionGraphGUI_backend_requestHandlers_DummyRequestHandler_hpp
 #define executionGraphGUI_backend_requestHandlers_DummyRequestHandler_hpp
 
-#include "backend/BackendRequestHandler.hpp"
-#include "backend/ExecutionGraphBackend.hpp"
+#include "executionGraphGUI/backend/BackendRequestHandler.hpp"
+#include "executionGraphGUI/backend/ExecutionGraphBackend.hpp"
 
 class DummyRequestHandler final : public BackendRequestHandler
 {
     RTTR_ENABLE(BackendRequestHandler)
 
 public:
-    using Id = BackendRequestHandler::Id;
+    using IdNamed = BackendRequestHandler::IdNamed;
 
 public:
     DummyRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,
-                        const Id& id = "DummyRequestHandler")
+                        const IdNamed& id = IdNamed("DummyRequestHandler"))
         : BackendRequestHandler(id)
     {
     }
 
 public:
-    void handleRequest(const Request& request, ResponsePromise& response) override;
+    void handleRequest(const Request& request,
+                       ResponsePromise& response) override;
 
 public:
     const std::unordered_set<std::string>& getRequestTypes() const override;

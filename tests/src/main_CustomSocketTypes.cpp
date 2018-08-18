@@ -111,7 +111,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     try
     {
         node1a->getISocket<double>(0);
-        EXECGRAPH_THROW_EXCEPTION("Should throw exception here!");
+        EXECGRAPH_THROW("Should throw exception here!");
     }
     catch(BadSocketCastException& e)
     {
@@ -119,7 +119,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     }
     catch(...)
     {
-        EXECGRAPH_THROW_EXCEPTION("Wrong Exception thrown!");
+        EXECGRAPH_THROW("Wrong Exception thrown!");
     }
     // Link
     node4a->setGetLink(*node3a, 0, 0);
@@ -151,10 +151,10 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 
     EXECGRAPH_LOG_TRACE(execTree.getExecutionOrderInfo());
 
-    execTree.execute(0);
+    execTree.runExecute(0);
 
     EXECGRAPH_LOG_TRACE("Result : " << resultNode->getOutVal<CustomDummyNode<Config>::Result1>()->memory[1]);
-    EXECGRAPH_THROW_EXCEPTION_IF(resultNode->getOutVal<CustomDummyNode<Config>::Result1>()->memory[1] != 30, "wrong result");
+    EXECGRAPH_THROW_IF(resultNode->getOutVal<CustomDummyNode<Config>::Result1>()->memory[1] != 30, "wrong result");
 }
 
 int main(int argc, char** argv)

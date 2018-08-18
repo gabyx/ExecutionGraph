@@ -10,10 +10,12 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "backend/BackendFactory.hpp"
+#include "executionGraphGUI/backend/BackendFactory.hpp"
 #include <utility>
-#include "backend/requestHandlers/DummyRequestHandler.hpp"
-#include "backend/requestHandlers/GeneralInfoRequestHandler.hpp"
+#include "executionGraphGUI/backend/requestHandlers/DummyRequestHandler.hpp"
+#include "executionGraphGUI/backend/requestHandlers/GeneralInfoRequestHandler.hpp"
+#include "executionGraphGUI/backend/requestHandlers/GraphManagementRequestHandler.hpp"
+#include "executionGraphGUI/backend/requestHandlers/GraphManipulationRequestHandler.hpp"
 
 BackendFactory::BackendData
 BackendFactory::CreatorExecutionGraphBackend::create()
@@ -24,8 +26,18 @@ BackendFactory::CreatorExecutionGraphBackend::create()
     // Create a simple dummy handler
     auto dummyHandler = std::make_shared<DummyRequestHandler>(backend);
 
-    // Create a graph handler (add/remove graphs, graph info etc.)
-    auto graphHandler = std::make_shared<GeneralInfoRequestHandler>(backend);
+    // Create a general info handler
+    auto generalInfoHandler = std::make_shared<GeneralInfoRequestHandler>(backend);
 
-    return BackendData{backend, {dummyHandler, graphHandler}};
+    // Create a graph manipulation handler
+    auto graphManipHandler = std::make_shared<GraphManipulationRequestHandler>(backend);
+
+    // Create a graph management handler
+    auto graphManagementHandler = std::make_shared<GraphManagementRequestHandler>(backend);
+
+    return BackendData{backend,
+                       {dummyHandler,
+                        generalInfoHandler,
+                        graphManipHandler,
+                        graphManagementHandler}};
 }

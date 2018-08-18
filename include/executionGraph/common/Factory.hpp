@@ -13,11 +13,11 @@
 #ifndef executionGraph_common_Factory_hpp
 #define executionGraph_common_Factory_hpp
 
-#include <meta/meta.hpp>
 #include <optional>
-#include <rttr/type>
 #include <type_traits>
 #include <unordered_map>
+#include <meta/meta.hpp>
+#include <rttr/type>
 #include "executionGraph/common/Assert.hpp"
 #include "executionGraph/config/Config.hpp"
 

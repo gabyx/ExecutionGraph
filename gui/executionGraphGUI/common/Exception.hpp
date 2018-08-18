@@ -17,7 +17,6 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-
 #include <executionGraph/common/Exception.hpp>
 
 #ifdef __clang__
@@ -25,32 +24,23 @@
 #    pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 
+#define EXECGRAPHGUI_THROW(...) EXECGRAPH_THROW(__VA_ARGS__)
+#define EXECGRAPHGUI_THROW_IF(condition, ...) EXECGRAPH_THROW_TYPE_IF(condition, executionGraph::Exception, __VA_ARGS__)
+#define EXECGRAPHGUI_THROW_TYPE(Type, ...) EXECGRAPH_THROW_TYPE(Type, __VA_ARGS__)
+#define EXECGRAPHGUI_THROW_TYPE_IF(condition, Type, ...) EXECGRAPH_THROW_TYPE_IF(condition, Type, __VA_ARGS__)
+
+#ifdef __clang__
+#    pragma clang diagnostic pop
+#endif
+
 class InternalBackendError final : public executionGraph::Exception
 {
 public:
-    InternalBackendError(const std::stringstream& ss)
-        : executionGraph::Exception(ss) {}
+    InternalBackendError(const std::string& s)
+        : executionGraph::Exception(s) {}
 };
 
-#    define EXECGRAPHGUI_THROW_EXCEPTION_TYPE(message, type)                      \
-        {                                                                         \
-            std::stringstream ___s___;                                            \
-            ___s___ << message << std::endl                                       \
-                    << " @ " << __FILE__ << " (" << __LINE__ << ")" << std::endl; \
-            throw type(___s___);                                                  \
-        }
-
-#    define EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(condition, message, type) \
-        if(condition)                                                      \
-        {                                                                  \
-            EXECGRAPHGUI_THROW_EXCEPTION_TYPE(message, type);              \
-        }
-
-#    define EXECGRAPHGUI_THROW_EXCEPTION(message) EXECGRAPHGUI_THROW_EXCEPTION_TYPE(message, executionGraph::Exception)
-#    define EXECGRAPHGUI_THROW_EXCEPTION_IF(condition, message) EXECGRAPHGUI_THROW_EXCEPTION_TYPE_IF(condition, message, executionGraph::Exception)
-
-#    ifdef __clang__
-#        pragma clang diagnostic pop
-#    endif
+#    define EXECGRAPHGUI_THROW_BACKEND_ERROR_IF(condition, ...) EXECGRAPHGGUI_THROW_TYPE_IF(condition, InternalBackendError, __VA_ARGS__)
+#    define EXECGRAPHGUI_THROW_BACKEND_ERROR(...) EXECGRAPHGGUI_THROW_TYPE(InternalBackendError, __VA_ARGS__)
 
 #endif

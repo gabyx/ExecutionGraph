@@ -15,11 +15,11 @@
 
 #include <cef_base.h>
 #include <cef_resource_handler.h>
-#include <executionGraph/common/FileSystem.hpp>
-#include <executionGraph/common/IObjectID.hpp>
 #include <functional>
 #include <wrapper/cef_helpers.h>
-#include "cefapp/ResponseCef.hpp"
+#include <executionGraph/common/FileSystem.hpp>
+#include <executionGraph/common/IObjectID.hpp>
+#include "executionGraphGUI/cefapp/ResponseCef.hpp"
 class BackendRequestDispatcher;
 class BufferPool;
 
@@ -34,7 +34,7 @@ class BufferPool;
 class BackendResourceHandler final : public CefResourceHandler,
                                      public executionGraph::IObjectID
 {
-    EXECGRAPH_OBJECT_ID_DECLARATION
+    EXECGRAPH_NAMED_OBJECT_ID_DECLARATION
 
 public:
     template<typename Deleter>
@@ -78,7 +78,7 @@ private:
     bool initRequest(CefRefPtr<CefRequest> request);
 
 private:
-    void finish();
+    void reset();
 
 private:
     std::shared_ptr<BackendRequestDispatcher> m_dispatcher;  //!< The dispatcher to which request/response get dispatched.
@@ -86,7 +86,9 @@ private:
     ResponseFutureCef m_responseFuture;                      //!< The response future we await in the resource handler.
     ResponseFutureCef::Payload m_payload;                    //!< The moved payload from the future. (default = empty)
 
-    std::size_t m_bytesRead = 0;  //!< @todo DEBUG
+    uint8_t* m_buffer        = nullptr;
+    std::size_t m_bufferSize = 0;
+    std::size_t m_bytesRead  = 0;  //!< Number of bytes read.
 
     //! CefRefCounted overrides
     //@{

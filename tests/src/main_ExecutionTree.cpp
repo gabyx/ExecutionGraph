@@ -10,10 +10,10 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
+#include <meta/meta.hpp>
 #include <executionGraph/graphs/ExecutionTreeInOut.hpp>
 #include <executionGraph/nodes/LogicNode.hpp>
 #include <executionGraph/nodes/LogicSocket.hpp>
-#include <meta/meta.hpp>
 #include "DummyNode.hpp"
 #include "GraphGenerator.hpp"
 #include "TestFunctions.hpp"
@@ -40,7 +40,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     try
     {
         node1a->getISocket<double>(0);
-        EXECGRAPH_THROW_EXCEPTION("Should throw exception here!");
+        EXECGRAPH_THROW("Should throw exception here!");
     }
     catch(BadSocketCastException& e)
     {
@@ -48,7 +48,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     }
     catch(...)
     {
-        EXECGRAPH_THROW_EXCEPTION("Wrong Exception thrown!");
+        EXECGRAPH_THROW("Wrong Exception thrown!");
     }
 
     // Link
@@ -84,11 +84,19 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 
     EXECGRAPH_LOG_TRACE(execTree.getExecutionOrderInfo());
 
-    execTree.execute(0);
+    execTree.runExecute(0);
 
     EXECGRAPH_LOG_TRACE("Result : " << resultNode->getOutVal<DummyNode<Config>::Result1>());
 
-    EXECGRAPH_THROW_EXCEPTION_IF(resultNode->getOutVal<DummyNode<Config>::Result1>() != 16, "wrong result");
+    ASSERT_EQ(resultNode->getOutVal<DummyNode<Config>::Result1>(), 16) << "wrong result";
+
+    execTree.removeNode(5);
+    execTree.setup();
+    execTree.runExecute(0);
+    execTree.removeNode(4);
+    execTree.setup();
+    execTree.runExecute(0);
+    ASSERT_EQ(resultNode->getOutVal<DummyNode<Config>::Result1>(), 4) << "wrong result";
 }
 
 MY_TEST(ExecutionTree_Test, IntBig)
@@ -115,9 +123,9 @@ MY_TEST(ExecutionTree_Test, IntBig)
             }
             catch(...)
             {
-                EXECGRAPH_THROW_EXCEPTION("Wrong Exception thrown!");
+                EXECGRAPH_THROW("Wrong Exception thrown!");
             }
-            EXECGRAPH_THROW_EXCEPTION("Added a Cycle but no exception has been thrown!");
+            EXECGRAPH_THROW("Added a Cycle but no exception has been thrown!");
         }
     }
 }

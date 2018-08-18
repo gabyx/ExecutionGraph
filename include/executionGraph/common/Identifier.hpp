@@ -13,9 +13,9 @@
 #ifndef executionGraph_common_Identifier_hpp
 #define executionGraph_common_Identifier_hpp
 
-#include <crossguid/guid.hpp>
 #include <functional>
 #include <string>
+#include <crossguid/guid.hpp>
 #include "executionGraph/config/Config.hpp"
 
 namespace executionGraph
@@ -28,52 +28,83 @@ namespace executionGraph
         @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
     */
     /* ---------------------------------------------------------------------------------------*/
-    class Identifier final
+    class Identifier
     {
         template<typename T>
         friend struct std::hash;
 
     public:
         Identifier()
-            : m_name(""), m_guid(xg::newGuid())
+            : m_guid(xg::newGuid())
         {}
 
-        template<typename T>
-        Identifier(const T& name)
-            : m_name(name), m_guid(xg::newGuid())
-        {}
+        Identifier(const Identifier&) = default;
+        Identifier(Identifier&&)      = default;
 
-        Identifier(const std::string& name, const xg::Guid& guid)
-            : m_name(name), m_guid(guid)
+        Identifier& operator=(const Identifier&) = default;
+        Identifier& operator=(Identifier&&) = default;
+
+        template<typename T,
+                 typename SFINAE = std::enable_if_t<!std::is_base_of_v<Identifier, std::decay_t<T>>>>
+        explicit Identifier(T&& guid)
+            : m_guid(std::forward<T>(guid))
         {
         }
 
-        //! Castoperator which returns the stringyfied GUID.
-        operator std::string() const { return m_guid; }
-
-        //! Get the name of this identifier
-        const std::string& getName() const { return m_name; }
-
-        //! Get full name of this identifier: "<name>-<guid>".
-        std::string getUniqueName() const
-        {
-            return m_name.empty() ? m_name + "-" + std::string(m_guid) : std::string(m_guid);
-        }
+        //! Get the name of this identifier.
+        std::string toString() const { return m_guid; }
 
         //! Comparison operators.
         bool operator==(const Identifier& id) const { return m_guid == id.m_guid; }
         bool operator!=(const Identifier& id) const { return !(m_guid == id.m_guid); }
 
+    protected:
+        //! Get the unique identifier.
+        const xg::Guid& getId() { return m_guid; }
+
     private:
-        std::string m_name;  //!< The nickname of this identifier.
-        xg::Guid m_guid;     //!< The unique guid of this identifier.
+        xg::Guid m_guid;  //!< The unique identifier.
     };
 
-    using Id = Identifier;  //! Abreviation
+    /* ---------------------------------------------------------------------------------------*/
+    /*!
+        Named Identifier Mixin.
 
+        @date Tue Jul 31 2018
+        @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+    */
+    /* ---------------------------------------------------------------------------------------*/
+    template<typename TIdentifier>
+    class MixinNamedIdentifier final : public TIdentifier
+    {
+    public:
+        MixinNamedIdentifier()
+            : TIdentifier(), m_name(TIdentifier::toString())
+        {}
+
+        MixinNamedIdentifier(const MixinNamedIdentifier&) = default;
+        MixinNamedIdentifier(MixinNamedIdentifier&&)      = default;
+
+        template<typename T, typename... Args>
+        explicit MixinNamedIdentifier(const T& name, Args&&... args)
+            : TIdentifier(std::forward<Args>(args)...), m_name(name)
+        {}
+
+        //! Get the name of this identifier.
+        std::string getName() const { return m_name + "-" + TIdentifier::toString(); }
+
+        //! Get the short name of this identifier.
+        const std::string& getShortName() const { return m_name; }
+
+    public:
+        std::string m_name;  //!< The short name of this identifier.
+    };
+
+    using Id      = Identifier;                        //! Abreviation
+    using IdNamed = MixinNamedIdentifier<Identifier>;  //! Abreviation
 }  // namespace executionGraph
 
-//! Sepcialize std::hash
+//! Specialize std::hash for executionGraph::Id
 namespace std
 {
     template<>

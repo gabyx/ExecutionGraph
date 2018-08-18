@@ -20,7 +20,7 @@ export class ExecutionServiceDummy extends ExecutionService {
   }
 
   public execute(): Promise<void> {
-    console.log(`[ExecutionServiceDummy] execute()`);
+    console.log(`execute()`);
     return Promise.resolve();
   }
 }

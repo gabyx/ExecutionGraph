@@ -11,17 +11,17 @@
 //! ========================================================================================
 
 #include "AppHandler.hpp"
-#include <base/cef_bind.h>
 #include <cef_app.h>
 #include <sstream>
 #include <string>
+#include <base/cef_bind.h>
 #include <views/cef_browser_view.h>
 #include <views/cef_window.h>
 #include <wrapper/cef_closure_task.h>
 #include <wrapper/cef_helpers.h>
-#include "cefapp/PlatformTitleChanger.hpp"
-#include "common/DevFlags.hpp"
-#include "common/Loggers.hpp"
+#include "executionGraphGUI/cefapp/PlatformTitleChanger.hpp"
+#include "executionGraphGUI/common/DevFlags.hpp"
+#include "executionGraphGUI/common/Loggers.hpp"
 
 namespace
 {

@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-include "GraphTypeDescription.fbs";
+include "executionGraph/serialization/schemas/GraphTypeDescription.fbs";
 
 namespace executionGraphGUI.serialization;
 
@@ -21,6 +21,6 @@ namespace executionGraphGUI.serialization;
 //!  -> no data
 //! Response data:
 table GetAllGraphTypeDescriptionsResponse {
-    graphsTypes:[GraphTypeDescription] (id:0);
+    graphsTypes:[executionGraph.serialization.GraphTypeDescription] (id:0);
 }
 //! ======================================================================

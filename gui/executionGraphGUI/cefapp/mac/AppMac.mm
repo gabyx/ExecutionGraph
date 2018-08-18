@@ -10,14 +10,14 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#import <Cocoa/Cocoa.h>
 #include <cef_application_mac.h>
+#import <Cocoa/Cocoa.h>
 #include <spdlog/spdlog.h>
 #include <wrapper/cef_helpers.h>
-#include "cefapp/App.hpp"
-#include "cefapp/AppCLArgs.hpp"
-#include "cefapp/AppHandler.hpp"
-#include "common/Loggers.hpp"
+#include "executionGraphGUI/cefapp/App.hpp"
+#include "executionGraphGUI/cefapp/AppCLArgs.hpp"
+#include "executionGraphGUI/cefapp/AppHandler.hpp"
+#include "executionGraphGUI/common/Loggers.hpp"
 
 namespace
 {
@@ -166,7 +166,8 @@ namespace
     }
 }
 
-- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender
+- (NSApplicationTerminateReply)applicationShouldTerminate:
+    (NSApplication*)sender
 {
     return NSTerminateNow;
 }
@@ -208,7 +209,8 @@ int main(int argc, char* argv[])
     // App implements application-level callbacks for the browser process.
     // It will create the first browser instance in OnContextInitialized() after
     // CEF has initialized.
-    application = std::make_unique<App>(appCLArgs->getClientSourcePath()).release();
+    application =
+        std::make_unique<App>(appCLArgs->getClientSourcePath()).release();
 
     // Initialize CEF for the browser process.
     CefInitialize(mainArgs, settings, application, nullptr);

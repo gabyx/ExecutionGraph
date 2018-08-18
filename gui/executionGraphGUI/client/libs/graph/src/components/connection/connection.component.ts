@@ -26,5 +26,4 @@ export class ConnectionComponent {
   @Input() to: string;
 
   @Input() drawStyle: ConnectionDrawStyle = new BezierConnectionDrawStyle();
-
 }

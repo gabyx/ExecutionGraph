@@ -10,8 +10,10 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "common/Loggers.hpp"
-#include "common/Exception.hpp"
+#include "executionGraphGUI/common/Loggers.hpp"
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_sinks.h>
+#include "executionGraphGUI/common/Exception.hpp"
 
 Loggers::Loggers(const std::path& logPath)
 {
@@ -21,7 +23,7 @@ Loggers::Loggers(const std::path& logPath)
     try
     {
         auto stdOutSink = std::make_shared<spdlog::sinks::stdout_sink_mt>();
-        auto fileSink   = std::make_shared<spdlog::sinks::simple_file_sink_mt>(logFile.string());
+        auto fileSink   = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logFile.string());
 
         std::vector<spdlog::sink_ptr> sinks{stdOutSink, fileSink};
 
@@ -37,6 +39,6 @@ Loggers::Loggers(const std::path& logPath)
     }
     catch(const spdlog::spdlog_ex& ex)
     {
-        EXECGRAPHGUI_THROW_EXCEPTION("Log initialization failed: " << ex.what());
+        EXECGRAPHGUI_THROW("Log initialization failed: '{0}'", ex.what());
     }
 }

@@ -10,19 +10,19 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGUI_backend_nodes_DummyNodes_hpp
-#define executionGraphGUI_backend_nodes_DummyNodes_hpp
+#ifndef executionGraphGUI_backend_nodes_DummyNode_hpp
+#define executionGraphGUI_backend_nodes_DummyNode_hpp
 
-#include <executionGraph/nodes/LogicCommon.hpp>
 #include <rttr/registration>
 #include <rttr/type>
+#include <executionGraph/nodes/LogicCommon.hpp>
 
 //! Stupid dummy Node for testing.
 template<typename TConfig>
 class DummyNode : public TConfig::NodeBaseType
 {
 public:
-    EXECGRAPH_TYPEDEF_CONFIG(TConfig);
+    EXECGRAPH_DEFINE_CONFIG(TConfig);
     using Base = typename Config::NodeBaseType;
 
 private:

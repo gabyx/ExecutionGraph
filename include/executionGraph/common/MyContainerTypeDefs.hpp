@@ -13,10 +13,10 @@
 //#define EIGEN_DONT_VECTORIZE
 //#define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
 
-#include <Eigen/StdVector>
 #include <map>
 #include <unordered_map>
 #include <vector>
+#include <Eigen/StdVector>
 
 #include <Eigen/Dense>
 

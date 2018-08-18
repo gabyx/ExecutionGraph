@@ -14,9 +14,9 @@
 #define cefapp_RequestDispatcherAdapterCef_h
 
 #include <cef_base.h>
-#include <executionGraph/common/Assert.hpp>
 #include <memory>
 #include <wrapper/cef_message_router.h>
+#include <executionGraph/common/Assert.hpp>
 class BackendRequestDispatcher;
 
 /* ---------------------------------------------------------------------------------------*/
@@ -34,7 +34,7 @@ public:
     explicit BackendRequestDispatcherAdapterCef(std::shared_ptr<BackendRequestDispatcher> dispatcher)
         : m_dispatcher(dispatcher)
     {
-        EXECGRAPH_ASSERT(m_dispatcher, "nullptr!");
+        EXECGRAPHGUI_ASSERT(m_dispatcher, "nullptr!");
     }
 
     virtual ~BackendRequestDispatcherAdapterCef() = default;

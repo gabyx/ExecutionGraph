@@ -20,7 +20,10 @@
         "libs/*"
       ],
       "@messages/*": [
-        "../messages/schemas/*"
+        "../messages/schemas/ts/*"
+      ],
+      "@serialization/*": [
+        "../../../include/executionGraph/serialization/schemas/ts/*"
       ]
     }
   },

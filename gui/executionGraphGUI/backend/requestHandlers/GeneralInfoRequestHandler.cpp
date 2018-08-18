@@ -10,17 +10,18 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "backend/requestHandlers/GeneralInfoRequestHandler.hpp"
-#include <chrono>
-#include <vector>
-#include "backend/ExecutionGraphBackend.hpp"
-#include "common/AllocatorProxyFlatBuffer.hpp"
-#include "common/Exception.hpp"
-#include "common/Loggers.hpp"
-#include "messages/schemas/GeneralInfoMessages_generated.h"
+#include "executionGraphGUI/backend/requestHandlers/GeneralInfoRequestHandler.hpp"
+#include <executionGraph/serialization/GraphTypeDescriptionSerializer.hpp>
+#include "executionGraphGUI/backend/ExecutionGraphBackend.hpp"
+#include "executionGraphGUI/common/AllocatorProxyFlatBuffer.hpp"
+#include "executionGraphGUI/common/Exception.hpp"
+#include "executionGraphGUI/common/Loggers.hpp"
+#include "executionGraphGUI/messages/schemas/cpp/GeneralInfoMessages_generated.h"
 
+using namespace executionGraph;
 namespace fl = flatbuffers;
-namespace s  = executionGraphGUI::serialization;
+namespace s  = executionGraph::serialization;
+namespace sG = executionGraphGUI::serialization;
 
 //! Init the function mapping.
 FunctionMap<GeneralInfoRequestHandler::Function> GeneralInfoRequestHandler::initFunctionMap()
@@ -36,7 +37,7 @@ const FunctionMap<GeneralInfoRequestHandler::Function> GeneralInfoRequestHandler
 
 //! Konstructor.
 GeneralInfoRequestHandler::GeneralInfoRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,
-                                                     const Id& id)
+                                                     const IdNamed& id)
     : BackendRequestHandler(id)
 {
 }
@@ -61,12 +62,12 @@ void GeneralInfoRequestHandler::handleRequest(const Request& request,
     }
 }
 
-//! Handle the "GetAllGraphTypeDescriptions"
+//! Handle the operation of getting all graph type descriptions.
 void GeneralInfoRequestHandler::handleGetAllGraphTypeDescriptions(const Request& request,
                                                                   ResponsePromise& response)
 {
-    EXECGRAPHGUI_THROW_EXCEPTION_IF(request.getPayload() != nullptr,
-                                    "There should not be any request payload for this request");
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(request.getPayload() != nullptr,
+                                      "There should not be any request payload for this request");
     using Allocator = ResponsePromise::Allocator;
 
     AllocatorProxyFlatBuffer<Allocator> allocator(response.getAllocator());
@@ -77,39 +78,15 @@ void GeneralInfoRequestHandler::handleGetAllGraphTypeDescriptions(const Request&
 
     for(auto& kV : m_backend->getGraphTypeDescriptions())
     {
-        auto& id                                          = kV.first;
-        ExecutionGraphBackend::GraphTypeDescription& desc = kV.second;
-
-        // Node descriptions
-        std::vector<flatbuffers::Offset<s::NodeTypeDescription>> nodes;
-        for(auto& nD : desc.m_nodeTypeDescription)
-        {
-            nodes.emplace_back(s::CreateNodeTypeDescriptionDirect(builder,
-                                                                  nD.m_name.c_str(),
-                                                                  nD.m_rtti.c_str()));
-        }
-
-        // Socket descriptions
-        std::vector<flatbuffers::Offset<s::SocketTypeDescription>> sockets;
-        for(auto& sD : desc.m_socketTypeDescription)
-        {
-            sockets.emplace_back(s::CreateSocketTypeDescriptionDirect(builder,
-                                                                      sD.m_name.c_str(),
-                                                                      sD.m_rtti.c_str()));
-        }
-
-        graphs.emplace_back(s::CreateGraphTypeDescriptionDirect(builder,
-                                                                id.getName().c_str(),
-                                                                id.getUniqueName().c_str(),
-                                                                &nodes,
-                                                                &sockets));
+        auto& graphDesc = kV.second;
+        graphs.emplace_back(GraphTypeDescriptionSerializer::write(builder, graphDesc));
     }
 
-    auto offset = s::CreateGetAllGraphTypeDescriptionsResponseDirect(builder, &graphs);
+    auto offset = sG::CreateGetAllGraphTypeDescriptionsResponseDirect(builder, &graphs);
     builder.Finish(offset);
 
     // Set the response.
-    auto detachedBuffer = builder.Release();
+    auto detachedBuffer = builder.ReleaseRaw();
     response.setReady(ResponsePromise::Payload{makeBinaryBuffer(std::move(allocator),
                                                                 std::move(detachedBuffer)),
                                                "application/octet-stream"});

@@ -13,10 +13,10 @@
 #ifndef executionGraphGUI_common_AllocatorProxyFlatBuffer
 #define executionGraphGUI_common_AllocatorProxyFlatBuffer
 
-#include <flatbuffers/flatbuffers.h>
 #include <memory>
-#include "common/BufferPool.hpp"
-#include "common/Exception.hpp"
+#include <flatbuffers/flatbuffers.h>
+#include "executionGraphGUI/common/BufferPool.hpp"
+#include "executionGraphGUI/common/Exception.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -44,67 +44,42 @@ public:
     //! Allocate `size` bytes of memory.
     virtual uint8_t* allocate(std::size_t bytes) override
     {
-        EXECGRAPHGUI_THROW_EXCEPTION_IF(m_buffer != nullptr,
-                                        "Another allocation from flatbuffers happened."
-                                        "Since we cache only one allocation here, this is going to get no good!")
-        m_allocatedBytes     = bytes;
-        m_enableDeallocation = true;
-        m_buffer             = static_cast<uint8_t*>(foonathan::memory::allocator_traits<RawAllocator>::allocate_array(*m_allocator,
-                                                                                                           bytes,
-                                                                                                           sizeof(uint8_t),
-                                                                                                           alignof(uint8_t)));
         // we dont get alignment requirement, its not important.
-        return m_buffer;
+        return static_cast<uint8_t*>(foonathan::memory::allocator_traits<RawAllocator>::allocate_array(*m_allocator,
+                                                                                                       bytes,
+                                                                                                       sizeof(uint8_t),
+                                                                                                       alignof(uint8_t)));
     }
 
     // Deallocate `size` bytes of memory at `p` allocated by this allocator.
     virtual void deallocate(uint8_t* p, size_t bytes) override
     {
-        if(m_enableDeallocation)
-        {
-            foonathan::memory::allocator_traits<RawAllocator>::deallocate_array(*m_allocator,
-                                                                                p,
-                                                                                bytes,
-                                                                                sizeof(uint8_t),
-                                                                                alignof(uint8_t));
-            m_buffer = nullptr;
-        }
+        foonathan::memory::allocator_traits<RawAllocator>::deallocate_array(*m_allocator,
+                                                                            p,
+                                                                            bytes,
+                                                                            sizeof(uint8_t),
+                                                                            alignof(uint8_t));
     }
 
-    //! Disable the deallocation (only rewrap a flatbuffers::DetachedBuffer in our Container)
-    //! This function call is dangerous, since memory leaks can happen while an exception
-    //! is thrown during rewrapping!
-    void disableDeallocation()
-    {
-        m_enableDeallocation = false;
-    }
     //! Return the wrapped allocator.
     auto& getAllocator() const { return m_allocator; }
 
-    //! Get current allocated buffer.
-    uint8_t* getCachedAllocatedBuffer() { return m_buffer; }
-    //! Return number of allocated bytes.
-    std::size_t getCachedAllocatedBytes() { return m_allocatedBytes; }
-
 private:
-    bool m_enableDeallocation    = true;        //!< If deallocation is enabled.
-    std::size_t m_allocatedBytes = 0;           //!< The number of currently allocated bytes.
-    uint8_t* m_buffer            = nullptr;     //!< The current allocated buffer.
     std::shared_ptr<RawAllocator> m_allocator;  //!< The allocator to which allocation/deallocation is forwarded.
 };
 
 //! Helper to quickly make a BinaryBuffer, forwards to the constructor and injects the allocated bytes!.
 template<typename RawAllocator, typename... Args>
 BinaryBuffer<RawAllocator> makeBinaryBuffer(AllocatorProxyFlatBuffer<RawAllocator>&& allocator,
-                                            flatbuffers::DetachedBuffer&& buffer,
+                                            flatbuffers::DetachedBufferRaw&& buffer,
                                             Args&&... args) noexcept
 {
-    allocator.disableDeallocation();  // disable deallocation such that DTOR of `buffer` does not deallocate the buffer.
+    EXECGRAPHGUI_ASSERT(!buffer.allocator_owned(), "Programming error!");
     return makeBinaryBuffer(allocator.getAllocator(),
-                            buffer.data(),
+                            buffer.start(),
                             buffer.size(),
-                            allocator.getCachedAllocatedBuffer(),
-                            allocator.getCachedAllocatedBytes());
+                            buffer.data(),
+                            buffer.reserved());
 }
 
 #endif

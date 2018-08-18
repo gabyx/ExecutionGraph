@@ -10,10 +10,11 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Injectable } from '@angular/core';
 
-import { ExecutionService } from '../../services/ExecutionService';
+import { TestService } from "../../services/TestService"
 
+@Injectable()
 @Component({
   selector: 'eg-toolbar',
   templateUrl: './toolbar.component.html',
@@ -22,19 +23,11 @@ import { ExecutionService } from '../../services/ExecutionService';
 export class ToolbarComponent implements OnInit {
   public testResponse: any;
 
-  constructor(private readonly executionService: ExecutionService) {}
+  constructor(private readonly testService: TestService) { }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   public test() {
-    console.log('Testing');
-    this.executionService.execute().then(
-      result => {
-        this.testResponse = result;
-      },
-      error => {
-        this.testResponse = error;
-      }
-    );
+    this.testService.testAddRemove();
   }
 }

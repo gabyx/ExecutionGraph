@@ -13,10 +13,10 @@
 #ifndef executionGraphGUI_cefapp_BackendRequestDispatcher_hpp
 #define executionGraphGUI_cefapp_BackendRequestDispatcher_hpp
 
-#include "backend/BackendRequestHandler.hpp"
-#include "cefapp/RequestCef.hpp"
-#include "cefapp/ResponseCef.hpp"
-#include "common/RequestDispatcher.hpp"
+#include "executionGraphGUI/backend/BackendRequestHandler.hpp"
+#include "executionGraphGUI/cefapp/RequestCef.hpp"
+#include "executionGraphGUI/cefapp/ResponseCef.hpp"
+#include "executionGraphGUI/common/RequestDispatcher.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!

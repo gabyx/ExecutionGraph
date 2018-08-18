@@ -26,7 +26,7 @@ describe('ToolbarComponent', () => {
       TestBed.configureTestingModule({
         imports: [MatToolbarModule, MatMenuModule, MatIconModule],
         declarations: [ToolbarComponent],
-        providers: [{ provide: ExecutionService, useClass: ExecutionServiceDummy}]
+        providers: [{ provide: ExecutionService, useClass: ExecutionServiceDummy }]
       }).compileComponents();
     })
   );

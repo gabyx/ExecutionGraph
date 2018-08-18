@@ -11,5 +11,6 @@
         "doi.fileheadercomment",
         "gaborv.flatbuffers",
         "eamodio.gitlens",
+        "joelday.docthis"
     ]
 }

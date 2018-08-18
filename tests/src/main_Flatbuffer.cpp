@@ -10,16 +10,16 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 #define FLATBUFFERS_DEBUG_VERIFICATION_FAILURE 1
+#include <fstream>
+#include <vector>
+#include <flatbuffers/flatbuffers.h>
 #include <executionGraph/common/Log.hpp>
 #include <executionGraph/graphs/ExecutionTreeInOut.hpp>
 #include <executionGraph/nodes/LogicNode.hpp>
 #include <executionGraph/serialization/ExecutionGraphSerializer.hpp>
 #include <executionGraph/serialization/FileMapper.hpp>
 #include <executionGraph/serialization/LogicNodeSerializer.hpp>
-#include <executionGraph/serialization/schemas/ExecutionGraph_generated.h>
-#include <flatbuffers/flatbuffers.h>
-#include <fstream>
-#include <vector>
+#include <executionGraph/serialization/schemas/cpp/ExecutionGraph_generated.h>
 #include "../files/testbuffer_generated.h"
 #include "DummyNode.hpp"
 #include "GraphGenerator.hpp"
@@ -35,7 +35,7 @@ MY_TEST(FlatBuffer, Test1)
     unsigned int n = 100;
     namespace t    = test;
 
-    flatbuffers::FlatBufferBuilder builder;
+    flatbuffers::FlatBufferBuilder builder(2500);
     std::vector<t::Vec3> vecs(n, t::Vec3(1, 3, 4));
     auto vecsOffsets  = builder.CreateVectorOfStructs(vecs.data(), vecs.size());
     auto vecsOffsets2 = builder.CreateVectorOfStructs(vecs.data(), vecs.size());
@@ -71,7 +71,7 @@ struct DummyNodeSerializer
     //! for the DummyNode `node`.
     struct Writer
     {
-        EXECGRAPH_TYPEDEF_CONFIG(Config);
+        EXECGRAPH_DEFINE_CONFIG(Config);
 
         using Key = DummyNodeType;
 
@@ -93,21 +93,25 @@ struct DummyNodeSerializer
     //! buffer `node`.
     struct Reader
     {
-        EXECGRAPH_TYPEDEF_CONFIG(Config);
+        EXECGRAPH_DEFINE_CONFIG(Config);
 
         using Key = DummyNodeType;
 
         static std::unique_ptr<NodeBaseType>
-        create(const s::LogicNode& node)
+        create(executionGraph::NodeId nodeId,
+               const std::string& name,
+               const flatbuffers::Vector<flatbuffers::Offset<s::LogicSocket>>* inputSockets  = nullptr,
+               const flatbuffers::Vector<flatbuffers::Offset<s::LogicSocket>>* outputSockets = nullptr,
+               const flatbuffers::Vector<uint8_t>* additionalData                            = nullptr)
         {
-            executionGraph::NodeId id = node.id();
-            return std::make_unique<DummyNodeType>(id);
+            return std::make_unique<DummyNodeType>(nodeId, name);
         }
     };
 };
 
 MY_TEST(FlatBuffer, Test2)
 {
+    using namespace executionGraph;
     unsigned int nNodes = 500;
 
     auto makeLogicNodes = [&](auto& builder) {
@@ -174,14 +178,17 @@ MY_TEST(FlatBuffer, Test2)
     {
         EXECGRAPH_LOG_TRACE("Read graph by Serializer");
 
-        using LogicNodeS = s::LogicNodeSerializer<Config,
-                                                  meta::list<DummyNodeSerializer>>;
+        using LogicNodeS = LogicNodeSerializer<Config,
+                                               meta::list<DummyNodeSerializer>>;
         LogicNodeS nodeSerializer;
-        s::ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(nodeSerializer);
+        ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(nodeSerializer);
         auto execGraph = serializer.read("myGraph.eg");
 
         EXECGRAPH_LOG_TRACE("Write graph by Serializer");
-        serializer.write(*execGraph, "myGraph-out.eg", true);
+        serializer.write(*execGraph,
+                         makeGraphTypeDescription<Config>(IdNamed{"Graph1"}),
+                         "myGraph-out.eg",
+                         true);
     }
 
     std::filesystem::remove("myGraph.eg");
@@ -189,14 +196,19 @@ MY_TEST(FlatBuffer, Test2)
 
 MY_TEST(FlatBuffer, Test3)
 {
+    using namespace executionGraph;
+
     EXECGRAPH_LOG_TRACE("Build graph");
     auto execGraph   = createRandomTree<GraphType, DummyNodeType>(3, 123456);
-    using LogicNodeS = s::LogicNodeSerializer<Config,
-                                              meta::list<DummyNodeSerializer>>;
+    using LogicNodeS = LogicNodeSerializer<Config,
+                                           meta::list<DummyNodeSerializer>>;
     LogicNodeS nodeSerializer;
-    s::ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(nodeSerializer);
+    ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(nodeSerializer);
     EXECGRAPH_LOG_TRACE("Write graph by Serializer");
-    serializer.write(*execGraph, "myGraph.eg", true);
+    serializer.write(*execGraph,
+                     makeGraphTypeDescription<Config>(IdNamed{"Graph1"}),
+                     "myGraph.eg",
+                     true);
     auto graphRead = serializer.read("myGraph.eg");
 
     std::filesystem::remove("myGraph.eg");

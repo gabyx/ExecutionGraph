@@ -15,7 +15,8 @@
 
 namespace devFlags
 {
-    static constexpr bool showDevTools = true;  //!< If the DeveloperTools are shown on start up of the browser.
-}
+    static constexpr bool showDevTools                = true;  //!< If the DeveloperTools are shown on start up of the browser.
+    static constexpr bool verifyAllFlatbufferMessages = true;  //!< If all Flatbuffer messages are verified.
+}  // namespace devFlags
 
 #endif

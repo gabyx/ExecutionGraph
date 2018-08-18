@@ -15,9 +15,19 @@ import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatIconModule, MatToolbarModule, MatMenuModule, MatButtonModule, MatCheckboxModule, MatButtonToggleModule } from '@angular/material';
+import {
+  MatIconModule,
+  MatToolbarModule,
+  MatMenuModule,
+  MatButtonModule,
+  MatCheckboxModule,
+  MatButtonToggleModule
+} from '@angular/material';
+
+import { VERBOSE_LOG_TOKEN } from './tokens';
 
 import { GraphModule } from '@eg/graph';
+import { SimpleConsoleLoggerFactory, LoggerFactory } from '@eg/logger';
 
 import { BinaryHttpRouterService } from './services/BinaryHttpRouterService';
 import { CefMessageRouterService } from './services/CefMessageRouterService';
@@ -26,9 +36,19 @@ import { ExecutionService } from './services/ExecutionService';
 import { ExecutionServiceBinaryHttp } from './services/ExecutionServiceBinaryHttp';
 import { ExecutionServiceDummy } from './services/ExecutionServiceDummy';
 
-import { GraphInfoService } from './services/GraphInfoService';
-import { GraphInfoServiceDummy } from './services/GraphInfoServiceDummy';
-import { GraphInfoServiceBinaryHttp } from './services/GraphInfoServiceBinaryHttp';
+import { GeneralInfoService } from './services/GeneralInfoService';
+import { GeneralInfoServiceDummy } from './services/GeneralInfoServiceDummy';
+import { GeneralInfoServiceBinaryHttp } from './services/GeneralInfoServiceBinaryHttp';
+
+import { GraphManipulationService } from './services/GraphManipulationService';
+import { GraphManipulationServiceBinaryHttp } from './services/GraphManipulationServiceBinaryHttp';
+import { GraphManipulationServiceDummy } from './services/GraphManipulationServiceDummy';
+
+import { GraphManagementService } from './services/GraphManagementService';
+import { GraphManagementServiceBinaryHttp } from './services/GraphManagementServiceBinaryHttp';
+import { GraphManagementServiceDummy } from './services/GraphManagementServiceDummy';
+
+import { TestService } from './services/TestService';
 
 import { AppComponent } from './app.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
@@ -52,10 +72,27 @@ import { ConnectionStyleOptionsComponent } from './components/connection-style-o
     GraphModule
   ],
   providers: [
+    { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory },
     BinaryHttpRouterService,
     CefMessageRouterService,
-    { provide: ExecutionService, useClass: environment.production ? ExecutionServiceBinaryHttp : ExecutionServiceDummy },
-    { provide: GraphInfoService, useClass: environment.production ? GraphInfoServiceBinaryHttp : GraphInfoServiceDummy }
+    TestService,
+    { provide: VERBOSE_LOG_TOKEN, useValue: environment.logReponsesVerbose },
+    {
+      provide: ExecutionService,
+      useClass: environment.production ? ExecutionServiceBinaryHttp : ExecutionServiceDummy
+    },
+    {
+      provide: GeneralInfoService,
+      useClass: environment.production ? GeneralInfoServiceBinaryHttp : GeneralInfoServiceDummy
+    },
+    {
+      provide: GraphManipulationService,
+      useClass: environment.production ? GraphManipulationServiceBinaryHttp : GraphManipulationServiceDummy
+    },
+    {
+      provide: GraphManagementService,
+      useClass: environment.production ? GraphManagementServiceBinaryHttp : GraphManagementServiceDummy
+    }
   ],
   bootstrap: [AppComponent]
 })

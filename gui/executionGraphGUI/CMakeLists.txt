@@ -41,6 +41,10 @@ set(ExecutionGraphGUI_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/requestHandlers/DummyRequestHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/requestHandlers/GeneralInfoRequestHandler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/requestHandlers/GeneralInfoRequestHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/requestHandlers/GraphManipulationRequestHandler.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/requestHandlers/GraphManipulationRequestHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/requestHandlers/GraphManagementRequestHandler.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/requestHandlers/GraphManagementRequestHandler.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/ExecutionGraphBackend.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/ExecutionGraphBackend.cpp
@@ -114,7 +118,7 @@ endif()
 
 
 set(ExecutionGraphGUI_INC_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../
 )
 
 # Configure the client application
@@ -180,7 +184,7 @@ if(OS_MACOSX)
                                                      OUTPUT_NAME "${ExecutionGraphGUI_HELPER_TARGET_OUTPUTNAME}"
                                                      RUNTIME_OUTPUT_DIRECTORY "${ExecutionGraphGUI_TARGET_OUT_DIR}")
 
-    target_link_libraries(ExecutionGraphGUIHelper cefLib ExecutionGraph::Core-Headers)
+    target_link_libraries(ExecutionGraphGUIHelper cefLib ExecutionGraph::Core-Headers fmtLib)
     
     # Fix the framework rpath in the helper executable.
     # The helper is in $app_name.app/Contents/Frameworks/$app_name Helper.app/Contents/MacOS/
@@ -216,10 +220,13 @@ if(OS_MACOSX)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
                 "${CEF_BINARY_DIR}/Chromium Embedded Framework.framework"
                 "${CEF_APP}/Contents/Frameworks/Chromium Embedded Framework.framework"
-        # Copy the Client Application into the Frameworks directory.
+        # Copy the client application into the Contents directory.
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+                "${CEF_APP}/Contents/client"
         COMMAND ${CMAKE_COMMAND} -E copy_directory
                 "${ExecutionGraphGUI_CLIENT_TARGET_OUT_DIR}"
-                "${CEF_APP}/Contents"
+                "${CEF_APP}/Contents/client"
+        # Copy libraries into the Contents/libs folder
         COMMAND ${CMAKE_COMMAND} -E make_directory
                 "${CEF_APP}/Contents/libs"
         COMMAND ${CMAKE_COMMAND} -E copy

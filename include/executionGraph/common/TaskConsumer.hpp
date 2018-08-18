@@ -15,8 +15,8 @@
 
 #include <atomic>
 #include <memory>
-#include <meta/meta.hpp>
 #include <thread>
+#include <meta/meta.hpp>
 #include "executionGraph/common/AccessMacros.hpp"
 #include "executionGraph/common/SfinaeMacros.hpp"
 

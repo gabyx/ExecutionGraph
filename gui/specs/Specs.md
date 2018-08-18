@@ -31,16 +31,29 @@ The schemas can be found in `gui/executionGraphGUI/messages/schemas`. The serial
 One message handlers is associated for each of the following grouped functionalities:
 The base template url of the backend is `http://executiongraph-backend/${requestUrl}` and all HTTP requests are sent to this url.
 
--   **Graph Creation Queries**:
+-   **Graph Mangement Queries**:
+    RequestHandler: `gui/backend/requestHandler/GraphManagementRequestHandler.hpp`
+    Client Service: `gui/client/.../app/services/GraphManagementServiceBinaryHttp.ts`
     * Add graph:
-    * Delete graph:
+        - url: `requestUrl = "general/addGraph"`
+        - request method: `POST`
+        - schema: `gui/executionGraphGUI/messages/schemas/GraphManagementMessages.fbs`
+        - request `AddGraphRequest`
+        - response: `AddGraphResponse`
+    * Remove graph:
+        - url: `requestUrl = "general/removeGraph"`
+        - request method: `POST`
+        - schema: `gui/executionGraphGUI/messages/schemas/GraphManagementMessages.fbs`
+        - request `RemoveGraphRequest`
+        - response: `RemoveGraphRequest`
 
 -   **General Info Queries** :
-
+    RequestHandler: `gui/backend/requestHandler/GeneralInfoRequestHandler.hpp`
+    Client Service: `gui/client/.../app/services/GeneralInfoServiceBinaryHttp.ts`
     * Get info of all available socket types and node types (of a graph):
         - url: `requestUrl = "general/getAllGraphTypeDescriptions"`
         - request method: `GET`
-        - schema: `gui/executionGraphGUI/messages/schemas/GraphInfoMessages.fbs`
+        - schema: `gui/executionGraphGUI/messages/schemas/GeneralInfoMessages.fbs`
         - response: `GetAllGraphTypeDescriptionsResponse`
 
 -   **Graph Info Queries**:
@@ -53,9 +66,22 @@ The base template url of the backend is `http://executiongraph-backend/${request
     * Serialize a graph to a `.eg` file. Corresponging of a serialization of the client data (gui visualization data) and graph data from the backend:
 
 -   **Graph Manipulation Queries**:
-    * Add/Remove node(s):
-    * Add/Remove connection(s):
+    Request Handler: `gui/backend/requestHandler/GraphManipulationRequestHandler.hpp`
+    Client Service: `gui/client/.../app/services/GraphManipulationServiceBinaryHttp.ts`
+    * Add node:
+        - url: `requestUrl = "graph/addNode"`
+        - request method: `POST`
+        - schema: `gui/executionGraphGUI/messages/schemas/GraphManipulationMessages.fbs`
+        - request: `AddNodeRequest`
+        - response: `AddNodeResponse`
+    * Add node:
+        - url: `requestUrl = "graph/removeNode"`
+        - request method: `POST`
+        - schema: `gui/executionGraphGUI/messages/schemas/GraphManipulationMessages.fbs`
+        - request: `RemoveNodeRequest`
+        - response: `RemoveNodeResponse`
 
+    * Add/Remove connection(s):
     * Set/Get node settings (`group id`, possible other custom node specific settings):
 
 - **Graph Execution Functionalities**:

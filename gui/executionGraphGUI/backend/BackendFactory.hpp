@@ -13,12 +13,12 @@
 #ifndef executionGraphGUI_backend_BackendFactory_hpp
 #define executionGraphGUI_backend_BackendFactory_hpp
 
-#include <executionGraph/common/Factory.hpp>
 #include <memory>
 #include <rttr/type>
-#include "backend/Backend.hpp"
-#include "backend/BackendRequestHandler.hpp"
-#include "backend/ExecutionGraphBackend.hpp"
+#include <executionGraph/common/Factory.hpp>
+#include "executionGraphGUI/backend/Backend.hpp"
+#include "executionGraphGUI/backend/BackendRequestHandler.hpp"
+#include "executionGraphGUI/backend/ExecutionGraphBackend.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!

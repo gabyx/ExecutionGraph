@@ -10,13 +10,15 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "backend/requestHandlers/GraphManipulationRequestHandler.hpp"
-#include <chrono>
-#include <vector>
-#include "backend/ExecutionGraphBackend.hpp"
-#include "common/AllocatorProxyFlatBuffer.hpp"
-#include "common/Loggers.hpp"
-#include "messages/schemas/GraphManipulationMessages_generated.h"
+#include "executionGraphGUI/backend/requestHandlers/GraphManipulationRequestHandler.hpp"
+#include "executionGraph/nodes/LogicCommon.hpp"
+#include "executionGraphGUI/backend/ExecutionGraphBackend.hpp"
+#include "executionGraphGUI/backend/ExecutionGraphBackendDefs.hpp"
+#include "executionGraphGUI/backend/requestHandlers/RequestHandlerCommon.hpp"
+#include "executionGraphGUI/common/AllocatorProxyFlatBuffer.hpp"
+#include "executionGraphGUI/common/Loggers.hpp"
+#include "executionGraphGUI/common/RequestError.hpp"
+#include "executionGraphGUI/messages/schemas/cpp/GraphManipulationMessages_generated.h"
 
 namespace fl = flatbuffers;
 namespace s  = executionGraphGUI::serialization;
@@ -26,18 +28,18 @@ FunctionMap<GraphManipulationRequestHandler::Function> GraphManipulationRequestH
 {
     using Entry = typename FunctionMap<Function>::Entry;
 
-    auto r = {Entry("graph/addNodes", Function(&GraphManipulationRequestHandler::handleAddNodes)),
-              Entry("graph/removeNodes", Function(&GraphManipulationRequestHandler::handleRemoveNodes))};
+    auto r = {Entry("graph/addNode", Function(&GraphManipulationRequestHandler::handleAddNode)),
+              Entry("graph/removeNode", Function(&GraphManipulationRequestHandler::handleRemoveNode))};
     return {r};
 }
 
 //! Static handler map: request to handler function mapping.
-const FunctionMap<gandler::Function> GraphManipulationRequestHandler::m_functionMap = GraphManipulationRequestHandler::initFunctionMap();
+const FunctionMap<GraphManipulationRequestHandler::Function> GraphManipulationRequestHandler::m_functionMap = GraphManipulationRequestHandler::initFunctionMap();
 
 //! Konstructor.
 GraphManipulationRequestHandler::GraphManipulationRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,
-                                                                 const Id& id)
-    : BackendRequestHandler(id)
+                                                                 const IdNamed& id)
+    : BackendRequestHandler(id), m_backend(backend)
 {
 }
 
@@ -61,60 +63,66 @@ void GraphManipulationRequestHandler::handleRequest(const Request& request,
     }
 }
 
-//! Handle the "GetAllGraphTypeDescriptions"
-void GraphManipulationRequestHandler::handleAddNodes(const Request& request,
-                                                     ResponsePromise& response)
+//! Handle the operation of adding a node.
+void GraphManipulationRequestHandler::handleAddNode(const Request& request,
+                                                    ResponsePromise& response)
 {
-    EXECGRAPHGUI_THROW_EXCEPTION_IF(request.getPayload() != nullptr,
-                                    "There should not be any request payload for this request");
-    using Allocator = ResponsePromise::Allocator;
+    // Request validation
+    auto* payload = request.getPayload();
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == nullptr,
+                                      "Request data is null!");
 
-    AllocatorProxyFlatBuffer<Allocator> allocator(response.getAllocator());
-    flatbuffers::FlatBufferBuilder builder(1024, &allocator);
+    auto nodeReq = getRootOfPayloadAndVerify<s::AddNodeRequest>(*payload);
 
-    // Serialize the response
-    std::vector<flatbuffers::Offset<s::GraphTypeDescription>> graphs;
+    Id graphID{nodeReq->graphId()->str()};
 
-    for(auto& kV : m_backend->getGraphTypeDescriptions())
-    {
-        auto& id                                          = kV.first;
-        ExecutionGraphBackend::GraphTypeDescription& desc = kV.second;
+    // Callback to create the response
+    auto responseCreator = [&response, graphID](auto& graph, auto& node) {
+        using Allocator = ResponsePromise::Allocator;
+        AllocatorProxyFlatBuffer<Allocator> allocator(response.getAllocator());
+        flatbuffers::FlatBufferBuilder builder(512, &allocator);
 
-        // Node descriptions
-        std::vector<flatbuffers::Offset<s::NodeTypeDescription>> nodes;
-        for(auto& nD : desc.m_nodeTypeDescription)
-        {
-            nodes.emplace_back(s::CreateNodeTypeDescriptionDirect(builder,
-                                                                  nD.m_name.c_str(),
-                                                                  nD.m_rtti.c_str()));
-        }
+        using GraphType      = std::remove_cv_t<std::remove_reference_t<decltype(graph)>>;
+        using Config         = typename GraphType::Config;
+        using NodeSerializer = typename ExecutionGraphBackendDefs<Config>::NodeSerializer;
 
-        // Socket descriptions
-        std::vector<flatbuffers::Offset<s::SocketTypeDescription>> sockets;
-        for(auto& sD : desc.m_socketTypeDescription)
-        {
-            sockets.emplace_back(s::CreateSocketTypeDescriptionDirect(builder,
-                                                                      sD.m_name.c_str(),
-                                                                      sD.m_rtti.c_str()));
-        }
+        // Serialize the response
+        NodeSerializer serializer;
+        auto nodeOffset = serializer.write(builder, node);
 
-        graphs.emplace_back(s::CreateGraphTypeDescriptionDirect(builder,
-                                                                id.getName().c_str(),
-                                                                id.getUniqueName().c_str(),
-                                                                &nodes,
-                                                                &sockets));
-    }
+        s::AddNodeResponseBuilder addResponse(builder);
+        addResponse.add_node(nodeOffset);
+        auto resOff = addResponse.Finish();
+        builder.Finish(resOff);
 
-    auto offset = s::CreateGetAllGraphTypeDescriptionsResponseDirect(builder, &graphs);
-    builder.Finish(offset);
+        // Set the response.
+        auto detachedBuffer = builder.ReleaseRaw();
+        response.setReady(ResponsePromise::Payload{makeBinaryBuffer(std::move(allocator),
+                                                                    std::move(detachedBuffer)),
+                                                   "application/octet-stream"});
+    };
 
-    // Set the response.
-    auto detachedBuffer = builder.Release();
-    response.setReady(ResponsePromise::Payload{makeBinaryBuffer(std::move(allocator),
-                                                                std::move(detachedBuffer)),
-                                               "application/octet-stream"});
+    // Execute the request
+    m_backend->addNode(graphID,
+                       nodeReq->node()->type()->str(),
+                       nodeReq->node()->name()->str(),
+                       responseCreator);
 }
 
-//! Handle the "GetAllGraphTypeDescriptions"
-void GraphManipulationRequestHandler::handleRemove(const Request& request,
-                                                   ResponsePromise& response)
+//! Handle the operation of removing a node.
+void GraphManipulationRequestHandler::handleRemoveNode(const Request& request,
+                                                       ResponsePromise& response)
+{
+    // Request validation
+    auto* payload = request.getPayload();
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == nullptr,
+                                      "Request data is null!");
+
+    auto nodeReq = getRootOfPayloadAndVerify<s::RemoveNodeRequest>(*payload);
+
+    Id graphID{nodeReq->graphId()->str()};
+
+    // Execute the request
+    m_backend->removeNode(graphID,
+                          nodeReq->nodeId());
+}

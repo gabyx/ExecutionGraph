@@ -13,10 +13,10 @@
 #ifndef executionGraphGUI_common_Request_hpp
 #define executionGraphGUI_common_Request_hpp
 
+#include <string>
+#include <rttr/type>
 #include <executionGraph/common/FileSystem.hpp>
 #include <executionGraph/common/IObjectID.hpp>
-#include <rttr/type>
-#include <string>
 class BinaryPayload;
 
 /* ---------------------------------------------------------------------------------------*/
@@ -46,7 +46,7 @@ public:
 
 protected:
     Request(const std::path& requestURL)
-        : m_id("Request-" + requestURL.string())
+        : m_id()
         , m_requestURL(requestURL)
     {}
 
@@ -66,7 +66,7 @@ public:
 
 private:
     //! The request URL (it will get adjusted during request forwarding)
-    //! e.g. "graph/6fdb1cb9-2d2b-46ba-93b5-0b7083ea28c3/addNode"
+    //! e.g. "graph/addNode"
     //! e.g. "general/addGraph"
     std::path m_requestURL;
 };

@@ -10,9 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable, Testability } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http'
-import { _throw } from 'rxjs/observable/throw';
+import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/first';
 import { flatbuffers } from 'flatbuffers';
@@ -22,9 +20,7 @@ import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 
 @Injectable()
 export class ExecutionServiceBinaryHttp extends ExecutionService {
-
-  constructor(private readonly binaryRouter: BinaryHttpRouterService)
-  {
+  constructor(private readonly binaryRouter: BinaryHttpRouterService) {
     super();
   }
 
@@ -36,7 +32,4 @@ export class ExecutionServiceBinaryHttp extends ExecutionService {
   private createBinaryData(data: any): Uint8Array {
     return new Uint8Array([0x81, 0xa3, 0x66, 0x6f, 0x6f, 0xa3, 0x62, 0x61, 0x72]);
   }
-
-
-
 }

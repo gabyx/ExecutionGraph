@@ -10,10 +10,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-include "LogicNode.fbs";
-include "SocketLink.fbs";
-
-include "GraphVisualization.fbs";
+include "executionGraph/serialization/schemas/GraphTypeDescription.fbs";
+include "executionGraph/serialization/schemas/LogicNode.fbs";
+include "executionGraph/serialization/schemas/SocketLink.fbs";
+include "executionGraph/serialization/schemas/GraphVisualization.fbs";
 
 namespace executionGraph.serialization;
 
@@ -34,10 +34,14 @@ table ExecutionGraphNodeProperties
 
 table ExecutionGraph 
 {
-    nodes:[LogicNode] (id:0);
-    links:[SocketLink] (id:1);
-    nodeProperties:[ExecutionGraphNodeProperties] (id:2);
-    visualization:GraphVisualization (id:3);
+    graphDescription:GraphTypeDescription (id:0); //!< The description of this graph.
+    
+    nodes:[LogicNode] (id:1); //!< All nodes.
+    links:[SocketLink] (id:2); //!< All links.
+    
+    nodeProperties:[ExecutionGraphNodeProperties] (id:3); //!< All node properties for the graph.
+    
+    visualization:GraphVisualization (id:4); //!< Additional visualization data for this graph.
 }
 
 file_identifier "EXGR";

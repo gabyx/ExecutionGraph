@@ -11,15 +11,21 @@
 // =========================================================================================
 
 import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
-import { ConnectionDrawStyle, DirectConnectionDrawStyle, ManhattenConnectionDrawStyle, BezierConnectionDrawStyle } from '@eg/graph';
+import {
+  ConnectionDrawStyle,
+  DirectConnectionDrawStyle,
+  ManhattenConnectionDrawStyle,
+  BezierConnectionDrawStyle
+} from '@eg/graph';
+import { ILogger, LoggerFactory } from '@eg/logger';
 
 type ConnectionDrawStyleName = 'direct' | 'manhatten' | 'bezier';
 
 const drawStyles = {
-  'direct': new DirectConnectionDrawStyle(),
-  'manhatten': new ManhattenConnectionDrawStyle(),
-  'bezier': new BezierConnectionDrawStyle(),
-}
+  direct: new DirectConnectionDrawStyle(),
+  manhatten: new ManhattenConnectionDrawStyle(),
+  bezier: new BezierConnectionDrawStyle()
+};
 
 @Component({
   selector: 'eg-connection-style-options',
@@ -27,13 +33,10 @@ const drawStyles = {
   styleUrls: ['./connection-style-options.component.css']
 })
 export class ConnectionStyleOptionsComponent implements OnInit {
-
   private drawStyleName: ConnectionDrawStyleName;
 
-  @Output()
-  connectionDrawStyleChanged = new EventEmitter<ConnectionDrawStyle>();
-  @Input()
-  connectionDrawStyle: ConnectionDrawStyle = drawStyles['direct'];
+  @Output() connectionDrawStyleChanged = new EventEmitter<ConnectionDrawStyle>();
+  @Input() connectionDrawStyle: ConnectionDrawStyle = drawStyles['direct'];
 
   get drawStyle(): ConnectionDrawStyleName {
     return this.drawStyleName;
@@ -41,14 +44,16 @@ export class ConnectionStyleOptionsComponent implements OnInit {
   set drawStyle(drawStyleName: ConnectionDrawStyleName) {
     this.drawStyleName = drawStyleName;
     this.connectionDrawStyle = drawStyles[this.drawStyleName];
-    console.log(`[ConnectionStyleOptionsComponent] Draw Style changed to ${this.drawStyleName}`);
+    this.log.info(`Draw Style changed to ${this.drawStyleName}`);
     this.connectionDrawStyleChanged.emit(this.connectionDrawStyle);
   }
 
-  constructor() {
+  private readonly log: ILogger;
+  
+  constructor(loggerFactory: LoggerFactory) {
+    this.log = loggerFactory.create('ConnectionStyleOptionsComponent');
     this.drawStyle = 'direct';
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 }

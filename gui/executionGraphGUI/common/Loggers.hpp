@@ -13,11 +13,113 @@
 #ifndef executionGraphGUI_common_Logger_hpp
 #define executionGraphGUI_common_Logger_hpp
 
+#include <spdlog/spdlog.h>
 #include <executionGraph/common/FileSystem.hpp>
 #include <executionGraph/common/Log.hpp>
 #include <executionGraph/common/Singleton.hpp>
-#include <spdlog/spdlog.h>
 
+// Undef all macros
+#define EXECGRAPHGUI_APPLOG_TRACE(...)
+#define EXECGRAPHGUI_APPLOG_DEBUG(...)
+#define EXECGRAPHGUI_APPLOG_INFO(...)
+#define EXECGRAPHGUI_APPLOG_WARN(...)
+#define EXECGRAPHGUI_APPLOG_ERROR(...)
+#define EXECGRAPHGUI_APPLOG_FATAL(...)
+
+#define EXECGRAPHGUI_BACKENDLOG_TRACE(...)
+#define EXECGRAPHGUI_BACKENDLOG_DEBUG(...)
+#define EXECGRAPHGUI_BACKENDLOG_INFO(...)
+#define EXECGRAPHGUI_BACKENDLOG_WARN(...)
+#define EXECGRAPHGUI_BACKENDLOG_ERROR(...)
+#define EXECGRAPHGUI_BACKENDLOG_FATAL(...)
+
+#define EXECGRAPHGUI_LOGCODE_TRACE(...)
+#define EXECGRAPHGUI_LOGCODE_DEBUG(...)
+#define EXECGRAPHGUI_LOGCODE_INFO(...)
+#define EXECGRAPHGUI_LOGCODE_WARN(...)
+#define EXECGRAPHGUI_LOGCODE_ERROR(...)
+#define EXECGRAPHGUI_LOGCODE_FATAL(...)
+
+// Define only those which are active!
+#if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_TRACE
+#    undef EXECGRAPHGUI_APPLOG_TRACE
+#    define EXECGRAPHGUI_APPLOG_TRACE(...) Loggers::getInstance().getAppLogger().trace(__VA_ARGS__)
+#    undef EXECGRAPHGUI_BACKENDLOG_TRACE
+#    define EXECGRAPHGUI_BACKENDLOG_TRACE(...) Loggers::getInstance().getBackendLogger().trace(__VA_ARGS__)
+#    undef EXECGRAPHGUI_LOGCODE_TRACE
+#    define EXECGRAPHGUI_LOGCODE_TRACE(expr) expr
+#endif
+
+#if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_DEBUG
+#    undef EXECGRAPHGUI_APPLOG_DEBUG
+#    define EXECGRAPHGUI_APPLOG_DEBUG(...) Loggers::getInstance().getAppLogger().debug(__VA_ARGS__)
+#    undef EXECGRAPHGUI_BACKENDLOG_DEBUG
+#    define EXECGRAPHGUI_BACKENDLOG_DEBUG(...) Loggers::getInstance().getBackendLogger().debug(__VA_ARGS__)
+#    undef EXECGRAPHGUI_LOGCODE_DEBUG
+#    define EXECGRAPHGUI_LOGCODE_DEBUG(expr) expr
+#endif
+
+#if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_INFO
+#    undef EXECGRAPHGUI_APPLOG_INFO
+#    define EXECGRAPHGUI_APPLOG_INFO(...) Loggers::getInstance().getAppLogger().info(__VA_ARGS__)
+#    undef EXECGRAPHGUI_BACKENDLOG_INFO
+#    define EXECGRAPHGUI_BACKENDLOG_INFO(...) Loggers::getInstance().getBackendLogger().info(__VA_ARGS__)
+#    undef EXECGRAPHGUI_LOGCODE_INFO
+#    define EXECGRAPHGUI_LOGCODE_INFO(expr) expr
+#endif
+
+#if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_WARN
+#    undef EXECGRAPHGUI_APPLOG_WARN
+#    define EXECGRAPHGUI_APPLOG_WARN(...) Loggers::getInstance().getAppLogger().warn(__VA_ARGS__)
+#    undef EXECGRAPHGUI_BACKENDLOG_WARN
+#    define EXECGRAPHGUI_BACKENDLOG_WARN(...) Loggers::getInstance().getBackendLogger().warn(__VA_ARGS__)
+#    undef EXECGRAPHGUI_LOGCODE_WARN
+#    define EXECGRAPHGUI_LOGCODE_WARN(expr) expr
+#endif
+
+#if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_ERROR
+#    undef EXECGRAPHGUI_APPLOG_ERROR
+#    define EXECGRAPHGUI_APPLOG_ERROR(...) Loggers::getInstance().getAppLogger().error(__VA_ARGS__)
+#    undef EXECGRAPHGUI_BACKENDLOG_ERROR
+#    define EXECGRAPHGUI_BACKENDLOG_ERROR(...) Loggers::getInstance().getBackendLogger().error(MSG, __VA_ARGS__)
+#    undef EXECGRAPHGUI_LOGCODE_ERROR
+#    define EXECGRAPHGUI_LOGCODE_ERROR(expr) expr
+#endif
+
+#if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_FATAL
+#    undef EXECGRAPHGUI_APPLOG_FATAL
+#    define EXECGRAPHGUI_APPLOG_FATAL(...) Loggers::getInstance().getAppLogger().critical(__VA_ARGS__)
+#    undef EXECGRAPHGUI_BACKENDLOG_FATAL
+#    define EXECGRAPHGUI_BACKENDLOG_FATAL(...) Loggers::getInstance().getBackendLogger().critical(__VA_ARGS__)
+#    undef EXECGRAPHGUI_LOGCODE_FATAL
+#    define EXECGRAPHGUI_LOGCODE_FATAL(expr) expr
+#endif
+
+// Define some asserts
+#define EXECGRAPH_STRINGIFY(x) #x
+#define EXECGRAPH_TOSTRING(x) EXECGRAPH_STRINGIFY(x)
+
+#ifdef NDEBUG
+#    define EXECGRAPHGUI_ASSERT(condition, ...)                                                    \
+        {                                                                                          \
+            if(!(condition))                                                                       \
+            {                                                                                      \
+                EXECGRAPHGUI_APPLOG_FATAL(__VA_ARGS__);                                            \
+                EXECGRAPHGUI_THROW("Exception: @ " __FILE__ "(" EXECGRAPH_TOSTRING(__LINE__) ")"); \
+            }                                                                                      \
+        }
+
+#    define EXECGRAPHGUI_VERIFY(condition, ...) EXECGRAPHGUI_ASSERT(condition, __VA_ARGS__)
+#else
+#    define EXECGRAPHGUI_ASSERT(condition, ...)         \
+        {                                               \
+            if(!(condition))                            \
+            {                                           \
+                EXECGRAPHGUI_APPLOG_FATAL(__VA_ARGS__); \
+            }                                           \
+        }
+#    define EXECGRAPHGUI_VERIFY(condition, ...) EXECGRAPHGUI_ASSERT(condition, __VA_ARGS__)
+#endif
 /* ---------------------------------------------------------------------------------------*/
 /*!
     The logger storage for the application
@@ -39,95 +141,5 @@ private:
     std::unique_ptr<spdlog::logger> m_backendLog;  //! Log for the backend (mutli-threaded)
     std::unique_ptr<spdlog::logger> m_appLog;      //! Log for the app (mutlti-threaded)
 };
-
-    // Undef all macros
-#    define EXECGRAPHGUI_APPLOG_TRACE(...)
-#    define EXECGRAPHGUI_APPLOG_DEBUG(...)
-#    define EXECGRAPHGUI_APPLOG_INFO(...)
-#    define EXECGRAPHGUI_APPLOG_WARN(...)
-#    define EXECGRAPHGUI_APPLOG_ERROR(...)
-#    define EXECGRAPHGUI_APPLOG_FATAL(...)
-
-#    define EXECGRAPHGUI_BACKENDLOG_TRACE(...)
-#    define EXECGRAPHGUI_BACKENDLOG_DEBUG(...)
-#    define EXECGRAPHGUI_BACKENDLOG_INFO(...)
-#    define EXECGRAPHGUI_BACKENDLOG_WARN(...)
-#    define EXECGRAPHGUI_BACKENDLOG_ERROR(...)
-#    define EXECGRAPHGUI_BACKENDLOG_FATAL(...)
-
-#    define EXECGRAPHGUI_LOGCODE_TRACE(...)
-#    define EXECGRAPHGUI_LOGCODE_DEBUG(...)
-#    define EXECGRAPHGUI_LOGCODE_INFO(...)
-#    define EXECGRAPHGUI_LOGCODE_WARN(...)
-#    define EXECGRAPHGUI_LOGCODE_ERROR(...)
-#    define EXECGRAPHGUI_LOGCODE_FATAL(...)
-
-    // Define only those which are active!
-#    if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_TRACE
-#        undef EXECGRAPHGUI_APPLOG_TRACE
-#        define EXECGRAPHGUI_APPLOG_TRACE(...) Loggers::getInstance().getAppLogger().trace(__VA_ARGS__)
-#        undef EXECGRAPHGUI_BACKENDLOG_TRACE
-#        define EXECGRAPHGUI_BACKENDLOG_TRACE(...) Loggers::getInstance().getBackendLogger().trace(__VA_ARGS__)
-#        undef EXECGRAPHGUI_LOGCODE_TRACE
-#        define EXECGRAPHGUI_LOGCODE_TRACE(expr) expr
-#    endif
-
-#    if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_DEBUG
-#        undef EXECGRAPHGUI_APPLOG_DEBUG
-#        define EXECGRAPHGUI_APPLOG_DEBUG(...) Loggers::getInstance().getAppLogger().debug(__VA_ARGS__)
-#        undef EXECGRAPHGUI_BACKENDLOG_DEBUG
-#        define EXECGRAPHGUI_BACKENDLOG_DEBUG(...) Loggers::getInstance().getBackendLogger().debug(__VA_ARGS__)
-#        undef EXECGRAPHGUI_LOGCODE_DEBUG
-#        define EXECGRAPHGUI_LOGCODE_DEBUG(expr) expr
-#    endif
-
-#    if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_INFO
-#        undef EXECGRAPHGUI_APPLOG_INFO
-#        define EXECGRAPHGUI_APPLOG_INFO(...) Loggers::getInstance().getAppLogger().info(__VA_ARGS__)
-#        undef EXECGRAPHGUI_BACKENDLOG_INFO
-#        define EXECGRAPHGUI_BACKENDLOG_INFO(...) Loggers::getInstance().getBackendLogger().info(__VA_ARGS__)
-#        undef EXECGRAPHGUI_LOGCODE_INFO
-#        define EXECGRAPHGUI_LOGCODE_INFO(expr) expr
-#    endif
-
-#    if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_WARN
-#        undef EXECGRAPHGUI_APPLOG_WARN
-#        define EXECGRAPHGUI_APPLOG_WARN(...) Loggers::getInstance().getAppLogger().warn(__VA_ARGS__)
-#        undef EXECGRAPHGUI_BACKENDLOG_WARN
-#        define EXECGRAPHGUI_BACKENDLOG_WARN(...) Loggers::getInstance().getBackendLogger().warn(__VA_ARGS__)
-#        undef EXECGRAPHGUI_LOGCODE_WARN
-#        define EXECGRAPHGUI_LOGCODE_WARN(expr) expr
-#    endif
-
-#    if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_ERROR
-#        undef EXECGRAPHGUI_APPLOG_ERROR
-#        define EXECGRAPHGUI_APPLOG_ERROR(...) Loggers::getInstance().getAppLogger().error(__VA_ARGS__)
-#        undef EXECGRAPHGUI_BACKENDLOG_ERROR
-#        define EXECGRAPHGUI_BACKENDLOG_ERROR(...) Loggers::getInstance().getBackendLogger().error(MSG, __VA_ARGS__)
-#        undef EXECGRAPHGUI_LOGCODE_ERROR
-#        define EXECGRAPHGUI_LOGCODE_ERROR(expr) expr
-#    endif
-
-#    if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_FATAL
-#        undef EXECGRAPHGUI_APPLOG_FATAL
-#        define EXECGRAPHGUI_APPLOG_FATAL(...) Loggers::getInstance().getAppLogger().critical(__VA_ARGS__)
-#        undef EXECGRAPHGUI_BACKENDLOG_FATAL
-#        define EXECGRAPHGUI_BACKENDLOG_FATAL(...) Loggers::getInstance().getBackendLogger().critical(__VA_ARGS__)
-#        undef EXECGRAPHGUI_LOGCODE_FATAL
-#        define EXECGRAPHGUI_LOGCODE_FATAL(expr) expr
-#    endif
-
-// Define some asserts
-#    define EXECGRAPH_STRINGIFY(x) #    x
-#    define EXECGRAPH_TOSTRING(x) EXECGRAPH_STRINGIFY(x)
-
-#    define EXECGRAPHGUI_ASSERT(condition, ...)                                                              \
-        {                                                                                                    \
-            if(!(condition))                                                                                 \
-            {                                                                                                \
-                EXECGRAPHGUI_APPLOG_FATAL(__VA_ARGS__);                                                      \
-                EXECGRAPHGUI_THROW_EXCEPTION("Exception: @ " __FILE__ "(" EXECGRAPH_TOSTRING(__LINE__) ")"); \
-            }                                                                                                \
-        }
 
 #endif

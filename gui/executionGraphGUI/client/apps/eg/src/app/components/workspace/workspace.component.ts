@@ -11,22 +11,22 @@
 // =========================================================================================
 
 import { Component, OnInit, ElementRef, HostListener, Injectable } from '@angular/core';
-import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 
 import { Point } from '@eg/graph';
 import { Node } from '../../model/Node';
 import { Connection } from '../../model/Connection';
 import { Socket } from '../../model/Socket';
 import { DragEvent } from '@eg/graph';
-import { GraphInfoService } from '../../services/GraphInfoService';
+import { GeneralInfoService } from '../../services/GeneralInfoService';
+import { GraphManipulationService } from '../../services/GraphManipulationService';
 
-@Injectable() @Component({
+@Injectable()
+@Component({
   selector: 'eg-workspace',
   templateUrl: './workspace.component.html',
   styleUrls: ['./workspace.component.scss']
 })
 export class WorkspaceComponent implements OnInit {
-
   public nodes: Node[] = [];
 
   public connections: Connection[] = [];
@@ -36,11 +36,12 @@ export class WorkspaceComponent implements OnInit {
 
   constructor(
     private elementRef: ElementRef,
-    private sanitizer: DomSanitizer,
-    private readonly graphInfoService: GraphInfoService) { }
+    private readonly generalInfoService: GeneralInfoService,
+    private readonly graphManipulationService: GraphManipulationService
+  ) {}
 
   ngOnInit() {
-    const NODES = 10;
+    const NODES = 3;
 
     for (let i = 0; i < NODES; i++) {
       this.generateNode(i);
@@ -56,12 +57,6 @@ export class WorkspaceComponent implements OnInit {
     // this.nodes.push(n2);
 
     // this.connections.push(new Connection(n1.outputs[0].id, n2.inputs[0].id));
-
-    // Get some graph info (nicht awaiten ist ja scheissegal zum testen...)
-    console.debug("Get all graph type descirptions...")
-    this.graphInfoService.getAllGraphTypeDescriptions();
-    console.debug("Get all graph type descirptions [done]")
-
   }
 
   public updateNodePosition(node: Node, event: DragEvent) {
@@ -72,7 +67,7 @@ export class WorkspaceComponent implements OnInit {
 
   public initConnectionFrom(socket: Socket, event: DragEvent) {
     console.log(`[WorkspaceComponent] Initiating new connection from ${socket.id}`);
-    this.newConnection = new Connection(socket.id, "tempTarget");
+    this.newConnection = new Connection(socket.id, 'tempTarget');
     this.newConnectionEndpoint = {
       x: event.dragElementPosition.x + event.mouseToElementOffset.x,
       y: event.dragElementPosition.y + event.mouseToElementOffset.y
@@ -87,14 +82,35 @@ export class WorkspaceComponent implements OnInit {
     // console.log(`Setting position to ${this.newConnectionEndpoint.x}:${this.newConnectionEndpoint.y}`)
   }
 
-  public createConnection() {
+  public abortConnection() {
     this.newConnection = null;
+  }
+
+  public createConnection(source: Socket, target: Socket) {
+    const connection = new Connection(source.id, target.id);
+    this.connections.push(connection);
+  }
+
+  public isOutputSocket(socket: Socket) {
+    return socket instanceof Socket && socket.id.indexOf('-o-') > 0;
+  }
+
+  public isInputSocket(socket: Socket) {
+    return socket instanceof Socket && socket.id.indexOf('-i-') > 0;
   }
 
   private generateNode(id: number) {
     const x = Math.random() * this.elementRef.nativeElement.offsetWidth / 2;
     const y = Math.random() * this.elementRef.nativeElement.offsetHeight / 2;
-    this.nodes.push(new Node(`n${id}`, `Some test node ${id}`, [new Socket(`n-${id}-i-1`, "Some Input")], [new Socket(`n-${id}-o-1`, "Some Output with text that is too long")], { x: x, y: y }));
+    this.nodes.push(
+      new Node(
+        `n${id}`,
+        `Some test node ${id}`,
+        [new Socket(`n-${id}-i-1`, 'Some Input')],
+        [new Socket(`n-${id}-o-1`, 'Some Output with text that is too long')],
+        { x: x, y: y }
+      )
+    );
   }
 
   private generateRandomConnection() {
@@ -104,5 +120,4 @@ export class WorkspaceComponent implements OnInit {
       this.connections.push(new Connection(source.id, target.id));
     }
   }
-
 }

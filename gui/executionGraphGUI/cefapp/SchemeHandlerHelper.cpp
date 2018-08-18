@@ -10,9 +10,9 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#include "cefapp/SchemeHandlerHelper.hpp"
+#include "executionGraphGUI/cefapp/SchemeHandlerHelper.hpp"
 #include <executionGraph/common/FileSystem.hpp>
-#include "common/Exception.hpp"
+#include "executionGraphGUI/common/Exception.hpp"
 
 namespace schemeHandlerHelper
 {
@@ -22,14 +22,14 @@ namespace schemeHandlerHelper
     {
         for(auto& scheme : getCustomSchemes())
         {
-            EXECGRAPHGUI_THROW_EXCEPTION_IF(!registrar->AddCustomScheme(scheme,
-                                                                        true /* is standart*/,
-                                                                        false /* is local */,
-                                                                        false /* is display_isolated */,
-                                                                        true /* is secure */,
-                                                                        false /* is cors enabled*/,
-                                                                        false /* is_csp_bypassing*/),
-                                            "Scheme not registered!");
+            bool result = registrar->AddCustomScheme(scheme,
+                                                     true /* is standart*/,
+                                                     false /* is local */,
+                                                     false /* is display_isolated */,
+                                                     true /* is secure */,
+                                                     false /* is cors enabled*/,
+                                                     false /* is_csp_bypassing*/);
+            EXECGRAPHGUI_THROW_IF(!result, "Scheme not registered!");
         }
     }
 
