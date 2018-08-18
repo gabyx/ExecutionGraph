@@ -58,6 +58,9 @@ export class TestService {
     let graphId = await this.graphManagementService.addGraph(graphTypeId)
 
     // Add the node.
-    this.graphManipulationService.addNode(graphId, nodeType, 'MySuperDuperNode');
+    await this.graphManipulationService.addNode(graphId, nodeType, 'MySuperDuperNode');
+
+    // Add a non existing node
+    await this.graphManipulationService.addNode(graphId, "BananaNode", 'MySupercalifragilisticexpialidociousBananaNode');
   }
 }

@@ -36,13 +36,16 @@ export class BinaryHttpRouterService {
    */
   public get(requestUrl: string): Promise<Uint8Array> {
     const url = `${this.baseUrl}/${requestUrl}`;
+
+    this.logger.debug(`Get from '${url})`);
+
     // Create a get request that returns an observable, which is kind of a stream of response events
     return (
       this.httpClient
         .get(url, { responseType: 'arraybuffer' })
         // Add a callback function that is executed whenever there is a new event in the request stream
         .do(responseData =>
-          this.logger.info(`Received response (Bytes: ${responseData.byteLength})`)
+          this.logger.debug(`Received response (Bytes: ${responseData.byteLength})`)
         )
         // In case of an error in the http event stream, catch it to log it and rethrow it, note that an error will only be actually thrown once
         // the observable is subscribed to, or in this case is converted into a promise and the promise is actually awaited.
@@ -69,9 +72,7 @@ export class BinaryHttpRouterService {
     const data = ( payload.byteOffset > 0 ? payload.slice().buffer : payload.buffer ) as ArrayBuffer;
     const url = `${this.baseUrl}/${requestUrl}`;
 
-    this.logger.info(
-      `Sending data to '${url}': (Bytes: '${data.byteLength}',  MIME-Type: '${this.binaryMimeType}')`
-    );
+    this.logger.debug(`Post to '${url}': (Bytes: '${data.byteLength}')`);
 
     // Create a post request that returns an observable, which is kind of a stream of response events
     return (
@@ -82,7 +83,7 @@ export class BinaryHttpRouterService {
         })
         // Add a callback function that is executed whenever there is a new event in the request stream
         .do(responseData =>
-          this.logger.info(`Received response (Bytes: ${responseData.byteLength})`)
+          this.logger.debug(`Received response (Bytes: ${responseData.byteLength})`)
         )
         // In case of an error in the http event stream, catch it to log it and rethrow it, note that an error will only be actually thrown once
         // the observable is subscribed to, or in this case is converted into a promise and the promise is actually awaited.
