@@ -43,8 +43,8 @@ export class Node {
     this.outputs = outputs.sort(s);
     // Setting all parents!
     this.inputs.forEach((s: Socket) => s.parent = this);
-    this.inputs.forEach((s: Socket) => s.parent = this);
-    this._idString = `${this.id.toInt()}`;
+    this.outputs.forEach((s: Socket) => s.parent = this);
+    this._idString = `n-${this.id.toInt()}`;
   }
 
   /**
@@ -53,5 +53,5 @@ export class Node {
    * @returns {string}
    * @memberof Node
    */
-  public idString(): string { return this._idString; }
+  public get idString(): string { return this._idString; }
 }

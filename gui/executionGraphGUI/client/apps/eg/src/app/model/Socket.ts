@@ -12,6 +12,7 @@
 
 import { SocketIndex } from './SocketIndex'
 import { Node } from './Node'
+import { Guid } from 'guid-typescript'
 
 /**
  * Modelclass for a Socket on a node.
@@ -21,7 +22,7 @@ import { Node } from './Node'
  */
 export abstract class Socket {
   private _parent: Node;
-  private _idString: string;
+  protected _idString: string = Guid.create().toString();
 
   constructor(
     public readonly type: string,
@@ -29,28 +30,36 @@ export abstract class Socket {
     public readonly index: SocketIndex,
     parent: Node = null) { }
 
-  /**
-   * The string identifier for this socket.
-   *
-   * @readonly
-   * @type {string}
-   * @memberof Socket
-   */
   public get idString(): string {
     return this._idString;
   }
 
   public get parent(): Node { return this._parent; }
   public set parent(parent: Node) {
-    if (this._parent == null) {
+    if (this._parent != null) {
       throw "You cannot assign a new parent!";
     }
     this._parent = parent;
-    this._idString = `n-${this.parent.id.toInt()}-i-${this.index.toInt()}`;
+    this.initIdString()
   }
+
+  protected abstract initIdString();
+
 }
 
-export class InputSocket extends Socket { }
-export class OutputSocket extends Socket { }
+export class InputSocket extends Socket {
+  protected initIdString() {
+    if (this.parent) {
+      this._idString = `n-${this.parent.id.toInt()}-i-${this.index.toInt()}`;
+    }
+  }
+}
+export class OutputSocket extends Socket {
+  protected initIdString() {
+    if (this.parent) {
+      this._idString = `n-${this.parent.id.toInt()}-o-${this.index.toInt()}`;
+    }
+  }
+}
 
 

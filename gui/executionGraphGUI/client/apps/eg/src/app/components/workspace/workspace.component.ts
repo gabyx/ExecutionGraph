@@ -33,19 +33,17 @@ export class WorkspaceComponent implements OnInit {
   public newConnectionEndpoint: Point = { x: 0, y: 0 };
 
   constructor(
-    private elementRef: ElementRef,
-    private readonly generalInfoService: GeneralInfoService,
-    private readonly graphManipulationService: GraphManipulationService
+    private elementRef: ElementRef
   ) { }
 
   ngOnInit() {
-    const NODES = 3;
+    const nNodes = 3;
 
-    for (let i = 0; i < NODES; i++) {
+    for (let i = 0; i < nNodes; i++) {
       this.generateNode(i);
     }
 
-    for (let i = 0; i < NODES; i++) {
+    for (let i = 0; i < nNodes; i++) {
       this.generateRandomConnection();
     }
 
@@ -64,8 +62,8 @@ export class WorkspaceComponent implements OnInit {
   }
 
   public initConnectionFrom(socket: Socket, event: DragEvent) {
-    console.log(`[WorkspaceComponent] Initiating new connection from ${socket.index}`);
-    this.newConnection = new Connection(socket, null);
+    console.log(`[WorkspaceComponent] Initiating new connection from ${socket.idString}`);
+    this.newConnection = new Connection(socket, new OutputSocket(socket.type, socket.name, new SocketIndex(0)));
     this.newConnectionEndpoint = {
       x: event.dragElementPosition.x + event.mouseToElementOffset.x,
       y: event.dragElementPosition.y + event.mouseToElementOffset.y
@@ -90,17 +88,18 @@ export class WorkspaceComponent implements OnInit {
   }
 
   public isOutputSocket(socket: Socket) {
-    return socket instanceof InputSocket;
+    return socket instanceof OutputSocket;
   }
 
+
   public isInputSocket(socket: Socket) {
-    return socket instanceof OutputSocket;
+    return socket instanceof InputSocket;
   }
 
   private generateNode(id: number) {
     const x = Math.random() * this.elementRef.nativeElement.offsetWidth / 2;
     const y = Math.random() * this.elementRef.nativeElement.offsetHeight / 2;
-    const nodeId = new NodeId(id)
+    const nodeId = new NodeId(id);
     this.nodes.push(
       new Node(
         nodeId,
@@ -116,8 +115,6 @@ export class WorkspaceComponent implements OnInit {
   private generateRandomConnection() {
     let source = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].outputs[0];
     let target = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].inputs[0];
-    if (source !== target) {
-      this.connections.push(new Connection(source, target));
-    }
+    this.createConnection(source, target);
   }
 }
