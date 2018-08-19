@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Socket } from "./Socket"
+import { InputSocket, OutputSocket } from "./Socket"
 
 /**
  * Modelclass for a connection
@@ -19,8 +19,25 @@ import { Socket } from "./Socket"
  * @class Connection
  */
 export class Connection {
+  private readonly _idString: string;
+
   constructor(
-    public outputSocket: Socket,
-    public inputSocket: Socket,
-    isWriteLink: boolean = true) { }
+    public outputSocket: OutputSocket,
+    public inputSocket: InputSocket,
+    isWriteLink: boolean = true) {
+    this._idString =
+      `n-${this.outputSocket.parent.id.toInt()}-o-${this.outputSocket.index.toInt()}` +
+      `-to-` +
+      `n-${this.inputSocket.parent.id.toInt()}-o-${this.inputSocket.index.toInt()}`;
+  }
+
+  /**
+   * Gets the string identifier for this connection.
+   *
+   * @readonly
+   * @memberof Connection
+   */
+  public get idString(): string {
+    return this._idString;
+  }
 }

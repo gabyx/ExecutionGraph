@@ -65,10 +65,11 @@ export function toNode(node: serialization.LogicNode): model.Node {
   let nodeId = toULong(node.id());
 
   let sockets: {
-    input: model.Socket[];
-    output: model.Socket[];
+    input: model.InputSocket[];
+    output: model.OutputSocket[];
   } = { input: [], output: [] };
 
+  // Convert the sockets
   for (let key of ["input", "output"]) {
     let isInput = key == "input";
     let l = node[`${key}SocketsLength`]();
@@ -76,7 +77,6 @@ export function toNode(node: serialization.LogicNode): model.Node {
     for (let i = 0; i < l; ++i) {
       let s = arrayFunc(i);
       sockets[key].push({
-        nodeId: nodeId,
         type: s.type(),
         name: s.name(),
         index: toULong(s.index()),

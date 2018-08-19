@@ -106,8 +106,8 @@ export class WorkspaceComponent implements OnInit {
         nodeId,
         'DummyNode',
         `Some test node ${id}`,
-        [new Socket(nodeId, 'double', 'Some Input', new SocketIndex(1))],
-        [new Socket(nodeId, 'double', 'Some Output with text that is too long', new SocketIndex(1))],
+        [new InputSocket('double', 'Some Input', new SocketIndex(1))],
+        [new OutputSocket('double', 'Some Output with text that is too long', new SocketIndex(1))],
         { x: x, y: y }
       )
     );
