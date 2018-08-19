@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Socket } from "./Socket"
+import { OutputSocket, InputSocket } from "./Socket"
 
 /**
  * Modelclass for a connection
@@ -22,10 +22,10 @@ export class Connection {
   private readonly _idString: string;
 
   constructor(
-    public outputSocket: Socket,
-    public inputSocket: Socket,
+    public outputSocket: OutputSocket,
+    public inputSocket: InputSocket,
     isWriteLink: boolean = true) {
-    this._idString = `${this.outputSocket.idString}-to-${this.inputSocket.idString}` ;
+    this._idString = `${this.outputSocket.idString}-to-${this.inputSocket.idString}`;
   }
 
   /**
@@ -36,5 +36,19 @@ export class Connection {
    */
   public get idString(): string {
     return this._idString;
+  }
+}
+
+export function createConnection(source: OutputSocket | InputSocket, target: OutputSocket | InputSocket) {
+  if (source instanceof OutputSocket && target instanceof InputSocket) {
+    // Make a Write-Link
+    return new Connection(source, target, true);
+  }
+  else if (source instanceof InputSocket && target instanceof OutputSocket) {
+    // Make a Get-Link
+    return new Connection(target, source, false);
+  }
+  else {
+    throw "Connection not allowed: Output <-> Input!";
   }
 }

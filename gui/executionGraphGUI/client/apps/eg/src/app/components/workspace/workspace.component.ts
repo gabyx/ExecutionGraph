@@ -10,13 +10,12 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, OnInit, ElementRef, HostListener, Injectable } from '@angular/core';
+import { Component, OnInit, ElementRef, HostListener, Injectable, Input } from '@angular/core';
 
 import { Point } from '@eg/graph';
-import { Socket, NodeId, Node, Connection, SocketIndex, InputSocket, OutputSocket } from '../../model';
+import { Socket, NodeId, Node, Connection, SocketIndex, InputSocket, OutputSocket, createConnection } from '../../model';
 import { DragEvent } from '@eg/graph';
-import { GeneralInfoService } from '../../services/GeneralInfoService';
-import { GraphManipulationService } from '../../services/GraphManipulationService';
+import { ILogger, LoggerFactory } from "@eg/logger"
 
 @Injectable()
 @Component({
@@ -25,16 +24,21 @@ import { GraphManipulationService } from '../../services/GraphManipulationServic
   styleUrls: ['./workspace.component.scss']
 })
 export class WorkspaceComponent implements OnInit {
+  private logger: ILogger;
   public nodes: Node[] = [];
 
   public connections: Connection[] = [];
 
+  public newTargetSocket: InputSocket | OutputSocket = null;
   public newConnection: Connection = null;
   public newConnectionEndpoint: Point = { x: 0, y: 0 };
 
   constructor(
-    private elementRef: ElementRef
-  ) { }
+    private elementRef: ElementRef,
+    loggerFactory: LoggerFactory,
+  ) {
+    this.logger = loggerFactory.create("Workspace");
+  }
 
   ngOnInit() {
     const nNodes = 3;
@@ -56,14 +60,21 @@ export class WorkspaceComponent implements OnInit {
   }
 
   public updateNodePosition(node: Node, event: DragEvent) {
-    // console.log(`[WorkspaceComponent] Updating node position to ${position.x}:${position.y}`);
+    // this.logger.info(`[WorkspaceComponent] Updating node position to ${position.x}:${position.y}`);
     node.uiProps.x = event.dragElementPosition.x;
     node.uiProps.y = event.dragElementPosition.y;
   }
 
-  public initConnectionFrom(socket: Socket, event: DragEvent) {
-    console.log(`[WorkspaceComponent] Initiating new connection from ${socket.idString}`);
-    this.newConnection = new Connection(socket, new OutputSocket(socket.type, socket.name, new SocketIndex(0)));
+  public initConnectionFrom(socket: OutputSocket | InputSocket, event: DragEvent) {
+    this.logger.info(`[WorkspaceComponnt] Initiating new connection from ${socket.idString}`);
+    if (socket instanceof OutputSocket) {
+      this.newTargetSocket = new InputSocket(socket.type, socket.name, new SocketIndex(0));;
+    } else {
+      this.newTargetSocket = new OutputSocket(socket.type, socket.name, new SocketIndex(0));;
+    }
+    // Create the connection
+    this.newConnection = createConnection(socket, this.newTargetSocket);
+
     this.newConnectionEndpoint = {
       x: event.dragElementPosition.x + event.mouseToElementOffset.x,
       y: event.dragElementPosition.y + event.mouseToElementOffset.y
@@ -75,22 +86,28 @@ export class WorkspaceComponent implements OnInit {
       x: event.dragElementPosition.x + event.mouseToElementOffset.x,
       y: event.dragElementPosition.y + event.mouseToElementOffset.y
     };
-    // console.log(`Setting position to ${this.newConnectionEndpoint.x}:${this.newConnectionEndpoint.y}`)
+    //this.logger.debug(`Setting position to ${this.newConnectionEndpoint.x}:${this.newConnectionEndpoint.y}`);
   }
 
   public abortConnection() {
     this.newConnection = null;
   }
 
-  public createConnection(source: Socket, target: Socket) {
-    const connection = new Connection(source, target);
-    this.connections.push(connection);
+  public addConnection(source: OutputSocket | InputSocket, target: OutputSocket | InputSocket) {
+    // Connection to itself and connection from same node output to input (or viceverse)
+    // is not allowed.
+    if (source === target || source.parent === target.parent) {
+      this.logger.error("Connection from source: '${source}' to '${target}' not allowed!")
+      return
+    }
+
+    // Create the connection
+    this.connections.push(createConnection(source, target));
   }
 
   public isOutputSocket(socket: Socket) {
     return socket instanceof OutputSocket;
   }
-
 
   public isInputSocket(socket: Socket) {
     return socket instanceof InputSocket;
@@ -112,9 +129,9 @@ export class WorkspaceComponent implements OnInit {
     );
   }
 
-  private generateRandomConnection() {
-    let source = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].outputs[0];
-    let target = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].inputs[0];
-    this.createConnection(source, target);
+  public generateRandomConnection() {
+    const source = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].outputs[0];
+    const target = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].inputs[0];
+    this.addConnection(source, target);
   }
 }

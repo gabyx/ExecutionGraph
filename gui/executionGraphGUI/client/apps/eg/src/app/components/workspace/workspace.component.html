@@ -10,7 +10,7 @@
                 <div class="inputs">
                     <span class="socket" *ngFor="let socket of node.inputs"
                     [ngcsDraggable]="socket" (dragStarted)="initConnectionFrom(socket, $event)" (dragContinued)="movingConnection($event)" (dragEnded)="abortConnection()"
-                    [ngcsDroppable]="isOutputSocket" (draggableDropped)="createConnection(socket, $event)">
+                    [ngcsDroppable]="isOutputSocket" (draggableDropped)="addConnection(socket, $event)">
                         {{ socket.name }}
                         <ngcs-port [id]="socket.idString" class="left middle"></ngcs-port>
                     </span>
@@ -18,7 +18,7 @@
                 <div class="outputs">
                     <span class="socket" *ngFor="let socket of node.outputs"
                     [ngcsDraggable]="socket" (dragStarted)="initConnectionFrom(socket, $event)" (dragContinued)="movingConnection($event)" (dragEnded)="abortConnection()"
-                    [ngcsDroppable]="isInputSocket" (draggableDropped)="createConnection($event, socket)">
+                    [ngcsDroppable]="isInputSocket" (draggableDropped)="addConnection($event, socket)">
                         {{ socket.name }}
                         <ngcs-port [id]="socket.idString" class="right middle"></ngcs-port>
                     </span>
@@ -35,7 +35,7 @@
         <ngcs-connection [from]="newConnection.outputSocket.idString" [to]="newConnection.inputSocket.idString" [drawStyle]="connectionStyleOptions.connectionDrawStyle"></ngcs-connection>
         <div style="position: absolute"
          [style.left]="newConnectionEndpoint.x+'px'" [style.top]="newConnectionEndpoint.y+'px'">
-            <ngcs-port [id]="newConnection.outputSocket.idString" class="right middle" ></ngcs-port>
+            <ngcs-port [id]="newTargetSocket.idString" class="right middle" ></ngcs-port>
         </div>
     </ng-container>
 </ngcs-graph>
