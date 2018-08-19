@@ -34,7 +34,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
   public async addNode(graphId: Id, type: string, name: string): Promise<Node> {
     // Build the AddNode request
     let builder = new flatbuffers.Builder(356);
-    let offGraphId = builder.createString(graphId.guidString());
+    let offGraphId = builder.createString(graphId.toString());
     let offType = builder.createString(type);
     let offName = builder.createString(name);
 
@@ -66,7 +66,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
   public async removeNode(graphId: Id, nodeId: NodeId): Promise<void> {
     // Build the RemoveNode request
     let builder = new flatbuffers.Builder(356);
-    let offGraphId = builder.createString(graphId.guidString());
+    let offGraphId = builder.createString(graphId.toString());
     sz.RemoveNodeRequest.startRemoveNodeRequest(builder);
     sz.RemoveNodeRequest.addGraphId(builder, offGraphId);
     sz.RemoveNodeRequest.addNodeId(builder, builder.createLong(nodeId.low, nodeId.high));

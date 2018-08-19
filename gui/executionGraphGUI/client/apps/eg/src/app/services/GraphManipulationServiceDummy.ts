@@ -30,7 +30,7 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
   public async addNode(graphId: Id, type: string, name: string): Promise<Node> {
     // Build the AddNode request
     let builder = new flatbuffers.Builder(345);
-    let offGraphId = builder.createString(graphId.guidString());
+    let offGraphId = builder.createString(graphId.toString());
     let offType = builder.createString(type);
     let offName = builder.createString(name);
 

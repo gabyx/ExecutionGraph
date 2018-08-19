@@ -37,7 +37,7 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
   public async addGraph(graphTypeId: Id): Promise<Id> {
     // Build the AddGraph request
     let builder = new flatbuffers.Builder(16);
-    let offGraphTypeId = builder.createString(graphTypeId.guidString());
+    let offGraphTypeId = builder.createString(graphTypeId.toString());
 
     sz.AddGraphRequest.startAddGraphRequest(builder);
     sz.AddGraphRequest.addGraphTypeId(builder, offGraphTypeId);
@@ -59,7 +59,7 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
   public async removeGraph(graphId: Id): Promise<void> {
     // Build the RemoveGraph request
     let builder = new flatbuffers.Builder(16);
-    let offGraphId = builder.createString(graphId.guidString());
+    let offGraphId = builder.createString(graphId.toString());
 
     sz.RemoveGraphRequest.startRemoveGraphRequest(builder);
     sz.RemoveGraphRequest.addGraphId(builder, offGraphId);
