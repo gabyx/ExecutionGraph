@@ -41,13 +41,13 @@ export class WorkspaceComponent implements OnInit {
   }
 
   ngOnInit() {
-    const nNodes = 3;
+    const nNodes = 5;
 
     for (let i = 0; i < nNodes; i++) {
       this.generateNode(i);
     }
 
-    for (let i = 0; i < nNodes; i++) {
+    for (let i = 0; i < nNodes*2; i++) {
       this.generateRandomConnection();
     }
 
@@ -97,7 +97,7 @@ export class WorkspaceComponent implements OnInit {
     // Connection to itself and connection from same node output to input (or viceverse)
     // is not allowed.
     if (source === target || source.parent === target.parent) {
-      this.logger.error("Connection from source: '${source}' to '${target}' not allowed!")
+      this.logger.error(`Connection from source: '${source}' to '${target}' not allowed!`);
       return
     }
 
