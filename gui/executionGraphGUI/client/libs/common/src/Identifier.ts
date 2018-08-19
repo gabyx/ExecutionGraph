@@ -29,6 +29,10 @@ export class Id {
     return this._id;
   }
 
+  public get guidString(): string {
+    return this._id.toString();
+  }
+
   protected getName(): string {
     return this.name;
   }

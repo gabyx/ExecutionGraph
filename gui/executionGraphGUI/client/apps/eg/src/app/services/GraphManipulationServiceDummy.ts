@@ -13,9 +13,10 @@
 import { Injectable } from '@angular/core';
 import { flatbuffers } from 'flatbuffers';
 import { ILogger, LoggerFactory } from '@eg/logger';
-
+import { Id } from '@eg/common';
 import { GraphManipulationService, sz } from './GraphManipulationService';
-import { NodeId } from '../model/NodeId';
+import { toNode } from './Conversions';
+import { Node, NodeId } from '../model';
 
 @Injectable()
 export class GraphManipulationServiceDummy extends GraphManipulationService {
@@ -26,10 +27,10 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
     this.logger = loggerFactory.create('GraphManipulationServiceDummy');
   }
 
-  public async addNode(graphId: string, type: string, name: string): Promise<sz.AddNodeResponse> {
+  public async addNode(graphId: Id, type: string, name: string): Promise<Node> {
     // Build the AddNode request
     let builder = new flatbuffers.Builder(345);
-    let offGraphId = builder.createString(graphId);
+    let offGraphId = builder.createString(graphId.guidString());
     let offType = builder.createString(type);
     let offName = builder.createString(name);
 
@@ -66,14 +67,14 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
     const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
 
     let node = response.node();
-    this.logger.info(`Added new node of type: '${node.type()}'
+    this.logger.info(`Added new node [type: '${node.type()}']
                   with name: '${node.name()}' [ins: ${node.inputSocketsLength()},
                   outs: ${node.outputSocketsLength()}`);
 
-    return response;
+    return toNode(node);
   }
 
-  public async removeNode(graphId: string, nodeId: NodeId): Promise<void> {
+  public async removeNode(graphId: Id, nodeId: NodeId): Promise<void> {
     this.logger.error(`Not implemented yet!`);
   }
 }

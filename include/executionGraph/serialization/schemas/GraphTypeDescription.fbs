@@ -16,8 +16,9 @@ include "executionGraph/serialization/schemas/SocketTypeDescription.fbs";
 namespace executionGraph.serialization;
 
 table GraphTypeDescription {
-    name:string (id:0, required);   //!< The readable name of this graph type.
-    id:string (id:1, required);     //!< The unique id of this graph type.
+    id:string (id:0, required);     //!< The unique id of this graph type.
+    name:string (id:1, required);   //!< The readable name of this graph type.
+    
     socketTypeDescriptions:[SocketTypeDescription] (id:2, required);  //!< Socket descriptions
     nodeTypeDescriptions:[NodeTypeDescription] (id:3);      //!< Node descriptions
 }

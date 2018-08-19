@@ -14,6 +14,8 @@ import { Injectable } from '@angular/core';
 import { GeneralInfoService, sz } from './GeneralInfoService';
 import { flatbuffers } from 'flatbuffers';
 import { ILogger, LoggerFactory } from '@eg/logger';
+import * as model from "../model"
+import { toGraphTypeDescription } from './Conversions';
 
 @Injectable()
 export class GeneralInfoServiceDummy extends GeneralInfoService {
@@ -24,7 +26,7 @@ export class GeneralInfoServiceDummy extends GeneralInfoService {
     this.logger = loggerFactory.create('GeneralInfoServiceDummy');
   }
 
-  public async getAllGraphTypeDescriptions(): Promise<sz.GetAllGraphTypeDescriptionsResponse> {
+  public async getAllGraphTypeDescriptions(): Promise<model.GraphTypeDescription[]> {
     let builder = new flatbuffers.Builder(1024);
 
     // NodeType Description machen
@@ -65,7 +67,14 @@ export class GeneralInfoServiceDummy extends GeneralInfoService {
     let buf = new flatbuffers.ByteBuffer(builder.asUint8Array());
     let response = sz.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
 
-    console.debug(`Received: Number of Graph types: ${response.graphsTypesLength()}`);
-    return response;
+
+    let graphDesc: model.GraphTypeDescription[] = [];
+    for (let g = 0; g < response.graphsTypesLength(); ++g) {
+      graphDesc.push(toGraphTypeDescription(response.graphsTypes(g)));
+    }
+
+    this.logger.debug(`GraphDescriptions: ${graphDesc}`);
+
+    return graphDesc;
   }
 }

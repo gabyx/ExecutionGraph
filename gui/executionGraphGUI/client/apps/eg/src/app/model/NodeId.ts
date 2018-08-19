@@ -10,12 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-export class NodeId {
-  constructor(private readonly lowerBits: number, private readonly higherBits: number) {}
-  public get lower() {
-    return this.lowerBits;
-  }
-  public get higher() {
-    return this.higherBits;
-  }
-}
+import * as Long from "long";
+
+export class NodeId extends Long {};
+

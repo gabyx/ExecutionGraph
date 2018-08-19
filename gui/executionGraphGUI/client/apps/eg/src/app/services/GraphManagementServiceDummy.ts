@@ -13,6 +13,7 @@
 import { Injectable } from '@angular/core';
 import { GraphManagementService } from './GraphManagementService';
 import { ILogger, LoggerFactory } from '@eg/logger';
+import { Id } from '@eg/common';
 
 @Injectable()
 export class GraphManagementServiceDummy extends GraphManagementService {
@@ -23,12 +24,12 @@ export class GraphManagementServiceDummy extends GraphManagementService {
     this.logger = loggerFactory.create('GraphManagementServiceDummy');
   }
 
-  public async addGraph(graphTypeId: string): Promise<string> {
+  public async addGraph(graphTypeId: Id): Promise<Id> {
     this.logger.error(`Not implemented yet!`);
-    return 'HERE 16byte GUID';
+    return new Id("606b5c8f-c9fd-41e2-9ed5-6f6429fd52ba");
   }
 
-  public async removeGraph(graphId: string): Promise<void> {
+  public async removeGraph(graphId: Id): Promise<void> {
     this.logger.error(`Not implemented yet!`);
   }
 }

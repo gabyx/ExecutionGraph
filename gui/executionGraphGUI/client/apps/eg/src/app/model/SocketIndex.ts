@@ -1,20 +1,15 @@
 // =========================================================================================
 //  ExecutionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
-// 
-//  @date Mon Jul 30 2018
+//
+//  @date Sun Aug 19 2018
 //  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
-// 
+//
 //  This Source Code Form is subject to the terms of the Mozilla Public
 //  License, v. 2.0. If a copy of the MPL was not distributed with this
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
- 
-namespace executionGraph.serialization;
 
-//! Describing a socket type.
-table SocketTypeDescription {
-    type:string (id:0, required); //!< The unqiue RTTI name of the node.
-    name:string (id:1, required); //!< The readable name of the node.
+import * as Long from "long";
 
-}
+export class SocketIndex extends Long { };

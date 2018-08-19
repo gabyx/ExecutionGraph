@@ -10,6 +10,17 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
+import { Socket } from "./Socket"
+
+/**
+ * Modelclass for a connection
+ * @todo see -> SocketLink.fbs
+ * @export
+ * @class Connection
+ */
 export class Connection {
-  constructor(public sourceId: string, public targetId: string) {}
+  constructor(
+    public outputSocket: Socket,
+    public inputSocket: Socket,
+    isWriteLink: boolean = true) { }
 }

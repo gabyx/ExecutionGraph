@@ -13,9 +13,7 @@
 import { Component, OnInit, ElementRef, HostListener, Injectable } from '@angular/core';
 
 import { Point } from '@eg/graph';
-import { Node } from '../../model/Node';
-import { Connection } from '../../model/Connection';
-import { Socket } from '../../model/Socket';
+import { Socket, NodeId, Node, Connection, SocketIndex, InputSocket, OutputSocket } from '../../model';
 import { DragEvent } from '@eg/graph';
 import { GeneralInfoService } from '../../services/GeneralInfoService';
 import { GraphManipulationService } from '../../services/GraphManipulationService';
@@ -38,7 +36,7 @@ export class WorkspaceComponent implements OnInit {
     private elementRef: ElementRef,
     private readonly generalInfoService: GeneralInfoService,
     private readonly graphManipulationService: GraphManipulationService
-  ) {}
+  ) { }
 
   ngOnInit() {
     const NODES = 3;
@@ -66,8 +64,8 @@ export class WorkspaceComponent implements OnInit {
   }
 
   public initConnectionFrom(socket: Socket, event: DragEvent) {
-    console.log(`[WorkspaceComponent] Initiating new connection from ${socket.id}`);
-    this.newConnection = new Connection(socket.id, 'tempTarget');
+    console.log(`[WorkspaceComponent] Initiating new connection from ${socket.index}`);
+    this.newConnection = new Connection(socket, null);
     this.newConnectionEndpoint = {
       x: event.dragElementPosition.x + event.mouseToElementOffset.x,
       y: event.dragElementPosition.y + event.mouseToElementOffset.y
@@ -87,27 +85,29 @@ export class WorkspaceComponent implements OnInit {
   }
 
   public createConnection(source: Socket, target: Socket) {
-    const connection = new Connection(source.id, target.id);
+    const connection = new Connection(source, target);
     this.connections.push(connection);
   }
 
   public isOutputSocket(socket: Socket) {
-    return socket instanceof Socket && socket.id.indexOf('-o-') > 0;
+    return socket instanceof InputSocket;
   }
 
   public isInputSocket(socket: Socket) {
-    return socket instanceof Socket && socket.id.indexOf('-i-') > 0;
+    return socket instanceof OutputSocket;
   }
 
   private generateNode(id: number) {
     const x = Math.random() * this.elementRef.nativeElement.offsetWidth / 2;
     const y = Math.random() * this.elementRef.nativeElement.offsetHeight / 2;
+    const nodeId = new NodeId(id)
     this.nodes.push(
       new Node(
-        `n${id}`,
+        nodeId,
+        'DummyNode',
         `Some test node ${id}`,
-        [new Socket(`n-${id}-i-1`, 'Some Input')],
-        [new Socket(`n-${id}-o-1`, 'Some Output with text that is too long')],
+        [new Socket(nodeId, 'double', 'Some Input', new SocketIndex(1))],
+        [new Socket(nodeId, 'double', 'Some Output with text that is too long', new SocketIndex(1))],
         { x: x, y: y }
       )
     );
@@ -117,7 +117,7 @@ export class WorkspaceComponent implements OnInit {
     let source = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].outputs[0];
     let target = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].inputs[0];
     if (source !== target) {
-      this.connections.push(new Connection(source.id, target.id));
+      this.connections.push(new Connection(source, target));
     }
   }
 }

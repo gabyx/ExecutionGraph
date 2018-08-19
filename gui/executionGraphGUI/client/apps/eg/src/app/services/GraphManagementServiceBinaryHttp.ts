@@ -15,6 +15,7 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/first';
 
 import { flatbuffers } from 'flatbuffers';
+import { Id } from '@eg/common';
 import { GraphManagementService, sz } from './GraphManagementService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 import { ILogger, LoggerFactory } from '@eg/logger';
@@ -33,10 +34,10 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     this.logger = loggerFactory.create('GraphManagementServiceBinaryHttp');
   }
 
-  public async addGraph(graphTypeId: string): Promise<string> {
+  public async addGraph(graphTypeId: Id): Promise<Id> {
     // Build the AddGraph request
     let builder = new flatbuffers.Builder(16);
-    let offGraphTypeId = builder.createString(graphTypeId);
+    let offGraphTypeId = builder.createString(graphTypeId.guidString());
 
     sz.AddGraphRequest.startAddGraphRequest(builder);
     sz.AddGraphRequest.addGraphTypeId(builder, offGraphTypeId);
@@ -50,16 +51,15 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     const buf = new flatbuffers.ByteBuffer(result);
     const response = sz.AddGraphResponse.getRootAsAddGraphResponse(buf);
 
-    let graphId = response.graphId();
-    this.logger.info(`Added new graph with id: '${graphId}' and type id: '${graphTypeId}'`);
+    this.logger.info(`Added new graph [id: '${response.graphId()}', type: '${graphTypeId}'].`);
 
-    return graphId;
+    return new Id(response.graphId());
   }
 
-  public async removeGraph(graphId: string): Promise<void> {
+  public async removeGraph(graphId: Id): Promise<void> {
     // Build the RemoveGraph request
     let builder = new flatbuffers.Builder(16);
-    let offGraphId = builder.createString(graphId);
+    let offGraphId = builder.createString(graphId.guidString());
 
     sz.RemoveGraphRequest.startRemoveGraphRequest(builder);
     sz.RemoveGraphRequest.addGraphId(builder, offGraphId);
@@ -70,7 +70,6 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
 
     // Send the request
     await this.binaryRouter.post('general/removeGraph', requestPayload);
-
-    this.logger.info(`Removed graph with id: '${graphId}'`);
+    this.logger.info(`Removed graph [id: '${graphId}'].`);
   }
 }

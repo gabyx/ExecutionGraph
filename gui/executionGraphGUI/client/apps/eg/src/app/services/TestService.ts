@@ -13,10 +13,10 @@
 import { Injectable } from '@angular/core';
 import { flatbuffers } from 'flatbuffers';
 import { ILogger, LoggerFactory } from '@eg/logger';
-
 import { GeneralInfoService } from "./GeneralInfoService"
 import { GraphManipulationService } from "./GraphManipulationService"
 import { GraphManagementService } from "./GraphManagementService"
+import { NodeId } from './../model';
 
 /**
  * Stupid TestService class which can be quickly injected
@@ -47,12 +47,12 @@ export class TestService {
   public async testAddRemove() {
     // Get the graph infos
     console.debug('Get all graph type descriptions...');
-    var graphInfos = await this.generalInfoService.getAllGraphTypeDescriptions();
+    let graphDescs = await this.generalInfoService.getAllGraphTypeDescriptions();
 
     // Add a node to the first graph
-    let graphInfo = graphInfos.graphsTypes(0);
-    let graphTypeId = graphInfo.id();
-    let nodeType = graphInfo.nodeTypeDescriptions(0).type();
+    let graphDesc = graphDescs[0];
+    let graphTypeId = graphDesc.id;
+    let nodeType = graphDesc.nodeTypeDescritptions[0].type;
 
     // Add a graph
     let graphId = await this.graphManagementService.addGraph(graphTypeId)
@@ -62,5 +62,8 @@ export class TestService {
 
     // Add a non existing node
     await this.graphManipulationService.addNode(graphId, "BananaNode", 'MySupercalifragilisticexpialidociousBananaNode');
+
+    // Remove first node
+    await this.graphManipulationService.removeNode(graphId, new NodeId(0));
   }
 }

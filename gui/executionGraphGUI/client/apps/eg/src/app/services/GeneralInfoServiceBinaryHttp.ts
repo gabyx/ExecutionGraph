@@ -19,6 +19,8 @@ import { GeneralInfoService, sz } from './GeneralInfoService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { VERBOSE_LOG_TOKEN } from '../tokens';
+import * as model from "../model"
+import { toGraphTypeDescription } from './Conversions';
 
 @Injectable()
 export class GeneralInfoServiceBinaryHttp extends GeneralInfoService {
@@ -33,31 +35,24 @@ export class GeneralInfoServiceBinaryHttp extends GeneralInfoService {
     this.logger = loggerFactory.create('GeneralInfoServiceBinaryHttp');
   }
 
-  public async getAllGraphTypeDescriptions(): Promise<sz.GetAllGraphTypeDescriptionsResponse> {
+  public async getAllGraphTypeDescriptions(): Promise<model.GraphTypeDescription[]> {
     const result = await this.binaryRouter.get('general/getAllGraphTypeDescriptions');
     let buf = new flatbuffers.ByteBuffer(result);
     let response = sz.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
 
-    this.logger.info(`Received: Number of Graph types: ${response.graphsTypesLength()}`);
+    this.logger.info(`Number of graph types: ${response.graphsTypesLength()}`);
 
-    // Verbose logging the response if enabled
-    if (this.verboseResponseLog) {
-      for (let g = 0; g < response.graphsTypesLength(); ++g) {
-        let graphDesc = response.graphsTypes(g);
-        this.logger.debug(`Infos for graph '${graphDesc.name()}' with id '${graphDesc.id()}' :`);
-        this.logger.debug('Sockets:');
-        for (let i = 0; i < graphDesc.socketTypeDescriptionsLength(); ++i) {
-          let socketDesc = graphDesc.socketTypeDescriptions(i);
-          this.logger.debug(`Socket: ${socketDesc.name()} [${socketDesc.type()}]`);
-        }
-        this.logger.debug('Nodes:');
-        for (let i = 0; i < graphDesc.nodeTypeDescriptionsLength(); ++i) {
-          let nodeDesc = graphDesc.nodeTypeDescriptions(i);
-          this.logger.debug(`Node: ${nodeDesc.name()} [${nodeDesc.type()}]`);
-        }
-      }
+    let graphDesc: model.GraphTypeDescription[] = [];
+
+    for (let g = 0; g < response.graphsTypesLength(); ++g) {
+      graphDesc.push(toGraphTypeDescription(response.graphsTypes(g)));
     }
 
-    return response;
+    if(this.verboseResponseLog)
+    {
+      this.logger.debug(`GraphDescriptions: ${graphDesc}`);
+    }
+
+    return graphDesc;
   }
 }

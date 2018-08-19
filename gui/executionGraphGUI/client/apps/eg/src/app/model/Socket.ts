@@ -10,6 +10,22 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
+import { SocketIndex } from './SocketIndex'
+import { NodeId } from './NodeId'
+
+/**
+ * Modelclass for a Socket on a node.
+ *
+ * @export
+ * @class Socket
+ */
 export class Socket {
-  constructor(public id: string, public name: string) {}
+  constructor(
+    public readonly nodeId: NodeId,
+    public readonly type: string,
+    public readonly name: string,
+    public readonly index: SocketIndex) { }
 }
+
+export class InputSocket extends Socket { }
+export class OutputSocket extends Socket { }
