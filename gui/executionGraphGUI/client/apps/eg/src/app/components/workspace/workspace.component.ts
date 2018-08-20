@@ -10,18 +10,34 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, OnInit, ElementRef, HostListener, Injectable, Input } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ElementRef,
+  HostListener,
+  Injectable,
+  Input
+} from "@angular/core";
 
-import { Point } from '@eg/graph';
-import { Socket, NodeId, Node, Connection, SocketIndex, InputSocket, OutputSocket, createConnection } from '../../model';
-import { DragEvent } from '@eg/graph';
-import { ILogger, LoggerFactory } from "@eg/logger"
+import { Point } from "@eg/graph";
+import {
+  Socket,
+  NodeId,
+  Node,
+  Connection,
+  SocketIndex,
+  InputSocket,
+  OutputSocket,
+  createConnection
+} from "../../model";
+import { DragEvent } from "@eg/graph";
+import { ILogger, LoggerFactory } from "@eg/logger";
 
 @Injectable()
 @Component({
-  selector: 'eg-workspace',
-  templateUrl: './workspace.component.html',
-  styleUrls: ['./workspace.component.scss']
+  selector: "eg-workspace",
+  templateUrl: "./workspace.component.html",
+  styleUrls: ["./workspace.component.scss"]
 })
 export class WorkspaceComponent implements OnInit {
   private logger: ILogger;
@@ -33,10 +49,7 @@ export class WorkspaceComponent implements OnInit {
   public newConnection: Connection = null;
   public newConnectionEndpoint: Point = { x: 0, y: 0 };
 
-  constructor(
-    private elementRef: ElementRef,
-    loggerFactory: LoggerFactory,
-  ) {
+  constructor(private elementRef: ElementRef, loggerFactory: LoggerFactory) {
     this.logger = loggerFactory.create("Workspace");
   }
 
@@ -47,7 +60,7 @@ export class WorkspaceComponent implements OnInit {
       this.generateNode(i);
     }
 
-    for (let i = 0; i < nNodes*2; i++) {
+    for (let i = 0; i < nNodes * 2; i++) {
       this.generateRandomConnection();
     }
 
@@ -65,12 +78,25 @@ export class WorkspaceComponent implements OnInit {
     node.uiProps.y = event.dragElementPosition.y;
   }
 
-  public initConnectionFrom(socket: OutputSocket | InputSocket, event: DragEvent) {
-    this.logger.info(`[WorkspaceComponnt] Initiating new connection from ${socket.idString}`);
+  public initConnectionFrom(
+    socket: OutputSocket | InputSocket,
+    event: DragEvent
+  ) {
+    this.logger.info(
+      `[WorkspaceComponnt] Initiating new connection from ${socket.idString}`
+    );
     if (socket instanceof OutputSocket) {
-      this.newTargetSocket = new InputSocket(socket.type, socket.name, new SocketIndex(0));;
+      this.newTargetSocket = new InputSocket(
+        socket.type,
+        socket.name,
+        new SocketIndex(0)
+      );
     } else {
-      this.newTargetSocket = new OutputSocket(socket.type, socket.name, new SocketIndex(0));;
+      this.newTargetSocket = new OutputSocket(
+        socket.type,
+        socket.name,
+        new SocketIndex(0)
+      );
     }
     // Create the connection
     this.newConnection = createConnection(socket, this.newTargetSocket);
@@ -93,12 +119,17 @@ export class WorkspaceComponent implements OnInit {
     this.newConnection = null;
   }
 
-  public addConnection(source: OutputSocket | InputSocket, target: OutputSocket | InputSocket) {
+  public addConnection(
+    source: OutputSocket | InputSocket,
+    target: OutputSocket | InputSocket
+  ) {
     // Connection to itself and connection from same node output to input (or viceverse)
     // is not allowed.
     if (source === target || source.parent === target.parent) {
-      this.logger.error(`Connection from source: '${source}' to '${target}' not allowed!`);
-      return
+      this.logger.error(
+        `Connection from source: '${source}' to '${target}' not allowed!`
+      );
+      return;
     }
 
     // Create the connection
@@ -120,18 +151,28 @@ export class WorkspaceComponent implements OnInit {
     this.nodes.push(
       new Node(
         nodeId,
-        'DummyNode',
+        "DummyNode",
         `Some test node ${id}`,
-        [new InputSocket('double', 'Some Input', new SocketIndex(1))],
-        [new OutputSocket('double', 'Some Output with text that is too long', new SocketIndex(1))],
+        [new InputSocket("double", "Some Input", new SocketIndex(1))],
+        [
+          new OutputSocket(
+            "double",
+            "Some Output with text that is too long",
+            new SocketIndex(1)
+          )
+        ],
         { x: x, y: y }
       )
     );
   }
 
   public generateRandomConnection() {
-    const source = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].outputs[0];
-    const target = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].inputs[0];
+    const source = this.nodes[
+      Math.round(Math.random() * (this.nodes.length - 1))
+    ].outputs[0];
+    const target = this.nodes[
+      Math.round(Math.random() * (this.nodes.length - 1))
+    ].inputs[0];
     this.addConnection(source, target);
   }
 }

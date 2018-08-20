@@ -10,13 +10,13 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable } from '@angular/core';
-import { flatbuffers } from 'flatbuffers';
-import { ILogger, LoggerFactory } from '@eg/logger';
-import { Id } from '@eg/common';
-import { GraphManipulationService, sz } from './GraphManipulationService';
-import { toNode } from './Conversions';
-import { Node, NodeId } from '../model';
+import { Injectable } from "@angular/core";
+import { flatbuffers } from "flatbuffers";
+import { ILogger, LoggerFactory } from "@eg/logger";
+import { Id } from "@eg/common";
+import { GraphManipulationService, sz } from "./GraphManipulationService";
+import { toNode } from "./Conversions";
+import { Node, NodeId } from "../model";
 
 @Injectable()
 export class GraphManipulationServiceDummy extends GraphManipulationService {
@@ -24,7 +24,7 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
 
   constructor(loggerFactory: LoggerFactory) {
     super();
-    this.logger = loggerFactory.create('GraphManipulationServiceDummy');
+    this.logger = loggerFactory.create("GraphManipulationServiceDummy");
   }
 
   public async addNode(graphId: Id, type: string, name: string): Promise<Node> {

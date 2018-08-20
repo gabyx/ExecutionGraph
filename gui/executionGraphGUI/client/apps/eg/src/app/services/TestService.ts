@@ -10,13 +10,13 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable } from '@angular/core';
-import { flatbuffers } from 'flatbuffers';
-import { ILogger, LoggerFactory } from '@eg/logger';
-import { GeneralInfoService } from "./GeneralInfoService"
-import { GraphManipulationService } from "./GraphManipulationService"
-import { GraphManagementService } from "./GraphManagementService"
-import { NodeId } from './../model';
+import { Injectable } from "@angular/core";
+import { flatbuffers } from "flatbuffers";
+import { ILogger, LoggerFactory } from "@eg/logger";
+import { GeneralInfoService } from "./GeneralInfoService";
+import { GraphManipulationService } from "./GraphManipulationService";
+import { GraphManagementService } from "./GraphManagementService";
+import { NodeId } from "./../model";
 
 /**
  * Stupid TestService class which can be quickly injected
@@ -36,7 +36,7 @@ export class TestService {
     private readonly graphManipulationService: GraphManipulationService,
     private readonly graphManagementService: GraphManagementService
   ) {
-    this.logger = loggerFactory.create('TestService');
+    this.logger = loggerFactory.create("TestService");
   }
 
   /**
@@ -46,7 +46,7 @@ export class TestService {
    */
   public async testAddRemove() {
     // Get the graph infos
-    console.debug('Get all graph type descriptions...');
+    console.debug("Get all graph type descriptions...");
     let graphDescs = await this.generalInfoService.getAllGraphTypeDescriptions();
 
     // Add a node to the first graph
@@ -55,13 +55,21 @@ export class TestService {
     let nodeType = graphDesc.nodeTypeDescritptions[0].type;
 
     // Add a graph
-    let graphId = await this.graphManagementService.addGraph(graphTypeId)
+    let graphId = await this.graphManagementService.addGraph(graphTypeId);
 
     // Add the node.
-    await this.graphManipulationService.addNode(graphId, nodeType, 'MySuperDuperNode');
+    await this.graphManipulationService.addNode(
+      graphId,
+      nodeType,
+      "MySuperDuperNode"
+    );
 
     // Add a non existing node
-    await this.graphManipulationService.addNode(graphId, "BananaNode", 'MySupercalifragilisticexpialidociousBananaNode');
+    await this.graphManipulationService.addNode(
+      graphId,
+      "BananaNode",
+      "MySupercalifragilisticexpialidociousBananaNode"
+    );
 
     // Remove first node
     await this.graphManipulationService.removeNode(graphId, new NodeId(0));

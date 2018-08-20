@@ -10,22 +10,22 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, OnInit, Injectable } from '@angular/core';
+import { Component, OnInit, Injectable } from "@angular/core";
 
-import { TestService } from "../../services/TestService"
+import { TestService } from "../../services/TestService";
 
 @Injectable()
 @Component({
-  selector: 'eg-toolbar',
-  templateUrl: './toolbar.component.html',
-  styleUrls: ['./toolbar.component.scss']
+  selector: "eg-toolbar",
+  templateUrl: "./toolbar.component.html",
+  styleUrls: ["./toolbar.component.scss"]
 })
 export class ToolbarComponent implements OnInit {
   public testResponse: any;
 
-  constructor(private readonly testService: TestService) { }
+  constructor(private readonly testService: TestService) {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   public test() {
     this.testService.testAddRemove();

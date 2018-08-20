@@ -4,7 +4,14 @@
     "node_modules/@nrwl/schematics/src/tslint"
   ],
   "rules": {
-    "align": [true, "parameters", "statements", "members", "arguments", "elements"],
+    "align": [
+      true,
+      "parameters",
+      "statements",
+      "members",
+      "arguments",
+      "elements"
+    ],
     "arrow-return-shorthand": true,
     "callable-types": true,
     "class-name": true,
@@ -14,7 +21,6 @@
     },
     "import-blacklist": [
       true,
-      "rxjs",
       "rxjs/Rx"
     ],
     "interface-over-type-literal": true,
@@ -91,12 +97,18 @@
     "use-pipe-transform-interface": true,
     "component-class-suffix": true,
     "directive-class-suffix": true,
-
     "nx-enforce-module-boundaries": [
       true,
       {
-        "lazyLoad": [],
-        "allow": []
+        "allow": [],
+        "depConstraints": [
+          {
+            "sourceTag": "*",
+            "onlyDependOnLibsWithTags": [
+              "*"
+            ]
+          }
+        ]
       }
     ]
   }

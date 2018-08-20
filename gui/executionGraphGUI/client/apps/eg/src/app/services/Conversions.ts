@@ -10,11 +10,11 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import * as Long from "long"
-import { flatbuffers } from "flatbuffers"
-import { Id } from '@eg/common'
-import * as model from "./../model"
-import * as serialization from '@serialization/index'
+import * as Long from "long";
+import { flatbuffers } from "flatbuffers";
+import { Id } from "@eg/common";
+import * as model from "./../model";
+import * as serialization from "@serialization/index";
 
 export function toLong(value: flatbuffers.Long): Long {
   return Long.fromBits(value.low, value.high, false);
@@ -31,8 +31,9 @@ export function toULong(value: flatbuffers.Long): Long {
  * @param {serialization.GraphTypeDescription} graphDesc
  * @returns {model.GraphTypeDescription}
  */
-export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescription): model.GraphTypeDescription {
-
+export function toGraphTypeDescription(
+  graphDesc: serialization.GraphTypeDescription
+): model.GraphTypeDescription {
   let sockets: model.SocketTypeDescription[] = [];
   for (let i = 0; i < graphDesc.socketTypeDescriptionsLength(); ++i) {
     let s = graphDesc.socketTypeDescriptions(i);
@@ -90,5 +91,6 @@ export function toNode(node: serialization.LogicNode): model.Node {
     node.type(),
     node.name(),
     sockets.input,
-    sockets.output);
+    sockets.output
+  );
 }

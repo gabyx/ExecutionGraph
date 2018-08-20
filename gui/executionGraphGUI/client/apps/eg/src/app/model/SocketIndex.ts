@@ -12,4 +12,4 @@
 
 import * as Long from "long";
 
-export class SocketIndex extends Long { };
+export class SocketIndex extends Long {}

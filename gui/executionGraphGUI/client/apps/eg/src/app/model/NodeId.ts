@@ -12,5 +12,4 @@
 
 import * as Long from "long";
 
-export class NodeId extends Long {};
-
+export class NodeId extends Long {}

@@ -10,12 +10,16 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { _throw } from 'rxjs/observable/throw';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/first';
-import { LoggerFactory, ILogger } from '@eg/logger';
+import { Injectable } from "@angular/core";
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpErrorResponse
+} from "@angular/common/http";
+import { _throw } from "rxjs/observable/throw";
+import "rxjs/add/operator/catch";
+import "rxjs/add/operator/first";
+import { LoggerFactory, ILogger } from "@eg/logger";
 
 /**
  * Router which sends binary payload to the backend using HTTP requests.
@@ -23,10 +27,13 @@ import { LoggerFactory, ILogger } from '@eg/logger';
 @Injectable()
 export class BinaryHttpRouterService {
   public baseUrl: string = `http://executiongraph-backend`;
-  public binaryMimeType: string = 'application/octet-stream';
+  public binaryMimeType: string = "application/octet-stream";
   private logger: ILogger;
 
-  constructor(private httpClient: HttpClient, private loggerFactory: LoggerFactory) {
+  constructor(
+    private httpClient: HttpClient,
+    private loggerFactory: LoggerFactory
+  ) {
     this.logger = loggerFactory.create("BinaryHttpRouterService");
   }
 
@@ -42,10 +49,12 @@ export class BinaryHttpRouterService {
     // Create a get request that returns an observable, which is kind of a stream of response events
     return (
       this.httpClient
-        .get(url, { responseType: 'arraybuffer' })
+        .get(url, { responseType: "arraybuffer" })
         // Add a callback function that is executed whenever there is a new event in the request stream
         .do(responseData =>
-          this.logger.debug(`Received response (Bytes: ${responseData.byteLength})`)
+          this.logger.debug(
+            `Received response (Bytes: ${responseData.byteLength})`
+          )
         )
         // In case of an error in the http event stream, catch it to log it and rethrow it, note that an error will only be actually thrown once
         // the observable is subscribed to, or in this case is converted into a promise and the promise is actually awaited.
@@ -69,7 +78,9 @@ export class BinaryHttpRouterService {
   public post(requestUrl: string, payload: Uint8Array): Promise<Uint8Array> {
     // @todo: This .slice is horribly inefficient, how to convert a payload with byteOffset != 0
     // to a ArrayBuffer -> its stupidly impossible...
-    const data = ( payload.byteOffset > 0 ? payload.slice().buffer : payload.buffer ) as ArrayBuffer;
+    const data = (payload.byteOffset > 0
+      ? payload.slice().buffer
+      : payload.buffer) as ArrayBuffer;
     const url = `${this.baseUrl}/${requestUrl}`;
 
     this.logger.debug(`Post to '${url}': (Bytes: '${data.byteLength}')`);
@@ -78,12 +89,14 @@ export class BinaryHttpRouterService {
     return (
       this.httpClient
         .post(url, data, {
-          responseType: 'arraybuffer',
-          headers: new HttpHeaders({ 'Content-Type': this.binaryMimeType })
+          responseType: "arraybuffer",
+          headers: new HttpHeaders({ "Content-Type": this.binaryMimeType })
         })
         // Add a callback function that is executed whenever there is a new event in the request stream
         .do(responseData =>
-          this.logger.debug(`Received response (Bytes: ${responseData.byteLength})`)
+          this.logger.debug(
+            `Received response (Bytes: ${responseData.byteLength})`
+          )
         )
         // In case of an error in the http event stream, catch it to log it and rethrow it, note that an error will only be actually thrown once
         // the observable is subscribed to, or in this case is converted into a promise and the promise is actually awaited.

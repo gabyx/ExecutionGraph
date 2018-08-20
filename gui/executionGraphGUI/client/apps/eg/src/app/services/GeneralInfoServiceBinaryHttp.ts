@@ -10,17 +10,17 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable, Inject } from '@angular/core';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/first';
+import { Injectable, Inject } from "@angular/core";
+import "rxjs/add/operator/catch";
+import "rxjs/add/operator/first";
 
-import { flatbuffers } from 'flatbuffers';
-import { GeneralInfoService, sz } from './GeneralInfoService';
-import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import { ILogger, LoggerFactory } from '@eg/logger';
-import { VERBOSE_LOG_TOKEN } from '../tokens';
-import * as model from "../model"
-import { toGraphTypeDescription } from './Conversions';
+import { flatbuffers } from "flatbuffers";
+import { GeneralInfoService, sz } from "./GeneralInfoService";
+import { BinaryHttpRouterService } from "./BinaryHttpRouterService";
+import { ILogger, LoggerFactory } from "@eg/logger";
+import { VERBOSE_LOG_TOKEN } from "../tokens";
+import * as model from "../model";
+import { toGraphTypeDescription } from "./Conversions";
 
 @Injectable()
 export class GeneralInfoServiceBinaryHttp extends GeneralInfoService {
@@ -32,13 +32,19 @@ export class GeneralInfoServiceBinaryHttp extends GeneralInfoService {
     @Inject(VERBOSE_LOG_TOKEN) private readonly verboseResponseLog = true
   ) {
     super();
-    this.logger = loggerFactory.create('GeneralInfoServiceBinaryHttp');
+    this.logger = loggerFactory.create("GeneralInfoServiceBinaryHttp");
   }
 
-  public async getAllGraphTypeDescriptions(): Promise<model.GraphTypeDescription[]> {
-    const result = await this.binaryRouter.get('general/getAllGraphTypeDescriptions');
+  public async getAllGraphTypeDescriptions(): Promise<
+    model.GraphTypeDescription[]
+  > {
+    const result = await this.binaryRouter.get(
+      "general/getAllGraphTypeDescriptions"
+    );
     let buf = new flatbuffers.ByteBuffer(result);
-    let response = sz.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
+    let response = sz.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(
+      buf
+    );
 
     this.logger.info(`Number of graph types: ${response.graphsTypesLength()}`);
 
@@ -48,8 +54,7 @@ export class GeneralInfoServiceBinaryHttp extends GeneralInfoService {
       graphDesc.push(toGraphTypeDescription(response.graphsTypes(g)));
     }
 
-    if(this.verboseResponseLog)
-    {
+    if (this.verboseResponseLog) {
       this.logger.debug(`GraphDescriptions: ${graphDesc}`);
     }
 

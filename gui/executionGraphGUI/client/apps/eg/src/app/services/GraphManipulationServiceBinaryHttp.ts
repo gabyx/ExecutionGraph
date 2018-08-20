@@ -10,14 +10,14 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable } from '@angular/core';
-import { flatbuffers } from 'flatbuffers';
-import { ILogger, LoggerFactory } from '@eg/logger';
-import { GraphManipulationService, sz } from './GraphManipulationService';
-import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import { Id } from '@eg/common';
-import { Node, NodeId } from './../model';
-import { toNode } from './Conversions';
+import { Injectable } from "@angular/core";
+import { flatbuffers } from "flatbuffers";
+import { ILogger, LoggerFactory } from "@eg/logger";
+import { GraphManipulationService, sz } from "./GraphManipulationService";
+import { BinaryHttpRouterService } from "./BinaryHttpRouterService";
+import { Id } from "@eg/common";
+import { Node, NodeId } from "./../model";
+import { toNode } from "./Conversions";
 
 @Injectable()
 export class GraphManipulationServiceBinaryHttp extends GraphManipulationService {
@@ -28,7 +28,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     private readonly binaryRouter: BinaryHttpRouterService
   ) {
     super();
-    this.logger = loggerFactory.create('GraphManipulationServiceBinaryHttp');
+    this.logger = loggerFactory.create("GraphManipulationServiceBinaryHttp");
   }
 
   public async addNode(graphId: Id, type: string, name: string): Promise<Node> {
@@ -52,12 +52,16 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     let requestPayload = builder.asUint8Array();
 
     // Send the request
-    const result = await this.binaryRouter.post('graph/addNode', requestPayload);
+    const result = await this.binaryRouter.post(
+      "graph/addNode",
+      requestPayload
+    );
     const buf = new flatbuffers.ByteBuffer(result);
     const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
 
     let node = response.node();
-    this.logger.info(`Added new node [type: '${node.type()}', name: '${node.name()}', ins: ${node.inputSocketsLength()},
+    this.logger
+      .info(`Added new node [type: '${node.type()}', name: '${node.name()}', ins: ${node.inputSocketsLength()},
                   outs: ${node.outputSocketsLength()}].`);
 
     return toNode(node);
@@ -69,14 +73,19 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     let offGraphId = builder.createString(graphId.toString());
     sz.RemoveNodeRequest.startRemoveNodeRequest(builder);
     sz.RemoveNodeRequest.addGraphId(builder, offGraphId);
-    sz.RemoveNodeRequest.addNodeId(builder, builder.createLong(nodeId.low, nodeId.high));
+    sz.RemoveNodeRequest.addNodeId(
+      builder,
+      builder.createLong(nodeId.low, nodeId.high)
+    );
     let reqOff = sz.RemoveNodeRequest.endRemoveNodeRequest(builder);
     builder.finish(reqOff);
 
     let requestPayload = builder.asUint8Array();
 
     // Send the request
-    await this.binaryRouter.post('graph/removeNode', requestPayload);
-    this.logger.debug(`Removed node [id: '${graphId}'] from graph [id '${graphId}']`);
+    await this.binaryRouter.post("graph/removeNode", requestPayload);
+    this.logger.debug(
+      `Removed node [id: '${graphId}'] from graph [id '${graphId}']`
+    );
   }
 }

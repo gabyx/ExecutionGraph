@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable } from '@angular/core';
-import { ExecutionService } from './ExecutionService';
+import { Injectable } from "@angular/core";
+import { ExecutionService } from "./ExecutionService";
 
 @Injectable()
 export class ExecutionServiceDummy extends ExecutionService {

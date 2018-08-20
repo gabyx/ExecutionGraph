@@ -10,12 +10,12 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { WorkspaceComponent } from './workspace.component';
-import { GraphModule } from '@eg/graph';
+import { WorkspaceComponent } from "./workspace.component";
+import { GraphModule } from "@eg/graph";
 
-describe('WorkspaceComponent', () => {
+describe("WorkspaceComponent", () => {
   let component: WorkspaceComponent;
   let fixture: ComponentFixture<WorkspaceComponent>;
 
@@ -34,7 +34,7 @@ describe('WorkspaceComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

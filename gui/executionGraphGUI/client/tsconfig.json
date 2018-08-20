@@ -24,6 +24,15 @@
       ],
       "@serialization/*": [
         "../../../include/executionGraph/serialization/schemas/ts/*"
+      ],
+      "@eg/common": [
+        "libs/common/src/index.ts"
+      ],
+      "@eg/graph": [
+        "libs/graph/src/index.ts"
+      ],
+      "@eg/logger": [
+        "libs/logger/src/index.ts"
       ]
     }
   },

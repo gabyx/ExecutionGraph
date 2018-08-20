@@ -10,23 +10,21 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import {Id} from "@eg/common"
+import { Id } from "@eg/common";
 
-export class SocketTypeDescription
-{
+export class SocketTypeDescription {
   public readonly type: string;
   public readonly name: string;
 }
 
-export class NodeTypeDescription
-{
+export class NodeTypeDescription {
   public readonly type: string;
   public readonly name: string;
 }
 
 export class GraphTypeDescription {
-  public readonly id : Id;
-  public readonly name : string;
-  public readonly socketTypeDescriptions : SocketTypeDescription[];
+  public readonly id: Id;
+  public readonly name: string;
+  public readonly socketTypeDescriptions: SocketTypeDescription[];
   public readonly nodeTypeDescritptions: NodeTypeDescription[];
 }

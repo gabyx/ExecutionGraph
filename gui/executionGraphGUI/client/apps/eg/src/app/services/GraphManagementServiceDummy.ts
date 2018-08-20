@@ -10,10 +10,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable } from '@angular/core';
-import { GraphManagementService } from './GraphManagementService';
-import { ILogger, LoggerFactory } from '@eg/logger';
-import { Id } from '@eg/common';
+import { Injectable } from "@angular/core";
+import { GraphManagementService } from "./GraphManagementService";
+import { ILogger, LoggerFactory } from "@eg/logger";
+import { Id } from "@eg/common";
 
 @Injectable()
 export class GraphManagementServiceDummy extends GraphManagementService {
@@ -21,7 +21,7 @@ export class GraphManagementServiceDummy extends GraphManagementService {
 
   constructor(loggerFactory: LoggerFactory) {
     super();
-    this.logger = loggerFactory.create('GraphManagementServiceDummy');
+    this.logger = loggerFactory.create("GraphManagementServiceDummy");
   }
 
   public async addGraph(graphTypeId: Id): Promise<Id> {
