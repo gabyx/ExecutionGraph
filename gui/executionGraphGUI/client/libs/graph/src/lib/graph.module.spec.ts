@@ -10,10 +10,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { GraphModule } from "./graph.module";
+import { GraphModule } from './graph.module';
 
-describe("GraphModule", () => {
-  it("should work", () => {
+describe('GraphModule', () => {
+  it('should work', () => {
     expect(new GraphModule()).toBeDefined();
   });
 });

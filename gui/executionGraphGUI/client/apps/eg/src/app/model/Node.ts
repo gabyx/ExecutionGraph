@@ -10,9 +10,9 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Socket, InputSocket, OutputSocket } from "./Socket";
-import { NodeId } from "./NodeId";
-import { Input } from "@angular/compiler/src/core";
+import { Socket, InputSocket, OutputSocket } from './Socket';
+import { NodeId } from './NodeId';
+import { Input } from '@angular/compiler/src/core';
 
 export type UIProps = {
   x: number;

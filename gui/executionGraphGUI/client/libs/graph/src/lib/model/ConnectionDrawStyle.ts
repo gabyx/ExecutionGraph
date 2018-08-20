@@ -10,12 +10,12 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Point } from "./Point";
+import { Point } from './Point';
 
 export abstract class ConnectionDrawStyle {
   public width: number = 1;
 
-  public color: string = "white";
+  public color: string = 'white';
 
   abstract getPath(start: Point, end: Point): string | Point[];
 }

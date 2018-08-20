@@ -10,18 +10,11 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import {
-  Directive,
-  ElementRef,
-  HostListener,
-  EventEmitter,
-  Output,
-  Input
-} from "@angular/core";
+import { Directive, ElementRef, HostListener, EventEmitter, Output, Input } from '@angular/core';
 
-import { tap, map, switchMap, takeUntil } from "rxjs/operators";
+import { tap, map, switchMap, takeUntil } from 'rxjs/operators';
 
-import { Point } from "../model/Point";
+import { Point } from '../model/Point';
 
 export type DragMouseEvent = {
   elementPosition: Point;
@@ -35,10 +28,10 @@ export type DragEvent = {
 };
 
 @Directive({
-  selector: "[ngcsDraggable]"
+  selector: '[ngcsDraggable]'
 })
 export class DraggableDirective {
-  @Input("ngcsDraggable") data: any = null;
+  @Input('ngcsDraggable') data: any = null;
 
   @Output() dragStarted = new EventEmitter<DragEvent>();
   @Output() dragContinued = new EventEmitter<DragEvent>();
@@ -47,7 +40,7 @@ export class DraggableDirective {
   @Input()
   set dragElement(value: HTMLElement) {
     this._nativeElement = value;
-    this._nativeElement["draggableElement"] = this;
+    this._nativeElement['draggableElement'] = this;
   }
 
   private readonly mousePressed = new EventEmitter<DragMouseEvent>();
@@ -68,19 +61,15 @@ export class DraggableDirective {
       .pipe(
         tap(dragStartEvent =>
           console.log(
-            `Started at Element: ${dragStartEvent.elementPosition.x}:${
-              dragStartEvent.elementPosition.y
-            }, Mouse: ${dragStartEvent.mousePosition.x}:${
-              dragStartEvent.mousePosition.y
-            }`
-        )),
-        tap(dragStartEvent =>
-          this.dragStarted.emit(
-            this.calculateDragEvent(dragStartEvent, dragStartEvent))
+            `Started at Element: ${dragStartEvent.elementPosition.x}:${dragStartEvent.elementPosition.y}, Mouse: ${
+              dragStartEvent.mousePosition.x
+            }:${dragStartEvent.mousePosition.y}`
+          )
         ),
+        tap(dragStartEvent => this.dragStarted.emit(this.calculateDragEvent(dragStartEvent, dragStartEvent))),
         switchMap(dragStartEvent =>
           this.mouseMoved.pipe(
-            map(dragMoveEvent => this.calculateDragEvent(dragStartEvent, dragMoveEvent) ),
+            map(dragMoveEvent => this.calculateDragEvent(dragStartEvent, dragMoveEvent)),
             // .do(e => console.log(`Now at ${e.dragElementPosition.x}:${e.dragElementPosition.y}`))
             tap(point => {
               // this.nativeElement.style.left = `${point.x}px`;
@@ -93,9 +82,11 @@ export class DraggableDirective {
                 // .do(p => console.log(`Ended at ${p.x}:${p.y}`))
                 tap(p => this.dragEnded.emit(p))
               )
-            ))
+            )
+          )
         )
-      ).subscribe(() => void 0);
+      )
+      .subscribe(() => void 0);
   }
 
   onMouseDown(event: DragMouseEvent) {
@@ -110,20 +101,13 @@ export class DraggableDirective {
     this.mouseMoved.emit(event);
   }
 
-  private calculateDragEvent(
-    startEvent: DragMouseEvent,
-    currentEvent: DragMouseEvent
-  ): DragEvent {
+  private calculateDragEvent(startEvent: DragMouseEvent, currentEvent: DragMouseEvent): DragEvent {
     const clientRect = this.nativeElement.getBoundingClientRect();
     let scale = clientRect.width / this.nativeElement.offsetWidth;
     const result = {
       dragElementPosition: {
-        x:
-          startEvent.elementPosition.x +
-          (currentEvent.mousePosition.x - startEvent.mousePosition.x) / scale,
-        y:
-          startEvent.elementPosition.y +
-          (currentEvent.mousePosition.y - startEvent.mousePosition.y) / scale
+        x: startEvent.elementPosition.x + (currentEvent.mousePosition.x - startEvent.mousePosition.x) / scale,
+        y: startEvent.elementPosition.y + (currentEvent.mousePosition.y - startEvent.mousePosition.y) / scale
       },
       mouseToElementOffset: {
         x: (startEvent.mousePosition.x - clientRect.left) / scale,

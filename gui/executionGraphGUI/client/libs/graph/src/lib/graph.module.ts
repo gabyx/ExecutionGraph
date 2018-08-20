@@ -10,29 +10,17 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { NgModule } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { GraphComponent } from "./components/graph/graph.component";
-import { PortComponent } from "./components/port/port.component";
-import { ConnectionComponent } from "./components/connection/connection.component";
-import { DraggableDirective } from "./directives/draggable.directive";
-import { DroppableDirective } from "./directives/droppable.directive";
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { GraphComponent } from './components/graph/graph.component';
+import { PortComponent } from './components/port/port.component';
+import { ConnectionComponent } from './components/connection/connection.component';
+import { DraggableDirective } from './directives/draggable.directive';
+import { DroppableDirective } from './directives/droppable.directive';
 
 @NgModule({
   imports: [CommonModule],
-  declarations: [
-    GraphComponent,
-    PortComponent,
-    ConnectionComponent,
-    DraggableDirective,
-    DroppableDirective
-  ],
-  exports: [
-    GraphComponent,
-    PortComponent,
-    ConnectionComponent,
-    DraggableDirective,
-    DroppableDirective
-  ]
+  declarations: [GraphComponent, PortComponent, ConnectionComponent, DraggableDirective, DroppableDirective],
+  exports: [GraphComponent, PortComponent, ConnectionComponent, DraggableDirective, DroppableDirective]
 })
 export class GraphModule {}

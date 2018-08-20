@@ -10,10 +10,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { ILogger } from "./ILogger";
-import { ISink } from "./ISink";
-import { LogLevel, logLevels } from "./LogLevel";
-import { LogEvent } from "./LogEvent";
+import { ILogger } from './ILogger';
+import { ISink } from './ISink';
+import { LogLevel, logLevels } from './LogLevel';
+import { LogEvent } from './LogEvent';
 
 function prepend(value, array) {
   var newArray = array.slice();

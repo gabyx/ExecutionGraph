@@ -24,20 +24,17 @@ import {
   NgZone,
   Input,
   AfterViewChecked
-} from "@angular/core";
-import { PortComponent } from "..//port/port.component";
-import {
-  DraggableDirective,
-  DragEvent
-} from "../../directives/draggable.directive";
-import { ConnectionComponent } from "../connection/connection.component";
-import { Point } from "../../model/Point";
-import { DroppableDirective } from "../../directives/droppable.directive";
+} from '@angular/core';
+import { PortComponent } from '..//port/port.component';
+import { DraggableDirective, DragEvent } from '../../directives/draggable.directive';
+import { ConnectionComponent } from '../connection/connection.component';
+import { Point } from '../../model/Point';
+import { DroppableDirective } from '../../directives/droppable.directive';
 
 @Component({
-  selector: "ngcs-graph",
-  templateUrl: "./graph.component.html",
-  styleUrls: ["./graph.component.scss"]
+  selector: 'ngcs-graph',
+  templateUrl: './graph.component.html',
+  styleUrls: ['./graph.component.scss']
 })
 export class GraphComponent implements OnInit, AfterViewChecked {
   @ContentChildren(PortComponent, { descendants: true })
@@ -70,18 +67,11 @@ export class GraphComponent implements OnInit, AfterViewChecked {
 
   private dragging: DraggableDirective = null;
 
-  constructor(
-    private element: ElementRef,
-    private cdr: ChangeDetectorRef,
-    private zone: NgZone
-  ) {}
+  constructor(private element: ElementRef, private cdr: ChangeDetectorRef, private zone: NgZone) {}
 
   ngOnInit() {
     this.zone.runOutsideAngular(() => {
-      window.document.addEventListener(
-        "mousemove",
-        this.onMouseMove.bind(this)
-      );
+      window.document.addEventListener('mousemove', this.onMouseMove.bind(this));
     });
   }
 
@@ -93,11 +83,11 @@ export class GraphComponent implements OnInit, AfterViewChecked {
    * Handles mouse button down events for drag starts
    * @param event
    */
-  @HostListener("mousedown", ["$event"])
+  @HostListener('mousedown', ['$event'])
   onMouseDown(event: MouseEvent) {
     event.preventDefault();
 
-    let draggable: DraggableDirective = event.target["draggableElement"];
+    let draggable: DraggableDirective = event.target['draggableElement'];
 
     if (draggable) {
       this.dragging = draggable;
@@ -117,7 +107,7 @@ export class GraphComponent implements OnInit, AfterViewChecked {
    * Handles Mouse Button releases for drag ends
    * @param event Mouse Event
    */
-  @HostListener("document:mouseup", ["$event"])
+  @HostListener('document:mouseup', ['$event'])
   onMouseUp(event: MouseEvent) {
     event.preventDefault();
     if (this.dragging) {
@@ -141,9 +131,7 @@ export class GraphComponent implements OnInit, AfterViewChecked {
       event.cancelBubble = true;
       this.zone.run(() =>
         this.dragging.onMouseMove({
-          elementPosition: this.getRelativePosition(
-            this.dragging.nativeElement
-          ),
+          elementPosition: this.getRelativePosition(this.dragging.nativeElement),
           mousePosition: { x: event.clientX, y: event.clientY }
         })
       );
@@ -154,7 +142,7 @@ export class GraphComponent implements OnInit, AfterViewChecked {
    * Handles scrolling for scaling
    * @param e Scroll event
    */
-  @HostListener("mousewheel", ["$event"])
+  @HostListener('mousewheel', ['$event'])
   onWindowScroll(e: MouseWheelEvent) {
     e.preventDefault();
     e.cancelBubble = true;
@@ -170,7 +158,7 @@ export class GraphComponent implements OnInit, AfterViewChecked {
    * Prevent context menu
    * @param e Event
    */
-  @HostListener("contextmenu", ["$event"])
+  @HostListener('contextmenu', ['$event'])
   onContextMenu(e: any) {
     e.preventDefault();
   }
@@ -184,14 +172,12 @@ export class GraphComponent implements OnInit, AfterViewChecked {
     const endPoint = this.getPortPosition(connection.to);
     // console.log("Updating path");
     let path = connection.drawStyle.getPath(startPoint, endPoint);
-    if (typeof path !== "string") {
+    if (typeof path !== 'string') {
       if (path.length < 2) {
         return ``;
       }
       const first = path.shift();
-      path = `M${first.x} ${first.y} ${path
-        .map(p => `L${p.x} ${p.y}`)
-        .join(" ")}`;
+      path = `M${first.x} ${first.y} ${path.map(p => `L${p.x} ${p.y}`).join(' ')}`;
     }
     return path;
   }
@@ -249,10 +235,7 @@ export class GraphComponent implements OnInit, AfterViewChecked {
     let offsetLeft = element.offsetLeft; //+ element.offsetWidth / 2;
     let offsetTop = element.offsetTop; // + element.offsetHeight / 2;
 
-    while (
-      element.offsetParent &&
-      element.offsetParent !== this.element.nativeElement
-    ) {
+    while (element.offsetParent && element.offsetParent !== this.element.nativeElement) {
       element = element.offsetParent as HTMLElement;
       offsetLeft += element.offsetLeft;
       offsetTop += element.offsetTop;

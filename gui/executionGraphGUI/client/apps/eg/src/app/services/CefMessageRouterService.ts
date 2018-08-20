@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 
 type CefRequest = {
   request: string;
@@ -32,7 +32,7 @@ export class CefMessageRouterService {
   private readonly cef: CefWindow;
 
   constructor() {
-    if (!window.hasOwnProperty("cefQuery")) {
+    if (!window.hasOwnProperty('cefQuery')) {
       console.error(`[CefMessageRouterService] No CEF available`);
     }
     this.cef = window as any;
@@ -51,15 +51,11 @@ export class CefMessageRouterService {
         request: requestString,
         persistent: false,
         onSuccess: response => {
-          console.log(
-            `[CefMessageRouterService] Response for '${requestURL}': ${response}`
-          );
+          console.log(`[CefMessageRouterService] Response for '${requestURL}': ${response}`);
           resolve(response);
         },
         onFailure: (errorCode, errorMessage) => {
-          console.error(
-            `[CefMessageRouterService] Request '${requestURL}' failed (${errorCode}): ${errorMessage}`
-          );
+          console.error(`[CefMessageRouterService] Request '${requestURL}' failed (${errorCode}): ${errorMessage}`);
           reject(errorMessage);
         }
       });

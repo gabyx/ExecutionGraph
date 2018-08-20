@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Id } from "@eg/common";
-import { GraphManagementMessages } from "@messages/index";
+import { Id } from '@eg/common';
+import { GraphManagementMessages } from '@messages/index';
 export import sz = GraphManagementMessages;
 
 export abstract class GraphManagementService {

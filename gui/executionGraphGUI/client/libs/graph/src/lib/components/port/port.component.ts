@@ -10,12 +10,12 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, ElementRef, Input } from "@angular/core";
+import { Component, ElementRef, Input } from '@angular/core';
 
 @Component({
-  selector: "ngcs-port",
-  templateUrl: "./port.component.html",
-  styleUrls: ["./port.component.scss"]
+  selector: 'ngcs-port',
+  templateUrl: './port.component.html',
+  styleUrls: ['./port.component.scss']
 })
 export class PortComponent {
   @Input() public id: string;

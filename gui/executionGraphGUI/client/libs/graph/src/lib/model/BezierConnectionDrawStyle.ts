@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { ConnectionDrawStyle } from "./ConnectionDrawStyle";
-import { Point } from "./Point";
+import { ConnectionDrawStyle } from './ConnectionDrawStyle';
+import { Point } from './Point';
 
 export class BezierConnectionDrawStyle extends ConnectionDrawStyle {
   constructor(public curviness: number = 1) {
@@ -34,6 +34,6 @@ export class BezierConnectionDrawStyle extends ConnectionDrawStyle {
     const pointStrings = points.map(p => `${p.x},${p.y}`);
     pointStrings[0] = `M${pointStrings[0]}`;
     pointStrings[1] = `C${pointStrings[1]}`;
-    return pointStrings.join(" ");
+    return pointStrings.join(' ');
   }
 }

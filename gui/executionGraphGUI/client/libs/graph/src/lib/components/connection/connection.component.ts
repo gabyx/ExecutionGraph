@@ -10,15 +10,15 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, Input } from "@angular/core";
+import { Component, Input } from '@angular/core';
 
-import { ConnectionDrawStyle } from "../../model/ConnectionDrawStyle";
-import { BezierConnectionDrawStyle } from "../../model/BezierConnectionDrawStyle";
+import { ConnectionDrawStyle } from '../../model/ConnectionDrawStyle';
+import { BezierConnectionDrawStyle } from '../../model/BezierConnectionDrawStyle';
 
 @Component({
-  selector: "ngcs-connection",
-  templateUrl: "./connection.component.html",
-  styleUrls: ["./connection.component.scss"]
+  selector: 'ngcs-connection',
+  templateUrl: './connection.component.html',
+  styleUrls: ['./connection.component.scss']
 })
 export class ConnectionComponent {
   @Input() from: string;

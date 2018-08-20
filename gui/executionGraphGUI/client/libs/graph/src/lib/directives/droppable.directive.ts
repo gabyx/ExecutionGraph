@@ -1,25 +1,18 @@
-import {
-  Directive,
-  EventEmitter,
-  Output,
-  ElementRef,
-  Renderer2,
-  Input
-} from "@angular/core";
-import { DraggableDirective } from "./draggable.directive";
+import { Directive, EventEmitter, Output, ElementRef, Renderer2, Input } from '@angular/core';
+import { DraggableDirective } from './draggable.directive';
 
 @Directive({
-  selector: "[ngcsDroppable]"
+  selector: '[ngcsDroppable]'
 })
 export class DroppableDirective {
   @Output() draggableEntered = new EventEmitter<any>();
   @Output() draggableLeft = new EventEmitter<any>();
   @Output() draggableDropped = new EventEmitter<any>();
 
-  @Input("ngcsDroppable") dropAcceptanceFilter: (data: any) => boolean;
-  @Input() droppingClass: string = "dropping";
-  @Input() dropAllowedClass: string = "dropping-allowed";
-  @Input() dropForbiddenClass: string = "dropping-forbidden";
+  @Input('ngcsDroppable') dropAcceptanceFilter: (data: any) => boolean;
+  @Input() droppingClass: string = 'dropping';
+  @Input() dropAllowedClass: string = 'dropping-allowed';
+  @Input() dropForbiddenClass: string = 'dropping-forbidden';
 
   private draggable: DraggableDirective = null;
   private isActive = false;
@@ -35,25 +28,13 @@ export class DroppableDirective {
 
   startTracking(draggable: DraggableDirective) {
     this.draggable = draggable;
-    this.element.nativeElement.addEventListener(
-      "mouseenter",
-      this.onMouseEnterRegistration
-    );
-    this.element.nativeElement.addEventListener(
-      "mouseleave",
-      this.onMouseLeaveRegistration
-    );
+    this.element.nativeElement.addEventListener('mouseenter', this.onMouseEnterRegistration);
+    this.element.nativeElement.addEventListener('mouseleave', this.onMouseLeaveRegistration);
   }
 
   stopTracking() {
-    this.element.nativeElement.removeEventListener(
-      "mouseenter",
-      this.onMouseEnterRegistration
-    );
-    this.element.nativeElement.removeEventListener(
-      "mouseleave",
-      this.onMouseLeaveRegistration
-    );
+    this.element.nativeElement.removeEventListener('mouseenter', this.onMouseEnterRegistration);
+    this.element.nativeElement.removeEventListener('mouseleave', this.onMouseLeaveRegistration);
     this.clearClasses();
 
     if (this.isActive) {
@@ -87,13 +68,7 @@ export class DroppableDirective {
 
   private clearClasses() {
     this.renderer.removeClass(this.element.nativeElement, this.droppingClass);
-    this.renderer.removeClass(
-      this.element.nativeElement,
-      this.dropAllowedClass
-    );
-    this.renderer.removeClass(
-      this.element.nativeElement,
-      this.dropForbiddenClass
-    );
+    this.renderer.removeClass(this.element.nativeElement, this.dropAllowedClass);
+    this.renderer.removeClass(this.element.nativeElement, this.dropForbiddenClass);
   }
 }

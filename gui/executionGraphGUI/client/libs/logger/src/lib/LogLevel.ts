@@ -34,11 +34,11 @@ export class LogLevel {
 }
 
 export const logLevels = {
-  ALL: new LogLevel(Number.MIN_VALUE, "ALL"),
-  DEBUG: new LogLevel(10000, "DEBUG"),
-  INFO: new LogLevel(20000, "INFO"),
-  WARN: new LogLevel(30000, "WARN"),
-  ERROR: new LogLevel(40000, "ERROR"),
-  FATAL: new LogLevel(50000, "FATAL"),
-  OFF: new LogLevel(Number.MAX_VALUE, "OFF")
+  ALL: new LogLevel(Number.MIN_VALUE, 'ALL'),
+  DEBUG: new LogLevel(10000, 'DEBUG'),
+  INFO: new LogLevel(20000, 'INFO'),
+  WARN: new LogLevel(30000, 'WARN'),
+  ERROR: new LogLevel(40000, 'ERROR'),
+  FATAL: new LogLevel(50000, 'FATAL'),
+  OFF: new LogLevel(Number.MAX_VALUE, 'OFF')
 };

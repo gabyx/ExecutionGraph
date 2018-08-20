@@ -10,11 +10,11 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ConnectionStyleOptionsComponent } from "./connection-style-options.component";
+import { ConnectionStyleOptionsComponent } from './connection-style-options.component';
 
-describe("ConnectionStyleOptionsComponent", () => {
+describe('ConnectionStyleOptionsComponent', () => {
   let component: ConnectionStyleOptionsComponent;
   let fixture: ComponentFixture<ConnectionStyleOptionsComponent>;
 
@@ -32,7 +32,7 @@ describe("ConnectionStyleOptionsComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

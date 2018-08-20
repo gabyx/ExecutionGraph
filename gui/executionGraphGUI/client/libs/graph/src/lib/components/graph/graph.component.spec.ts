@@ -10,21 +10,16 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import {
-  async,
-  ComponentFixture,
-  TestBed,
-  getTestBed
-} from "@angular/core/testing";
-import { Component } from "@angular/core";
-import { By } from "@angular/platform-browser";
+import { async, ComponentFixture, TestBed, getTestBed } from '@angular/core/testing';
+import { Component } from '@angular/core';
+import { By } from '@angular/platform-browser';
 
-import { GraphComponent } from "@eg/graph/src/components/graph/graph.component";
-import { PortComponent } from "@eg/graph/src/components/port/port.component";
-import { ConnectionComponent } from "@eg/graph/src/components/connection/connection.component";
+import { GraphComponent } from '@eg/graph/src/components/graph/graph.component';
+import { PortComponent } from '@eg/graph/src/components/port/port.component';
+import { ConnectionComponent } from '@eg/graph/src/components/connection/connection.component';
 
 @Component({
-  selector: "test",
+  selector: 'test',
   template: `
 <ngcs-graph>
   <ngcs-port id="s"></ngcs-port>
@@ -35,18 +30,13 @@ import { ConnectionComponent } from "@eg/graph/src/components/connection/connect
 })
 export class TestComponent {}
 
-describe("GraphComponent", () => {
+describe('GraphComponent', () => {
   let component: TestComponent;
   let fixture: ComponentFixture<TestComponent>;
   beforeEach(
     async(() => {
       TestBed.configureTestingModule({
-        declarations: [
-          TestComponent,
-          GraphComponent,
-          PortComponent,
-          ConnectionComponent
-        ]
+        declarations: [TestComponent, GraphComponent, PortComponent, ConnectionComponent]
       }).compileComponents();
     })
   );
@@ -58,11 +48,9 @@ describe("GraphComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should draw a line when adding a connection", () => {
-    let pathElement = fixture.debugElement.query(By.css("path"));
+  it('should draw a line when adding a connection', () => {
+    let pathElement = fixture.debugElement.query(By.css('path'));
     expect(pathElement).toBeDefined();
-    expect(pathElement.nativeElement.attributes.d.value).toBe(
-      "M0,0 C0,0 0,0 0,0"
-    );
+    expect(pathElement.nativeElement.attributes.d.value).toBe('M0,0 C0,0 0,0 0,0');
   });
 });

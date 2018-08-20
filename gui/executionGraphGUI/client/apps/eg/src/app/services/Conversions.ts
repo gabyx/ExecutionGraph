@@ -10,11 +10,11 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import * as Long from "long";
-import { flatbuffers } from "flatbuffers";
-import { Id } from "@eg/common";
-import * as model from "./../model";
-import * as serialization from "@serialization/index";
+import * as Long from 'long';
+import { flatbuffers } from 'flatbuffers';
+import { Id } from '@eg/common';
+import * as model from './../model';
+import * as serialization from '@serialization/index';
 
 export function toLong(value: flatbuffers.Long): Long {
   return Long.fromBits(value.low, value.high, false);
@@ -31,9 +31,7 @@ export function toULong(value: flatbuffers.Long): Long {
  * @param {serialization.GraphTypeDescription} graphDesc
  * @returns {model.GraphTypeDescription}
  */
-export function toGraphTypeDescription(
-  graphDesc: serialization.GraphTypeDescription
-): model.GraphTypeDescription {
+export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescription): model.GraphTypeDescription {
   let sockets: model.SocketTypeDescription[] = [];
   for (let i = 0; i < graphDesc.socketTypeDescriptionsLength(); ++i) {
     let s = graphDesc.socketTypeDescriptions(i);
@@ -71,8 +69,8 @@ export function toNode(node: serialization.LogicNode): model.Node {
   } = { input: [], output: [] };
 
   // Convert the sockets
-  for (let key of ["input", "output"]) {
-    let isInput = key == "input";
+  for (let key of ['input', 'output']) {
+    let isInput = key == 'input';
     let l = node[`${key}SocketsLength`]();
     let arrayFunc = node[`${key}Sockets`];
     for (let i = 0; i < l; ++i) {
@@ -86,11 +84,5 @@ export function toNode(node: serialization.LogicNode): model.Node {
     }
   }
 
-  return new model.Node(
-    nodeId,
-    node.type(),
-    node.name(),
-    sockets.input,
-    sockets.output
-  );
+  return new model.Node(nodeId, node.type(), node.name(), sockets.input, sockets.output);
 }

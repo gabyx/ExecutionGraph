@@ -10,14 +10,11 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { IFormatter } from "./IFormatter";
-import { LogEvent } from "./LogEvent";
+import { IFormatter } from './IFormatter';
+import { LogEvent } from './LogEvent';
 
 export class SimpleFormatter implements IFormatter {
   public format(event: LogEvent): string {
-    return (
-      `[${event.level.toString()}]:` +
-      event.data.reduce((a: any, b: string) => `${a} ${b}`, "")
-    );
+    return `[${event.level.toString()}]:` + event.data.reduce((a: any, b: string) => `${a} ${b}`, '');
   }
 }

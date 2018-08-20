@@ -10,18 +10,14 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
-import {
-  MatToolbarModule,
-  MatMenuModule,
-  MatIconModule
-} from "@angular/material";
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatToolbarModule, MatMenuModule, MatIconModule } from '@angular/material';
 
-import { ToolbarComponent } from "./toolbar.component";
-import { ExecutionService } from "../../services/ExecutionService";
-import { ExecutionServiceDummy } from "../../services/ExecutionServiceDummy";
+import { ToolbarComponent } from './toolbar.component';
+import { ExecutionService } from '../../services/ExecutionService';
+import { ExecutionServiceDummy } from '../../services/ExecutionServiceDummy';
 
-describe("ToolbarComponent", () => {
+describe('ToolbarComponent', () => {
   let component: ToolbarComponent;
   let fixture: ComponentFixture<ToolbarComponent>;
 
@@ -30,9 +26,7 @@ describe("ToolbarComponent", () => {
       TestBed.configureTestingModule({
         imports: [MatToolbarModule, MatMenuModule, MatIconModule],
         declarations: [ToolbarComponent],
-        providers: [
-          { provide: ExecutionService, useClass: ExecutionServiceDummy }
-        ]
+        providers: [{ provide: ExecutionService, useClass: ExecutionServiceDummy }]
       }).compileComponents();
     })
   );
@@ -43,7 +37,7 @@ describe("ToolbarComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

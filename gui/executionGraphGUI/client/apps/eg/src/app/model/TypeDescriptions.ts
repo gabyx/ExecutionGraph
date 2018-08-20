@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Id } from "@eg/common";
+import { Id } from '@eg/common';
 
 export class SocketTypeDescription {
   public readonly type: string;

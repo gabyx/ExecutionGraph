@@ -10,19 +10,16 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { ISink } from "./ISink";
-import { LogEvent } from "./LogEvent";
-import { IFormatter } from "./IFormatter";
-import { LogLevel, logLevels } from "./LogLevel";
+import { ISink } from './ISink';
+import { LogEvent } from './LogEvent';
+import { IFormatter } from './IFormatter';
+import { LogLevel, logLevels } from './LogLevel';
 
 /**
  * Simple console sink.
  */
 export class ConsoleSink implements ISink {
-  constructor(
-    private formatter: IFormatter,
-    private readonly minLevel: LogLevel = logLevels.DEBUG
-  ) {}
+  constructor(private formatter: IFormatter, private readonly minLevel: LogLevel = logLevels.DEBUG) {}
 
   public write(event: LogEvent) {
     if (!event.level.isGreaterThanOrEqualTo(this.minLevel)) {

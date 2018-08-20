@@ -10,17 +10,13 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable } from "@angular/core";
-import {
-  HttpClient,
-  HttpHeaders,
-  HttpErrorResponse
-} from "@angular/common/http";
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 
-import { throwError } from "rxjs";
-import { tap, map, catchError, first } from "rxjs/operators";
+import { throwError } from 'rxjs';
+import { tap, map, catchError, first } from 'rxjs/operators';
 
-import { LoggerFactory, ILogger } from "@eg/logger";
+import { LoggerFactory, ILogger } from '@eg/logger';
 
 /**
  * Router which sends binary payload to the backend using HTTP requests.
@@ -28,14 +24,11 @@ import { LoggerFactory, ILogger } from "@eg/logger";
 @Injectable()
 export class BinaryHttpRouterService {
   public baseUrl: string = `http://executiongraph-backend`;
-  public binaryMimeType: string = "application/octet-stream";
+  public binaryMimeType: string = 'application/octet-stream';
   private logger: ILogger;
 
-  constructor(
-    private httpClient: HttpClient,
-    private loggerFactory: LoggerFactory
-  ) {
-    this.logger = loggerFactory.create("BinaryHttpRouterService");
+  constructor(private httpClient: HttpClient, private loggerFactory: LoggerFactory) {
+    this.logger = loggerFactory.create('BinaryHttpRouterService');
   }
 
   /**
@@ -50,13 +43,10 @@ export class BinaryHttpRouterService {
     // Create a get request that returns an observable, which is kind of a stream of response events
     return (
       this.httpClient
-        .get(url, { responseType: "arraybuffer" }).pipe(
+        .get(url, { responseType: 'arraybuffer' })
+        .pipe(
           // Add a callback function that is executed whenever there is a new event in the request stream
-          tap(responseData =>
-            this.logger.debug(
-              `Received response (Bytes: ${responseData.byteLength})`
-            )
-          ),
+          tap(responseData => this.logger.debug(`Received response (Bytes: ${responseData.byteLength})`)),
           // In case of an error in the http event stream, catch it to log it and rethrow it, note that an error will only be actually thrown once
           // the observable is subscribed to, or in this case is converted into a promise and the promise is actually awaited.
           catchError((error: HttpErrorResponse) => {
@@ -80,9 +70,7 @@ export class BinaryHttpRouterService {
   public post(requestUrl: string, payload: Uint8Array): Promise<Uint8Array> {
     // @todo: This .slice is horribly inefficient, how to convert a payload with byteOffset != 0
     // to a ArrayBuffer -> its stupidly impossible...
-    const data = (payload.byteOffset > 0
-      ? payload.slice().buffer
-      : payload.buffer) as ArrayBuffer;
+    const data = (payload.byteOffset > 0 ? payload.slice().buffer : payload.buffer) as ArrayBuffer;
     const url = `${this.baseUrl}/${requestUrl}`;
 
     this.logger.debug(`Post to '${url}': (Bytes: '${data.byteLength}')`);
@@ -91,15 +79,12 @@ export class BinaryHttpRouterService {
     return (
       this.httpClient
         .post(url, data, {
-          responseType: "arraybuffer",
-          headers: new HttpHeaders({ "Content-Type": this.binaryMimeType })
-        }).pipe(
+          responseType: 'arraybuffer',
+          headers: new HttpHeaders({ 'Content-Type': this.binaryMimeType })
+        })
+        .pipe(
           // Add a callback function that is executed whenever there is a new event in the request stream
-          tap(responseData =>
-            this.logger.debug(
-              `Received response (Bytes: ${responseData.byteLength})`
-            )
-          ),
+          tap(responseData => this.logger.debug(`Received response (Bytes: ${responseData.byteLength})`)),
           // In case of an error in the http event stream, catch it to log it and rethrow it, note that an error will only be actually thrown once
           // the observable is subscribed to, or in this case is converted into a promise and the promise is actually awaited.
           catchError((error: HttpErrorResponse) => {

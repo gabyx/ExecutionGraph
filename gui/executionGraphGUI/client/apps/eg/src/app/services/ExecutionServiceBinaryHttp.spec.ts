@@ -10,15 +10,12 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { TestBed, async, getTestBed } from "@angular/core/testing";
-import {
-  HttpClientTestingModule,
-  HttpTestingController
-} from "@angular/common/http/testing";
+import { TestBed, async, getTestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { ExecutionServiceBinaryHttp } from "./ExecutionServiceBinaryHttp";
+import { ExecutionServiceBinaryHttp } from './ExecutionServiceBinaryHttp';
 
-describe("ExecutionServiceBinaryHttp", () => {
+describe('ExecutionServiceBinaryHttp', () => {
   let injector: TestBed;
   let service: ExecutionServiceBinaryHttp;
   let httpMock: HttpTestingController;
@@ -39,7 +36,7 @@ describe("ExecutionServiceBinaryHttp", () => {
   });
 
   it(
-    "should return an execution result if successful",
+    'should return an execution result if successful',
     async(async () => {
       //@todo setup dummy response data
       const responseData = new ArrayBuffer(1);
@@ -49,10 +46,8 @@ describe("ExecutionServiceBinaryHttp", () => {
       });
 
       const req = httpMock.expectOne(`${service.baseUrl}/execution`);
-      expect(req.request.method).toBe("POST");
-      expect(req.request.headers.get("Content-Type")).toBe(
-        service.binaryMimeType
-      );
+      expect(req.request.method).toBe('POST');
+      expect(req.request.headers.get('Content-Type')).toBe(service.binaryMimeType);
 
       req.flush(responseData);
     })

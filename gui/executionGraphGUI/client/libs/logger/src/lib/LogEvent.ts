@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { LogLevel } from "./LogLevel";
+import { LogLevel } from './LogLevel';
 
 export class LogEvent {
   constructor(public _level: LogLevel, public _data: any[]) {}

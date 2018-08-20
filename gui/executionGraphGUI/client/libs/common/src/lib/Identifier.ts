@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Guid } from "guid-typescript";
+import { Guid } from 'guid-typescript';
 
 export class Id {
   private readonly _id: Guid;

@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { ConnectionDrawStyle } from "./ConnectionDrawStyle";
-import { Point } from "./Point";
+import { ConnectionDrawStyle } from './ConnectionDrawStyle';
+import { Point } from './Point';
 
 export class DirectConnectionDrawStyle extends ConnectionDrawStyle {
   getPath(start: Point, end: Point): Point[] {

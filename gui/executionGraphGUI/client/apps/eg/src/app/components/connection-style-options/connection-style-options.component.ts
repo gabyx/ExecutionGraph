@@ -10,16 +10,16 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, OnInit, EventEmitter, Output, Input } from "@angular/core";
+import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
 import {
   ConnectionDrawStyle,
   DirectConnectionDrawStyle,
   ManhattenConnectionDrawStyle,
   BezierConnectionDrawStyle
-} from "@eg/graph";
-import { ILogger, LoggerFactory } from "@eg/logger";
+} from '@eg/graph';
+import { ILogger, LoggerFactory } from '@eg/logger';
 
-type ConnectionDrawStyleName = "direct" | "manhatten" | "bezier";
+type ConnectionDrawStyleName = 'direct' | 'manhatten' | 'bezier';
 
 const drawStyles = {
   direct: new DirectConnectionDrawStyle(),
@@ -28,16 +28,15 @@ const drawStyles = {
 };
 
 @Component({
-  selector: "eg-connection-style-options",
-  templateUrl: "./connection-style-options.component.html",
-  styleUrls: ["./connection-style-options.component.css"]
+  selector: 'eg-connection-style-options',
+  templateUrl: './connection-style-options.component.html',
+  styleUrls: ['./connection-style-options.component.css']
 })
 export class ConnectionStyleOptionsComponent implements OnInit {
   private drawStyleName: ConnectionDrawStyleName;
 
-  @Output()
-  connectionDrawStyleChanged = new EventEmitter<ConnectionDrawStyle>();
-  @Input() connectionDrawStyle: ConnectionDrawStyle = drawStyles["direct"];
+  @Output() connectionDrawStyleChanged = new EventEmitter<ConnectionDrawStyle>();
+  @Input() connectionDrawStyle: ConnectionDrawStyle = drawStyles['direct'];
 
   get drawStyle(): ConnectionDrawStyleName {
     return this.drawStyleName;
@@ -52,8 +51,8 @@ export class ConnectionStyleOptionsComponent implements OnInit {
   private readonly log: ILogger;
 
   constructor(loggerFactory: LoggerFactory) {
-    this.log = loggerFactory.create("ConnectionStyleOptionsComponent");
-    this.drawStyle = "direct";
+    this.log = loggerFactory.create('ConnectionStyleOptionsComponent');
+    this.drawStyle = 'direct';
   }
 
   ngOnInit() {}

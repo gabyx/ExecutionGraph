@@ -10,9 +10,9 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { SocketIndex } from "./SocketIndex";
-import { Node } from "./Node";
-import { Guid } from "guid-typescript";
+import { SocketIndex } from './SocketIndex';
+import { Node } from './Node';
+import { Guid } from 'guid-typescript';
 
 /**
  * Modelclass for a Socket on a node.
@@ -40,7 +40,7 @@ export abstract class Socket {
   }
   public set parent(parent: Node) {
     if (this._parent != null) {
-      throw "You cannot assign a new parent!";
+      throw 'You cannot assign a new parent!';
     }
     this._parent = parent;
     this.initIdString();
