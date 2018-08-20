@@ -16,9 +16,10 @@ import {
   HttpHeaders,
   HttpErrorResponse
 } from "@angular/common/http";
-import { _throw } from "rxjs/observable/throw";
-import "rxjs/add/operator/catch";
-import "rxjs/add/operator/first";
+
+import { throwError } from "rxjs";
+import { tap, map, catchError, first } from "rxjs/operators";
+
 import { LoggerFactory, ILogger } from "@eg/logger";
 
 /**
@@ -49,22 +50,23 @@ export class BinaryHttpRouterService {
     // Create a get request that returns an observable, which is kind of a stream of response events
     return (
       this.httpClient
-        .get(url, { responseType: "arraybuffer" })
-        // Add a callback function that is executed whenever there is a new event in the request stream
-        .do(responseData =>
-          this.logger.debug(
-            `Received response (Bytes: ${responseData.byteLength})`
-          )
+        .get(url, { responseType: "arraybuffer" }).pipe(
+          // Add a callback function that is executed whenever there is a new event in the request stream
+          tap(responseData =>
+            this.logger.debug(
+              `Received response (Bytes: ${responseData.byteLength})`
+            )
+          ),
+          // In case of an error in the http event stream, catch it to log it and rethrow it, note that an error will only be actually thrown once
+          // the observable is subscribed to, or in this case is converted into a promise and the promise is actually awaited.
+          catchError((error: HttpErrorResponse) => {
+            this.logger.error(`${error.message} (status: ${error.status})`);
+            return throwError(error);
+          }),
+          // After the first successful event in the stream, unsubscribe from the event stream
+          first(),
+          map(responseData => new Uint8Array(responseData))
         )
-        // In case of an error in the http event stream, catch it to log it and rethrow it, note that an error will only be actually thrown once
-        // the observable is subscribed to, or in this case is converted into a promise and the promise is actually awaited.
-        .catch((error: HttpErrorResponse) => {
-          this.logger.error(`${error.message} (status: ${error.status})`);
-          return _throw(error);
-        })
-        // After the first successful event in the stream, unsubscribe from the event stream
-        .first()
-        .map(responseData => new Uint8Array(responseData))
         // Convert the Observable to a Promise, so we're back to the "old-school" async await world instead of the "new-school" stream based approach
         .toPromise()
     );
@@ -91,22 +93,23 @@ export class BinaryHttpRouterService {
         .post(url, data, {
           responseType: "arraybuffer",
           headers: new HttpHeaders({ "Content-Type": this.binaryMimeType })
-        })
-        // Add a callback function that is executed whenever there is a new event in the request stream
-        .do(responseData =>
-          this.logger.debug(
-            `Received response (Bytes: ${responseData.byteLength})`
-          )
+        }).pipe(
+          // Add a callback function that is executed whenever there is a new event in the request stream
+          tap(responseData =>
+            this.logger.debug(
+              `Received response (Bytes: ${responseData.byteLength})`
+            )
+          ),
+          // In case of an error in the http event stream, catch it to log it and rethrow it, note that an error will only be actually thrown once
+          // the observable is subscribed to, or in this case is converted into a promise and the promise is actually awaited.
+          catchError((error: HttpErrorResponse) => {
+            this.logger.error(`${error.message} (status: ${error.status})`);
+            return throwError(error);
+          }),
+          // After the first successful event in the stream, unsubscribe from the event stream
+          first(),
+          map(responseData => new Uint8Array(responseData))
         )
-        // In case of an error in the http event stream, catch it to log it and rethrow it, note that an error will only be actually thrown once
-        // the observable is subscribed to, or in this case is converted into a promise and the promise is actually awaited.
-        .catch((error: HttpErrorResponse) => {
-          this.logger.error(`${error.message} (status: ${error.status})`);
-          return _throw(error);
-        })
-        // After the first successful event in the stream, unsubscribe from the event stream
-        .first()
-        .map(responseData => new Uint8Array(responseData))
         // Convert the Observable to a Promise, so we're back to the "old-school" async await world instead of the "new-school" stream based approach
         .toPromise()
     );

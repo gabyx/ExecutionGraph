@@ -18,11 +18,10 @@ import {
   Output,
   Input
 } from "@angular/core";
+
+import { tap, map, switchMap, takeUntil } from "rxjs/operators";
+
 import { Point } from "../model/Point";
-import "rxjs/add/operator/do";
-import "rxjs/add/operator/map";
-import "rxjs/add/operator/switchMap";
-import "rxjs/add/operator/takeUntil";
 
 export type DragMouseEvent = {
   elementPosition: Point;
@@ -62,45 +61,41 @@ export class DraggableDirective {
   }
 
   constructor(private element: ElementRef) {
-    this.dragElement = element.nativeElement;
     //Hack for faster access to the component from events
+    this.dragElement = element.nativeElement;
 
     this.mousePressed
-      .do(dragStartEvent =>
-        console.log(
-          `Started at Element: ${dragStartEvent.elementPosition.x}:${
-            dragStartEvent.elementPosition.y
-          }, Mouse: ${dragStartEvent.mousePosition.x}:${
-            dragStartEvent.mousePosition.y
-          }`
-        )
-      )
-      .do(dragStartEvent =>
-        this.dragStarted.emit(
-          this.calculateDragEvent(dragStartEvent, dragStartEvent)
-        )
-      )
-      .switchMap(dragStartEvent =>
-        this.mouseMoved
-          .map(dragMoveEvent =>
-            this.calculateDragEvent(dragStartEvent, dragMoveEvent)
-          )
-          // .do(e => console.log(`Now at ${e.dragElementPosition.x}:${e.dragElementPosition.y}`))
-          .do(point => {
-            // this.nativeElement.style.left = `${point.x}px`;
-            // this.nativeElement.style.top  = `${point.y}px`;
-          })
-          .do(point => this.dragContinued.emit(point))
-          .takeUntil(
-            this.mouseReleased
-              .map(dragEndEvent =>
-                this.calculateDragEvent(dragStartEvent, dragEndEvent)
+      .pipe(
+        tap(dragStartEvent =>
+          console.log(
+            `Started at Element: ${dragStartEvent.elementPosition.x}:${
+              dragStartEvent.elementPosition.y
+            }, Mouse: ${dragStartEvent.mousePosition.x}:${
+              dragStartEvent.mousePosition.y
+            }`
+        )),
+        tap(dragStartEvent =>
+          this.dragStarted.emit(
+            this.calculateDragEvent(dragStartEvent, dragStartEvent))
+        ),
+        switchMap(dragStartEvent =>
+          this.mouseMoved.pipe(
+            map(dragMoveEvent => this.calculateDragEvent(dragStartEvent, dragMoveEvent) ),
+            // .do(e => console.log(`Now at ${e.dragElementPosition.x}:${e.dragElementPosition.y}`))
+            tap(point => {
+              // this.nativeElement.style.left = `${point.x}px`;
+              // this.nativeElement.style.top  = `${point.y}px`;
+            }),
+            tap(point => this.dragContinued.emit(point)),
+            takeUntil(
+              this.mouseReleased.pipe(
+                map(dragEndEvent => this.calculateDragEvent(dragStartEvent, dragEndEvent)),
+                // .do(p => console.log(`Ended at ${p.x}:${p.y}`))
+                tap(p => this.dragEnded.emit(p))
               )
-              // .do(p => console.log(`Ended at ${p.x}:${p.y}`))
-              .do(p => this.dragEnded.emit(p))
-          )
-      )
-      .subscribe(() => void 0);
+            ))
+        )
+      ).subscribe(() => void 0);
   }
 
   onMouseDown(event: DragMouseEvent) {

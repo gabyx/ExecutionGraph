@@ -13,10 +13,10 @@
 import { Injectable } from "@angular/core";
 import { flatbuffers } from "flatbuffers";
 import { ILogger, LoggerFactory } from "@eg/logger";
+import { Id } from "@eg/common";
 import { GraphManipulationService, sz } from "./GraphManipulationService";
 import { BinaryHttpRouterService } from "./BinaryHttpRouterService";
-import { Id } from "@eg/common";
-import { Node, NodeId } from "./../model";
+import { Node, NodeId } from "../model";
 import { toNode } from "./Conversions";
 
 @Injectable()

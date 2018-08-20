@@ -11,14 +11,12 @@
 // =========================================================================================
 
 import { Inject, Injectable } from "@angular/core";
-import "rxjs/add/operator/catch";
-import "rxjs/add/operator/first";
-
 import { flatbuffers } from "flatbuffers";
+
 import { Id } from "@eg/common";
+import { ILogger, LoggerFactory } from "@eg/logger";
 import { GraphManagementService, sz } from "./GraphManagementService";
 import { BinaryHttpRouterService } from "./BinaryHttpRouterService";
-import { ILogger, LoggerFactory } from "@eg/logger";
 import { VERBOSE_LOG_TOKEN } from "../tokens";
 
 @Injectable()
