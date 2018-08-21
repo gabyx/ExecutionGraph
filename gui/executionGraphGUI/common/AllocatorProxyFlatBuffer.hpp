@@ -68,18 +68,20 @@ private:
     std::shared_ptr<RawAllocator> m_allocator;  //!< The allocator to which allocation/deallocation is forwarded.
 };
 
-//! Helper to quickly make a BinaryBuffer, forwards to the constructor and injects the allocated bytes!.
+//! Helper to quickly make a BinaryBuffer, releases the memory block from the FlatBufferBuilder
+//! and transfers ownership.
 template<typename RawAllocator, typename... Args>
-BinaryBuffer<RawAllocator> makeBinaryBuffer(AllocatorProxyFlatBuffer<RawAllocator>&& allocator,
-                                            flatbuffers::DetachedBufferRaw&& buffer,
-                                            Args&&... args) noexcept
+BinaryBuffer<RawAllocator> releaseIntoBinaryBuffer(AllocatorProxyFlatBuffer<RawAllocator>&& allocator,
+                                                   flatbuffers::FlatBufferBuilder& builder,
+                                                   Args&&... args) noexcept
 {
-    EXECGRAPHGUI_ASSERT(!buffer.allocator_owned(), "Programming error!");
+    std::size_t size, offset;
+    uint8_t* data = builder.ReleaseRaw(size, offset);
     return makeBinaryBuffer(allocator.getAllocator(),
-                            buffer.start(),
-                            buffer.size(),
-                            buffer.data(),
-                            buffer.reserved());
+                            data + offset,
+                            size - offset,
+                            data,
+                            size);
 }
 
 #endif

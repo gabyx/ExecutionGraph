@@ -87,12 +87,9 @@ void GraphManagementRequestHandler::handleAddGraph(const Request& request,
     auto responseOff = s::CreateAddGraphResponseDirect(builder, graphId.toString().c_str());
     builder.Finish(responseOff);
 
-    auto detachedBuffer = builder.ReleaseRaw();
-    EXECGRAPHGUI_APPLOG_WARN("Here");
-    response.setReady(ResponsePromise::Payload{makeBinaryBuffer(std::move(allocator),
-                                                                std::move(detachedBuffer)),
+    response.setReady(ResponsePromise::Payload{releaseIntoBinaryBuffer(std::move(allocator),
+                                                                       builder),
                                                "application/octet-stream"});
-    EXECGRAPHGUI_APPLOG_WARN("Here-end");
 }
 
 //! Handle the operation of removing a graph.
