@@ -33,9 +33,6 @@
       ],
       "@eg/logger": [
         "libs/logger/src/index.ts"
-      ],
-      "@eg/cqrs": [
-        "libs/cqrs/src/index.ts"
       ]
     }
   },
