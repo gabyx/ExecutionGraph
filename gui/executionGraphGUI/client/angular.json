@@ -212,6 +212,34 @@
         }
       },
       "prefix": "app"
+    },
+    "cqrs": {
+      "root": "libs/cqrs",
+      "sourceRoot": "libs/cqrs/src",
+      "projectType": "library",
+      "prefix": "eg",
+      "architect": {
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "libs/cqrs/src/test.ts",
+            "tsConfig": "libs/cqrs/tsconfig.spec.json",
+            "karmaConfig": "libs/cqrs/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/cqrs/tsconfig.lib.json",
+              "libs/cqrs/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "eg",

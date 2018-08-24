@@ -15,6 +15,9 @@
     },
     "logger": {
       "tags": []
+    },
+    "cqrs": {
+      "tags": []
     }
   },
   "implicitDependencies": {
