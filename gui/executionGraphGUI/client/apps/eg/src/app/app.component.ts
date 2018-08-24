@@ -10,13 +10,37 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { filter } from 'rxjs/operators';
+
+import { LoggerFactory, ILogger } from '@eg/logger';
+
+import { AppState } from './+state/app.reducer';
+import { LoadApp, SelectGraph } from './+state/app.actions';
+import { appQuery } from './+state/app.selectors';
 
 @Component({
-  selector: 'app-root',
+  selector: 'eg-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-  title = 'app';
+export class AppComponent implements OnInit {
+  
+  private readonly log: ILogger;
+
+  constructor(private store: Store<AppState>, loggerFactory: LoggerFactory) {
+    this.log = loggerFactory.create("AppComponent");
+  }
+
+  ngOnInit() {
+    this.store.dispatch(new LoadApp());
+
+    this.store.select(appQuery.getAllApp)
+      .pipe(filter(graphs => graphs.length > 0))
+      .subscribe(graphs => {
+        this.log.debug(`Loaded graphs, auto-selecting the first one`);
+        this.store.dispatch(new SelectGraph(graphs[0].id))
+      });
+  }
 }

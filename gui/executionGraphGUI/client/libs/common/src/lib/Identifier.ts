@@ -32,6 +32,10 @@ export class Id {
   public toString(): string {
     return this._id.toString();
   }
+
+  public equals(id: Id): boolean {
+    return id != null && this.guid === id.guid;
+  }
 }
 
 export class IdNamed extends Id {

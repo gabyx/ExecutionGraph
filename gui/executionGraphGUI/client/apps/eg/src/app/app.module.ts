@@ -56,6 +56,13 @@ import { WorkspaceComponent } from './components/workspace/workspace.component';
 
 import { environment } from '../environments/environment';
 import { ConnectionStyleOptionsComponent } from './components/connection-style-options/connection-style-options.component';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { initialState as appInitialState, appReducer } from './+state/app.reducer';
+import { AppEffects } from './+state/app.effects';
+import { NxModule } from '@nrwl/nx';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { storeFreeze } from 'ngrx-store-freeze';
 
 @NgModule({
   declarations: [AppComponent, ToolbarComponent, WorkspaceComponent, ConnectionStyleOptionsComponent],
@@ -69,7 +76,17 @@ import { ConnectionStyleOptionsComponent } from './components/connection-style-o
     MatButtonModule,
     MatButtonToggleModule,
     MatCheckboxModule,
-    GraphModule
+    GraphModule,
+    NxModule.forRoot(),
+    StoreModule.forRoot(
+      { app: appReducer },
+      {
+        initialState : { app : appInitialState },
+        //metaReducers : !environment.production ? [storeFreeze] : []
+      }
+    ),
+    EffectsModule.forRoot([AppEffects]),
+    !environment.production ? StoreDevtoolsModule.instrument() : []
   ],
   providers: [
     { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory },

@@ -1,7 +1,7 @@
 <eg-connection-style-options #connectionStyleOptions></eg-connection-style-options>
 
 <ngcs-graph id="graph-1" >
-    <ng-container *ngFor="let node of nodes">
+    <ng-container *ngFor="let node of (graph | async).nodes">
         <div #theNode class="node ngcs-node" [attr.id]="node.idString" [style.left]="node.uiProps.x+'px'" [style.top]="node.uiProps.y+'px'">
             <span class="header" ngcsDraggable [dragElement]="theNode" (dragContinued)="updateNodePosition(node, $event)">
                 {{ node.name }}
@@ -27,7 +27,7 @@
         </div>
     </ng-container>
 
-    <ng-container *ngFor="let connection of connections">
+    <ng-container *ngFor="let connection of (graph | async).connections">
         <ngcs-connection [from]="connection.outputSocket.idString" [to]="connection.inputSocket.idString" [drawStyle]="connectionStyleOptions.connectionDrawStyle"></ngcs-connection>
     </ng-container>
 
