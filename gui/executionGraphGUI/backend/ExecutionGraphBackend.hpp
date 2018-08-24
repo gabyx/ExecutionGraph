@@ -85,6 +85,8 @@ private:
     using GraphVariant = std::variant<DefaultGraph>;
     //! Map of normal graphs identified by its id.
     std::unordered_map<Id, GraphVariant> m_graphs;
+
+    //! Map of graph locks
 };
 
 //! Add a node with type `type` to the graph with id `graphId`.

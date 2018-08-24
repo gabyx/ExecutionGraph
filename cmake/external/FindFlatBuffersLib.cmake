@@ -3,7 +3,7 @@ include(FindPackageHandleStandardArgs)
 
 # Try to find the library, if it is installed!
 # otherwise download it
-set(URL "https://github.com/gabyx/flatbuffers.git")
+set(URL "https://github.com/google/flatbuffers.git")
 set(INSTALL_DIR "${ExecutionGraph_EXTERNAL_INSTALL_DIR}/flatbuffers")
 
 message(STATUS "flatbuffers library finding ...")

@@ -81,7 +81,9 @@
         "typeindex": "cpp",
         "__functional_03": "cpp",
         "thread": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "__mutex_base": "cpp",
+        "mutex": "cpp"
     },
     "cmake.useCMakeServer": true,
     "cmake.preferredGenerators": [
