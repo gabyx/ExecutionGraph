@@ -103,7 +103,7 @@ namespace executionGraph
 
         private:
             explicit LockedPtr(CSynchronizedType* parent)
-                : /*m_lock{parent->m_mutex}*/
+                : m_lock{parent->m_mutex}
                 , m_parent{parent}
             {}
 
