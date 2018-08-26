@@ -41,11 +41,17 @@ namespace executionGraph
         class LockedPtr
         {
         public:
-            using SynchronizedType = std::remove_const_t<TTSynchronized>;
-            using LockType         = TLock;
-            using CDataType        = std::conditional_t<std::is_const_v<SynchronizedType>,
+            using LockType          = TLock;
+            using CSynchronizedType = TTSynchronized;
+            using SynchronizedType  = std::remove_const_t<TTSynchronized>;
+            using CDataType         = std::conditional_t<std::is_const_v<CSynchronizedType>,
                                                  const typename SynchronizedType::Data,
                                                  typename SynchronizedType::Data>;
+
+        private:
+            friend SynchronizedType;
+
+        public:
             /*
             * Copy constructor and assignment operator are deleted.
             */
@@ -82,7 +88,7 @@ namespace executionGraph
              */
             CDataType* operator->() const
             {
-                return &this->m_parent->m_data;
+                return &m_parent->m_data;
             }
 
             /**
@@ -92,24 +98,24 @@ namespace executionGraph
              */
             CDataType& operator*() const
             {
-                return this->m_parent->m_data;
+                return m_parent->m_data;
             }
 
-        protected:
-            explicit LockedPtr(SynchronizedType* parent)
-                : m_lock{parent->m_mutex}
+        private:
+            explicit LockedPtr(CSynchronizedType* parent)
+                : /*m_lock{parent->m_mutex}*/
                 , m_parent{parent}
             {}
 
             template<class Rep, class Period>
-            LockedPtr(SynchronizedType* parent,
+            LockedPtr(CSynchronizedType* parent,
                       const std::chrono::duration<Rep, Period>& duration)
                 : m_lock{parent->m_mutex, duration}
                 , m_parent{parent}
             {
                 if(!m_lock)
                 {
-                    this->m_parent = nullptr;
+                    m_parent = nullptr;
                 }
             }
 
@@ -126,7 +132,7 @@ namespace executionGraph
 
         private:
             LockType m_lock;
-            SynchronizedType* m_parent = nullptr;
+            CSynchronizedType* m_parent = nullptr;
         };
 
     }  // namespace details
@@ -155,14 +161,13 @@ namespace executionGraph
         using ExclusiveLock = TExclusiveLock;
         using SharedLock    = TSharedLock;
 
-    private:
-        /** LockPtr is a friend */
-        template<typename, typename>
-        friend class details::LockedPtr;
-
     public:
-        using ConstLockedPtr = details::LockedPtr<TSharedLock, Synchronized>;
-        using LockedPtr      = details::LockedPtr<ExclusiveLock, const Synchronized>;
+        using ConstLockedPtr = details::LockedPtr<TSharedLock, const Synchronized>;
+        using LockedPtr      = details::LockedPtr<ExclusiveLock, Synchronized>;
+
+    private:
+        friend ConstLockedPtr;
+        friend LockedPtr;
 
     public:
         template<typename... Args>
@@ -250,8 +255,8 @@ namespace executionGraph
         }
 
     private:
-        Mutex m_mutex;  //! Mutex for `m_data`.
-        Data m_data;    //! The actual guarded data.
+        mutable Mutex m_mutex;  //!< Mutex for `m_data`.
+        Data m_data;            //!< The actual guarded data.
     };
 };  // namespace executionGraph
 

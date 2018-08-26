@@ -1,3 +1,4 @@
+#include <thread>
 #include "TestFunctions.hpp"
 #include "executionGraph/common/Synchronized.hpp"
 
@@ -21,6 +22,38 @@ struct A
 MY_TEST(Synchronized, SetterGetter)
 {
     Synchronized<A> synced;
+
+    std::thread a([&]() {
+        DEFINE_RANDOM_GENERATOR_FUNC(1);
+        for(int i = 0; i <= 1000; ++i)
+        {
+            auto sleep = int(rand() * 5);
+            std::this_thread::sleep_for(std::chrono::milliseconds(sleep));
+            //std::cout << "setting: " << i << std::endl;
+            synced.wlock()->set(i, i);
+        }
+    });
+
+    std::thread b([&]() {
+        DEFINE_RANDOM_GENERATOR_FUNC(0);
+        for(int i = 0; i <= 1000; ++i)
+        {
+            auto p     = synced.rlock()->get();
+            auto sleep = int(rand() * 5);
+            std::this_thread::sleep_for(std::chrono::milliseconds(sleep));
+
+            //std::cout << "p.first: " << p.first << std::endl;
+            ASSERT_EQ(p.first, p.second);
+        }
+    });
+
+    a.join();
+    b.join();
+
+    const Synchronized<A>& synced2 = synced;
+
+    double r = synced2.withRLock([](auto& a) { return a.get().first; });
+    ASSERT_EQ(r, 100);
 }
 
 int main(int argc, char** argv)
