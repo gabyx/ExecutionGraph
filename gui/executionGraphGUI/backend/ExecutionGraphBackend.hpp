@@ -14,11 +14,14 @@
 #define executionGraphGUI_backend_ExecutionGraphBackend_hpp
 
 #include <array>
+#include <chrono>
 #include <string>
 #include <variant>
 #include <vector>
 #include <rttr/type>
+#include <executionGraph/common/Deferred.hpp>
 #include <executionGraph/common/Identifier.hpp>
+#include <executionGraph/common/Synchronized.hpp>
 #include <executionGraph/graphs/ExecutionTreeInOut.hpp>
 #include <executionGraph/serialization/GraphTypeDescription.hpp>
 #include "executionGraphGUI/backend/Backend.hpp"
@@ -38,11 +41,14 @@ class ExecutionGraphBackend final : public Backend
     RTTR_ENABLE()
 
 public:
-    using DefaultGraph         = executionGraph::ExecutionTreeInOut<executionGraph::GeneralConfig<>>;
+    using DefaultGraph = executionGraph::ExecutionTreeInOut<executionGraph::GeneralConfig<>>;
+
     using Id                   = executionGraph::Id;
     using IdNamed              = executionGraph::IdNamed;
     using GraphTypeDescription = executionGraph::GraphTypeDescription;
     using NodeId               = executionGraph::NodeId;
+    template<typename K, typename T>
+    using SyncedUMap = Synchronized<std::unordered_map<K, T>>;
 
 public:
     ExecutionGraphBackend()
@@ -79,14 +85,83 @@ private:
 
 public:
     //! Get all graph descriptions identified by its id.
-    const std::unordered_map<Id, GraphTypeDescription>& getGraphTypeDescriptions() const { return m_graphTypeDescription; }
+    const Systd::unordered_map<Id, GraphTypeDescription>& getGraphTypeDescriptions() const { return m_graphTypeDescription; }
     //@}
-private:
-    using GraphVariant = std::variant<DefaultGraph>;
-    //! Map of normal graphs identified by its id.
-    std::unordered_map<Id, GraphVariant> m_graphs;
 
-    //! Map of graph locks
+private:
+    [[nodiscard]] Deferred initRequest(Id graphId);
+
+private:
+    class GraphStatus
+    {
+    private:
+        using Mutex             = std::mutex;
+        using Lock              = std::lock_guard<Mutex>;
+        using ConditionVariable = std::condition_variable;
+
+    public:
+        void isRequestHandlingEnabled() const { return m_requestHandlingEnabled; }
+        void setRequestHandlingEnabled(bool enabled) { m_requestHandlingEnabled = enabled; }
+
+    private:
+        std::atomic<bool> m_requestHandlingEnabled = true;
+
+    public:
+        std::size_t getRequestCount() const
+        {
+            Lock lock(m_requestCountMutex);
+            return m_requestCount;
+        }
+
+        void incrementRequestCount()
+        {
+            Lock lock(m_requestCountMutex);
+            return ++m_requestCount;
+        };
+        void decrementRequestCount()
+        {
+            bool singleRequest = false;
+            {  // Locking start
+                Lock lock(m_requestCountMutex);
+                if(m_requestCount)
+                {
+                    --m_requestCount;
+                }
+                singleRequest = m_requestCount == 1;
+            }  // Locking end
+
+            if(singleRequest)
+            {
+                m_onlySingleRequest.notify_all();  // Notify all waiting threads, that this graph has one single request
+            }
+        };
+
+        //! Wait until the request count is zero, or timeout.
+        //! @param Return the lock, such that no one can change the request count and
+        //! the bool indicating if the request count is zero!
+        template<typename Duration>
+        std::pair<std::unique_lock<std::mutex>, bool>
+        waitUntilOnlySingleRequests(const Duration& timeout = std::chrono::seconds(10))
+        {
+            std::unique_lock<std::mutex> lock(m_requestCountMutex);
+            bool singleRequest = m_onlySingleRequest.wait_for(lock,
+                                                              timeout,
+                                                              [&]() { return m_requestCount == 1; });
+            return {std::move(lock), singleRequest};
+        }
+
+    private:
+        ConditionVariable m_onlySingleRequest;  //!< Condition variable indicating: request count == 1
+        Mutex m_requestCountMutex;              //!< The mutex for the request count
+        std::size_t m_requestCount = 0;         //!< The number of simultanously handling requests.
+    };
+
+    using GraphVariant = std::variant<std::shared_ptr<Synchronized<DefaultGraph>>>;
+
+private:
+    SyncedUMap<Id, GraphVariant> m_graphs;                  //! Graphs identified by its id.
+    SyncedUMap<Id, std::shared_ptr<GraphStatus>> m_status;  //! Graph status for each graph id.
+    //SyncedUMap<Id, std::shared_ptr<IGraphIExecutor> > m_executor; //!< Graph executors for each graph id.
 };
 
 //! Add a node with type `type` to the graph with id `graphId`.
@@ -96,15 +171,25 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
                                     const std::string& nodeName,
                                     ResponseCreator&& responseCreator)
 {
-    auto graphIt = m_graphs.find(graphId);
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(graphIt == m_graphs.end(),
-                                      "Graph id: '{0}' does not exist!",
-                                      graphId.toString());
-    GraphVariant& graphVar = graphIt->second;
+    abortIfHandlingDisabled(graphId);
+
+    GraphVariant graphVar;
+
+    m_graphs.withlock([&](auto& graphs) {
+        auto graphIt = graphs.find(graphId);
+        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(graphIt == graphs.cend(),
+                                          "Graph id: '{0}' does not exist!",
+                                          graphId.toString());
+        graphVar = graphIt->second;
+    });
+
+    // Remark: Here somebody could potentially call `removeGraph` (other thread)
+    // which would remove this GraphVariant... and we carry on here adding a node
+    // its not optimal but still safe.
 
     // Make a visitor to dispatch the "add" over the variant...
     auto add = [&](auto& graph) {
-        using GraphType    = std::remove_cv_t<std::remove_reference_t<decltype(graph)>>;
+        using GraphType    = std::remove_cv_t<std::remove_reference_t<typename decltype(*graph)>>;
         using Config       = typename GraphType::Config;
         using NodeBaseType = typename Config::NodeBaseType;
 
@@ -113,10 +198,13 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
         NodeId id          = graph.generateNodeId();
         NodeBaseType* node = nullptr;
 
+        // Locking start
+        auto graphLock = graph->wlock();
+        auto& graph    = *graphL;
         try
         {
             auto n = serializer.read(type, id, nodeName);
-            node   = graph.addNode(std::move(n));
+            node   = graphL->addNode(std::move(n));
         }
         catch(executionGraph::Exception& e)
         {
@@ -131,6 +219,8 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
 
         // Create the response
         responseCreator(graph, *node);
+
+        // Locking end
     };
 
     std::visit(add, graphVar);

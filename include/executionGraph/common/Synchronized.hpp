@@ -44,9 +44,10 @@ namespace executionGraph
             using LockType          = TLock;
             using CSynchronizedType = TTSynchronized;
             using SynchronizedType  = std::remove_const_t<TTSynchronized>;
+            using DataType          = typename SynchronizedType::DataType;
             using CDataType         = std::conditional_t<std::is_const_v<CSynchronizedType>,
-                                                 const typename SynchronizedType::Data,
-                                                 typename SynchronizedType::Data>;
+                                                 const DataType,
+                                                 DataType>;
 
         private:
             friend SynchronizedType;
@@ -156,8 +157,8 @@ namespace executionGraph
     class Synchronized
     {
     public:
-        using Data          = TData;
-        using Mutex         = TMutex;
+        using DataType      = TData;
+        using MutexType     = TMutex;
         using ExclusiveLock = TExclusiveLock;
         using SharedLock    = TSharedLock;
 
@@ -171,7 +172,7 @@ namespace executionGraph
 
     public:
         template<typename... Args>
-        explicit Synchronized(Args&&... args) noexcept(noexcept(Data(std::forward<Args>(args)...)))
+        explicit Synchronized(Args&&... args) noexcept(noexcept(DataType(std::forward<Args>(args)...)))
             : m_data(std::forward<Args>(args)...)
         {}
 
@@ -255,8 +256,8 @@ namespace executionGraph
         }
 
     private:
-        mutable Mutex m_mutex;  //!< Mutex for `m_data`.
-        Data m_data;            //!< The actual guarded data.
+        mutable MutexType m_mutex;  //!< MutexType for `m_data`.
+        DataType m_data;            //!< The actual guarded data.
     };
 };  // namespace executionGraph
 
