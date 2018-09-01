@@ -12,6 +12,7 @@
 
 #include "executionGraphGUI/backend/ExecutionGraphBackend.hpp"
 #include "executionGraphGUI/backend/ExecutionGraphBackendDefs.hpp"
+#include "executionGraphGUI/common/Assert.hpp"
 #include "executionGraphGUI/common/Exception.hpp"
 #include "executionGraphGUI/common/RequestError.hpp"
 
@@ -44,8 +45,10 @@ Id ExecutionGraphBackend::addGraph(const Id& graphType)
 
     if(graphType == m_graphTypeDescriptionIds[0])
     {
-        auto graph = std::make_shared<Synchronized<DefaultGraph>>();
+        auto graph       = std::make_shared<Synchronized<DefaultGraph>>();
+        auto graphStatus = std::make_shared<GraphStatus>();
         m_graphs.wlock()->emplace(std::make_pair(newId, graph));
+        m_status.wlock()->emplace(std::make_pair(newId, graphStatus));
     }
     else
     {
@@ -68,7 +71,7 @@ void ExecutionGraphBackend::removeGraph(const Id& graphId)
     std::shared_ptr<GraphStatus> graphStatus;
     m_status.withWLock([&graphId, &graphStatus](auto& status) {
         auto it = status.find(graphId);
-        EXECGRAPH_ASSERT(it != status.cend(), "Programming error!");
+        EXECGRAPHGUI_ASSERT(it != status.cend(), "Programming error!");
         graphStatus = it->second;
     });
 
@@ -116,7 +119,7 @@ void ExecutionGraphBackend::removeNode(const Id& graphId,
     GraphVariant graphVar;
     m_graphs.withRLock([&](auto& graphs) {
         auto graphIt = graphs.find(graphId);
-        EXECGRAPH_ASSERT(graphIt != graphs.cend());
+        EXECGRAPHGUI_ASSERT(graphIt != graphs.cend(), "Programming Error!");
         graphVar = graphIt->second;
     });
 
@@ -141,7 +144,7 @@ Deferred ExecutionGraphBackend::initRequest(Id graphId)
     m_status.withWLock([&graphId](auto& stati) {
         auto it = stati.find(graphId);
 
-        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(it != stati.end(),
+        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(it == stati.end(),
                                           "No status for graph id: '{0}', Graph doesn't exist!",
                                           graphId.toString());
 
