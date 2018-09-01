@@ -157,14 +157,14 @@ namespace executionGraph
     class Synchronized
     {
     public:
-        using DataType      = TData;
-        using MutexType     = TMutex;
-        using ExclusiveLock = TExclusiveLock;
-        using SharedLock    = TSharedLock;
+        using DataType          = TData;
+        using MutexType         = TMutex;
+        using ExclusiveLockType = TExclusiveLock;
+        using SharedLockType    = TSharedLock;
 
     public:
-        using ConstLockedPtr = details::LockedPtr<TSharedLock, const Synchronized>;
-        using LockedPtr      = details::LockedPtr<ExclusiveLock, Synchronized>;
+        using ConstLockedPtr = details::LockedPtr<SharedLockType, const Synchronized>;
+        using LockedPtr      = details::LockedPtr<ExclusiveLockType, Synchronized>;
 
     private:
         friend ConstLockedPtr;

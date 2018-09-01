@@ -28,6 +28,7 @@ namespace executionGraph
     /* ---------------------------------------------------------------------------------------*/
     class Deferred final
     {
+    public:
         template<typename T>
         Deferred(T&& function)
             : m_defered(function)
@@ -37,7 +38,7 @@ namespace executionGraph
 
         //! Copy/Assignment is disabled!
         Deferred(const Deferred&) = delete;
-        Deferred& oeprator = (const Deferred&) = delete;
+        Deferred& operator=(const Deferred&) = delete;
 
         //! Move/move assignment is allowed
         Deferred(Deferred&&) = default;

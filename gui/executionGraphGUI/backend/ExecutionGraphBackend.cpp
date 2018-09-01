@@ -21,6 +21,7 @@ using GraphTypeDescription = ExecutionGraphBackend::GraphTypeDescription;
 using DefaultGraph         = ExecutionGraphBackend::DefaultGraph;
 using DefaultGraphConfig   = typename DefaultGraph::Config;
 using NodeId               = ExecutionGraphBackend::NodeId;
+using Deferred             = ExecutionGraphBackend::Deferred;
 
 namespace e = executionGraph;
 
@@ -43,7 +44,7 @@ Id ExecutionGraphBackend::addGraph(const Id& graphType)
 
     if(graphType == m_graphTypeDescriptionIds[0])
     {
-        auto graph = std::make_shared<Synchronized<DefaultGraph>>{};
+        auto graph = std::make_shared<Synchronized<DefaultGraph>>();
         m_graphs.wlock()->emplace(std::make_pair(newId, graph));
     }
     else
@@ -65,17 +66,18 @@ void ExecutionGraphBackend::removeGraph(const Id& graphId)
     // Holding a shared_ptr to the graphStatus is ok, since we are the only
     // function which is gona delete this!
     std::shared_ptr<GraphStatus> graphStatus;
-    m_status.withWLock([&graphId](auto& status) {
+    m_status.withWLock([&graphId, &graphStatus](auto& status) {
         auto it = status.find(graphId);
         EXECGRAPH_ASSERT(it != status.cend(), "Programming error!");
         graphStatus = it->second;
-        // Disable request handling for this graph
-        // Important: No request may be handled anymore from now on!
-        graphStatus->enableRequestHandling(false);
     });
 
-    // Wait till all request are finished except this one
-    auto result = graphStatus->waitUntilOnlySingleRequests();
+    // Disable request handling for this graph
+    // Important: No request may be handled anymore from now on!
+    graphStatus->setRequestHandlingEnabled(false);
+
+    // Wait till all other requests are finished
+    auto result = graphStatus->waitUntilOtherRequestsFinished();
 
     EXECGRAPHGUI_THROW_BAD_REQUEST_IF(!result.second,
                                       "Time-out while waiting for all request to "
@@ -83,18 +85,18 @@ void ExecutionGraphBackend::removeGraph(const Id& graphId)
                                       graphId.toString());
 
     // We are clear to delete all data structures for this graph
-    clearGraphData(graphId;)
+    clearGraphData(graphId);
 }
 
 //! Remove all graphs from the backend.
 void ExecutionGraphBackend::removeGraphs()
 {
     // Make set of all graph ids.
-    std::set<Id> ids;
-    m_graphs.withRLock([&graphId](auto& graphs) {
+    std::unordered_set<Id> ids;
+    m_graphs.withRLock([&ids](auto& graphs) {
         for(auto& kV : graphs)
         {
-            ids.emplace{kV.first};
+            ids.emplace(kV.first);
         }
     });
 
@@ -112,11 +114,11 @@ void ExecutionGraphBackend::removeNode(const Id& graphId,
     auto s = initRequest(graphId);
 
     GraphVariant graphVar;
-    m_graphs.withRlock([&](auto& graphs){
-        auto graphIt = graphs->find(graphId);
-        EXECGRAPH_ASSERT(graphIt != graphs.end());
+    m_graphs.withRLock([&](auto& graphs) {
+        auto graphIt = graphs.find(graphId);
+        EXECGRAPH_ASSERT(graphIt != graphs.cend());
         graphVar = graphIt->second;
-    }
+    });
 
     // Make a visitor to dispatch the "remove" over the variant...
     auto remove = [&](auto& graph) {
@@ -136,32 +138,33 @@ void ExecutionGraphBackend::removeNode(const Id& graphId,
 Deferred ExecutionGraphBackend::initRequest(Id graphId)
 {
     // Check if request handling for this graph is disabled
-    m_status.withWLock([&graphId](auto& status) {
-        auto it = status.find(graphId);
+    m_status.withWLock([&graphId](auto& stati) {
+        auto it = stati.find(graphId);
 
-        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(it != status.end(),
+        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(it != stati.end(),
                                           "No status for graph id: '{0}', Graph doesn't exist!",
                                           graphId.toString());
 
-        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(!it->isRequestHandlingEnabled(),
+        auto& status = it->second;
+        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(!status->isRequestHandlingEnabled(),
                                           "Request is cancled since, request handling on "
                                           "the graph with id: '{0}' is disabled!",
                                           graphId.toString());
 
         // Request handling is enabled
         // Increment the request counter for this graph id
-        it->incrementRequestCount();
+        status->incrementRequestCount();
     });
 
     // Return a deferred functor which decrements
     // the request count.
-    return makeDeferred([graphId, this]() {
+    return executionGraph::makeDeferred([graphId, this]() {
         auto locked = m_status.wlock();
         auto it     = locked->find(graphId);
         if(it != locked->end())
         {
             // We have a status
-            it->decrementRequestCount();
+            it->second->decrementRequestCount();
         }
     });
 }
@@ -179,8 +182,8 @@ void ExecutionGraphBackend::clearGraphData(Id graphId)
                      "No such graph status with id: '{0}' removed!",
                      graphId.toString());
 
-    nErased = m_executor.wlock()->erase(graphId);
-    EXECGRAPH_ASSERT(nErased == 0,
-                     "No such graph status with id: '{0}' removed!",
-                     graphId.toString());
+    // nErased = m_executor.wlock()->erase(graphId);
+    // EXECGRAPH_ASSERT(nErased == 0,
+    //                  "No such graph status with id: '{0}' removed!",
+    //                  graphId.toString());
 }

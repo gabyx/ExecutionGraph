@@ -87,8 +87,8 @@
     },
     "cmake.useCMakeServer": true,
     "cmake.preferredGenerators": [
-        "Unix Makefiles",
-        "Ninja"
+        "Ninja",
+        "Unix Makefiles"
     ],
     // "C_Cpp.clang_format_fallbackStyle": "none",
     // "C_Cpp.clang_format_style": "file",

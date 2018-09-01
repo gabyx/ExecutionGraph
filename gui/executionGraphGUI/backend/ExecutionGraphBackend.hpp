@@ -47,6 +47,11 @@ public:
     using IdNamed              = executionGraph::IdNamed;
     using GraphTypeDescription = executionGraph::GraphTypeDescription;
     using NodeId               = executionGraph::NodeId;
+    using Deferred             = executionGraph::Deferred;
+
+    template<typename... Args>
+    using Synchronized = executionGraph::Synchronized<Args...>;
+
     template<typename K, typename T>
     using SyncedUMap = Synchronized<std::unordered_map<K, T>>;
 
@@ -85,22 +90,23 @@ private:
 
 public:
     //! Get all graph descriptions identified by its id.
-    const Systd::unordered_map<Id, GraphTypeDescription>& getGraphTypeDescriptions() const { return m_graphTypeDescription; }
+    const std::unordered_map<Id, GraphTypeDescription>& getGraphTypeDescriptions() const { return m_graphTypeDescription; }
     //@}
 
 private:
-    [[nodiscard]] Deferred initRequest(Id graphId);
+    [[nodiscard]] executionGraph::Deferred initRequest(Id graphId);
+    void clearGraphData(Id graphId);
 
 private:
     class GraphStatus
     {
     private:
         using Mutex             = std::mutex;
-        using Lock              = std::lock_guard<Mutex>;
+        using Lock              = std::scoped_lock<Mutex>;
         using ConditionVariable = std::condition_variable;
 
     public:
-        void isRequestHandlingEnabled() const { return m_requestHandlingEnabled; }
+        bool isRequestHandlingEnabled() const { return m_requestHandlingEnabled; }
         void setRequestHandlingEnabled(bool enabled) { m_requestHandlingEnabled = enabled; }
 
     private:
@@ -116,8 +122,9 @@ private:
         void incrementRequestCount()
         {
             Lock lock(m_requestCountMutex);
-            return ++m_requestCount;
+            ++m_requestCount;
         };
+
         void decrementRequestCount()
         {
             bool singleRequest = false;
@@ -139,20 +146,20 @@ private:
         //! Wait until the request count is zero, or timeout.
         //! @param Return the lock, such that no one can change the request count and
         //! the bool indicating if the request count is zero!
-        template<typename Duration>
-        std::pair<std::unique_lock<std::mutex>, bool>
-        waitUntilOnlySingleRequests(const Duration& timeout = std::chrono::seconds(10))
+        template<typename Duration = std::chrono::seconds>
+        std::pair<std::unique_lock<Mutex>, bool>
+        waitUntilOtherRequestsFinished(Duration timeout = std::chrono::seconds(10))
         {
-            std::unique_lock<std::mutex> lock(m_requestCountMutex);
+            std::unique_lock<Mutex> lock(m_requestCountMutex);
             bool singleRequest = m_onlySingleRequest.wait_for(lock,
                                                               timeout,
                                                               [&]() { return m_requestCount == 1; });
-            return {std::move(lock), singleRequest};
+            return std::make_pair(std::move(lock), singleRequest);
         }
 
     private:
         ConditionVariable m_onlySingleRequest;  //!< Condition variable indicating: request count == 1
-        Mutex m_requestCountMutex;              //!< The mutex for the request count
+        mutable Mutex m_requestCountMutex;      //!< The mutex for the request count
         std::size_t m_requestCount = 0;         //!< The number of simultanously handling requests.
     };
 
@@ -171,11 +178,11 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
                                     const std::string& nodeName,
                                     ResponseCreator&& responseCreator)
 {
-    abortIfHandlingDisabled(graphId);
+    auto deferred = initRequest(graphId);
 
     GraphVariant graphVar;
 
-    m_graphs.withlock([&](auto& graphs) {
+    m_graphs.withRLock([&](auto& graphs) {
         auto graphIt = graphs.find(graphId);
         EXECGRAPHGUI_THROW_BAD_REQUEST_IF(graphIt == graphs.cend(),
                                           "Graph id: '{0}' does not exist!",
@@ -184,23 +191,22 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
     });
 
     // Remark: Here somebody could potentially call `removeGraph` (other thread)
-    // which would remove this GraphVariant... and we carry on here adding a node
-    // its not optimal but still safe.
+    // which waits till all requests on this graph are handled.
 
     // Make a visitor to dispatch the "add" over the variant...
     auto add = [&](auto& graph) {
-        using GraphType    = std::remove_cv_t<std::remove_reference_t<typename decltype(*graph)>>;
+        using GraphType    = typename std::remove_cv_t<std::remove_reference_t<decltype(*graph)>>::DataType;
         using Config       = typename GraphType::Config;
         using NodeBaseType = typename Config::NodeBaseType;
 
+        // Locking start
+        auto graphL = graph->wlock();
+
         // Construct the node with the serializer
         typename ExecutionGraphBackendDefs<Config>::NodeSerializer serializer;
-        NodeId id          = graph.generateNodeId();
+        NodeId id          = graphL->generateNodeId();
         NodeBaseType* node = nullptr;
 
-        // Locking start
-        auto graphLock = graph->wlock();
-        auto& graph    = *graphL;
         try
         {
             auto n = serializer.read(type, id, nodeName);
@@ -208,17 +214,19 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
         }
         catch(executionGraph::Exception& e)
         {
-            EXECGRAPHGUI_THROW_BAD_REQUEST("Construction of node '{0}' with type: '{1}' for graph id '{2}' failed: '{3}'",
-                                           nodeName,
-                                           type,
-                                           graphId.toString(),
-                                           e.what());
+            EXECGRAPHGUI_THROW_BAD_REQUEST(
+                "Construction of node '{0}' with type: '{1}' "
+                "for graph id '{2}' failed: '{3}'",
+                nodeName,
+                type,
+                graphId.toString(),
+                e.what());
         }
 
         EXECGRAPH_ASSERT(node != nullptr, "Node is nullptr!!?");
 
-        // Create the response
-        responseCreator(graph, *node);
+        // Create the response (with the graph locked)
+        responseCreator(*graphL, *node);
 
         // Locking end
     };
