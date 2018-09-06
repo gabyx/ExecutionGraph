@@ -37,22 +37,22 @@ type():flatbuffers.Long {
 };
 
 /**
- * @returns flatbuffers.Long
- */
-index():flatbuffers.Long {
-  var offset = this.bb!.__offset(this.bb_pos, 6);
-  return offset ? this.bb!.readUint64(this.bb_pos + offset) : this.bb!.createLong(0, 0);
-};
-
-/**
  * @param flatbuffers.Encoding= optionalEncoding
  * @returns string|Uint8Array|null
  */
 name():string|null
 name(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
 name(optionalEncoding?:any):string|Uint8Array|null {
-  var offset = this.bb!.__offset(this.bb_pos, 8);
+  var offset = this.bb!.__offset(this.bb_pos, 6);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+};
+
+/**
+ * @returns flatbuffers.Long
+ */
+index():flatbuffers.Long {
+  var offset = this.bb!.__offset(this.bb_pos, 8);
+  return offset ? this.bb!.readUint64(this.bb_pos + offset) : this.bb!.createLong(0, 0);
 };
 
 /**
@@ -72,18 +72,18 @@ static addType(builder:flatbuffers.Builder, type:flatbuffers.Long) {
 
 /**
  * @param flatbuffers.Builder builder
- * @param flatbuffers.Long index
+ * @param flatbuffers.Offset nameOffset
  */
-static addIndex(builder:flatbuffers.Builder, index:flatbuffers.Long) {
-  builder.addFieldInt64(1, index, builder.createLong(0, 0));
+static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(1, nameOffset, 0);
 };
 
 /**
  * @param flatbuffers.Builder builder
- * @param flatbuffers.Offset nameOffset
+ * @param flatbuffers.Long index
  */
-static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(2, nameOffset, 0);
+static addIndex(builder:flatbuffers.Builder, index:flatbuffers.Long) {
+  builder.addFieldInt64(2, index, builder.createLong(0, 0));
 };
 
 /**
