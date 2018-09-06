@@ -20,10 +20,10 @@
         "libs/*"
       ],
       "@messages/*": [
-        "../messages/schemas/ts/*"
+        "libs/messages/*"
       ],
       "@serialization/*": [
-        "../../../include/executionGraph/serialization/schemas/ts/*"
+        "libs/serialization/*"
       ],
       "@eg/common": [
         "libs/common/src/index.ts"
