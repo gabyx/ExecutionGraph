@@ -8,7 +8,7 @@
     "build": "ng build",
     "build-prod": "ng build --prod",
     "build-prod-watch": "ng build --prod --watch",
-    "build-prod-app-eg": "ng build --prod --app=eg",
+    "build-prod-app-eg": "ng build --prod --project=eg",
     "test": "ng test",
     "lint": "./node_modules/.bin/nx lint && ng lint",
     "e2e": "ng e2e",

@@ -136,7 +136,7 @@
             "type": "chrome",
             "request": "launch",
             "url": "http://localhost:4200/#",
-            "webRoot": "${workspaceRoot}/gui/executionGraphGui/client"
+            "webRoot": "${workspaceRoot}/gui/executionGraphGui/client/apps/eg"
         }
     ]
 }
