@@ -103,7 +103,7 @@ export class WorkspaceComponent implements OnInit {
     // Connection to itself and connection from same node output to input (or viceverse)
     // is not allowed.
     if (source === target || source.parent === target.parent) {
-      this.logger.error(`Connection from source: '${source}' to '${target}' not allowed!`);
+      this.logger.error(`Connection from source: '${source.idString}' to '${target.idString}' not allowed!`);
       return;
     }
 

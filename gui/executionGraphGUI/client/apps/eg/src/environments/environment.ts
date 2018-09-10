@@ -17,5 +17,6 @@
 
 export const environment = {
   production: false,
-  logReponsesVerbose: true
+  logReponsesVerbose: true,
+  useServiceDummys: true
 };

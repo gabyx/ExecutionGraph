@@ -57,6 +57,8 @@ import { WorkspaceComponent } from './components/workspace/workspace.component';
 import { environment } from '../environments/environment';
 import { ConnectionStyleOptionsComponent } from './components/connection-style-options/connection-style-options.component';
 
+environment.production = true
+
 @NgModule({
   declarations: [AppComponent, ToolbarComponent, WorkspaceComponent, ConnectionStyleOptionsComponent],
   imports: [
@@ -79,19 +81,19 @@ import { ConnectionStyleOptionsComponent } from './components/connection-style-o
     { provide: VERBOSE_LOG_TOKEN, useValue: environment.logReponsesVerbose },
     {
       provide: ExecutionService,
-      useClass: environment.production ? ExecutionServiceBinaryHttp : ExecutionServiceDummy
+      useClass: environment.useServiceDummys ? ExecutionServiceBinaryHttp : ExecutionServiceDummy
     },
     {
       provide: GeneralInfoService,
-      useClass: environment.production ? GeneralInfoServiceBinaryHttp : GeneralInfoServiceDummy
+      useClass: environment.useServiceDummys ? GeneralInfoServiceBinaryHttp : GeneralInfoServiceDummy
     },
     {
       provide: GraphManipulationService,
-      useClass: environment.production ? GraphManipulationServiceBinaryHttp : GraphManipulationServiceDummy
+      useClass: environment.useServiceDummys ? GraphManipulationServiceBinaryHttp : GraphManipulationServiceDummy
     },
     {
       provide: GraphManagementService,
-      useClass: environment.production ? GraphManagementServiceBinaryHttp : GraphManagementServiceDummy
+      useClass: environment.useServiceDummys ? GraphManagementServiceBinaryHttp : GraphManagementServiceDummy
     }
   ],
   bootstrap: [AppComponent]
