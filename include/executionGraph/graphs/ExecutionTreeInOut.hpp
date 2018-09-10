@@ -30,6 +30,17 @@
 
 namespace executionGraph
 {
+    /* ---------------------------------------------------------------------------------------*/
+    /*!
+        Execution Graph which stores all nodes and lets them execute in order such that 
+        all dependencies (inputs) of any node is computed before it is computed.
+
+        @todo When saving an execution graph, we should make a remapping to linear ids. 
+
+        @date Tue Sep 11 2018
+        @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+    */
+    /* ---------------------------------------------------------------------------------------*/
     template<typename TConfig>
     class ExecutionTreeInOut final
     {
@@ -153,9 +164,9 @@ namespace executionGraph
         //! Generate a new unique node id (not yet contained in the graph).
         NodeId generateNodeId()
         {
-            EXECGRAPH_ASSERT(m_maxCurrentNodeId + 1 != std::numeric_limits<NodeId>::max(),
+            EXECGRAPH_ASSERT(m_nextNodeId != std::numeric_limits<NodeId>::max(),
                              "Maximal node count reached! (max() reserved for defaultOutputPool)");
-            return m_maxCurrentNodeId + 1;
+            return m_nextNodeId;
         }
         //! Get a specific node with id \p nodeId if it exists, nullptr otherwise.
         //! This invalidates the execution order, since we cannot guarantee that the caller added other links.
@@ -217,8 +228,6 @@ namespace executionGraph
                                "Node id: '{0}' already added in tree!",
                                id);
 
-            m_maxCurrentNodeId = std::max(m_maxCurrentNodeId, id);
-
             if(type != NodeClassification::ConstantNode)
             {
                 m_executionOrderUpToDate = false;
@@ -242,6 +251,8 @@ namespace executionGraph
 
             // Add to classes
             m_nodeClassifications[type].emplace(pNode);
+
+            m_nextNodeId = std::max(m_nextNodeId, id) + 1;
 
             return pNode;
         }
@@ -288,10 +299,10 @@ namespace executionGraph
             // Erase from nodes.
             m_nodes.erase(nodeIt);
 
-            // Decrement max current node id.
-            if(nodeId == m_maxCurrentNodeId && m_maxCurrentNodeId > 0)
+            // Decrement next current node id.
+            if(nodeId + 1 == m_nextNodeId)
             {
-                --m_maxCurrentNodeId;
+                --m_nextNodeId;
             }
 
             // Execution order is not up-to-date.
@@ -1112,7 +1123,7 @@ namespace executionGraph
 
         LogicNodeDefaultOutputs* m_nodeDefaultOutputPool;  //!< Default Pool with output sockets, to which all not connected input sockets are connected!
 
-        NodeId m_maxCurrentNodeId = 0;  //!< Maximal current node id, to generate a new node id.
+        NodeId m_nextNodeId = 0;  //!< Next node id currently available.
     };
 }  // namespace executionGraph
 

@@ -13,7 +13,7 @@
 import { Injectable, Inject} from '@angular/core';
 import { VERBOSE_LOG_TOKEN } from '../tokens';
 import { flatbuffers } from 'flatbuffers';
-import { ILogger, LoggerFactory } from '@eg/logger';
+import { ILogger, LoggerFactory, stringify} from '@eg/logger';
 import { Id } from '@eg/common';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { toNode } from './Conversions';
@@ -77,7 +77,7 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
 
     let nodeModel = toNode(node);
     if (this.verboseResponseLog) {
-      this.logger.info(`Node: '${nodeModel}'`);
+      this.logger.info(`Node: '${stringify(nodeModel)}'`);
     }
     return nodeModel;
   }

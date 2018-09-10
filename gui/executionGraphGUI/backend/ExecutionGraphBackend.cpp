@@ -176,12 +176,12 @@ Deferred ExecutionGraphBackend::initRequest(Id graphId)
 void ExecutionGraphBackend::clearGraphData(Id graphId)
 {
     auto nErased = m_graphs.wlock()->erase(graphId);
-    EXECGRAPH_ASSERT(nErased == 0,
+    EXECGRAPH_ASSERT(nErased != 0,
                      "No such graph with id: '{0}' removed!",
                      graphId.toString());
 
     nErased = m_status.wlock()->erase(graphId);
-    EXECGRAPH_ASSERT(nErased == 0,
+    EXECGRAPH_ASSERT(nErased != 0,
                      "No such graph status with id: '{0}' removed!",
                      graphId.toString());
 

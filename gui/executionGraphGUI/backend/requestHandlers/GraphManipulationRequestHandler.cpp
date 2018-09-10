@@ -124,4 +124,7 @@ void GraphManipulationRequestHandler::handleRemoveNode(const Request& request,
     // Execute the request
     m_backend->removeNode(graphID,
                           nodeReq->nodeId());
+
+    // Set the response.
+    response.setReady();
 }

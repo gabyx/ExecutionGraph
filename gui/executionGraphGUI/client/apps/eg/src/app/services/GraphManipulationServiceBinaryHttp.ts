@@ -13,7 +13,7 @@
 import { Injectable, Inject } from '@angular/core';
 import { VERBOSE_LOG_TOKEN } from '../tokens';
 import { flatbuffers } from 'flatbuffers';
-import { ILogger, LoggerFactory } from '@eg/logger';
+import { ILogger, LoggerFactory, stringify } from '@eg/logger';
 import { Id } from '@eg/common';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
@@ -64,7 +64,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
 
     let nodeModel = toNode(node);
     if (this.verboseResponseLog) {
-      this.logger.info(`Node: '${nodeModel}'`);
+      this.logger.info(`Node: '${stringify(nodeModel)}'`);
     }
     return nodeModel;
   }
@@ -83,6 +83,6 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
 
     // Send the request
     await this.binaryRouter.post('graph/removeNode', requestPayload);
-    this.logger.debug(`Removed node [id: '${graphId}'] from graph [id '${graphId}']`);
+    this.logger.debug(`Removed node [id: '${nodeId}'] from graph [id '${graphId}']`);
   }
 }
