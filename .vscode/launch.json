@@ -136,7 +136,8 @@
             "type": "chrome",
             "request": "launch",
             "url": "http://localhost:4200/#",
-            "webRoot": "${workspaceRoot}/gui/executionGraphGui/client/apps/eg"
+            "webRoot": "${workspaceRoot}/gui/executionGraphGui/client/apps/eg",
+            "skipFiles": ["ConsoleSink.ts", "MultiSinkLogger.ts"]
         }
     ]
 }
