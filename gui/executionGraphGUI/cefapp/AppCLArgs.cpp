@@ -15,6 +15,7 @@
 #include <iostream>
 #include <executionGraph/common/StringFormat.hpp>
 #include "executionGraphGUI/common/Exception.hpp"
+#include "executionGraphGUI/common/Loggers.hpp"
 
 AppCLArgs::AppCLArgs(int argc, char* argv[])
     : executionGraph::CommandLineArguments(argc, argv, "ExecutionGUI Application", "No detailed description")
@@ -42,10 +43,18 @@ AppCLArgs::AppCLArgs(int argc, char* argv[])
 
         // Post process CEF args
         m_cefArgsSplitted = executionGraph::splitString(args::get(m_cefArgs));
+
+        m_cefArgsArray.reserve(1 + m_cefArgsSplitted.size());  // No reallocation!
+        m_cefArgsArray.emplace_back(std::strlen(argv[0]) + 1);
+        std::strcpy(m_cefArgsArray.back().data(), argv[0]);
+        m_cefArgsPtrArray.emplace_back(m_cefArgsArray.back().data());
+
         for(std::string& arg : m_cefArgsSplitted)
         {
-            m_cefArgsArray.emplace_back(std::strlen(arg.c_str()));
+            std::cout << "CEF Arg: " << arg << std::endl;
+            m_cefArgsArray.emplace_back(arg.size() + 1);
             std::strcpy(m_cefArgsArray.back().data(), arg.c_str());
+            m_cefArgsPtrArray.emplace_back(m_cefArgsArray.back().data());
         }
     }
     catch(args::Help)
@@ -61,15 +70,9 @@ AppCLArgs::AppCLArgs(int argc, char* argv[])
 
 //! Return CEF Arguments inform of an char*[] array.
 //!
-//! @return  Values stay valid as long as this singelton exists.
+//! @return  Values stay valid as long as this singleton exists.
 //!
-std::vector<char*> AppCLArgs::getCEFArgs()
+std::vector<char*>& AppCLArgs::getCEFArgs()
 {
-    std::vector<char*> vec(m_cefArgsArray.size() + 1);
-    vec[0] = m_argv[0];
-    for(auto charVec : m_cefArgsArray)
-    {
-        vec.emplace_back(charVec.data());
-    }
-    return vec;
+    return m_cefArgsPtrArray;
 }

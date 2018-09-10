@@ -200,7 +200,7 @@ int main(int argc, char* argv[])
 {
     // Parse command line arguments
     EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(AppCLArgs, appCLArgs, (argc, argv));
-    auto cefArgs = AppCLArgs::getInstance().getCEFArgs();
+    auto& cefArgs = AppCLArgs::getInstance().getCEFArgs();
 
     // Provide CEF with command-line arguments.
     CefMainArgs mainArgs(cefArgs.size(), cefArgs.data());

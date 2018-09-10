@@ -72,9 +72,9 @@ export function toNode(node: serialization.LogicNode): model.Node {
   for (let key of ['input', 'output']) {
     let isInput = key == 'input';
     let l = node[`${key}SocketsLength`]();
-    let arrayFunc = node[`${key}Sockets`];
+    let socks = (idx: number) => node[`${key}Sockets`](idx);
     for (let i = 0; i < l; ++i) {
-      let s = arrayFunc(i);
+      let s = socks(i);
       sockets[key].push({
         type: s.type(),
         name: s.name(),

@@ -81,19 +81,19 @@ environment.production = true
     { provide: VERBOSE_LOG_TOKEN, useValue: environment.logReponsesVerbose },
     {
       provide: ExecutionService,
-      useClass: environment.useServiceDummys ? ExecutionServiceBinaryHttp : ExecutionServiceDummy
+      useClass: !environment.useServiceDummys ? ExecutionServiceBinaryHttp : ExecutionServiceDummy
     },
     {
       provide: GeneralInfoService,
-      useClass: environment.useServiceDummys ? GeneralInfoServiceBinaryHttp : GeneralInfoServiceDummy
+      useClass: !environment.useServiceDummys ? GeneralInfoServiceBinaryHttp : GeneralInfoServiceDummy
     },
     {
       provide: GraphManipulationService,
-      useClass: environment.useServiceDummys ? GraphManipulationServiceBinaryHttp : GraphManipulationServiceDummy
+      useClass: !environment.useServiceDummys ? GraphManipulationServiceBinaryHttp : GraphManipulationServiceDummy
     },
     {
       provide: GraphManagementService,
-      useClass: environment.useServiceDummys ? GraphManagementServiceBinaryHttp : GraphManagementServiceDummy
+      useClass: !environment.useServiceDummys ? GraphManagementServiceBinaryHttp : GraphManagementServiceDummy
     }
   ],
   bootstrap: [AppComponent]
