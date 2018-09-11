@@ -34,7 +34,7 @@ export class SelectGraph implements Action {
 
 export class AddConnection implements Action {
   readonly type = AppActionTypes.AddConnection;
-  constructor(public source: OutputSocket, public target: InputSocket) { }
+  constructor(public source: OutputSocket | InputSocket, public target: OutputSocket | InputSocket) { }
 }
 
 export class ConnectionAdded implements Action {

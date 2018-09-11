@@ -41,7 +41,7 @@ import { Point, DragEvent } from '@eg/graph';
 })
 export class WorkspaceComponent implements OnInit {
   private logger: ILogger;
-  
+
   public readonly graph: Observable<Graph>;
   // public nodes: Node[] = [];
   // public connections: Connection[] = [];
@@ -81,7 +81,6 @@ export class WorkspaceComponent implements OnInit {
 
   public updateNodePosition(node: Node, event: DragEvent) {
     // this.logger.info(`[WorkspaceComponent] Updating node position to ${position.x}:${position.y}`);
-    
     // @todo This is not allowed! We modifie the immutable state :hank: This should be dispatched!
     node.uiProps.x = event.dragElementPosition.x;
     node.uiProps.y = event.dragElementPosition.y;
@@ -116,13 +115,6 @@ export class WorkspaceComponent implements OnInit {
   }
 
   public addConnection(source: OutputSocket | InputSocket, target: OutputSocket | InputSocket) {
-    // Connection to itself and connection from same node output to input (or viceverse)
-    // is not allowed.
-    // if (source === target || source.parent === target.parent) {
-    //   this.logger.error(`Connection from source: '${source.idString}' to '${target.idString}' not allowed!`);
-    //   return;
-    // }
-
     // Create the connection
     this.store.dispatch(new AddConnection(source, target));
   }
@@ -133,27 +125,5 @@ export class WorkspaceComponent implements OnInit {
 
   public isInputSocket(socket: Socket) {
     return socket instanceof InputSocket;
-  }
-
-  // private generateNode(id: number) {
-  //   const x = Math.random() * this.elementRef.nativeElement.offsetWidth / 2;
-  //   const y = Math.random() * this.elementRef.nativeElement.offsetHeight / 2;
-  //   const nodeId = new NodeId(id);
-  //   this.nodes.push(
-  //     new Node(
-  //       nodeId,
-  //       'DummyNode',
-  //       `Some test node ${id}`,
-  //       [new InputSocket('double', 'Some Input', new SocketIndex(1))],
-  //       [new OutputSocket('double', 'Some Output with text that is too long', new SocketIndex(1))],
-  //       { x: x, y: y }
-  //     )
-  //   );
-  // }
-
-  // public generateRandomConnection() {
-  //   const source = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].outputs[0];
-  //   const target = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].inputs[0];
-  //   this.addConnection(source, target);
   }
 }
