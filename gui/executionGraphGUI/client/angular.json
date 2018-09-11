@@ -62,7 +62,7 @@
           "configurations": {
             "production": {
               "browserTarget": "eg:build:production"
-            }
+            },
           }
         },
         "extract-i18n": {
