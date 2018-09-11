@@ -10,9 +10,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
+import { VERBOSE_LOG_TOKEN } from '../tokens';
 import { flatbuffers } from 'flatbuffers';
-import { ILogger, LoggerFactory } from '@eg/logger';
+import { ILogger, LoggerFactory, stringify } from '@eg/logger';
 import { Id } from '@eg/common';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
@@ -23,7 +24,11 @@ import { toNode } from './Conversions';
 export class GraphManipulationServiceBinaryHttp extends GraphManipulationService {
   private logger: ILogger;
 
-  constructor(loggerFactory: LoggerFactory, private readonly binaryRouter: BinaryHttpRouterService) {
+  constructor(
+    loggerFactory: LoggerFactory,
+    private readonly binaryRouter: BinaryHttpRouterService,
+    @Inject(VERBOSE_LOG_TOKEN) private readonly verboseResponseLog = true
+  ) {
     super();
     this.logger = loggerFactory.create('GraphManipulationServiceBinaryHttp');
   }
@@ -57,7 +62,11 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     this.logger.info(`Added new node [type: '${node.type()}', name: '${node.name()}', ins: ${node.inputSocketsLength()},
                   outs: ${node.outputSocketsLength()}].`);
 
-    return toNode(node);
+    let nodeModel = toNode(node);
+    if (this.verboseResponseLog) {
+      this.logger.info(`Node: '${stringify(nodeModel)}'`);
+    }
+    return nodeModel;
   }
 
   public async removeNode(graphId: Id, nodeId: NodeId): Promise<void> {
@@ -74,6 +83,6 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
 
     // Send the request
     await this.binaryRouter.post('graph/removeNode', requestPayload);
-    this.logger.debug(`Removed node [id: '${graphId}'] from graph [id '${graphId}']`);
+    this.logger.debug(`Removed node [id: '${nodeId}'] from graph [id '${graphId}']`);
   }
 }

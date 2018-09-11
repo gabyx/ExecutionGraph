@@ -10,7 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
+import { VERBOSE_LOG_TOKEN } from '../tokens';
 import { GeneralInfoService, sz } from './GeneralInfoService';
 import { flatbuffers } from 'flatbuffers';
 import { ILogger, LoggerFactory } from '@eg/logger';
@@ -21,7 +22,10 @@ import { toGraphTypeDescription } from './Conversions';
 export class GeneralInfoServiceDummy extends GeneralInfoService {
   private logger: ILogger;
 
-  constructor(loggerFactory: LoggerFactory) {
+  constructor(
+    loggerFactory: LoggerFactory,
+    @Inject(VERBOSE_LOG_TOKEN) private readonly verboseResponseLog = true
+  ) {
     super();
     this.logger = loggerFactory.create('GeneralInfoServiceDummy');
   }
@@ -72,7 +76,9 @@ export class GeneralInfoServiceDummy extends GeneralInfoService {
       graphDesc.push(toGraphTypeDescription(response.graphsTypes(g)));
     }
 
-    this.logger.debug(`GraphDescriptions: ${graphDesc}`);
+    if (this.verboseResponseLog) {
+      this.logger.debug(`GraphDescriptions: ${JSON.stringify(graphDesc)}`);
+    }
 
     return graphDesc;
   }

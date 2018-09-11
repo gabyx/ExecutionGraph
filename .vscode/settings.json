@@ -81,12 +81,14 @@
         "typeindex": "cpp",
         "__functional_03": "cpp",
         "thread": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "__mutex_base": "cpp",
+        "mutex": "cpp"
     },
     "cmake.useCMakeServer": true,
     "cmake.preferredGenerators": [
-        "Unix Makefiles",
-        "Ninja"
+        "Ninja",
+        "Unix Makefiles"
     ],
     // "C_Cpp.clang_format_fallbackStyle": "none",
     // "C_Cpp.clang_format_style": "file",

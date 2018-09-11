@@ -42,6 +42,15 @@
                   "with": "apps/eg/src/environments/environment.prod.ts"
                 }
               ]
+            },
+            "dev": {
+              "optimization": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/eg/src/environments/environment.ts",
+                  "with": "apps/eg/src/environments/environment.dev.ts"
+                }
+              ]
             }
           }
         },

@@ -11,12 +11,11 @@
 // =========================================================================================
 
 import { Injectable, Inject } from '@angular/core';
+import { VERBOSE_LOG_TOKEN } from '../tokens';
 import { flatbuffers } from 'flatbuffers';
-
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { GeneralInfoService, sz } from './GeneralInfoService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import { VERBOSE_LOG_TOKEN } from '../tokens';
 import * as model from '../model';
 import { toGraphTypeDescription } from './Conversions';
 
@@ -47,7 +46,7 @@ export class GeneralInfoServiceBinaryHttp extends GeneralInfoService {
     }
 
     if (this.verboseResponseLog) {
-      this.logger.debug(`GraphDescriptions: ${graphDesc}`);
+      this.logger.debug(`GraphDescriptions: ${JSON.stringify(graphDesc)}`);
     }
 
     return graphDesc;

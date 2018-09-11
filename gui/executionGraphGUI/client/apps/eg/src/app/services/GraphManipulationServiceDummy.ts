@@ -10,9 +10,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable } from '@angular/core';
+import { Injectable, Inject} from '@angular/core';
+import { VERBOSE_LOG_TOKEN } from '../tokens';
 import { flatbuffers } from 'flatbuffers';
-import { ILogger, LoggerFactory } from '@eg/logger';
+import { ILogger, LoggerFactory, stringify} from '@eg/logger';
 import { Id } from '@eg/common';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { toNode } from './Conversions';
@@ -22,7 +23,10 @@ import { Node, NodeId } from '../model';
 export class GraphManipulationServiceDummy extends GraphManipulationService {
   private logger: ILogger;
 
-  constructor(loggerFactory: LoggerFactory) {
+  constructor(
+    loggerFactory: LoggerFactory,
+    @Inject(VERBOSE_LOG_TOKEN) private readonly verboseResponseLog = true
+  ) {
     super();
     this.logger = loggerFactory.create('GraphManipulationServiceDummy');
   }
@@ -71,10 +75,14 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
                   with name: '${node.name()}' [ins: ${node.inputSocketsLength()},
                   outs: ${node.outputSocketsLength()}`);
 
-    return toNode(node);
+    let nodeModel = toNode(node);
+    if (this.verboseResponseLog) {
+      this.logger.info(`Node: '${stringify(nodeModel)}'`);
+    }
+    return nodeModel;
   }
 
   public async removeNode(graphId: Id, nodeId: NodeId): Promise<void> {
-    this.logger.error(`Not implemented yet!`);
+    this.logger.info(`Remove node [id: '${nodeId.toString()}'] from graph id '${graphId.toString()}'`);
   }
 }

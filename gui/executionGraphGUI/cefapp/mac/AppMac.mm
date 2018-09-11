@@ -37,6 +37,7 @@ namespace
 - (void)tryToTerminateApplication:(NSApplication*)app;
 
 - (IBAction)showDeveloperTools:(id)sender;
+- (IBAction)reload:(id)sender;
 @end
 
 // Provide the CefAppProtocol implementation required by CEF.
@@ -181,6 +182,17 @@ namespace
         appHandler->ShowDeveloperTools();
     }
 }
+
+//! Show the developer tools.
+- (IBAction)reload:(id)sender
+{
+    auto appHandler = GetAppHandler();
+    if(appHandler)
+    {
+        appHandler->Reload();
+    }
+}
+
 @end
 
 // Entry point function for the browser process.
@@ -188,7 +200,7 @@ int main(int argc, char* argv[])
 {
     // Parse command line arguments
     EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(AppCLArgs, appCLArgs, (argc, argv));
-    auto cefArgs = AppCLArgs::getInstance().getCEFArgs();
+    auto& cefArgs = AppCLArgs::getInstance().getCEFArgs();
 
     // Provide CEF with command-line arguments.
     CefMainArgs mainArgs(cefArgs.size(), cefArgs.data());

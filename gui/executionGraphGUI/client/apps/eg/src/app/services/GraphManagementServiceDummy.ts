@@ -25,11 +25,9 @@ export class GraphManagementServiceDummy extends GraphManagementService {
   }
 
   public async addGraph(graphTypeId: Id): Promise<Id> {
-    this.logger.error(`Not implemented yet!`);
     return new Id('606b5c8f-c9fd-41e2-9ed5-6f6429fd52ba');
   }
 
   public async removeGraph(graphId: Id): Promise<void> {
-    this.logger.error(`Not implemented yet!`);
   }
 }

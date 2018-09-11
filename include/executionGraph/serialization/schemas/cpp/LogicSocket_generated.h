@@ -14,24 +14,24 @@ struct LogicSocket;
 struct LogicSocket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_TYPE = 4,
-    VT_INDEX = 6,
-    VT_NAME = 8
+    VT_NAME = 6,
+    VT_INDEX = 8
   };
   uint64_t type() const {
     return GetField<uint64_t>(VT_TYPE, 0);
   }
-  uint64_t index() const {
-    return GetField<uint64_t>(VT_INDEX, 0);
-  }
   const flatbuffers::String *name() const {
     return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
+  uint64_t index() const {
+    return GetField<uint64_t>(VT_INDEX, 0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_TYPE) &&
-           VerifyField<uint64_t>(verifier, VT_INDEX) &&
            VerifyOffset(verifier, VT_NAME) &&
            verifier.VerifyString(name()) &&
+           VerifyField<uint64_t>(verifier, VT_INDEX) &&
            verifier.EndTable();
   }
 };
@@ -42,11 +42,11 @@ struct LogicSocketBuilder {
   void add_type(uint64_t type) {
     fbb_.AddElement<uint64_t>(LogicSocket::VT_TYPE, type, 0);
   }
-  void add_index(uint64_t index) {
-    fbb_.AddElement<uint64_t>(LogicSocket::VT_INDEX, index, 0);
-  }
   void add_name(flatbuffers::Offset<flatbuffers::String> name) {
     fbb_.AddOffset(LogicSocket::VT_NAME, name);
+  }
+  void add_index(uint64_t index) {
+    fbb_.AddElement<uint64_t>(LogicSocket::VT_INDEX, index, 0);
   }
   explicit LogicSocketBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -63,8 +63,8 @@ struct LogicSocketBuilder {
 inline flatbuffers::Offset<LogicSocket> CreateLogicSocket(
     flatbuffers::FlatBufferBuilder &_fbb,
     uint64_t type = 0,
-    uint64_t index = 0,
-    flatbuffers::Offset<flatbuffers::String> name = 0) {
+    flatbuffers::Offset<flatbuffers::String> name = 0,
+    uint64_t index = 0) {
   LogicSocketBuilder builder_(_fbb);
   builder_.add_index(index);
   builder_.add_type(type);
@@ -75,13 +75,13 @@ inline flatbuffers::Offset<LogicSocket> CreateLogicSocket(
 inline flatbuffers::Offset<LogicSocket> CreateLogicSocketDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     uint64_t type = 0,
-    uint64_t index = 0,
-    const char *name = nullptr) {
+    const char *name = nullptr,
+    uint64_t index = 0) {
   return executionGraph::serialization::CreateLogicSocket(
       _fbb,
       type,
-      index,
-      name ? _fbb.CreateString(name) : 0);
+      name ? _fbb.CreateString(name) : 0,
+      index);
 }
 
 }  // namespace serialization

@@ -46,7 +46,7 @@ export class TestService {
    */
   public async testAddRemove() {
     // Get the graph infos
-    console.debug('Get all graph type descriptions...');
+    this.logger.debug('Get all graph type descriptions...');
     let graphDescs = await this.generalInfoService.getAllGraphTypeDescriptions();
 
     // Add a node to the first graph
@@ -61,13 +61,20 @@ export class TestService {
     await this.graphManipulationService.addNode(graphId, nodeType, 'MySuperDuperNode');
 
     // Add a non existing node
-    await this.graphManipulationService.addNode(
-      graphId,
-      'BananaNode',
-      'MySupercalifragilisticexpialidociousBananaNode'
-    );
+    try {
+      await this.graphManipulationService.addNode(
+        graphId,
+        'BananaNode',
+        'MySupercalifragilisticexpialidociousBananaNode'
+      );
+    } catch (error) {
+      this.logger.error(error);
+    }
 
     // Remove first node
     await this.graphManipulationService.removeNode(graphId, new NodeId(0));
+
+    // Remove graph
+    await this.graphManagementService.removeGraph(graphId);
   }
 }

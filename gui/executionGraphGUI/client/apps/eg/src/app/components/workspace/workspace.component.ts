@@ -15,8 +15,6 @@ import { Observable } from 'rxjs';
 import { tap, filter } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 
-import { ILogger, LoggerFactory } from '@eg/logger';
-import { Point, DragEvent } from '@eg/graph';
 import {
   Graph,
   Socket,
@@ -31,6 +29,9 @@ import {
 import { AppState } from '../../+state/app.reducer';
 import { appQuery } from '../../+state/app.selectors';
 import { AddConnection } from '../../+state/app.actions';
+
+import { ILogger, LoggerFactory } from '@eg/logger';
+import { Point, DragEvent } from '@eg/graph';
 
 @Injectable()
 @Component({
@@ -114,11 +115,11 @@ export class WorkspaceComponent implements OnInit {
     this.newConnection = null;
   }
 
-  public addConnection(source: OutputSocket, target: InputSocket) {
+  public addConnection(source: OutputSocket | InputSocket, target: OutputSocket | InputSocket) {
     // Connection to itself and connection from same node output to input (or viceverse)
     // is not allowed.
     // if (source === target || source.parent === target.parent) {
-    //   this.logger.error(`Connection from source: '${source}' to '${target}' not allowed!`);
+    //   this.logger.error(`Connection from source: '${source.idString}' to '${target.idString}' not allowed!`);
     //   return;
     // }
 
