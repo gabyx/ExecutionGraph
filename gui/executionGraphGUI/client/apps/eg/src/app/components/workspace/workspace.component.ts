@@ -60,24 +60,7 @@ export class WorkspaceComponent implements OnInit {
     this.graph.subscribe(g => this.logger.debug(`Displaying graph ${g.id} `));
   }
 
-  ngOnInit() {
-    // const nNodes = 5;
-
-    // for (let i = 0; i < nNodes; i++) {
-    //   this.generateNode(i);
-    // }
-
-    // for (let i = 0; i < nNodes * 2; i++) {
-    //   this.generateRandomConnection();
-    // }
-
-    // const n1 = new Node('n-1', 'Knoten Uno', [], [new Socket("n-1-o-1", "Some Output with text that is too long")], { x: 100, y: 150 });
-    // const n2 = new Node('n-2', 'Knoten Due', [new Socket("n-2-i-1", "Some Input")], [], { x: 300, y: 300 });
-    // this.nodes.push(n1);
-    // this.nodes.push(n2);
-
-    // this.connections.push(new Connection(n1.outputs[0].id, n2.inputs[0].id));
-  }
+  ngOnInit() { }
 
   public updateNodePosition(node: Node, event: DragEvent) {
     // this.logger.info(`[WorkspaceComponent] Updating node position to ${position.x}:${position.y}`);
