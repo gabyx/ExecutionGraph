@@ -14,7 +14,7 @@ import * as Long from 'long';
 import { flatbuffers } from 'flatbuffers';
 import { Id } from '@eg/common';
 import * as model from './../model';
-import * as serialization from '@serialization/index';
+import * as serialization from '@eg/serialization';
 
 export function toLong(value: flatbuffers.Long): Long {
   return Long.fromBits(value.low, value.high, false);

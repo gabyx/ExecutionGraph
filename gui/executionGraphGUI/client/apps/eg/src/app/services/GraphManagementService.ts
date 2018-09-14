@@ -11,7 +11,7 @@
 // =========================================================================================
 
 import { Id } from '@eg/common';
-import { GraphManagementMessages } from '@messages/index';
+import { GraphManagementMessages } from '@eg/messages';
 export import sz = GraphManagementMessages;
 
 export abstract class GraphManagementService {

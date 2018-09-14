@@ -38,7 +38,7 @@ python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
      --inputFile='./flatbuffers.includes' \
      --includePaths="${REPO_DIR}/include/executionGraph/serialization/schemas"  \
      --generator='ts' \
-     --regex='.*executionGraph/.*/(\w+)' --substitution='@serialization/\1'
+     --regex='.*executionGraph/.*/(\w+)' --substitution='./\1'
 
 rm flatbuffers.includes
 
@@ -63,8 +63,8 @@ python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
      --includePaths="${REPO_DIR}/include/executionGraph/serialization/schemas"  \
      --includePaths="${REPO_DIR}/gui/executionGraphGUI/messages/schemas"  \
      --generator='ts' \
-     --regex='.*executionGraph/.*/(\w+)' --substitution='@serialization/\1' \
-     --regex='.*executionGraphGUI/.*/(\w+)' --substitution='@messages/\1'
+     --regex='.*executionGraph/.*/(\w+)' --substitution='@eg/serialization/\1' \
+     --regex='.*executionGraphGUI/.*/(\w+)' --substitution='./\1'
 
 rm flatbuffers.includes
 

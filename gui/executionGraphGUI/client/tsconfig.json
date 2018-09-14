@@ -19,12 +19,6 @@
       "@eg/*": [
         "libs/*"
       ],
-      "@messages/*": [
-        "libs/messages/*"
-      ],
-      "@serialization/*": [
-        "libs/serialization/*"
-      ],
       "@eg/common": [
         "libs/common/src/index.ts"
       ],
@@ -33,6 +27,15 @@
       ],
       "@eg/logger": [
         "libs/logger/src/index.ts"
+      ],
+      "@eg/messages": [
+        "libs/messages/src/index.ts"
+      ],
+      "@eg/serialization": [
+        "libs/serialization/src/index.ts"
+      ],
+      "@eg/serialization/*": [
+        "libs/serialization/src/lib/*"
       ]
     }
   },

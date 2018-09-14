@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/out-tsc/libs/graph",
+    "outDir": "../../dist/out-tsc/libs/messages",
     "target": "es2015",
     "module": "es2015",
     "moduleResolution": "node",
@@ -15,7 +15,9 @@
     "lib": [
       "dom",
       "es2015"
-    ]
+    ],
+    "paths": {
+    }
   },
   "angularCompilerOptions": {
     "annotateForClosureCompiler": true,
@@ -28,6 +30,7 @@
   },
   "exclude": [
     "src/test.ts",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "karma.conf.ts"
   ]
 }
