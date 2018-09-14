@@ -12,7 +12,7 @@
 
 import { Id } from '@eg/common';
 import { NodeId, Node } from '../model';
-import { GraphManipulationMessages } from '@messages/index';
+import { GraphManipulationMessages } from '@eg/messages';
 
 export import sz = GraphManipulationMessages;
 

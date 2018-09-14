@@ -62,7 +62,7 @@
           "configurations": {
             "production": {
               "browserTarget": "eg:build:production"
-            },
+            }
           }
         },
         "extract-i18n": {
@@ -221,6 +221,62 @@
         }
       },
       "prefix": "app"
+    },
+    "messages": {
+      "root": "libs/messages",
+      "sourceRoot": "libs/messages/src",
+      "projectType": "library",
+      "prefix": "eg",
+      "architect": {
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "libs/messages/src/test.ts",
+            "tsConfig": "libs/messages/tsconfig.spec.json",
+            "karmaConfig": "libs/messages/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/messages/tsconfig.lib.json",
+              "libs/messages/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "serialization": {
+      "root": "libs/serialization",
+      "sourceRoot": "libs/serialization/src",
+      "projectType": "library",
+      "prefix": "eg",
+      "architect": {
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "libs/serialization/src/test.ts",
+            "tsConfig": "libs/serialization/tsconfig.spec.json",
+            "karmaConfig": "libs/serialization/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/serialization/tsconfig.lib.json",
+              "libs/serialization/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "eg",

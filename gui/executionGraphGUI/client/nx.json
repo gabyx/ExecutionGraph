@@ -15,6 +15,12 @@
     },
     "logger": {
       "tags": []
+    },
+    "messages": {
+      "tags": []
+    },
+    "serialization": {
+      "tags": []
     }
   },
   "implicitDependencies": {

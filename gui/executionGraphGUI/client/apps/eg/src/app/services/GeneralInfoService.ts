@@ -11,7 +11,7 @@
 // =========================================================================================
 
 import * as model from '../model';
-import { GeneralInfoMessages } from '@messages/index';
+import { GeneralInfoMessages } from '@eg/messages';
 export import sz = GeneralInfoMessages;
 
 export abstract class GeneralInfoService {

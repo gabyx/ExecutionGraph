@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../out-tsc/libs/logger",
+    "outDir": "../../dist/out-tsc/libs/logger",
     "target": "es2015",
     "module": "es2015",
     "moduleResolution": "node",
