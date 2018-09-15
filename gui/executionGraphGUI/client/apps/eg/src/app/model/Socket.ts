@@ -37,28 +37,31 @@ export abstract class Socket {
     return this._parent;
   }
   public set parent(parent: Node) {
-    if (this._parent != null) {
+    if (!parent) { return; }
+    if  (this._parent != null) {
       throw 'You cannot assign a new parent!';
     }
     this._parent = parent;
-    this.initIdString();
+    this.initId();
   }
 
-  public get id(): SocketId { return this.id; }
-  public get idString(): string { return this.id.string; }
+  public get id(): SocketId { return this._id; }
+  public get idString(): string {
+    return this._id.string;
+  }
 
-  protected abstract initIdString();
+  protected abstract initId();
 }
 
 export class InputSocket extends Socket {
-  protected initIdString() {
+  protected initId() {
     if (this.parent) {
       this._id = new SocketId(this.parent.id, this.index, false);
     }
   }
 }
 export class OutputSocket extends Socket {
-  protected initIdString() {
+  protected initId() {
     if (this.parent) {
       this._id = new SocketId(this.parent.id, this.index, true);
     }

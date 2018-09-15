@@ -12,12 +12,21 @@
 
 import * as Long from 'long';
 
+
+function isLong(value: any): value is Long {
+  return value instanceof Long;
+}
+
 export class NodeId extends Long {
-  private readonly _idString : string
-  constructor(low: number, high?: number, unsigned?: boolean)
-  {
-    super(low,high,unsigned);
-    this._idString = `n-${this.toInt()}`;
+  private readonly _idString: string
+  constructor(id: number | Long) {
+    if (isLong(id)) {
+      super(id.low, id.high, id.unsigned);
+    }
+    else {
+      super(id, 0, true);
+    }
+    this._idString = `n-${this.toInt()}`
   }
   /**
    * String identifer for this NodeId.
@@ -28,4 +37,5 @@ export class NodeId extends Long {
   public get string(): string {
     return this._idString;
   }
+
 }

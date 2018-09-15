@@ -23,12 +23,12 @@ import { Guid } from 'guid-typescript';
 export class SocketId {
   private readonly _idString: string
   constructor(
-    private readonly parentId: NodeId | null = null,
+    private readonly parentId: NodeId = null,
     private readonly index: SocketIndex = SocketIndex.fromInt(0),
     private readonly outputSocket: boolean = true
   ) {
     if (parentId) {
-      this._idString = `${parentId.string}-` + outputSocket ? "o" : "i" + `-${index.toInt()}`
+      this._idString = `${parentId.string}-` + (outputSocket ? "o" : "i") + `-${index.toInt()}`
     }
     else {
       this._idString = Guid.create().toString();

@@ -42,6 +42,7 @@ export class Node {
     this.outputs.forEach((s: Socket) => (s.parent = this));
   }
 
-  public get idString() : string { return this.id.string; }
-
+  public get idString() : string {
+    return this.id.string;
+  }
 }
