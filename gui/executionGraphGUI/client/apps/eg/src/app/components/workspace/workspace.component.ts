@@ -32,6 +32,7 @@ import { AddConnection } from '../../+state/app.actions';
 
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { Point, DragEvent } from '@eg/graph';
+import { isDefined } from '@eg/common';
 
 @Injectable()
 @Component({
@@ -51,7 +52,7 @@ export class WorkspaceComponent implements OnInit {
     this.logger = loggerFactory.create('Workspace');
     this.graph = store.select(appQuery.getSelectedGraph)
       .pipe(
-        filter(g => g!==undefined)
+        filter(g => isDefined(g))
       );
 
     this.graph.subscribe(g => this.logger.debug(`Displaying graph ${g.id} `));

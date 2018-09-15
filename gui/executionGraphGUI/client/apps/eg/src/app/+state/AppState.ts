@@ -12,6 +12,7 @@
 
 import { Id } from "@eg/common";
 import { Graph, GraphTypeDescription } from '../model';
+import {isDefined} from '@eg/common'
 
 export class AppState {
   /** Map of graphs:
@@ -33,33 +34,33 @@ export class AppState {
    * Get the graph with the id `id` if it exists.
    *
    * @param {Id} id
-   * @returns {(Graph | null)}
+   * @returns {(Graph | undefined)}
    * @memberof AppState
    */
-  public getGraph(id: Id): Graph | null {
+  public getGraph(id: Id): Graph | undefined {
     let s = id.toString();
-    return (s in this.graphs) ? this.graphs[s] : null
+    return (s in this.graphs) ? this.graphs[s] : undefined
   }
 
   /**
    * Get the graph with the id `id` if it exists.
    *
    * @param {Id} id
-   * @returns {(Graph | null)}
+   * @returns {(Graph | undefined)}
    * @memberof AppState
    */
-  public getGraphDescription(id: Id): GraphTypeDescription | null {
+  public getGraphDescription(id: Id): GraphTypeDescription | undefined {
     let s = id.toString();
-    return (s in this.graphDescriptions) ? this.graphDescriptions[s] : null
+    return (s in this.graphDescriptions) ? this.graphDescriptions[s] : undefined
   }
 
   public getSelectedGraph()
   {
-    return this.getGraph(this.selectedGraphId);
+    return isDefined(this.selectedGraphId) ? this.getGraph(this.selectedGraphId) : undefined;
   }
   public getSelectedGraphDescription()
   {
-    return this.getGraphDescription(this.selectedGraphId);
+     return isDefined(this.selectedGraphId) ? this.getGraphDescription(this.selectedGraphId) : undefined;
   }
 
 }
