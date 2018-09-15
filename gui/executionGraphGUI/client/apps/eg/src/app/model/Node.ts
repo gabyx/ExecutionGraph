@@ -25,8 +25,6 @@ export interface UIProps {
  * @class Node
  */
 export class Node {
-  private readonly _idString: string;
-
   constructor(
     public readonly id: NodeId,
     public readonly type: string,
@@ -44,13 +42,6 @@ export class Node {
     this.outputs.forEach((s: Socket) => (s.parent = this));
   }
 
-  /**
-   * String identifer for this node.
-   *
-   * @returns {string}
-   * @memberof Node
-   */
-  public get idString(): string {
-    return `n-${this.id.toInt()}`;
-  }
+  public get idString() : string { return this.id.string; }
+
 }

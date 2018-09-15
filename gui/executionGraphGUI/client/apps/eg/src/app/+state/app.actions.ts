@@ -1,7 +1,6 @@
 import { Action } from '@ngrx/store';
-import { Graph } from '../model/Graph';
 import { Id } from '@eg/common/src';
-import { Socket, Connection, OutputSocket, InputSocket } from '../model';
+import { Graph, Node, Connection, OutputSocket, InputSocket, NodeId, ConnectionId } from '../model';
 
 export enum AppActionTypes {
   LoadApp = '[App] Load App',
@@ -22,6 +21,8 @@ export enum AppActionTypes {
 
   AddConnection = '[Graph] Add Connection',
   ConnectionAdded = '[Graph] Connection Added',
+  RemoveConnection = '[Graph] Remove Connection',
+  ConnectionRemoved = '[Graph] Connection Removed',
 }
 
 export class LoadApp implements Action {
@@ -30,12 +31,12 @@ export class LoadApp implements Action {
 
 export class AppLoadError implements Action {
   readonly type = AppActionTypes.LoadApp;
-  constructor(public payload: any) {}
+  constructor(public payload: any) { }
 }
 
 export class AppLoaded implements Action {
   readonly type = AppActionTypes.AppLoaded;
-  constructor(public payload: Graph[]) {}
+  constructor(public payload: Graph[]) { }
 }
 
 export class SelectGraph implements Action {
@@ -79,12 +80,12 @@ export class NodeAdded implements Action {
 
 export class RemoveNode implements Action {
   readonly type = AppActionTypes.RemoveNode;
-  constructor(public id: Id) { }
+  constructor(public id: NodeId) { }
 }
 
 export class NodeRemoved implements Action {
   readonly type = AppActionTypes.NodeRemoved;
-  constructor(public id: Id) { }
+  constructor(public id: NodeId) { }
 }
 
 export class AddConnection implements Action {
@@ -97,16 +98,39 @@ export class ConnectionAdded implements Action {
   constructor(public connection: Connection) { }
 }
 
+export class RemoveConnection implements Action {
+  readonly type = AppActionTypes.RemoveConnection;
+  constructor(public connection: Connection) { }
+}
+
+export class ConnectionRemoved implements Action {
+  readonly type = AppActionTypes.ConnectionRemoved;
+  constructor(public connectionId: ConnectionId) { }
+}
+
 /**
  *  All Actions for this application.
  */
-export type AppAction = LoadApp | AppLoaded | AppLoadError | SelectGraph | AddConnection | ConnectionAdded;
+export type AppAction =
+  LoadApp | AppLoaded | AppLoadError | SelectGraph |
+
+  AddGraph | GraphAdded |
+  RemoveGraph | GraphRemoved |
+
+  AddNode | NodeAdded |
+  RemoveNode | NodeRemoved |
+  AddConnection | ConnectionAdded |
+  RemoveConnection | ConnectionRemoved;
 
 export const fromAppActions = {
   LoadApp,
   AppLoaded,
   AppLoadError,
-  RemoveGraph,
-  AddConnection,
-  ConnectionAdded
+
+  AddGraph, GraphAdded,
+  RemoveGraph, GraphRemoved,
+
+  AddNode, NodeAdded,
+  RemoveNode, NodeRemoved,
+  AddConnection, ConnectionAdded
 };

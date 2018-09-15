@@ -43,9 +43,6 @@ export class WorkspaceComponent implements OnInit {
   private logger: ILogger;
 
   public readonly graph: Observable<Graph>;
-  // public nodes: Node[] = [];
-  // public connections: Connection[] = [];
-
   public newTargetSocket: InputSocket | OutputSocket = null;
   public newConnection: Connection = null;
   public newConnectionEndpoint: Point = { x: 0, y: 0 };
@@ -64,7 +61,7 @@ export class WorkspaceComponent implements OnInit {
 
   public updateNodePosition(node: Node, event: DragEvent) {
     // this.logger.info(`[WorkspaceComponent] Updating node position to ${position.x}:${position.y}`);
-    // @todo This is not allowed! We modifie the immutable state :hank: This should be dispatched!
+    // @todo This is not allowed! We modify the immutable state :hank: This should be dispatched!
     node.uiProps.x = event.dragElementPosition.x;
     node.uiProps.y = event.dragElementPosition.y;
   }

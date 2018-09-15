@@ -11,6 +11,7 @@
 // =========================================================================================
 
 import { OutputSocket, InputSocket } from './Socket';
+import { ConnectionId } from './ConnectionId';
 
 /**
  * Modelclass for a connection
@@ -19,10 +20,13 @@ import { OutputSocket, InputSocket } from './Socket';
  * @class Connection
  */
 export class Connection {
-  private readonly _idString: string;
+  public readonly id: ConnectionId;
 
-  constructor(public outputSocket: OutputSocket, public inputSocket: InputSocket, isWriteLink: boolean = true) {
-    this._idString = `${this.outputSocket.idString}-to-${this.inputSocket.idString}`;
+  constructor(
+    public outputSocket: OutputSocket,
+    public inputSocket: InputSocket,
+    isWriteLink: boolean = true) {
+    this.id = new ConnectionId(outputSocket.id, inputSocket.id, isWriteLink);
   }
 
   /**
@@ -32,7 +36,7 @@ export class Connection {
    * @memberof Connection
    */
   public get idString(): string {
-    return this._idString;
+    return this.id.string;
   }
 }
 

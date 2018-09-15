@@ -12,7 +12,7 @@
 
 import { SocketIndex } from './SocketIndex';
 import { Node } from './Node';
-import { Guid } from 'guid-typescript';
+import { SocketId } from './SocketId';
 
 /**
  * Modelclass for a Socket on a node.
@@ -21,18 +21,16 @@ import { Guid } from 'guid-typescript';
  * @class Socket
  */
 export abstract class Socket {
-  private _parent: Node;
-  protected _idString: string = Guid.create().toString();
+  protected _parent: Node;
+  protected _id: SocketId = new SocketId();
 
   constructor(
     public readonly type: string,
     public readonly name: string,
     public readonly index: SocketIndex,
     parent: Node = null
-  ) {}
-
-  public get idString(): string {
-    return this._idString;
+  ) {
+    this.parent = parent;
   }
 
   public get parent(): Node {
@@ -46,20 +44,23 @@ export abstract class Socket {
     this.initIdString();
   }
 
+  public get id(): SocketId { return this.id; }
+  public get idString(): string { return this.id.string; }
+
   protected abstract initIdString();
 }
 
 export class InputSocket extends Socket {
   protected initIdString() {
     if (this.parent) {
-      this._idString = `n-${this.parent.id.toInt()}-i-${this.index.toInt()}`;
+      this._id = new SocketId(this.parent.id, this.index, false);
     }
   }
 }
 export class OutputSocket extends Socket {
   protected initIdString() {
     if (this.parent) {
-      this._idString = `n-${this.parent.id.toInt()}-o-${this.index.toInt()}`;
+      this._id = new SocketId(this.parent.id, this.index, true);
     }
   }
 }

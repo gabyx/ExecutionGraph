@@ -12,4 +12,20 @@
 
 import * as Long from 'long';
 
-export class NodeId extends Long {}
+export class NodeId extends Long {
+  private readonly _idString : string
+  constructor(low: number, high?: number, unsigned?: boolean)
+  {
+    super(low,high,unsigned);
+    this._idString = `n-${this.toInt()}`;
+  }
+  /**
+   * String identifer for this NodeId.
+   *
+   * @returns {string}
+   * @memberof NodeId
+   */
+  public get string(): string {
+    return this._idString;
+  }
+}
