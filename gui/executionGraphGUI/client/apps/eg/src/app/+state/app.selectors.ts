@@ -8,7 +8,7 @@ const getLoaded = createSelector(getAppState, (state: AppState) => state.loaded)
 const getError = createSelector(getAppState, (state: AppState) => state.error);
 
 const getAllGraphs = createSelector(getAppState, getLoaded, (state: AppState, isLoaded) => {
-  return isLoaded ? state.graphs : [];
+  return isLoaded ? state.graphs : {};
 });
 const getSelectedGraph = createSelector(getAppState, (appState) => {
   const result = appState.getSelectedGraph();

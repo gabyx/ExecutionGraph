@@ -18,15 +18,15 @@ export class AppState {
    * id -> graph
    * @todo can we make this Map()...?
   */
-  public graphs: { [id: string]: Graph; };
+  public graphs: { [id: string]: Graph; } = {};
 
   /** Map of graph types descriptions:
    * type id -> graph description
    */
-  public graphDescriptions: { [type: string]: GraphTypeDescription };
+  public graphDescriptions: { [type: string]: GraphTypeDescription } = {};
 
   public selectedGraphId?: Id; // Which Graph has been selected
-  public loaded: boolean; // Has the AppState been loaded
+  public loaded: boolean = false; // Has the AppState been loaded
   public error?: any; // Last none error (if any)
 
   /**
