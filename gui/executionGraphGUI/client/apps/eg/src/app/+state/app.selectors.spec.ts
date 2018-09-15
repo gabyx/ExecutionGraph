@@ -23,16 +23,16 @@ describe('App Selectors', () => {
   });
 
   describe('App Selectors', () => {
-    it('getAllApp() should return the list of App', () => {
-      const results = appQuery.getAllApp(storeState);
+    it('getAllGraphs() should return the list of App', () => {
+      const results = appQuery.getAllGraphs(storeState);
       const selId = getAppId(results[1]);
 
       expect(results.length).toBe(3);
       expect(selId).toBe('PRODUCT-BBB');
     });
 
-    it('getSelectedApp() should return the selected Entity', () => {
-      const result = appQuery.getSelectedApp(storeState);
+    it('getSelectedGraph() should return the selected Entity', () => {
+      const result = appQuery.getSelectedGraph(storeState);
       const selId = getAppId(result);
 
       expect(selId).toBe('PRODUCT-BBB');

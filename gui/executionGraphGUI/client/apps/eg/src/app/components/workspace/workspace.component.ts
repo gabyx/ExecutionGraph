@@ -26,7 +26,7 @@ import {
   OutputSocket,
   createConnection
 } from '../../model';
-import { AppState } from '../../+state/app.reducer';
+import { AppState } from '../../+state/AppState'
 import { appQuery } from '../../+state/app.selectors';
 import { AddConnection } from '../../+state/app.actions';
 
@@ -49,7 +49,7 @@ export class WorkspaceComponent implements OnInit {
 
   constructor(private store: Store<AppState>, private elementRef: ElementRef, loggerFactory: LoggerFactory) {
     this.logger = loggerFactory.create('Workspace');
-    this.graph = store.select(appQuery.getSelectedApp)
+    this.graph = store.select(appQuery.getSelectedGraph)
       .pipe(
         filter(g => g!==undefined)
       );

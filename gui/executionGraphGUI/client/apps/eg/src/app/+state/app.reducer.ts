@@ -1,59 +1,49 @@
 import { AppAction, AppActionTypes } from './app.actions';
-import { Graph, Node, Connection } from '../model';
+import { Graph, GraphTypeDescription, Node, Connection } from '../model';
 import { Id } from '@eg/common/src';
+import { AppState } from "./AppState";
 
-export interface AppState {
-  graphs: Graph[]; // list of App; analogous to a sql normalized table
-  selectedGraphId?: Id; // which App record has been selected
-  loaded: boolean; // has the App list been loaded
-  error?: any; // last none error (if any)
-}
-
-export const initialState: AppState = {
-  graphs: [],
-  loaded: false
-};
+export const initialState: AppState = new AppState();
 
 export function appReducer(state: AppState = initialState, action: AppAction): AppState {
   switch (action.type) {
     case AppActionTypes.AppLoaded: {
-      state = {
-        ...state,
-        graphs: action.payload,
-        loaded: true
-      };
+      action.graphs.forEach((graph: Graph) => {
+        state.graphs[graph.id.toString()] = graph;
+      });
+      action.graphDescriptions.forEach((graphDesc: GraphTypeDescription) => {
+        state.graphDescriptions[graphDesc.id.toString()] = graphDesc;
+      })
+      state.loaded = true;
       break;
     }
     case AppActionTypes.SelectGraph: {
-      state = {
-        ...state,
-        selectedGraphId: action.id
-      };
+      state.selectedGraphId = action.id
       break;
     }
     case AppActionTypes.NodeAdded: {
-      const graph = state.graphs.find(g => g.id.equals(state.selectedGraphId));
+      const graph = state.getSelectedGraph();
       if (graph) {
         graph.nodes.push(action.node);
       }
       break;
     }
     case AppActionTypes.NodeRemoved: {
-      const graph = state.graphs.find(g => g.id.equals(state.selectedGraphId));
+      const graph = state.getSelectedGraph();
       if (graph) {
         graph.nodes.filter((node: Node) => node.id.equals(action.id));
       }
       break;
     }
     case AppActionTypes.ConnectionAdded: {
-      const graph = state.graphs.find(g => g.id.equals(state.selectedGraphId));
+      const graph = state.getSelectedGraph();
       if (graph) {
         graph.connections.push(action.connection);
       }
       break;
     }
     case AppActionTypes.ConnectionRemoved: {
-      const graph = state.graphs.find(g => g.id.equals(state.selectedGraphId));
+      const graph = state.getSelectedGraph();
       if (graph) {
         graph.connections.filter((connection: Connection) => connection.id.equal(action.connectionId));
       }

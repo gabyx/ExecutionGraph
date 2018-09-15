@@ -60,6 +60,7 @@ export class InputSocket extends Socket {
     }
   }
 }
+
 export class OutputSocket extends Socket {
   protected initId() {
     if (this.parent) {

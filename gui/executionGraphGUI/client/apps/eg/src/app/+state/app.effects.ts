@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Effect, Actions } from '@ngrx/effects';
 import { DataPersistence } from '@nrwl/nx';
-
 import { Id } from '@eg/common';
 import { LoggerFactory, ILogger } from '@eg/logger';
-import { AppState } from './app.reducer';
 import { LoadApp, AppLoaded, AppLoadError, AppActionTypes, ConnectionAdded, AddConnection } from './app.actions';
-import { Graph, InputSocket, SocketIndex, Node, NodeId, OutputSocket, createConnection } from '../model';
+import {
+  Graph, GraphTypeDescription,
+  InputSocket, SocketIndex, Node, NodeId, OutputSocket, createConnection
+} from '../model';
+import { AppState } from './AppState';
+import * as services from '../services';
 
 @Injectable()
 export class AppEffects {
@@ -15,6 +18,10 @@ export class AppEffects {
   @Effect()
   loadApp$ = this.dataPersistence.fetch(AppActionTypes.LoadApp, {
     run: (action: LoadApp, state: AppState) => {
+
+      // // Get Graph Infos
+      // generalInfoService.getAllTypeDesc
+
       // Your custom REST 'load' logic goes here. For now just return an empty list...
       const n1 = new Node(
         new NodeId(0),
@@ -40,11 +47,8 @@ export class AppEffects {
         [],
         [new OutputSocket('float', 'Dä Sächser', new SocketIndex(0))]);
 
-      const g = new Graph(new Id(), [n1, n2, n3], []);
-
-      return new AppLoaded([
-        g
-      ]);
+      const g = new Graph(new Id("644020cc-1f8b-4e50-9210-34f4bf2308d4"), new Id(), [n1, n2, n3], []);
+      return new AppLoaded([g], []);
     },
 
     onError: (action: LoadApp, error) => {
@@ -68,7 +72,10 @@ export class AppEffects {
   constructor(
     private actions$: Actions,
     private dataPersistence: DataPersistence<AppState>,
-    loggerFactory: LoggerFactory
+    loggerFactory: LoggerFactory,
+    private readonly generalInfoService: services.GeneralInfoService,
+    private readonly graphManipulationService: services.GraphManipulationService,
+    private readonly graphManagementService: services.GraphManagementService
   ) {
     this.log = loggerFactory.create('AppEffects');
   }

@@ -15,8 +15,8 @@ import { Store } from '@ngrx/store';
 import { filter } from 'rxjs/operators';
 
 import { LoggerFactory, ILogger } from '@eg/logger';
-
-import { AppState } from './+state/app.reducer';
+import { Id } from "@eg/common"
+import { AppState } from './+state/AppState';
 import { LoadApp, SelectGraph } from './+state/app.actions';
 import { appQuery } from './+state/app.selectors';
 
@@ -26,7 +26,7 @@ import { appQuery } from './+state/app.selectors';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  
+
   private readonly log: ILogger;
 
   constructor(private store: Store<AppState>, loggerFactory: LoggerFactory) {
@@ -36,11 +36,17 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.store.dispatch(new LoadApp());
 
-    this.store.select(appQuery.getAllApp)
-      .pipe(filter(graphs => graphs.length > 0))
+    this.store.select(appQuery.getAllGraphs)
       .subscribe(graphs => {
-        this.log.debug(`Loaded graphs, auto-selecting the first one`);
-        this.store.dispatch(new SelectGraph(graphs[0].id))
+        let defaultId = "644020cc-1f8b-4e50-9210-34f4bf2308d4";
+        this.log.debug(`Loaded graphs, auto-selecting ${defaultId}`);
+        if (!(defaultId in graphs)) {
+          this.log.error(`Could not select graph id ${defaultId}!`)
+        }
+        else
+        {
+          this.store.dispatch(new SelectGraph(new Id(defaultId)))
+        }
       });
   }
 }

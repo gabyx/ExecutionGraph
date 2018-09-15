@@ -31,7 +31,24 @@ export class GeneralInfoServiceDummy extends GeneralInfoService {
   }
 
   public async getAllGraphTypeDescriptions(): Promise<model.GraphTypeDescription[]> {
-    let builder = new flatbuffers.Builder(1024);
+    let graphDesc = GeneralInfoServiceDummy.testGetAllGraphTypeDescription();
+
+    if (this.verboseResponseLog) {
+      this.logger.debug(`GraphDescriptions: ${JSON.stringify(graphDesc)}`);
+    }
+    return graphDesc;
+  }
+
+  /**
+   * Test function to generate a GraphTypeDescription
+   *
+   * @static
+   * @returns {model.GraphTypeDescription[]}
+   * @memberof GeneralInfoServiceDummy
+   */
+  public static testGetAllGraphTypeDescription(): model.GraphTypeDescription[]
+  {
+     let builder = new flatbuffers.Builder(1024);
 
     // NodeType Description machen
     let offName = builder.createString('DummyNode');
@@ -74,10 +91,6 @@ export class GeneralInfoServiceDummy extends GeneralInfoService {
     let graphDesc: model.GraphTypeDescription[] = [];
     for (let g = 0; g < response.graphsTypesLength(); ++g) {
       graphDesc.push(toGraphTypeDescription(response.graphsTypes(g)));
-    }
-
-    if (this.verboseResponseLog) {
-      this.logger.debug(`GraphDescriptions: ${JSON.stringify(graphDesc)}`);
     }
 
     return graphDesc;

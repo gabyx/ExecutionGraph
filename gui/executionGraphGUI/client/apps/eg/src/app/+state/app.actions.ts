@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store';
 import { Id } from '@eg/common/src';
-import { Graph, Node, Connection, OutputSocket, InputSocket, NodeId, ConnectionId } from '../model';
+import { Graph, Node, Connection, OutputSocket, InputSocket, NodeId, ConnectionId, GraphTypeDescription } from '../model';
 
 export enum AppActionTypes {
   LoadApp = '[App] Load App',
@@ -31,12 +31,12 @@ export class LoadApp implements Action {
 
 export class AppLoadError implements Action {
   readonly type = AppActionTypes.LoadApp;
-  constructor(public payload: any) { }
+  constructor(public error: any) { }
 }
 
 export class AppLoaded implements Action {
   readonly type = AppActionTypes.AppLoaded;
-  constructor(public payload: Graph[]) { }
+  constructor(public graphs: Graph[], public graphDescriptions: GraphTypeDescription[]) { }
 }
 
 export class SelectGraph implements Action {
