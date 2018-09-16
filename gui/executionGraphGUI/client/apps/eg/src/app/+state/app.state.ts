@@ -39,7 +39,7 @@ export class AppState {
    */
   public getGraph(id: Id): Graph | undefined {
     let s = id.toString();
-    return (s in this.graphs) ? this.graphs[s] : undefined
+    return this.graphs[s];
   }
 
   /**
@@ -51,7 +51,7 @@ export class AppState {
    */
   public getGraphDescription(id: Id): GraphTypeDescription | undefined {
     let s = id.toString();
-    return (s in this.graphDescriptions) ? this.graphDescriptions[s] : undefined
+    return this.graphDescriptions[s];
   }
 
   public getSelectedGraph() {
