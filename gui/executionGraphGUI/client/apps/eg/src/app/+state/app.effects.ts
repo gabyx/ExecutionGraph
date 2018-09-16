@@ -15,42 +15,48 @@ import * as services from '../services';
 export class AppEffects {
   private readonly log: ILogger;
 
+  private loadApp() : AppLoaded {
+
+    // Get Graph Infos
+    const graphDescs = [] //await this.generalInfoService.getAllGraphTypeDescriptions();
+
+    // Your custom REST 'load' logic goes here. For now just return an empty list...
+    const n1 = new Node(
+      new NodeId(0),
+      'Add',
+      'Eis und eis git drüü',
+      [
+        new InputSocket('float', 'Lustiger Pete', new SocketIndex(0)),
+        new InputSocket('float', 'Listiger Luch', new SocketIndex(1))
+      ],
+      [new OutputSocket('float', 'Garstiger Hans', new SocketIndex(0))]);
+
+    const n2 = new Node(
+      new NodeId(1),
+      'Const',
+      'Foif',
+      [],
+      [new OutputSocket('float', 'Dä Foifer', new SocketIndex(0))]);
+
+    const n3 = new Node(
+      new NodeId(2),
+      'Const',
+      'Sächs',
+      [],
+      [new OutputSocket('float', 'Dä Sächser', new SocketIndex(0))]);
+
+    const g = new Graph(
+      new Id("644020cc-1f8b-4e50-9210-34f4bf2308d4"),
+      new Id(),
+      [n1, n2, n3],
+      []
+    );
+    return new AppLoaded([g], graphDescs);
+  }
+
   @Effect()
   loadApp$ = this.dataPersistence.fetch(AppActionTypes.LoadApp, {
-    run: (action: LoadApp, state: AppState) => {
-
-      // // Get Graph Infos
-      // generalInfoService.getAllTypeDesc
-
-      // Your custom REST 'load' logic goes here. For now just return an empty list...
-      const n1 = new Node(
-        new NodeId(0),
-        'Add',
-        'Eis und eis git drüü',
-        [
-          new InputSocket('float', 'Lustiger Pete', new SocketIndex(0)),
-          new InputSocket('float', 'Listiger Luch', new SocketIndex(1))
-        ],
-        [new OutputSocket('float', 'Garstiger Hans', new SocketIndex(0))]);
-
-      const n2 = new Node(
-        new NodeId(1),
-        'Const',
-        'Foif',
-        [],
-        [new OutputSocket('float', 'Dä Foifer', new SocketIndex(0))]);
-
-      const n3 = new Node(
-        new NodeId(2),
-        'Const',
-        'Sächs',
-        [],
-        [new OutputSocket('float', 'Dä Sächser', new SocketIndex(0))]);
-
-      const g = new Graph(new Id("644020cc-1f8b-4e50-9210-34f4bf2308d4"), new Id(), [n1, n2, n3], []);
-      return new AppLoaded([g], []);
-    },
-
+    run: (action: LoadApp, state: AppState) => { return this.loadApp() },
     onError: (action: LoadApp, error) => {
       this.log.error('Error', error);
       return new AppLoadError(error);
