@@ -37,7 +37,7 @@ export class AppComponent implements OnInit {
     this.store.dispatch(new LoadApp());
 
     this.store.select(appQuery.getAllGraphs)
-      .pipe(filter(graphs => isDefined(graphs))
+      .pipe(filter(graphs => isDefined(graphs)))
       .subscribe(graphs => {
         let defaultId = "644020cc-1f8b-4e50-9210-34f4bf2308d4";
         this.log.debug(`Loaded graphs, auto-selecting ${defaultId}`);
