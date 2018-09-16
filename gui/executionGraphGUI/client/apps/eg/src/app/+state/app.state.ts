@@ -54,10 +54,10 @@ export class AppState {
     return this.graphDescriptions[s];
   }
 
-  public getSelectedGraph() {
+  public getSelectedGraph() : Graph | undefined {
     return isDefined(this.selectedGraphId) ? this.getGraph(this.selectedGraphId) : undefined;
   }
-  public getSelectedGraphDescription() {
+  public getSelectedGraphDescription() : GraphTypeDescription | undefined {
     return isDefined(this.selectedGraphId) ? this.getGraphDescription(this.selectedGraphId) : undefined;
   }
 

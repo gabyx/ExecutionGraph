@@ -5,7 +5,8 @@ import { AppState } from "./app.state";
 
 export const initialState: AppState = new AppState();
 
-export function appReducer(state: AppState = initialState, action: AppAction): AppState {
+export function appReducer(immutableState: AppState = initialState, action: AppAction): AppState {
+  let state = Object.assign(new AppState(), immutableState);
   switch (action.type) {
     case AppActionTypes.AppLoaded: {
       action.graphs.forEach((graph: Graph) => {
@@ -50,5 +51,5 @@ export function appReducer(state: AppState = initialState, action: AppAction): A
       break;
     }
   }
-  return state;
+  return state
 }
