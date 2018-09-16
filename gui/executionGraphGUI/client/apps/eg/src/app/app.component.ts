@@ -16,7 +16,7 @@ import { filter } from 'rxjs/operators';
 
 import { LoggerFactory, ILogger } from '@eg/logger';
 import { Id, isDefined } from "@eg/common"
-import { AppState } from './+state/AppState';
+import { AppState } from './+state/app.state';
 import { LoadApp, SelectGraph } from './+state/app.actions';
 import { appQuery } from './+state/app.selectors';
 

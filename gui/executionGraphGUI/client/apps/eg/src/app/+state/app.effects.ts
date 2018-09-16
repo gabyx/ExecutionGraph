@@ -8,7 +8,7 @@ import {
   Graph, GraphTypeDescription,
   InputSocket, SocketIndex, Node, NodeId, OutputSocket, createConnection
 } from '../model';
-import { AppState } from './AppState';
+import { AppState } from './app.state';
 import * as services from '../services';
 
 @Injectable()

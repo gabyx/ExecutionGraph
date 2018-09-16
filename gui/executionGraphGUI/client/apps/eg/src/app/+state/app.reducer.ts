@@ -1,7 +1,7 @@
 import { AppAction, AppActionTypes } from './app.actions';
 import { Graph, GraphTypeDescription, Node, Connection } from '../model';
 import { Id, isDefined } from '@eg/common';
-import { AppState } from "./AppState";
+import { AppState } from "./app.state";
 
 export const initialState: AppState = new AppState();
 

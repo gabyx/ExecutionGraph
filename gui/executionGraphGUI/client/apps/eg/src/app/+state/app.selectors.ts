@@ -1,5 +1,5 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { AppState } from './AppState';
+import { AppState } from './app.state';
 
 // Lookup the 'App' feature state managed by NgRx
 const getAppState = createFeatureSelector<AppState>('app');

@@ -26,7 +26,7 @@ import {
   OutputSocket,
   createConnection
 } from '../../model';
-import { AppState } from '../../+state/AppState'
+import { AppState } from '../../+state/app.state'
 import { appQuery } from '../../+state/app.selectors';
 import { AddConnection } from '../../+state/app.actions';
 
@@ -48,14 +48,20 @@ export class WorkspaceComponent implements OnInit {
   public newConnection: Connection = null;
   public newConnectionEndpoint: Point = { x: 0, y: 0 };
 
-  constructor(private store: Store<AppState>, private elementRef: ElementRef, loggerFactory: LoggerFactory) {
+  constructor(
+    private store: Store<AppState>,
+    private elementRef: ElementRef,
+    loggerFactory: LoggerFactory
+  ) {
     this.logger = loggerFactory.create('Workspace');
     this.graph = store.select(appQuery.getSelectedGraph)
       .pipe(
         filter(g => isDefined(g))
       );
 
-    this.graph.subscribe(g => this.logger.debug(`Displaying graph ${g.id} `));
+    this.graph.subscribe(
+      g => this.logger.debug(`Displaying graph ${g.id}`)
+    );
   }
 
   ngOnInit() { }

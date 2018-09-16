@@ -12,7 +12,7 @@
 
 import { Id } from "@eg/common";
 import { Graph, GraphTypeDescription } from '../model';
-import {isDefined} from '@eg/common'
+import { isDefined } from '@eg/common'
 
 export class AppState {
   /** Map of graphs:
@@ -54,13 +54,11 @@ export class AppState {
     return (s in this.graphDescriptions) ? this.graphDescriptions[s] : undefined
   }
 
-  public getSelectedGraph()
-  {
+  public getSelectedGraph() {
     return isDefined(this.selectedGraphId) ? this.getGraph(this.selectedGraphId) : undefined;
   }
-  public getSelectedGraphDescription()
-  {
-     return isDefined(this.selectedGraphId) ? this.getGraphDescription(this.selectedGraphId) : undefined;
+  public getSelectedGraphDescription() {
+    return isDefined(this.selectedGraphId) ? this.getGraphDescription(this.selectedGraphId) : undefined;
   }
 
 }
