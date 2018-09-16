@@ -1,8 +1,11 @@
 <eg-connection-style-options #connectionStyleOptions></eg-connection-style-options>
 
 <ngcs-graph id="graph-1" >
-    <ng-container *ngFor="let node of (graph | async).nodes">
-        <div #theNode class="node ngcs-node" [attr.id]="node.idString" [style.left]="node.uiProps.x+'px'" [style.top]="node.uiProps.y+'px'">
+    <ng-container *ngFor="let node of (graph | async)?.nodes">
+        <div #theNode class="node ngcs-node"
+          [attr.id]="node.idString"
+          [style.left]="node.uiProps.x+'px'"
+          [style.top]="node.uiProps.y+'px'">
             <span class="header" ngcsDraggable [dragElement]="theNode" (dragContinued)="updateNodePosition(node, $event)">
                 {{ node.name }}
             </span>
@@ -27,12 +30,20 @@
         </div>
     </ng-container>
 
-    <ng-container *ngFor="let connection of (graph | async).connections">
-        <ngcs-connection [from]="connection.outputSocket.idString" [to]="connection.inputSocket.idString" [drawStyle]="connectionStyleOptions.connectionDrawStyle"></ngcs-connection>
+    <ng-container *ngFor="let connection of (graph | async)?.connections">
+        <ngcs-connection
+          [from]="connection.outputSocket.idString"
+          [to]="connection.inputSocket.idString"
+          [drawStyle]="connectionStyleOptions.connectionDrawStyle">
+        </ngcs-connection>
     </ng-container>
 
     <ng-container *ngIf="newConnection">
-        <ngcs-connection [from]="newConnection.outputSocket.idString" [to]="newConnection.inputSocket.idString" [drawStyle]="connectionStyleOptions.connectionDrawStyle"></ngcs-connection>
+        <ngcs-connection
+          [from]="newConnection.outputSocket.idString"
+          [to]="newConnection.inputSocket.idString"
+          [drawStyle]="connectionStyleOptions.connectionDrawStyle">
+        </ngcs-connection>
         <div style="position: absolute"
          [style.left]="newConnectionEndpoint.x+'px'" [style.top]="newConnectionEndpoint.y+'px'">
             <ngcs-port [id]="newTargetSocket.idString" class="right middle" ></ngcs-port>

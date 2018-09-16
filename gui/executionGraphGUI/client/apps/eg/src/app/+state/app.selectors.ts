@@ -10,8 +10,8 @@ const getError = createSelector(getAppState, (state: AppState) => state.error);
 const getAllGraphs = createSelector(getAppState, getLoaded, (state: AppState, isLoaded) => {
   return isLoaded ? state.graphs : undefined;
 });
-const getSelectedGraph = createSelector(getAppState, (appState) => {
-  return appState.getSelectedGraph();
+const getSelectedGraph = createSelector(getAppState, (state: AppState) => {
+  return state.getSelectedGraph();
 });
 
 export const appQuery = {
