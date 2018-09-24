@@ -12,9 +12,10 @@
 
 import { Id } from '@eg/common';
 import { GraphManagementMessages } from '@eg/messages';
+import { Graph } from "../model";
 export import sz = GraphManagementMessages;
 
 export abstract class GraphManagementService {
-  public abstract async addGraph(graphTypeId: Id): Promise<Id>;
+  public abstract async addGraph(graphTypeId: Id): Promise<Graph>;
   public abstract async removeGraph(graphId: Id): Promise<void>;
 }

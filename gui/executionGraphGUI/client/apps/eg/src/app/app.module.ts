@@ -49,6 +49,7 @@ import { GraphManagementServiceBinaryHttp } from './services/GraphManagementServ
 import { GraphManagementServiceDummy } from './services/GraphManagementServiceDummy';
 
 import { TestService } from './services/TestService';
+import { ITestBackend, TestBackend } from './services/TestBackend';
 
 import { AppComponent } from './app.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
@@ -92,6 +93,7 @@ environment.production = true
   ],
   providers: [
     { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory },
+    { provide: ITestBackend, useClass: TestBackend },
     BinaryHttpRouterService,
     CefMessageRouterService,
     TestService,

@@ -12,7 +12,7 @@
 
 import { Injectable, Inject} from '@angular/core';
 import { VERBOSE_LOG_TOKEN } from '../tokens';
-import { flatbuffers } from 'flatbuffers';
+import { ITestBackend } from './TestBackend';
 import { ILogger, LoggerFactory, stringify} from '@eg/logger';
 import { Id } from '@eg/common';
 import { GraphManipulationService, sz } from './GraphManipulationService';
@@ -22,9 +22,11 @@ import { Node, NodeId } from '../model';
 @Injectable()
 export class GraphManipulationServiceDummy extends GraphManipulationService {
   private logger: ILogger;
+  private nodeId: number = 0;
 
   constructor(
     loggerFactory: LoggerFactory,
+    private backend: ITestBackend,
     @Inject(VERBOSE_LOG_TOKEN) private readonly verboseResponseLog = true
   ) {
     super();
@@ -32,43 +34,8 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
   }
 
   public async addNode(graphId: Id, type: string, name: string): Promise<Node> {
-    // Build the AddNode request
-    let builder = new flatbuffers.Builder(345);
-    let offGraphId = builder.createString(graphId.toString());
-    let offType = builder.createString(type);
-    let offName = builder.createString(name);
 
-    sz.NodeConstructionInfo.startNodeConstructionInfo(builder);
-    sz.NodeConstructionInfo.addName(builder, offName);
-    sz.NodeConstructionInfo.addType(builder, offType);
-    let off = sz.NodeConstructionInfo.endNodeConstructionInfo(builder);
-
-    sz.AddNodeRequest.startAddNodeRequest(builder);
-    sz.AddNodeRequest.addGraphId(builder, offGraphId);
-    sz.AddNodeRequest.addNode(builder, off);
-    off = sz.AddNodeRequest.endAddNodeRequest(builder);
-    builder.finish(off);
-
-    let requestPayload = builder.asUint8Array();
-
-    // Build a dummy result
-    builder = new flatbuffers.Builder(1024);
-    let nameOff = builder.createString(name);
-    let typeOff = builder.createString(type);
-    sz.LogicNode.startLogicNode(builder);
-    sz.LogicNode.addId(builder, builder.createLong(13, 13));
-    sz.LogicNode.addName(builder, nameOff);
-    sz.LogicNode.addType(builder, typeOff);
-    let nodeOff = sz.LogicNode.endLogicNode(builder);
-
-    sz.AddNodeResponse.startAddNodeResponse(builder);
-    sz.AddNodeResponse.addNode(builder, nodeOff);
-    let respOff = sz.AddNodeResponse.endAddNodeResponse(builder);
-    builder.finish(respOff);
-    let result = builder.asUint8Array();
-
-    const buf = new flatbuffers.ByteBuffer(result);
-    const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
+    let response = this.backend.createAddNodeResponse(type,name);
 
     let node = response.node();
     this.logger.info(`Added new node [type: '${node.type()}']

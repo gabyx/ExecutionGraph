@@ -55,15 +55,15 @@ export class TestService {
     let nodeType = graphDesc.nodeTypeDescritptions[0].type;
 
     // Add a graph
-    let graphId = await this.graphManagementService.addGraph(graphTypeId);
+    let graph = await this.graphManagementService.addGraph(graphTypeId);
 
     // Add the node.
-    await this.graphManipulationService.addNode(graphId, nodeType, 'MySuperDuperNode');
+    await this.graphManipulationService.addNode(graph.id, nodeType, 'MySuperDuperNode');
 
     // Add a non existing node
     try {
       await this.graphManipulationService.addNode(
-        graphId,
+        graph.id,
         'BananaNode',
         'MySupercalifragilisticexpialidociousBananaNode'
       );
@@ -72,9 +72,9 @@ export class TestService {
     }
 
     // Remove first node
-    await this.graphManipulationService.removeNode(graphId, new NodeId(0));
+    await this.graphManipulationService.removeNode(graph.id, new NodeId(0));
 
     // Remove graph
-    await this.graphManagementService.removeGraph(graphId);
+    await this.graphManagementService.removeGraph(graph.id);
   }
 }
