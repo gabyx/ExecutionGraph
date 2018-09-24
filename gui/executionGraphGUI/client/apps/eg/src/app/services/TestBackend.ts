@@ -115,7 +115,7 @@ export class TestBackend extends ITestBackend {
       for (let i = 0; i < nSockets; i++) {
         let socketType = 0;
         let sockTOff: number;
-        if (inputs) {
+        if (!inputs) {
           sockTOff = builder.createString(`${this.graphTypeDesc[0].socketTypeDescriptions[socketType].name} : ${suffix}-${i}`);
         }
         else {
