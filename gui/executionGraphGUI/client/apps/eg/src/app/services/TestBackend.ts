@@ -12,13 +12,20 @@
 
 import { Injectable } from '@angular/core';
 import { flatbuffers } from 'flatbuffers';
-import {Id} from "@eg/common";
+import { Id } from "@eg/common";
 import { toGraphTypeDescription } from './Conversions';
 import { sz as szInfo } from './GeneralInfoService';
 import { sz as szMani } from './GraphManipulationService';
 import * as model from '../model';
 
 
+/**
+ * Interface class for a dummy backend which is used in the dummy services.
+ *
+ * @export
+ * @abstract
+ * @class ITestBackend
+ */
 export abstract class ITestBackend {
   public graphTypeId: Id;
   public graphTypeDesc: model.GraphTypeDescription[] = [];
@@ -26,6 +33,15 @@ export abstract class ITestBackend {
   public abstract createAddNodeResponse(type: string, name: string): szMani.AddNodeResponse
 }
 
+/**
+ * A dummy test backend which provides a central storage only
+ * for testing purposes. Providing serialized messages such that
+ * the conversion pipeline can be tested in the various services.
+ *
+ * @export
+ * @class TestBackend
+ * @extends {ITestBackend}
+ */
 @Injectable()
 export class TestBackend extends ITestBackend {
   public nodeId: number = 0;
@@ -48,7 +64,7 @@ export class TestBackend extends ITestBackend {
     let offN = szInfo.NodeTypeDescription.endNodeTypeDescription(builder);
 
     // SocketType Description machen
-    offName = builder.createString('Integral Socket');
+    offName = builder.createString('[int]');
     offType = builder.createString('int');
     szInfo.SocketTypeDescription.startSocketTypeDescription(builder);
     szInfo.SocketTypeDescription.addName(builder, offName);
@@ -94,23 +110,29 @@ export class TestBackend extends ITestBackend {
     let typeOff = builder.createString(type);
 
     // Create input/output sockets
-    let createSockets = (nSockets: number) => {
-      let socketOffs: number[];
+    let createSockets = (nSockets: number, suffix: string, inputs: boolean) => {
+      let socketOffs: number[] = [];
       for (let i = 0; i < nSockets; i++) {
-        let socketIndex = 0;
-        let sockTOff = builder.createString(this.graphTypeDesc[0].socketTypeDescriptions[socketIndex].name);
+        let socketType = 0;
+        let sockTOff: number;
+        if (inputs) {
+          sockTOff = builder.createString(`${this.graphTypeDesc[0].socketTypeDescriptions[socketType].name} : ${suffix}-${i}`);
+        }
+        else {
+          sockTOff = builder.createString(`${suffix}-${i} : ${this.graphTypeDesc[0].socketTypeDescriptions[socketType].name}`);
+        }
         szMani.LogicSocket.startLogicSocket(builder);
-        szMani.LogicSocket.addType(builder, flatbuffers.Long.create(socketIndex, 0));
+        szMani.LogicSocket.addType(builder, flatbuffers.Long.create(socketType, 0));
         szMani.LogicSocket.addName(builder, sockTOff);
-        szMani.LogicSocket.addIndex(builder, flatbuffers.Long.create(i,0));
+        szMani.LogicSocket.addIndex(builder, flatbuffers.Long.create(i, 0));
         let off = szMani.LogicSocket.endLogicSocket(builder);
         socketOffs.push(off);
       }
       return szMani.LogicNode.createInputSocketsVector(builder, socketOffs);
     };
 
-    let inSocksOff = createSockets(2);
-    let outSocksOff = createSockets(3);
+    let inSocksOff = createSockets(2, "in", true);
+    let outSocksOff = createSockets(3, "out", false);
 
     szMani.LogicNode.startLogicNode(builder);
     this.nodeId += 1;

@@ -23,7 +23,8 @@ export class GraphManagementServiceDummy extends GraphManagementService {
 
   constructor(
     loggerFactory: LoggerFactory,
-    private backend: ITestBackend) {
+    private backend: ITestBackend
+  ) {
     super();
     this.logger = loggerFactory.create('GraphManagementServiceDummy');
   }

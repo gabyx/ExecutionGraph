@@ -1,14 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Observable, from } from "rxjs"
+import { from } from "rxjs"
 import { Effect, Actions } from '@ngrx/effects';
 import { DataPersistence } from '@nrwl/nx';
 import { Id } from '@eg/common';
 import { LoggerFactory, ILogger } from '@eg/logger';
 import { LoadApp, AppLoaded, AppLoadError, AppActionTypes, ConnectionAdded, AddConnection } from './app.actions';
-import {
-  Graph,
-  InputSocket, SocketIndex, Node, NodeId, OutputSocket, createConnection
-} from '../model';
+import { createConnection } from '../model';
 import { AppState } from './app.state';
 import * as services from '../services';
 
@@ -17,10 +14,8 @@ export class AppEffects {
   private readonly log: ILogger;
 
   private async loadApp(): Promise<AppLoaded> {
-
     // Get Graph Infos
     const graphDescs = await this.generalInfoService.getAllGraphTypeDescriptions();
-
     let graphDesc = graphDescs[0];
     let graphTypeId = graphDesc.id;
     let nodeType = graphDesc.nodeTypeDescritptions[0].type;
@@ -30,7 +25,7 @@ export class AppEffects {
 
     // Add nodes.
     for(let i = 0; i < 3 ; ++i){
-      let node = await this.graphManipulationService.addNode(graph.id, nodeType, `MyIntegralNode-${i}`);
+      let node = await this.graphManipulationService.addNode(graph.id, nodeType, `${nodeType}-${i}`);
       graph.nodes.push(node);
     }
     return new AppLoaded([graph], graphDescs);

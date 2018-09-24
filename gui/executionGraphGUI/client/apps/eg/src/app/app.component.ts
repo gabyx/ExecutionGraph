@@ -39,14 +39,14 @@ export class AppComponent implements OnInit {
     this.store.select(appQuery.getAllGraphs)
       .pipe(filter(graphs => isDefined(graphs)))
       .subscribe(graphs => {
-        let defaultId = "644020cc-1f8b-4e50-9210-34f4bf2308d4";
-        this.log.debug(`Loaded graphs, auto-selecting ${defaultId}`);
-        if (!(defaultId in graphs)) {
-          this.log.error(`Could not select graph id ${defaultId}!`)
+        this.log.debug(`Loaded graphs, auto-selecting first`);
+        let ids = Object.keys(graphs);
+        if (!ids.length) {
+          this.log.error(`Cannot select, since no graphs loaded!`);
         }
         else
         {
-          this.store.dispatch(new SelectGraph(new Id(defaultId)))
+          this.store.dispatch(new SelectGraph(new Id(ids[0])));
         }
       });
   }
