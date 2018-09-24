@@ -12,9 +12,8 @@
 
 import { Socket, InputSocket, OutputSocket } from './Socket';
 import { NodeId } from './NodeId';
-import { Input } from '@angular/compiler/src/core';
 
-export type UIProps = {
+export interface UIProps {
   x: number;
   y: number;
 };
@@ -26,8 +25,6 @@ export type UIProps = {
  * @class Node
  */
 export class Node {
-  private readonly _idString: string;
-
   constructor(
     public readonly id: NodeId,
     public readonly type: string,
@@ -37,22 +34,15 @@ export class Node {
     public uiProps: UIProps = { x: 0, y: 0 }
   ) {
     // Sorting input/outputs according to index.
-    let s = (a: Socket, b: Socket) => a.index.comp(b.index);
-    this.inputs = inputs.sort(s);
-    this.outputs = outputs.sort(s);
+    const sort = (a: Socket, b: Socket) => a.index.comp(b.index);
+    this.inputs = inputs.sort(sort);
+    this.outputs = outputs.sort(sort);
     // Setting all parents!
     this.inputs.forEach((s: Socket) => (s.parent = this));
     this.outputs.forEach((s: Socket) => (s.parent = this));
-    this._idString = `n-${this.id.toInt()}`;
   }
 
-  /**
-   * String identifer for this node.
-   *
-   * @returns {string}
-   * @memberof Node
-   */
-  public get idString(): string {
-    return this._idString;
+  public get idString() : string {
+    return this.id.string;
   }
 }

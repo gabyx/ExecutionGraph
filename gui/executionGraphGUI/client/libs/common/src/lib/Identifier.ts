@@ -14,6 +14,7 @@ import { Guid } from 'guid-typescript';
 
 export class Id {
   private readonly _id: Guid;
+  private readonly _idString: string;
 
   constructor(id?: string) {
     if (id) {
@@ -21,6 +22,7 @@ export class Id {
     } else {
       this._id = Guid.create();
     }
+    this._idString = this._id.toString();
   }
   public get name(): string {
     return this.guid.toString();
@@ -30,7 +32,11 @@ export class Id {
   }
 
   public toString(): string {
-    return this._id.toString();
+    return this._idString;
+  }
+
+  public equals(id: Id): boolean {
+    return id != null && this.guid === id.guid;
   }
 }
 
