@@ -10,9 +10,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { GeneralInfoMessages } from '../../../../../../messages/schemas/ts';
+import * as model from '../model';
+import { GeneralInfoMessages } from '@eg/messages';
 export import sz = GeneralInfoMessages;
 
 export abstract class GeneralInfoService {
-  public abstract async getAllGraphTypeDescriptions(): Promise<sz.GetAllGraphTypeDescriptionsResponse>;
+  public abstract async getAllGraphTypeDescriptions(): Promise<model.GraphTypeDescription[]>;
 }

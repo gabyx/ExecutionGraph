@@ -10,19 +10,39 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Socket } from './Socket';
+import { Socket, InputSocket, OutputSocket } from './Socket';
+import { NodeId } from './NodeId';
 
-export type UIProps = {
+export interface UIProps {
   x: number;
   y: number;
 };
 
+/**
+ *  Modelclass for a node.
+ *
+ * @export
+ * @class Node
+ */
 export class Node {
   constructor(
-    public readonly id: string,
+    public readonly id: NodeId,
+    public readonly type: string,
     public readonly name: string,
-    public readonly inputs: Socket[],
-    public readonly outputs: Socket[],
-    public readonly uiProps: UIProps = { x: 0, y: 0 }
-  ) {}
+    public inputs: InputSocket[] = [],
+    public outputs: OutputSocket[] = [],
+    public uiProps: UIProps = { x: 0, y: 0 }
+  ) {
+    // Sorting input/outputs according to index.
+    const sort = (a: Socket, b: Socket) => a.index.comp(b.index);
+    this.inputs = inputs.sort(sort);
+    this.outputs = outputs.sort(sort);
+    // Setting all parents!
+    this.inputs.forEach((s: Socket) => (s.parent = this));
+    this.outputs.forEach((s: Socket) => (s.parent = this));
+  }
+
+  public get idString() : string {
+    return this.id.string;
+  }
 }

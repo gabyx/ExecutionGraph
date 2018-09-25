@@ -10,15 +10,29 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, OnInit, ElementRef, HostListener, Injectable } from '@angular/core';
+import { Component, OnInit, ElementRef, HostListener, Injectable, Input } from '@angular/core';
+import { Observable } from 'rxjs';
+import { tap, filter } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
 
-import { Point } from '@eg/graph';
-import { Node } from '../../model/Node';
-import { Connection } from '../../model/Connection';
-import { Socket } from '../../model/Socket';
-import { DragEvent } from '@eg/graph';
-import { GeneralInfoService } from '../../services/GeneralInfoService';
-import { GraphManipulationService } from '../../services/GraphManipulationService';
+import {
+  Graph,
+  Socket,
+  NodeId,
+  Node,
+  Connection,
+  SocketIndex,
+  InputSocket,
+  OutputSocket,
+  createConnection
+} from '../../model';
+import { AppState } from '../../+state/app.state'
+import { appQuery } from '../../+state/app.selectors';
+import { AddConnection } from '../../+state/app.actions';
+
+import { ILogger, LoggerFactory } from '@eg/logger';
+import { Point, DragEvent } from '@eg/graph';
+import { isDefined } from '@eg/common';
 
 @Injectable()
 @Component({
@@ -27,47 +41,48 @@ import { GraphManipulationService } from '../../services/GraphManipulationServic
   styleUrls: ['./workspace.component.scss']
 })
 export class WorkspaceComponent implements OnInit {
-  public nodes: Node[] = [];
+  private logger: ILogger;
 
-  public connections: Connection[] = [];
-
+  public readonly graph: Observable<Graph>;
+  public newTargetSocket: InputSocket | OutputSocket = null;
   public newConnection: Connection = null;
   public newConnectionEndpoint: Point = { x: 0, y: 0 };
 
   constructor(
+    private store: Store<AppState>,
     private elementRef: ElementRef,
-    private readonly generalInfoService: GeneralInfoService,
-    private readonly graphManipulationService: GraphManipulationService
-  ) {}
+    loggerFactory: LoggerFactory
+  ) {
+    this.logger = loggerFactory.create('Workspace');
+    this.graph = store.select(appQuery.getSelectedGraph)
+      .pipe(
+        filter(g => isDefined(g))
+      );
 
-  ngOnInit() {
-    const NODES = 3;
-
-    for (let i = 0; i < NODES; i++) {
-      this.generateNode(i);
-    }
-
-    for (let i = 0; i < NODES; i++) {
-      this.generateRandomConnection();
-    }
-
-    // const n1 = new Node('n-1', 'Knoten Uno', [], [new Socket("n-1-o-1", "Some Output with text that is too long")], { x: 100, y: 150 });
-    // const n2 = new Node('n-2', 'Knoten Due', [new Socket("n-2-i-1", "Some Input")], [], { x: 300, y: 300 });
-    // this.nodes.push(n1);
-    // this.nodes.push(n2);
-
-    // this.connections.push(new Connection(n1.outputs[0].id, n2.inputs[0].id));
+    this.graph.subscribe(
+      g => this.logger.debug(`Displaying graph ${g.id}`)
+    );
   }
 
+  ngOnInit() { }
+
   public updateNodePosition(node: Node, event: DragEvent) {
-    // console.log(`[WorkspaceComponent] Updating node position to ${position.x}:${position.y}`);
+    // this.logger.info(`[WorkspaceComponent] Updating node position to ${position.x}:${position.y}`);
+    // @todo This is not allowed! We modify the immutable state :hank: This should be dispatched!
     node.uiProps.x = event.dragElementPosition.x;
     node.uiProps.y = event.dragElementPosition.y;
   }
 
-  public initConnectionFrom(socket: Socket, event: DragEvent) {
-    console.log(`[WorkspaceComponent] Initiating new connection from ${socket.id}`);
-    this.newConnection = new Connection(socket.id, 'tempTarget');
+  public initConnectionFrom(socket: OutputSocket | InputSocket, event: DragEvent) {
+    this.logger.info(`[WorkspaceComponnt] Initiating new connection from ${socket.idString}`);
+    if (socket instanceof OutputSocket) {
+      this.newTargetSocket = new InputSocket(socket.type, socket.name, new SocketIndex(0));
+    } else {
+      this.newTargetSocket = new OutputSocket(socket.type, socket.name, new SocketIndex(0));
+    }
+    // Create the connection
+    this.newConnection = createConnection(socket, this.newTargetSocket);
+
     this.newConnectionEndpoint = {
       x: event.dragElementPosition.x + event.mouseToElementOffset.x,
       y: event.dragElementPosition.y + event.mouseToElementOffset.y
@@ -79,45 +94,23 @@ export class WorkspaceComponent implements OnInit {
       x: event.dragElementPosition.x + event.mouseToElementOffset.x,
       y: event.dragElementPosition.y + event.mouseToElementOffset.y
     };
-    // console.log(`Setting position to ${this.newConnectionEndpoint.x}:${this.newConnectionEndpoint.y}`)
+    //this.logger.debug(`Setting position to ${this.newConnectionEndpoint.x}:${this.newConnectionEndpoint.y}`);
   }
 
   public abortConnection() {
     this.newConnection = null;
   }
 
-  public createConnection(source: Socket, target: Socket) {
-    const connection = new Connection(source.id, target.id);
-    this.connections.push(connection);
+  public addConnection(source: OutputSocket | InputSocket, target: OutputSocket | InputSocket) {
+    // Create the connection
+    this.store.dispatch(new AddConnection(source, target));
   }
 
   public isOutputSocket(socket: Socket) {
-    return socket instanceof Socket && socket.id.indexOf('-o-') > 0;
+    return socket instanceof OutputSocket;
   }
 
   public isInputSocket(socket: Socket) {
-    return socket instanceof Socket && socket.id.indexOf('-i-') > 0;
-  }
-
-  private generateNode(id: number) {
-    const x = Math.random() * this.elementRef.nativeElement.offsetWidth / 2;
-    const y = Math.random() * this.elementRef.nativeElement.offsetHeight / 2;
-    this.nodes.push(
-      new Node(
-        `n${id}`,
-        `Some test node ${id}`,
-        [new Socket(`n-${id}-i-1`, 'Some Input')],
-        [new Socket(`n-${id}-o-1`, 'Some Output with text that is too long')],
-        { x: x, y: y }
-      )
-    );
-  }
-
-  private generateRandomConnection() {
-    let source = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].outputs[0];
-    let target = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].inputs[0];
-    if (source !== target) {
-      this.connections.push(new Connection(source.id, target.id));
-    }
+    return socket instanceof InputSocket;
   }
 }

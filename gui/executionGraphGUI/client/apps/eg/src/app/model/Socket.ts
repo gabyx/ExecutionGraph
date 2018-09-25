@@ -10,6 +10,69 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
+import { SocketIndex } from './SocketIndex';
+import { Node } from './Node';
+import { SocketId } from './SocketId';
+
+/**
+ * Modelclass for a Socket on a node.
+ *
+ * @export
+ * @class Socket
+ */
 export class Socket {
-  constructor(public id: string, public name: string) {}
+  sockettype: 'input' | 'output'
+  protected _parent: Node;
+  protected _id: SocketId = new SocketId();
+
+  constructor(
+    public readonly type: string,
+    public readonly name: string,
+    public readonly index: SocketIndex,
+    parent: Node = null
+  ) {
+    this.parent = parent;
+  }
+
+  public get parent(): Node {
+    return this._parent;
+  }
+  public set parent(parent: Node) {
+    if (!parent) { return; }
+    if  (this._parent != null) {
+      throw 'You cannot assign a new parent!';
+    }
+    this._parent = parent;
+    this.initId();
+  }
+
+  public get id(): SocketId { return this._id; }
+  public get idString(): string {
+    return this._id.string;
+  }
+
+  protected abstract initId();
+}
+
+// export class InputSocket extends Socket {
+//   protected initId() {
+//     if (this.parent) {
+//       this._id = new SocketId(this.parent.id, this.index, false);
+//     }
+//   }
+// }
+
+// export class OutputSocket extends Socket {
+//   protected initId() {
+//     if (this.parent) {
+//       this._id = new SocketId(this.parent.id, this.index, true);
+//     }
+//   }
+// }
+
+type InputSocket  = Socket;
+
+function isInputSocket(socket: Socket): socket is InputSocket
+{
+  return socket.sockettype === 'input';
 }

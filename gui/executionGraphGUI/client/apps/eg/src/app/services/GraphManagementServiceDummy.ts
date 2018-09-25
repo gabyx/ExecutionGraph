@@ -11,24 +11,28 @@
 // =========================================================================================
 
 import { Injectable } from '@angular/core';
-import { GraphManagementService } from './GraphManagementService';
+import { Id } from "@eg/common";
 import { ILogger, LoggerFactory } from '@eg/logger';
+import { GraphManagementService } from './GraphManagementService';
+import { ITestBackend } from './TestBackend';
+import { Graph } from "../model";
 
 @Injectable()
 export class GraphManagementServiceDummy extends GraphManagementService {
   private logger: ILogger;
 
-  constructor(loggerFactory: LoggerFactory) {
+  constructor(
+    loggerFactory: LoggerFactory,
+    private backend: ITestBackend
+  ) {
     super();
     this.logger = loggerFactory.create('GraphManagementServiceDummy');
   }
 
-  public async addGraph(graphTypeId: string): Promise<string> {
-    this.logger.error(`Not implemented yet!`);
-    return 'HERE 16byte GUID';
+  public async addGraph(graphTypeId: Id): Promise<Graph> {
+    return new Graph(new Id(), this.backend.graphTypeId, [], []);
   }
 
-  public async removeGraph(graphId: string): Promise<void> {
-    this.logger.error(`Not implemented yet!`);
+  public async removeGraph(graphId: Id): Promise<void> {
   }
 }

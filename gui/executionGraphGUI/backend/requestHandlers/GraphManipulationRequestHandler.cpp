@@ -82,7 +82,7 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
         AllocatorProxyFlatBuffer<Allocator> allocator(response.getAllocator());
         flatbuffers::FlatBufferBuilder builder(512, &allocator);
 
-        using GraphType      = std::remove_cv_t<std::remove_reference_t<decltype(graph)>>;
+        using GraphType      = typename std::remove_cv_t<std::remove_reference_t<decltype(graph)>>;
         using Config         = typename GraphType::Config;
         using NodeSerializer = typename ExecutionGraphBackendDefs<Config>::NodeSerializer;
 
@@ -96,9 +96,8 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
         builder.Finish(resOff);
 
         // Set the response.
-        auto detachedBuffer = builder.Release();
-        response.setReady(ResponsePromise::Payload{makeBinaryBuffer(std::move(allocator),
-                                                                    std::move(detachedBuffer)),
+        response.setReady(ResponsePromise::Payload{releaseIntoBinaryBuffer(std::move(allocator),
+                                                                           builder),
                                                    "application/octet-stream"});
     };
 
@@ -125,4 +124,7 @@ void GraphManipulationRequestHandler::handleRemoveNode(const Request& request,
     // Execute the request
     m_backend->removeNode(graphID,
                           nodeReq->nodeId());
+
+    // Set the response.
+    response.setReady();
 }

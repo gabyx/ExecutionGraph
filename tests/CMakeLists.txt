@@ -91,3 +91,8 @@ defineCompileDefs(${EXEC_NAME})
 set(EXEC_NAME ${PROJECT_NAME}Test-MetaProgramming)
 add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_MetaProg.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 defineCompileDefs(${EXEC_NAME})
+
+# Synchronized Test
+set(EXEC_NAME ${PROJECT_NAME}Test-Synchronized)
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Synchronized.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME})

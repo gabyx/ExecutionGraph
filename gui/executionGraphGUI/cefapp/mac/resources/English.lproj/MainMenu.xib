@@ -317,6 +317,12 @@ propertyAccessControl="none">
                   <action selector="showDeveloperTools:" target="-2" id="8GQ-Ph-2iP" />
                 </connections>
               </menuItem>
+              <menuItem title="Reload" tag="998" keyEquivalent="r" id="7Gf-w2-HJE">
+                <modifierMask key="keyEquivalentModifierMask" option="NO" command="YES" />
+                <connections>
+                  <action selector="reload:" target="-2" id="8GQ-Ph-2iQ" />
+                </connections>
+              </menuItem>
             </items>
           </menu>
         </menuItem>

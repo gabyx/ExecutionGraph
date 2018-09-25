@@ -42,7 +42,10 @@ export class CefMessageRouterService {
     console.log(`[CefMessageRouterService] Executing '${requestURL}'`);
 
     return new Promise((resolve, reject) => {
-      var requestString = JSON.stringify({ requestURL: requestURL, payload: payload });
+      var requestString = JSON.stringify({
+        requestURL: requestURL,
+        payload: payload
+      });
 
       this.cef.cefQuery({
         request: requestString,

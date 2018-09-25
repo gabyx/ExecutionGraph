@@ -89,7 +89,7 @@ void BackendResourceHandler::Cancel()
     // and after that -> call finish() and leave here!
     // todo
 
-    finish();
+    reset();
 }
 
 //! Get the response headers (see: http://magpcss.org/ceforum/apidocs3/projects/(default)/CefResourceHandler.html)
@@ -101,18 +101,24 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
 
     auto& future      = m_responseFuture.getFuture();
     std::string error = "Unknown Exception";
+
+    responseLength = 0;
+    m_bytesRead    = 0;
+
     try
     {
         EXECGRAPHGUI_THROW_IF(!future.valid(), "Future is invalid!");
 
         m_payload = future.get();  // Set the payload!
 
-        response->SetMimeType(m_payload.getMIMEType());    // set the mime type
-        responseLength = m_payload.getBuffer().getSize();  // set the response byte size
+        m_bufferSize = responseLength = m_payload.getBuffer().getSize();  // set the response byte size (can be empty)
+        if(responseLength)
+        {
+            response->SetMimeType(m_payload.getMIMEType());  // set the mime type
+            m_buffer = m_payload.getBuffer().getData();      // set the buffer pointer (can be nullptr!)
+        }
         response->SetStatusText("handled");
         response->SetStatus(200);  // http status code: 200 := The request has been handled! (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
-
-        m_bytesRead = 0;
         return;
     }
     catch(const BadRequestError& e)
@@ -120,7 +126,6 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
         EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler: Bad request: '{0}'", e.what());
         response->SetStatusText(e.what());
         response->SetStatus(400);  // http status code: 400 : Bad request!
-        response->SetError(cef_errorcode_t::ERR_FAILED);
         return;
     }
     // Every other Exception is an internal server error!
@@ -137,7 +142,6 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
     EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler: Exception in GetResponseHeaders");
     response->SetStatusText(error);
     response->SetStatus(500);  // http status code: 500 : Internal server error!
-    response->SetError(cef_errorcode_t::ERR_FAILED);
 }
 
 //! Process the request (see: http://magpcss.org/ceforum/apidocs3/projects/(default)/CefResourceHandler.html)
@@ -151,7 +155,6 @@ bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
     if(!initRequest(request))
     {
         // we dont handle this request or an error occured
-        finish();
         return false;
     }
 
@@ -160,7 +163,6 @@ bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
     std::optional<RequestCef::Payload> payload;
     if(!m_mimeType.empty() && !readPostData(request->GetPostData(), m_mimeType, payload, m_allocator))
     {
-        finish();
         return false;
     }
 
@@ -187,24 +189,22 @@ bool BackendResourceHandler::ReadResponse(void* dataOut,
                                           CefRefPtr<CefCallback> callback)
 {
     CEF_REQUIRE_IO_THREAD();
+
+    EXECGRAPHGUI_ASSERT(m_buffer, "We need a buffer set! We should not come to this method!");
+
     // Handle the repsponse
-
-    auto bufferSize = m_payload.getBuffer().getSize();
-
-    if(m_bytesRead < bufferSize)
+    if(m_bytesRead < m_bufferSize)
     {
         // Copy as many bytes as possible into the output buffer
-        std::size_t nBytes = std::min(std::size_t(bytesToRead), bufferSize - m_bytesRead);
-        std::memcpy(dataOut, m_payload.getBuffer().getData() + m_bytesRead, nBytes);
+        std::size_t nBytes = std::min(std::size_t(bytesToRead), m_bufferSize - m_bytesRead);
+        std::memcpy(dataOut, m_buffer + m_bytesRead, nBytes);
         m_bytesRead += nBytes;
         bytesRead = nBytes;
         return true;
     }
     else
     {
-        // Response is finished, we copied all bytes into the output buffer, so
-        // finish up and return false.
-        finish();
+        bytesRead = 0;
         return false;
     }
 }
@@ -213,6 +213,8 @@ bool BackendResourceHandler::ReadResponse(void* dataOut,
 //! @return false if the request cannot be handled.
 bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
 {
+    reset();
+
     CefString url = request->GetURL();
     CefURLParts urlParts;
     if(!CefParseURL(url, urlParts))
@@ -261,11 +263,14 @@ bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
 }
 
 //! Finish handling the request: Reset everything and signal callback.
-void BackendResourceHandler::finish()
+void BackendResourceHandler::reset()
 {
     m_requestURL.clear();
     m_query.clear();
     m_mimeType.clear();
+    m_buffer     = nullptr;
+    m_bufferSize = 0;
+    m_bytesRead  = 0;
 }
 
 //! Release method for CefRefCounted

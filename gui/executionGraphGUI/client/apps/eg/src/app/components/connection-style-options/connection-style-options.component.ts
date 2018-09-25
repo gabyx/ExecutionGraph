@@ -49,7 +49,7 @@ export class ConnectionStyleOptionsComponent implements OnInit {
   }
 
   private readonly log: ILogger;
-  
+
   constructor(loggerFactory: LoggerFactory) {
     this.log = loggerFactory.create('ConnectionStyleOptionsComponent');
     this.drawStyle = 'direct';

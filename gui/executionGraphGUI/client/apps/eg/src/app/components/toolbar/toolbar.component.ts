@@ -10,12 +10,11 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Injectable } from '@angular/core';
 
-import { ExecutionService } from '../../services/ExecutionService';
-import { GraphManipulationService } from '../../services/GraphManipulationService';
-import { GeneralInfoService } from '../../services/GeneralInfoService';
+import { TestService } from '../../services/TestService';
 
+@Injectable()
 @Component({
   selector: 'eg-toolbar',
   templateUrl: './toolbar.component.html',
@@ -24,33 +23,11 @@ import { GeneralInfoService } from '../../services/GeneralInfoService';
 export class ToolbarComponent implements OnInit {
   public testResponse: any;
 
-  constructor(
-    private readonly executionService: ExecutionService,
-    private readonly generalInfoService: GeneralInfoService,
-    private readonly graphManipulationService: GraphManipulationService
-  ) {}
+  constructor(private readonly testService: TestService) {}
 
   ngOnInit() {}
 
   public test() {
-    console.log('Testing AddNode');
-    this.debugAddNode();
-  }
-
-  /**
-   * Add some node for debugging purposes
-   */
-  private async debugAddNode() {
-    // Get the graph infos
-    console.debug('Get all graph type descriptions...');
-    var graphInfos = await this.generalInfoService.getAllGraphTypeDescriptions();
-
-    // Add a node to the first graph
-    let graphInfo = graphInfos.graphsTypes(0);
-    let graphId = graphInfo.id();
-    let nodeType = graphInfo.nodeTypeDescriptions(0).type();
-
-    // Add the node.
-    this.graphManipulationService.addNode(graphId, nodeType, 'MySuperDuperNode');
+    this.testService.testAddRemove();
   }
 }

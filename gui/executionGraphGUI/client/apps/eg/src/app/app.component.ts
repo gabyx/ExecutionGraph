@@ -10,13 +10,44 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { filter } from 'rxjs/operators';
+
+import { LoggerFactory, ILogger } from '@eg/logger';
+import { Id, isDefined } from "@eg/common"
+import { AppState } from './+state/app.state';
+import { LoadApp, SelectGraph } from './+state/app.actions';
+import { appQuery } from './+state/app.selectors';
 
 @Component({
-  selector: 'app-root',
+  selector: 'eg-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-  title = 'app';
+export class AppComponent implements OnInit {
+
+  private readonly log: ILogger;
+
+  constructor(private store: Store<AppState>, loggerFactory: LoggerFactory) {
+    this.log = loggerFactory.create("AppComponent");
+  }
+
+  ngOnInit() {
+    this.store.dispatch(new LoadApp());
+
+    this.store.select(appQuery.getAllGraphs)
+      .pipe(filter(graphs => isDefined(graphs)))
+      .subscribe(graphs => {
+        this.log.debug(`Loaded graphs, auto-selecting first`);
+        let ids = Object.keys(graphs);
+        if (!ids.length) {
+          this.log.error(`Cannot select, since no graphs loaded!`);
+        }
+        else
+        {
+          this.store.dispatch(new SelectGraph(new Id(ids[0])));
+        }
+      });
+  }
 }

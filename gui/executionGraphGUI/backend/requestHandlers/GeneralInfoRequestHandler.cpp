@@ -86,8 +86,7 @@ void GeneralInfoRequestHandler::handleGetAllGraphTypeDescriptions(const Request&
     builder.Finish(offset);
 
     // Set the response.
-    auto detachedBuffer = builder.Release();
-    response.setReady(ResponsePromise::Payload{makeBinaryBuffer(std::move(allocator),
-                                                                std::move(detachedBuffer)),
+    response.setReady(ResponsePromise::Payload{releaseIntoBinaryBuffer(std::move(allocator),
+                                                                       builder),
                                                "application/octet-stream"});
 }

@@ -85,16 +85,16 @@ public:
     virtual ~ResponsePromise() = default;
 
 public:
-    //! Callback for signaling that the response object is available.
-    void setReady(Payload&& payload)
+    //! Callback for signaling that the response object is available with payload `payload` (default=empty).
+    void setReady(Payload&& payload = {})
     {
+        m_promisePayload.set_value(std::move(payload));
         if(m_state != State::Nothing)
         {
             EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', is already set to a state!", m_requestId.toString());
             return;
         }
         m_state = State::Ready;
-        m_promisePayload.set_value(std::move(payload));
         setReadyImpl();  // forward to actual instance
     }
 

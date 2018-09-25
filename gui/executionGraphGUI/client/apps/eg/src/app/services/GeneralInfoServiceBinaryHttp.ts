@@ -11,14 +11,13 @@
 // =========================================================================================
 
 import { Injectable, Inject } from '@angular/core';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/first';
-
+import { VERBOSE_LOG_TOKEN } from '../tokens';
 import { flatbuffers } from 'flatbuffers';
+import { ILogger, LoggerFactory } from '@eg/logger';
 import { GeneralInfoService, sz } from './GeneralInfoService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import { ILogger, LoggerFactory } from '@eg/logger';
-import { VERBOSE_LOG_TOKEN } from '../tokens';
+import * as model from '../model';
+import { toGraphTypeDescription } from './Conversions';
 
 @Injectable()
 export class GeneralInfoServiceBinaryHttp extends GeneralInfoService {
@@ -33,30 +32,23 @@ export class GeneralInfoServiceBinaryHttp extends GeneralInfoService {
     this.logger = loggerFactory.create('GeneralInfoServiceBinaryHttp');
   }
 
-  public async getAllGraphTypeDescriptions(): Promise<sz.GetAllGraphTypeDescriptionsResponse> {
+  public async getAllGraphTypeDescriptions(): Promise<model.GraphTypeDescription[]> {
     const result = await this.binaryRouter.get('general/getAllGraphTypeDescriptions');
     let buf = new flatbuffers.ByteBuffer(result);
     let response = sz.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
-    this.logger.info(`Received: Number of Graph types: ${response.graphsTypesLength()}`);
 
-    // Verbose logging the response if enabled
-    if (this.verboseResponseLog) {
-      for (let g = 0; g < response.graphsTypesLength(); ++g) {
-        let graphDesc = response.graphsTypes(g);
-        this.logger.info(`Infos for graph '${graphDesc.name()}' with id '${graphDesc.id()}' :`);
-        this.logger.info('Sockets:');
-        for (let i = 0; i < graphDesc.socketTypeDescriptionsLength(); ++i) {
-          let socketDesc = graphDesc.socketTypeDescriptions(i);
-          this.logger.info(`Socket: ${socketDesc.name()} [${socketDesc.type()}]`);
-        }
-        this.logger.info('Nodes:');
-        for (let i = 0; i < graphDesc.nodeTypeDescriptionsLength(); ++i) {
-          let nodeDesc = graphDesc.nodeTypeDescriptions(i);
-          this.logger.info(`Node: ${nodeDesc.name()} [${nodeDesc.type()}]`);
-        }
-      }
+    this.logger.info(`Number of graph types: ${response.graphsTypesLength()}`);
+
+    let graphDesc: model.GraphTypeDescription[] = [];
+
+    for (let g = 0; g < response.graphsTypesLength(); ++g) {
+      graphDesc.push(toGraphTypeDescription(response.graphsTypes(g)));
     }
 
-    return response;
+    if (this.verboseResponseLog) {
+      this.logger.debug(`GraphDescriptions: ${JSON.stringify(graphDesc)}`);
+    }
+
+    return graphDesc;
   }
 }

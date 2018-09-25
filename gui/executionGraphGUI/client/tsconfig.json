@@ -19,11 +19,23 @@
       "@eg/*": [
         "libs/*"
       ],
-      "@messages/*": [
-        "../messages/schemas/ts/*"
+      "@eg/common": [
+        "libs/common/src/index.ts"
       ],
-      "@serialization/*": [
-        "../../../include/executionGraph/serialization/schemas/ts/*"
+      "@eg/graph": [
+        "libs/graph/src/index.ts"
+      ],
+      "@eg/logger": [
+        "libs/logger/src/index.ts"
+      ],
+      "@eg/messages": [
+        "libs/messages/src/index.ts"
+      ],
+      "@eg/serialization": [
+        "libs/serialization/src/index.ts"
+      ],
+      "@eg/serialization/*": [
+        "libs/serialization/src/lib/*"
       ]
     }
   },

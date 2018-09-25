@@ -87,7 +87,7 @@ private:
         std::vector<NodeTypeDescription> description;
         for(std::size_t idx = 0; idx < nodeNames.size(); ++idx)
         {
-            description.emplace_back(NodeTypeDescription{nodeNames[idx], nodeRTTIs[idx]});
+            description.emplace_back(NodeTypeDescription{nodeRTTIs[idx], nodeNames[idx]});
         }
         return description;
     }

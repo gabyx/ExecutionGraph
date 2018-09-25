@@ -11,8 +11,6 @@
 // =========================================================================================
 
 import { Injectable } from '@angular/core';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/first';
 import { flatbuffers } from 'flatbuffers';
 
 import { ExecutionService } from './ExecutionService';

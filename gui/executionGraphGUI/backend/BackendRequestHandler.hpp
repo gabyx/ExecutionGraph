@@ -18,6 +18,7 @@
 #include <rttr/type>
 #include <executionGraph/common/IObjectID.hpp>
 #include "executionGraphGUI/backend/Backend.hpp"
+#include "executionGraphGUI/common/Assert.hpp"
 #include "executionGraphGUI/common/Request.hpp"
 #include "executionGraphGUI/common/Response.hpp"
 

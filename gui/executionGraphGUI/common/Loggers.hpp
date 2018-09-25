@@ -95,31 +95,6 @@
 #    define EXECGRAPHGUI_LOGCODE_FATAL(expr) expr
 #endif
 
-// Define some asserts
-#define EXECGRAPH_STRINGIFY(x) #x
-#define EXECGRAPH_TOSTRING(x) EXECGRAPH_STRINGIFY(x)
-
-#ifdef NDEBUG
-#    define EXECGRAPHGUI_ASSERT(condition, ...)                                                    \
-        {                                                                                          \
-            if(!(condition))                                                                       \
-            {                                                                                      \
-                EXECGRAPHGUI_APPLOG_FATAL(__VA_ARGS__);                                            \
-                EXECGRAPHGUI_THROW("Exception: @ " __FILE__ "(" EXECGRAPH_TOSTRING(__LINE__) ")"); \
-            }                                                                                      \
-        }
-
-#    define EXECGRAPHGUI_VERIFY(condition, ...) EXECGRAPHGUI_ASSERT(condition, __VA_ARGS__)
-#else
-#    define EXECGRAPHGUI_ASSERT(condition, ...)         \
-        {                                               \
-            if(!(condition))                            \
-            {                                           \
-                EXECGRAPHGUI_APPLOG_FATAL(__VA_ARGS__); \
-            }                                           \
-        }
-#    define EXECGRAPHGUI_VERIFY(condition, ...) EXECGRAPHGUI_ASSERT(condition, __VA_ARGS__)
-#endif
 /* ---------------------------------------------------------------------------------------*/
 /*!
     The logger storage for the application

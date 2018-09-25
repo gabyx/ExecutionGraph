@@ -48,12 +48,24 @@ import { GraphManagementService } from './services/GraphManagementService';
 import { GraphManagementServiceBinaryHttp } from './services/GraphManagementServiceBinaryHttp';
 import { GraphManagementServiceDummy } from './services/GraphManagementServiceDummy';
 
+import { TestService } from './services/TestService';
+import { ITestBackend, TestBackend } from './services/TestBackend';
+
 import { AppComponent } from './app.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
 
 import { environment } from '../environments/environment';
 import { ConnectionStyleOptionsComponent } from './components/connection-style-options/connection-style-options.component';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { initialState as appInitialState, appReducer } from './+state/app.reducer';
+import { AppEffects } from './+state/app.effects';
+import { NxModule } from '@nrwl/nx';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { storeFreeze } from 'ngrx-store-freeze';
+
+environment.production = true
 
 @NgModule({
   declarations: [AppComponent, ToolbarComponent, WorkspaceComponent, ConnectionStyleOptionsComponent],
@@ -67,28 +79,40 @@ import { ConnectionStyleOptionsComponent } from './components/connection-style-o
     MatButtonModule,
     MatButtonToggleModule,
     MatCheckboxModule,
-    GraphModule
+    GraphModule,
+    NxModule.forRoot(),
+    StoreModule.forRoot(
+      { app: appReducer },
+      {
+        initialState : { app : appInitialState },
+        //metaReducers : !environment.production ? [storeFreeze] : []
+      }
+    ),
+    EffectsModule.forRoot([AppEffects]),
+    !environment.production ? StoreDevtoolsModule.instrument() : []
   ],
   providers: [
+    { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory },
+    { provide: ITestBackend, useClass: TestBackend },
     BinaryHttpRouterService,
     CefMessageRouterService,
+    TestService,
     { provide: VERBOSE_LOG_TOKEN, useValue: environment.logReponsesVerbose },
-    { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory },
     {
       provide: ExecutionService,
-      useClass: environment.production ? ExecutionServiceBinaryHttp : ExecutionServiceDummy
+      useClass: !environment.useServiceDummys ? ExecutionServiceBinaryHttp : ExecutionServiceDummy
     },
     {
       provide: GeneralInfoService,
-      useClass: environment.production ? GeneralInfoServiceBinaryHttp : GeneralInfoServiceDummy
+      useClass: !environment.useServiceDummys ? GeneralInfoServiceBinaryHttp : GeneralInfoServiceDummy
     },
     {
       provide: GraphManipulationService,
-      useClass: environment.production ? GraphManipulationServiceBinaryHttp : GraphManipulationServiceDummy
+      useClass: !environment.useServiceDummys ? GraphManipulationServiceBinaryHttp : GraphManipulationServiceDummy
     },
     {
       provide: GraphManagementService,
-      useClass: environment.production ? GraphManagementServiceBinaryHttp : GraphManagementServiceDummy
+      useClass: !environment.useServiceDummys ? GraphManagementServiceBinaryHttp : GraphManagementServiceDummy
     }
   ],
   bootstrap: [AppComponent]

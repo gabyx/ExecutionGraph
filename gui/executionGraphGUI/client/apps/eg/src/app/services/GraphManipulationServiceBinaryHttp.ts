@@ -10,29 +10,33 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Inject } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
+import { VERBOSE_LOG_TOKEN } from '../tokens';
 import { flatbuffers } from 'flatbuffers';
-
-import { ILogger, LoggerFactory } from '@eg/logger';
+import { ILogger, LoggerFactory, stringify } from '@eg/logger';
+import { Id } from '@eg/common';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import { NodeId } from '../model/NodeId';
+import { Node, NodeId } from '../model';
+import { toNode } from './Conversions';
 
+@Injectable()
 export class GraphManipulationServiceBinaryHttp extends GraphManipulationService {
   private logger: ILogger;
 
   constructor(
     loggerFactory: LoggerFactory,
-    private readonly binaryRouter: BinaryHttpRouterService
+    private readonly binaryRouter: BinaryHttpRouterService,
+    @Inject(VERBOSE_LOG_TOKEN) private readonly verboseResponseLog = true
   ) {
     super();
     this.logger = loggerFactory.create('GraphManipulationServiceBinaryHttp');
   }
 
-  public async addNode(graphId: string, type: string, name: string): Promise<sz.AddNodeResponse> {
+  public async addNode(graphId: Id, type: string, name: string): Promise<Node> {
     // Build the AddNode request
     let builder = new flatbuffers.Builder(356);
-    let offGraphId = builder.createString(graphId);
+    let offGraphId = builder.createString(graphId.toString());
     let offType = builder.createString(type);
     let offName = builder.createString(name);
 
@@ -55,20 +59,23 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
 
     let node = response.node();
-    this.logger.info(`Added new node of type: '${node.type()}'
-                  with name: '${node.name()}' [ins: ${node.inputSocketsLength()},
-                  outs: ${node.outputSocketsLength()}`);
+    this.logger.info(`Added new node [type: '${node.type()}', name: '${node.name()}', ins: ${node.inputSocketsLength()},
+                  outs: ${node.outputSocketsLength()}].`);
 
-    return response;
+    let nodeModel = toNode(node);
+    if (this.verboseResponseLog) {
+      this.logger.info(`Node: '${stringify(nodeModel)}'`);
+    }
+    return nodeModel;
   }
 
-  public async removeNode(graphId: string, nodeId: NodeId): Promise<void> {
+  public async removeNode(graphId: Id, nodeId: NodeId): Promise<void> {
     // Build the RemoveNode request
     let builder = new flatbuffers.Builder(356);
-    let offGraphId = builder.createString(graphId);
+    let offGraphId = builder.createString(graphId.toString());
     sz.RemoveNodeRequest.startRemoveNodeRequest(builder);
     sz.RemoveNodeRequest.addGraphId(builder, offGraphId);
-    sz.RemoveNodeRequest.addNodeId(builder, builder.createLong(nodeId.lower, nodeId.higher));
+    sz.RemoveNodeRequest.addNodeId(builder, builder.createLong(nodeId.low, nodeId.high));
     let reqOff = sz.RemoveNodeRequest.endRemoveNodeRequest(builder);
     builder.finish(reqOff);
 
@@ -76,5 +83,6 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
 
     // Send the request
     await this.binaryRouter.post('graph/removeNode', requestPayload);
+    this.logger.debug(`Removed node [id: '${nodeId}'] from graph [id '${graphId}']`);
   }
 }
