@@ -86,5 +86,21 @@ export function toNode(node: serialization.LogicNode): model.Node {
     }
   }
 
+  const s = createSocket('output');
+
   return new model.Node(nodeId, node.type(), node.name(), sockets.input, sockets.output);
+}
+
+
+type SocketType = 'input' | 'output';
+
+function createSocket(key: 'input') : model.InputSocket;
+
+function createSocket(key: 'output'): model.OutputSocket;
+
+function createSocket(key: SocketType)
+{
+    return key === 'input'
+      ? new model.InputSocket("adsf", "adsf", null)
+      : new model.OutputSocket("adsf", "adsf", null);
 }

@@ -29,39 +29,39 @@ export class AppEffects {
       graph.nodes.push(node);
     }
     return new AppLoaded([graph], graphDescs);
-}
-
-@Effect()
-loadApp$ = this.dataPersistence.fetch(AppActionTypes.LoadApp, {
-  run: (action: LoadApp, state: AppState) => {
-    return from(this.loadApp());
-  },
-  onError: (action: LoadApp, error) => {
-    this.log.error('Error', error);
-    return new AppLoadError(error);
   }
-});
 
-@Effect()
-addConnection$ = this.dataPersistence.pessimisticUpdate(AppActionTypes.AddConnection, {
-  run: (action: AddConnection, state: AppState) => {
-    return new ConnectionAdded(createConnection(action.source, action.target));
-  },
+  @Effect()
+  loadApp$ = this.dataPersistence.fetch(AppActionTypes.LoadApp, {
+    run: (action: LoadApp, state: AppState) => {
+      return from(this.loadApp());
+    },
+    onError: (action: LoadApp, error) => {
+      this.log.error('Error', error);
+      return new AppLoadError(error);
+    }
+  });
 
-  onError: (action: AddConnection, error) => {
-    this.log.error('Error', error);
-    return new AppLoadError(error);
+  @Effect()
+  addConnection$ = this.dataPersistence.pessimisticUpdate(AppActionTypes.AddConnection, {
+    run: (action: AddConnection, state: AppState) => {
+      return new ConnectionAdded(createConnection(action.source, action.target));
+    },
+
+    onError: (action: AddConnection, error) => {
+      this.log.error('Error', error);
+      return new AppLoadError(error);
+    }
+  });
+
+  constructor(
+    private actions$: Actions,
+    private dataPersistence: DataPersistence < AppState >,
+    loggerFactory: LoggerFactory,
+    private readonly generalInfoService: services.GeneralInfoService,
+    private readonly graphManipulationService: services.GraphManipulationService,
+    private readonly graphManagementService: services.GraphManagementService
+  ) {
+    this.log = loggerFactory.create('AppEffects');
   }
-});
-
-constructor(
-  private actions$: Actions,
-  private dataPersistence: DataPersistence < AppState >,
-  loggerFactory: LoggerFactory,
-  private readonly generalInfoService: services.GeneralInfoService,
-  private readonly graphManipulationService: services.GraphManipulationService,
-  private readonly graphManagementService: services.GraphManagementService
-) {
-  this.log = loggerFactory.create('AppEffects');
-}
 }

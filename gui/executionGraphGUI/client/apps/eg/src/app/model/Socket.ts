@@ -20,7 +20,8 @@ import { SocketId } from './SocketId';
  * @export
  * @class Socket
  */
-export abstract class Socket {
+export class Socket {
+  sockettype: 'input' | 'output'
   protected _parent: Node;
   protected _id: SocketId = new SocketId();
 
@@ -53,18 +54,25 @@ export abstract class Socket {
   protected abstract initId();
 }
 
-export class InputSocket extends Socket {
-  protected initId() {
-    if (this.parent) {
-      this._id = new SocketId(this.parent.id, this.index, false);
-    }
-  }
-}
+// export class InputSocket extends Socket {
+//   protected initId() {
+//     if (this.parent) {
+//       this._id = new SocketId(this.parent.id, this.index, false);
+//     }
+//   }
+// }
 
-export class OutputSocket extends Socket {
-  protected initId() {
-    if (this.parent) {
-      this._id = new SocketId(this.parent.id, this.index, true);
-    }
-  }
+// export class OutputSocket extends Socket {
+//   protected initId() {
+//     if (this.parent) {
+//       this._id = new SocketId(this.parent.id, this.index, true);
+//     }
+//   }
+// }
+
+type InputSocket  = Socket;
+
+function isInputSocket(socket: Socket): socket is InputSocket
+{
+  return socket.sockettype === 'input';
 }
