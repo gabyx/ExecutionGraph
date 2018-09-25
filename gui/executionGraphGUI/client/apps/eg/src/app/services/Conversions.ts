@@ -63,44 +63,29 @@ export function toNode(node: serialization.LogicNode): model.Node {
   // Convert to a node model
   let nodeId = new model.NodeId(toULong(node.id()));
 
-  let sockets: {
-    input: model.InputSocket[];
-    output: model.OutputSocket[];
-  } = { input: [], output: [] };
+  let sockets: model.Socket[];
 
   // Convert the sockets
-  for (let key of ['input', 'output']) {
-    let isInput = key == 'input';
-    let ctor = isInput ? model.InputSocket.constructor : model.OutputSocket.constructor;
-    let l = node[`${key}SocketsLength`]();
-    let socks = (idx: number) => node[`${key}Sockets`](idx);
+  let extractSockets = (output: boolean, sockets: model.Socket[]) => {
+    let l: number;
+    let socks: (idx: number) => serialization.LogicSocket;
+    if (output) {
+      l = node.outputSocketsLength();
+      socks = (idx: number) => node.outputSockets(idx);
+    }
+    else {
+      l = node.inputSocketsLength();
+      socks = (idx: number) => node.inputSockets(idx);
+    }
     for (let i = 0; i < l; ++i) {
       let s = socks(i);
-      let socket: model.InputSocket | model.OutputSocket;
-      if (isInput) {
-        socket = new model.InputSocket(s.type(), s.name(), toULong(s.index()));
-      } else {
-        socket = new model.OutputSocket(s.type(), s.name(), toULong(s.index()));
-      }
-      sockets[key].push(socket);
+      let socket = new model.Socket(toULong(s.type()), s.name(), toULong(s.index()), output);
+      sockets.push(socket);
     }
-  }
+  };
 
-  const s = createSocket('output');
+  extractSockets(false, sockets);
+  extractSockets(true, sockets);
 
-  return new model.Node(nodeId, node.type(), node.name(), sockets.input, sockets.output);
-}
-
-
-type SocketType = 'input' | 'output';
-
-function createSocket(key: 'input') : model.InputSocket;
-
-function createSocket(key: 'output'): model.OutputSocket;
-
-function createSocket(key: SocketType)
-{
-    return key === 'input'
-      ? new model.InputSocket("adsf", "adsf", null)
-      : new model.OutputSocket("adsf", "adsf", null);
+  return new model.Node(nodeId, node.type(), node.name(), sockets);
 }

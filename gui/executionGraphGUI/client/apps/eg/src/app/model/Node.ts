@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Socket, InputSocket, OutputSocket } from './Socket';
+import { Socket } from './Socket';
 import { NodeId } from './NodeId';
 
 export interface UIProps {
@@ -25,24 +25,32 @@ export interface UIProps {
  * @class Node
  */
 export class Node {
+  /** Two different lists for sockets */
+  public readonly inputs: Socket[];
+  public readonly outputs: Socket[];
   constructor(
-    public readonly id: NodeId,
+    private readonly _id: NodeId,
     public readonly type: string,
     public readonly name: string,
-    public inputs: InputSocket[] = [],
-    public outputs: OutputSocket[] = [],
+    public sockets: Socket[] = [],
     public uiProps: UIProps = { x: 0, y: 0 }
   ) {
+    // Make
+    sockets.forEach((s: Socket) => {
+      if (s.isOutputSocket) { this.inputs.push(s) }
+      else { this.outputs.push(s) }
+    })
     // Sorting input/outputs according to index.
     const sort = (a: Socket, b: Socket) => a.index.comp(b.index);
-    this.inputs = inputs.sort(sort);
-    this.outputs = outputs.sort(sort);
+    this.inputs = this.inputs.sort(sort);
+    this.outputs = this.outputs.sort(sort);
     // Setting all parents!
     this.inputs.forEach((s: Socket) => (s.parent = this));
     this.outputs.forEach((s: Socket) => (s.parent = this));
   }
 
-  public get idString() : string {
+  public get id(): NodeId { return this._id; }
+  public get idString(): string {
     return this.id.string;
   }
 }

@@ -13,6 +13,7 @@
 import { SocketIndex } from './SocketIndex';
 import { Node } from './Node';
 import { SocketId } from './SocketId';
+import { isDefined } from '@eg/common';
 
 /**
  * Modelclass for a Socket on a node.
@@ -21,58 +22,30 @@ import { SocketId } from './SocketId';
  * @class Socket
  */
 export class Socket {
-  sockettype: 'input' | 'output'
-  protected _parent: Node;
   protected _id: SocketId = new SocketId();
 
   constructor(
-    public readonly type: string,
+    public readonly type: Long,
     public readonly name: string,
     public readonly index: SocketIndex,
-    parent: Node = null
-  ) {
-    this.parent = parent;
-  }
+    public readonly isOutputSocket: boolean,
+    protected _parent: Node = undefined
+  ) { }
 
   public get parent(): Node {
     return this._parent;
   }
   public set parent(parent: Node) {
-    if (!parent) { return; }
-    if  (this._parent != null) {
+    if (isDefined(parent) || parent) {
       throw 'You cannot assign a new parent!';
     }
     this._parent = parent;
-    this.initId();
+    // Assign a new unique id to the socket, for debugging purposes
+    this._id = new SocketId(`${this.parent.id.string}-` + (this.isOutputSocket ? "o" : "i") + `-${this.index.toInt()}`);
   }
 
   public get id(): SocketId { return this._id; }
   public get idString(): string {
     return this._id.string;
   }
-
-  protected abstract initId();
-}
-
-// export class InputSocket extends Socket {
-//   protected initId() {
-//     if (this.parent) {
-//       this._id = new SocketId(this.parent.id, this.index, false);
-//     }
-//   }
-// }
-
-// export class OutputSocket extends Socket {
-//   protected initId() {
-//     if (this.parent) {
-//       this._id = new SocketId(this.parent.id, this.index, true);
-//     }
-//   }
-// }
-
-type InputSocket  = Socket;
-
-function isInputSocket(socket: Socket): socket is InputSocket
-{
-  return socket.sockettype === 'input';
 }

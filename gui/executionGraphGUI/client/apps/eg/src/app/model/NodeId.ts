@@ -12,7 +12,6 @@
 
 import * as Long from 'long';
 
-
 function isLong(value: any): value is Long {
   return value instanceof Long;
 }

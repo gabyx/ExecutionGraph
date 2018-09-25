@@ -10,8 +10,6 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { SocketIndex } from "./SocketIndex"
-import { NodeId } from "./NodeId"
 import { Guid } from 'guid-typescript';
 
 /**
@@ -21,18 +19,7 @@ import { Guid } from 'guid-typescript';
  * @class SocketId
  */
 export class SocketId {
-  private readonly _idString: string
-  constructor(
-    private readonly parentId: NodeId = null,
-    private readonly index: SocketIndex = SocketIndex.fromInt(0),
-    private readonly outputSocket: boolean = true
-  ) {
-    if (parentId) {
-      this._idString = `${parentId.string}-` + (outputSocket ? "o" : "i") + `-${index.toInt()}`
-    }
-    else {
-      this._idString = Guid.create().toString();
-    }
+  constructor(private readonly _idString: string = Guid.create().toString()) {
   }
   /**
    * String identifer for this NodeId.
@@ -45,8 +32,6 @@ export class SocketId {
   }
 
   public equal(id: SocketId) {
-    return this.parentId === id.parentId &&
-      this.index === id.index &&
-      this.outputSocket === id.outputSocket
+    return this._idString === id._idString;
   }
 }
