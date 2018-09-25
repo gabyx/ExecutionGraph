@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "copy-flatbuffer-files": "scripts/copyFlatBuffersBuildFiles.sh",
+    "copy-flatbuffer-files": "bash scripts/copyFlatBuffersBuildFiles.sh",
     "prebuild": "npm run copy-flatbuffer-files",
     "start": "npm run prebuild && ng serve --project=eg",
     "build": "npm run prebuild && ng build --project=eg --configuration=dev --watch",
