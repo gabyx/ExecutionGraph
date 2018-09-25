@@ -49,3 +49,17 @@ export class Socket {
     return this._id.string;
   }
 }
+
+export type InputSocket = Socket;
+export type OutputSocket = Socket;
+
+export function isOutputSocket(socket: InputSocket | OutputSocket): socket is OutputSocket {
+  return socket.isOutputSocket === true;
+}
+
+export function createInputSocket(type: Long, name: string, index: SocketIndex, parent: Node = undefined) {
+  return new Socket(type, name, index, false, parent);
+}
+export function createOutputSocket(type: Long, name: string, index: SocketIndex, parent: Node = undefined) {
+  return new Socket(type, name, index, true, parent);
+}

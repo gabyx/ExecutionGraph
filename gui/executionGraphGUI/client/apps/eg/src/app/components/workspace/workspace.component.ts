@@ -18,13 +18,13 @@ import { Store } from '@ngrx/store';
 import {
   Graph,
   Socket,
-  NodeId,
   Node,
   Connection,
   SocketIndex,
   InputSocket,
   OutputSocket,
-  createConnection
+  createConnection,
+  isOutputSocket, createOutputSocket, createInputSocket
 } from '../../model';
 import { AppState } from '../../+state/app.state'
 import { appQuery } from '../../+state/app.selectors';
@@ -73,12 +73,12 @@ export class WorkspaceComponent implements OnInit {
     node.uiProps.y = event.dragElementPosition.y;
   }
 
-  public initConnectionFrom(socket: OutputSocket | InputSocket, event: DragEvent) {
+  public initConnectionFrom(socket: InputSocket | OutputSocket, event: DragEvent) {
     this.logger.info(`[WorkspaceComponnt] Initiating new connection from ${socket.idString}`);
-    if (socket instanceof OutputSocket) {
-      this.newTargetSocket = new InputSocket(socket.type, socket.name, new SocketIndex(0));
+    if (isOutputSocket(socket)) {
+      this.newTargetSocket = createInputSocket(socket.type, socket.name, new SocketIndex(0));
     } else {
-      this.newTargetSocket = new OutputSocket(socket.type, socket.name, new SocketIndex(0));
+      this.newTargetSocket = createOutputSocket(socket.type, socket.name, new SocketIndex(0));
     }
     // Create the connection
     this.newConnection = createConnection(socket, this.newTargetSocket);
