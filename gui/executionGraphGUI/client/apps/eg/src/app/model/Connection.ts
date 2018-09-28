@@ -10,8 +10,29 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { OutputSocket, InputSocket } from './Socket';
-import { ConnectionId } from './ConnectionId';
+import { OutputSocket, InputSocket, SocketId, isInputSocket, isOutputSocket } from './Socket';
+
+/**
+ * A class for defining a unique id for a `Connection`.
+ *
+ * @export
+ * @class ConnectionId
+ */
+export class ConnectionId {
+  private readonly _idString: string
+  constructor(
+    public outSocketId: SocketId,
+    public inSocketId: SocketId,
+    public isWriteLink: boolean) {
+    this._idString = `${outSocketId.string}-to-${inSocketId.string}`;
+  }
+
+  public equal(id: ConnectionId) {
+    return this.string == id.string;
+  }
+
+  public get string() { return this._idString; }
+}
 
 /**
  * Modelclass for a connection
@@ -40,11 +61,14 @@ export class Connection {
   }
 }
 
-export function createConnection(source: OutputSocket | InputSocket, target: OutputSocket | InputSocket) {
-  if (source instanceof OutputSocket && target instanceof InputSocket) {
+export function createConnection(
+  source: OutputSocket | InputSocket,
+  target: OutputSocket | InputSocket
+) {
+  if (isOutputSocket(source) && isInputSocket(target)) {
     // Make a Write-Link
     return new Connection(source, target, true);
-  } else if (source instanceof InputSocket && target instanceof OutputSocket) {
+  } else if (isInputSocket(source) && isOutputSocket(target)) {
     // Make a Get-Link
     return new Connection(target, source, false);
   } else {

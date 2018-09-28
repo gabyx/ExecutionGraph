@@ -10,13 +10,46 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Socket } from './Socket';
-import { NodeId } from './NodeId';
+import * as Long from 'long';
+import { Socket, InputSocket, OutputSocket, isOutputSocket } from './Socket';
+
+function isLong(value: any): value is Long {
+  return value instanceof Long;
+}
 
 export interface UIProps {
   x: number;
   y: number;
 };
+
+/**
+ * Unique Identifier for a `Node`.
+ *
+ * @export
+ * @class NodeId
+ * @extends {Long}
+ */
+export class NodeId extends Long {
+  private readonly _idString: string
+  constructor(id: number | Long) {
+    if (isLong(id)) {
+      super(id.low, id.high, id.unsigned);
+    }
+    else {
+      super(id, 0, true);
+    }
+    this._idString = `n-${this.toInt()}`
+  }
+  /**
+   * String identifer for this NodeId.
+   *
+   * @returns {string}
+   * @memberof NodeId
+   */
+  public get string(): string {
+    return this._idString;
+  }
+}
 
 /**
  *  Modelclass for a node.
@@ -26,19 +59,23 @@ export interface UIProps {
  */
 export class Node {
   /** Two different lists for sockets */
-  public readonly inputs: Socket[];
-  public readonly outputs: Socket[];
+  public readonly inputs: InputSocket[];
+  public readonly outputs: OutputSocket[];
   constructor(
-    private readonly _id: NodeId,
+    public readonly id: NodeId,
     public readonly type: string,
     public readonly name: string,
     public sockets: Socket[] = [],
     public uiProps: UIProps = { x: 0, y: 0 }
   ) {
     // Make
-    sockets.forEach((s: Socket) => {
-      if (s.isOutputSocket) { this.inputs.push(s) }
-      else { this.outputs.push(s) }
+    sockets.forEach((s: InputSocket | OutputSocket) => {
+      if (isOutputSocket(s)) {
+        this.outputs.push(s)
+      }
+      else {
+        this.inputs.push(s)
+      }
     })
     // Sorting input/outputs according to index.
     const sort = (a: Socket, b: Socket) => a.index.comp(b.index);
@@ -49,7 +86,6 @@ export class Node {
     this.outputs.forEach((s: Socket) => (s.parent = this));
   }
 
-  public get id(): NodeId { return this._id; }
   public get idString(): string {
     return this.id.string;
   }

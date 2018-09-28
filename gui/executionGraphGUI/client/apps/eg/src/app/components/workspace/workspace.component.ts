@@ -17,14 +17,13 @@ import { Store } from '@ngrx/store';
 
 import {
   Graph,
-  Socket,
   Node,
   Connection,
   SocketIndex,
   InputSocket,
   OutputSocket,
   createConnection,
-  isOutputSocket, createOutputSocket, createInputSocket
+  isOutputSocket
 } from '../../model';
 import { AppState } from '../../+state/app.state'
 import { appQuery } from '../../+state/app.selectors';
@@ -73,12 +72,12 @@ export class WorkspaceComponent implements OnInit {
     node.uiProps.y = event.dragElementPosition.y;
   }
 
-  public initConnectionFrom(socket: InputSocket | OutputSocket, event: DragEvent) {
-    this.logger.info(`[WorkspaceComponnt] Initiating new connection from ${socket.idString}`);
+  public initConnectionFrom(socket: OutputSocket | InputSocket, event: DragEvent) {
+    this.logger.info(`[WorkspaceComponent] Initiating new connection from ${socket.idString}`);
     if (isOutputSocket(socket)) {
-      this.newTargetSocket = createInputSocket(socket.type, socket.name, new SocketIndex(0));
+      this.newTargetSocket = new InputSocket(socket.type, socket.name, new SocketIndex(0));
     } else {
-      this.newTargetSocket = createOutputSocket(socket.type, socket.name, new SocketIndex(0));
+      this.newTargetSocket = new OutputSocket(socket.type, socket.name, new SocketIndex(0));
     }
     // Create the connection
     this.newConnection = createConnection(socket, this.newTargetSocket);
@@ -106,11 +105,11 @@ export class WorkspaceComponent implements OnInit {
     this.store.dispatch(new AddConnection(source, target));
   }
 
-  public isOutputSocket(socket: Socket) {
-    return socket instanceof OutputSocket;
+  public isOutputSocket(socket: InputSocket | OutputSocket) : socket is OutputSocket {
+    return isOutputSocket(socket);
   }
 
-  public isInputSocket(socket: Socket) {
-    return socket instanceof InputSocket;
+  public isInputSocket(socket: InputSocket | OutputSocket) : socket is InputSocket {
+    return !isOutputSocket(socket);
   }
 }
