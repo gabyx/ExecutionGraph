@@ -2,7 +2,7 @@ export { Graph } from './Graph';
 export { Node, NodeId } from './Node';
 export {
   Socket,
-  SocketType
+  SocketType,
   SocketId, SocketIndex,
   InputSocket, OutputSocket,
   isOutputSocket, isInputSocket,
