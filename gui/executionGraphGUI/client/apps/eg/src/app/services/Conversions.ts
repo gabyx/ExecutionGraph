@@ -63,7 +63,7 @@ export function toNode(node: serialization.LogicNode): model.Node {
   // Convert to a node model
   let nodeId = new model.NodeId(toULong(node.id()));
 
-  let sockets: model.Socket[];
+  let sockets: model.Socket[] = [];
 
   // Convert the sockets
   let extractSockets = (kind: model.SocketType, sockets: model.Socket[]) => {

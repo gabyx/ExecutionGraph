@@ -59,8 +59,8 @@ export class NodeId extends Long {
  */
 export class Node {
   /** Two different lists for sockets */
-  public readonly inputs: InputSocket[];
-  public readonly outputs: OutputSocket[];
+  public readonly inputs: InputSocket[] = [];
+  public readonly outputs: OutputSocket[] = [];
   constructor(
     public readonly id: NodeId,
     public readonly type: string,

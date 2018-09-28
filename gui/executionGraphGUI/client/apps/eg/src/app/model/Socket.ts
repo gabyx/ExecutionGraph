@@ -68,8 +68,8 @@ export abstract class Socket {
     return this._parent;
   }
   public set parent(parent: Node) {
-    if (isDefined(parent) || parent) {
-      throw 'You cannot assign a new parent!';
+    if (isDefined(this.parent) || !isDefined(parent)) {
+      throw 'You cannot assign a new parent or undefined!';
     }
     this._parent = parent;
     // Assign a new unique id to the socket, for debugging purposes
