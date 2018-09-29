@@ -58,8 +58,7 @@
     "to": "^0.2.9",
     "update": "^0.7.4",
     "zone.js": "^0.8.26",
-    "@ngrx/entity": "6.0.1",
-    "vector2d": "3.0.0"
+    "@ngrx/entity": "6.0.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.6.1",
