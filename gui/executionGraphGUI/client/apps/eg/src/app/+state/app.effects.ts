@@ -23,7 +23,7 @@ export class AppEffects {
     // Add a graph
     let graph = await this.graphManagementService.addGraph(graphTypeId);
 
-    // Add nodes.
+    // Add nodes
     for(let i = 0; i < 3 ; ++i){
       let node = await this.graphManipulationService.addNode(graph.id, nodeType, `${nodeType}-${i}`);
       graph.addNode(node);

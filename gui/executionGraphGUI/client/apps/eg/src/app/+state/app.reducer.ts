@@ -25,10 +25,10 @@ export function appReducer(immutableState: AppState = initialState, action: AppA
     case AppActionTypes.NodeMoved: {
       const graph = state.selectedGraph;
       if (isDefined(graph)) {
-        let pos = graph.node(action.node.id).uiProps.position;
-        if (isDefined(pos)) {
-          pos.x = action.newPosition.x;
-          pos.y = action.newPosition.y;
+        let n = graph.node(action.node.id);
+        if (isDefined(n)) {
+n.uiProps.position.x = action.newPosition.x;
+          n.uiProps.position.y = action.newPosition.y;
         }
       }
       break;
