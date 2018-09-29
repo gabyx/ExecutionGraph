@@ -27,7 +27,7 @@ export function appReducer(immutableState: AppState = initialState, action: AppA
       if (isDefined(graph)) {
         let n = graph.node(action.node.id);
         if (isDefined(n)) {
-n.uiProps.position.x = action.newPosition.x;
+          n.uiProps.position.x = action.newPosition.x;
           n.uiProps.position.y = action.newPosition.y;
         }
       }
