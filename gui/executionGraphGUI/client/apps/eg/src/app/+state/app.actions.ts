@@ -1,11 +1,15 @@
 import { Action } from '@ngrx/store';
 import { Id } from '@eg/common/src';
 import { Graph, Node, Connection, OutputSocket, InputSocket, NodeId, ConnectionId, GraphTypeDescription } from '../model';
+import { Point } from "@eg/graph";
 
 export enum AppActionTypes {
   LoadApp = '[App] Load App',
   AppLoaded = '[App] App Loaded',
   AppLoadError = '[App] App Load Error',
+
+  MoveNode = "[Workspace] Move Node",
+  NodeMoved = "[Workspace] Node Moved",
 
   AddGraph = "[App] Add Graph",
   GraphAdded = "[App] Graph Added",
@@ -44,8 +48,20 @@ export class SelectGraph implements Action {
   constructor(public id: Id) { }
 }
 
+// Actions related to the Workspace
+// --------------------------------
+export class MoveNode implements Action {
+  readonly type = AppActionTypes.MoveNode;
+  constructor(public node: Node, public newPosition: Point) { }
+}
+export class NodeMoved implements Action {
+  readonly type = AppActionTypes.NodeMoved;
+  constructor(public node: Node, public newPosition: Point ) { }
+}
+
+
 // Actions related to GraphManagementService
-//------------------------------------------
+// -----------------------------------------
 export class AddGraph implements Action {
   readonly type = AppActionTypes.AddGraph;
   constructor(public graph: Graph) { }
@@ -67,7 +83,7 @@ export class GraphRemoved implements Action {
 }
 
 // Actions related to GraphManipulationService
-//--------------------------------------------
+// -------------------------------------------
 export class AddNode implements Action {
   readonly type = AppActionTypes.AddNode;
   constructor(public node: Node) { }
@@ -117,6 +133,8 @@ export type AppAction =
   AddGraph | GraphAdded |
   RemoveGraph | GraphRemoved |
 
+  MoveNode | NodeMoved |
+
   AddNode | NodeAdded |
   RemoveNode | NodeRemoved |
   AddConnection | ConnectionAdded |
@@ -126,6 +144,8 @@ export const fromAppActions = {
   LoadApp,
   AppLoaded,
   AppLoadError,
+
+  MoveNode, NodeMoved,
 
   AddGraph, GraphAdded,
   RemoveGraph, GraphRemoved,

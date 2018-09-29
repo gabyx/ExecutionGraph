@@ -4,8 +4,8 @@
     <ng-container *ngFor="let node of (graph | async)?.nodes">
         <div #theNode class="node ngcs-node"
           [attr.id]="node.idString"
-          [style.left]="node.uiProps.x+'px'"
-          [style.top]="node.uiProps.y+'px'">
+          [style.left]="node.uiProps.position.x+'px'"
+          [style.top]="node.uiProps.position.y+'px'">
             <span class="header" ngcsDraggable [dragElement]="theNode" (dragContinued)="updateNodePosition(node, $event)">
                 {{ node.name }}
             </span>

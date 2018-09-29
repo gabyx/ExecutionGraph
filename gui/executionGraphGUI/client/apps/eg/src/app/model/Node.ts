@@ -10,6 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
+import { Point } from '@eg/graph'
 import * as Long from 'long';
 import { Socket, InputSocket, OutputSocket, isOutputSocket } from './Socket';
 
@@ -17,9 +18,8 @@ function isLong(value: any): value is Long {
   return value instanceof Long;
 }
 
-export interface UIProps {
-  x: number;
-  y: number;
+export class UIProps {
+  public position : Point = {x:0, y:0};
 };
 
 /**
@@ -66,7 +66,7 @@ export class Node {
     public readonly type: string,
     public readonly name: string,
     public sockets: Socket[] = [],
-    public uiProps: UIProps = { x: 0, y: 0 }
+    public uiProps: UIProps = new UIProps()
   ) {
     // Make
     sockets.forEach((s: InputSocket | OutputSocket) => {

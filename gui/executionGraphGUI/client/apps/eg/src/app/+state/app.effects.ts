@@ -4,7 +4,7 @@ import { Effect, Actions } from '@ngrx/effects';
 import { DataPersistence } from '@nrwl/nx';
 import { Id } from '@eg/common';
 import { LoggerFactory, ILogger } from '@eg/logger';
-import { LoadApp, AppLoaded, AppLoadError, AppActionTypes, ConnectionAdded, AddConnection } from './app.actions';
+import { LoadApp, AppLoaded, AppLoadError, AppActionTypes, ConnectionAdded, AddConnection, MoveNode, NodeMoved } from './app.actions';
 import { createConnection } from '../model';
 import { AppState } from './app.state';
 import * as services from '../services';
@@ -26,7 +26,7 @@ export class AppEffects {
     // Add nodes.
     for(let i = 0; i < 3 ; ++i){
       let node = await this.graphManipulationService.addNode(graph.id, nodeType, `${nodeType}-${i}`);
-      graph.nodes.push(node);
+      graph.addNode(node);
     }
     return new AppLoaded([graph], graphDescs);
   }
@@ -37,6 +37,17 @@ export class AppEffects {
       return from(this.loadApp());
     },
     onError: (action: LoadApp, error) => {
+      this.log.error('Error', error);
+      return new AppLoadError(error);
+    }
+  });
+
+  @Effect()
+  moveNode$ = this.dataPersistence.pessimisticUpdate(AppActionTypes.MoveNode, {
+    run: (action: MoveNode, state: AppState) => {
+      return new NodeMoved(action.node, action.newPosition);
+    },
+    onError: (action: MoveNode, error) => {
       this.log.error('Error', error);
       return new AppLoadError(error);
     }

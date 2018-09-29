@@ -12,7 +12,7 @@ const getAllGraphs = createSelector(getAppState, getLoaded, (state: AppState, is
 });
 
 const getSelectedGraph = createSelector(getAppState, (state: AppState) => {
-  return state.getSelectedGraph();
+  return state.selectedGraph;
 });
 
 export const appQuery = {

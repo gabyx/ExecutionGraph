@@ -27,7 +27,7 @@ import {
 } from '../../model';
 import { AppState } from '../../+state/app.state'
 import { appQuery } from '../../+state/app.selectors';
-import { AddConnection } from '../../+state/app.actions';
+import { AddConnection, MoveNode } from '../../+state/app.actions';
 
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { Point, DragEvent } from '@eg/graph';
@@ -67,9 +67,8 @@ export class WorkspaceComponent implements OnInit {
 
   public updateNodePosition(node: Node, event: DragEvent) {
     // this.logger.info(`[WorkspaceComponent] Updating node position to ${position.x}:${position.y}`);
-    // @todo This is not allowed! We modify the immutable state :hank: This should be dispatched!
-    node.uiProps.x = event.dragElementPosition.x;
-    node.uiProps.y = event.dragElementPosition.y;
+    this.store.dispatch(new MoveNode(node,
+      { x: event.dragElementPosition.x, y: event.dragElementPosition.y }));
   }
 
   public initConnectionFrom(socket: OutputSocket | InputSocket, event: DragEvent) {
@@ -105,11 +104,11 @@ export class WorkspaceComponent implements OnInit {
     this.store.dispatch(new AddConnection(source, target));
   }
 
-  public isOutputSocket(socket: InputSocket | OutputSocket) : socket is OutputSocket {
+  public isOutputSocket(socket: InputSocket | OutputSocket): socket is OutputSocket {
     return isOutputSocket(socket);
   }
 
-  public isInputSocket(socket: InputSocket | OutputSocket) : socket is InputSocket {
+  public isInputSocket(socket: InputSocket | OutputSocket): socket is InputSocket {
     return !isOutputSocket(socket);
   }
 }

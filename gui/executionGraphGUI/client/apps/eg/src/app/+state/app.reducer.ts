@@ -10,10 +10,10 @@ export function appReducer(immutableState: AppState = initialState, action: AppA
   switch (action.type) {
     case AppActionTypes.AppLoaded: {
       action.graphs.forEach((graph: Graph) => {
-        state.graphs[graph.id.toString()] = graph;
+        state.addGraph(graph);
       });
       action.graphDescriptions.forEach((graphDesc: GraphTypeDescription) => {
-        state.graphDescriptions[graphDesc.id.toString()] = graphDesc;
+        state.addGraphDescription(graphDesc);
       })
       state.loaded = true;
       break;
@@ -22,31 +22,42 @@ export function appReducer(immutableState: AppState = initialState, action: AppA
       state.selectedGraphId = action.id
       break;
     }
-    case AppActionTypes.NodeAdded: {
-      const graph = state.getSelectedGraph();
+    case AppActionTypes.NodeMoved: {
+      const graph = state.selectedGraph;
       if (isDefined(graph)) {
-        graph.nodes.push(action.node);
+        let pos = graph.node(action.node.id).uiProps.position;
+        if (isDefined(pos)) {
+          pos.x = action.newPosition.x;
+          pos.y = action.newPosition.y;
+        }
+      }
+      break;
+    }
+    case AppActionTypes.NodeAdded: {
+      const graph = state.selectedGraph;
+      if (isDefined(graph)) {
+        graph.addNode(action.node);
       }
       break;
     }
     case AppActionTypes.NodeRemoved: {
-      const graph = state.getSelectedGraph();
+      const graph = state.selectedGraph;
       if (isDefined(graph)) {
-        graph.nodes.filter((node: Node) => node.id.equals(action.id));
+        graph.removeNode(action.id);
       }
       break;
     }
     case AppActionTypes.ConnectionAdded: {
-      const graph = state.getSelectedGraph();
+      const graph = state.selectedGraph;
       if (isDefined(graph)) {
-        graph.connections.push(action.connection);
+        graph.addConnection(action.connection);
       }
       break;
     }
     case AppActionTypes.ConnectionRemoved: {
-      const graph = state.getSelectedGraph()
+      const graph = state.selectedGraph
       if (isDefined(graph)) {
-        graph.connections.filter((connection: Connection) => connection.id.equal(action.connectionId));
+        graph.removeConnection(action.connectionId);
       }
       break;
     }

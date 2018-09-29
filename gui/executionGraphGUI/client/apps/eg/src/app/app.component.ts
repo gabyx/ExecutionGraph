@@ -37,16 +37,15 @@ export class AppComponent implements OnInit {
     this.store.dispatch(new LoadApp());
 
     this.store.select(appQuery.getAllGraphs)
-      .pipe(filter(graphs => isDefined(graphs)))
+      .pipe(filter(graph => isDefined(graph)))
       .subscribe(graphs => {
         this.log.debug(`Loaded graphs, auto-selecting first`);
-        let ids = Object.keys(graphs);
-        if (!ids.length) {
+        if (graphs.size === 0) {
           this.log.error(`Cannot select, since no graphs loaded!`);
         }
         else
         {
-          this.store.dispatch(new SelectGraph(new Id(ids[0])));
+          this.store.dispatch(new SelectGraph(graphs.keys().next().value));
         }
       });
   }
