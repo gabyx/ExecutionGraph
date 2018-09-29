@@ -65,7 +65,7 @@ import { NxModule } from '@nrwl/nx';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { storeFreeze } from 'ngrx-store-freeze';
 
-environment.production = true
+environment.production = true;
 
 @NgModule({
   declarations: [AppComponent, ToolbarComponent, WorkspaceComponent, ConnectionStyleOptionsComponent],
@@ -84,7 +84,7 @@ environment.production = true
     StoreModule.forRoot(
       { app: appReducer },
       {
-        initialState : { app : appInitialState },
+        initialState: { app: appInitialState }
         //metaReducers : !environment.production ? [storeFreeze] : []
       }
     ),

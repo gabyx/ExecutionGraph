@@ -11,20 +11,17 @@
 // =========================================================================================
 
 import { Injectable } from '@angular/core';
-import { Id } from "@eg/common";
+import { Id } from '@eg/common';
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { GraphManagementService } from './GraphManagementService';
 import { ITestBackend } from './TestBackend';
-import { Graph } from "../model";
+import { Graph } from '../model';
 
 @Injectable()
 export class GraphManagementServiceDummy extends GraphManagementService {
   private logger: ILogger;
 
-  constructor(
-    loggerFactory: LoggerFactory,
-    private backend: ITestBackend
-  ) {
+  constructor(loggerFactory: LoggerFactory, private backend: ITestBackend) {
     super();
     this.logger = loggerFactory.create('GraphManagementServiceDummy');
   }
@@ -33,6 +30,5 @@ export class GraphManagementServiceDummy extends GraphManagementService {
     return new Graph(new Id(), this.backend.graphTypeId, [], []);
   }
 
-  public async removeGraph(graphId: Id): Promise<void> {
-  }
+  public async removeGraph(graphId: Id): Promise<void> {}
 }

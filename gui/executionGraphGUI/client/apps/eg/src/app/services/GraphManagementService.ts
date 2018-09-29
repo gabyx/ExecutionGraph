@@ -12,7 +12,7 @@
 
 import { Id } from '@eg/common';
 import { GraphManagementMessages } from '@eg/messages';
-import { Graph } from "../model";
+import { Graph } from '../model';
 export import sz = GraphManagementMessages;
 
 export abstract class GraphManagementService {

@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Point } from '@eg/graph'
+import { Point } from '@eg/graph';
 import * as Long from 'long';
 import { Socket, InputSocket, OutputSocket, isOutputSocket } from './Socket';
 
@@ -19,8 +19,8 @@ function isLong(value: any): value is Long {
 }
 
 export class UIProps {
-  public position : Point = {x:0, y:0};
-};
+  public position: Point = { x: 0, y: 0 };
+}
 
 /**
  * Unique Identifier for a `Node`.
@@ -30,15 +30,14 @@ export class UIProps {
  * @extends {Long}
  */
 export class NodeId extends Long {
-  private readonly _idString: string
+  private readonly _idString: string;
   constructor(id: number | Long) {
     if (isLong(id)) {
       super(id.low, id.high, id.unsigned);
-    }
-    else {
+    } else {
       super(id, 0, true);
     }
-    this._idString = `n-${this.toInt()}`
+    this._idString = `n-${this.toInt()}`;
   }
   /**
    * String identifer for this NodeId.
@@ -71,12 +70,11 @@ export class Node {
     // Make
     sockets.forEach((s: InputSocket | OutputSocket) => {
       if (isOutputSocket(s)) {
-        this.outputs.push(s)
+        this.outputs.push(s);
+      } else {
+        this.inputs.push(s);
       }
-      else {
-        this.inputs.push(s)
-      }
-    })
+    });
     // Sorting input/outputs according to index.
     const sort = (a: Socket, b: Socket) => a.index.comp(b.index);
     this.inputs = this.inputs.sort(sort);

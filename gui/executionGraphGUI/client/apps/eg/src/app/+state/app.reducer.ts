@@ -1,7 +1,7 @@
 import { AppAction, AppActionTypes } from './app.actions';
 import { Graph, GraphTypeDescription, Node, Connection } from '../model';
 import { Id, isDefined } from '@eg/common';
-import { AppState } from "./app.state";
+import { AppState } from './app.state';
 
 export const initialState: AppState = new AppState();
 
@@ -14,12 +14,12 @@ export function appReducer(immutableState: AppState = initialState, action: AppA
       });
       action.graphDescriptions.forEach((graphDesc: GraphTypeDescription) => {
         state.addGraphDescription(graphDesc);
-      })
+      });
       state.loaded = true;
       break;
     }
     case AppActionTypes.SelectGraph: {
-      state.selectedGraphId = action.id
+      state.selectedGraphId = action.id;
       break;
     }
     case AppActionTypes.NodeMoved: {
@@ -55,12 +55,12 @@ export function appReducer(immutableState: AppState = initialState, action: AppA
       break;
     }
     case AppActionTypes.ConnectionRemoved: {
-      const graph = state.selectedGraph
+      const graph = state.selectedGraph;
       if (isDefined(graph)) {
         graph.removeConnection(action.connectionId);
       }
       break;
     }
   }
-  return state
+  return state;
 }

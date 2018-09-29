@@ -21,9 +21,12 @@ import { BezierConnectionDrawStyle } from '../../model/BezierConnectionDrawStyle
   styleUrls: ['./connection.component.scss']
 })
 export class ConnectionComponent {
-  @Input() from: string;
+  @Input()
+  from: string;
 
-  @Input() to: string;
+  @Input()
+  to: string;
 
-  @Input() drawStyle: ConnectionDrawStyle = new BezierConnectionDrawStyle();
+  @Input()
+  drawStyle: ConnectionDrawStyle = new BezierConnectionDrawStyle();
 }

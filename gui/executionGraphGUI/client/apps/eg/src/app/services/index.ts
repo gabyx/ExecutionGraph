@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-export { GeneralInfoService } from "./GeneralInfoService"
-export { GraphManagementService } from "./GraphManagementService"
-export { GraphManipulationService } from "./GraphManipulationService"
-export { ExecutionService } from "./ExecutionService"
+export { GeneralInfoService } from './GeneralInfoService';
+export { GraphManagementService } from './GraphManagementService';
+export { GraphManipulationService } from './GraphManipulationService';
+export { ExecutionService } from './ExecutionService';

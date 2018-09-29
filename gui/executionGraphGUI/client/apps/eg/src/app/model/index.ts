@@ -3,9 +3,12 @@ export { Node, NodeId } from './Node';
 export {
   Socket,
   SocketType,
-  SocketId, SocketIndex,
-  InputSocket, OutputSocket,
-  isOutputSocket, isInputSocket,
+  SocketId,
+  SocketIndex,
+  InputSocket,
+  OutputSocket,
+  isOutputSocket,
+  isInputSocket,
   createSocket
 } from './Socket';
 export { Connection, ConnectionId, createConnection } from './Connection';

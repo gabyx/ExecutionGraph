@@ -31,11 +31,15 @@ export type DragEvent = {
   selector: '[ngcsDraggable]'
 })
 export class DraggableDirective {
-  @Input('ngcsDraggable') data: any = null;
+  @Input('ngcsDraggable')
+  data: any = null;
 
-  @Output() dragStarted = new EventEmitter<DragEvent>();
-  @Output() dragContinued = new EventEmitter<DragEvent>();
-  @Output() dragEnded = new EventEmitter<DragEvent>();
+  @Output()
+  dragStarted = new EventEmitter<DragEvent>();
+  @Output()
+  dragContinued = new EventEmitter<DragEvent>();
+  @Output()
+  dragEnded = new EventEmitter<DragEvent>();
 
   @Input()
   set dragElement(value: HTMLElement) {

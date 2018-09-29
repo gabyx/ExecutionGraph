@@ -21,15 +21,13 @@ describe('ToolbarComponent', () => {
   let component: ToolbarComponent;
   let fixture: ComponentFixture<ToolbarComponent>;
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        imports: [MatToolbarModule, MatMenuModule, MatIconModule],
-        declarations: [ToolbarComponent],
-        providers: [{ provide: ExecutionService, useClass: ExecutionServiceDummy }]
-      }).compileComponents();
-    })
-  );
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [MatToolbarModule, MatMenuModule, MatIconModule],
+      declarations: [ToolbarComponent],
+      providers: [{ provide: ExecutionService, useClass: ExecutionServiceDummy }]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ToolbarComponent);

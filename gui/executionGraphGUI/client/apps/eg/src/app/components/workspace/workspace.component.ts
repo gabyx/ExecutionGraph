@@ -25,7 +25,7 @@ import {
   createConnection,
   isOutputSocket
 } from '../../model';
-import { AppState } from '../../+state/app.state'
+import { AppState } from '../../+state/app.state';
 import { appQuery } from '../../+state/app.selectors';
 import { AddConnection, MoveNode } from '../../+state/app.actions';
 
@@ -47,28 +47,18 @@ export class WorkspaceComponent implements OnInit {
   public newConnection: Connection = null;
   public newConnectionEndpoint: Point = { x: 0, y: 0 };
 
-  constructor(
-    private store: Store<AppState>,
-    private elementRef: ElementRef,
-    loggerFactory: LoggerFactory
-  ) {
+  constructor(private store: Store<AppState>, private elementRef: ElementRef, loggerFactory: LoggerFactory) {
     this.logger = loggerFactory.create('Workspace');
-    this.graph = store.select(appQuery.getSelectedGraph)
-      .pipe(
-        filter(g => isDefined(g))
-      );
+    this.graph = store.select(appQuery.getSelectedGraph).pipe(filter(g => isDefined(g)));
 
-    this.graph.subscribe(
-      g => this.logger.debug(`Displaying graph ${g.id}`)
-    );
+    this.graph.subscribe(g => this.logger.debug(`Displaying graph ${g.id}`));
   }
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   public updateNodePosition(node: Node, event: DragEvent) {
     // this.logger.info(`[WorkspaceComponent] Updating node position to ${position.x}:${position.y}`);
-    this.store.dispatch(new MoveNode(node,
-      { x: event.dragElementPosition.x, y: event.dragElementPosition.y }));
+    this.store.dispatch(new MoveNode(node, { x: event.dragElementPosition.x, y: event.dragElementPosition.y }));
   }
 
   public initConnectionFrom(socket: OutputSocket | InputSocket, event: DragEvent) {

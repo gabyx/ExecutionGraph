@@ -33,13 +33,11 @@ export class TestComponent {}
 describe('GraphComponent', () => {
   let component: TestComponent;
   let fixture: ComponentFixture<TestComponent>;
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        declarations: [TestComponent, GraphComponent, PortComponent, ConnectionComponent]
-      }).compileComponents();
-    })
-  );
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [TestComponent, GraphComponent, PortComponent, ConnectionComponent]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TestComponent);

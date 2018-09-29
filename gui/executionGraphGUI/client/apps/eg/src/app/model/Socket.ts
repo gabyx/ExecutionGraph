@@ -22,7 +22,7 @@ import { isDefined } from '@eg/common';
  * @class SocketIndex
  * @extends {Long}
  */
-export class SocketIndex extends Long { }
+export class SocketIndex extends Long {}
 
 /**
  * Unique Identifier for a `Socket`.
@@ -31,8 +31,7 @@ export class SocketIndex extends Long { }
  * @class SocketId
  */
 export class SocketId {
-  constructor(private readonly _idString: string = Guid.create().toString()) {
-  }
+  constructor(private readonly _idString: string = Guid.create().toString()) {}
   /**
    * String identifer for this NodeId.
    *
@@ -62,7 +61,7 @@ export abstract class Socket {
     public readonly name: string,
     public readonly index: SocketIndex,
     protected _parent: Node = undefined
-  ) { }
+  ) {}
 
   public get parent(): Node {
     return this._parent;
@@ -73,17 +72,19 @@ export abstract class Socket {
     }
     this._parent = parent;
     // Assign a new unique id to the socket, for debugging purposes
-    this._id = this.createId()
+    this._id = this.createId();
   }
 
-  public get id(): SocketId { return this._id; }
+  public get id(): SocketId {
+    return this._id;
+  }
   public get idString(): string {
     return this._id.string;
   }
   protected abstract createId(): SocketId;
 }
 
-export type SocketType = "input" | "output";
+export type SocketType = 'input' | 'output';
 
 /**
  * The output socket.
@@ -93,11 +94,11 @@ export type SocketType = "input" | "output";
  * @extends {Socket}
  */
 export class InputSocket extends Socket {
-  public readonly kind: SocketType = "input";
+  public readonly kind: SocketType = 'input';
   protected createId(): SocketId {
     return new SocketId(`${this.parent.id.string}-i-${this.index.toInt()}`);
   }
-};
+}
 
 /**
  * The input socket.
@@ -107,20 +108,20 @@ export class InputSocket extends Socket {
  * @extends {Socket}
  */
 export class OutputSocket extends Socket {
-  public readonly kind: SocketType = "output";
+  public readonly kind: SocketType = 'output';
   protected createId(): SocketId {
     return new SocketId(`${this.parent.id.string}-o-${this.index.toInt()}`);
   }
-};
+}
 
 /** Type guard for InputSocket */
 export function isInputSocket(socket: InputSocket | OutputSocket): socket is InputSocket {
-  return socket.kind === "input";
+  return socket.kind === 'input';
 }
 
 /** Type guard for OutputSocket */
 export function isOutputSocket(socket: InputSocket | OutputSocket): socket is OutputSocket {
-  return socket.kind === "output";
+  return socket.kind === 'output';
 }
 
 /**
@@ -134,17 +135,11 @@ export function isOutputSocket(socket: InputSocket | OutputSocket): socket is Ou
  * @param {Node} [parent=undefined]
  * @returns
  */
-export function createSocket(
-  kind: SocketType,
-  type: Long,
-  name: string,
-  index: SocketIndex,
-  parent: Node = undefined
-) {
+export function createSocket(kind: SocketType, type: Long, name: string, index: SocketIndex, parent: Node = undefined) {
   switch (kind) {
-    case "input":
+    case 'input':
       return new InputSocket(type, name, index, parent);
-    case "output":
+    case 'output':
       return new OutputSocket(type, name, index, parent);
   }
 }

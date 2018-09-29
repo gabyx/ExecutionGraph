@@ -1,67 +1,91 @@
 #graph-1 {
-    
-    height: 100%;
-    .node {
-        font-family: Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace; 
-        width: 20em;
-        background: rgba(255, 255, 255, 0.8);
+  height: 100%;
+  .node {
+    font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace;
+    width: 20em;
+    background: rgba(255, 255, 255, 0.8);
 
-        .header {
-            display: block;
-            width: 100%;
-            text-align: center;
-            padding: 1em;
-        }
-        .sockets {
-            display: flex;
-            font-size: 0.8em;
-        }
-
-        .inputs, .outputs {
-            display: inline-block;
-            width: 50%;
-            min-width: 50%;
-            padding: 0;
-            margin: 0;
-            box-sizing: border-box;
-            
-            .socket {
-                display: block;
-                width: 100%;
-                box-sizing: border-box;
-                position: relative;
-                padding: 0 1em;
-                border-top: 1px solid black;
-
-                &.dropping {
-                    font-weight: bold;
-                }
-                &.dropping-allowed {
-                    color: greenyellow;
-                }
-                &.dropping-forbidden {
-                    color: orangered;
-                }
-            }
-        }
-        .inputs {
-            border-right: 1px solid black;
-        }
-
-        .socket, .header {
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-        }
+    .header {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 1em;
     }
+    .sockets {
+      display: flex;
+      font-size: 0.8em;
+    }
+
+    .inputs,
+    .outputs {
+      display: inline-block;
+      width: 50%;
+      min-width: 50%;
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+
+      .socket {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        position: relative;
+        padding: 0 1em;
+        border-top: 1px solid black;
+
+        &.dropping {
+          font-weight: bold;
+        }
+        &.dropping-allowed {
+          color: greenyellow;
+        }
+        &.dropping-forbidden {
+          color: orangered;
+        }
+      }
+    }
+    .inputs {
+      border-right: 1px solid black;
+    }
+
+    .socket,
+    .header {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
 }
 :host {
-    background-color: #444;
-    background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent);
-    background-size:50px 50px;
+  background-color: #444;
+  background-image: linear-gradient(
+      0deg,
+      transparent 24%,
+      rgba(255, 255, 255, 0.05) 25%,
+      rgba(255, 255, 255, 0.05) 26%,
+      transparent 27%,
+      transparent 74%,
+      rgba(255, 255, 255, 0.05) 75%,
+      rgba(255, 255, 255, 0.05) 76%,
+      transparent 77%,
+      transparent
+    ),
+    linear-gradient(
+      90deg,
+      transparent 24%,
+      rgba(255, 255, 255, 0.05) 25%,
+      rgba(255, 255, 255, 0.05) 26%,
+      transparent 27%,
+      transparent 74%,
+      rgba(255, 255, 255, 0.05) 75%,
+      rgba(255, 255, 255, 0.05) 76%,
+      transparent 77%,
+      transparent
+    );
+  background-size: 50px 50px;
 
-    display: block;
-    height: 100%;
-    overflow: hidden;
-    padding: 0;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  padding: 0;
 }

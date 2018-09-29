@@ -35,21 +35,18 @@ describe('ExecutionServiceBinaryHttp', () => {
     httpMock.verify();
   });
 
-  it(
-    'should return an execution result if successful',
-    async(async () => {
-      //@todo setup dummy response data
-      const responseData = new ArrayBuffer(1);
+  it('should return an execution result if successful', async(async () => {
+    //@todo setup dummy response data
+    const responseData = new ArrayBuffer(1);
 
-      service.execute().then(() => {
-        expect().nothing();
-      });
+    service.execute().then(() => {
+      expect().nothing();
+    });
 
-      const req = httpMock.expectOne(`${service.baseUrl}/execution`);
-      expect(req.request.method).toBe('POST');
-      expect(req.request.headers.get('Content-Type')).toBe(service.binaryMimeType);
+    const req = httpMock.expectOne(`${service.baseUrl}/execution`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.headers.get('Content-Type')).toBe(service.binaryMimeType);
 
-      req.flush(responseData);
-    })
-  );
+    req.flush(responseData);
+  }));
 });

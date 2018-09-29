@@ -19,11 +19,8 @@ import { OutputSocket, InputSocket, SocketId, isInputSocket, isOutputSocket } fr
  * @class ConnectionId
  */
 export class ConnectionId {
-  private readonly _idString: string
-  constructor(
-    public outSocketId: SocketId,
-    public inSocketId: SocketId,
-    public isWriteLink: boolean) {
+  private readonly _idString: string;
+  constructor(public outSocketId: SocketId, public inSocketId: SocketId, public isWriteLink: boolean) {
     this._idString = `${outSocketId.string}-to-${inSocketId.string}`;
   }
 
@@ -31,7 +28,9 @@ export class ConnectionId {
     return this.string == id.string;
   }
 
-  public get string() { return this._idString; }
+  public get string() {
+    return this._idString;
+  }
 }
 
 /**
@@ -43,10 +42,7 @@ export class ConnectionId {
 export class Connection {
   public readonly id: ConnectionId;
 
-  constructor(
-    public outputSocket: OutputSocket,
-    public inputSocket: InputSocket,
-    isWriteLink: boolean = true) {
+  constructor(public outputSocket: OutputSocket, public inputSocket: InputSocket, isWriteLink: boolean = true) {
     this.id = new ConnectionId(outputSocket.id, inputSocket.id, isWriteLink);
   }
 
@@ -61,10 +57,7 @@ export class Connection {
   }
 }
 
-export function createConnection(
-  source: OutputSocket | InputSocket,
-  target: OutputSocket | InputSocket
-) {
+export function createConnection(source: OutputSocket | InputSocket, target: OutputSocket | InputSocket) {
   if (isOutputSocket(source) && isInputSocket(target)) {
     // Make a Write-Link
     return new Connection(source, target, true);

@@ -35,8 +35,10 @@ const drawStyles = {
 export class ConnectionStyleOptionsComponent implements OnInit {
   private drawStyleName: ConnectionDrawStyleName;
 
-  @Output() connectionDrawStyleChanged = new EventEmitter<ConnectionDrawStyle>();
-  @Input() connectionDrawStyle: ConnectionDrawStyle = drawStyles['direct'];
+  @Output()
+  connectionDrawStyleChanged = new EventEmitter<ConnectionDrawStyle>();
+  @Input()
+  connectionDrawStyle: ConnectionDrawStyle = drawStyles['direct'];
 
   get drawStyle(): ConnectionDrawStyleName {
     return this.drawStyleName;

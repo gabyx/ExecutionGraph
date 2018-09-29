@@ -38,5 +38,4 @@ export class GeneralInfoServiceDummy extends GeneralInfoService {
     }
     return graphDesc;
   }
-
 }

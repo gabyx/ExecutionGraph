@@ -1,6 +1,6 @@
-import { Id } from "@eg/common";
-import { Connection, ConnectionId } from "./Connection";
-import { Node, NodeId } from "./Node";
+import { Id } from '@eg/common';
+import { Connection, ConnectionId } from './Connection';
+import { Node, NodeId } from './Node';
 
 export class Graph {
   private nodesMap = new Map<NodeId, Node>();
@@ -9,7 +9,7 @@ export class Graph {
     private readonly _id: Id,
     private readonly _type: Id,
     nodes: Node[] = [],
-    connections: Connection[] = [],
+    connections: Connection[] = []
   ) {
     nodes.forEach((n: Node) => {
       this.addNode(n);
@@ -19,10 +19,18 @@ export class Graph {
     });
   }
 
-  public get id(): Id { return this._id; }
-  public get type(): Id { return this._type; }
-  public get nodes() { return this.nodesMap.values(); }
-  public get connections() { return this.connectionsMap.values(); }
+  public get id(): Id {
+    return this._id;
+  }
+  public get type(): Id {
+    return this._type;
+  }
+  public get nodes() {
+    return this.nodesMap.values();
+  }
+  public get connections() {
+    return this.connectionsMap.values();
+  }
 
   public addNode(n: Node) {
     if (this.nodesMap.has(n.id)) {
@@ -45,7 +53,7 @@ export class Graph {
   }
 
   public removeConnection(id: ConnectionId) {
-    if (!(this.connectionsMap.has(id))) {
+    if (!this.connectionsMap.has(id)) {
       throw `Connection '${id}' not in graph!`;
     }
     this.connectionsMap.delete(id);

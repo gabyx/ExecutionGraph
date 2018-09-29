@@ -12,7 +12,7 @@
 
 import { Inject, Injectable } from '@angular/core';
 import { flatbuffers } from 'flatbuffers';
-import { Graph } from "../model";
+import { Graph } from '../model';
 import { Id } from '@eg/common';
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { GraphManagementService, sz } from './GraphManagementService';
@@ -32,7 +32,7 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     this.logger = loggerFactory.create('GraphManagementServiceBinaryHttp');
   }
 
-   public async addGraph(graphTypeId: Id): Promise<Graph> {
+  public async addGraph(graphTypeId: Id): Promise<Graph> {
     // Build the AddGraph request
     let builder = new flatbuffers.Builder(16);
     let offGraphTypeId = builder.createString(graphTypeId.toString());

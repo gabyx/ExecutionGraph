@@ -1,5 +1,5 @@
 #!/bin/bash
-# format all JSON files in the repository
+# format all CSS files in the repository
 
 owndir="$(cd "$(dirname "$0")"; pwd -P)"
 ${owndir}/typescript "${@}"

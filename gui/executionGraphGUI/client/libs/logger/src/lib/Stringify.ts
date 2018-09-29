@@ -10,7 +10,6 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-
 /**
  * JSON stringify function which ignores circular reference.
  *
@@ -18,10 +17,9 @@
  * @param {*} v
  * @returns JSON string of object `v`.
  */
-export function stringify(v : any)
-{
+export function stringify(v: any) {
   const cache = new Map();
-  return JSON.stringify(v, function (key, value) {
+  return JSON.stringify(v, function(key, value) {
     if (typeof value === 'object' && value !== null) {
       if (cache.has(value)) {
         // Circular reference found, discard key
@@ -33,4 +31,3 @@ export function stringify(v : any)
     return value;
   });
 }
-

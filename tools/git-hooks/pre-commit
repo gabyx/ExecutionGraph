@@ -1,5 +1,23 @@
 #!/bin/bash
-echo "Pre-Commit Hook: autoformat"
+
+if [ "$1" == "--formatAll" ] ; then
+  formatAll="true"
+  title="Format all:"
+else
+  title="Pre-Commit Hook: autoformat:"
+fi
+
+echo "$title [START]"
+
+function exitTrap()
+{
+  ret=$?
+  trap '' SIGINT SIGHUP SIGTERM SIGQUIT   # ignore signals
+  if [ $ret -gt 0 ] ; then
+    echo "$title [failed]"
+  fi
+}
+trap exitTrap EXIT
 
 owndir="$(cd "$(dirname "$0")"; pwd -P)"
 
@@ -9,9 +27,17 @@ root="$(git rev-parse --show-toplevel)"
 # check if .pre-commmit-changed file is here
 [ -f "${root}/.pre-commit-changed" ] && rm "${root}/.pre-commit-changed"
 
+# OS name
 OS_NAME=$(uname)
 
-allFiles=$(git diff --name-only --cached | tr '\n' '\0' | base64 )
+# Get only changed files or all files
+if [ -z "${formatAll}" ] ; then
+  echo "$title get files with diffs ..."
+  allFiles=$(git diff --name-only --cached | tr '\n' '\0' | base64 )
+else
+  echo "$title get all files ..."
+  allFiles=$(git ls-tree -r HEAD --name-only --full-name ${root} | tr '\n' '\0' | base64 )
+fi
 
 function findExecutables(){
   find "$owndir/autoformat" -type f -perm +0111 > /dev/null 2>&1
@@ -22,20 +48,34 @@ function findExecutables(){
   fi
 }
 
-findExecutables | {
-  abort=0
+# get all disabled formaters
+disabledFormatters=$(git config precommit-format.disabledFormattersRegex)
+enabledFormatters=$(git config precommit-format.enabledFormattersRegex)
 
+findExecutables | {
   while read formatter ; do
+    # check the formatter is disabled
+    if [ ! -z "${enabledFormatters}" ] ; then
+      echo "$formatter" | grep -Eqi "${enabledFormatters}" || \
+        { echo "Skip formatter '${formatter}'' [disabled by git config]"; continue ; }
+    fi
+    if [ ! -z "${disabledFormatters}" ] ; then
+      echo "$formatter" | grep -Eqi "${disabledFormatters}" && \
+        { echo "Skip formatter '${formatter}'' [disabled by git config]"; continue ; }
+    fi
+
+    echo "Formatting: '${formatter}':"
+
+    # get pattern files
     magic="$formatter".magic
     patterns="$formatter".patterns
     [ -f "$patterns" -o -f "$magic" ] || continue
 
+    # format all files
     echo -ne "$allFiles" | base64 -D | {
-      labort=0
-
       while IFS=; read -r -d $'\0' orig ; do
         orig="${root}/${orig}"
-        #echo "$orig"
+
         # file is getting deleted, ignore
         [ -f "$orig" ] || continue
 
@@ -50,17 +90,15 @@ findExecutables | {
         }
 
         # if none, ignore
-        [ "$match_pattern" -o "$match_magic" ] ||  continue
+        [ "$match_pattern" -o "$match_magic" ] || continue
 
-        "$formatter" "$orig" || labort=1
-        git add "$orig"
-      done
+        "$formatter" "$orig" || { echo "[1] exit"; exit 1; }
+        
+        [ ! -z "${formatAll}" ] && git add "$orig"
 
-      exit $labort
-    } || abort=1
+      done 
+    } || { echo "[2] exit"; exit 1; }
   done
+} || { echo "[3] exit"; exit 1; }
 
-  exit $abort
-}
-
-echo "Pre-Commit Hook: autoformat [DONE]"
+echo "$title [DONE]"

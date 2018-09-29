@@ -1,10 +1,19 @@
 import { Injectable } from '@angular/core';
-import { from } from "rxjs"
+import { from } from 'rxjs';
 import { Effect, Actions } from '@ngrx/effects';
 import { DataPersistence } from '@nrwl/nx';
 import { Id } from '@eg/common';
 import { LoggerFactory, ILogger } from '@eg/logger';
-import { LoadApp, AppLoaded, AppLoadError, AppActionTypes, ConnectionAdded, AddConnection, MoveNode, NodeMoved } from './app.actions';
+import {
+  LoadApp,
+  AppLoaded,
+  AppLoadError,
+  AppActionTypes,
+  ConnectionAdded,
+  AddConnection,
+  MoveNode,
+  NodeMoved
+} from './app.actions';
 import { createConnection } from '../model';
 import { AppState } from './app.state';
 import * as services from '../services';
@@ -24,7 +33,7 @@ export class AppEffects {
     let graph = await this.graphManagementService.addGraph(graphTypeId);
 
     // Add nodes
-    for(let i = 0; i < 3 ; ++i){
+    for (let i = 0; i < 3; ++i) {
       let node = await this.graphManipulationService.addNode(graph.id, nodeType, `${nodeType}-${i}`);
       graph.addNode(node);
     }
@@ -67,7 +76,7 @@ export class AppEffects {
 
   constructor(
     private actions$: Actions,
-    private dataPersistence: DataPersistence < AppState >,
+    private dataPersistence: DataPersistence<AppState>,
     loggerFactory: LoggerFactory,
     private readonly generalInfoService: services.GeneralInfoService,
     private readonly graphManipulationService: services.GraphManipulationService,

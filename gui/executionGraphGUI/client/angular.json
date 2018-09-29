@@ -16,13 +16,8 @@
             "main": "apps/eg/src/main.ts",
             "tsConfig": "apps/eg/tsconfig.app.json",
             "polyfills": "apps/eg/src/polyfills.ts",
-            "assets": [
-              "apps/eg/src/assets",
-              "apps/eg/src/favicon.ico"
-            ],
-            "styles": [
-              "apps/eg/src/styles.css"
-            ],
+            "assets": ["apps/eg/src/assets", "apps/eg/src/favicon.ico"],
+            "styles": ["apps/eg/src/styles.css"],
             "scripts": []
           },
           "configurations": {
@@ -79,25 +74,15 @@
             "polyfills": "apps/eg/src/polyfills.ts",
             "tsConfig": "apps/eg/tsconfig.spec.json",
             "scripts": [],
-            "styles": [
-              "apps/eg/src/styles.css"
-            ],
-            "assets": [
-              "apps/eg/src/assets",
-              "apps/eg/src/favicon.ico"
-            ]
+            "styles": ["apps/eg/src/styles.css"],
+            "assets": ["apps/eg/src/assets", "apps/eg/src/favicon.ico"]
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": [
-              "apps/eg/tsconfig.app.json",
-              "apps/eg/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "tsConfig": ["apps/eg/tsconfig.app.json", "apps/eg/tsconfig.spec.json"],
+            "exclude": ["**/node_modules/**"]
           }
         }
       },
@@ -118,12 +103,8 @@
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": [
-              "apps/eg-e2e/tsconfig.e2e.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "tsConfig": ["apps/eg-e2e/tsconfig.e2e.json"],
+            "exclude": ["**/node_modules/**"]
           }
         }
       },
@@ -148,13 +129,8 @@
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": [
-              "libs/common/tsconfig.lib.json",
-              "libs/common/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "tsConfig": ["libs/common/tsconfig.lib.json", "libs/common/tsconfig.spec.json"],
+            "exclude": ["**/node_modules/**"]
           }
         }
       },
@@ -179,13 +155,8 @@
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": [
-              "libs/graph/tsconfig.lib.json",
-              "libs/graph/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "tsConfig": ["libs/graph/tsconfig.lib.json", "libs/graph/tsconfig.spec.json"],
+            "exclude": ["**/node_modules/**"]
           }
         }
       },
@@ -210,13 +181,8 @@
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": [
-              "libs/logger/tsconfig.lib.json",
-              "libs/logger/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "tsConfig": ["libs/logger/tsconfig.lib.json", "libs/logger/tsconfig.spec.json"],
+            "exclude": ["**/node_modules/**"]
           }
         }
       },
@@ -239,13 +205,8 @@
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": [
-              "libs/messages/tsconfig.lib.json",
-              "libs/messages/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "tsConfig": ["libs/messages/tsconfig.lib.json", "libs/messages/tsconfig.spec.json"],
+            "exclude": ["**/node_modules/**"]
           }
         }
       }
@@ -267,13 +228,8 @@
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": [
-              "libs/serialization/tsconfig.lib.json",
-              "libs/serialization/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "tsConfig": ["libs/serialization/tsconfig.lib.json", "libs/serialization/tsconfig.spec.json"],
+            "exclude": ["**/node_modules/**"]
           }
         }
       }

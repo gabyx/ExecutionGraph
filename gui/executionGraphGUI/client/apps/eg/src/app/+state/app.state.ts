@@ -10,15 +10,15 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Id } from "@eg/common";
+import { Id } from '@eg/common';
 import { Graph, GraphTypeDescription } from '../model';
-import { isDefined } from '@eg/common'
+import { isDefined } from '@eg/common';
 
 export class AppState {
   /** Map of graphs:
    * id -> graph
    * @todo can we make this Map()...?
-  */
+   */
   public graphs: Map<Id, Graph> = new Map<Id, Graph>();
 
   /** Map of graph types descriptions:
@@ -38,8 +38,7 @@ export class AppState {
   }
 
   public removeGraph(id: Id) {
-    if (!this.graphs.delete(id))
-    {
+    if (!this.graphs.delete(id)) {
       throw `Graph '${id.toString()}' not existing!`;
     }
   }
@@ -79,5 +78,4 @@ export class AppState {
   public get selectedGraphDescription(): GraphTypeDescription | undefined {
     return isDefined(this.selectedGraphId) ? this.graphDescription(this.selectedGraphId) : undefined;
   }
-
 }

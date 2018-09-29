@@ -10,10 +10,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable, Inject} from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { VERBOSE_LOG_TOKEN } from '../tokens';
 import { ITestBackend } from './TestBackend';
-import { ILogger, LoggerFactory, stringify} from '@eg/logger';
+import { ILogger, LoggerFactory, stringify } from '@eg/logger';
 import { Id } from '@eg/common';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { toNode } from './Conversions';
@@ -34,8 +34,7 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
   }
 
   public async addNode(graphId: Id, type: string, name: string): Promise<Node> {
-
-    let response = this.backend.createAddNodeResponse(type,name);
+    let response = this.backend.createAddNodeResponse(type, name);
 
     let node = response.node();
     this.logger.info(`Added new node [type: '${node.type()}']

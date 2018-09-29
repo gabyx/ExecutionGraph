@@ -18,13 +18,11 @@ describe('ConnectionStyleOptionsComponent', () => {
   let component: ConnectionStyleOptionsComponent;
   let fixture: ComponentFixture<ConnectionStyleOptionsComponent>;
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        declarations: [ConnectionStyleOptionsComponent]
-      }).compileComponents();
-    })
-  );
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ConnectionStyleOptionsComponent]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ConnectionStyleOptionsComponent);

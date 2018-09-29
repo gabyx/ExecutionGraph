@@ -5,14 +5,21 @@ import { DraggableDirective } from './draggable.directive';
   selector: '[ngcsDroppable]'
 })
 export class DroppableDirective {
-  @Output() draggableEntered = new EventEmitter<any>();
-  @Output() draggableLeft = new EventEmitter<any>();
-  @Output() draggableDropped = new EventEmitter<any>();
+  @Output()
+  draggableEntered = new EventEmitter<any>();
+  @Output()
+  draggableLeft = new EventEmitter<any>();
+  @Output()
+  draggableDropped = new EventEmitter<any>();
 
-  @Input('ngcsDroppable') dropAcceptanceFilter: (data: any) => boolean;
-  @Input() droppingClass: string = 'dropping';
-  @Input() dropAllowedClass: string = 'dropping-allowed';
-  @Input() dropForbiddenClass: string = 'dropping-forbidden';
+  @Input('ngcsDroppable')
+  dropAcceptanceFilter: (data: any) => boolean;
+  @Input()
+  droppingClass: string = 'dropping';
+  @Input()
+  dropAllowedClass: string = 'dropping-allowed';
+  @Input()
+  dropForbiddenClass: string = 'dropping-forbidden';
 
   private draggable: DraggableDirective = null;
   private isActive = false;

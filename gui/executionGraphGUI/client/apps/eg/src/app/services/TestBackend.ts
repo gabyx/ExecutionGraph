@@ -12,12 +12,11 @@
 
 import { Injectable } from '@angular/core';
 import { flatbuffers } from 'flatbuffers';
-import { Id } from "@eg/common";
+import { Id } from '@eg/common';
 import { toGraphTypeDescription } from './Conversions';
 import { sz as szInfo } from './GeneralInfoService';
 import { sz as szMani } from './GraphManipulationService';
 import * as model from '../model';
-
 
 /**
  * Interface class for a dummy backend which is used in the dummy services.
@@ -30,7 +29,7 @@ export abstract class ITestBackend {
   public graphTypeId: Id;
   public graphTypeDesc: model.GraphTypeDescription[] = [];
   public graphTypeDescsResponse: szInfo.GetAllGraphTypeDescriptionsResponse;
-  public abstract createAddNodeResponse(type: string, name: string): szMani.AddNodeResponse
+  public abstract createAddNodeResponse(type: string, name: string): szMani.AddNodeResponse;
 }
 
 /**
@@ -97,11 +96,9 @@ export class TestBackend extends ITestBackend {
       this.graphTypeDesc.push(toGraphTypeDescription(response.graphsTypes(g)));
     }
     this.graphTypeDescsResponse = response;
-
   }
 
   public createAddNodeResponse(type: string, name: string): szMani.AddNodeResponse {
-
     // Create a node response
     // ----------------------
 
@@ -116,10 +113,13 @@ export class TestBackend extends ITestBackend {
         let socketType = 0;
         let sockTOff: number;
         if (!inputs) {
-          sockTOff = builder.createString(`${this.graphTypeDesc[0].socketTypeDescriptions[socketType].name} : ${suffix}-${i}`);
-        }
-        else {
-          sockTOff = builder.createString(`${suffix}-${i} : ${this.graphTypeDesc[0].socketTypeDescriptions[socketType].name}`);
+          sockTOff = builder.createString(
+            `${this.graphTypeDesc[0].socketTypeDescriptions[socketType].name} : ${suffix}-${i}`
+          );
+        } else {
+          sockTOff = builder.createString(
+            `${suffix}-${i} : ${this.graphTypeDesc[0].socketTypeDescriptions[socketType].name}`
+          );
         }
         szMani.LogicSocket.startLogicSocket(builder);
         szMani.LogicSocket.addType(builder, flatbuffers.Long.create(socketType, 0));
@@ -131,8 +131,8 @@ export class TestBackend extends ITestBackend {
       return szMani.LogicNode.createInputSocketsVector(builder, socketOffs);
     };
 
-    let inSocksOff = createSockets(2, "in", true);
-    let outSocksOff = createSockets(3, "out", false);
+    let inSocksOff = createSockets(2, 'in', true);
+    let outSocksOff = createSockets(3, 'out', false);
 
     szMani.LogicNode.startLogicNode(builder);
     this.nodeId += 1;
@@ -152,5 +152,4 @@ export class TestBackend extends ITestBackend {
     const buf = new flatbuffers.ByteBuffer(result);
     return szMani.AddNodeResponse.getRootAsAddNodeResponse(buf);
   }
-
 }
