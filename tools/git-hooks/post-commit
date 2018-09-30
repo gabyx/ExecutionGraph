@@ -1,16 +1,12 @@
 #!/bin/bash
 root="$(git rev-parse --show-toplevel)"
 [ -d "$root" ] || exit 1
+preCommitFileChanged="${root}/.pre-commit-changed"
 
 # check if file is here
-[ -f "${root}/.pre-commit-changed" ] || exit 0
+[ -f "${preCommitFileChanged}" ] || exit 0
 
-echo "Post-Commit Hook: add automatically changed files ..."
-
-function deleteFile()
-{
-    rm "${root}/.pre-commit-changed"
-}
+echo "Post-Commit Hook [START]: add automatically changed files ..."
 
 function addFile()
 {
@@ -20,9 +16,10 @@ function addFile()
 }
 export -f addFile
 
-cat "${root}/.pre-commit-changed" | xargs -n 1 -0 -I {} bash -c 'addFile "${@}"' _ {} || (deleteFile; echo "Error!"; exit 0)
+cat "${preCommitFileChanged}" | xargs -n 1 -0 -I {} bash -c 'addFile "${@}"' _ {} || (deleteFile; echo "Error!"; exit 0)
 
-deleteFile
+# Delete the file
+rm "${preCommitFileChanged}"
 
 # Show the status
 git status
@@ -37,7 +34,6 @@ case $yn in
     [Y] ) git commit --amend -C HEAD --no-verify
 esac
 
-echo "Post-Commit Hook: add automatically changed files [DONE]"
-exit 0
+echo "Post-Commit Hook [DONE]"
 
 
