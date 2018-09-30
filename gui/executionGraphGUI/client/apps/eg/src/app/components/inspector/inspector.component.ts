@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'eg-component',
+  selector: 'eg-inspector',
   templateUrl: './inspector.component.html',
   styleUrls: ['./inspector.component.css']
 })

@@ -21,7 +21,8 @@ import {
   MatMenuModule,
   MatButtonModule,
   MatCheckboxModule,
-  MatButtonToggleModule
+  MatButtonToggleModule,
+  MatSidenavModule
 } from '@angular/material';
 
 import { VERBOSE_LOG_TOKEN } from './tokens';
@@ -86,6 +87,7 @@ environment.production = true;
     MatButtonModule,
     MatButtonToggleModule,
     MatCheckboxModule,
+    MatSidenavModule,
     GraphModule,
     NxModule.forRoot(),
     StoreModule.forRoot(
