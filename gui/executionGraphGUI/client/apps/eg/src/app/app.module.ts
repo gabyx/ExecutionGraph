@@ -54,6 +54,7 @@ import { ITestBackend, TestBackend } from './services/TestBackend';
 import { AppComponent } from './app.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
+import { InspectorComponent } from './components/inspector/inspector.component';
 
 import { environment } from '../environments/environment';
 import { ConnectionStyleOptionsComponent } from './components/connection-style-options/connection-style-options.component';
@@ -68,7 +69,13 @@ import { storeFreeze } from 'ngrx-store-freeze';
 environment.production = true;
 
 @NgModule({
-  declarations: [AppComponent, ToolbarComponent, WorkspaceComponent, ConnectionStyleOptionsComponent],
+  declarations: [
+    AppComponent,
+    ToolbarComponent,
+    WorkspaceComponent,
+    ConnectionStyleOptionsComponent,
+    InspectorComponent
+  ],
   imports: [
     HttpClientModule,
     BrowserModule,
