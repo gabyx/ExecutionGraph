@@ -94,7 +94,7 @@ findExecutables | {
 
         "$formatter" "$orig" || { echo "[1] exit"; exit 1; }
         
-        [ ! -z "${formatAll}" ] && git add "$orig"
+        [ ! -z "${formatAll}" ] && git add "$orig" || true
 
       done 
     } || { echo "[2] exit"; exit 1; }
