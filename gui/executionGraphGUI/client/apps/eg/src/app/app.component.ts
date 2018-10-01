@@ -13,12 +13,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { filter } from 'rxjs/operators';
-
+import { Observable } from 'rxjs';
 import { LoggerFactory, ILogger } from '@eg/logger';
 import { Id, isDefined } from '@eg/common';
 import { AppState } from './+state/app.state';
-import { LoadApp, SelectGraph } from './+state/app.actions';
+import { fromAppActions } from './+state/app.actions';
 import { appQuery } from './+state/app.selectors';
+import { UIPropertiesInspector } from './+state/app.uiproperties';
 
 @Component({
   selector: 'eg-root',
@@ -28,12 +29,22 @@ import { appQuery } from './+state/app.selectors';
 export class AppComponent implements OnInit {
   private readonly log: ILogger;
 
+  public inspectorProps: Observable<UIPropertiesInspector>;
+
   constructor(private store: Store<AppState>, loggerFactory: LoggerFactory) {
     this.log = loggerFactory.create('AppComponent');
   }
 
   ngOnInit() {
-    this.store.dispatch(new LoadApp());
+    this.inspectorProps = this.store
+      .select(appQuery.getInspectorUIProperties)
+      .pipe(filter(uiProps => isDefined(uiProps)));
+
+    this.inspectorProps.subscribe((props: UIPropertiesInspector) => {
+      this.log.debug('AppComponent:: inspectorProps changed');
+    });
+
+    this.store.dispatch(new fromAppActions.LoadApp());
 
     this.store
       .select(appQuery.getAllGraphs)
@@ -43,7 +54,7 @@ export class AppComponent implements OnInit {
         if (graphs.size === 0) {
           this.log.error(`Cannot select, since no graphs loaded!`);
         } else {
-          this.store.dispatch(new SelectGraph(graphs.keys().next().value));
+          this.store.dispatch(new fromAppActions.SelectGraph(graphs.keys().next().value));
         }
       });
   }

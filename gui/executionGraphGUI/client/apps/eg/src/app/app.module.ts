@@ -20,8 +20,13 @@ import {
   MatToolbarModule,
   MatMenuModule,
   MatButtonModule,
+  MatSliderModule,
+  MatListModule,
+  MatDividerModule,
+  MatExpansionModule,
   MatCheckboxModule,
-  MatButtonToggleModule
+  MatButtonToggleModule,
+  MatSidenavModule
 } from '@angular/material';
 
 import { VERBOSE_LOG_TOKEN } from './tokens';
@@ -54,6 +59,7 @@ import { ITestBackend, TestBackend } from './services/TestBackend';
 import { AppComponent } from './app.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
+import { InspectorComponent } from './components/inspector/inspector.component';
 
 import { environment } from '../environments/environment';
 import { ConnectionStyleOptionsComponent } from './components/connection-style-options/connection-style-options.component';
@@ -68,7 +74,13 @@ import { storeFreeze } from 'ngrx-store-freeze';
 environment.production = true;
 
 @NgModule({
-  declarations: [AppComponent, ToolbarComponent, WorkspaceComponent, ConnectionStyleOptionsComponent],
+  declarations: [
+    AppComponent,
+    ToolbarComponent,
+    WorkspaceComponent,
+    ConnectionStyleOptionsComponent,
+    InspectorComponent
+  ],
   imports: [
     HttpClientModule,
     BrowserModule,
@@ -77,8 +89,13 @@ environment.production = true;
     MatToolbarModule,
     MatMenuModule,
     MatButtonModule,
+    MatListModule,
+    MatDividerModule,
+    MatExpansionModule,
     MatButtonToggleModule,
     MatCheckboxModule,
+    MatSidenavModule,
+    MatSliderModule,
     GraphModule,
     NxModule.forRoot(),
     StoreModule.forRoot(
