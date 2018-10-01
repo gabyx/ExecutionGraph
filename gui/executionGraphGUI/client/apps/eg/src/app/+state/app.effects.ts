@@ -16,6 +16,7 @@ import {
 } from './app.actions';
 import { createConnection } from '../model';
 import { AppState } from './app.state';
+import { createDefaultUIProperties } from './app.uiproperties';
 import * as services from '../services';
 
 @Injectable()
@@ -23,6 +24,9 @@ export class AppEffects {
   private readonly log: ILogger;
 
   private async loadApp(): Promise<AppLoaded> {
+    // Load UIProperties
+    const uiProps = createDefaultUIProperties();
+
     // Get Graph Infos
     const graphDescs = await this.generalInfoService.getAllGraphTypeDescriptions();
     let graphDesc = graphDescs[0];
@@ -37,7 +41,7 @@ export class AppEffects {
       let node = await this.graphManipulationService.addNode(graph.id, nodeType, `${nodeType}-${i}`);
       graph.addNode(node);
     }
-    return new AppLoaded([graph], graphDescs);
+    return new AppLoaded(uiProps, [graph], graphDescs);
   }
 
   @Effect()

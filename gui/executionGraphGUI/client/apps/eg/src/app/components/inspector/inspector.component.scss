@@ -1,0 +1,24 @@
+.title-devider {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.title {
+  text-align: center;
+}
+
+#closeButton {
+  color: rgb(34, 34, 34);
+  position: absolute;
+  top: 0ex;
+  right: 0ex;
+}
+
+#closeButton:hover {
+  color: blue;
+  cursor: pointer;
+}
+
+:host {
+  flex: 0 0 0;
+}

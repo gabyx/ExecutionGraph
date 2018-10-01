@@ -13,11 +13,19 @@
 import { Id } from '@eg/common';
 import { Graph, GraphTypeDescription } from '../model';
 import { isDefined } from '@eg/common';
+import { UIProperties } from './app.uiproperties';
 
 export class AppState {
+  /**
+   * User-Interface Properties
+   *
+   * @type {UIProperties}
+   * @memberof AppState
+   */
+  public uiProps: UIProperties = new UIProperties();
+
   /** Map of graphs:
    * id -> graph
-   * @todo can we make this Map()...?
    */
   public graphs: Map<Id, Graph> = new Map<Id, Graph>();
 

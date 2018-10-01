@@ -12,7 +12,7 @@
 
 import { Component, OnInit, ElementRef, HostListener, Injectable, Input } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap, filter } from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 
 import {
@@ -25,9 +25,7 @@ import {
   createConnection,
   isOutputSocket
 } from '../../model';
-import { AppState } from '../../+state/app.state';
-import { appQuery } from '../../+state/app.selectors';
-import { AddConnection, MoveNode } from '../../+state/app.actions';
+import { AppState, fromAppActions, appQuery } from '../../+state';
 
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { Point, DragEvent } from '@eg/graph';
@@ -58,7 +56,9 @@ export class WorkspaceComponent implements OnInit {
 
   public updateNodePosition(node: Node, event: DragEvent) {
     // this.logger.info(`[WorkspaceComponent] Updating node position to ${position.x}:${position.y}`);
-    this.store.dispatch(new MoveNode(node, { x: event.dragElementPosition.x, y: event.dragElementPosition.y }));
+    this.store.dispatch(
+      new fromAppActions.MoveNode(node, { x: event.dragElementPosition.x, y: event.dragElementPosition.y })
+    );
   }
 
   public initConnectionFrom(socket: OutputSocket | InputSocket, event: DragEvent) {
@@ -91,7 +91,7 @@ export class WorkspaceComponent implements OnInit {
 
   public addConnection(source: OutputSocket | InputSocket, target: OutputSocket | InputSocket) {
     // Create the connection
-    this.store.dispatch(new AddConnection(source, target));
+    this.store.dispatch(new fromAppActions.AddConnection(source, target));
   }
 
   public isOutputSocket(socket: InputSocket | OutputSocket): socket is OutputSocket {

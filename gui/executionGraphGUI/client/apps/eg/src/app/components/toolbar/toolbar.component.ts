@@ -11,7 +11,9 @@
 // =========================================================================================
 
 import { Component, OnInit, Injectable } from '@angular/core';
-
+import { Store } from '@ngrx/store';
+import { AppState, fromAppActions } from '../../+state';
+import { appQuery } from '../../+state/app.selectors';
 import { TestService } from '../../services/TestService';
 
 @Injectable()
@@ -23,9 +25,13 @@ import { TestService } from '../../services/TestService';
 export class ToolbarComponent implements OnInit {
   public testResponse: any;
 
-  constructor(private readonly testService: TestService) {}
+  constructor(private store: Store<AppState>, private readonly testService: TestService) {}
 
   ngOnInit() {}
+
+  public showInspector() {
+    this.store.dispatch(new fromAppActions.UpdateUIProperties({ inspector: { isVisible: true } }));
+  }
 
   public test() {
     this.testService.testAddRemove();

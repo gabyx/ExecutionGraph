@@ -11,11 +11,16 @@ import {
   GraphTypeDescription
 } from '../model';
 import { Point } from '@eg/graph';
+import { UIProperties } from './app.uiproperties';
 
 export enum AppActionTypes {
   LoadApp = '[App] Load App',
   AppLoaded = '[App] App Loaded',
   AppLoadError = '[App] App Load Error',
+
+  SelectGraph = '[App] Select Graph',
+
+  UpdateUIProperties = '[App] Update UI Properties',
 
   MoveNode = '[Workspace] Move Node',
   NodeMoved = '[Workspace] Node Moved',
@@ -24,8 +29,6 @@ export enum AppActionTypes {
   GraphAdded = '[App] Graph Added',
   RemoveGraph = '[App] Remove Graph',
   GraphRemoved = '[App] Graph Removed',
-
-  SelectGraph = '[App] Select Graph',
 
   AddNode = '[Graph] Add Node',
   NodeAdded = '[Graph] Node Added',
@@ -49,12 +52,19 @@ export class AppLoadError implements Action {
 
 export class AppLoaded implements Action {
   readonly type = AppActionTypes.AppLoaded;
-  constructor(public graphs: Graph[], public graphDescriptions: GraphTypeDescription[]) {}
+  constructor(public uiProps: UIProperties, public graphs: Graph[], public graphDescriptions: GraphTypeDescription[]) {}
 }
 
 export class SelectGraph implements Action {
   readonly type = AppActionTypes.SelectGraph;
   constructor(public id: Id) {}
+}
+
+// UI Properties
+// -------------
+export class UpdateUIProperties implements Action {
+  readonly type = AppActionTypes.UpdateUIProperties;
+  constructor(public props: UIProperties) {}
 }
 
 // Actions related to the Workspace
@@ -140,6 +150,7 @@ export type AppAction =
   | AppLoaded
   | AppLoadError
   | SelectGraph
+  | UpdateUIProperties
   | AddGraph
   | GraphAdded
   | RemoveGraph
@@ -159,6 +170,9 @@ export const fromAppActions = {
   LoadApp,
   AppLoaded,
   AppLoadError,
+  SelectGraph,
+
+  UpdateUIProperties,
 
   MoveNode,
   NodeMoved,
