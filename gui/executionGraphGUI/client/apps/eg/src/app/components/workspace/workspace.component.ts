@@ -10,9 +10,9 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, OnInit, ElementRef, HostListener, Injectable, Input } from '@angular/core';
+import { Component, OnInit, ElementRef, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap, filter } from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 
 import {
@@ -25,13 +25,13 @@ import {
   createConnection,
   isOutputSocket
 } from '../../model';
-import { AppState } from '../../+state/app.state';
-import { appQuery } from '../../+state/app.selectors';
-import { AddConnection, MoveNode } from '../../+state/app.actions';
 
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { Point, DragEvent } from '@eg/graph';
 import { isDefined } from '@eg/common';
+import { GraphsState } from '../../+state/reducers';
+import * as graphActions from '../../+state/actions/graph.actions';
+import * as graphQueries from '../../+state/selectors/graph.selectors'
 
 @Injectable()
 @Component({
@@ -47,9 +47,9 @@ export class WorkspaceComponent implements OnInit {
   public newConnection: Connection = null;
   public newConnectionEndpoint: Point = { x: 0, y: 0 };
 
-  constructor(private store: Store<AppState>, private elementRef: ElementRef, loggerFactory: LoggerFactory) {
+  constructor(private store: Store<GraphsState>, private elementRef: ElementRef, loggerFactory: LoggerFactory) {
     this.logger = loggerFactory.create('Workspace');
-    this.graph = store.select(appQuery.getSelectedGraph).pipe(filter(g => isDefined(g)));
+    this.graph = store.select(graphQueries.getSelectedGraph).pipe(filter(g => isDefined(g)));
 
     this.graph.subscribe(g => this.logger.debug(`Displaying graph ${g.id}`));
   }
@@ -58,7 +58,7 @@ export class WorkspaceComponent implements OnInit {
 
   public updateNodePosition(node: Node, event: DragEvent) {
     // this.logger.info(`[WorkspaceComponent] Updating node position to ${position.x}:${position.y}`);
-    this.store.dispatch(new MoveNode(node, { x: event.dragElementPosition.x, y: event.dragElementPosition.y }));
+    this.store.dispatch(new graphActions.MoveNode(node, { x: event.dragElementPosition.x, y: event.dragElementPosition.y }));
   }
 
   public initConnectionFrom(socket: OutputSocket | InputSocket, event: DragEvent) {
@@ -91,7 +91,7 @@ export class WorkspaceComponent implements OnInit {
 
   public addConnection(source: OutputSocket | InputSocket, target: OutputSocket | InputSocket) {
     // Create the connection
-    this.store.dispatch(new AddConnection(source, target));
+    this.store.dispatch(new graphActions.AddConnection(source, target));
   }
 
   public isOutputSocket(socket: InputSocket | OutputSocket): socket is OutputSocket {

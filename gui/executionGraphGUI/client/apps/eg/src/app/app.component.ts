@@ -15,10 +15,9 @@ import { Store } from '@ngrx/store';
 import { filter } from 'rxjs/operators';
 
 import { LoggerFactory, ILogger } from '@eg/logger';
-import { Id, isDefined } from '@eg/common';
-import { AppState } from './+state/app.state';
-import { LoadApp, SelectGraph } from './+state/app.actions';
-import { appQuery } from './+state/app.selectors';
+import * as graphActions from './+state/actions';
+import { GraphsState } from './+state/reducers';
+import * as graphQueries from './+state/selectors/graph.selectors';
 
 @Component({
   selector: 'eg-root',
@@ -28,22 +27,22 @@ import { appQuery } from './+state/app.selectors';
 export class AppComponent implements OnInit {
   private readonly log: ILogger;
 
-  constructor(private store: Store<AppState>, loggerFactory: LoggerFactory) {
+  constructor(private store: Store<GraphsState>, loggerFactory: LoggerFactory) {
     this.log = loggerFactory.create('AppComponent');
   }
 
   ngOnInit() {
-    this.store.dispatch(new LoadApp());
+    this.store.dispatch(new graphActions.LoadGraphs());
 
     this.store
-      .select(appQuery.getAllGraphs)
-      .pipe(filter(graph => isDefined(graph)))
-      .subscribe(graphs => {
+      .select(graphQueries.getGraphEntities)
+      .pipe(filter(entities => entities.size > 0))
+      .subscribe(entities => {
         this.log.debug(`Loaded graphs, auto-selecting first`);
-        if (graphs.size === 0) {
+        if (entities.size === 0) {
           this.log.error(`Cannot select, since no graphs loaded!`);
         } else {
-          this.store.dispatch(new SelectGraph(graphs.keys().next().value));
+          this.store.dispatch(new graphActions.SelectGraph(entities.keys().next().value));
         }
       });
   }

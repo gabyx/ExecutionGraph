@@ -65,6 +65,6 @@ export function createConnection(source: OutputSocket | InputSocket, target: Out
     // Make a Get-Link
     return new Connection(target, source, false);
   } else {
-    throw 'Connection not allowed: Output <-> Input!';
+    throw new Error('Connection not allowed: Output <-> Input!');
   }
 }

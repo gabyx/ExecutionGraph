@@ -24,6 +24,9 @@ import {
   MatButtonToggleModule,
   MatSidenavModule
 } from '@angular/material';
+import { NxModule } from '@nrwl/nx';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { storeFreeze } from 'ngrx-store-freeze';
 
 import { VERBOSE_LOG_TOKEN } from './tokens';
 
@@ -61,11 +64,8 @@ import { environment } from '../environments/environment';
 import { ConnectionStyleOptionsComponent } from './components/connection-style-options/connection-style-options.component';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
-import { initialState as appInitialState, appReducer } from './+state/app.reducer';
-import { AppEffects } from './+state/app.effects';
-import { NxModule } from '@nrwl/nx';
-import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { storeFreeze } from 'ngrx-store-freeze';
+import { reducers } from './+state/reducers/app.reducers';
+import { effects } from './+state/effects';
 
 environment.production = true;
 
@@ -91,13 +91,13 @@ environment.production = true;
     GraphModule,
     NxModule.forRoot(),
     StoreModule.forRoot(
-      { app: appReducer },
+      reducers,
       {
-        initialState: { app: appInitialState }
+        initialState: { }
         //metaReducers : !environment.production ? [storeFreeze] : []
       }
     ),
-    EffectsModule.forRoot([AppEffects]),
+    EffectsModule.forRoot(effects),
     !environment.production ? StoreDevtoolsModule.instrument() : []
   ],
   providers: [
