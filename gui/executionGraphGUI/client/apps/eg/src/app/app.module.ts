@@ -22,7 +22,9 @@ import {
   MatButtonModule,
   MatCheckboxModule,
   MatButtonToggleModule,
-  MatSidenavModule
+  MatSidenavModule,
+  MatCardModule,
+  MatGridListModule
 } from '@angular/material';
 import { NxModule } from '@nrwl/nx';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
@@ -63,12 +65,25 @@ import { WorkspaceComponent } from './components/workspace/workspace.component';
 import { InspectorComponent } from './components/inspector/inspector.component';
 
 import { ConnectionStyleOptionsComponent } from './components/connection-style-options/connection-style-options.component';
+import { GraphCreateComponent } from './components/graph-create/graph-create.component';
+
 import { reducers } from './+state/reducers/app.reducers';
 import { effects } from './+state/effects';
 
 import { environment } from '../environments/environment';
+import { Route, RouterModule } from '@angular/router';
 
-environment.production = true;
+//environment.production = true;
+
+const routes: Route[] = [
+  {
+    path: 'graph',
+    children: [
+      { path: 'new', component: GraphCreateComponent },
+      { path: ':graphId', component: WorkspaceComponent }
+    ]
+  }
+];
 
 @NgModule({
   declarations: [
@@ -76,7 +91,8 @@ environment.production = true;
     ToolbarComponent,
     WorkspaceComponent,
     ConnectionStyleOptionsComponent,
-    InspectorComponent
+    InspectorComponent,
+    GraphCreateComponent
   ],
   imports: [
     HttpClientModule,
@@ -89,8 +105,11 @@ environment.production = true;
     MatButtonToggleModule,
     MatCheckboxModule,
     MatSidenavModule,
+    MatCardModule,
+    MatGridListModule,
     GraphModule,
     NxModule.forRoot(),
+    RouterModule.forRoot(routes),
     StoreModule.forRoot(
       reducers,
       {
@@ -99,7 +118,7 @@ environment.production = true;
       }
     ),
     EffectsModule.forRoot(effects),
-    StoreDevtoolsModule.instrument()
+    environment.production ? [] : StoreDevtoolsModule.instrument()
   ],
   providers: [
     { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory },

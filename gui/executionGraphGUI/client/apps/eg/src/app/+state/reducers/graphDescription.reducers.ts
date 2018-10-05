@@ -2,14 +2,18 @@ import { Id } from "@eg/common";
 import { GraphTypeDescription } from "../../model";
 import * as fromActions from "../actions/graphDescription.actions";
 
+export interface GraphDescriptionMap {
+    [id: string]: GraphTypeDescription
+};
+
 export interface GraphDescriptionsState {
-    entities: Map<Id, GraphTypeDescription>;
+    entities: GraphDescriptionMap;
     loaded: boolean,
     error?: any
 }
 
 export const initialState = {
-    entities: new Map<Id, GraphTypeDescription>(),
+    entities: { },
     loaded: false,
     error: null
 }
@@ -19,8 +23,8 @@ export function reducer(state: GraphDescriptionsState = initialState, action: fr
 
         case fromActions.GRAPH_DESCRIPTIONS_LOADED: {
             const entities = action.graphDescriptions.reduce(
-                (existing: Map<Id, GraphTypeDescription>, graphDescription: GraphTypeDescription) => existing.set(graphDescription.id, graphDescription),
-                new Map<Id, GraphTypeDescription>(state.entities));
+                (existing: GraphDescriptionMap, graphDescription: GraphTypeDescription) => ({ ...existing, [graphDescription.id.toString()]: graphDescription}),
+                {...state.entities});
 
             return {
                 ...state,
