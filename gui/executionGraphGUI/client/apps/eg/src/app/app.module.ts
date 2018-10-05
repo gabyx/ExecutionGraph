@@ -24,7 +24,8 @@ import {
   MatButtonToggleModule,
   MatSidenavModule,
   MatCardModule,
-  MatGridListModule
+  MatGridListModule,
+  MatSnackBarModule
 } from '@angular/material';
 import { NxModule } from '@nrwl/nx';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
@@ -118,6 +119,7 @@ const routes: Route[] = [
     MatButtonToggleModule,
     MatCheckboxModule,
     MatSidenavModule,
+    MatSnackBarModule,
     MatCardModule,
     MatGridListModule,
     GraphModule,

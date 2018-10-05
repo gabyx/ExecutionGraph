@@ -11,6 +11,7 @@ import { Id } from '@eg/common';
 import { LoggerFactory, ILogger } from '@eg/logger';
 
 import * as fromGraph from '../actions/graph.actions';
+import * as fromNotifications from '../actions/notification.actions';
 
 import { createConnection } from '../../model';
 import { GeneralInfoService, GraphManipulationService, GraphManagementService } from '../../services';
@@ -51,13 +52,18 @@ export class GraphEffects {
 
     @Effect({ dispatch: false})
     openGraph$ = this.actions$.ofType<fromGraph.GraphAdded>(fromGraph.GRAPH_ADDED).
-            pipe(tap(action => this.router.navigate(['graph', action.graph.id.toString()])));
+            pipe(
+                tap(action => this.router.navigate(['graph', action.graph.id.toString()]))
+            );
 
     @Effect()
     createGraph$ = this.actions$.ofType<fromGraph.CreateGraph>(fromGraph.CREATE_GRAPH)
         .pipe(
             switchMap((action, state) => from(this.graphManagementService.addGraph(action.graphType.id))),
-            switchMap(graph => of(new fromGraph.GraphAdded(graph)))
+            switchMap(graph => [
+                new fromGraph.GraphAdded(graph),
+                new fromNotifications.ShowNotification(`Shiny new graph created for you \u{1F6EB}`)
+            ])
         );
 
     @Effect()
