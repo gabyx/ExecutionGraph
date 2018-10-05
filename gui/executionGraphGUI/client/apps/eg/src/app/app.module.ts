@@ -73,6 +73,7 @@ import { effects } from './+state/effects';
 import { environment } from '../environments/environment';
 import { Route, RouterModule } from '@angular/router';
 import { RouterStateSerializer, StoreRouterConnectingModule } from '@ngrx/router-store';
+import { GraphLoadedGuard } from './guards/graphLoaded.guard';
 
 //environment.production = true;
 
@@ -81,7 +82,7 @@ const routes: Route[] = [
     path: 'graph',
     children: [
       { path: 'new', component: GraphCreateComponent },
-      { path: ':graphId', component: WorkspaceComponent }
+      { path: ':graphId', component: WorkspaceComponent, canActivate: [GraphLoadedGuard] }
     ]
   }
 ];
@@ -128,6 +129,7 @@ const routes: Route[] = [
     BinaryHttpRouterService,
     CefMessageRouterService,
     TestService,
+    GraphLoadedGuard,
     { provide: VERBOSE_LOG_TOKEN, useValue: environment.logReponsesVerbose },
     {
       provide: ExecutionService,

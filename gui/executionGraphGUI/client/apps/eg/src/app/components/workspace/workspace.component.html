@@ -1,14 +1,15 @@
 <eg-connection-style-options #connectionStyleOptions></eg-connection-style-options>
 
 <ngcs-graph id="graph-1" >
-    <ng-container *ngFor="let node of (graph | async)?.nodes">
+    <ng-container *ngFor="let node of (graph | async).nodes">
         <div #theNode class="node ngcs-node"
-          [attr.id]="node.idString"
-          [style.left]="node.uiProps.position.x+'px'"
-          [style.top]="node.uiProps.position.y+'px'">
-            <span class="header" ngcsDraggable [dragElement]="theNode" (dragContinued)="updateNodePosition(node, $event)">
-                {{ node.name }}
-            </span>
+        [attr.id]="node.idString"
+        [style.left]="node.uiProps.position.x+'px'"
+        [style.top]="node.uiProps.position.y+'px'"
+        >
+        <span class="header" ngcsDraggable [dragElement]="theNode" (dragContinued)="updateNodePosition(node, $event)">
+            {{ node.name }}
+        </span>
             <div class="sockets">
                 <div class="inputs">
                     <span class="socket" *ngFor="let socket of node.inputs"
@@ -29,12 +30,11 @@
             </div>
         </div>
     </ng-container>
-
-    <ng-container *ngFor="let connection of (graph | async)?.connections">
+    <ng-container *ngFor="let connection of (graph | async).connections">
         <ngcs-connection
-          [from]="connection.outputSocket.idString"
-          [to]="connection.inputSocket.idString"
-          [drawStyle]="connectionStyleOptions.connectionDrawStyle">
+        [from]="connection.outputSocket.idString"
+        [to]="connection.inputSocket.idString"
+        [drawStyle]="connectionStyleOptions.connectionDrawStyle">
         </ngcs-connection>
     </ng-container>
 

@@ -26,10 +26,10 @@ export class Graph {
     return this._type;
   }
   public get nodes() {
-    return this.nodesMap.values();
+    return Array.from(this.nodesMap.values());
   }
   public get connections() {
-    return this.connectionsMap.values();
+    return Array.from(this.connectionsMap.values());
   }
 
   // @todo cmonspqr: These methods should be removed. This is the responsibility of the reducers

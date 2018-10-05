@@ -10,9 +10,9 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, OnInit, ElementRef, Injectable } from '@angular/core';
+import { Component, OnInit, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { filter, tap, map } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 
 import {
@@ -42,14 +42,23 @@ import * as graphQueries from '../../+state/selectors/graph.selectors'
 export class WorkspaceComponent implements OnInit {
   private logger: ILogger;
 
-  public readonly graph: Observable<Graph>;
+  public graph: Observable<Graph>;
+
+  public get nodes() {
+    return this.graph.pipe(map(graph => graph.nodes));
+  }
+
+  public get connections() {
+    return this.graph.pipe(map(graph => graph.connections));
+  }
+
   public newTargetSocket: InputSocket | OutputSocket = null;
   public newConnection: Connection = null;
   public newConnectionEndpoint: Point = { x: 0, y: 0 };
 
-  constructor(private store: Store<GraphsState>, private elementRef: ElementRef, loggerFactory: LoggerFactory) {
+  constructor(private store: Store<GraphsState>, loggerFactory: LoggerFactory) {
     this.logger = loggerFactory.create('Workspace');
-    this.graph = store.select(graphQueries.getSelectedGraph).pipe(filter(g => isDefined(g)));
+    this.graph = store.select(graphQueries.getSelectedGraph).pipe( filter(g => isDefined(g) && g!=null));
 
     // this.graph.subscribe(g => this.logger.debug(`Displaying graph ${g.id}`));
   }
