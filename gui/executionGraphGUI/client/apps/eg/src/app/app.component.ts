@@ -31,8 +31,7 @@ export class AppComponent implements OnInit {
   private readonly log: ILogger;
 
   public get hasDrawerContent() {
-    return this.store.select(getDrawerRequired)
-      .pipe(tap(isRequired => this.log.debug(`Drawer required? ${isRequired}`)));
+    return this.store.select(getDrawerRequired);
   }
 
   constructor(private graphStore: Store<GraphsState>, private store: Store<RouterState>, private router: Router, loggerFactory: LoggerFactory) {

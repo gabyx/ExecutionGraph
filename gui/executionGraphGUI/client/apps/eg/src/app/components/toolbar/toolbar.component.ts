@@ -13,7 +13,6 @@
 import { Component, OnInit, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { TestService } from '../../services/TestService';
 import { Graph } from '../../model';
 import { Store } from '@ngrx/store';
 import { GraphsState } from '../../+state/reducers';
@@ -27,17 +26,11 @@ import { getGraphs } from '../../+state/selectors';
 })
 export class ToolbarComponent implements OnInit {
 
-  public testResponse: any;
-
   public graphsMRU: Observable<Graph[]>;
 
-  constructor(private store: Store<GraphsState>, private readonly testService: TestService) {
+  constructor(private store: Store<GraphsState>) {
     this.graphsMRU = store.select(getGraphs);
   }
 
   ngOnInit() {}
-
-  public test() {
-    this.testService.testAddRemove();
-  }
 }
