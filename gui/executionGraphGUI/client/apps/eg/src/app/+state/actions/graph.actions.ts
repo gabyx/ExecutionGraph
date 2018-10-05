@@ -14,7 +14,7 @@ import { Point } from '@eg/graph';
 export const LOAD_GRAPHS = '[Graph] Load';
 export const GRAPHS_LOADED = '[Graph] Loaded';
 export const GRAPHS_LOAD_ERROR = '[Graph] Load Error';
-export const SELECT_GRAPH = '[Graph] Select Graph';
+export const OPEN_GRAPH = '[Graph] Open';
 export const MOVE_NODE = '[Graph] Move Node';
 export const NODE_UPDATED = '[Graph] Node Updated';
 export const ADD_GRAPH = '[Graph] Add Graph';
@@ -45,8 +45,8 @@ export class GraphsLoaded implements Action {
     constructor(public graphs: Graph[]) { }
 }
 
-export class SelectGraph implements Action {
-    readonly type = SELECT_GRAPH;
+export class OpenGraph implements Action {
+    readonly type = OPEN_GRAPH;
     constructor(public id: Id) { }
 }
 
@@ -129,7 +129,7 @@ export type GraphAction =
     | LoadGraphs
     | GraphsLoaded
     | GraphLoadError
-    | SelectGraph
+    | OpenGraph
     | AddGraph
     | GraphAdded
     | RemoveGraph

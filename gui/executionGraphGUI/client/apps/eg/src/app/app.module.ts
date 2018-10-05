@@ -67,11 +67,12 @@ import { InspectorComponent } from './components/inspector/inspector.component';
 import { ConnectionStyleOptionsComponent } from './components/connection-style-options/connection-style-options.component';
 import { GraphCreateComponent } from './components/graph-create/graph-create.component';
 
-import { reducers } from './+state/reducers/app.reducers';
+import { reducers, RouterStateUrlSerializer } from './+state/reducers/app.reducers';
 import { effects } from './+state/effects';
 
 import { environment } from '../environments/environment';
 import { Route, RouterModule } from '@angular/router';
+import { RouterStateSerializer, StoreRouterConnectingModule } from '@ngrx/router-store';
 
 //environment.production = true;
 
@@ -110,6 +111,7 @@ const routes: Route[] = [
     GraphModule,
     NxModule.forRoot(),
     RouterModule.forRoot(routes),
+    StoreRouterConnectingModule.forRoot({}),
     StoreModule.forRoot(
       reducers,
       {
@@ -142,7 +144,8 @@ const routes: Route[] = [
     {
       provide: GraphManagementService,
       useClass: !environment.useServiceDummys ? GraphManagementServiceBinaryHttp : GraphManagementServiceDummy
-    }
+    },
+    { provide: RouterStateSerializer, useClass: RouterStateUrlSerializer }
   ],
   bootstrap: [AppComponent]
 })

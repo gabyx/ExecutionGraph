@@ -51,7 +51,7 @@ export class WorkspaceComponent implements OnInit {
     this.logger = loggerFactory.create('Workspace');
     this.graph = store.select(graphQueries.getSelectedGraph).pipe(filter(g => isDefined(g)));
 
-    this.graph.subscribe(g => this.logger.debug(`Displaying graph ${g.id}`));
+    // this.graph.subscribe(g => this.logger.debug(`Displaying graph ${g.id}`));
   }
 
   ngOnInit() {}

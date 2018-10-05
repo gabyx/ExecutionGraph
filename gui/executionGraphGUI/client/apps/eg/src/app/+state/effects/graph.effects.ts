@@ -10,6 +10,7 @@ import * as fromGraph from '../actions/graph.actions';
 
 import { createConnection } from '../../model';
 import { GeneralInfoService, GraphManipulationService, GraphManagementService } from '../../services';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class GraphEffects {
@@ -17,6 +18,7 @@ export class GraphEffects {
 
     constructor(
         private actions$: Actions,
+        private readonly router: Router,
         private readonly generalInfoService: GeneralInfoService,
         private readonly graphManipulationService: GraphManipulationService,
         private readonly graphManagementService: GraphManagementService,
@@ -34,6 +36,12 @@ export class GraphEffects {
                 this.log.error(`Failed to load graphs`, error);
                 return of(new fromGraph.GraphLoadError(error))
             })
+        );
+
+    @Effect({ dispatch: false })
+    openGraph$ = this.actions$.ofType<fromGraph.OpenGraph>(fromGraph.OPEN_GRAPH)
+        .pipe(
+            tap(action => { this.router.navigate(['graph', action.id.toString()]); })
         );
 
     @Effect()

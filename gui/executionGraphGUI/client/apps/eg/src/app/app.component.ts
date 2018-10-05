@@ -36,14 +36,14 @@ export class AppComponent implements OnInit {
     this.store.dispatch(new actions.LoadGraphs());
 
     this.store
-      .select(graphQueries.getGraphEntities)
-      .pipe(filter(entities => entities.size > 0))
-      .subscribe(entities => {
+      .select(graphQueries.getGraphs)
+      .pipe(filter(graphs => graphs.length > 0))
+      .subscribe(graphs => {
         this.log.debug(`Loaded graphs, auto-selecting first`);
-        if (entities.size === 0) {
+        if (graphs.length === 0) {
           this.log.error(`Cannot select, since no graphs loaded!`);
         } else {
-          this.store.dispatch(new actions.SelectGraph(entities.keys().next().value));
+          this.store.dispatch(new actions.OpenGraph(graphs[0].id));
         }
       });
   }
