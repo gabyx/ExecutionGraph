@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Effect, Actions } from '@ngrx/effects';
 
-import { of } from 'rxjs';
+import { of, from } from 'rxjs';
 import { map, tap, switchMap, catchError } from 'rxjs/operators';
 
 import { LoggerFactory, ILogger } from '@eg/logger';
@@ -42,6 +42,16 @@ export class GraphEffects {
     openGraph$ = this.actions$.ofType<fromGraph.OpenGraph>(fromGraph.OPEN_GRAPH)
         .pipe(
             tap(action => { this.router.navigate(['graph', action.id.toString()]); })
+        );
+
+    @Effect()
+    createGraph$ = this.actions$.ofType<fromGraph.CreateGraph>(fromGraph.CREATE_GRAPH)
+        .pipe(
+            switchMap((action, state) => from(this.graphManagementService.addGraph(action.graphType.id))),
+            switchMap(graph => [
+                new fromGraph.GraphsLoaded([graph]),
+                new fromGraph.OpenGraph(graph.id)
+            ])
         );
 
     @Effect()

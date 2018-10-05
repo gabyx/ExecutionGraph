@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import * as fromGraphDescriptions from '../../+state/selectors/'
 import { GraphDescriptionsState } from '../../+state/reducers/graphDescription.reducers';
 import { GraphTypeDescription } from '../../model';
+import { CreateGraph } from '../../+state/actions';
 
 @Component({
   selector: 'eg-graph-create',
@@ -21,4 +22,7 @@ export class GraphCreateComponent implements OnInit {
   ngOnInit() {
   }
 
+  createGraph(graphType: GraphTypeDescription) {
+    this.store.dispatch(new CreateGraph(graphType));
+  }
 }

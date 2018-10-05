@@ -7,7 +7,8 @@ import {
     OutputSocket,
     InputSocket,
     NodeId,
-    ConnectionId
+    ConnectionId,
+    GraphTypeDescription
 } from '../../model';
 import { Point } from '@eg/graph';
 
@@ -15,6 +16,8 @@ export const LOAD_GRAPHS = '[Graph] Load';
 export const GRAPHS_LOADED = '[Graph] Loaded';
 export const GRAPHS_LOAD_ERROR = '[Graph] Load Error';
 export const OPEN_GRAPH = '[Graph] Open';
+export const CREATE_GRAPH = '[Graph] Create';
+
 export const MOVE_NODE = '[Graph] Move Node';
 export const NODE_UPDATED = '[Graph] Node Updated';
 export const ADD_GRAPH = '[Graph] Add Graph';
@@ -63,11 +66,19 @@ export class NodeUpdated implements Action {
 
 // Actions related to GraphManagementService
 // -----------------------------------------
+export class CreateGraph implements Action {
+    readonly type = CREATE_GRAPH;
+    constructor(public graphType: GraphTypeDescription) { }
+}
+
+
+// @todo cmonspqr: I don't think so. We normally create an empty graph, than add stuff to it
 export class AddGraph implements Action {
     readonly type = ADD_GRAPH;
     constructor(public graph: Graph) { }
 }
 
+// @todo cmonspqr: Duplicate of GraphsLoaded? This smells...
 export class GraphAdded implements Action {
     readonly type = GRAPH_ADDED;
     constructor(public graph: Graph) { }
@@ -130,6 +141,7 @@ export type GraphAction =
     | GraphsLoaded
     | GraphLoadError
     | OpenGraph
+    | CreateGraph
     | AddGraph
     | GraphAdded
     | RemoveGraph
