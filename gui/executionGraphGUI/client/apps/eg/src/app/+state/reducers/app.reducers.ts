@@ -1,4 +1,4 @@
-import { Params, RouterStateSnapshot } from '@angular/router';
+import { Params, RouterStateSnapshot, Route } from '@angular/router';
 import { ActionReducerMap } from '@ngrx/store';
 import * as fromRouter from '@ngrx/router-store';
 
@@ -10,6 +10,7 @@ export interface RouterStateUrl {
   url: string;
   queryParams: Params;
   params: Params;
+  routeSegments: string[]
 }
 
 export class RouterStateUrlSerializer implements RouterStateSerializer<RouterStateUrl> {
@@ -18,13 +19,17 @@ export class RouterStateUrlSerializer implements RouterStateSerializer<RouterSta
     const { queryParams } = routerState.root;
 
     let state = routerState.root;
+    const routeSegments = [];
     while(state.firstChild) {
       state = state.firstChild;
+      if(state.routeConfig) {
+        routeSegments.push(state.routeConfig.path);
+      }
     }
 
     const { params } = state;
 
-    return { url, queryParams, params };
+    return { url, queryParams, params, routeSegments};
   }
 }
 

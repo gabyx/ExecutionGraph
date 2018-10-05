@@ -78,7 +78,6 @@ export class AddGraph implements Action {
     constructor(public graph: Graph) { }
 }
 
-// @todo cmonspqr: Duplicate of GraphsLoaded? This smells...
 export class GraphAdded implements Action {
     readonly type = GRAPH_ADDED;
     constructor(public graph: Graph) { }

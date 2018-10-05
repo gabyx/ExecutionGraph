@@ -13,20 +13,20 @@ export const getGraphs = createSelector(
     (entities: GraphMap) => Object.keys(entities).map(id => entities[id])
 );
 
-export const getSelectedGraphId = createSelector(
-    getRouterState,
-    (router) => router.state && router.state.params.graphId
-)
-
 // export const getSelectedGraphId = createSelector(
-//     getGraphsState,
-//     (state) => state.selectedGraphId
+//     getRouterState,
+//     (router) => router.state && router.state.params.graphId
 // )
+
+export const getSelectedGraphId = createSelector(
+    getGraphsState,
+    (state) => state.selectedGraphId
+)
 
 export const getSelectedGraph = createSelector(
     getSelectedGraphId,
     getGraphEntities,
-    (id, entities) => isDefined(id) ? entities[id] : null
+    (id, entities) => isDefined(id) ? entities[id.toString()] : null
 );
 
 export const getGraphsLoaded = createSelector(

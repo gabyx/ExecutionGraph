@@ -35,7 +35,6 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
                 error: null,
                 entities
             }
-            break;
         }
 
         case fromActions.GRAPHS_LOAD_ERROR: {
@@ -44,7 +43,22 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
                 loaded: true,
                 error: action.error
             }
-            break;
+        }
+
+        case fromActions.GRAPH_ADDED: {
+            const entities = { ...state.entities, [action.graph.id.toString()]: action.graph };
+
+            return {
+                ...state,
+                entities
+            }
+        }
+
+        case fromActions.OPEN_GRAPH: {
+            return {
+                ...state,
+                selectedGraphId: action.id
+            }
         }
 
         case fromActions.NODE_UPDATED: {
