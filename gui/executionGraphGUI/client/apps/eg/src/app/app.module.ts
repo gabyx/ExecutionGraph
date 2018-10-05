@@ -82,10 +82,17 @@ const routes: Route[] = [
     path: 'graph',
     children: [
       { path: 'new', component: GraphCreateComponent },
-      { path: ':graphId', component: WorkspaceComponent, canActivate: [GraphLoadedGuard] }
+      {
+        path: ':graphId',
+        component: WorkspaceComponent,
+        canActivate: [GraphLoadedGuard],
+        children: [
+        ]
+      },
     ],
   },
-  { path: '**', redirectTo: 'graph/new' }
+  { path: 'inspector', component: InspectorComponent, outlet: 'drawer'},
+  { path: '**', redirectTo: 'graph/new' },
 ];
 
 @NgModule({

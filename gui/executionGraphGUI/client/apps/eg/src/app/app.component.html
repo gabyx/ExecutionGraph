@@ -1,15 +1,22 @@
-<eg-toolbar></eg-toolbar>
 
-<!--
+<mat-drawer-container class="sidenav-container">
 
-  <mat-drawer-container class="sidenav-container" autosize>
-    <mat-drawer mode="over" position=end>
+  <mat-drawer mode="over" position="end" [opened]="(hasDrawerContent | async)" (closedStart)="drawerClosed()">
+    <h2>The drawer is with you</h2>
+    <!--
+
       <eg-inspector></eg-inspector>
-    </mat-drawer>
+      <eg-connection-style-options #connectionStyleOptions></eg-connection-style-options>
+    -->
 
+    <router-outlet name="drawer"></router-outlet>
+  </mat-drawer>
+
+  <mat-drawer-content>
+    <eg-toolbar></eg-toolbar>
     <router-outlet></router-outlet>
 
-  </mat-drawer-container>
--->
+  </mat-drawer-content>
 
-<router-outlet></router-outlet>
+</mat-drawer-container>
+

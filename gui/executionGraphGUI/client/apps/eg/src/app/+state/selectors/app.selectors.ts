@@ -11,6 +11,11 @@ export const getRouterState = createFeatureSelector<fromRouter.RouterReducerStat
 export const getGraphsState = createFeatureSelector<GraphsState>('graphs');
 export const getGraphDescriptionsState = createFeatureSelector<GraphDescriptionsState>('graphDescriptions');
 
+export const getDrawerRequired = createSelector(
+    getRouterState,
+    (router) => router && router.state && router.state.drawerRouteSegments.length > 0
+)
+
 // export const getLoaded = createSelector(getAppState, (state: AppState) => state.loaded);
 // export const getError = createSelector(getAppState, (state: AppState) => state.error);
 

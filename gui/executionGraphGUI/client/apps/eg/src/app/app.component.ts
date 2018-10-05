@@ -12,12 +12,15 @@
 
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { filter } from 'rxjs/operators';
+import { filter, tap } from 'rxjs/operators';
 
 import { LoggerFactory, ILogger } from '@eg/logger';
 import * as actions from './+state/actions';
 import { GraphsState } from './+state/reducers';
 import * as graphQueries from './+state/selectors/graph.selectors';
+import { getDrawerRequired } from './+state/selectors';
+import { AppState } from './+state/reducers/app.reducers';
+import { RouterState, Router } from '@angular/router';
 
 @Component({
   selector: 'eg-root',
@@ -27,13 +30,18 @@ import * as graphQueries from './+state/selectors/graph.selectors';
 export class AppComponent implements OnInit {
   private readonly log: ILogger;
 
-  constructor(private store: Store<GraphsState>, loggerFactory: LoggerFactory) {
+  public get hasDrawerContent() {
+    return this.store.select(getDrawerRequired)
+      .pipe(tap(isRequired => this.log.debug(`Drawer required? ${isRequired}`)));
+  }
+
+  constructor(private graphStore: Store<GraphsState>, private store: Store<RouterState>, private router: Router, loggerFactory: LoggerFactory) {
     this.log = loggerFactory.create('AppComponent');
   }
 
   ngOnInit() {
-    this.store.dispatch(new actions.LoadGraphDescriptions());
-    this.store.dispatch(new actions.LoadGraphs());
+    this.graphStore.dispatch(new actions.LoadGraphDescriptions());
+    this.graphStore.dispatch(new actions.LoadGraphs());
 
     // this.store
     //   .select(graphQueries.getGraphs)
@@ -46,5 +54,9 @@ export class AppComponent implements OnInit {
     //       this.store.dispatch(new actions.OpenGraph(graphs[0].id));
     //     }
     //   });
+  }
+
+  drawerClosed() {
+    this.router.navigate([{outlets: { drawer: null}}]);
   }
 }

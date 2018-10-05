@@ -1,6 +1,7 @@
 <mat-toolbar>
   <mat-toolbar-row>
     <h1>Execution Graph</h1>
+
     <mat-menu #fileMenu="matMenu">
       <button mat-menu-item routerLink="/graph/new">
         <mat-icon>add</mat-icon>
@@ -12,6 +13,17 @@
       </button>
       <button mat-menu-item [matMenuTriggerFor]="openRecentMenu">
         <span>Open recent</span>
+      </button>
+    </mat-menu>
+
+    <mat-menu #viewMenu="matMenu">
+      <button mat-menu-item [routerLink]="[{ outlets: { drawer: ['inspector'] } }]">
+        <mat-icon>add</mat-icon>
+        <span>Inspector</span>
+      </button>
+      <button mat-menu-item [routerLink]="[{ outlets: { drawer: ['lines'] } }]">
+        <mat-icon>mode_edit</mat-icon>
+        <span>Line Style</span>
       </button>
     </mat-menu>
 
@@ -33,12 +45,13 @@
     <button mat-button [matMenuTriggerFor]="fileMenu">
       <mat-icon>insert_drive_file</mat-icon> File
     </button>
+    <button mat-button [matMenuTriggerFor]="viewMenu">
+      <mat-icon>info</mat-icon> View
+    </button>
     <button mat-button [matMenuTriggerFor]="executionMenu">
       <mat-icon>play_arrow</mat-icon> Execution
     </button>
-    <button mat-button (click)="toogleInspector">
-      <mat-icon>info</mat-icon>
-    </button>
+
     <button mat-button (click)="test()">
       <mat-icon>play_arrow</mat-icon> Test
     </button>

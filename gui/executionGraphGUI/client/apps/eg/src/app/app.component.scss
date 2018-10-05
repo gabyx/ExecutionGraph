@@ -1,8 +1,15 @@
 :host {
-  height: 100%;
+  //height: 100%;
 
-  display: flex;
-  flex-direction: column;
+  // display: flex;
+  // flex-direction: column;
+}
+.mat-drawer-container {
+  background: transparent;
+
+  .mat-drawer-content {
+    overflow:hidden;
+  }
 }
 
 .sidenav-container {

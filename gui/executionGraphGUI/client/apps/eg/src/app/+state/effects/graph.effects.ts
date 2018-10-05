@@ -97,7 +97,7 @@ export class GraphEffects {
 
         return this.actions$.ofType<RouterNavigationAction<RouterStateUrl>>(ROUTER_NAVIGATION).
             pipe(map(r => r.payload.routerState),
-                 filter(r => r && arraysEqual(r.routeSegments, segments)),
+                 filter(r => r && arraysEqual(r.primaryRouteSegments, segments)),
                  withLatestFrom(this.store),
                  switchMap(([r, state]) => callback(r, state)),
                  catchError(error => {
