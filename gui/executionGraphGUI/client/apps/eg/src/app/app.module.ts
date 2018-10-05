@@ -26,6 +26,8 @@ import {
 } from '@angular/material';
 import { NxModule } from '@nrwl/nx';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
 import { storeFreeze } from 'ngrx-store-freeze';
 
 import { VERBOSE_LOG_TOKEN } from './tokens';
@@ -60,12 +62,11 @@ import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
 import { InspectorComponent } from './components/inspector/inspector.component';
 
-import { environment } from '../environments/environment';
 import { ConnectionStyleOptionsComponent } from './components/connection-style-options/connection-style-options.component';
-import { StoreModule } from '@ngrx/store';
-import { EffectsModule } from '@ngrx/effects';
 import { reducers } from './+state/reducers/app.reducers';
 import { effects } from './+state/effects';
+
+import { environment } from '../environments/environment';
 
 environment.production = true;
 
@@ -98,7 +99,7 @@ environment.production = true;
       }
     ),
     EffectsModule.forRoot(effects),
-    !environment.production ? StoreDevtoolsModule.instrument() : []
+    StoreDevtoolsModule.instrument()
   ],
   providers: [
     { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory },

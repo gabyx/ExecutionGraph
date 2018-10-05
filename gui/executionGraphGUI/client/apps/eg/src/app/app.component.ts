@@ -15,7 +15,7 @@ import { Store } from '@ngrx/store';
 import { filter } from 'rxjs/operators';
 
 import { LoggerFactory, ILogger } from '@eg/logger';
-import * as graphActions from './+state/actions';
+import * as actions from './+state/actions';
 import { GraphsState } from './+state/reducers';
 import * as graphQueries from './+state/selectors/graph.selectors';
 
@@ -32,7 +32,8 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.store.dispatch(new graphActions.LoadGraphs());
+    this.store.dispatch(new actions.LoadGraphDescriptions());
+    this.store.dispatch(new actions.LoadGraphs());
 
     this.store
       .select(graphQueries.getGraphEntities)
@@ -42,7 +43,7 @@ export class AppComponent implements OnInit {
         if (entities.size === 0) {
           this.log.error(`Cannot select, since no graphs loaded!`);
         } else {
-          this.store.dispatch(new graphActions.SelectGraph(entities.keys().next().value));
+          this.store.dispatch(new actions.SelectGraph(entities.keys().next().value));
         }
       });
   }

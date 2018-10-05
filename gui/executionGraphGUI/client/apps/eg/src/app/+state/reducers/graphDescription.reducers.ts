@@ -20,7 +20,7 @@ export function reducer(state: GraphDescriptionsState = initialState, action: fr
         case fromActions.GRAPH_DESCRIPTIONS_LOADED: {
             const entities = action.graphDescriptions.reduce(
                 (existing: Map<Id, GraphTypeDescription>, graphDescription: GraphTypeDescription) => existing.set(graphDescription.id, graphDescription),
-                { ...state.entities });
+                new Map<Id, GraphTypeDescription>(state.entities));
 
             return {
                 ...state,
@@ -28,7 +28,6 @@ export function reducer(state: GraphDescriptionsState = initialState, action: fr
                 error: null,
                 entities
             }
-            break;
         }
 
         case fromActions.GRAPH_DESCRIPTIONS_LOAD_ERROR: {
@@ -37,7 +36,6 @@ export function reducer(state: GraphDescriptionsState = initialState, action: fr
                 loaded: true,
                 error: action.error
             }
-            break;
         }
     }
     return state;

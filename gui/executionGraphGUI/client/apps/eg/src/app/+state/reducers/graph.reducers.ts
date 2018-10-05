@@ -50,17 +50,16 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
             };
         }
 
-        case fromActions.NODE_MOVED: {
+        case fromActions.NODE_UPDATED: {
             if(!isDefined(state.selectedGraphId))
             {
                 throw new Error('No active graph to move a node on');
             }
 
             //@todo cmonspqr: This is not proper immutable state
-            const node = state.entities.get(state.selectedGraphId).node(action.node.id);
-            if (isDefined(node)) {
-                node.uiProps.position = { x: action.newPosition.x, y: action.newPosition.y}
-            }
+            const graph = state.entities.get(state.selectedGraphId);
+            graph.removeNode(action.node.id);
+            graph.addNode(action.node);
             return {
                 ...state
             };

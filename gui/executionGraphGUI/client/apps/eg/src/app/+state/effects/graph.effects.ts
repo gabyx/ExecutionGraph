@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Effect, Actions } from '@ngrx/effects';
 
 import { of } from 'rxjs';
-import { map, switchMap, catchError } from 'rxjs/operators';
+import { map, tap, switchMap, catchError } from 'rxjs/operators';
 
 import { LoggerFactory, ILogger } from '@eg/logger';
 
@@ -39,7 +39,10 @@ export class GraphEffects {
     @Effect()
     moveNode$ = this.actions$.ofType<fromGraph.MoveNode>(fromGraph.MOVE_NODE)
     .pipe(
-        map((action, state) => new fromGraph.NodeMoved(action.node, action.newPosition))
+        tap((action) => { action.node.uiProps.position = { x: action.newPosition.x, y: action.newPosition.y }; }),
+        map((action, state) => new fromGraph.NodeUpdated(action.node))
+        //map((action) => ({ ...action.node, uiProps: { position: action.newPosition }})),
+        // map((updatedNode) => new fromGraph.NodeUpdated(updatedNode))
     );
 
     @Effect()

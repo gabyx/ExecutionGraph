@@ -32,29 +32,31 @@ export class Graph {
     return this.connectionsMap.values();
   }
 
+  // @todo cmonspqr: These methods should be removed. This is the responsibility of the reducers
+
   public addNode(n: Node) {
     if (this.nodesMap.has(n.id)) {
-      throw `Node '${n.id}' already in graph!`;
+      throw Error(`Node '${n.id}' already in graph!`);
     }
     this.nodesMap.set(n.id, n);
   }
 
   public removeNode(id: NodeId) {
     if (!this.nodesMap.delete(id)) {
-      throw `Node '${id}' is not in graph!`;
+      throw Error(`Node '${id}' is not in graph!`);
     }
   }
 
   public addConnection(c: Connection) {
     if (this.connectionsMap.has(c.id)) {
-      throw `Node '${c.id.toString()}' already in graph!`;
+      throw new Error(`Node '${c.id.toString()}' already in graph!`);
     }
     this.connectionsMap.set(c.id, c);
   }
 
   public removeConnection(id: ConnectionId) {
     if (!this.connectionsMap.has(id)) {
-      throw `Connection '${id}' not in graph!`;
+      throw new Error(`Connection '${id}' not in graph!`);
     }
     this.connectionsMap.delete(id);
   }

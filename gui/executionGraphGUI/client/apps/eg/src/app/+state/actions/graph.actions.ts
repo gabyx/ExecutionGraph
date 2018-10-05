@@ -16,7 +16,7 @@ export const GRAPHS_LOADED = '[Graph] Loaded';
 export const GRAPHS_LOAD_ERROR = '[Graph] Load Error';
 export const SELECT_GRAPH = '[Graph] Select Graph';
 export const MOVE_NODE = '[Graph] Move Node';
-export const NODE_MOVED = '[Graph] Node Moved';
+export const NODE_UPDATED = '[Graph] Node Updated';
 export const ADD_GRAPH = '[Graph] Add Graph';
 export const GRAPH_ADDED = '[Graph] Graph Added';
 export const REMOVE_GRAPH = '[Graph] Remove Graph';
@@ -56,9 +56,9 @@ export class MoveNode implements Action {
     readonly type = MOVE_NODE;
     constructor(public node: Node, public newPosition: Point) { }
 }
-export class NodeMoved implements Action {
-    readonly type = NODE_MOVED;
-    constructor(public node: Node, public newPosition: Point) { }
+export class NodeUpdated implements Action {
+    readonly type = NODE_UPDATED;
+    constructor(public node: Node) { }
 }
 
 // Actions related to GraphManagementService
@@ -135,7 +135,7 @@ export type GraphAction =
     | RemoveGraph
     | GraphRemoved
     | MoveNode
-    | NodeMoved
+    | NodeUpdated
     | AddNode
     | NodeAdded
     | RemoveNode
