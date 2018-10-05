@@ -11,8 +11,13 @@
 // =========================================================================================
 
 import { Component, OnInit, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 
 import { TestService } from '../../services/TestService';
+import { Graph } from '../../model';
+import { Store } from '@ngrx/store';
+import { GraphsState } from '../../+state/reducers';
+import { getGraphs } from '../../+state/selectors';
 
 @Injectable()
 @Component({
@@ -21,9 +26,14 @@ import { TestService } from '../../services/TestService';
   styleUrls: ['./toolbar.component.scss']
 })
 export class ToolbarComponent implements OnInit {
+
   public testResponse: any;
 
-  constructor(private readonly testService: TestService) {}
+  public graphsMRU: Observable<Graph[]>;
+
+  constructor(private store: Store<GraphsState>, private readonly testService: TestService) {
+    this.graphsMRU = store.select(getGraphs);
+  }
 
   ngOnInit() {}
 

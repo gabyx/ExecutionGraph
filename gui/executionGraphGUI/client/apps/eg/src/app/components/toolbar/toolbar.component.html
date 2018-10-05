@@ -16,9 +16,7 @@
     </mat-menu>
 
     <mat-menu #openRecentMenu="matMenu">
-      <button mat-menu-item>Some file a</button>
-      <button mat-menu-item>Some file b</button>
-      <button mat-menu-item>Some file c</button>
+      <button *ngFor="let graph of graphsMRU | async" mat-menu-item [routerLink]="['graph', graph.id.toString()]">{{ graph.id }}</button>
     </mat-menu>
 
     <mat-menu #executionMenu="matMenu">
