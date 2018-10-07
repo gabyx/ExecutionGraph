@@ -5,6 +5,7 @@ import * as fromRouter from '@ngrx/router-store';
 import { GraphsState, reducer as graphsReducer } from './graph.reducers';
 import { GraphDescriptionsState, reducer as graphDescriptionsReducer } from './graphDescription.reducers';
 import { RouterStateSerializer } from '@ngrx/router-store';
+import { UiState, reducer as uiReducer } from './ui.reducers';
 
 export interface RouterStateUrl {
   url: string;
@@ -58,29 +59,18 @@ export class RouterStateUrlSerializer implements RouterStateSerializer<RouterSta
     }
   }
 
-  private collectRouteSegments(routeState: ActivatedRouteSnapshot, outletName: string = 'primary'): string[] {
-    let segments = [];
-    if(routeState.outlet === outletName) {
-      if(routeState.routeConfig) {
-        segments = [routeState.routeConfig.path];
-      }
-    }
-    for(const childState of routeState.children) {
-      segments = [...segments, ...this.collectRouteSegments(childState, outletName)];
-    }
-    return segments;
-  }
-
 }
 
 export interface AppState {
   routerReducer: fromRouter.RouterReducerState<RouterStateUrl>,
   graphs: GraphsState,
-  graphDescriptions: GraphDescriptionsState
+  graphDescriptions: GraphDescriptionsState,
+  ui: UiState
 }
 
 export const reducers: ActionReducerMap<AppState> = {
   routerReducer: fromRouter.routerReducer,
   graphs: graphsReducer,
-  graphDescriptions: graphDescriptionsReducer
+  graphDescriptions: graphDescriptionsReducer,
+  ui: uiReducer
 }

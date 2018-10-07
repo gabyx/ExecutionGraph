@@ -80,7 +80,10 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
           // Let the graph reducer handle the rest
           return {
             ...state,
-            [state.selectedGraphId.toString()]: graphReducer(graph, action)
+            entities: {
+              ...state.entities,
+              [state.selectedGraphId.toString()]: graphReducer(graph, action)
+            }
           };
         }
       default: {

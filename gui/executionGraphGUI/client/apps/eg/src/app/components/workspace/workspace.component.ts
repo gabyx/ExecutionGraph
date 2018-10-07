@@ -27,11 +27,12 @@ import {
 } from '../../model';
 
 import { ILogger, LoggerFactory } from '@eg/logger';
-import { Point, DragEvent } from '@eg/graph';
+import { Point, DragEvent, ConnectionDrawStyle } from '@eg/graph';
 import { isDefined } from '@eg/common';
 import { GraphsState } from '../../+state/reducers';
 import * as graphActions from '../../+state/actions/graph.actions';
 import * as graphQueries from '../../+state/selectors/graph.selectors'
+import { getConnectionDrawStyle } from '../../+state/selectors/ui.selectors';
 
 @Injectable()
 @Component({
@@ -44,12 +45,22 @@ export class WorkspaceComponent implements OnInit {
 
   public graph: Observable<Graph>;
 
+  public connectionDrawStyle: Observable<ConnectionDrawStyle>;
+
   public get nodes(): Observable<Node[]> {
     return this.graph.pipe(map(graph => graph.nodes), map(nodes => Object.keys(nodes).map(id => nodes[id])));
   }
 
   public get connections(): Observable<Connection[]> {
-    return this.graph.pipe(map(graph => graph.connections), map(connections => Object.keys(connections).map(id => connections[id])));
+    return this.graph.pipe(
+      map(graph => graph.connections),
+      map(connections => Object.keys(connections).map(id => connections[id])),
+      tap(connections => {
+        if(connections.length > 0) {
+          console.log(connections);
+        }
+      })
+    );
   }
 
   public newTargetSocket: InputSocket | OutputSocket = null;
@@ -59,7 +70,7 @@ export class WorkspaceComponent implements OnInit {
   constructor(private store: Store<GraphsState>, loggerFactory: LoggerFactory) {
     this.logger = loggerFactory.create('Workspace');
     this.graph = store.select(graphQueries.getSelectedGraph).pipe( filter(g => isDefined(g) && g!=null));
-
+    this.connectionDrawStyle = store.select(getConnectionDrawStyle);
     // this.graph.subscribe(g => this.logger.debug(`Displaying graph ${g.id}`));
   }
 

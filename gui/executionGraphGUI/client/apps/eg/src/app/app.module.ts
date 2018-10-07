@@ -94,6 +94,7 @@ const routes: Route[] = [
     ],
   },
   { path: 'inspector', component: InspectorComponent, outlet: 'drawer' },
+  { path: 'lines', component: ConnectionStyleOptionsComponent, outlet: 'drawer' },
   { path: 'backend-test', component: BackendTestComponent, outlet: 'drawer' },
   { path: '**', redirectTo: 'graph/new' },
 ];

@@ -26,13 +26,13 @@
         </div>
     </ng-container>
     <ng-container *ngFor="let connection of connections | async">
-        <ngcs-connection [from]="connection.outputSocket.idString" [to]="connection.inputSocket.idString" [drawStyle]="connectionStyleOptions.connectionDrawStyle">
+        <ngcs-connection [from]="connection.outputSocket.idString" [to]="connection.inputSocket.idString" [drawStyle]="connectionDrawStyle | async">
         </ngcs-connection>
     </ng-container>
 
     <ng-container *ngIf="newConnection">
         <ngcs-connection [from]="newConnection.outputSocket.idString" [to]="newConnection.inputSocket.idString"
-            [drawStyle]="connectionStyleOptions.connectionDrawStyle">
+            [drawStyle]="connectionDrawStyle | async">
         </ngcs-connection>
         <div style="position: absolute" [style.left]="newConnectionEndpoint.x+'px'" [style.top]="newConnectionEndpoint.y+'px'">
             <ngcs-port [id]="newTargetSocket.idString" class="right middle"></ngcs-port>
