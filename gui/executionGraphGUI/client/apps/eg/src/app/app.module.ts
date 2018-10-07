@@ -25,7 +25,8 @@ import {
   MatSidenavModule,
   MatCardModule,
   MatGridListModule,
-  MatSnackBarModule
+  MatSnackBarModule,
+  MatTabsModule
 } from '@angular/material';
 import { NxModule } from '@nrwl/nx';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
@@ -123,6 +124,7 @@ const routes: Route[] = [
     MatSnackBarModule,
     MatCardModule,
     MatGridListModule,
+    MatTabsModule,
     GraphModule,
     NxModule.forRoot(),
     RouterModule.forRoot(routes),

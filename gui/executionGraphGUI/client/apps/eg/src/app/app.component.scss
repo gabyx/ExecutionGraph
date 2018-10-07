@@ -4,6 +4,7 @@
   display: flex;
   flex-direction: column;
 }
+
 .mat-drawer-container {
   position: relative;
   background: transparent;
@@ -20,4 +21,8 @@
 
 .sidenav-container {
   height: 100%;
+}
+
+.mat-tab-link {
+  min-width: 0;
 }
