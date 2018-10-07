@@ -2,6 +2,7 @@ import { Id, isDefined } from "@eg/common";
 
 import * as fromActions from '../actions/graph.actions';
 import { Graph } from "../../model";
+import { NodeMap } from "../../model/Graph";
 
 export interface GraphMap {
     [id: string]: Graph
@@ -61,70 +62,88 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
             }
         }
 
-        case fromActions.NODE_UPDATED: {
-            if(!isDefined(state.selectedGraphId))
-            {
-                throw new Error('No active graph to move a node on');
-            }
+        case fromActions.CONNECTION_ADDED:
+        case fromActions.CONNECTION_REMOVED:
+        case fromActions.NODE_ADDED:
+        case fromActions.NODE_REMOVED:
+        {
+          if(!isDefined(state.selectedGraphId))
+          {
+              throw new Error(`No active graph to operate on, ${action.type} cannot be handled`);
+          }
+          const graph = state.entities[state.selectedGraphId.toString()];
+          if(!isDefined(graph))
+          {
+              throw new Error(`No graph with the id ${state.selectedGraphId} exists`);
+          }
 
-            //@todo cmonspqr: This is not proper immutable state
-            const graph = state.entities[state.selectedGraphId.toString()];
-            graph.removeNode(action.node.id);
-            graph.addNode(action.node);
-            return {
-                ...state
-            };
+          // Let the graph reducer handle the rest
+          return {
+            ...state,
+            [state.selectedGraphId.toString()]: graphReducer(graph, action)
+          };
         }
+      default: {
+        return state;
+      }
 
-        case fromActions.NODE_ADDED: {
-            if (!isDefined(state.selectedGraphId)) {
-                throw new Error('No active graph to add a node to');
-            }
-            //@todo cmonspqr: This is not proper immutable state
-            const graph = state.entities[state.selectedGraphId.toString()];
-            graph.addNode(action.node);
-            return {
-                ...state
-            };
-        }
-
-        case fromActions.NODE_REMOVED: {
-            if (!isDefined(state.selectedGraphId)) {
-                throw new Error('No active graph to remove a node from');
-            }
-            //@todo cmonspqr: This is not proper immutable state
-            const graph = state.entities[state.selectedGraphId.toString()];
-            graph.removeNode(action.id);
-            return {
-                ...state
-            };
-        }
-
-        case fromActions.CONNECTION_ADDED: {
-            if (!isDefined(state.selectedGraphId)) {
-                throw new Error('No active graph to add a connection to');
-            }
-            //@todo cmonspqr: This is not proper immutable state
-            const graph = state.entities[state.selectedGraphId.toString()];
-            graph.addConnection(action.connection);
-            return {
-                ...state
-            };
-        }
-
-        case fromActions.CONNECTION_REMOVED: {
-            if (!isDefined(state.selectedGraphId)) {
-                throw new Error('No active graph to remove a connection from');
-            }
-            //@todo cmonspqr: This is not proper immutable state
-            const graph = state.entities[state.selectedGraphId.toString()];
-            graph.removeConnection(action.connectionId);
-            return {
-                ...state
-            };
-        }
-
-        default:
-            return state;
     }
 };
+
+export function graphReducer(graph: Graph, action: fromActions.GraphAction): Graph {
+
+  switch(action.type) {
+
+    case fromActions.NODE_UPDATED: {
+      const { node } = action;
+      return {
+        ...graph,
+        nodes: {
+          ...graph.nodes,
+          [node.id.toString()]: node
+        }
+      }
+    }
+
+    case fromActions.NODE_ADDED: {
+      const { node } = action;
+      return {
+        ...graph,
+        nodes: {
+          ...graph.nodes,
+          [node.id.toString()]: node
+        }
+      }
+    }
+
+    case fromActions.NODE_REMOVED: {
+      // Remove by destructuring to the removed and the rest
+      const {[action.id.toString()]: removed, ...nodes} = graph.nodes;
+      return {
+        ...graph,
+        nodes: nodes
+      }
+    }
+
+    case fromActions.CONNECTION_ADDED: {
+      const { connection } = action;
+      return {
+        ...graph,
+        connections: {
+          ...graph.connections,
+          [connection.id.toString()]: connection
+        }
+      }
+    }
+
+    case fromActions.CONNECTION_REMOVED: {
+        // Remove by destructuring to the removed and the rest
+      const {[action.connectionId.toString()]: removed, ...connections} = graph.connections;
+      return {
+        ...graph,
+        connections: connections
+      }
+    }
+  }
+
+}

@@ -87,13 +87,15 @@ export class GraphEffects {
         const nodeType = graphDesc.nodeTypeDescritptions[0].type;
 
         // Add a graph
-        const graph = await this.graphManagementService.addGraph(graphTypeId);
-
+        let graph = await this.graphManagementService.addGraph(graphTypeId);
+        let nodes = {};
         // Add nodes
         for (let i = 0; i < 3; ++i) {
             const node = await this.graphManipulationService.addNode(graph.id, nodeType, `${nodeType}-${i}`);
-            graph.addNode(node);
+            nodes[node.id.toString()] = node;
         }
+
+        graph = {...graph, nodes: nodes};
 
         return new fromGraph.GraphsLoaded([graph]);
     }

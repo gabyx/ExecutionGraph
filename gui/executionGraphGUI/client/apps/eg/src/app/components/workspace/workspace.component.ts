@@ -44,12 +44,12 @@ export class WorkspaceComponent implements OnInit {
 
   public graph: Observable<Graph>;
 
-  public get nodes() {
-    return this.graph.pipe(map(graph => graph.nodes));
+  public get nodes(): Observable<Node[]> {
+    return this.graph.pipe(map(graph => graph.nodes), map(nodes => Object.keys(nodes).map(id => nodes[id])));
   }
 
-  public get connections() {
-    return this.graph.pipe(map(graph => graph.connections));
+  public get connections(): Observable<Connection[]> {
+    return this.graph.pipe(map(graph => graph.connections), map(connections => Object.keys(connections).map(id => connections[id])));
   }
 
   public newTargetSocket: InputSocket | OutputSocket = null;

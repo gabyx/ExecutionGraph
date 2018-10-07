@@ -1,5 +1,5 @@
 <ngcs-graph id="graph-1">
-    <ng-container *ngFor="let node of (graph | async).nodes">
+    <ng-container *ngFor="let node of nodes | async">
         <div #theNode class="node ngcs-node" [attr.id]="node.idString" [style.left]="node.uiProps.position.x+'px'"
             [style.top]="node.uiProps.position.y+'px'">
             <span class="header" ngcsDraggable [dragElement]="theNode" (dragContinued)="updateNodePosition(node, $event)">
@@ -25,7 +25,7 @@
             </div>
         </div>
     </ng-container>
-    <ng-container *ngFor="let connection of (graph | async).connections">
+    <ng-container *ngFor="let connection of connections | async">
         <ngcs-connection [from]="connection.outputSocket.idString" [to]="connection.inputSocket.idString" [drawStyle]="connectionStyleOptions.connectionDrawStyle">
         </ngcs-connection>
     </ng-container>
