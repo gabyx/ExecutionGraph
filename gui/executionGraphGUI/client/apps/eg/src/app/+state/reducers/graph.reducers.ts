@@ -78,11 +78,13 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
           }
 
           // Let the graph reducer handle the rest
+          const updatedGraph = graphReducer(graph, action);
+          console.log(updatedGraph);
           return {
             ...state,
             entities: {
               ...state.entities,
-              [state.selectedGraphId.toString()]: graphReducer(graph, action)
+              [state.selectedGraphId.toString()]: updatedGraph
             }
           };
         }
@@ -134,14 +136,14 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
         ...graph,
         connections: {
           ...graph.connections,
-          [connection.id.toString()]: connection
+          [connection.idString]: connection
         }
       }
     }
 
     case fromActions.CONNECTION_REMOVED: {
         // Remove by destructuring to the removed and the rest
-      const {[action.connectionId.toString()]: removed, ...connections} = graph.connections;
+      const {[action.connectionId.string]: removed, ...connections} = graph.connections;
       return {
         ...graph,
         connections: connections
