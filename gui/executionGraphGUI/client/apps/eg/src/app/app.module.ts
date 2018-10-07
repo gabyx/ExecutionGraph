@@ -76,7 +76,8 @@ import { environment } from '../environments/environment';
 import { Route, RouterModule } from '@angular/router';
 import { RouterStateSerializer, StoreRouterConnectingModule } from '@ngrx/router-store';
 import { GraphLoadedGuard } from './guards/graphLoaded.guard';
-import { BackendTestComponent } from './components/backend-test/backend-test.component'
+import { BackendTestComponent } from './components/backend-test/backend-test.component';
+import { AddNodeComponent } from './components/add-node/add-node.component'
 
 //environment.production = true;
 
@@ -96,6 +97,7 @@ const routes: Route[] = [
   },
   { path: 'inspector', component: InspectorComponent, outlet: 'drawer' },
   { path: 'lines', component: ConnectionStyleOptionsComponent, outlet: 'drawer' },
+  { path: 'nodes', component: AddNodeComponent, outlet: 'drawer' },
   { path: 'backend-test', component: BackendTestComponent, outlet: 'drawer' },
   { path: '**', redirectTo: 'graph/new' },
 ];
@@ -108,7 +110,8 @@ const routes: Route[] = [
     ConnectionStyleOptionsComponent,
     InspectorComponent,
     GraphCreateComponent,
-    BackendTestComponent
+    BackendTestComponent,
+    AddNodeComponent
   ],
   imports: [
     HttpClientModule,

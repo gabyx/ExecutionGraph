@@ -10,6 +10,10 @@
          routerLinkActive #inspectorActive="routerLinkActive" [active]="inspectorActive.isActive">
         <mat-icon>zoom_in</mat-icon>
       </a>
+      <a mat-tab-link [routerLink]="[{outlets: { drawer: 'nodes'}}]"
+          routerLinkActive #nodesActive="routerLinkActive" [active]="nodesActive.isActive">
+        <mat-icon>library_add</mat-icon>
+      </a>
       <a mat-tab-link [routerLink]="[{outlets: { drawer: 'lines'}}]"
           routerLinkActive #linesActive="routerLinkActive" [active]="linesActive.isActive">
         <mat-icon>timeline</mat-icon>
