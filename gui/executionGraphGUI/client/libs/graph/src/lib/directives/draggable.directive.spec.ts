@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { DraggableDirective } from '@eg/graph/src/directives/draggable.directive';
+import { DraggableDirective } from './draggable.directive';
 import { ElementRef } from '@angular/core';
 
 describe('DraggableDirective', () => {

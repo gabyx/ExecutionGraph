@@ -14,15 +14,11 @@ import {
   Component,
   OnInit,
   ElementRef,
-  ViewChildren,
   QueryList,
   HostListener,
   ContentChildren,
-  ChangeDetectionStrategy,
   ChangeDetectorRef,
-  AfterViewInit,
   NgZone,
-  Input,
   AfterViewChecked
 } from '@angular/core';
 import { PortComponent } from '..//port/port.component';
@@ -87,7 +83,7 @@ export class GraphComponent implements OnInit, AfterViewChecked {
   onMouseDown(event: MouseEvent) {
     event.preventDefault();
 
-    let draggable: DraggableDirective = event.target['draggableElement'];
+    const draggable: DraggableDirective = event.target['draggableElement'];
 
     if (draggable) {
       this.dragging = draggable;
@@ -189,9 +185,9 @@ export class GraphComponent implements OnInit, AfterViewChecked {
   public getPortPosition(id: string) {
     const port = this.getPort(id);
     if (port) {
-      let element: HTMLElement = port.element.nativeElement;
+      const element: HTMLElement = port.element.nativeElement;
 
-      let position = this.getRelativePosition(element);
+      const position = this.getRelativePosition(element);
       position.x += element.offsetWidth / 2;
       position.y += element.offsetHeight / 2;
       return position;

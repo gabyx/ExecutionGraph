@@ -16,12 +16,12 @@ import { tap, map, switchMap, takeUntil } from 'rxjs/operators';
 
 import { Point } from '../model/Point';
 
-export type DragMouseEvent = {
+export interface DragMouseEvent {
   elementPosition: Point;
   mousePosition: Point;
 };
 
-export type DragEvent = {
+export interface DragEvent {
   dragElementPosition: Point;
   mousePosition: Point;
   mouseToElementOffset: Point;
@@ -57,7 +57,7 @@ export class DraggableDirective {
     return this._nativeElement;
   }
 
-  constructor(private element: ElementRef) {
+  constructor(element: ElementRef) {
     //Hack for faster access to the component from events
     this.dragElement = element.nativeElement;
 
@@ -107,7 +107,7 @@ export class DraggableDirective {
 
   private calculateDragEvent(startEvent: DragMouseEvent, currentEvent: DragMouseEvent): DragEvent {
     const clientRect = this.nativeElement.getBoundingClientRect();
-    let scale = clientRect.width / this.nativeElement.offsetWidth;
+    const scale = clientRect.width / this.nativeElement.offsetWidth;
     const result = {
       dragElementPosition: {
         x: startEvent.elementPosition.x + (currentEvent.mousePosition.x - startEvent.mousePosition.x) / scale,
