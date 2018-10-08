@@ -14,10 +14,12 @@ import { TestBed, async, getTestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import { ExecutionServiceBinaryHttp } from './ExecutionServiceBinaryHttp';
+import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 
 describe('ExecutionServiceBinaryHttp', () => {
   let injector: TestBed;
   let service: ExecutionServiceBinaryHttp;
+  let binaryHttpService: BinaryHttpRouterService;
   let httpMock: HttpTestingController;
 
   // Create a new service and mock before each test case
@@ -27,6 +29,8 @@ describe('ExecutionServiceBinaryHttp', () => {
       providers: [ExecutionServiceBinaryHttp]
     });
     injector = getTestBed();
+
+    binaryHttpService = injector.get(BinaryHttpRouterService);
     service = injector.get(ExecutionServiceBinaryHttp);
     httpMock = injector.get(HttpTestingController);
   });
@@ -43,9 +47,9 @@ describe('ExecutionServiceBinaryHttp', () => {
       expect().nothing();
     });
 
-    const req = httpMock.expectOne(`${service.baseUrl}/execution`);
+    const req = httpMock.expectOne(`${binaryHttpService.baseUrl}/execution`);
     expect(req.request.method).toBe('POST');
-    expect(req.request.headers.get('Content-Type')).toBe(service.binaryMimeType);
+    expect(req.request.headers.get('Content-Type')).toBe(binaryHttpService.binaryMimeType);
 
     req.flush(responseData);
   }));
