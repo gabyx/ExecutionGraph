@@ -22,7 +22,6 @@ import { Node, NodeId } from '../model';
 @Injectable()
 export class GraphManipulationServiceDummy extends GraphManipulationService {
   private logger: ILogger;
-  private nodeId: number = 0;
 
   constructor(
     loggerFactory: LoggerFactory,
@@ -34,14 +33,16 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
   }
 
   public async addNode(graphId: Id, type: string, name: string): Promise<Node> {
-    let response = this.backend.createAddNodeResponse(type, name);
+    const response = this.backend.createAddNodeResponse(type, name);
 
-    let node = response.node();
-    this.logger.info(`Added new node [type: '${node.type()}']
-                  with name: '${node.name()}' [ins: ${node.inputSocketsLength()},
-                  outs: ${node.outputSocketsLength()}`);
+    const node = response.node();
+    if (this.verboseResponseLog) {
+      this.logger.info(`Added new node [type: '${node.type()}']
+                    with name: '${node.name()}' [ins: ${node.inputSocketsLength()},
+                    outs: ${node.outputSocketsLength()}`);
+    }
 
-    let nodeModel = toNode(node);
+    const nodeModel = toNode(node);
     if (this.verboseResponseLog) {
       this.logger.info(`Node: '${stringify(nodeModel)}'`);
     }

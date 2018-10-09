@@ -60,7 +60,7 @@ export abstract class Socket {
     public readonly type: Long,
     public readonly name: string,
     public readonly index: SocketIndex,
-    protected _parent: Node = undefined
+    protected _parent?: Node
   ) {}
 
   public get parent(): Node {
@@ -68,7 +68,7 @@ export abstract class Socket {
   }
   public set parent(parent: Node) {
     if (isDefined(this.parent) || !isDefined(parent)) {
-      throw 'You cannot assign a new parent or undefined!';
+      throw new Error('You cannot assign a new parent or undefined!');
     }
     this._parent = parent;
     // Assign a new unique id to the socket, for debugging purposes
@@ -135,7 +135,7 @@ export function isOutputSocket(socket: InputSocket | OutputSocket): socket is Ou
  * @param {Node} [parent=undefined]
  * @returns
  */
-export function createSocket(kind: SocketType, type: Long, name: string, index: SocketIndex, parent: Node = undefined) {
+export function createSocket(kind: SocketType, type: Long, name: string, index: SocketIndex, parent?: Node) {
   switch (kind) {
     case 'input':
       return new InputSocket(type, name, index, parent);

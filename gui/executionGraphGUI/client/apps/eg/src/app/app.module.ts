@@ -130,7 +130,7 @@ const routes: Route[] = [
     MatTabsModule,
     GraphModule,
     NxModule.forRoot(),
-    RouterModule.forRoot(routes),
+    RouterModule.forRoot(routes, { enableTracing: true}),
     StoreRouterConnectingModule.forRoot({}),
     StoreModule.forRoot(
       reducers,

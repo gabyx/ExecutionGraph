@@ -21,6 +21,10 @@
         <mat-icon>zoom_in</mat-icon>
         <span>Inspector</span>
       </button>
+      <button mat-menu-item [routerLink]="[{ outlets: { drawer: ['nodes'] } }]">
+        <mat-icon>library_add</mat-icon>
+        <span>Add nodes</span>
+      </button>
       <button mat-menu-item [routerLink]="[{ outlets: { drawer: ['lines'] } }]">
         <mat-icon>timeline</mat-icon>
         <span>Line Style</span>

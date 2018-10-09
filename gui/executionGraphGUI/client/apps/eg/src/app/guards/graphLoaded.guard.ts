@@ -4,9 +4,10 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
+import { isDefined } from '@eg/common';
+
 import { GraphsState } from '../+state/reducers';
-import { getSelectedGraphId, getSelectedGraph } from '../+state/selectors';
-import { isDefined } from '@eg/common/src';
+import { getSelectedGraph } from '../+state/selectors';
 
 @Injectable()
 export class GraphLoadedGuard implements CanActivate {

@@ -116,6 +116,7 @@ export class GraphEffects {
             pipe(map(r => r.payload.routerState),
                  filter(r => r && arraysEqual(r.primaryRouteSegments, segments)),
                  withLatestFrom(this.store),
+                 //tap(([r, state]) => console.log(`Handling navigation`)))
                  switchMap(([r, state]) => callback(r, state)),
                  catchError(error => {
                     this.log.error(`Failed to navigate`, error);

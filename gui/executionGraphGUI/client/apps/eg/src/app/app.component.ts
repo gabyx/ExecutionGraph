@@ -42,17 +42,22 @@ export class AppComponent implements OnInit {
     this.graphStore.dispatch(new actions.LoadGraphDescriptions());
     this.graphStore.dispatch(new actions.LoadGraphs());
 
-    // this.store
-    //   .select(graphQueries.getGraphs)
-    //   .pipe(filter(graphs => graphs.length > 0))
-    //   .subscribe(graphs => {
-    //     this.log.debug(`Loaded graphs, auto-selecting first`);
-    //     if (graphs.length === 0) {
-    //       this.log.error(`Cannot select, since no graphs loaded!`);
-    //     } else {
-    //       this.store.dispatch(new actions.OpenGraph(graphs[0].id));
-    //     }
-    //   });
+    this.store
+      .select(graphQueries.getGraphs)
+      .pipe(filter(graphs => graphs.length > 0))
+      .subscribe(graphs => {
+        this.log.debug(`Loaded graphs, auto-selecting first`);
+        if (graphs.length === 0) {
+          this.log.error(`Cannot select, since no graphs loaded!`);
+        } else {
+          this.router.navigate([{
+            outlets: {
+              primary: ['graph', graphs[0].id.toString()],
+              drawer: ['nodes']
+            }
+          }]);
+        }
+      });
   }
 
   drawerClosed() {

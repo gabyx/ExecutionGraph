@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable, combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, filter } from 'rxjs/operators';
 
 import { GraphsState } from '../../+state/reducers';
 import { GraphDescriptionsState } from '../../+state/reducers/graphDescription.reducers';
 import { NodeTypeDescription } from '../../model';
 import { getGraphDescriptionEntities, getSelectedGraph } from '../../+state/selectors';
+import { isDefined } from '@angular/compiler/src/util';
 
 @Component({
   selector: 'eg-add-node',
@@ -18,13 +19,14 @@ export class AddNodeComponent implements OnInit {
   public nodeTypes: Observable<NodeTypeDescription[]>;
 
   constructor(
-    private graphStore: Store<GraphsState>,
-    private graphDescriptionStore: Store<GraphDescriptionsState>) {
+    graphStore: Store<GraphsState>,
+    graphDescriptionStore: Store<GraphDescriptionsState>) {
 
       this.nodeTypes = combineLatest(
         graphDescriptionStore.select(getGraphDescriptionEntities),
         graphStore.select(getSelectedGraph)
       ).pipe(
+        filter(([descriptions, graph]) => isDefined(graph)),
         map(([descriptions, graph]) => descriptions[graph.typeId.toString()]),
         map(graphType => graphType.nodeTypeDescritptions)
       );
