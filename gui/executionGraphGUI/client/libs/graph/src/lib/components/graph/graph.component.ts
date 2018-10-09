@@ -82,6 +82,9 @@ export class GraphComponent implements OnInit, AfterViewChecked {
     } else {
       this.zoomFactor /= 0.95;
     }
+    // this.pan.x /= this.zoomFactor;
+    // this.pan.y /= this.zoomFactor;
+    // console.log(`[WorkspaceComponent] Zoomed by ${this.zoomFactor} to ${this.pan.x}:${this.pan.y}`);
     this.cdr.detectChanges();
   }
 
@@ -159,15 +162,15 @@ export class GraphComponent implements OnInit, AfterViewChecked {
   public onPan(p: DragEvent) {
     this.pan.x = p.mousePosition.x + this.panStart.x;
     this.pan.y = p.mousePosition.y + this.panStart.y;
-    // console.log(`[WorkspaceComponent] Panning ${this.pan.x}:${this.pan.y}`);
+    console.log(`[WorkspaceComponent] Panned to ${this.pan.x}:${this.pan.y}`);
   }
 
   public convertMouseToGraphPosition(mousePoint: Point, offset?: Point) {
     const graphPosition = this.getGraphPosition();
     offset = offset ? offset : {x: 0, y: 0};
     return {
-      x: mousePoint.x - graphPosition.x - offset.x,
-      y: mousePoint.y - graphPosition.y - offset.y
+      x: (mousePoint.x - graphPosition.x - offset.x) / this.zoomFactor - this.pan.x,
+      y: (mousePoint.y - graphPosition.y - offset.y) / this.zoomFactor - this.pan.y
     };
   }
 

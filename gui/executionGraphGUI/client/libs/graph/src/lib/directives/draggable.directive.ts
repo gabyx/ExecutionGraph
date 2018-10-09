@@ -111,12 +111,12 @@ export class DraggableDirective {
     event.preventDefault();
     event.cancelBubble = true;
     const clientRect = this.nativeElement.getBoundingClientRect();
-    const scale = clientRect.width / this.nativeElement.offsetWidth;
+    //const scale = clientRect.width / this.nativeElement.offsetWidth;
 
     const dragEvent = {
       mouseToElementOffset: {
-        x: (event.clientX - clientRect.left) / scale,
-        y: (event.clientY - clientRect.top) / scale
+        x: (event.clientX - clientRect.left),
+        y: (event.clientY - clientRect.top)
       },
       mousePosition: { x: event.clientX, y: event.clientY }
     };
