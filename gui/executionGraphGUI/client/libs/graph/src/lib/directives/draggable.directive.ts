@@ -17,14 +17,21 @@ import { tap, map, switchMap, takeUntil } from 'rxjs/operators';
 import { Point } from '../model/Point';
 import { DragAndDropService } from '@eg/graph/src/lib/services/DragAndDropServices';
 
+export enum MouseButton {
+  Left = 0,
+  Right = 2
+}
+
 export interface DragMouseEvent {
   mouseToElementOffset?: Point;
   mousePosition: Point;
+  mouseButton: MouseButton;
 };
 
 export interface DragEvent {
   mousePosition: Point;
   mouseToElementOffset: Point;
+  mouseButton: MouseButton;
 };
 
 @Directive({
@@ -119,7 +126,8 @@ export class DraggableDirective {
         x: (event.clientX - clientRect.left),
         y: (event.clientY - clientRect.top)
       },
-      mousePosition: { x: event.clientX, y: event.clientY }
+      mousePosition: { x: event.clientX, y: event.clientY },
+      mouseButton: event.button
     };
 
     this.isTracking = true;
@@ -140,7 +148,8 @@ export class DraggableDirective {
       event.preventDefault();
       event.cancelBubble = true;
       const dragEvent = {
-        mousePosition: { x: event.clientX, y: event.clientY }
+        mousePosition: { x: event.clientX, y: event.clientY },
+        mouseButton: event.button
       };
       this.mouseReleased.emit(dragEvent);
     }
@@ -159,7 +168,8 @@ export class DraggableDirective {
       event.cancelBubble = true;
 
       const dragEvent = {
-        mousePosition: { x: event.clientX, y: event.clientY }
+        mousePosition: { x: event.clientX, y: event.clientY },
+        mouseButton: event.button
       };
       this.mouseMoved.emit(dragEvent);
     }
@@ -168,7 +178,8 @@ export class DraggableDirective {
   private calculateDragEvent(startEvent: DragMouseEvent, currentEvent: DragMouseEvent): DragEvent {
     const result = {
       mouseToElementOffset: startEvent.mouseToElementOffset,
-      mousePosition: currentEvent.mousePosition
+      mousePosition: currentEvent.mousePosition,
+      mouseButton: currentEvent.mouseButton
     };
     return result;
   }

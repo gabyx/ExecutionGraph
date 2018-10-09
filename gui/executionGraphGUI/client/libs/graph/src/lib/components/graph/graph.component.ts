@@ -22,7 +22,7 @@ import {
   AfterViewChecked
 } from '@angular/core';
 import { PortComponent } from '..//port/port.component';
-import { DraggableDirective, DragEvent } from '../../directives/draggable.directive';
+import { DraggableDirective, DragEvent, MouseButton } from '../../directives/draggable.directive';
 import { ConnectionComponent } from '../connection/connection.component';
 import { Point } from '../../model/Point';
 import { DroppableDirective } from '../../directives/droppable.directive';
@@ -55,9 +55,13 @@ export class GraphComponent implements OnInit, AfterViewChecked {
 
   public zoomFactor: number = 1;
 
+  public get isPanning(): boolean {
+    return this.panStart!==null;
+  }
+
   public pan: Point = { x: 0, y: 0 };
 
-  private panStart: Point;
+  private panStart: Point = null;
 
   constructor(private element: ElementRef, private cdr: ChangeDetectorRef, private zone: NgZone) {}
 
@@ -143,6 +147,23 @@ export class GraphComponent implements OnInit, AfterViewChecked {
     }
     return this.ports.find(p => p.id === id);
   }
+
+  public onStartDrag(p: DragEvent) {
+    if(p.mouseButton === MouseButton.Right) {
+    }
+    this.onStartPan(p);
+  }
+
+  public onDrag(p: DragEvent) {
+    if(p.mouseButton === MouseButton.Right) {
+    }
+    this.onPan(p);
+  }
+
+  public onEndDrag(p: DragEvent) {
+    this.panStart = null;
+  }
+
 
   /**
    * Handles the start event of the panning (mouse down)

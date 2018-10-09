@@ -5,6 +5,10 @@
   overflow: visible;
   position: relative;
 
+  .ngcs-graph.panning {
+    cursor: move;
+  }
+
   .container {
     position: absolute;
     // display: block;
@@ -25,6 +29,20 @@
   }
   ::ng-deep svg {
     z-index: 100;
-    pointer-events: none;
+    //pointer-events: none;
   }
+
+  ::ng-deep .ngcs-connection {
+    z-index: 200;
+    fill: none;
+    stroke: white;
+    stroke-width: 2;
+  }
+
+  ::ng-deep .ngcs-connection:hover {
+    cursor: pointer;
+    stroke: red;
+  }
+
+
 }
