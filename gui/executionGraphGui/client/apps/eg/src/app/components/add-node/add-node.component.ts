@@ -12,7 +12,7 @@ import { isDefined } from '@angular/compiler/src/util';
 @Component({
   selector: 'eg-add-node',
   templateUrl: './add-node.component.html',
-  styleUrls: ['./add-node.component.css']
+  styleUrls: ['./add-node.component.scss']
 })
 export class AddNodeComponent implements OnInit {
 

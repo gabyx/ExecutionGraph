@@ -12,7 +12,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { filter, tap } from 'rxjs/operators';
+import { filter, tap, take } from 'rxjs/operators';
 
 import { LoggerFactory, ILogger } from '@eg/logger';
 import * as actions from './+state/actions';
@@ -44,20 +44,26 @@ export class AppComponent implements OnInit {
 
     this.store
       .select(graphQueries.getGraphs)
-      .pipe(filter(graphs => graphs.length > 0))
-      .subscribe(graphs => {
-        this.log.debug(`Loaded graphs, auto-selecting first`);
-        if (graphs.length === 0) {
-          this.log.error(`Cannot select, since no graphs loaded!`);
-        } else {
-          this.router.navigate([{
-            outlets: {
-              primary: ['graph', graphs[0].id.toString()],
-              drawer: ['nodes']
-            }
-          }]);
-        }
-      });
+      .pipe(
+        filter(graphs => graphs.length > 0),
+        tap(graphs => {
+          this.log.debug(`Loaded graphs, auto-selecting first`);
+          if (graphs.length === 0) {
+            this.log.error(`Cannot select, since no graphs loaded!`);
+          } else {
+            this.router.navigate([{
+              outlets: {
+                primary: ['graph', graphs[0].id.toString()],
+                drawer: ['nodes']
+              }
+            }]);
+
+            this.graphStore.dispatch(new actions.ShowNotification(`To help you debug I created a dummy graph for you \u{1F64C}`, 7000));
+          }
+        }),
+        take(1)
+      )
+      .subscribe(graphs => {});
   }
 
   drawerClosed() {

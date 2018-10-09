@@ -26,7 +26,8 @@ import {
   MatCardModule,
   MatGridListModule,
   MatSnackBarModule,
-  MatTabsModule
+  MatTabsModule,
+  MatListModule
 } from '@angular/material';
 import { NxModule } from '@nrwl/nx';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
@@ -117,17 +118,18 @@ const routes: Route[] = [
     HttpClientModule,
     BrowserModule,
     BrowserAnimationsModule,
-    MatIconModule,
-    MatToolbarModule,
-    MatMenuModule,
     MatButtonModule,
     MatButtonToggleModule,
     MatCheckboxModule,
-    MatSidenavModule,
-    MatSnackBarModule,
     MatCardModule,
     MatGridListModule,
+    MatIconModule,
+    MatListModule,
+    MatMenuModule,
+    MatSidenavModule,
+    MatSnackBarModule,
     MatTabsModule,
+    MatToolbarModule,
     GraphModule,
     NxModule.forRoot(),
     RouterModule.forRoot(routes, { enableTracing: true}),
