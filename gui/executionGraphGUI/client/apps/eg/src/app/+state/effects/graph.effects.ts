@@ -69,9 +69,11 @@ export class GraphEffects {
     @Effect()
     createNode$ = this.actions$.ofType<fromGraph.CreateNode>(fromGraph.CREATE_NODE)
         .pipe(
-            switchMap((action, state) => from(this.graphManipulationService.addNode(action.graphId, action.nodeType.name, "Some new node"))),
-            switchMap(node => [
+            switchMap((action, state) => from(this.graphManipulationService.addNode(action.graphId, action.nodeType.name, "Some new node"))
+                .pipe(map(node => ({node, action})))),
+            switchMap(({ node, action }) => [
                 new fromGraph.NodeAdded(node),
+                new fromGraph.MoveNode(node, action.position ? action.position : {x:0, y:0 }),
                 new fromNotifications.ShowNotification(`Added the node ${node.name} for you \u{1F6EB}`)
             ])
         );

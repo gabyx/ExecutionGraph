@@ -90,7 +90,7 @@ export class GraphRemoved implements Action {
 // -------------------------------------------
 export class CreateNode implements Action {
     readonly type = CREATE_NODE;
-    constructor(public nodeType: NodeTypeDescription, public graphId: Id) { }
+    constructor(public nodeType: NodeTypeDescription, public graphId: Id, public position?: Point) { }
 }
 
 export class NodeAdded implements Action {

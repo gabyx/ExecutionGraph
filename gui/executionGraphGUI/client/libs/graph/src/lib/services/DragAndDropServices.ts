@@ -1,5 +1,5 @@
 import { DroppableDirective } from "../directives/droppable.directive";
-import { DraggableDirective } from "@eg/graph/src/lib/directives/draggable.directive";
+import { DraggableDirective, DragEvent } from "../directives/draggable.directive";
 
 export class DragAndDropService {
     private readonly droppables: DroppableDirective[] = [];
@@ -22,7 +22,7 @@ export class DragAndDropService {
         this.droppables.forEach(droppable => droppable.startTracking(draggable));
     }
 
-    public stopTracking() {
-        this.droppables.forEach(droppable => droppable.stopTracking());
+    public stopTracking(dragEvent: DragEvent) {
+        this.droppables.forEach(droppable => droppable.stopTracking(dragEvent));
     }
 }

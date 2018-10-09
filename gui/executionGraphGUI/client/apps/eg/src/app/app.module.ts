@@ -132,7 +132,7 @@ const routes: Route[] = [
     MatToolbarModule,
     GraphModule,
     NxModule.forRoot(),
-    RouterModule.forRoot(routes, { enableTracing: true}),
+    RouterModule.forRoot(routes, { enableTracing: false}),
     StoreRouterConnectingModule.forRoot({}),
     StoreModule.forRoot(
       reducers,

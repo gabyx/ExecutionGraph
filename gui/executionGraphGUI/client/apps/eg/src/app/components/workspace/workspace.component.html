@@ -2,7 +2,7 @@
     #graph
     *ngIf="graph | async as syncGraph"
     [ngcsDroppable]="isNodeType"
-    (draggableDropped)="createNode($event, syncGraph)">
+    (draggableDropped)="createNode($event.data, syncGraph, graph.convertMouseToGraphPosition($event.event.mousePosition))">
 
     <!-- All the nodes of the graph-->
     <ng-container *ngFor="let node of nodes | async">
@@ -28,7 +28,7 @@
                         (dragContinued)="movingConnection(graph.convertMouseToGraphPosition($event.mousePosition))"
                         (dragEnded)="abortConnection()"
                         [ngcsDroppable]="isOutputSocket"
-                        (draggableDropped)="addConnection(socket, $event)">
+                        (draggableDropped)="addConnection(socket, $event.data)">
                         {{ socket.name }}
                         <ngcs-port [id]="socket.idString" class="left middle"></ngcs-port>
                     </span>
@@ -42,7 +42,7 @@
                         (dragContinued)="movingConnection(graph.convertMouseToGraphPosition($event.mousePosition))"
                         (dragEnded)="abortConnection()"
                         [ngcsDroppable]="isInputSocket"
-                        (draggableDropped)="addConnection($event, socket)">
+                        (draggableDropped)="addConnection($event.data, socket)">
                         {{ socket.name }}
                         <ngcs-port [id]="socket.idString" class="right middle"></ngcs-port>
                     </span>

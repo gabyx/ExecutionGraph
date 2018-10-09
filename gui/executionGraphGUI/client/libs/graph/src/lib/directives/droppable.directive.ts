@@ -1,6 +1,6 @@
 import { Directive, EventEmitter, Output, ElementRef, Renderer2, Input, OnInit, OnDestroy } from '@angular/core';
-import { DraggableDirective } from './draggable.directive';
-import { DragAndDropService } from '@eg/graph/src/lib/services/DragAndDropServices';
+import { DraggableDirective, DragEvent } from './draggable.directive';
+import { DragAndDropService } from '../services/DragAndDropServices';
 
 @Directive({
   selector: '[ngcsDroppable]'
@@ -11,7 +11,7 @@ export class DroppableDirective implements OnInit, OnDestroy {
   @Output()
   draggableLeft = new EventEmitter<any>();
   @Output()
-  draggableDropped = new EventEmitter<any>();
+  draggableDropped = new EventEmitter<{event: DragEvent, data: any}>();
 
   @Input('ngcsDroppable')
   dropAcceptanceFilter: (data: any) => boolean;
@@ -48,14 +48,14 @@ export class DroppableDirective implements OnInit, OnDestroy {
     this.element.nativeElement.addEventListener('mouseleave', this.onMouseLeaveRegistration);
   }
 
-  stopTracking() {
+  stopTracking(dragEvent: DragEvent) {
     this.element.nativeElement.removeEventListener('mouseenter', this.onMouseEnterRegistration);
     this.element.nativeElement.removeEventListener('mouseleave', this.onMouseLeaveRegistration);
     this.clearClasses();
 
     if (this.isActive) {
       if (this.isAccepted) {
-        this.draggableDropped.emit(this.draggable.data);
+        this.draggableDropped.emit({event: dragEvent, data: this.draggable.data});
       }
       this.isActive = false;
     }

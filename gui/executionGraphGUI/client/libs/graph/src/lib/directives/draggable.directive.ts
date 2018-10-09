@@ -87,6 +87,7 @@ export class DraggableDirective {
             takeUntil(
               this.mouseReleased.pipe(
                 map(dragEndEvent => this.calculateDragEvent(dragStartEvent, dragEndEvent)),
+                tap(dragEndEvent => this.dragAndDropService.stopTracking(dragEndEvent)),
                 // tap(p => console.log(`Ended at ${p.dragElementPosition.x}:${p.dragElementPosition.y}`)),
                 tap(p => this.dragEnded.emit(p))
               )
@@ -138,7 +139,6 @@ export class DraggableDirective {
 
       event.preventDefault();
       event.cancelBubble = true;
-      this.dragAndDropService.stopTracking();
       const dragEvent = {
         mousePosition: { x: event.clientX, y: event.clientY }
       };

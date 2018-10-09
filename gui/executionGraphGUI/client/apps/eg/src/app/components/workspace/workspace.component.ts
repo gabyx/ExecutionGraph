@@ -104,8 +104,8 @@ export class WorkspaceComponent implements OnInit {
     this.store.dispatch(new graphActions.AddConnection(source, target));
   }
 
-  public createNode(nodeType: NodeTypeDescription, graph: Graph) {
-    this.store.dispatch(new graphActions.CreateNode(nodeType, graph.id))
+  public createNode(nodeType: NodeTypeDescription, graph: Graph, position?: Point) {
+    this.store.dispatch(new graphActions.CreateNode(nodeType, graph.id, position))
   }
 
   public isOutputSocket(socket: InputSocket | OutputSocket): socket is OutputSocket {
