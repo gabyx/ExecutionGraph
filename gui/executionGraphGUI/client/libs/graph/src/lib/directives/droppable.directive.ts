@@ -1,10 +1,11 @@
-import { Directive, EventEmitter, Output, ElementRef, Renderer2, Input } from '@angular/core';
+import { Directive, EventEmitter, Output, ElementRef, Renderer2, Input, OnInit, OnDestroy } from '@angular/core';
 import { DraggableDirective } from './draggable.directive';
+import { DragAndDropService } from '@eg/graph/src/lib/services/DragAndDropServices';
 
 @Directive({
   selector: '[ngcsDroppable]'
 })
-export class DroppableDirective {
+export class DroppableDirective implements OnInit, OnDestroy {
   @Output()
   draggableEntered = new EventEmitter<any>();
   @Output()
@@ -28,9 +29,17 @@ export class DroppableDirective {
   private onMouseEnterRegistration: any;
   private onMouseLeaveRegistration: any;
 
-  constructor(public element: ElementRef, private renderer: Renderer2) {
+  constructor(public element: ElementRef, private renderer: Renderer2, private dragAndDropService: DragAndDropService) {
     this.onMouseEnterRegistration = this.onMouseEnter.bind(this);
     this.onMouseLeaveRegistration = this.onMouseLeave.bind(this);
+  }
+
+  ngOnInit() {
+    this.dragAndDropService.registerDroppable(this);
+  }
+
+  ngOnDestroy() {
+    this.dragAndDropService.deregisterDroppable(this);
   }
 
   startTracking(draggable: DraggableDirective) {

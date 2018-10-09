@@ -13,7 +13,6 @@ export interface GraphsState {
 
     loaded: boolean; // Has the AppState been loaded
     error?: any; // Last none error (if any)
-    // @todo cmonspqr: Move this to the router
     selectedGraphId?: Id; // Which Graph has been selected
 }
 
@@ -79,7 +78,6 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
 
           // Let the graph reducer handle the rest
           const updatedGraph = graphReducer(graph, action);
-          console.log(updatedGraph);
           return {
             ...state,
             entities: {

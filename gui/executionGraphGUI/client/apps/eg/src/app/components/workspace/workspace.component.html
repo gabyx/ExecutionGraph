@@ -1,13 +1,13 @@
-<ngcs-graph id="graph-1">
+<ngcs-graph id="graph-1" #graph>
     <ng-container *ngFor="let node of nodes | async">
         <div #theNode class="node ngcs-node" [attr.id]="node.idString" [style.left]="node.uiProps.position.x+'px'"
             [style.top]="node.uiProps.position.y+'px'">
-            <span class="header" ngcsDraggable [dragElement]="theNode" (dragContinued)="updateNodePosition(node, $event)">
+            <span class="header" ngcsDraggable [dragElement]="theNode" [positionRelativeTo]="graph.element" (dragContinued)="updateNodePosition(node, $event)">
                 {{ node.name }}
             </span>
             <div class="sockets">
                 <div class="inputs">
-                    <span class="socket" *ngFor="let socket of node.inputs" [ngcsDraggable]="socket" (dragStarted)="initConnectionFrom(socket, $event)"
+                    <span class="socket" *ngFor="let socket of node.inputs" [ngcsDraggable]="socket" [positionRelativeTo]="graph.element" (dragStarted)="initConnectionFrom(socket, $event)"
                         (dragContinued)="movingConnection($event)" (dragEnded)="abortConnection()" [ngcsDroppable]="isOutputSocket"
                         (draggableDropped)="addConnection(socket, $event)">
                         {{ socket.name }}
@@ -15,7 +15,7 @@
                     </span>
                 </div>
                 <div class="outputs">
-                    <span class="socket" *ngFor="let socket of node.outputs" [ngcsDraggable]="socket" (dragStarted)="initConnectionFrom(socket, $event)"
+                    <span class="socket" *ngFor="let socket of node.outputs" [ngcsDraggable]="socket" [positionRelativeTo]="graph.element" (dragStarted)="initConnectionFrom(socket, $event)"
                         (dragContinued)="movingConnection($event)" (dragEnded)="abortConnection()" [ngcsDroppable]="isInputSocket"
                         (draggableDropped)="addConnection($event, socket)">
                         {{ socket.name }}

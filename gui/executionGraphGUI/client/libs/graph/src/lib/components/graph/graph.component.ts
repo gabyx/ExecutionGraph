@@ -26,6 +26,7 @@ import { DraggableDirective, DragEvent } from '../../directives/draggable.direct
 import { ConnectionComponent } from '../connection/connection.component';
 import { Point } from '../../model/Point';
 import { DroppableDirective } from '../../directives/droppable.directive';
+import { PositionService } from '@eg/graph/src/lib/services/PositionService';
 
 @Component({
   selector: 'ngcs-graph',
@@ -38,9 +39,6 @@ export class GraphComponent implements OnInit, AfterViewChecked {
 
   @ContentChildren(ConnectionComponent, { descendants: true })
   connections: QueryList<ConnectionComponent>;
-
-  @ContentChildren(DroppableDirective, { descendants: true })
-  droppables: QueryList<DroppableDirective>;
 
   public get transformSvg() {
     return `translate(${this.pan.x} ${this.pan.y})`;
@@ -61,78 +59,15 @@ export class GraphComponent implements OnInit, AfterViewChecked {
 
   private panStart: Point;
 
-  private dragging: DraggableDirective = null;
-
   constructor(private element: ElementRef, private cdr: ChangeDetectorRef, private zone: NgZone) {}
 
   ngOnInit() {
-    this.zone.runOutsideAngular(() => {
-      window.document.addEventListener('mousemove', this.onMouseMove.bind(this));
-    });
   }
 
   ngAfterViewChecked() {
     this.cdr.detectChanges();
   }
 
-  /**
-   * Handles mouse button down events for drag starts
-   * @param event
-   */
-  @HostListener('mousedown', ['$event'])
-  onMouseDown(event: MouseEvent) {
-    event.preventDefault();
-
-    const draggable: DraggableDirective = event.target['draggableElement'];
-
-    if (draggable) {
-      this.dragging = draggable;
-
-      this.droppables.forEach(d => d.startTracking(this.dragging));
-
-      event.preventDefault();
-      event.cancelBubble = true;
-      this.dragging.onMouseDown({
-        elementPosition: this.getRelativePosition(this.dragging.nativeElement),
-        mousePosition: { x: event.clientX, y: event.clientY }
-      });
-    }
-  }
-
-  /**
-   * Handles Mouse Button releases for drag ends
-   * @param event Mouse Event
-   */
-  @HostListener('document:mouseup', ['$event'])
-  onMouseUp(event: MouseEvent) {
-    event.preventDefault();
-    if (this.dragging) {
-      event.cancelBubble = true;
-      this.droppables.forEach(d => d.stopTracking());
-      this.dragging.onMouseUp({
-        elementPosition: this.getRelativePosition(this.dragging.nativeElement),
-        mousePosition: { x: event.clientX, y: event.clientY }
-      });
-      this.dragging = null;
-    }
-  }
-
-  /**
-   * Handles mouse movement for dragging
-   * @param event Mouse move event
-   */
-  onMouseMove(event: MouseEvent) {
-    if (this.dragging) {
-      event.preventDefault();
-      event.cancelBubble = true;
-      this.zone.run(() =>
-        this.dragging.onMouseMove({
-          elementPosition: this.getRelativePosition(this.dragging.nativeElement),
-          mousePosition: { x: event.clientX, y: event.clientY }
-        })
-      );
-    }
-  }
 
   /**
    * Handles scrolling for scaling
@@ -228,18 +163,6 @@ export class GraphComponent implements OnInit, AfterViewChecked {
   }
 
   private getRelativePosition(element: HTMLElement): Point {
-    let offsetLeft = element.offsetLeft; //+ element.offsetWidth / 2;
-    let offsetTop = element.offsetTop; // + element.offsetHeight / 2;
-
-    while (element.offsetParent && element.offsetParent !== this.element.nativeElement) {
-      element = element.offsetParent as HTMLElement;
-      offsetLeft += element.offsetLeft;
-      offsetTop += element.offsetTop;
-    }
-
-    return {
-      x: offsetLeft,
-      y: offsetTop
-    };
+    return PositionService.getPositionRelativeToParent(element, this.element.nativeElement);
   }
 }

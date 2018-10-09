@@ -10,11 +10,13 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Directive, ElementRef, HostListener, EventEmitter, Output, Input } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, Output, Input, HostListener, } from '@angular/core';
 
 import { tap, map, switchMap, takeUntil } from 'rxjs/operators';
 
 import { Point } from '../model/Point';
+import { DragAndDropService } from '@eg/graph/src/lib/services/DragAndDropServices';
+import { PositionService } from '@eg/graph/src/lib/services/PositionService';
 
 export interface DragMouseEvent {
   elementPosition: Point;
@@ -44,8 +46,10 @@ export class DraggableDirective {
   @Input()
   set dragElement(value: HTMLElement) {
     this._nativeElement = value;
-    this._nativeElement['draggableElement'] = this;
   }
+
+  @Input()
+  positionRelativeTo: ElementRef;
 
   private readonly mousePressed = new EventEmitter<DragMouseEvent>();
   private readonly mouseMoved = new EventEmitter<DragMouseEvent>();
@@ -53,28 +57,33 @@ export class DraggableDirective {
 
   private _nativeElement: HTMLElement;
 
+  private isTracking: boolean = false;
+
+  private readonly onMouseMoveRegistration = this.onMouseMove.bind(this);
+  private readonly onMouseUpRegistration = this.onMouseUp.bind(this);
+
   public get nativeElement(): HTMLElement {
     return this._nativeElement;
   }
 
-  constructor(element: ElementRef) {
-    //Hack for faster access to the component from events
+  constructor(element: ElementRef, private dragAndDropService: DragAndDropService) {
+    // //Hack for faster access to the component from events
     this.dragElement = element.nativeElement;
 
     this.mousePressed
       .pipe(
-        tap(dragStartEvent =>
-          console.log(
-            `Started at Element: ${dragStartEvent.elementPosition.x}:${dragStartEvent.elementPosition.y}, Mouse: ${
-              dragStartEvent.mousePosition.x
-            }:${dragStartEvent.mousePosition.y}`
-          )
-        ),
+        // tap(dragStartEvent =>
+        //   console.log(
+        //     `Started at Element: ${dragStartEvent.elementPosition.x}:${dragStartEvent.elementPosition.y}, Mouse: ${
+        //       dragStartEvent.mousePosition.x
+        //     }:${dragStartEvent.mousePosition.y}`
+        //   )
+          // ),
         tap(dragStartEvent => this.dragStarted.emit(this.calculateDragEvent(dragStartEvent, dragStartEvent))),
         switchMap(dragStartEvent =>
           this.mouseMoved.pipe(
             map(dragMoveEvent => this.calculateDragEvent(dragStartEvent, dragMoveEvent)),
-            // .do(e => console.log(`Now at ${e.dragElementPosition.x}:${e.dragElementPosition.y}`))
+            // tap(e => console.log(`Now at ${e.dragElementPosition.x}:${e.dragElementPosition.y}`)),
             tap(point => {
               // this.nativeElement.style.left = `${point.x}px`;
               // this.nativeElement.style.top  = `${point.y}px`;
@@ -83,7 +92,7 @@ export class DraggableDirective {
             takeUntil(
               this.mouseReleased.pipe(
                 map(dragEndEvent => this.calculateDragEvent(dragStartEvent, dragEndEvent)),
-                // .do(p => console.log(`Ended at ${p.x}:${p.y}`))
+                // tap(p => console.log(`Ended at ${p.dragElementPosition.x}:${p.dragElementPosition.y}`)),
                 tap(p => this.dragEnded.emit(p))
               )
             )
@@ -91,18 +100,70 @@ export class DraggableDirective {
         )
       )
       .subscribe(() => void 0);
+
   }
 
-  onMouseDown(event: DragMouseEvent) {
-    this.mousePressed.emit(event);
+  /**
+   * Handles mouse button down events for drag starts
+   * @param event
+   */
+  @HostListener('mousedown', ['$event'])
+  onMouseDown(event: MouseEvent) {
+
+    document.addEventListener('mouseup', this.onMouseUpRegistration);
+    document.addEventListener('mousemove', this.onMouseMoveRegistration);
+
+    event.preventDefault();
+    event.cancelBubble = true;
+    const dragEvent = {
+      elementPosition: this.getRelativeElementPosition(),
+      mousePosition: { x: event.clientX, y: event.clientY }
+    };
+
+    this.isTracking = true;
+
+    this.dragAndDropService.startTracking(this);
+    this.mousePressed.emit(dragEvent);
   }
 
-  onMouseUp(event: DragMouseEvent) {
-    this.mouseReleased.emit(event);
+  /**
+   * Handles Mouse Button releases for drag ends
+   * @param event Mouse Event
+   */
+  onMouseUp(event: MouseEvent) {
+
+    if (this.isTracking) {
+      this.isTracking = false;
+
+      event.preventDefault();
+      event.cancelBubble = true;
+      this.dragAndDropService.stopTracking();
+      const dragEvent = {
+        elementPosition: this.getRelativeElementPosition(),
+        mousePosition: { x: event.clientX, y: event.clientY }
+      };
+      this.mouseReleased.emit(dragEvent);
+    }
+
+    document.removeEventListener('mouseup', this.onMouseUpRegistration);
+    document.removeEventListener('mousemove', this.onMouseMoveRegistration);
   }
 
-  onMouseMove(event: DragMouseEvent) {
-    this.mouseMoved.emit(event);
+  /**
+   * Handles mouse movement for dragging
+   * @param event Mouse move event
+   */
+  onMouseMove(event: MouseEvent) {
+    if (this.isTracking) {
+      event.preventDefault();
+      event.cancelBubble = true;
+
+      const dragEvent = {
+        elementPosition: this.getRelativeElementPosition(),
+        mousePosition: { x: event.clientX, y: event.clientY }
+      };
+      this.mouseMoved.emit(dragEvent);
+    }
   }
 
   private calculateDragEvent(startEvent: DragMouseEvent, currentEvent: DragMouseEvent): DragEvent {
@@ -120,5 +181,9 @@ export class DraggableDirective {
       mousePosition: currentEvent.mousePosition
     };
     return result;
+  }
+
+  private getRelativeElementPosition() {
+    return PositionService.getPositionRelativeToParent(this._nativeElement, this.positionRelativeTo ? this.positionRelativeTo.nativeElement : null);
   }
 }

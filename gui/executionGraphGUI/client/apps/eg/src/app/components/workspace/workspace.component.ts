@@ -54,12 +54,7 @@ export class WorkspaceComponent implements OnInit {
   public get connections(): Observable<Connection[]> {
     return this.graph.pipe(
       map(graph => graph.connections),
-      map(connections => Object.keys(connections).map(id => connections[id])),
-      tap(connections => {
-        if(connections.length > 0) {
-          console.log(connections);
-        }
-      })
+      map(connections => Object.keys(connections).map(id => connections[id]))
     );
   }
 
