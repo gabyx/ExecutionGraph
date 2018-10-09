@@ -57,6 +57,13 @@
       overflow: hidden;
     }
   }
+
+  &.dropping-allowed {
+    background: green;
+  }
+  &.dropping-forbidden {
+    background: red;
+  }
 }
 :host {
   background-color: #444;

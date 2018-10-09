@@ -1,4 +1,4 @@
-<ngcs-graph id="graph-1" #graph>
+<ngcs-graph *ngIf="graph | async as syncGraph" id="graph-1" #graph [ngcsDroppable]="isNodeType" (draggableDropped)="createNode($event, syncGraph)">
     <ng-container *ngFor="let node of nodes | async">
         <div #theNode class="node ngcs-node" [attr.id]="node.idString" [style.left]="node.uiProps.position.x+'px'"
             [style.top]="node.uiProps.position.y+'px'">

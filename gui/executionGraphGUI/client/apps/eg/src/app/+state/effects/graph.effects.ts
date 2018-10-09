@@ -67,6 +67,15 @@ export class GraphEffects {
         );
 
     @Effect()
+    createNode$ = this.actions$.ofType<fromGraph.CreateNode>(fromGraph.CREATE_NODE)
+        .pipe(
+            switchMap((action, state) => from(this.graphManipulationService.addNode(action.graphId, action.nodeType.name, "Some new node"))),
+            switchMap(node => [
+                new fromGraph.NodeAdded(node),
+                new fromNotifications.ShowNotification(`Added the node ${node.name} for you \u{1F6EB}`)
+            ])
+        );
+    @Effect()
     moveNode$ = this.actions$.ofType<fromGraph.MoveNode>(fromGraph.MOVE_NODE)
     .pipe(
         tap((action) => { action.node.uiProps.position = { x: action.newPosition.x, y: action.newPosition.y }; }),
@@ -88,7 +97,7 @@ export class GraphEffects {
 
         // Add a graph
         let graph = await this.graphManagementService.addGraph(graphTypeId);
-        let nodes = {};
+        const nodes = {};
         // Add nodes
         for (let i = 0; i < 3; ++i) {
             const node = await this.graphManipulationService.addNode(graph.id, nodeType, `${nodeType}-${i}`);

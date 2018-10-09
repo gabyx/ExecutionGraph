@@ -8,7 +8,8 @@ import {
     InputSocket,
     NodeId,
     ConnectionId,
-    GraphTypeDescription
+    GraphTypeDescription,
+    NodeTypeDescription
 } from '../../model';
 import { Point } from '@eg/graph';
 
@@ -20,11 +21,10 @@ export const CREATE_GRAPH = '[Graph] Create';
 
 export const MOVE_NODE = '[Graph] Move Node';
 export const NODE_UPDATED = '[Graph] Node Updated';
-export const ADD_GRAPH = '[Graph] Add Graph';
 export const GRAPH_ADDED = '[Graph] Graph Added';
 export const REMOVE_GRAPH = '[Graph] Remove Graph';
 export const GRAPH_REMOVED = '[Graph] Graph Removed';
-export const ADD_NODE = '[Graph] Add Node';
+export const CREATE_NODE = '[Graph] Create Node';
 export const NODE_ADDED = '[Graph] Node Added';
 export const REMOVE_NODE = '[Graph] Remove Node';
 export const NODE_REMOVED = '[Graph] Node Removed';
@@ -71,13 +71,6 @@ export class CreateGraph implements Action {
     constructor(public graphType: GraphTypeDescription) { }
 }
 
-
-// @todo cmonspqr: I don't think so. We normally create an empty graph, than add stuff to it
-export class AddGraph implements Action {
-    readonly type = ADD_GRAPH;
-    constructor(public graph: Graph) { }
-}
-
 export class GraphAdded implements Action {
     readonly type = GRAPH_ADDED;
     constructor(public graph: Graph) { }
@@ -95,9 +88,9 @@ export class GraphRemoved implements Action {
 
 // Actions related to GraphManipulationService
 // -------------------------------------------
-export class AddNode implements Action {
-    readonly type = ADD_NODE;
-    constructor(public node: Node) { }
+export class CreateNode implements Action {
+    readonly type = CREATE_NODE;
+    constructor(public nodeType: NodeTypeDescription, public graphId: Id) { }
 }
 
 export class NodeAdded implements Action {
@@ -141,13 +134,12 @@ export type GraphAction =
     | GraphLoadError
     | OpenGraph
     | CreateGraph
-    | AddGraph
     | GraphAdded
     | RemoveGraph
     | GraphRemoved
     | MoveNode
     | NodeUpdated
-    | AddNode
+    | CreateNode
     | NodeAdded
     | RemoveNode
     | NodeRemoved

@@ -23,7 +23,8 @@ import {
   InputSocket,
   OutputSocket,
   createConnection,
-  isOutputSocket
+  isOutputSocket,
+  NodeTypeDescription
 } from '../../model';
 
 import { ILogger, LoggerFactory } from '@eg/logger';
@@ -103,11 +104,20 @@ export class WorkspaceComponent implements OnInit {
     this.store.dispatch(new graphActions.AddConnection(source, target));
   }
 
+  public createNode(nodeType: NodeTypeDescription, graph: Graph) {
+    this.store.dispatch(new graphActions.CreateNode(nodeType, graph.id))
+  }
+
   public isOutputSocket(socket: InputSocket | OutputSocket): socket is OutputSocket {
     return isOutputSocket(socket);
   }
 
   public isInputSocket(socket: InputSocket | OutputSocket): socket is InputSocket {
     return !isOutputSocket(socket);
+  }
+
+  public isNodeType(nodeType: NodeTypeDescription): boolean {
+    console.log("is node type?", nodeType);
+    return isDefined(nodeType.type) && isDefined(nodeType.type);
   }
 }

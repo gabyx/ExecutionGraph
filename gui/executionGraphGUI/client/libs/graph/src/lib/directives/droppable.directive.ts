@@ -63,6 +63,7 @@ export class DroppableDirective implements OnInit, OnDestroy {
   }
 
   onMouseEnter(event: MouseEvent) {
+    console.log("Entering droppable");
     this.isActive = true;
     this.renderer.addClass(this.element.nativeElement, this.droppingClass);
     if (this.dropAcceptanceFilter) {
