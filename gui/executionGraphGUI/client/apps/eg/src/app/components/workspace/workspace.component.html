@@ -2,21 +2,21 @@
     <ng-container *ngFor="let node of nodes | async">
         <div #theNode class="node ngcs-node" [attr.id]="node.idString" [style.left]="node.uiProps.position.x+'px'"
             [style.top]="node.uiProps.position.y+'px'">
-            <span class="header" ngcsDraggable [dragElement]="theNode" [positionRelativeTo]="graph.element" (dragContinued)="updateNodePosition(node, $event)">
+            <span class="header" ngcsDraggable [dragElement]="theNode" (dragContinued)="updateNodePosition(node, graph.convertMouseToGraphPosition($event.mousePosition, $event.mouseToElementOffset))">
                 {{ node.name }}
             </span>
             <div class="sockets">
                 <div class="inputs">
-                    <span class="socket" *ngFor="let socket of node.inputs" [ngcsDraggable]="socket" [positionRelativeTo]="graph.element" (dragStarted)="initConnectionFrom(socket, $event)"
-                        (dragContinued)="movingConnection($event)" (dragEnded)="abortConnection()" [ngcsDroppable]="isOutputSocket"
+                    <span class="socket" *ngFor="let socket of node.inputs" [ngcsDraggable]="socket" (dragStarted)="initConnectionFrom(socket, graph.convertMouseToGraphPosition($event.mousePosition))"
+                        (dragContinued)="movingConnection(graph.convertMouseToGraphPosition($event.mousePosition))" (dragEnded)="abortConnection()" [ngcsDroppable]="isOutputSocket"
                         (draggableDropped)="addConnection(socket, $event)">
                         {{ socket.name }}
                         <ngcs-port [id]="socket.idString" class="left middle"></ngcs-port>
                     </span>
                 </div>
                 <div class="outputs">
-                    <span class="socket" *ngFor="let socket of node.outputs" [ngcsDraggable]="socket" [positionRelativeTo]="graph.element" (dragStarted)="initConnectionFrom(socket, $event)"
-                        (dragContinued)="movingConnection($event)" (dragEnded)="abortConnection()" [ngcsDroppable]="isInputSocket"
+                    <span class="socket" *ngFor="let socket of node.outputs" [ngcsDraggable]="socket" (dragStarted)="initConnectionFrom(socket, graph.convertMouseToGraphPosition($event.mousePosition))"
+                        (dragContinued)="movingConnection(graph.convertMouseToGraphPosition($event.mousePosition))" (dragEnded)="abortConnection()" [ngcsDroppable]="isInputSocket"
                         (draggableDropped)="addConnection($event, socket)">
                         {{ socket.name }}
                         <ngcs-port [id]="socket.idString" class="right middle"></ngcs-port>

@@ -16,15 +16,13 @@ import { tap, map, switchMap, takeUntil } from 'rxjs/operators';
 
 import { Point } from '../model/Point';
 import { DragAndDropService } from '@eg/graph/src/lib/services/DragAndDropServices';
-import { PositionService } from '@eg/graph/src/lib/services/PositionService';
 
 export interface DragMouseEvent {
-  elementPosition: Point;
+  mouseToElementOffset?: Point;
   mousePosition: Point;
 };
 
 export interface DragEvent {
-  dragElementPosition: Point;
   mousePosition: Point;
   mouseToElementOffset: Point;
 };
@@ -47,9 +45,6 @@ export class DraggableDirective {
   set dragElement(value: HTMLElement) {
     this._nativeElement = value;
   }
-
-  @Input()
-  positionRelativeTo: ElementRef;
 
   private readonly mousePressed = new EventEmitter<DragMouseEvent>();
   private readonly mouseMoved = new EventEmitter<DragMouseEvent>();
@@ -83,7 +78,7 @@ export class DraggableDirective {
         switchMap(dragStartEvent =>
           this.mouseMoved.pipe(
             map(dragMoveEvent => this.calculateDragEvent(dragStartEvent, dragMoveEvent)),
-            // tap(e => console.log(`Now at ${e.dragElementPosition.x}:${e.dragElementPosition.y}`)),
+            // tap(e => console.log(`Now at ${e.mousePosition.x}:${e.mousePosition.y} ${e.mouseToElementOffset.x}:${e.mousePosition.y}`)),
             tap(point => {
               // this.nativeElement.style.left = `${point.x}px`;
               // this.nativeElement.style.top  = `${point.y}px`;
@@ -115,8 +110,14 @@ export class DraggableDirective {
 
     event.preventDefault();
     event.cancelBubble = true;
+    const clientRect = this.nativeElement.getBoundingClientRect();
+    const scale = clientRect.width / this.nativeElement.offsetWidth;
+
     const dragEvent = {
-      elementPosition: this.getRelativeElementPosition(),
+      mouseToElementOffset: {
+        x: (event.clientX - clientRect.left) / scale,
+        y: (event.clientY - clientRect.top) / scale
+      },
       mousePosition: { x: event.clientX, y: event.clientY }
     };
 
@@ -139,7 +140,6 @@ export class DraggableDirective {
       event.cancelBubble = true;
       this.dragAndDropService.stopTracking();
       const dragEvent = {
-        elementPosition: this.getRelativeElementPosition(),
         mousePosition: { x: event.clientX, y: event.clientY }
       };
       this.mouseReleased.emit(dragEvent);
@@ -159,7 +159,6 @@ export class DraggableDirective {
       event.cancelBubble = true;
 
       const dragEvent = {
-        elementPosition: this.getRelativeElementPosition(),
         mousePosition: { x: event.clientX, y: event.clientY }
       };
       this.mouseMoved.emit(dragEvent);
@@ -167,23 +166,10 @@ export class DraggableDirective {
   }
 
   private calculateDragEvent(startEvent: DragMouseEvent, currentEvent: DragMouseEvent): DragEvent {
-    const clientRect = this.nativeElement.getBoundingClientRect();
-    const scale = clientRect.width / this.nativeElement.offsetWidth;
     const result = {
-      dragElementPosition: {
-        x: startEvent.elementPosition.x + (currentEvent.mousePosition.x - startEvent.mousePosition.x) / scale,
-        y: startEvent.elementPosition.y + (currentEvent.mousePosition.y - startEvent.mousePosition.y) / scale
-      },
-      mouseToElementOffset: {
-        x: (startEvent.mousePosition.x - clientRect.left) / scale,
-        y: (startEvent.mousePosition.y - clientRect.top) / scale
-      },
+      mouseToElementOffset: startEvent.mouseToElementOffset,
       mousePosition: currentEvent.mousePosition
     };
     return result;
-  }
-
-  private getRelativeElementPosition() {
-    return PositionService.getPositionRelativeToParent(this._nativeElement, this.positionRelativeTo ? this.positionRelativeTo.nativeElement : null);
   }
 }

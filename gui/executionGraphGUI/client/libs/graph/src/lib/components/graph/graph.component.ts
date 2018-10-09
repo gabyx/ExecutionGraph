@@ -147,8 +147,8 @@ export class GraphComponent implements OnInit, AfterViewChecked {
    */
   public onStartPan(p: DragEvent) {
     this.panStart = {
-      x: this.pan.x - p.dragElementPosition.x,
-      y: this.pan.y - p.dragElementPosition.y
+      x: this.pan.x - p.mousePosition.x,
+      y: this.pan.y - p.mousePosition.y
     };
   }
 
@@ -157,9 +157,22 @@ export class GraphComponent implements OnInit, AfterViewChecked {
    * @param p Current position
    */
   public onPan(p: DragEvent) {
-    this.pan.x = p.dragElementPosition.x + this.panStart.x;
-    this.pan.y = p.dragElementPosition.y + this.panStart.y;
+    this.pan.x = p.mousePosition.x + this.panStart.x;
+    this.pan.y = p.mousePosition.y + this.panStart.y;
     // console.log(`[WorkspaceComponent] Panning ${this.pan.x}:${this.pan.y}`);
+  }
+
+  public convertMouseToGraphPosition(mousePoint: Point, offset?: Point) {
+    const graphPosition = this.getGraphPosition();
+    offset = offset ? offset : {x: 0, y: 0};
+    return {
+      x: mousePoint.x - graphPosition.x - offset.x,
+      y: mousePoint.y - graphPosition.y - offset.y
+    };
+  }
+
+  public getGraphPosition(): Point {
+    return PositionService.getPositionRelativeToParent(this.element.nativeElement, document.body);
   }
 
   private getRelativePosition(element: HTMLElement): Point {

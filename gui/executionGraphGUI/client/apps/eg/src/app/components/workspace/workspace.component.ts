@@ -71,12 +71,12 @@ export class WorkspaceComponent implements OnInit {
 
   ngOnInit() {}
 
-  public updateNodePosition(node: Node, event: DragEvent) {
+  public updateNodePosition(node: Node, graphPosition: Point) {
     // this.logger.info(`[WorkspaceComponent] Updating node position to ${position.x}:${position.y}`);
-    this.store.dispatch(new graphActions.MoveNode(node, { x: event.dragElementPosition.x, y: event.dragElementPosition.y }));
+    this.store.dispatch(new graphActions.MoveNode(node, graphPosition));
   }
 
-  public initConnectionFrom(socket: OutputSocket | InputSocket, event: DragEvent) {
+  public initConnectionFrom(socket: OutputSocket | InputSocket, position: Point) {
     this.logger.info(`[WorkspaceComponent] Initiating new connection from ${socket.idString}`);
     if (isOutputSocket(socket)) {
       this.newTargetSocket = new InputSocket(socket.type, socket.name, new SocketIndex(0));
@@ -86,17 +86,11 @@ export class WorkspaceComponent implements OnInit {
     // Create the connection
     this.newConnection = createConnection(socket, this.newTargetSocket);
 
-    this.newConnectionEndpoint = {
-      x: event.dragElementPosition.x + event.mouseToElementOffset.x,
-      y: event.dragElementPosition.y + event.mouseToElementOffset.y
-    };
+    this.newConnectionEndpoint = position;
   }
 
-  public movingConnection(event: DragEvent) {
-    this.newConnectionEndpoint = {
-      x: event.dragElementPosition.x + event.mouseToElementOffset.x,
-      y: event.dragElementPosition.y + event.mouseToElementOffset.y
-    };
+  public movingConnection(graphPosition: Point) {
+    this.newConnectionEndpoint = graphPosition;
     //this.logger.debug(`Setting position to ${this.newConnectionEndpoint.x}:${this.newConnectionEndpoint.y}`);
   }
 
