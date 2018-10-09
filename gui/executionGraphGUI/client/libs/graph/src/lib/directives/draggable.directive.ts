@@ -78,7 +78,7 @@ export class DraggableDirective {
         switchMap(dragStartEvent =>
           this.mouseMoved.pipe(
             map(dragMoveEvent => this.calculateDragEvent(dragStartEvent, dragMoveEvent)),
-            tap(e => console.log(`Now at ${e.mousePosition.x}:${e.mousePosition.y} ${e.mouseToElementOffset.x}:${e.mousePosition.y}`)),
+            // tap(e => console.log(`Now at ${e.mousePosition.x}:${e.mousePosition.y} ${e.mouseToElementOffset.x}:${e.mousePosition.y}`)),
             tap(point => {
               // this.nativeElement.style.left = `${point.x}px`;
               // this.nativeElement.style.top  = `${point.y}px`;

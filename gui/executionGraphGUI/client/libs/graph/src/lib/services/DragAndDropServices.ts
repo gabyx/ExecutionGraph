@@ -15,7 +15,7 @@ export class DragAndDropService {
         if(this.droppables.indexOf(droppable) < 0) {
             throw new Error(`Droppable cannot be deregistered because it is not registered`);
         }
-        this.droppables.splice(this.droppables.indexOf(droppable));
+        this.droppables.splice(this.droppables.indexOf(droppable), 1);
     }
 
     public startTracking(draggable: DraggableDirective) {
