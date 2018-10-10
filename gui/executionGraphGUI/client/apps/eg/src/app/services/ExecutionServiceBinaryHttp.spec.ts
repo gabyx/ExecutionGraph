@@ -15,6 +15,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import { ExecutionServiceBinaryHttp } from './ExecutionServiceBinaryHttp';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
+import { LoggerFactory, SimpleConsoleLoggerFactory } from '@eg/logger';
 
 describe('ExecutionServiceBinaryHttp', () => {
   let injector: TestBed;
@@ -26,7 +27,10 @@ describe('ExecutionServiceBinaryHttp', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [ExecutionServiceBinaryHttp]
+      providers: [
+        ExecutionServiceBinaryHttp,
+        BinaryHttpRouterService,
+        { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory }]
     });
     injector = getTestBed();
 
@@ -47,7 +51,7 @@ describe('ExecutionServiceBinaryHttp', () => {
       expect().nothing();
     });
 
-    const req = httpMock.expectOne(`${binaryHttpService.baseUrl}/execution`);
+    const req = httpMock.expectOne(`${binaryHttpService.baseUrl}/graph/execute`);
     expect(req.request.method).toBe('POST');
     expect(req.request.headers.get('Content-Type')).toBe(binaryHttpService.binaryMimeType);
 

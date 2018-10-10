@@ -2,7 +2,6 @@ import { Id, isDefined } from "@eg/common";
 
 import * as fromActions from '../actions/graph.actions';
 import { Graph } from "../../model";
-import { NodeMap } from "../../model/Graph";
 
 export interface GraphMap {
     [id: string]: Graph
@@ -141,7 +140,7 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
 
     case fromActions.CONNECTION_REMOVED: {
         // Remove by destructuring to the removed and the rest
-      const {[action.connectionId.string]: removed, ...connections} = graph.connections;
+      const {[action.connectionId.idString]: removed, ...connections} = graph.connections;
       return {
         ...graph,
         connections: connections

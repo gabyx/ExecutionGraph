@@ -19,17 +19,16 @@ import { OutputSocket, InputSocket, SocketId, isInputSocket, isOutputSocket } fr
  * @class ConnectionId
  */
 export class ConnectionId {
-  private readonly _idString: string;
-  constructor(public outSocketId: SocketId, public inSocketId: SocketId, public isWriteLink: boolean) {
-    this._idString = `${outSocketId.string}-to-${inSocketId.string}`;
+
+  public static FromSockets(outSocketId: SocketId, inSocketId: SocketId): ConnectionId {
+    return new ConnectionId(`${outSocketId.string}-to-${inSocketId.string}`);
+  }
+
+  constructor(public readonly idString) {
   }
 
   public equal(id: ConnectionId) {
-    return this.string == id.string;
-  }
-
-  public get string() {
-    return this._idString;
+    return this.idString === id.idString;
   }
 }
 
@@ -42,8 +41,8 @@ export class ConnectionId {
 export class Connection {
   public readonly id: ConnectionId;
 
-  constructor(public outputSocket: OutputSocket, public inputSocket: InputSocket, isWriteLink: boolean = true) {
-    this.id = new ConnectionId(outputSocket.id, inputSocket.id, isWriteLink);
+  constructor(public outputSocket: OutputSocket, public inputSocket: InputSocket, public isWriteLink: boolean = true) {
+    this.id = ConnectionId.FromSockets(outputSocket.id, inputSocket.id);
   }
 
   /**
@@ -53,7 +52,7 @@ export class Connection {
    * @memberof Connection
    */
   public get idString(): string {
-    return this.id.string;
+    return this.id.idString;
   }
 }
 

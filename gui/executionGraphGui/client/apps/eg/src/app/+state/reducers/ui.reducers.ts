@@ -1,23 +1,78 @@
 import { ConnectionDrawStyleName } from "../../components/connection-style-options/connection-style-options.component";
-import { UiAction, UiActions } from "../actions/ui.actions";
+import * as fromUiActions from "../actions/ui.actions";
+import { NodeId, ConnectionId } from "../../model";
 
 export interface UiState {
-  connectionDrawStyle: ConnectionDrawStyleName
+  connectionDrawStyle: ConnectionDrawStyleName,
+  selection: {
+    nodes: NodeId[],
+    connections: ConnectionId[]
+  }
 }
 
 export const initalState: UiState = {
-  connectionDrawStyle: 'bezier'
+  connectionDrawStyle: 'bezier',
+  selection: {
+    nodes: [],
+    connections: []
+  }
 };
 
-export function reducer(state: UiState = initalState, action: UiAction): UiState {
+export function reducer(state: UiState = initalState, action: fromUiActions.UiAction): UiState {
 
   switch(action.type) {
 
-    case UiActions.SET_CONNECTION_DRAW_STYLE: {
-      state = {...state, connectionDrawStyle: action.drawStyle};
+    case fromUiActions.SET_CONNECTION_DRAW_STYLE: {
+      return {
+        ...state,
+        connectionDrawStyle: action.drawStyle
+      };
+    }
+
+    case fromUiActions.SET_SELECTION: {
+      return {
+        ...state,
+        selection: {
+          nodes: [...action.nodes],
+          connections: [...action.connections]
+        }
+      }
+    }
+
+    case fromUiActions.ADD_SELECTION: {
+      return {
+        ...state,
+        selection: {
+          nodes: [...state.selection.nodes, ...action.nodes],
+          connections: [...state.selection.connections, ...action.connections]
+        }
+      }
+    }
+
+    case fromUiActions.REMOVE_SELECTION: {
+      const nodes = state.selection.nodes.filter(nodeId => action.nodes.indexOf(nodeId) < 0);
+      const connections = state.selection.connections.filter(connectionId => action.connections.indexOf(connectionId) < 0);
+
+      return {
+        ...state,
+        selection: {
+          nodes: [...nodes],
+          connections: [...connections]
+        }
+      }
+    }
+
+    case fromUiActions.CLEAR_SELECTION: {
+      return {
+        ...state,
+        selection: {
+          nodes: [],
+          connections: []
+        }
+      }
     }
 
     default:
-      return {...state};
+      return state;
   }
 }
