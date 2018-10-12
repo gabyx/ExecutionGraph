@@ -1,4 +1,5 @@
-import { Point } from "@eg/graph";
+import { Point, GraphComponent, IElementEvents } from "@eg/graph";
+import { Input } from "@angular/core";
 
 export interface GraphMouseEvent {
     /**
@@ -20,8 +21,7 @@ export interface GraphMouseEvent {
 
 export abstract class ToolComponent {
 
+    @Input() graph: GraphComponent;
 
-    public activate() {}
-
-    public deactivate() {}
+    @Input() nodeEvents: IElementEvents<Node>;
 }

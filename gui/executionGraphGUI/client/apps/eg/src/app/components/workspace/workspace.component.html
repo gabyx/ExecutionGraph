@@ -1,3 +1,4 @@
+<eg-selection-tool [graph]="graph" [nodeEvents]="nodeEvents"></eg-selection-tool>
 <ngcs-graph id="graph-1"
     #graph
     *ngIf="graph | async as syncGraph"
@@ -9,7 +10,9 @@
 
         <div #nodeElement class="node ngcs-node" [attr.id]="node.idString"
             [style.left]="node.uiProps.position.x+'px'"
-            [style.top]="node.uiProps.position.y+'px'">
+            [style.top]="node.uiProps.position.y+'px'"
+            [ngcsEventSource]="node" [forwardTo]="nodeEvents"
+            >
 
             <span class="header"
                 ngcsDraggable

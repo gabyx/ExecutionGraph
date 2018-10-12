@@ -17,12 +17,13 @@ import { PortComponent } from './components/port/port.component';
 import { ConnectionComponent } from './components/connection/connection.component';
 import { DraggableDirective } from './directives/draggable.directive';
 import { DroppableDirective } from './directives/droppable.directive';
-import { DragAndDropService } from '@eg/graph/src/lib/services/DragAndDropServices';
+import { DragAndDropService } from '@eg/graph/src/lib/services/drag-and-drop.service';
+import { ElementEventSourceDirective } from './directives/element-event-source.directive';
 
 @NgModule({
   imports: [CommonModule],
-  declarations: [GraphComponent, PortComponent, ConnectionComponent, DraggableDirective, DroppableDirective],
-  exports: [GraphComponent, PortComponent, ConnectionComponent, DraggableDirective, DroppableDirective],
+  declarations: [GraphComponent, PortComponent, ConnectionComponent, DraggableDirective, DroppableDirective, ElementEventSourceDirective],
+  exports: [GraphComponent, PortComponent, ConnectionComponent, DraggableDirective, DroppableDirective, ElementEventSourceDirective],
   providers: [DragAndDropService]
 })
 export class GraphModule {}

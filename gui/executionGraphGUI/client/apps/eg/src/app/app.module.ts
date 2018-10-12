@@ -79,6 +79,7 @@ import { RouterStateSerializer, StoreRouterConnectingModule } from '@ngrx/router
 import { GraphLoadedGuard } from './guards/graphLoaded.guard';
 import { BackendTestComponent } from './components/backend-test/backend-test.component';
 import { AddNodeComponent } from './components/add-node/add-node.component'
+import { SelectionToolComponent } from './components/tools/selection-tool.component';
 
 //environment.production = true;
 
@@ -112,7 +113,8 @@ const routes: Route[] = [
     InspectorComponent,
     GraphCreateComponent,
     BackendTestComponent,
-    AddNodeComponent
+    AddNodeComponent,
+    SelectionToolComponent
   ],
   imports: [
     HttpClientModule,

@@ -15,7 +15,7 @@ import { Directive, ElementRef, EventEmitter, Output, Input, HostListener, } fro
 import { tap, map, switchMap, takeUntil } from 'rxjs/operators';
 
 import { Point } from '../model/Point';
-import { DragAndDropService } from '@eg/graph/src/lib/services/DragAndDropServices';
+import { DragAndDropService } from '../services/drag-and-drop.service';
 
 export enum MouseButton {
   Left = 0,

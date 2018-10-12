@@ -1,6 +1,6 @@
 import { Directive, EventEmitter, Output, ElementRef, Renderer2, Input, OnInit, OnDestroy } from '@angular/core';
 import { DraggableDirective, DragEvent } from './draggable.directive';
-import { DragAndDropService } from '../services/DragAndDropServices';
+import { DragAndDropService } from '../services/drag-and-drop.service';
 
 @Directive({
   selector: '[ngcsDroppable]'

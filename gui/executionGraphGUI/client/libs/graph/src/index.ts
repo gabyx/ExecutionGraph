@@ -18,3 +18,4 @@ export { ConnectionDrawStyle } from './lib/model/ConnectionDrawStyle';
 export { BezierConnectionDrawStyle } from './lib/model/BezierConnectionDrawStyle';
 export { ManhattenConnectionDrawStyle } from './lib/model/ManhattenConnectionDrawStyle';
 export { DirectConnectionDrawStyle } from './lib/model/DirectConnectionDrawStyle';
+export * from './lib/services/ElementInteraction';

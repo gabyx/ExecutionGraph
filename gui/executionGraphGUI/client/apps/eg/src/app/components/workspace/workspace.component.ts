@@ -28,7 +28,7 @@ import {
 } from '../../model';
 
 import { ILogger, LoggerFactory } from '@eg/logger';
-import { Point, DragEvent, ConnectionDrawStyle } from '@eg/graph';
+import { Point, ConnectionDrawStyle, EventSourceGateway, GraphComponent } from '@eg/graph';
 import { isDefined } from '@eg/common';
 import { GraphsState } from '../../+state/reducers';
 import * as graphActions from '../../+state/actions/graph.actions';
@@ -45,6 +45,10 @@ export class WorkspaceComponent implements OnInit {
   private logger: ILogger;
 
   public graph: Observable<Graph>;
+
+  public readonly nodeEvents = new EventSourceGateway<Node>();
+
+  public readonly graphEvents = new EventSourceGateway<GraphComponent>();
 
   public connectionDrawStyle: Observable<ConnectionDrawStyle>;
 

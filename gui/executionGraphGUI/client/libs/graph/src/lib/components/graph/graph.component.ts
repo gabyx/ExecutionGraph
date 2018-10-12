@@ -22,11 +22,11 @@ import {
   AfterViewChecked
 } from '@angular/core';
 import { PortComponent } from '..//port/port.component';
-import { DraggableDirective, DragEvent, MouseButton } from '../../directives/draggable.directive';
+import { DragEvent, MouseButton } from '../../directives/draggable.directive';
 import { ConnectionComponent } from '../connection/connection.component';
-import { Point } from '../../model/Point';
-import { DroppableDirective } from '../../directives/droppable.directive';
-import { PositionService } from '@eg/graph/src/lib/services/PositionService';
+import { Point, Position } from '../../model/Point';
+import { PositionService } from '@eg/graph/src/lib/services/position.service';
+import { EventSourceGateway } from '../../services/ElementInteraction';
 
 @Component({
   selector: 'ngcs-graph',
@@ -59,7 +59,7 @@ export class GraphComponent implements OnInit, AfterViewChecked {
     return this.panStart!==null;
   }
 
-  public pan: Point = { x: 0, y: 0 };
+  public pan: Position = { x: 0, y: 0 };
 
   private panStart: Point = null;
 
