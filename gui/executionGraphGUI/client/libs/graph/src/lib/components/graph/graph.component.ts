@@ -16,24 +16,19 @@ import {
   ElementRef,
   QueryList,
   HostListener,
-  ContentChildren,
-  ChangeDetectorRef,
-  NgZone,
-  AfterViewChecked
+  ContentChildren
 } from '@angular/core';
-import { PortComponent } from '..//port/port.component';
-import { DragEvent, MouseButton } from '../../directives/draggable.directive';
+import { PortComponent } from '../port/port.component';
 import { ConnectionComponent } from '../connection/connection.component';
 import { Point, Position } from '../../model/Point';
-import { PositionService } from '@eg/graph/src/lib/services/position.service';
-import { EventSourceGateway } from '../../services/ElementInteraction';
+import { PositionService } from '@eg/graph';
 
 @Component({
   selector: 'ngcs-graph',
   templateUrl: './graph.component.html',
   styleUrls: ['./graph.component.scss']
 })
-export class GraphComponent implements OnInit, AfterViewChecked {
+export class GraphComponent {
   @ContentChildren(PortComponent, { descendants: true })
   ports: QueryList<PortComponent>;
 
@@ -49,7 +44,6 @@ export class GraphComponent implements OnInit, AfterViewChecked {
   }
 
   public get scaleTransform() {
-    // return this.sanitizer.bypassSecurityTrustStyle(`scale(${this.zoomFactor})`);
     return `scale(${this.zoomFactor})`;
   }
 
@@ -57,34 +51,7 @@ export class GraphComponent implements OnInit, AfterViewChecked {
 
   public pan: Position = { x: 0, y: 0 };
 
-  constructor(private element: ElementRef, private cdr: ChangeDetectorRef, private zone: NgZone) {}
-
-  ngOnInit() {
-  }
-
-  ngAfterViewChecked() {
-    this.cdr.detectChanges();
-  }
-
-
-  /**
-   * Handles scrolling for scaling
-   * @param e Scroll event
-   */
-  @HostListener('mousewheel', ['$event'])
-  onWindowScroll(e: MouseWheelEvent) {
-    e.preventDefault();
-    e.cancelBubble = true;
-    if (e.wheelDelta < 0) {
-      this.zoomFactor *= 0.95;
-    } else {
-      this.zoomFactor /= 0.95;
-    }
-    // this.pan.x /= this.zoomFactor;
-    // this.pan.y /= this.zoomFactor;
-    // console.log(`[WorkspaceComponent] Zoomed by ${this.zoomFactor} to ${this.pan.x}:${this.pan.y}`);
-    this.cdr.detectChanges();
-  }
+  constructor(private element: ElementRef) {}
 
   /**
    * Prevent context menu

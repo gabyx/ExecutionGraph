@@ -16,6 +16,10 @@ export interface ElementMouseButtonEvent<TElement> extends ElementMouseEvent<TEl
     button: MouseButton;
 }
 
+export interface ElementMouseScrollEvent<TElement> extends ElementMouseEvent<TElement> {
+    delta: number
+}
+
 export interface ElementDragEvent<TElement> {
     started: ElementMouseButtonEvent<TElement>;
     current: ElementMouseButtonEvent<TElement>;
@@ -33,6 +37,8 @@ export interface IElementEvents<TElement> {
     readonly onDragStart: Observable<ElementMouseButtonEvent<TElement>>;
     readonly onDragContinue: Observable<ElementMouseButtonEvent<TElement>>;
     readonly onDragStop: Observable<ElementMouseButtonEvent<TElement>>;
+
+    readonly onScroll: Observable<ElementMouseScrollEvent<TElement>>;
 }
 
 interface GatewaySourceSubscription {
@@ -46,6 +52,7 @@ interface GatewaySourceSubscription {
     readonly onDragStart: Subscription;
     readonly onDragContinue: Subscription;
     readonly onDragStop: Subscription;
+    readonly onScroll: Subscription;
 }
 
 export class EventSourceGateway<TElement> implements IElementEvents<TElement> {
@@ -61,6 +68,8 @@ export class EventSourceGateway<TElement> implements IElementEvents<TElement> {
     private readonly _onDragStart = new Subject<ElementMouseButtonEvent<TElement>>();
     private readonly _onDragContinue = new Subject<ElementMouseButtonEvent<TElement>>();
     private readonly _onDragStop = new Subject<ElementMouseButtonEvent<TElement>>();
+
+    private readonly _onScroll = new Subject<ElementMouseScrollEvent<TElement>>();
 
     private subscriptions: GatewaySourceSubscription[] = [];
 
@@ -94,6 +103,10 @@ export class EventSourceGateway<TElement> implements IElementEvents<TElement> {
         return this._onDragStop.asObservable();
     }
 
+    public get onScroll(): Observable<ElementMouseScrollEvent<TElement>> {
+        return this._onScroll.asObservable();
+    }
+
     public forward(source: IElementEvents<TElement>) {
         const subscription = {
             source: source,
@@ -107,6 +120,7 @@ export class EventSourceGateway<TElement> implements IElementEvents<TElement> {
             onDragStart: source.onDragStart.subscribe(e => this._onDragStart.next(e)),
             onDragContinue: source.onDragContinue.subscribe(e => this._onDragContinue.next(e)),
             onDragStop: source.onDragStop.subscribe(e => this._onDragStop.next(e)),
+            onScroll: source.onScroll.subscribe(e => this._onScroll.next(e))
         };
         this.subscriptions.push(subscription);
     }

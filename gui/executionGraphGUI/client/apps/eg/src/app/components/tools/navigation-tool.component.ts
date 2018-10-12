@@ -26,6 +26,15 @@ export class NavigationToolComponent extends ToolComponent implements OnInit {
             console.log(`[WorkspaceComponent] Panned to ${e.element.pan.x}:${e.element.pan.y}`);
         });
 
+        this.graphEvents.onScroll.subscribe(e => {
+          const zoomSpeed = 0.98;
+          if (e.delta < 0) {
+            e.element.zoomFactor *= zoomSpeed;
+          } else {
+            e.element.zoomFactor /= zoomSpeed;
+          }
+        });
+
         // this.graphEvents.onDragStop.subscribe(e => console.log("Graph drag stop"));
         // this.graphEvents.onMove.subscribe(e => console.log("Graph move"));
         // this.graphEvents.onDown.subscribe(e => console.log("Graph down"));

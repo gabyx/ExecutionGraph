@@ -1,5 +1,5 @@
 import { Directive, Input, HostListener, EventEmitter, ElementRef, OnDestroy } from "@angular/core";
-import { IElementEvents, ElementMouseEvent, ElementMouseButtonEvent, EventSourceGateway } from "../services/ElementInteraction";
+import { IElementEvents, ElementMouseEvent, ElementMouseButtonEvent, EventSourceGateway, ElementMouseScrollEvent } from "../services/ElementInteraction";
 import { Position } from "../model/Point";
 import { Observable } from "rxjs";
 import { switchMap, map, takeUntil, tap } from "rxjs/operators";
@@ -33,6 +33,7 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
     private readonly mousePressed = new EventEmitter<ElementMouseButtonEvent<TElement>>();
     private readonly mouseReleased = new EventEmitter<ElementMouseButtonEvent<TElement>>();
     private readonly mouseMoved = new EventEmitter<ElementMouseEvent<TElement>>();
+    private readonly mouseScrolled = new EventEmitter<ElementMouseScrollEvent<TElement>>();
 
     private gateway: EventSourceGateway<TElement> = null;
 
@@ -89,6 +90,10 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
         );
     }
 
+    public get onScroll(): Observable<ElementMouseScrollEvent<TElement>> {
+      return this.mouseScrolled.asObservable();
+    }
+
     private get nativeElement(): HTMLElement {
         return this.elementRef.nativeElement;
     }
@@ -121,6 +126,11 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
         this.mouseReleased.emit(this.convertButtonEvent(event));
     }
 
+    @HostListener('mousewheel', ['$event']) onMouseScroll(e: MouseWheelEvent) {
+      e.preventDefault();
+      this.mouseScrolled.emit(this.convertScrollEvent(e));
+    }
+
     private convertEvent(mouseEvent: MouseEvent): ElementMouseEvent<TElement> {
         const elementPosition = this.elementPosition;
 
@@ -142,6 +152,14 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
         return {
             ...event,
             button: mouseEvent.button
+        };
+    }
+
+    private convertScrollEvent(mouseEvent: MouseWheelEvent): ElementMouseScrollEvent<TElement> {
+        const event = this.convertEvent(mouseEvent);
+        return {
+            ...event,
+            delta: mouseEvent.wheelDelta
         };
     }
 }
