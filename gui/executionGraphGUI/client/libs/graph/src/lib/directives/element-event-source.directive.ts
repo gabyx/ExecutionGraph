@@ -2,7 +2,7 @@ import { Directive, Input, HostListener, EventEmitter, ElementRef, OnDestroy } f
 import { IElementEvents, ElementMouseEvent, ElementMouseButtonEvent, EventSourceGateway } from "../services/ElementInteraction";
 import { Position } from "../model/Point";
 import { Observable } from "rxjs";
-import { switchMap, map, takeUntil } from "rxjs/operators";
+import { switchMap, map, takeUntil, tap } from "rxjs/operators";
 
 @Directive({
     selector: '[ngcsEventSource]'
@@ -75,16 +75,17 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
     }
 
     public get onDragContinue(): Observable<ElementMouseButtonEvent<TElement>> {
-        return this.onDragStart.pipe(
-            switchMap(down => this.onMove.pipe(
-                map(move => ({...move, button: down.button}))
+        return this.mousePressed.pipe(
+            switchMap(down => this.mouseMoved.pipe(
+                map(move => ({...move, button: down.button})),
+                takeUntil(this.mouseReleased)
             ))
         );
     }
 
     public get onDragStop(): Observable<ElementMouseButtonEvent<TElement>> {
         return this.onDragContinue.pipe(
-            takeUntil(this.onUp)
+            switchMap(drag => this.mouseReleased)
         );
     }
 

@@ -1,9 +1,11 @@
-<eg-selection-tool [graph]="graph" [nodeEvents]="nodeEvents"></eg-selection-tool>
 <ngcs-graph id="graph-1"
-    #graph
+    #graphComponent
     *ngIf="graph | async as syncGraph"
+
+    [ngcsEventSource]="graphComponent" [forwardTo]="graphEvents"
+
     [ngcsDroppable]="isNodeType"
-    (draggableDropped)="createNode($event.data, syncGraph, graph.convertMouseToGraphPosition($event.event.mousePosition))">
+    (draggableDropped)="createNode($event.data, syncGraph, graphComponent.convertMouseToGraphPosition($event.event.mousePosition))">
 
     <!-- All the nodes of the graph-->
     <ng-container *ngFor="let node of nodes | async">
@@ -17,7 +19,7 @@
             <span class="header"
                 ngcsDraggable
                 [dragElement]="nodeElement"
-                (dragContinued)="updateNodePosition(node, graph.convertMouseToGraphPosition($event.mousePosition, $event.mouseToElementOffset))">
+                (dragContinued)="updateNodePosition(node, graphComponent.convertMouseToGraphPosition($event.mousePosition, $event.mouseToElementOffset))">
                 {{ node.name }}
             </span>
 
@@ -27,8 +29,8 @@
                     <span class="socket"
                         *ngFor="let socket of node.inputs"
                         [ngcsDraggable]="socket"
-                        (dragStarted)="initConnectionFrom(socket, graph.convertMouseToGraphPosition($event.mousePosition))"
-                        (dragContinued)="movingConnection(graph.convertMouseToGraphPosition($event.mousePosition))"
+                        (dragStarted)="initConnectionFrom(socket, graphComponent.convertMouseToGraphPosition($event.mousePosition))"
+                        (dragContinued)="movingConnection(graphComponent.convertMouseToGraphPosition($event.mousePosition))"
                         (dragEnded)="abortConnection()"
                         [ngcsDroppable]="isOutputSocket"
                         (draggableDropped)="addConnection(socket, $event.data)">
@@ -41,8 +43,8 @@
                     <span class="socket"
                         *ngFor="let socket of node.outputs"
                         [ngcsDraggable]="socket"
-                        (dragStarted)="initConnectionFrom(socket, graph.convertMouseToGraphPosition($event.mousePosition))"
-                        (dragContinued)="movingConnection(graph.convertMouseToGraphPosition($event.mousePosition))"
+                        (dragStarted)="initConnectionFrom(socket, graphComponent.convertMouseToGraphPosition($event.mousePosition))"
+                        (dragContinued)="movingConnection(graphComponent.convertMouseToGraphPosition($event.mousePosition))"
                         (dragEnded)="abortConnection()"
                         [ngcsDroppable]="isInputSocket"
                         (draggableDropped)="addConnection($event.data, socket)">
@@ -89,3 +91,6 @@
     </ng-container>
 
 </ngcs-graph>
+
+<eg-navigation-tool [graph]="graphComponent" [nodeEvents]="nodeEvents" [graphEvents]="graphEvents"></eg-navigation-tool>
+<eg-selection-tool [graph]="graphComponent" [nodeEvents]="nodeEvents" [graphEvents]="graphEvents"></eg-selection-tool>

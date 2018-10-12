@@ -55,13 +55,7 @@ export class GraphComponent implements OnInit, AfterViewChecked {
 
   public zoomFactor: number = 1;
 
-  public get isPanning(): boolean {
-    return this.panStart!==null;
-  }
-
   public pan: Position = { x: 0, y: 0 };
-
-  private panStart: Point = null;
 
   constructor(private element: ElementRef, private cdr: ChangeDetectorRef, private zone: NgZone) {}
 
@@ -146,44 +140,6 @@ export class GraphComponent implements OnInit, AfterViewChecked {
       return null;
     }
     return this.ports.find(p => p.id === id);
-  }
-
-  public onStartDrag(p: DragEvent) {
-    if(p.mouseButton === MouseButton.Right) {
-    }
-    this.onStartPan(p);
-  }
-
-  public onDrag(p: DragEvent) {
-    if(p.mouseButton === MouseButton.Right) {
-    }
-    this.onPan(p);
-  }
-
-  public onEndDrag(p: DragEvent) {
-    this.panStart = null;
-  }
-
-
-  /**
-   * Handles the start event of the panning (mouse down)
-   * @param p Current position
-   */
-  public onStartPan(p: DragEvent) {
-    this.panStart = {
-      x: this.pan.x - p.mousePosition.x,
-      y: this.pan.y - p.mousePosition.y
-    };
-  }
-
-  /**
-   * Handles panning events
-   * @param p Current position
-   */
-  public onPan(p: DragEvent) {
-    this.pan.x = p.mousePosition.x + this.panStart.x;
-    this.pan.y = p.mousePosition.y + this.panStart.y;
-    console.log(`[WorkspaceComponent] Panned to ${this.pan.x}:${this.pan.y}`);
   }
 
   public convertMouseToGraphPosition(mousePoint: Point, offset?: Point) {

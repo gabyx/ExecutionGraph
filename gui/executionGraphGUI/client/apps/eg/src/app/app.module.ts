@@ -80,6 +80,7 @@ import { GraphLoadedGuard } from './guards/graphLoaded.guard';
 import { BackendTestComponent } from './components/backend-test/backend-test.component';
 import { AddNodeComponent } from './components/add-node/add-node.component'
 import { SelectionToolComponent } from './components/tools/selection-tool.component';
+import { NavigationToolComponent } from './components/tools/navigation-tool.component';
 
 //environment.production = true;
 
@@ -114,7 +115,8 @@ const routes: Route[] = [
     GraphCreateComponent,
     BackendTestComponent,
     AddNodeComponent,
-    SelectionToolComponent
+    SelectionToolComponent,
+    NavigationToolComponent
   ],
   imports: [
     HttpClientModule,

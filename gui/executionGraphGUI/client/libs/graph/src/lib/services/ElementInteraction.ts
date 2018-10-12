@@ -105,7 +105,7 @@ export class EventSourceGateway<TElement> implements IElementEvents<TElement> {
             onUp: source.onUp.subscribe(e => this._onUp.next(e)),
             onClick: source.onClick.subscribe(e => this._onClick.next(e)),
             onDragStart: source.onDragStart.subscribe(e => this._onDragStart.next(e)),
-            onDragContinue: source.onDragStart.subscribe(e => this._onDragContinue.next(e)),
+            onDragContinue: source.onDragContinue.subscribe(e => this._onDragContinue.next(e)),
             onDragStop: source.onDragStop.subscribe(e => this._onDragStop.next(e)),
         };
         this.subscriptions.push(subscription);

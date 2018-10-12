@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, OnInit, Injectable } from '@angular/core';
+import { Component, OnInit, Injectable, ElementRef } from '@angular/core';
 import { Observable } from 'rxjs';
 import { filter, tap, map } from 'rxjs/operators';
 import { Store } from '@ngrx/store';

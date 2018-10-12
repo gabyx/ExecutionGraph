@@ -2,11 +2,7 @@
   class="ngcs-graph"
   [style.transform]="scaleTransform" [style.transformOrigin]="'0 0'"
   [style.height]="100/zoomFactor+ '%'" [style.width]="100/zoomFactor+'%'"
-  [class.panning]="isPanning"
-  ngcsDraggable
-  (dragContinued)="onDrag($event)"
-  (dragStarted)="onStartDrag($event)"
-  (dragEnded)="onEndDrag($event)">
+>
 
     <svg height="100%" width="100%">
 
