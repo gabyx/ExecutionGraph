@@ -12,7 +12,6 @@
 
 import {
   Component,
-  OnInit,
   ElementRef,
   QueryList,
   HostListener,
@@ -21,7 +20,22 @@ import {
 import { PortComponent } from '../port/port.component';
 import { ConnectionComponent } from '../connection/connection.component';
 import { Point, Position } from '../../model/Point';
-import { PositionService } from '@eg/graph';
+
+export function getPositionRelativeToParent(element: HTMLElement, referenceParent?: HTMLElement) {
+  let offsetLeft = element.offsetLeft; //+ element.offsetWidth / 2;
+  let offsetTop = element.offsetTop; // + element.offsetHeight / 2;
+
+  while (element.offsetParent && element.offsetParent !== referenceParent) {
+      element = element.offsetParent as HTMLElement;
+      offsetLeft += element.offsetLeft;
+      offsetTop += element.offsetTop;
+  }
+
+  return {
+      x: offsetLeft,
+      y: offsetTop
+  };
+}
 
 @Component({
   selector: 'ngcs-graph',
@@ -119,10 +133,12 @@ export class GraphComponent {
   }
 
   public getGraphPosition(): Point {
-    return PositionService.getPositionRelativeToParent(this.element.nativeElement, document.body);
+    return getPositionRelativeToParent(this.element.nativeElement, document.body);
   }
 
   private getRelativePosition(element: HTMLElement): Point {
-    return PositionService.getPositionRelativeToParent(element, this.element.nativeElement);
+    return getPositionRelativeToParent(element, this.element.nativeElement);
   }
+
+
 }

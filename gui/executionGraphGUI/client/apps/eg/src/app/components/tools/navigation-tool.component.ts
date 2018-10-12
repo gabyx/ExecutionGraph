@@ -22,8 +22,6 @@ export class NavigationToolComponent extends ToolComponent implements OnInit {
             const position = e.element.convertMouseToGraphPosition(e.mousePosition);
             e.element.pan.x += position.x - panStart.x;
             e.element.pan.y += position.y - panStart.y;
-
-            console.log(`[WorkspaceComponent] Panned to ${e.element.pan.x}:${e.element.pan.y}`);
         });
 
         this.graphEvents.onScroll.subscribe(e => {

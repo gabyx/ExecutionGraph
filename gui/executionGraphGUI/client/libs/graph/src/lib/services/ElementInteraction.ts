@@ -1,5 +1,6 @@
 import { Point } from "../model/Point";
-import { Observable, Subject, Subscription } from "rxjs";
+import { Observable, Subject, Subscription, BehaviorSubject, merge } from "rxjs";
+import { switchMap } from "rxjs/operators";
 
 export enum MouseButton {
     Left = 0,
@@ -41,91 +42,72 @@ export interface IElementEvents<TElement> {
     readonly onScroll: Observable<ElementMouseScrollEvent<TElement>>;
 }
 
-interface GatewaySourceSubscription {
-    readonly source: any,
-    readonly onEnter: Subscription;
-    readonly onLeave: Subscription;
-    readonly onMove: Subscription;
-    readonly onDown: Subscription;
-    readonly onUp: Subscription;
-    readonly onClick: Subscription;
-    readonly onDragStart: Subscription;
-    readonly onDragContinue: Subscription;
-    readonly onDragStop: Subscription;
-    readonly onScroll: Subscription;
-}
-
 export class EventSourceGateway<TElement> implements IElementEvents<TElement> {
 
-    private readonly _onEnter = new Subject<ElementMouseEvent<TElement>>();
-    private readonly _onLeave = new Subject<ElementMouseEvent<TElement>>();
-    private readonly _onMove = new Subject<ElementMouseEvent<TElement>>();
-
-    private readonly _onDown = new Subject<ElementMouseButtonEvent<TElement>>();
-    private readonly _onUp = new Subject<ElementMouseButtonEvent<TElement>>();
-    private readonly _onClick = new Subject<ElementMouseButtonEvent<TElement>>();
-
-    private readonly _onDragStart = new Subject<ElementMouseButtonEvent<TElement>>();
-    private readonly _onDragContinue = new Subject<ElementMouseButtonEvent<TElement>>();
-    private readonly _onDragStop = new Subject<ElementMouseButtonEvent<TElement>>();
-
-    private readonly _onScroll = new Subject<ElementMouseScrollEvent<TElement>>();
-
-    private subscriptions: GatewaySourceSubscription[] = [];
+    private readonly lastSources: IElementEvents<TElement>[] = [];
+    private readonly sources = new BehaviorSubject<IElementEvents<TElement>[]>(this.lastSources);
 
     public get onEnter(): Observable<ElementMouseEvent<TElement>> {
-        return this._onEnter.asObservable();
+        return this.sources.pipe(
+          switchMap(sources => merge(...sources.map(s => s.onEnter)))
+        );
     }
     public get onLeave(): Observable<ElementMouseEvent<TElement>> {
-        return this._onLeave.asObservable();
+      return this.sources.pipe(
+        switchMap(sources => merge(...sources.map(s => s.onLeave)))
+      );
     }
     public get onMove(): Observable<ElementMouseEvent<TElement>> {
-        return this._onMove.asObservable();
+        return this.sources.pipe(
+            switchMap(sources => merge(...sources.map(s => s.onMove)))
+        );
     }
 
     public get onDown(): Observable<ElementMouseButtonEvent<TElement>> {
-        return this._onDown.asObservable();
+        return this.sources.pipe(
+            switchMap(sources => merge(...sources.map(s => s.onDown)))
+        );
     }
     public get onUp(): Observable<ElementMouseButtonEvent<TElement>> {
-        return this._onUp.asObservable();
+        return this.sources.pipe(
+            switchMap(sources => merge(...sources.map(s => s.onUp)))
+        );
     }
     public get onClick(): Observable<ElementMouseButtonEvent<TElement>> {
-        return this._onClick.asObservable();
+        return this.sources.pipe(
+            switchMap(sources => merge(...sources.map(s => s.onClick)))
+        );
     }
 
     public get onDragStart(): Observable<ElementMouseButtonEvent<TElement>> {
-        return this._onDragStart.asObservable();
+        return this.sources.pipe(
+            switchMap(sources => merge(...sources.map(s => s.onDragStart)))
+        );
     }
     public get onDragContinue(): Observable<ElementMouseButtonEvent<TElement>> {
-        return this._onDragContinue.asObservable();
+        return this.sources.pipe(
+            switchMap(sources => merge(...sources.map(s => s.onDragContinue)))
+        );
     }
     public get onDragStop(): Observable<ElementMouseButtonEvent<TElement>> {
-        return this._onDragStop.asObservable();
+        return this.sources.pipe(
+            switchMap(sources => merge(...sources.map(s => s.onDragStop)))
+        );
     }
 
     public get onScroll(): Observable<ElementMouseScrollEvent<TElement>> {
-        return this._onScroll.asObservable();
+        return this.sources.pipe(
+            switchMap(sources => merge(...sources.map(s => s.onScroll)))
+        );
     }
 
     public forward(source: IElementEvents<TElement>) {
-        const subscription = {
-            source: source,
-
-            onEnter: source.onEnter.subscribe(e => this._onEnter.next(e)),
-            onLeave: source.onLeave.subscribe(e => this._onLeave.next(e)),
-            onMove: source.onMove.subscribe(e => this._onMove.next(e)),
-            onDown: source.onDown.subscribe(e => this._onDown.next(e)),
-            onUp: source.onUp.subscribe(e => this._onUp.next(e)),
-            onClick: source.onClick.subscribe(e => this._onClick.next(e)),
-            onDragStart: source.onDragStart.subscribe(e => this._onDragStart.next(e)),
-            onDragContinue: source.onDragContinue.subscribe(e => this._onDragContinue.next(e)),
-            onDragStop: source.onDragStop.subscribe(e => this._onDragStop.next(e)),
-            onScroll: source.onScroll.subscribe(e => this._onScroll.next(e))
-        };
-        this.subscriptions.push(subscription);
+        this.lastSources.push(source);
+        this.sources.next(this.lastSources);
     }
 
     public mute(source: IElementEvents<TElement>) {
-        this.subscriptions.splice(this.subscriptions.findIndex(s => s.source===source), 1);
+        this.lastSources.splice(this.lastSources.findIndex(s => s===source), 1);
+        this.sources.next(this.lastSources);
     }
 }
