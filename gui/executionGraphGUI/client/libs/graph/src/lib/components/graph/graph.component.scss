@@ -9,40 +9,15 @@
     cursor: move;
   }
 
-  .container {
-    position: absolute;
-    // display: block;
-    // width: 100%;
-    // height: 100%;
-    z-index: 50;
-    top: 0;
-    left: 0;
-  }
-
   ::ng-deep .ngcs-node {
     display: inline-block;
     position: absolute;
     background: white;
     border: 1px solid black;
     cursor: pointer;
-    z-index: 1000;
-  }
-  ::ng-deep svg {
-    z-index: 100;
-    //pointer-events: none;
+    // z-index: 1000;
   }
 
-  ::ng-deep .ngcs-connection {
-    z-index: 200;
-    fill: none;
-    stroke: white;
-    stroke-width: 2;
-  }
-
-  ::ng-deep .ngcs-connection:hover {
-    cursor: pointer;
-    stroke: red;
-  }
 
 
 }

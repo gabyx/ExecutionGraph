@@ -1,0 +1,10 @@
+::ng-deep .ngcs-connection {
+    fill: none;
+    stroke: white;
+    stroke-width: 2;
+}
+
+::ng-deep .ngcs-connection:hover {
+    cursor: pointer;
+    stroke: red;
+}

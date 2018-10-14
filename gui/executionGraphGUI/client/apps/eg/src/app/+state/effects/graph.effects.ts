@@ -13,7 +13,7 @@ import { LoggerFactory, ILogger } from '@eg/logger';
 import * as fromGraph from '../actions/graph.actions';
 import * as fromNotifications from '../actions/notification.actions';
 
-import { createConnection } from '../../model';
+import { createConnection, Node } from '../../model';
 import { GeneralInfoService, GraphManipulationService, GraphManagementService } from '../../services';
 import { GraphsState } from '../reducers';
 import { RouterStateUrl } from '../reducers/app.reducers';
@@ -102,12 +102,22 @@ export class GraphEffects {
         let graph = await this.graphManagementService.addGraph(graphTypeId);
         const nodes = {};
         // Add nodes
+        let lastNode: Node = null;
+        const connections = {};
         for (let i = 0; i < 3; ++i) {
             const node = await this.graphManipulationService.addNode(graph.id, nodeType, `${nodeType}-${i}`);
+            node.uiProps.position.x = 200 * i;
+            node.uiProps.position.y = 50 + 100 * i;
             nodes[node.id.toString()] = node;
+
+            if(lastNode) {
+                const connection = createConnection(lastNode.outputs[0], node.inputs[0]);
+                connections[connection.idString] = connection;
+            }
+            lastNode = node;
         }
 
-        graph = {...graph, nodes: nodes};
+        graph = {...graph, nodes: nodes, connections: connections};
 
         return new fromGraph.GraphsLoaded([graph]);
     }

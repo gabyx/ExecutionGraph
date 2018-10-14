@@ -3,22 +3,7 @@
   [style.transform]="scaleTransform" [style.transformOrigin]="'0 0'"
   [style.height]="100/zoomFactor+ '%'" [style.width]="100/zoomFactor+'%'"
 >
-  {{ connections.length }}
-    <svg height="100%" width="100%">
 
-        <g [attr.transform]="transformSvg">
-
-          <path
-            class="ngcs-connection"
-            *ngFor="let connection of connections"
-            [attr.d]="getPathDescription(connection)" />
-
-        </g>
-    </svg>
-
-
-    <div [style.transform]="transformCss" class="container">
-        <ng-content></ng-content>
-    </div>
+    <ng-content></ng-content>
 
 </div>

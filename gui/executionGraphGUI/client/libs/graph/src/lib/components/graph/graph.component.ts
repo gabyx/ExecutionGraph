@@ -15,10 +15,10 @@ import {
   ElementRef,
   QueryList,
   HostListener,
-  ContentChildren
+  ContentChildren,
+  ChangeDetectorRef
 } from '@angular/core';
 import { PortComponent } from '../port/port.component';
-import { ConnectionComponent } from '../connection/connection.component';
 import { Point, Position } from '../../model/Point';
 
 export function getPositionRelativeToParent(element: HTMLElement, referenceParent?: HTMLElement) {
@@ -43,11 +43,11 @@ export function getPositionRelativeToParent(element: HTMLElement, referenceParen
   styleUrls: ['./graph.component.scss']
 })
 export class GraphComponent {
-  @ContentChildren(PortComponent, { descendants: true })
-  ports: QueryList<PortComponent>;
+  // @ContentChildren(PortComponent, { descendants: true })
+  // ports: QueryList<PortComponent>;
 
-  @ContentChildren(ConnectionComponent, { descendants: true, })
-  connections: QueryList<ConnectionComponent>;
+  // @ContentChildren(ConnectionComponent, { descendants: true, })
+  // connections: QueryList<ConnectionComponent>;
 
   public get transformSvg() {
     return `translate(${this.pan.x} ${this.pan.y})`;
@@ -61,11 +61,17 @@ export class GraphComponent {
     return `scale(${this.zoomFactor})`;
   }
 
+  private ports: {[id: string]: PortComponent} = {};
+
   public zoomFactor: number = 1;
 
   public pan: Position = { x: 0, y: 0 };
 
-  constructor(private element: ElementRef) {}
+  constructor(private element: ElementRef, private cdr: ChangeDetectorRef) {}
+
+  ngAfterViewChecked() {
+    this.cdr.detectChanges();
+  }
 
   /**
    * Prevent context menu
@@ -76,23 +82,8 @@ export class GraphComponent {
     e.preventDefault();
   }
 
-  /**
-   * Create an SVG Path description for the given connection
-   * @param connection Connection to create a path for
-   */
-  public getPathDescription(connection: ConnectionComponent): string {
-    const startPoint = this.getPortPosition(connection.from);
-    const endPoint = this.getPortPosition(connection.to);
-    // console.log("Updating path");
-    let path = connection.drawStyle.getPath(startPoint, endPoint);
-    if (typeof path !== 'string') {
-      if (path.length < 2) {
-        return ``;
-      }
-      const first = path.shift();
-      path = `M${first.x} ${first.y} ${path.map(p => `L${p.x} ${p.y}`).join(' ')}`;
-    }
-    return path;
+  public registerPort(port: PortComponent) {
+    this.ports[port.id] = port;
   }
 
   /**
@@ -120,7 +111,7 @@ export class GraphComponent {
     if (!this.ports) {
       return null;
     }
-    return this.ports.find(p => p.id === id);
+    return this.ports[id];
   }
 
   public convertMouseToGraphPosition(mousePoint: Point, offset?: Point) {

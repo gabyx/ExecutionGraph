@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Point, ConnectionDrawStyle } from '@eg/graph';
 import { ILogger, LoggerFactory } from '@eg/logger';
@@ -11,34 +11,47 @@ import { AddConnection } from '../../+state/actions';
 @Component({
     selector: 'eg-socket-connection-tool',
     template: `
-    <ng-container *ngIf="newConnection">
-
-        <ngcs-connection
-          [from]="newConnection.outputSocket.idString"
-          [to]="newConnection.inputSocket.idString"
-          [drawStyle]="connectionDrawStyle">
-        </ngcs-connection>
-
-      <div style="position: absolute"
-        [style.left]="newConnectionEndpoint.x+'px'"
-        [style.top]="newConnectionEndpoint.y+'px'">
-
-      <ngcs-port [id]="newTargetSocket.idString" class="right middle"></ngcs-port>
-
-    </div>
-
+    <ng-container *ngIf="tempConnection">
+        
+      <eg-connection-layer
+          [connections]="[tempConnection]"
+          [drawStyle]="connectionDrawStyle"
+          class="new-connections"
+          [class.nondroppable]="!targetSocket">
+      </eg-connection-layer>
+      
+      <ngcs-html-layer>
+        <div 
+        *ngIf="!targetSocket"
+        style="position: absolute"
+        [style.left]="tempConnectionEndpoint.x+'px'"
+        [style.top]="tempConnectionEndpoint.y+'px'">
+        
+          <ngcs-port [id]="tempTargetSocket.idString" class="right middle"></ngcs-port>
+        
+        </div>
+      </ngcs-html-layer>
     </ng-container>
     `,
     styles: [`
+      ::ng-deep .new-connections .ngcs-connection {
+        stroke: green;
+      }
+      ::ng-deep .new-connections.nondroppable .ngcs-connection {
+        stroke: #888;
+      }
     `]
 })
 export class SocketConnectionToolComponent extends ToolComponent implements OnInit {
 
   @Input() connectionDrawStyle: ConnectionDrawStyle;
 
-  public newTargetSocket: InputSocket | OutputSocket = null;
-  public newConnection: Connection = null;
-  public newConnectionEndpoint: Point = { x: 0, y: 0 };
+  public tempTargetSocket: InputSocket | OutputSocket = null;
+  public tempConnection: Connection = null;
+  public tempConnectionEndpoint: Point = { x: 0, y: 0 };
+
+  private sourceSocket: Socket;
+  private targetSocket: Socket;
 
   private readonly logger: ILogger;
 
@@ -48,52 +61,74 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
   }
 
   ngOnInit() {
-    // (dragStarted)="initConnectionFrom(socket, graphComponent.convertMouseToGraphPosition($event.mousePosition))"
-    // (dragContinued)="movingConnection(graphComponent.convertMouseToGraphPosition($event.mousePosition))"
-    // (dragEnded)="abortConnection()"
-    // [ngcsDroppable]="isInputSocket"
-    // (draggableDropped)="addConnection($event.data, socket)">
-    this.socketEvents.onDragStart.subscribe(e => this.initConnectionFrom(e.element, this.graph.convertMouseToGraphPosition(e.mousePosition)));
-    this.socketEvents.onDragContinue.subscribe(e => this.movingConnection(this.graph.convertMouseToGraphPosition(e.mousePosition)));
-    this.socketEvents.onDragStop.subscribe(e => this.abortConnection());
+    this.socketEvents.onDragStart.subscribe(e => {
+      const socket = e.element;
+      
+      this.logger.info(`Initiating new connection from ${socket.idString}`);
+      this.sourceSocket = socket;
+      if (isOutputSocket(this.sourceSocket)) {
+        this.tempTargetSocket = new InputSocket(socket.type, socket.name, new SocketIndex(0));
+      } else {
+        this.tempTargetSocket = new OutputSocket(socket.type, socket.name, new SocketIndex(0));
+      }
+
+      this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
+      this.tempConnection = this.createConnection(socket, this.tempTargetSocket);
+    });
+    this.socketEvents.onDragContinue.subscribe(e => {
+      if(!this.targetSocket) {
+        this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
+      }
+    });
+    this.socketEvents.onDragStop.subscribe(e => {
+      if(this.targetSocket) {
+        this.addConnection(this.sourceSocket, this.targetSocket);
+      }
+      else {
+        this.abortConnection()
+      }
+    });
+
+    this.socketEvents.onEnter.subscribe(e => {
+      if(this.tempConnection) {
+        const targetSocket = e.element;
+        if(targetSocket !== this.sourceSocket && this.sourceSocket.kind!==targetSocket.kind) {
+          console.log("Entering potential target socket");
+          this.targetSocket = targetSocket;
+          this.tempConnection = this.createConnection(this.sourceSocket, this.targetSocket);
+        }
+      }
+    });
+
+    this.socketEvents.onLeave.subscribe(e => {
+      if(this.targetSocket) {
+        console.log("Leaving potential target Socket");
+        this.targetSocket = null;
+        this.tempConnection = this.createConnection(this.sourceSocket, this.tempTargetSocket);
+        this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
+      }
+    });
   }
 
-
-  private initConnectionFrom(socket: Socket, position: Point) {
-    this.logger.info(`Initiating new connection from ${socket.idString}`);
-    if (isOutputSocket(socket)) {
-      this.newTargetSocket = new InputSocket(socket.type, socket.name, new SocketIndex(0));
+  private createConnection(source: Socket, target: Socket): Connection {
+    if (isOutputSocket(source)) {
+      return createConnection(source, target);
     } else {
-      this.newTargetSocket = new OutputSocket(socket.type, socket.name, new SocketIndex(0));
+      return createConnection(target, source);
     }
-    // Create the connection
-    this.newConnection = createConnection(socket, this.newTargetSocket);
-    this.newConnectionEndpoint = position;
-    console.log(this.newConnection);
-  }
-
-  private movingConnection(graphPosition: Point) {
-
-    this.logger.info(`Setting position to ${this.newConnectionEndpoint.x}:${this.newConnectionEndpoint.y}`);
-    this.newConnectionEndpoint = graphPosition;
   }
 
   private abortConnection() {
-    this.newConnection = null;
+    this.tempConnection = null;
+    this.tempTargetSocket = null;
+    this.sourceSocket = null;
+    this.targetSocket = null;
   }
 
-  private addConnection(source: OutputSocket | InputSocket, target: OutputSocket | InputSocket) {
+  private addConnection(source: Socket, target: Socket) {
     // Create the connection
     this.store.dispatch(new AddConnection(source, target));
-  }
-
-
-  private isOutputSocket(socket: InputSocket | OutputSocket): socket is OutputSocket {
-    return isOutputSocket(socket);
-  }
-
-  private isInputSocket(socket: InputSocket | OutputSocket): socket is InputSocket {
-    return !isOutputSocket(socket);
+    this.abortConnection();
   }
 
 }

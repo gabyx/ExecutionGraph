@@ -10,16 +10,21 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, ElementRef, Input } from '@angular/core';
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import { GraphComponent } from '../graph/graph.component';
 
 @Component({
   selector: 'ngcs-port',
   templateUrl: './port.component.html',
   styleUrls: ['./port.component.scss']
 })
-export class PortComponent {
+export class PortComponent implements OnInit {
   @Input()
   public id: string;
 
-  constructor(public element: ElementRef) {}
+  constructor(public element: ElementRef, private graph: GraphComponent) {}
+
+  ngOnInit() {
+    this.graph.registerPort(this);
+  }
 }

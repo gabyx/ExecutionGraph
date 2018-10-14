@@ -8,6 +8,8 @@
   position: absolute;
   margin: -3px -3px;
 
+  pointer-events: none;
+
   &.left {
     left: 0px;
   }

@@ -108,11 +108,11 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
         };
     }
 
-    @HostListener('mouseenter', ['$event']) private onMouseEnter(event: MouseEvent) {
+    @HostListener('mouseenter', ['$event']) onMouseEnter(event: MouseEvent) {
         this.mouseEntered.emit(this.convertEvent(event));
     }
 
-    @HostListener('mouseleave', ['$event']) private onMouseLeave(event: MouseEvent) {
+    @HostListener('mouseleave', ['$event']) onMouseLeave(event: MouseEvent) {
         this.mouseLeft.emit(this.convertEvent(event));
     }
 

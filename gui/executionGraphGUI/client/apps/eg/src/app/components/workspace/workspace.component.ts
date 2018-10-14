@@ -71,13 +71,14 @@ export class WorkspaceComponent implements OnInit {
 
   constructor(private store: Store<GraphsState>, loggerFactory: LoggerFactory) {
     this.logger = loggerFactory.create('Workspace');
-    this.graph = store.select(graphQueries.getSelectedGraph).pipe( filter(g => isDefined(g) && g!=null));
-    this.connectionDrawStyle = store.select(getConnectionDrawStyle);
     // this.graph.subscribe(g => this.logger.debug(`Displaying graph ${g.id}`));
   }
-
-  ngOnInit() {}
-
+  
+  ngOnInit() {
+    this.graph = this.store.select(graphQueries.getSelectedGraph).pipe( filter(g => isDefined(g) && g!=null));
+    this.connectionDrawStyle = this.store.select(getConnectionDrawStyle);
+  }
+  
   // public initConnectionFrom(socket: OutputSocket | InputSocket, position: Point) {
   //   this.logger.info(`[WorkspaceComponent] Initiating new connection from ${socket.idString}`);
   //   if (isOutputSocket(socket)) {

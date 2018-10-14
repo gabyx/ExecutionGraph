@@ -9,7 +9,8 @@ import {
     NodeId,
     ConnectionId,
     GraphTypeDescription,
-    NodeTypeDescription
+    NodeTypeDescription,
+    Socket
 } from '../../model';
 import { Point } from '@eg/graph';
 
@@ -110,7 +111,7 @@ export class NodeRemoved implements Action {
 
 export class AddConnection implements Action {
     readonly type = ADD_CONNECTION;
-    constructor(public source: OutputSocket | InputSocket, public target: OutputSocket | InputSocket) { }
+    constructor(public source: Socket, public target: Socket) { }
 }
 
 export class ConnectionAdded implements Action {
