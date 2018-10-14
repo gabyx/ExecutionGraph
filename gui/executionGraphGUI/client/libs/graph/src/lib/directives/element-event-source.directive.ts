@@ -34,6 +34,8 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
     private readonly mouseReleased = new EventEmitter<ElementMouseButtonEvent<TElement>>();
     private readonly mouseMoved = new EventEmitter<ElementMouseEvent<TElement>>();
     private readonly mouseScrolled = new EventEmitter<ElementMouseScrollEvent<TElement>>();
+    private readonly documentMouseMoved = new EventEmitter<ElementMouseEvent<TElement>>();
+    private readonly documentMouseReleased = new EventEmitter<ElementMouseButtonEvent<TElement>>();
 
     private gateway: EventSourceGateway<TElement> = null;
 
@@ -77,16 +79,16 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
 
     public get onDragContinue(): Observable<ElementMouseButtonEvent<TElement>> {
         return this.mousePressed.pipe(
-            switchMap(down => this.mouseMoved.pipe(
+            switchMap(down => this.documentMouseMoved.pipe(
                 map(move => ({...move, button: down.button})),
-                takeUntil(this.mouseReleased)
+                takeUntil(this.documentMouseReleased)
             ))
         );
     }
 
     public get onDragStop(): Observable<ElementMouseButtonEvent<TElement>> {
         return this.onDragContinue.pipe(
-            switchMap(drag => this.mouseReleased)
+            switchMap(drag => this.documentMouseReleased)
         );
     }
 
@@ -115,15 +117,27 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
     }
 
     @HostListener('mousedown', ['$event']) onMouseDown(event: MouseEvent) {
-        this.mousePressed.emit(this.convertButtonEvent(event));
+      event.cancelBubble = true;
+      event.preventDefault();
+      this.mousePressed.emit(this.convertButtonEvent(event));
     }
 
     @HostListener('mousemove', ['$event']) onMouseMove(event: MouseEvent) {
-        this.mouseMoved.emit(this.convertEvent(event));
+      event.preventDefault();
+      this.mouseMoved.emit(this.convertEvent(event));
+    }
+
+
+    @HostListener('document:mousemove', ['$event']) onDocumentMouseMove(event: MouseEvent) {
+      this.documentMouseMoved.emit(this.convertEvent(event));
     }
 
     @HostListener('mouseup', ['$event']) onMouseUp(event: MouseEvent) {
-        this.mouseReleased.emit(this.convertButtonEvent(event));
+      this.mouseReleased.emit(this.convertButtonEvent(event));
+    }
+
+    @HostListener('document:mouseup', ['$event']) onDocumentMouseUp(event: MouseEvent) {
+        this.documentMouseReleased.emit(this.convertButtonEvent(event));
     }
 
     @HostListener('mousewheel', ['$event']) onMouseScroll(e: MouseWheelEvent) {

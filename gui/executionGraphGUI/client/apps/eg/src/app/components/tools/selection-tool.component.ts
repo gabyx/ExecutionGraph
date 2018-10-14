@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Point } from '@eg/graph';
 
-import { ToolComponent, GraphMouseEvent } from './tool-component';
+import { ToolComponent } from './tool-component';
 
 @Component({
     selector: 'eg-selection-tool',
@@ -51,8 +51,8 @@ export class SelectionToolComponent extends ToolComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.nodeEvents.onMove.subscribe(() => console.log("mouse moved"));
-        this.nodeEvents.onDown.subscribe(() => console.log("mouse down"));
+        // this.nodeEvents.onMove.subscribe(() => console.log("mouse moved"));
+        // this.nodeEvents.onDown.subscribe(() => console.log("mouse down"));
     }
 
     // public onDragStart(dragEvent: GraphMouseEvent)  {

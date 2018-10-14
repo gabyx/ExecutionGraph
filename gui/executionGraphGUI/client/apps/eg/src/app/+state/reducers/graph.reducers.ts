@@ -98,6 +98,7 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
 
     case fromActions.NODE_UPDATED: {
       const { node } = action;
+      console.log('node updated', node);
       return {
         ...graph,
         nodes: {

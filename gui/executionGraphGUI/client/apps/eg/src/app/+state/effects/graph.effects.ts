@@ -80,6 +80,7 @@ export class GraphEffects {
     @Effect()
     moveNode$ = this.actions$.ofType<fromGraph.MoveNode>(fromGraph.MOVE_NODE)
     .pipe(
+        // tap(action => console.log('moving node ', action.node, action.newPosition)),
         tap((action) => { action.node.uiProps.position = { x: action.newPosition.x, y: action.newPosition.y }; }),
         map((action, state) => new fromGraph.NodeUpdated(action.node))
     );

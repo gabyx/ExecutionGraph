@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { OutputSocket, InputSocket, SocketId, isInputSocket, isOutputSocket } from './Socket';
+import { OutputSocket, InputSocket, SocketId, isInputSocket, isOutputSocket, Socket } from './Socket';
 
 /**
  * A class for defining a unique id for a `Connection`.
@@ -56,7 +56,7 @@ export class Connection {
   }
 }
 
-export function createConnection(source: OutputSocket | InputSocket, target: OutputSocket | InputSocket) {
+export function createConnection(source: Socket, target: Socket) {
   if (isOutputSocket(source) && isInputSocket(target)) {
     // Make a Write-Link
     return new Connection(source, target, true);

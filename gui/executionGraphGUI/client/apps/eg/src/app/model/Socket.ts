@@ -54,6 +54,7 @@ export class SocketId {
  * @class Socket
  */
 export abstract class Socket {
+  abstract get kind(): SocketType;
   protected _id: SocketId = new SocketId();
 
   constructor(
@@ -115,12 +116,12 @@ export class OutputSocket extends Socket {
 }
 
 /** Type guard for InputSocket */
-export function isInputSocket(socket: InputSocket | OutputSocket): socket is InputSocket {
+export function isInputSocket(socket: Socket): socket is InputSocket {
   return socket.kind === 'input';
 }
 
 /** Type guard for OutputSocket */
-export function isOutputSocket(socket: InputSocket | OutputSocket): socket is OutputSocket {
+export function isOutputSocket(socket: Socket): socket is OutputSocket {
   return socket.kind === 'output';
 }
 

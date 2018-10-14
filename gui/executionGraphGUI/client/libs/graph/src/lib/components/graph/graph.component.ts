@@ -46,7 +46,7 @@ export class GraphComponent {
   @ContentChildren(PortComponent, { descendants: true })
   ports: QueryList<PortComponent>;
 
-  @ContentChildren(ConnectionComponent, { descendants: true })
+  @ContentChildren(ConnectionComponent, { descendants: true, })
   connections: QueryList<ConnectionComponent>;
 
   public get transformSvg() {

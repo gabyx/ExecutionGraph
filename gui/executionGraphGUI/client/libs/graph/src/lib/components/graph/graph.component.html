@@ -3,7 +3,7 @@
   [style.transform]="scaleTransform" [style.transformOrigin]="'0 0'"
   [style.height]="100/zoomFactor+ '%'" [style.width]="100/zoomFactor+'%'"
 >
-
+  {{ connections.length }}
     <svg height="100%" width="100%">
 
         <g [attr.transform]="transformSvg">

@@ -81,6 +81,8 @@ import { BackendTestComponent } from './components/backend-test/backend-test.com
 import { AddNodeComponent } from './components/add-node/add-node.component'
 import { SelectionToolComponent } from './components/tools/selection-tool.component';
 import { NavigationToolComponent } from './components/tools/navigation-tool.component';
+import { SocketConnectionToolComponent } from './components/tools/socket-connection-tool.component';
+import { MoveToolComponent } from './components/tools/move-tool.component';
 
 //environment.production = true;
 
@@ -116,7 +118,9 @@ const routes: Route[] = [
     BackendTestComponent,
     AddNodeComponent,
     SelectionToolComponent,
-    NavigationToolComponent
+    NavigationToolComponent,
+    MoveToolComponent,
+    SocketConnectionToolComponent
   ],
   imports: [
     HttpClientModule,

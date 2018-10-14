@@ -24,14 +24,14 @@ import {
   OutputSocket,
   createConnection,
   isOutputSocket,
-  NodeTypeDescription
+  NodeTypeDescription,
+  Socket
 } from '../../model';
 
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { Point, ConnectionDrawStyle, EventSourceGateway, GraphComponent } from '@eg/graph';
 import { isDefined } from '@eg/common';
 import { GraphsState } from '../../+state/reducers';
-import * as graphActions from '../../+state/actions/graph.actions';
 import * as graphQueries from '../../+state/selectors/graph.selectors'
 import { getConnectionDrawStyle } from '../../+state/selectors/ui.selectors';
 
@@ -46,9 +46,11 @@ export class WorkspaceComponent implements OnInit {
 
   public graph: Observable<Graph>;
 
+  public readonly graphEvents = new EventSourceGateway<GraphComponent>();
+
   public readonly nodeEvents = new EventSourceGateway<Node>();
 
-  public readonly graphEvents = new EventSourceGateway<GraphComponent>();
+  public readonly socketEvents = new EventSourceGateway<Socket>();
 
   public connectionDrawStyle: Observable<ConnectionDrawStyle>;
 
@@ -76,49 +78,44 @@ export class WorkspaceComponent implements OnInit {
 
   ngOnInit() {}
 
-  public updateNodePosition(node: Node, graphPosition: Point) {
-    // this.logger.info(`[WorkspaceComponent] Updating node position to ${position.x}:${position.y}`);
-    this.store.dispatch(new graphActions.MoveNode(node, graphPosition));
-  }
+  // public initConnectionFrom(socket: OutputSocket | InputSocket, position: Point) {
+  //   this.logger.info(`[WorkspaceComponent] Initiating new connection from ${socket.idString}`);
+  //   if (isOutputSocket(socket)) {
+  //     this.newTargetSocket = new InputSocket(socket.type, socket.name, new SocketIndex(0));
+  //   } else {
+  //     this.newTargetSocket = new OutputSocket(socket.type, socket.name, new SocketIndex(0));
+  //   }
+  //   // Create the connection
+  //   this.newConnection = createConnection(socket, this.newTargetSocket);
 
-  public initConnectionFrom(socket: OutputSocket | InputSocket, position: Point) {
-    this.logger.info(`[WorkspaceComponent] Initiating new connection from ${socket.idString}`);
-    if (isOutputSocket(socket)) {
-      this.newTargetSocket = new InputSocket(socket.type, socket.name, new SocketIndex(0));
-    } else {
-      this.newTargetSocket = new OutputSocket(socket.type, socket.name, new SocketIndex(0));
-    }
-    // Create the connection
-    this.newConnection = createConnection(socket, this.newTargetSocket);
+  //   this.newConnectionEndpoint = position;
+  // }
 
-    this.newConnectionEndpoint = position;
-  }
+  // public movingConnection(graphPosition: Point) {
+  //   this.newConnectionEndpoint = graphPosition;
+  //   //this.logger.debug(`Setting position to ${this.newConnectionEndpoint.x}:${this.newConnectionEndpoint.y}`);
+  // }
 
-  public movingConnection(graphPosition: Point) {
-    this.newConnectionEndpoint = graphPosition;
-    //this.logger.debug(`Setting position to ${this.newConnectionEndpoint.x}:${this.newConnectionEndpoint.y}`);
-  }
+  // public abortConnection() {
+  //   this.newConnection = null;
+  // }
 
-  public abortConnection() {
-    this.newConnection = null;
-  }
+  // public addConnection(source: OutputSocket | InputSocket, target: OutputSocket | InputSocket) {
+  //   // Create the connection
+  //   this.store.dispatch(new graphActions.AddConnection(source, target));
+  // }
 
-  public addConnection(source: OutputSocket | InputSocket, target: OutputSocket | InputSocket) {
-    // Create the connection
-    this.store.dispatch(new graphActions.AddConnection(source, target));
-  }
+  // public createNode(nodeType: NodeTypeDescription, graph: Graph, position?: Point) {
+  //   this.store.dispatch(new graphActions.CreateNode(nodeType, graph.id, position))
+  // }
 
-  public createNode(nodeType: NodeTypeDescription, graph: Graph, position?: Point) {
-    this.store.dispatch(new graphActions.CreateNode(nodeType, graph.id, position))
-  }
+  // public isOutputSocket(socket: InputSocket | OutputSocket): socket is OutputSocket {
+  //   return isOutputSocket(socket);
+  // }
 
-  public isOutputSocket(socket: InputSocket | OutputSocket): socket is OutputSocket {
-    return isOutputSocket(socket);
-  }
-
-  public isInputSocket(socket: InputSocket | OutputSocket): socket is InputSocket {
-    return !isOutputSocket(socket);
-  }
+  // public isInputSocket(socket: InputSocket | OutputSocket): socket is InputSocket {
+  //   return !isOutputSocket(socket);
+  // }
 
   public isNodeType(nodeType: NodeTypeDescription): boolean {
     console.log("is node type?", nodeType);
