@@ -33,7 +33,8 @@ import { Point, ConnectionDrawStyle, EventSourceGateway, GraphComponent } from '
 import { isDefined } from '@eg/common';
 import { GraphsState } from '../../+state/reducers';
 import * as graphQueries from '../../+state/selectors/graph.selectors'
-import { getConnectionDrawStyle } from '../../+state/selectors/ui.selectors';
+import { getConnectionDrawStyle, getSelection } from '../../+state/selectors/ui.selectors';
+import { Selection, UiState } from '../../+state/reducers/ui.reducers';
 
 @Injectable()
 @Component({
@@ -42,7 +43,9 @@ import { getConnectionDrawStyle } from '../../+state/selectors/ui.selectors';
   styleUrls: ['./workspace.component.scss']
 })
 export class WorkspaceComponent implements OnInit {
-  private logger: ILogger;
+  private readonly logger: ILogger;
+
+  private readonly selection: Observable<Selection>;
 
   public graph: Observable<Graph>;
 
@@ -53,6 +56,7 @@ export class WorkspaceComponent implements OnInit {
   public readonly socketEvents = new EventSourceGateway<Socket>();
 
   public connectionDrawStyle: Observable<ConnectionDrawStyle>;
+
 
   public get nodes(): Observable<Node[]> {
     return this.graph.pipe(map(graph => graph.nodes), map(nodes => Object.keys(nodes).map(id => nodes[id])));
@@ -69,16 +73,17 @@ export class WorkspaceComponent implements OnInit {
   public newConnection: Connection = null;
   public newConnectionEndpoint: Point = { x: 0, y: 0 };
 
-  constructor(private store: Store<GraphsState>, loggerFactory: LoggerFactory) {
+  constructor(private store: Store<GraphsState>, uiStore: Store<UiState>, loggerFactory: LoggerFactory) {
     this.logger = loggerFactory.create('Workspace');
+    this.selection = uiStore.select(getSelection);
     // this.graph.subscribe(g => this.logger.debug(`Displaying graph ${g.id}`));
   }
-  
+
   ngOnInit() {
     this.graph = this.store.select(graphQueries.getSelectedGraph).pipe( filter(g => isDefined(g) && g!=null));
     this.connectionDrawStyle = this.store.select(getConnectionDrawStyle);
   }
-  
+
   // public initConnectionFrom(socket: OutputSocket | InputSocket, position: Point) {
   //   this.logger.info(`[WorkspaceComponent] Initiating new connection from ${socket.idString}`);
   //   if (isOutputSocket(socket)) {
@@ -117,6 +122,10 @@ export class WorkspaceComponent implements OnInit {
   // public isInputSocket(socket: InputSocket | OutputSocket): socket is InputSocket {
   //   return !isOutputSocket(socket);
   // }
+
+  public isNodeSelected(node: Node): Observable<boolean> {
+    return this.selection.pipe(map(selection => selection.nodes.indexOf(node.id) >= 0));
+  }
 
   public isNodeType(nodeType: NodeTypeDescription): boolean {
     console.log("is node type?", nodeType);

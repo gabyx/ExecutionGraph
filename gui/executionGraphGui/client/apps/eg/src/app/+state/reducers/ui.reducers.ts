@@ -2,12 +2,14 @@ import { ConnectionDrawStyleName } from "../../components/connection-style-optio
 import * as fromUiActions from "../actions/ui.actions";
 import { NodeId, ConnectionId } from "../../model";
 
+export interface Selection {
+  nodes: NodeId[],
+  connections: ConnectionId[]
+}
+
 export interface UiState {
   connectionDrawStyle: ConnectionDrawStyleName,
-  selection: {
-    nodes: NodeId[],
-    connections: ConnectionId[]
-  }
+  selection: Selection
 }
 
 export const initalState: UiState = {

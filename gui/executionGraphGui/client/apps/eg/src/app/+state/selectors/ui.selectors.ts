@@ -5,7 +5,7 @@ import { BezierConnectionDrawStyle, DirectConnectionDrawStyle, ManhattenConnecti
 export const getConnectionDrawStyleName = createSelector(
   getUiState,
   (state) => state.connectionDrawStyle
-)
+);
 
 export const getConnectionDrawStyle = createSelector(
   getConnectionDrawStyleName,
@@ -25,4 +25,9 @@ export const getConnectionDrawStyle = createSelector(
       }
     }
   }
-)
+);
+
+export const getSelection = createSelector(
+  getUiState,
+  (state) => state.selection
+);

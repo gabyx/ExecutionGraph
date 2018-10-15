@@ -1,8 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { filter, tap, withLatestFrom } from 'rxjs/operators';
+
 import { Point, MouseButton } from '@eg/graph';
 
 import { ToolComponent } from './tool-component';
-import { filter } from 'rxjs/operators';
+import { UiState, Selection } from '../../+state/reducers/ui.reducers';
+import * as fromUiSelectors from '../../+state/selectors/ui.selectors';
+import * as fromUiActions from '../../+state/actions/ui.actions';
+
+enum KEY_CODE {
+    BACKSPACE = 8,
+    SHIFT = 16,
+    CTRL = 17,
+    DELETE = 46,
+}
 
 @Component({
     selector: 'eg-selection-tool',
@@ -35,6 +48,15 @@ export class SelectionToolComponent extends ToolComponent implements OnInit {
 
     private dragPoint: Point = null;
 
+    private readonly selection: Observable<Selection>;
+
+    private isExtending: boolean = false;
+
+    constructor(private store: Store<UiState>) {
+        super();
+        this.selection = store.select(fromUiSelectors.getSelection);
+    }
+
     public get isSelecting() {
         return this.dragStartPoint !== null && this.dragPoint !== null;
     }
@@ -65,5 +87,35 @@ export class SelectionToolComponent extends ToolComponent implements OnInit {
         this.graphEvents.onDragStop
             .pipe(filter(e => e.button === MouseButton.Left))
             .subscribe(e => { this.dragPoint = null; this.dragStartPoint = null;});
+
+        this.nodeEvents.onClick.pipe( withLatestFrom(this.selection) )
+            .subscribe(([e, selection]) => {
+                if(this.isExtending) {
+                    if(selection.nodes.indexOf(e.element.id) < 0) {
+                        this.store.dispatch(new fromUiActions.AddSelection([e.element.id]));
+                    } else {
+                        this.store.dispatch(new fromUiActions.RemoveSelection([e.element.id]));
+                    }
+                } else {
+                    this.store.dispatch(new fromUiActions.SetSelection([e.element.id], [...selection.connections]));
+                }
+            });
+        this.graphEvents.onClick.subscribe(e => this.store.dispatch(new fromUiActions.ClearSelection()));
     }
+
+    @HostListener('window:keydown', ['$event'])
+    onKeyDown(keyEvent: KeyboardEvent) {
+        if (keyEvent.keyCode === KEY_CODE.CTRL || keyEvent.keyCode === KEY_CODE.SHIFT) {
+            this.isExtending = true;
+        }
+    }
+
+    @HostListener('window:keyup', ['$event'])
+    onKeyUp(keyEvent: KeyboardEvent) {
+        if (keyEvent.keyCode === KEY_CODE.CTRL || keyEvent.keyCode === KEY_CODE.SHIFT) {
+            this.isExtending = false;
+        }
+    }
+
+
 }

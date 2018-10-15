@@ -13,7 +13,8 @@
         <div *ngFor="let node of nodes | async"
             #nodeElement
             class="node ngcs-node"
-            [attr.id]="node.idString"            
+            [class.selected]="isNodeSelected(node) | async"
+            [attr.id]="node.idString"
             [style.left]="node.uiProps.position.x+'px'"
             [style.top]="node.uiProps.position.y+'px'"
             [ngcsEventSource]="node" [forwardTo]="nodeEvents"

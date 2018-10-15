@@ -1,8 +1,8 @@
 import { Directive, Input, HostListener, EventEmitter, ElementRef, OnDestroy } from "@angular/core";
 import { IElementEvents, ElementMouseEvent, ElementMouseButtonEvent, EventSourceGateway, ElementMouseScrollEvent } from "../services/ElementInteraction";
 import { Position } from "../model/Point";
-import { Observable } from "rxjs";
-import { switchMap, map, takeUntil, tap } from "rxjs/operators";
+import { Observable, fromEvent } from "rxjs";
+import { switchMap, map, takeUntil, tap, first, mergeMap, concatMap } from "rxjs/operators";
 
 @Directive({
     selector: '[ngcsEventSource]'
@@ -58,7 +58,7 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
 
     public get onClick(): Observable<ElementMouseButtonEvent<TElement>> {
         return this.mousePressed
-            .pipe(switchMap(down => this.mousePressed.asObservable()));
+            .pipe(switchMap(down => this.mouseReleased.pipe( first()) ) );
     }
 
     public get onEnter(): Observable<ElementMouseEvent<TElement>> {
@@ -79,7 +79,7 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
 
     public get onDragContinue(): Observable<ElementMouseButtonEvent<TElement>> {
         return this.mousePressed.pipe(
-            switchMap(down => this.documentMouseMoved.pipe(
+            mergeMap(down => this.documentMouseMoved.pipe(
                 map(move => ({...move, button: down.button})),
                 takeUntil(this.documentMouseReleased)
             ))
@@ -133,6 +133,7 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
     }
 
     @HostListener('mouseup', ['$event']) onMouseUp(event: MouseEvent) {
+    //   event.cancelBubble = true;
       this.mouseReleased.emit(this.convertButtonEvent(event));
     }
 
