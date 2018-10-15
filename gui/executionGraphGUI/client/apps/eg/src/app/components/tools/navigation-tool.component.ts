@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Point } from '@eg/graph';
+import { Point, MouseButton } from '@eg/graph';
 
 import { ToolComponent } from './tool-component';
 
@@ -13,15 +13,19 @@ export class NavigationToolComponent extends ToolComponent implements OnInit {
     ngOnInit() {
         const panStart: Point = {x: 0, y: 0};
         this.graphEvents.onDragStart.subscribe((e) => {
-            const mousePosition = e.element.convertMouseToGraphPosition(e.mousePosition);
-            panStart.x = mousePosition.x;
-            panStart.y = mousePosition.y;
+            if(e.button === MouseButton.Right) {
+                const mousePosition = e.element.convertMouseToGraphPosition(e.mousePosition);
+                panStart.x = mousePosition.x;
+                panStart.y = mousePosition.y;
+            }
         });
 
         this.graphEvents.onDragContinue.subscribe((e) => {
-            const position = e.element.convertMouseToGraphPosition(e.mousePosition);
-            e.element.pan.x += position.x - panStart.x;
-            e.element.pan.y += position.y - panStart.y;
+            if (e.button === MouseButton.Right) {
+                const position = e.element.convertMouseToGraphPosition(e.mousePosition);
+                e.element.pan.x += position.x - panStart.x;
+                e.element.pan.y += position.y - panStart.y;
+            }
         });
 
         this.graphEvents.onScroll.subscribe(e => {

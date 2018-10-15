@@ -1,18 +1,23 @@
 import { Component, OnInit } from '@angular/core';
-import { Point } from '@eg/graph';
+import { Point, MouseButton } from '@eg/graph';
 
 import { ToolComponent } from './tool-component';
+import { filter } from 'rxjs/operators';
 
 @Component({
     selector: 'eg-selection-tool',
     template: `
-    <svg:rect class="selection-preview"
-        *ngIf="isSelecting"
-        [attr.x]="selectionAreaX"
-        [attr.y]="selectionAreaY"
-        [attr.width]="selectionAreaWidth"
-        [attr.height]="selectionAreaHeight"
-        ></svg:rect>
+    <ngcs-svg-layer *ngIf="isSelecting">
+
+        <svg:rect class="selection-preview"
+
+            [attr.x]="selectionAreaX"
+            [attr.y]="selectionAreaY"
+            [attr.width]="selectionAreaWidth"
+            [attr.height]="selectionAreaHeight"
+            ></svg:rect>
+
+    </ngcs-svg-layer>
     `,
     styles: [`
     .selection-preview {
@@ -51,20 +56,14 @@ export class SelectionToolComponent extends ToolComponent implements OnInit {
     }
 
     ngOnInit() {
-        // this.nodeEvents.onMove.subscribe(() => console.log("mouse moved"));
-        // this.nodeEvents.onDown.subscribe(() => console.log("mouse down"));
+        this.graphEvents.onDragStart
+            .pipe(filter(e => e.button === MouseButton.Left))
+            .subscribe(e => this.dragStartPoint = this.graph.convertMouseToGraphPosition(e.mousePosition));
+        this.graphEvents.onDragContinue
+            .pipe(filter(e => e.button === MouseButton.Left))
+            .subscribe(e => this.dragPoint = this.graph.convertMouseToGraphPosition(e.mousePosition));
+        this.graphEvents.onDragStop
+            .pipe(filter(e => e.button === MouseButton.Left))
+            .subscribe(e => { this.dragPoint = null; this.dragStartPoint = null;});
     }
-
-    // public onDragStart(dragEvent: GraphMouseEvent)  {
-    //     this.dragStartPoint = dragEvent.graphPosition;
-    // }
-
-    // public onDrag(dragPoint: GraphMouseEvent) {
-    //     this.dragPoint = dragPoint.graphPosition;
-    // }
-
-    // public onDragEnd(dragEvent: GraphMouseEvent) {
-    //     this.dragStartPoint = null;
-    //     this.dragPoint = null;
-    // }
 }
