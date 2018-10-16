@@ -8,13 +8,18 @@ import { Point, MouseButton } from '@eg/graph';
 import { ToolComponent } from './tool-component';
 import { UiState, Selection } from '../../+state/reducers/ui.reducers';
 import * as fromUiSelectors from '../../+state/selectors/ui.selectors';
+import * as fromGraphSelectors from '../../+state/selectors/graph.selectors';
 import * as fromUiActions from '../../+state/actions/ui.actions';
+import { GraphsState } from '../../+state/reducers';
+import { Graph } from '../../model';
 
 enum KEY_CODE {
     BACKSPACE = 8,
     SHIFT = 16,
     CTRL = 17,
     DELETE = 46,
+    ESC = 27,
+    A = 65
 }
 
 @Component({
@@ -50,11 +55,14 @@ export class SelectionToolComponent extends ToolComponent implements OnInit {
 
     private readonly selection: Observable<Selection>;
 
+    private selectedGraph: Graph;
+
     private isExtending: boolean = false;
 
-    constructor(private store: Store<UiState>) {
+    constructor(private store: Store<UiState>, graphStore: Store<GraphsState>) {
         super();
         this.selection = store.select(fromUiSelectors.getSelection);
+        graphStore.select(fromGraphSelectors.getSelectedGraph).subscribe(g => this.selectedGraph = g);
     }
 
     public get isSelecting() {
@@ -105,8 +113,21 @@ export class SelectionToolComponent extends ToolComponent implements OnInit {
 
     @HostListener('window:keydown', ['$event'])
     onKeyDown(keyEvent: KeyboardEvent) {
+        keyEvent.preventDefault();
         if (keyEvent.keyCode === KEY_CODE.CTRL || keyEvent.keyCode === KEY_CODE.SHIFT) {
             this.isExtending = true;
+        }
+
+        if(keyEvent.keyCode===KEY_CODE.ESC) {
+            this.store.dispatch(new fromUiActions.ClearSelection());
+        }
+
+        if (keyEvent.keyCode === KEY_CODE.A && keyEvent.ctrlKey) {
+            if (this.selectedGraph) {
+                const nodes = Object.keys(this.selectedGraph.nodes).map(nodeId => this.selectedGraph.nodes[nodeId].id);
+                const connections = Object.keys(this.selectedGraph.connections).map(id => this.selectedGraph.connections[id].id);
+                this.store.dispatch(new fromUiActions.SetSelection([...nodes], [...connections]));
+            }
         }
     }
 
@@ -116,6 +137,4 @@ export class SelectionToolComponent extends ToolComponent implements OnInit {
             this.isExtending = false;
         }
     }
-
-
 }
