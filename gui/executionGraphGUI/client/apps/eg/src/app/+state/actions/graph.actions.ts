@@ -101,7 +101,7 @@ export class NodeAdded implements Action {
 
 export class RemoveNode implements Action {
     readonly type = REMOVE_NODE;
-    constructor(public id: NodeId) { }
+    constructor(public graphId: Id, public nodeId: NodeId) { }
 }
 
 export class NodeRemoved implements Action {

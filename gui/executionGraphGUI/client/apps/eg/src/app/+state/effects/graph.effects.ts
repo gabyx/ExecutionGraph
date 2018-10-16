@@ -77,6 +77,7 @@ export class GraphEffects {
                 new fromNotifications.ShowNotification(`Added the node ${node.name} for you \u{1F6EB}`)
             ])
         );
+
     @Effect()
     moveNode$ = this.actions$.ofType<fromGraph.MoveNode>(fromGraph.MOVE_NODE)
     .pipe(
@@ -84,6 +85,17 @@ export class GraphEffects {
         tap((action) => { action.node.uiProps.position = { x: action.newPosition.x, y: action.newPosition.y }; }),
         map((action, state) => new fromGraph.NodeUpdated(action.node))
     );
+
+    @Effect()
+    removeNode$ = this.actions$.ofType<fromGraph.RemoveNode>(fromGraph.REMOVE_NODE)
+        .pipe(
+            switchMap((action, state) => from(this.graphManipulationService.removeNode(action.graphId, action.nodeId))
+                .pipe(map(() => action))),
+            switchMap(action => [
+                new fromGraph.NodeRemoved(action.nodeId),
+                new fromNotifications.ShowNotification(`Removed the node for you \u{1F6EB}`)
+            ])
+        );
 
     @Effect()
     addConnection$ = this.actions$.ofType<fromGraph.AddConnection>(fromGraph.ADD_CONNECTION)

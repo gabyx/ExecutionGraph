@@ -5,7 +5,7 @@ import { filter, tap, withLatestFrom } from 'rxjs/operators';
 
 import { Point, MouseButton } from '@eg/graph';
 
-import { ToolComponent } from './tool-component';
+import { ToolComponent, KEY_CODE } from './tool-component';
 import { UiState, Selection } from '../../+state/reducers/ui.reducers';
 import * as fromUiSelectors from '../../+state/selectors/ui.selectors';
 import * as fromGraphSelectors from '../../+state/selectors/graph.selectors';
@@ -13,14 +13,6 @@ import * as fromUiActions from '../../+state/actions/ui.actions';
 import { GraphsState } from '../../+state/reducers';
 import { Graph } from '../../model';
 
-enum KEY_CODE {
-    BACKSPACE = 8,
-    SHIFT = 16,
-    CTRL = 17,
-    DELETE = 46,
-    ESC = 27,
-    A = 65
-}
 
 @Component({
     selector: 'eg-selection-tool',

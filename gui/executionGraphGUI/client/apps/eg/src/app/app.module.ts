@@ -84,6 +84,7 @@ import { NavigationToolComponent } from './components/tools/navigation-tool.comp
 import { SocketConnectionToolComponent } from './components/tools/socket-connection-tool.component';
 import { ConnectionLayerComponent } from './components/connection-layer/connection-layer.component';
 import { MoveToolComponent } from './components/tools/move-tool.component';
+import { DeleteToolComponent } from './components/tools/delete-tool.component';
 
 //environment.production = true;
 
@@ -122,6 +123,7 @@ const routes: Route[] = [
     NavigationToolComponent,
     MoveToolComponent,
     SocketConnectionToolComponent,
+    DeleteToolComponent,
     ConnectionLayerComponent
   ],
   imports: [
