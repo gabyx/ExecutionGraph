@@ -5,7 +5,7 @@ import { Effect, Actions } from '@ngrx/effects';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 
 import { of, from, Observable } from 'rxjs';
-import { map, tap, switchMap, catchError, filter, withLatestFrom, exhaustMap } from 'rxjs/operators';
+import { map, tap, switchMap, catchError, filter, withLatestFrom, exhaustMap, mergeMap } from 'rxjs/operators';
 
 import { Id } from '@eg/common';
 import { LoggerFactory, ILogger } from '@eg/logger';
@@ -39,7 +39,7 @@ export class GraphEffects {
     @Effect()
     loadGraphs$ = this.actions$.ofType<fromGraph.LoadGraphs>(fromGraph.LOAD_GRAPHS)
         .pipe(
-            switchMap((action, state) => this.createDummyGraph()),
+            mergeMap((action, state) => this.createDummyGraph()),
             catchError(error => {
                 this.log.error(`Failed to load graphs`, error);
                 return of(new fromGraph.GraphLoadError(error))
@@ -59,8 +59,8 @@ export class GraphEffects {
     @Effect()
     createGraph$ = this.actions$.ofType<fromGraph.CreateGraph>(fromGraph.CREATE_GRAPH)
         .pipe(
-            switchMap((action, state) => from(this.graphManagementService.addGraph(action.graphType.id))),
-            switchMap(graph => [
+            mergeMap((action, state) => from(this.graphManagementService.addGraph(action.graphType.id))),
+            mergeMap  (graph => [
                 new fromGraph.GraphAdded(graph),
                 new fromNotifications.ShowNotification(`Shiny new graph created for you \u{1F6EB}`)
             ])
@@ -69,9 +69,9 @@ export class GraphEffects {
     @Effect()
     createNode$ = this.actions$.ofType<fromGraph.CreateNode>(fromGraph.CREATE_NODE)
         .pipe(
-            switchMap((action, state) => from(this.graphManipulationService.addNode(action.graphId, action.nodeType.name, "Some new node"))
+              mergeMap((action, state) => from(this.graphManipulationService.addNode(action.graphId, action.nodeType.name, "Some new node"))
                 .pipe(map(node => ({node, action})))),
-            switchMap(({ node, action }) => [
+              mergeMap(({ node, action }) => [
                 new fromGraph.NodeAdded(node),
                 new fromGraph.MoveNode(node, action.position ? action.position : {x:0, y:0 }),
                 new fromNotifications.ShowNotification(`Added the node ${node.name} for you \u{1F6EB}`)
@@ -89,9 +89,9 @@ export class GraphEffects {
     @Effect()
     removeNode$ = this.actions$.ofType<fromGraph.RemoveNode>(fromGraph.REMOVE_NODE)
         .pipe(
-            switchMap(action => from(this.graphManipulationService.removeNode(action.graphId, action.nodeId))
+            mergeMap(action => from(this.graphManipulationService.removeNode(action.graphId, action.nodeId))
                 .pipe(map(() => action))),
-            switchMap(action => [
+            mergeMap(action => [
                 new fromGraph.NodeRemoved(action.nodeId),
                 new fromNotifications.ShowNotification(`Removed the node for you \u{1F6EB}`)
             ])
@@ -142,7 +142,7 @@ export class GraphEffects {
                  filter(r => r && arraysEqual(r.primaryRouteSegments, segments)),
                  withLatestFrom(this.store),
                  //tap(([r, state]) => console.log(`Handling navigation`)))
-                 switchMap(([r, state]) => callback(r, state)),
+                 mergeMap(([r, state]) => callback(r, state)),
                  catchError(error => {
                     this.log.error(`Failed to navigate`, error);
                     return of();
