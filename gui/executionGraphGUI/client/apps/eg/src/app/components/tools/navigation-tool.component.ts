@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Point, MouseButton } from '@eg/graph';
+import { Point, MouseButton, GraphComponent } from '@eg/graph';
 
 import { ToolComponent } from './tool-component';
 
@@ -9,12 +9,15 @@ import { ToolComponent } from './tool-component';
 })
 export class NavigationToolComponent extends ToolComponent implements OnInit {
 
+    constructor(private graph: GraphComponent) {
+      super();
+    }
 
     ngOnInit() {
         const panStart: Point = {x: 0, y: 0};
         this.graphEvents.onDragStart.subscribe((e) => {
             if(e.button === MouseButton.Right) {
-                const mousePosition = e.element.convertMouseToGraphPosition(e.mousePosition);
+                const mousePosition = this.graph.convertMouseToGraphPosition(e.mousePosition);
                 panStart.x = mousePosition.x;
                 panStart.y = mousePosition.y;
             }
@@ -22,18 +25,22 @@ export class NavigationToolComponent extends ToolComponent implements OnInit {
 
         this.graphEvents.onDragContinue.subscribe((e) => {
             if (e.button === MouseButton.Right) {
-                const position = e.element.convertMouseToGraphPosition(e.mousePosition);
-                e.element.pan.x += position.x - panStart.x;
-                e.element.pan.y += position.y - panStart.y;
+                const position = this.graph.convertMouseToGraphPosition(e.mousePosition);
+                this.graph.pan.x += position.x - panStart.x;
+                this.graph.pan.y += position.y - panStart.y;
             }
         });
 
         this.graphEvents.onScroll.subscribe(e => {
           const zoomSpeed = 0.98;
           if (e.delta < 0) {
-            e.element.zoomFactor *= zoomSpeed;
+            this.graph.zoomFactor *= zoomSpeed;
+            // this.graph.pan.x *= zoomSpeed;
+            // this.graph.pan.y *= zoomSpeed;
           } else {
-            e.element.zoomFactor /= zoomSpeed;
+            this.graph.zoomFactor /= zoomSpeed;
+            // this.graph.pan.x /= zoomSpeed;
+            // this.graph.pan.y /= zoomSpeed;
           }
         });
 
