@@ -1,7 +1,8 @@
 import { Id, isDefined } from "@eg/common";
 
 import * as fromActions from '../actions/graph.actions';
-import { Graph } from "../../model";
+import { Graph, Connection } from "../../model";
+import { ConnectionMap } from "../../model/Graph";
 
 export interface GraphMap {
     [id: string]: Graph
@@ -122,9 +123,22 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
     case fromActions.NODE_REMOVED: {
       // Remove by destructuring to the removed and the rest
       const {[action.id.toString()]: removed, ...nodes} = graph.nodes;
+      //@todo cmonspqr -> gabnue:
+      // Either the backend should report removed connections due to
+      // removed nodes to keep the model consistent, or the backend should
+      // not hold the model at all but be stateless and merely execute graphs
+      // that are passed in as a whole?
+      // Anyway we deleting obsolete connections here is just a hack
+      const connections = Object.keys(graph.connections)
+        .map(id => graph.connections[id])
+        .filter(connection => connection.inputSocket.parent.id !== action.id)
+        .filter(connection => connection.outputSocket.parent.id !== action.id);
       return {
         ...graph,
-        nodes: nodes
+        nodes: nodes,
+        connections: connections.reduce(
+          (existing: ConnectionMap, connection: Connection) => ({...existing, [connection.id.toString()]: connection}),
+          {})
       }
     }
 

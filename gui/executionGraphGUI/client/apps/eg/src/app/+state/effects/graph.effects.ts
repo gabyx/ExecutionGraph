@@ -89,7 +89,7 @@ export class GraphEffects {
     @Effect()
     removeNode$ = this.actions$.ofType<fromGraph.RemoveNode>(fromGraph.REMOVE_NODE)
         .pipe(
-            switchMap((action, state) => from(this.graphManipulationService.removeNode(action.graphId, action.nodeId))
+            switchMap(action => from(this.graphManipulationService.removeNode(action.graphId, action.nodeId))
                 .pipe(map(() => action))),
             switchMap(action => [
                 new fromGraph.NodeRemoved(action.nodeId),

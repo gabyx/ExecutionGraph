@@ -114,7 +114,7 @@ export class SelectionToolComponent extends ToolComponent implements OnInit {
             this.store.dispatch(new fromUiActions.ClearSelection());
         }
 
-        if (keyEvent.keyCode === KEY_CODE.A && keyEvent.ctrlKey) {
+        if (keyEvent.keyCode === KEY_CODE.A && (keyEvent.ctrlKey || keyEvent.metaKey)) {
             if (this.selectedGraph) {
                 const nodes = Object.keys(this.selectedGraph.nodes).map(nodeId => this.selectedGraph.nodes[nodeId].id);
                 const connections = Object.keys(this.selectedGraph.connections).map(id => this.selectedGraph.connections[id].id);
