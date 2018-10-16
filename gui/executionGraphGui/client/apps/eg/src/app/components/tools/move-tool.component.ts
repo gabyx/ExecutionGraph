@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
 
-import { Point } from "@eg/graph";
+import { Point, GraphComponent } from "@eg/graph";
 import { ToolComponent } from "./tool-component";
 import { GraphsState } from "../../+state/reducers";
 import { MoveNode } from "../../+state/actions";
@@ -12,7 +12,7 @@ import { MoveNode } from "../../+state/actions";
 })
 export class MoveToolComponent extends ToolComponent implements OnInit {
 
-  constructor(private store: Store<GraphsState>) {
+  constructor(private graph: GraphComponent, private store: Store<GraphsState>) {
     super();
   }
 

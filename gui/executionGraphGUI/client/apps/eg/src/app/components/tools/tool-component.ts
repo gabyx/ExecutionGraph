@@ -12,9 +12,6 @@ export enum KEY_CODE {
 }
 
 export abstract class ToolComponent {
-
-    @Input() graph: GraphComponent;
-
     @Input() nodeEvents: IElementEvents<Node>;
 
     @Input() graphEvents: IElementEvents<GraphComponent>;

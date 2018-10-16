@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { filter, tap, withLatestFrom } from 'rxjs/operators';
 
-import { Point, MouseButton } from '@eg/graph';
+import { Point, MouseButton, GraphComponent } from '@eg/graph';
 
 import { ToolComponent, KEY_CODE } from './tool-component';
 import { UiState, Selection } from '../../+state/reducers/ui.reducers';
@@ -51,7 +51,7 @@ export class SelectionToolComponent extends ToolComponent implements OnInit {
 
     private isExtending: boolean = false;
 
-    constructor(private store: Store<UiState>, graphStore: Store<GraphsState>) {
+    constructor(private graph: GraphComponent, private store: Store<UiState>, graphStore: Store<GraphsState>) {
         super();
         this.selection = store.select(fromUiSelectors.getSelection);
         graphStore.select(fromGraphSelectors.getSelectedGraph).subscribe(g => this.selectedGraph = g);

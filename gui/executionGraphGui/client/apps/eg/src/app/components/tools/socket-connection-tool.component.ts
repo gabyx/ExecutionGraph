@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Point, ConnectionDrawStyle } from '@eg/graph';
+import { Point, ConnectionDrawStyle, GraphComponent } from '@eg/graph';
 import { ILogger, LoggerFactory } from '@eg/logger';
 
 import { ToolComponent } from './tool-component';
@@ -12,23 +12,23 @@ import { AddConnection } from '../../+state/actions';
     selector: 'eg-socket-connection-tool',
     template: `
     <ng-container *ngIf="tempConnection">
-        
+
       <eg-connection-layer
           [connections]="[tempConnection]"
           [drawStyle]="connectionDrawStyle"
           class="new-connections"
           [class.nondroppable]="!targetSocket">
       </eg-connection-layer>
-      
+
       <ngcs-html-layer>
-        <div 
+        <div
         *ngIf="!targetSocket"
         style="position: absolute"
         [style.left]="tempConnectionEndpoint.x+'px'"
         [style.top]="tempConnectionEndpoint.y+'px'">
-        
+
           <ngcs-port [id]="tempTargetSocket.idString" class="right middle"></ngcs-port>
-        
+
         </div>
       </ngcs-html-layer>
     </ng-container>
@@ -55,7 +55,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
 
   private readonly logger: ILogger;
 
-  constructor(private store: Store<GraphsState>, loggerFactory: LoggerFactory) {
+  constructor(private graph: GraphComponent, private store: Store<GraphsState>, loggerFactory: LoggerFactory) {
     super();
     this.logger = loggerFactory.create('SocketConnectionToolComponent');
   }
@@ -63,7 +63,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
   ngOnInit() {
     this.socketEvents.onDragStart.subscribe(e => {
       const socket = e.element;
-      
+
       this.logger.info(`Initiating new connection from ${socket.idString}`);
       this.sourceSocket = socket;
       if (isOutputSocket(this.sourceSocket)) {
