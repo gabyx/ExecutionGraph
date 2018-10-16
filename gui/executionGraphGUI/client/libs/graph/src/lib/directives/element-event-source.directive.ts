@@ -58,7 +58,7 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
 
     public get onClick(): Observable<ElementMouseButtonEvent<TElement>> {
         return this.mousePressed
-            .pipe(switchMap(down => this.mouseReleased.pipe( first()) ) );
+            .pipe(switchMap(down => this.mouseReleased.pipe( first(), takeUntil(this.mouseMoved)) ) );
     }
 
     public get onEnter(): Observable<ElementMouseEvent<TElement>> {
@@ -123,8 +123,12 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
     }
 
     @HostListener('mousemove', ['$event']) onMouseMove(event: MouseEvent) {
-      event.preventDefault();
-      this.mouseMoved.emit(this.convertEvent(event));
+        // Fix Chrome Bug
+        if(event.movementX===0 && event.movementY===0) {
+            return;
+        }
+        event.preventDefault();
+        this.mouseMoved.emit(this.convertEvent(event));
     }
 
 
