@@ -1,6 +1,6 @@
 import { GraphComponent, IElementEvents } from "@eg/graph";
 import { Input } from "@angular/core";
-import { Socket, Node, Graph } from "../../model";
+import { Socket, Node, Graph, Connection } from "../../model";
 
 export enum KEY_CODE {
     BACKSPACE = 8,
@@ -17,4 +17,6 @@ export abstract class ToolComponent {
     @Input() graphEvents: IElementEvents<Graph>;
 
     @Input() socketEvents: IElementEvents<Socket>;
+
+    @Input() connectionEvents: IElementEvents<Connection>;
 }

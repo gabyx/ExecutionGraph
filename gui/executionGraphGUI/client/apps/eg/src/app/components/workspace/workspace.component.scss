@@ -1,3 +1,4 @@
+@import "app/variables";
 
 
 #graph-1 {
@@ -58,15 +59,15 @@
     }
 
     &.selected {
-      box-shadow: 0px 0px 7px 3px rgba(233, 70, 211, 0.5);
+      box-shadow: 0px 0px 7px 3px $accent;
     }
   }
 
   &.dropping-allowed {
-    background: rgba(233, 70, 211, 0.5);
+    background: $accent;
   }
   &.dropping-forbidden {
-    background: red;
+    background: $warn;
   }
 
 }

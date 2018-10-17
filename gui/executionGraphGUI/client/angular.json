@@ -18,6 +18,11 @@
             "polyfills": "apps/eg/src/polyfills.ts",
             "assets": ["apps/eg/src/assets", "apps/eg/src/favicon.ico"],
             "styles": ["apps/eg/src/styles.css"],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "apps/eg/src"
+              ]
+            },
             "scripts": []
           },
           "configurations": {

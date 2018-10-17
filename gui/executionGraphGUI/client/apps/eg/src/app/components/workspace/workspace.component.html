@@ -64,7 +64,7 @@
     </eg-connection-layer>
 
     <!-- Tools are embedded in the graph, so they can add content to it too -->
-    <eg-selection-tool [nodeEvents]="nodeEvents" [graphEvents]="graphEvents"></eg-selection-tool>
+    <eg-selection-tool [nodeEvents]="nodeEvents" [graphEvents]="graphEvents" [connectionEvents]="connectionEvents"></eg-selection-tool>
     <eg-navigation-tool [nodeEvents]="nodeEvents" [graphEvents]="graphEvents"></eg-navigation-tool>
     <eg-move-tool [nodeEvents]="nodeEvents"></eg-move-tool>
     <eg-socket-connection-tool [socketEvents]="socketEvents" [graphEvents]="graphEvents" [connectionDrawStyle]="connectionDrawStyle | async"></eg-socket-connection-tool>

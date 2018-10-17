@@ -56,6 +56,8 @@ export class WorkspaceComponent implements OnInit {
 
   public readonly socketEvents = new EventSourceGateway<Socket>();
 
+  public readonly connectionEvents = new EventSourceGateway<Connection>();
+
   public connectionDrawStyle: Observable<ConnectionDrawStyle>;
 
   public get nodes(): Observable<Node[]> {
