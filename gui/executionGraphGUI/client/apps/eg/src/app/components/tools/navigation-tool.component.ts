@@ -32,26 +32,18 @@ export class NavigationToolComponent extends ToolComponent implements OnInit {
         });
 
         this.graphEvents.onScroll.subscribe(e => {
-          const zoomSpeed = 0.98;
+          const zoomSpeed = 0.95;
+          const graphPositionBefore = this.graph.convertMouseToGraphPosition(e.mousePosition);
           if (e.delta < 0) {
             this.graph.zoomFactor *= zoomSpeed;
-            // this.graph.pan.x *= zoomSpeed;
-            // this.graph.pan.y *= zoomSpeed;
           } else {
             this.graph.zoomFactor /= zoomSpeed;
-            // this.graph.pan.x /= zoomSpeed;
-            // this.graph.pan.y /= zoomSpeed;
           }
+          const graphPositionAfter = this.graph.convertMouseToGraphPosition(e.mousePosition);
+
+          this.graph.pan.x += graphPositionAfter.x - graphPositionBefore.x;
+          this.graph.pan.y += graphPositionAfter.y - graphPositionBefore.y;
         });
-
-        // this.graphEvents.onDragStop.subscribe(e => console.log("Graph drag stop"));
-        // this.graphEvents.onMove.subscribe(e => console.log("Graph move"));
-        // this.graphEvents.onDown.subscribe(e => console.log("Graph down"));
-
-        // this.graphEvents.onDown.subscribe(e => console.log("Graph down"));
-        // this.graphEvents.onEnter.subscribe(e => console.log("Graph enter"));
-        // this.graphEvents.onLeave.subscribe(e => console.log("Graph leave"));
-
     }
 
 }
