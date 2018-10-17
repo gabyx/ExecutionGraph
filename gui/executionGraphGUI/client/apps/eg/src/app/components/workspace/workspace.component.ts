@@ -50,7 +50,7 @@ export class WorkspaceComponent implements OnInit {
 
   public graph: Observable<Graph>;
 
-  public readonly graphEvents = new EventSourceGateway<GraphComponent>();
+  public readonly graphEvents = new EventSourceGateway<Graph>();
 
   public readonly nodeEvents = new EventSourceGateway<Node>();
 

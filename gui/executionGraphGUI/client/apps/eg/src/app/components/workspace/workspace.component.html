@@ -2,7 +2,7 @@
     #graphComponent
     *ngIf="graph | async as syncGraph"
 
-    [ngcsEventSource]="graphComponent" [forwardTo]="graphEvents"
+    [ngcsEventSource]="syncGraph" [forwardTo]="graphEvents"
 
     [ngcsDroppable]="isNodeType"
     (draggableDropped)="createNode($event.data, syncGraph, graphComponent.convertMouseToGraphPosition($event.event.mousePosition))">
