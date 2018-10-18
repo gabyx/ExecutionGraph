@@ -18,14 +18,19 @@ import {
   BezierConnectionDrawStyle
 } from '@eg/graph';
 import { ILogger, LoggerFactory } from '@eg/logger';
+import { Store } from '@ngrx/store';
+import { UiState } from '../../+state/reducers/ui.reducers';
+import { SetConnectionDrawStyle } from '../../+state/actions/ui.actions';
+import { Observable } from 'rxjs';
+import { getConnectionDrawStyleName } from '../../+state/selectors/ui.selectors';
 
-type ConnectionDrawStyleName = 'direct' | 'manhatten' | 'bezier';
+export type ConnectionDrawStyleName = 'direct' | 'manhatten' | 'bezier';
 
-const drawStyles = {
-  direct: new DirectConnectionDrawStyle(),
-  manhatten: new ManhattenConnectionDrawStyle(),
-  bezier: new BezierConnectionDrawStyle()
-};
+// const drawStyles = {
+//   direct: new DirectConnectionDrawStyle(),
+//   manhatten: new ManhattenConnectionDrawStyle(),
+//   bezier: new BezierConnectionDrawStyle()
+// };
 
 @Component({
   selector: 'eg-connection-style-options',
@@ -33,29 +38,20 @@ const drawStyles = {
   styleUrls: ['./connection-style-options.component.css']
 })
 export class ConnectionStyleOptionsComponent implements OnInit {
-  private drawStyleName: ConnectionDrawStyleName;
 
-  @Output()
-  connectionDrawStyleChanged = new EventEmitter<ConnectionDrawStyle>();
-  @Input()
-  connectionDrawStyle: ConnectionDrawStyle = drawStyles['direct'];
-
-  get drawStyle(): ConnectionDrawStyleName {
-    return this.drawStyleName;
-  }
-  set drawStyle(drawStyleName: ConnectionDrawStyleName) {
-    this.drawStyleName = drawStyleName;
-    this.connectionDrawStyle = drawStyles[this.drawStyleName];
-    this.log.info(`Draw Style changed to ${this.drawStyleName}`);
-    this.connectionDrawStyleChanged.emit(this.connectionDrawStyle);
-  }
+  drawStyle: Observable<ConnectionDrawStyleName>;
 
   private readonly log: ILogger;
 
-  constructor(loggerFactory: LoggerFactory) {
+  constructor(private store: Store<UiState>, loggerFactory: LoggerFactory) {
     this.log = loggerFactory.create('ConnectionStyleOptionsComponent');
-    this.drawStyle = 'direct';
+    this.drawStyle = store.select(getConnectionDrawStyleName);
   }
 
   ngOnInit() {}
+
+  setDrawStyle(drawStyleName: ConnectionDrawStyleName) {
+    this.log.info(`Draw Style changed to ${drawStyleName}`);
+    this.store.dispatch(new SetConnectionDrawStyle(drawStyleName));
+  }
 }

@@ -10,24 +10,34 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { HttpClientModule, HttpClient } from '@angular/common/http';
-
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { Route, RouterModule } from '@angular/router';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   MatIconModule,
   MatToolbarModule,
   MatMenuModule,
   MatButtonModule,
-  MatSliderModule,
-  MatListModule,
   MatDividerModule,
   MatExpansionModule,
   MatCheckboxModule,
   MatButtonToggleModule,
-  MatSidenavModule
+  MatSidenavModule,
+  MatCardModule,
+  MatGridListModule,
+  MatSnackBarModule,
+  MatTabsModule,
+  MatListModule,
+  MatSliderModule
 } from '@angular/material';
+import { NxModule } from '@nrwl/nx';
+import { RouterStateSerializer, StoreRouterConnectingModule } from '@ngrx/router-store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { storeFreeze } from 'ngrx-store-freeze';
 
 import { VERBOSE_LOG_TOKEN } from './tokens';
 
@@ -61,17 +71,45 @@ import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
 import { InspectorComponent } from './components/inspector/inspector.component';
 
-import { environment } from '../environments/environment';
 import { ConnectionStyleOptionsComponent } from './components/connection-style-options/connection-style-options.component';
-import { StoreModule } from '@ngrx/store';
-import { EffectsModule } from '@ngrx/effects';
-import { initialState as appInitialState, appReducer } from './+state/app.reducer';
-import { AppEffects } from './+state/app.effects';
-import { NxModule } from '@nrwl/nx';
-import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { storeFreeze } from 'ngrx-store-freeze';
+import { GraphCreateComponent } from './components/graph-create/graph-create.component';
 
-environment.production = true;
+import { reducers, RouterStateUrlSerializer } from './+state/reducers/app.reducers';
+import { effects } from './+state/effects';
+
+import { environment } from '../environments/environment';
+import { GraphLoadedGuard } from './guards/graphLoaded.guard';
+import { BackendTestComponent } from './components/backend-test/backend-test.component';
+import { AddNodeComponent } from './components/add-node/add-node.component'
+import { SelectionToolComponent } from './components/tools/selection-tool.component';
+import { NavigationToolComponent } from './components/tools/navigation-tool.component';
+import { SocketConnectionToolComponent } from './components/tools/socket-connection-tool.component';
+import { ConnectionLayerComponent } from './components/connection-layer/connection-layer.component';
+import { MoveToolComponent } from './components/tools/move-tool.component';
+import { DeleteToolComponent } from './components/tools/delete-tool.component';
+
+//environment.production = true;
+
+const routes: Route[] = [
+  {
+    path: 'graph',
+    children: [
+      { path: 'new', component: GraphCreateComponent },
+      {
+        path: ':graphId',
+        component: WorkspaceComponent,
+        canActivate: [GraphLoadedGuard],
+        children: [
+        ]
+      },
+    ],
+  },
+  { path: 'inspector', component: InspectorComponent, outlet: 'drawer' },
+  { path: 'lines', component: ConnectionStyleOptionsComponent, outlet: 'drawer' },
+  { path: 'nodes', component: AddNodeComponent, outlet: 'drawer' },
+  { path: 'backend-test', component: BackendTestComponent, outlet: 'drawer' },
+  { path: '**', redirectTo: 'graph/new' },
+];
 
 @NgModule({
   declarations: [
@@ -79,34 +117,50 @@ environment.production = true;
     ToolbarComponent,
     WorkspaceComponent,
     ConnectionStyleOptionsComponent,
-    InspectorComponent
+    InspectorComponent,
+    GraphCreateComponent,
+    BackendTestComponent,
+    AddNodeComponent,
+    SelectionToolComponent,
+    NavigationToolComponent,
+    MoveToolComponent,
+    SocketConnectionToolComponent,
+    DeleteToolComponent,
+    ConnectionLayerComponent
   ],
   imports: [
     HttpClientModule,
     BrowserModule,
     BrowserAnimationsModule,
-    MatIconModule,
-    MatToolbarModule,
-    MatMenuModule,
     MatButtonModule,
     MatListModule,
     MatDividerModule,
     MatExpansionModule,
     MatButtonToggleModule,
     MatCheckboxModule,
+    MatCardModule,
+    MatGridListModule,
+    MatIconModule,
+    MatListModule,
+    MatMenuModule,
     MatSidenavModule,
     MatSliderModule,
+    MatSnackBarModule,
+    MatTabsModule,
+    MatToolbarModule,
     GraphModule,
     NxModule.forRoot(),
+    RouterModule.forRoot(routes, { enableTracing: false}),
+    StoreRouterConnectingModule.forRoot({}),
     StoreModule.forRoot(
-      { app: appReducer },
+      reducers,
       {
-        initialState: { app: appInitialState }
+        initialState: { }
         //metaReducers : !environment.production ? [storeFreeze] : []
       }
     ),
-    EffectsModule.forRoot([AppEffects]),
-    !environment.production ? StoreDevtoolsModule.instrument() : []
+    EffectsModule.forRoot(effects),
+    environment.production ? [] : StoreDevtoolsModule.instrument()
   ],
   providers: [
     { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory },
@@ -114,6 +168,7 @@ environment.production = true;
     BinaryHttpRouterService,
     CefMessageRouterService,
     TestService,
+    GraphLoadedGuard,
     { provide: VERBOSE_LOG_TOKEN, useValue: environment.logReponsesVerbose },
     {
       provide: ExecutionService,
@@ -130,7 +185,8 @@ environment.production = true;
     {
       provide: GraphManagementService,
       useClass: !environment.useServiceDummys ? GraphManagementServiceBinaryHttp : GraphManagementServiceDummy
-    }
+    },
+    { provide: RouterStateSerializer, useClass: RouterStateUrlSerializer }
   ],
   bootstrap: [AppComponent]
 })

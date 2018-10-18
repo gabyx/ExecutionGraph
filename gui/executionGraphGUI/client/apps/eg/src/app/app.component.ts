@@ -11,15 +11,15 @@
 // =========================================================================================
 
 import { Component, OnInit } from '@angular/core';
+import { RouterState, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { filter } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { filter, tap, take } from 'rxjs/operators';
+
 import { LoggerFactory, ILogger } from '@eg/logger';
-import { Id, isDefined } from '@eg/common';
-import { AppState } from './+state/app.state';
-import { fromAppActions } from './+state/app.actions';
-import { appQuery } from './+state/app.selectors';
-import { UIPropertiesInspector } from './+state/app.uiproperties';
+import * as actions from './+state/actions';
+import { GraphsState } from './+state/reducers';
+import * as graphQueries from './+state/selectors/graph.selectors';
+import { getDrawerRequired } from './+state/selectors';
 
 @Component({
   selector: 'eg-root',
@@ -29,33 +29,44 @@ import { UIPropertiesInspector } from './+state/app.uiproperties';
 export class AppComponent implements OnInit {
   private readonly log: ILogger;
 
-  public inspectorProps: Observable<UIPropertiesInspector>;
+  public get hasDrawerContent() {
+    return this.store.select(getDrawerRequired);
+  }
 
-  constructor(private store: Store<AppState>, loggerFactory: LoggerFactory) {
+  constructor(private graphStore: Store<GraphsState>, private store: Store<RouterState>, private router: Router, loggerFactory: LoggerFactory) {
     this.log = loggerFactory.create('AppComponent');
   }
 
   ngOnInit() {
-    this.inspectorProps = this.store
-      .select(appQuery.getInspectorUIProperties)
-      .pipe(filter(uiProps => isDefined(uiProps)));
 
-    this.inspectorProps.subscribe((props: UIPropertiesInspector) => {
-      this.log.debug('AppComponent:: inspectorProps changed');
-    });
-
-    this.store.dispatch(new fromAppActions.LoadApp());
+    this.graphStore.dispatch(new actions.LoadGraphDescriptions());
+    this.graphStore.dispatch(new actions.LoadGraphs());
 
     this.store
-      .select(appQuery.getAllGraphs)
-      .pipe(filter(graph => isDefined(graph)))
-      .subscribe(graphs => {
-        this.log.debug(`Loaded graphs, auto-selecting first`);
-        if (graphs.size === 0) {
-          this.log.error(`Cannot select, since no graphs loaded!`);
-        } else {
-          this.store.dispatch(new fromAppActions.SelectGraph(graphs.keys().next().value));
-        }
-      });
+      .select(graphQueries.getGraphs)
+      .pipe(
+        filter(graphs => graphs.length > 0),
+        tap(graphs => {
+          this.log.debug(`Loaded graphs, auto-selecting first`);
+          if (graphs.length === 0) {
+            this.log.error(`Cannot select, since no graphs loaded!`);
+          } else {
+            this.router.navigate([{
+              outlets: {
+                primary: ['graph', graphs[0].id.toString()],
+                drawer: ['nodes']
+              }
+            }]);
+
+            this.graphStore.dispatch(new actions.ShowNotification(`To help you debug I created a dummy graph for you \u{1F64C}`, 7000));
+          }
+        }),
+        take(1)
+      )
+      .subscribe(graphs => {});
+  }
+
+  drawerClosed() {
+    this.router.navigate([{outlets: { drawer: null}}]);
   }
 }

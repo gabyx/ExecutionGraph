@@ -12,8 +12,10 @@
 
 export { GraphModule } from './lib/graph.module';
 export { Point } from './lib/model/Point';
+export { GraphComponent } from './lib/components/graph/graph.component';
 export { DragEvent } from './lib/directives/draggable.directive';
 export { ConnectionDrawStyle } from './lib/model/ConnectionDrawStyle';
 export { BezierConnectionDrawStyle } from './lib/model/BezierConnectionDrawStyle';
 export { ManhattenConnectionDrawStyle } from './lib/model/ManhattenConnectionDrawStyle';
 export { DirectConnectionDrawStyle } from './lib/model/DirectConnectionDrawStyle';
+export * from './lib/services/ElementInteraction';

@@ -12,9 +12,11 @@
 
 import { Component, OnInit, Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppState, fromAppActions } from '../../+state';
-import { appQuery } from '../../+state/app.selectors';
-import { TestService } from '../../services/TestService';
+import { Observable } from 'rxjs';
+
+import { Graph } from '../../model';
+import { GraphsState } from '../../+state/reducers';
+import { getGraphs } from '../../+state/selectors';
 
 @Injectable()
 @Component({
@@ -23,17 +25,12 @@ import { TestService } from '../../services/TestService';
   styleUrls: ['./toolbar.component.scss']
 })
 export class ToolbarComponent implements OnInit {
-  public testResponse: any;
 
-  constructor(private store: Store<AppState>, private readonly testService: TestService) {}
+  public graphsMRU: Observable<Graph[]>;
+
+  constructor(private store: Store<GraphsState>) {
+    this.graphsMRU = store.select(getGraphs);
+  }
 
   ngOnInit() {}
-
-  public showInspector() {
-    this.store.dispatch(new fromAppActions.UpdateUIProperties({ inspector: { isVisible: true } }));
-  }
-
-  public test() {
-    this.testService.testAddRemove();
-  }
 }

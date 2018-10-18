@@ -1,0 +1,23 @@
+@import '~@angular/material/theming';
+
+// @mixin eg-theme($theme) {
+//   // Extract whichever individual palettes you need from the theme.
+//   $primary: map-get($theme, primary);
+//   $accent: map-get($theme, accent);
+
+// //   // Use mat-color to extract individual colors from a palette as necessary.
+// //   .candy-carousel {
+// //     background-color: mat-color($primary);
+// //     border-color: mat-color($accent, A400);
+// //   }
+// }
+
+// Copy the palettes from your selected theme (usually theme.scss).
+$app-primary: mat-palette($mat-pink);
+$app-accent:  mat-palette($mat-pink);
+$app-warn:    mat-palette($mat-pink);
+
+// Create your Sass color vars (will be available in all the project)
+$primary: mat-color($app-primary);
+$accent: mat-color($app-accent);
+$warn: mat-color($app-warn);

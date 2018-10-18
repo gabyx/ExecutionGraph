@@ -5,15 +5,24 @@
   flex-direction: column;
 }
 
+.mat-drawer-container {
+  position: relative;
+  background: transparent;
+
+  .mat-drawer-content {
+    overflow:hidden;
+  }
+
+  .mat-drawer {
+    padding: 1rem;
+    background: rgba(255,255,255,0.3);
+  }
+}
+
 .sidenav-container {
   height: 100%;
 }
 
-.drawer {
-  $color-1: rgba(191, 190, 190, 1);
-  $color-2: rgba(166, 166, 166, 1);
-  $color-3: rgba(91, 91, 91, 1);
-  padding: 0ex;
-  background: linear-gradient(to bottom, $color-1 0%, $color-2 25%, $color-3 100%);
-  border-left: 3px solid $color-3;
+.mat-tab-link {
+  min-width: 0;
 }

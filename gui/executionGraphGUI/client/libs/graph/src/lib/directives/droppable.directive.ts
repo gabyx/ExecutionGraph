@@ -1,16 +1,17 @@
-import { Directive, EventEmitter, Output, ElementRef, Renderer2, Input } from '@angular/core';
-import { DraggableDirective } from './draggable.directive';
+import { Directive, EventEmitter, Output, ElementRef, Renderer2, Input, OnInit, OnDestroy } from '@angular/core';
+import { DraggableDirective, DragEvent } from './draggable.directive';
+import { DragAndDropService } from '../services/drag-and-drop.service';
 
 @Directive({
   selector: '[ngcsDroppable]'
 })
-export class DroppableDirective {
+export class DroppableDirective implements OnInit, OnDestroy {
   @Output()
   draggableEntered = new EventEmitter<any>();
   @Output()
   draggableLeft = new EventEmitter<any>();
   @Output()
-  draggableDropped = new EventEmitter<any>();
+  draggableDropped = new EventEmitter<{event: DragEvent, data: any}>();
 
   @Input('ngcsDroppable')
   dropAcceptanceFilter: (data: any) => boolean;
@@ -28,9 +29,17 @@ export class DroppableDirective {
   private onMouseEnterRegistration: any;
   private onMouseLeaveRegistration: any;
 
-  constructor(public element: ElementRef, private renderer: Renderer2) {
+  constructor(public element: ElementRef, private renderer: Renderer2, private dragAndDropService: DragAndDropService) {
     this.onMouseEnterRegistration = this.onMouseEnter.bind(this);
     this.onMouseLeaveRegistration = this.onMouseLeave.bind(this);
+  }
+
+  ngOnInit() {
+    this.dragAndDropService.registerDroppable(this);
+  }
+
+  ngOnDestroy() {
+    this.dragAndDropService.deregisterDroppable(this);
   }
 
   startTracking(draggable: DraggableDirective) {
@@ -39,14 +48,14 @@ export class DroppableDirective {
     this.element.nativeElement.addEventListener('mouseleave', this.onMouseLeaveRegistration);
   }
 
-  stopTracking() {
+  stopTracking(dragEvent: DragEvent) {
     this.element.nativeElement.removeEventListener('mouseenter', this.onMouseEnterRegistration);
     this.element.nativeElement.removeEventListener('mouseleave', this.onMouseLeaveRegistration);
     this.clearClasses();
 
     if (this.isActive) {
       if (this.isAccepted) {
-        this.draggableDropped.emit(this.draggable.data);
+        this.draggableDropped.emit({event: dragEvent, data: this.draggable.data});
       }
       this.isActive = false;
     }
@@ -54,6 +63,7 @@ export class DroppableDirective {
   }
 
   onMouseEnter(event: MouseEvent) {
+    console.log("Entering droppable");
     this.isActive = true;
     this.renderer.addClass(this.element.nativeElement, this.droppingClass);
     if (this.dropAcceptanceFilter) {

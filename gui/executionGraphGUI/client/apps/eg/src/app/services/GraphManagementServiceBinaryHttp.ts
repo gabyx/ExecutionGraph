@@ -51,7 +51,13 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
 
     this.logger.info(`Added new graph [id: '${response.graphId()}', type: '${graphTypeId}'].`);
 
-    return new Graph(new Id(response.graphId()), graphTypeId);
+    const graph: Graph = {
+      id: new Id(response.graphId()),
+      typeId: graphTypeId,
+      connections: {},
+      nodes: {}
+    };
+    return graph;
   }
 
   public async removeGraph(graphId: Id): Promise<void> {

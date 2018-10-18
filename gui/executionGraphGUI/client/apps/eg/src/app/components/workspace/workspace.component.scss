@@ -1,3 +1,6 @@
+@import "app/variables";
+
+
 #graph-1 {
   height: 100%;
   .node {
@@ -54,8 +57,21 @@
       text-overflow: ellipsis;
       overflow: hidden;
     }
+
+    &.selected {
+      box-shadow: 0px 0px 7px 3px $accent;
+    }
   }
+
+  &.dropping-allowed {
+    background: $accent;
+  }
+  &.dropping-forbidden {
+    background: $warn;
+  }
+
 }
+
 :host {
   background-color: #444;
   background-image: linear-gradient(

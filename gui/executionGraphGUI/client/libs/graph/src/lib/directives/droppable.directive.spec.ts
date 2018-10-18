@@ -1,8 +1,8 @@
-import { DroppableDirective } from '@eg/graph/src/directives/droppable.directive';
+import { DroppableDirective } from './droppable.directive';
 
 describe('DroppableDirective', () => {
   it('should create an instance', () => {
-    const directive = new DroppableDirective();
+    const directive = new DroppableDirective(null, null);
     expect(directive).toBeTruthy();
   });
 });

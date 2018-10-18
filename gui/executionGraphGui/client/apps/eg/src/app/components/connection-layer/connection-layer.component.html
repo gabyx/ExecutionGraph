@@ -1,0 +1,9 @@
+<ngcs-svg-layer>
+
+  <svg:path
+      *ngFor="let connection of connections"
+      class="ngcs-connection"
+      [class.selected]="isSelected(connection) | async"
+      [attr.d]="getPathDescription(connection)" />
+
+</ngcs-svg-layer>

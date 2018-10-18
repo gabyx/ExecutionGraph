@@ -10,9 +10,9 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, OnInit, ElementRef, HostListener, Injectable, Input } from '@angular/core';
+import { Component, OnInit, Injectable, ElementRef } from '@angular/core';
 import { Observable } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { filter, tap, map } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 
 import {
@@ -23,13 +23,19 @@ import {
   InputSocket,
   OutputSocket,
   createConnection,
-  isOutputSocket
+  isOutputSocket,
+  NodeTypeDescription,
+  Socket
 } from '../../model';
-import { AppState, fromAppActions, appQuery } from '../../+state';
 
 import { ILogger, LoggerFactory } from '@eg/logger';
-import { Point, DragEvent } from '@eg/graph';
+import { Point, ConnectionDrawStyle, EventSourceGateway, GraphComponent } from '@eg/graph';
 import { isDefined } from '@eg/common';
+import { GraphsState } from '../../+state/reducers';
+import * as graphQueries from '../../+state/selectors/graph.selectors'
+import { getConnectionDrawStyle, getSelection } from '../../+state/selectors/ui.selectors';
+import { Selection, UiState } from '../../+state/reducers/ui.reducers';
+import { CreateNode } from '../../+state/actions';
 
 @Injectable()
 @Component({
@@ -38,67 +44,53 @@ import { isDefined } from '@eg/common';
   styleUrls: ['./workspace.component.scss']
 })
 export class WorkspaceComponent implements OnInit {
-  private logger: ILogger;
+  private readonly logger: ILogger;
 
-  public readonly graph: Observable<Graph>;
-  public newTargetSocket: InputSocket | OutputSocket = null;
-  public newConnection: Connection = null;
-  public newConnectionEndpoint: Point = { x: 0, y: 0 };
+  private readonly selection: Observable<Selection>;
 
-  constructor(private store: Store<AppState>, private elementRef: ElementRef, loggerFactory: LoggerFactory) {
-    this.logger = loggerFactory.create('Workspace');
-    this.graph = store.select(appQuery.getSelectedGraph).pipe(filter(g => isDefined(g)));
+  public graph: Observable<Graph>;
 
-    this.graph.subscribe(g => this.logger.debug(`Displaying graph ${g.id}`));
+  public readonly graphEvents = new EventSourceGateway<Graph>();
+
+  public readonly nodeEvents = new EventSourceGateway<Node>();
+
+  public readonly socketEvents = new EventSourceGateway<Socket>();
+
+  public readonly connectionEvents = new EventSourceGateway<Connection>();
+
+  public connectionDrawStyle: Observable<ConnectionDrawStyle>;
+
+  public get nodes(): Observable<Node[]> {
+    return this.graph.pipe(map(graph => graph.nodes), map(nodes => Object.keys(nodes).map(id => nodes[id])));
   }
 
-  ngOnInit() {}
-
-  public updateNodePosition(node: Node, event: DragEvent) {
-    // this.logger.info(`[WorkspaceComponent] Updating node position to ${position.x}:${position.y}`);
-    this.store.dispatch(
-      new fromAppActions.MoveNode(node, { x: event.dragElementPosition.x, y: event.dragElementPosition.y })
+  public get connections(): Observable<Connection[]> {
+    return this.graph.pipe(
+      map(graph => graph.connections),
+      map(connections => Object.keys(connections).map(id => connections[id]))
     );
   }
 
-  public initConnectionFrom(socket: OutputSocket | InputSocket, event: DragEvent) {
-    this.logger.info(`[WorkspaceComponent] Initiating new connection from ${socket.idString}`);
-    if (isOutputSocket(socket)) {
-      this.newTargetSocket = new InputSocket(socket.type, socket.name, new SocketIndex(0));
-    } else {
-      this.newTargetSocket = new OutputSocket(socket.type, socket.name, new SocketIndex(0));
-    }
-    // Create the connection
-    this.newConnection = createConnection(socket, this.newTargetSocket);
-
-    this.newConnectionEndpoint = {
-      x: event.dragElementPosition.x + event.mouseToElementOffset.x,
-      y: event.dragElementPosition.y + event.mouseToElementOffset.y
-    };
+  constructor(private store: Store<GraphsState>, uiStore: Store<UiState>, loggerFactory: LoggerFactory) {
+    this.logger = loggerFactory.create('Workspace');
+    this.selection = uiStore.select(getSelection);
+    // this.graph.subscribe(g => this.logger.debug(`Displaying graph ${g.id}`));
   }
 
-  public movingConnection(event: DragEvent) {
-    this.newConnectionEndpoint = {
-      x: event.dragElementPosition.x + event.mouseToElementOffset.x,
-      y: event.dragElementPosition.y + event.mouseToElementOffset.y
-    };
-    //this.logger.debug(`Setting position to ${this.newConnectionEndpoint.x}:${this.newConnectionEndpoint.y}`);
+  ngOnInit() {
+    this.graph = this.store.select(graphQueries.getSelectedGraph).pipe( filter(g => isDefined(g) && g!=null));
+    this.connectionDrawStyle = this.store.select(getConnectionDrawStyle);
   }
 
-  public abortConnection() {
-    this.newConnection = null;
+  public createNode(nodeType: NodeTypeDescription, graph: Graph, position?: Point) {
+    this.store.dispatch(new CreateNode(nodeType, graph.id, position))
   }
 
-  public addConnection(source: OutputSocket | InputSocket, target: OutputSocket | InputSocket) {
-    // Create the connection
-    this.store.dispatch(new fromAppActions.AddConnection(source, target));
+  public isNodeSelected(node: Node): Observable<boolean> {
+    return this.selection.pipe(map(selection => selection.nodes.indexOf(node.id) >= 0));
   }
 
-  public isOutputSocket(socket: InputSocket | OutputSocket): socket is OutputSocket {
-    return isOutputSocket(socket);
-  }
-
-  public isInputSocket(socket: InputSocket | OutputSocket): socket is InputSocket {
-    return !isOutputSocket(socket);
+  public isNodeType(nodeType: NodeTypeDescription): boolean {
+    return isDefined(nodeType.type) && isDefined(nodeType.type);
   }
 }

@@ -1,52 +1,74 @@
-<eg-connection-style-options #connectionStyleOptions></eg-connection-style-options>
+<ngcs-graph id="graph-1"
+    #graphComponent
+    *ngIf="graph | async as syncGraph"
 
-<ngcs-graph id="graph-1" >
-    <ng-container *ngFor="let node of (graph | async)?.nodes">
-        <div #theNode class="node ngcs-node"
-          [attr.id]="node.idString"
-          [style.left]="node.uiProps.position.x+'px'"
-          [style.top]="node.uiProps.position.y+'px'">
-            <span class="header" ngcsDraggable [dragElement]="theNode" (dragContinued)="updateNodePosition(node, $event)">
+    [ngcsEventSource]="syncGraph" [forwardTo]="graphEvents"
+
+    [ngcsDroppable]="isNodeType"
+    (draggableDropped)="createNode($event.data, syncGraph, graphComponent.convertMouseToGraphPosition($event.event.mousePosition))">
+
+    <!-- All the nodes of the graph-->
+    <ngcs-html-layer>
+
+        <div *ngFor="let node of nodes | async"
+            #nodeElement
+            class="node ngcs-node"
+            [class.selected]="isNodeSelected(node) | async"
+            [attr.id]="node.idString"
+            [style.left]="node.uiProps.position.x+'px'"
+            [style.top]="node.uiProps.position.y+'px'"
+            [ngcsEventSource]="node" [forwardTo]="nodeEvents"
+            >
+
+            <span class="header">
                 {{ node.name }}
             </span>
+
             <div class="sockets">
+
                 <div class="inputs">
-                    <span class="socket" *ngFor="let socket of node.inputs"
-                    [ngcsDraggable]="socket" (dragStarted)="initConnectionFrom(socket, $event)" (dragContinued)="movingConnection($event)" (dragEnded)="abortConnection()"
-                    [ngcsDroppable]="isOutputSocket" (draggableDropped)="addConnection(socket, $event)">
-                        {{ socket.name }}
+                    <div class="socket"
+                        *ngFor="let socket of node.inputs"
+                        [ngcsEventSource]="socket" [forwardTo]="socketEvents"
+                        >
+                        <span>
+                            {{ socket.name }}
+                        </span>
                         <ngcs-port [id]="socket.idString" class="left middle"></ngcs-port>
-                    </span>
+                    </div>
                 </div>
+
                 <div class="outputs">
-                    <span class="socket" *ngFor="let socket of node.outputs"
-                    [ngcsDraggable]="socket" (dragStarted)="initConnectionFrom(socket, $event)" (dragContinued)="movingConnection($event)" (dragEnded)="abortConnection()"
-                    [ngcsDroppable]="isInputSocket" (draggableDropped)="addConnection($event, socket)">
-                        {{ socket.name }}
+                    <div class="socket"
+                        *ngFor="let socket of node.outputs"
+                        [ngcsEventSource]="socket" [forwardTo]="socketEvents"
+                        >
+                        <span>
+                            {{ socket.name }}
+                        </span>
                         <ngcs-port [id]="socket.idString" class="right middle"></ngcs-port>
-                    </span>
+                    </div>
                 </div>
+
             </div>
-        </div>
-    </ng-container>
 
-    <ng-container *ngFor="let connection of (graph | async)?.connections">
-        <ngcs-connection
-          [from]="connection.outputSocket.idString"
-          [to]="connection.inputSocket.idString"
-          [drawStyle]="connectionStyleOptions.connectionDrawStyle">
-        </ngcs-connection>
-    </ng-container>
-
-    <ng-container *ngIf="newConnection">
-        <ngcs-connection
-          [from]="newConnection.outputSocket.idString"
-          [to]="newConnection.inputSocket.idString"
-          [drawStyle]="connectionStyleOptions.connectionDrawStyle">
-        </ngcs-connection>
-        <div style="position: absolute"
-         [style.left]="newConnectionEndpoint.x+'px'" [style.top]="newConnectionEndpoint.y+'px'">
-            <ngcs-port [id]="newTargetSocket.idString" class="right middle" ></ngcs-port>
         </div>
-    </ng-container>
+
+    </ngcs-html-layer>
+
+    <!-- All the connections of the graph -->
+    <eg-connection-layer
+        [connections]="connections | async"
+        [drawStyle]="connectionDrawStyle | async">
+
+    </eg-connection-layer>
+
+    <!-- Tools are embedded in the graph, so they can add content to it too -->
+    <eg-selection-tool [nodeEvents]="nodeEvents" [graphEvents]="graphEvents" [connectionEvents]="connectionEvents"></eg-selection-tool>
+    <eg-navigation-tool [nodeEvents]="nodeEvents" [graphEvents]="graphEvents"></eg-navigation-tool>
+    <eg-move-tool [nodeEvents]="nodeEvents"></eg-move-tool>
+    <eg-socket-connection-tool [socketEvents]="socketEvents" [graphEvents]="graphEvents" [connectionDrawStyle]="connectionDrawStyle | async"></eg-socket-connection-tool>
+    <eg-delete-tool></eg-delete-tool>
+
 </ngcs-graph>
+

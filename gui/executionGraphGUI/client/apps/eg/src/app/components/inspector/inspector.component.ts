@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { dispatch } from 'rxjs/internal/observable/range';
 import { Store } from '@ngrx/store';
-import { AppState, fromAppActions } from '../../+state';
+import { AppState } from '../../+state/reducers/app.reducers';
 
 @Component({
   selector: 'eg-inspector',
@@ -14,6 +13,5 @@ export class InspectorComponent implements OnInit {
   ngOnInit() {}
 
   public closeInspector() {
-    this.store.dispatch(new fromAppActions.UpdateUIProperties({ inspector: { isVisible: false } }));
   }
 }

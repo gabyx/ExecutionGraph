@@ -54,13 +54,14 @@ export class SocketId {
  * @class Socket
  */
 export abstract class Socket {
+  abstract get kind(): SocketType;
   protected _id: SocketId = new SocketId();
 
   constructor(
     public readonly type: Long,
     public readonly name: string,
     public readonly index: SocketIndex,
-    protected _parent: Node = undefined
+    protected _parent?: Node
   ) {}
 
   public get parent(): Node {
@@ -68,7 +69,7 @@ export abstract class Socket {
   }
   public set parent(parent: Node) {
     if (isDefined(this.parent) || !isDefined(parent)) {
-      throw 'You cannot assign a new parent or undefined!';
+      throw new Error('You cannot assign a new parent or undefined!');
     }
     this._parent = parent;
     // Assign a new unique id to the socket, for debugging purposes
@@ -115,12 +116,12 @@ export class OutputSocket extends Socket {
 }
 
 /** Type guard for InputSocket */
-export function isInputSocket(socket: InputSocket | OutputSocket): socket is InputSocket {
+export function isInputSocket(socket: Socket): socket is InputSocket {
   return socket.kind === 'input';
 }
 
 /** Type guard for OutputSocket */
-export function isOutputSocket(socket: InputSocket | OutputSocket): socket is OutputSocket {
+export function isOutputSocket(socket: Socket): socket is OutputSocket {
   return socket.kind === 'output';
 }
 
@@ -135,7 +136,7 @@ export function isOutputSocket(socket: InputSocket | OutputSocket): socket is Ou
  * @param {Node} [parent=undefined]
  * @returns
  */
-export function createSocket(kind: SocketType, type: Long, name: string, index: SocketIndex, parent: Node = undefined) {
+export function createSocket(kind: SocketType, type: Long, name: string, index: SocketIndex, parent?: Node) {
   switch (kind) {
     case 'input':
       return new InputSocket(type, name, index, parent);

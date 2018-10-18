@@ -27,7 +27,12 @@ export class GraphManagementServiceDummy extends GraphManagementService {
   }
 
   public async addGraph(graphTypeId: Id): Promise<Graph> {
-    return new Graph(new Id(), this.backend.graphTypeId, [], []);
+    return {
+      id: new Id(),
+      typeId: graphTypeId,
+      nodes: {},
+      connections: {}
+    };
   }
 
   public async removeGraph(graphId: Id): Promise<void> {}
