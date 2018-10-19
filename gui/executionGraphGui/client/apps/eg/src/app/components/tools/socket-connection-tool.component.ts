@@ -73,7 +73,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       }
 
       this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
-      this.tempConnection = this.createConnection(socket, this.tempTargetSocket);
+      this.tempConnection = createConnection(socket, this.tempTargetSocket);
     });
     this.socketEvents.onDragContinue.subscribe(e => {
       if(!this.targetSocket) {
@@ -95,7 +95,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
         if(targetSocket !== this.sourceSocket && this.sourceSocket.kind!==targetSocket.kind) {
           console.log("Entering potential target socket");
           this.targetSocket = targetSocket;
-          this.tempConnection = this.createConnection(this.sourceSocket, this.targetSocket);
+          this.tempConnection = createConnection(this.sourceSocket, this.targetSocket);
         }
       }
     });
@@ -104,18 +104,10 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       if(this.targetSocket) {
         console.log("Leaving potential target Socket");
         this.targetSocket = null;
-        this.tempConnection = this.createConnection(this.sourceSocket, this.tempTargetSocket);
+        this.tempConnection = createConnection(this.sourceSocket, this.tempTargetSocket);
         this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
       }
     });
-  }
-
-  private createConnection(source: Socket, target: Socket): Connection {
-    if (isOutputSocket(source)) {
-      return createConnection(source, target);
-    } else {
-      return createConnection(target, source);
-    }
   }
 
   private abortConnection() {

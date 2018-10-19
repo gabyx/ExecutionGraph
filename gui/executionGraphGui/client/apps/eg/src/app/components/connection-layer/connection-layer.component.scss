@@ -9,6 +9,13 @@
         stroke: $accent;
         stroke-width: 3;
     }
+
+    &.write-link {
+        marker-start: url(#markerCurvedArrowS);
+    }
+    &.get-link {
+        marker-end: url(#markerCurvedArrowE);
+    }
 }
 
 ::ng-deep .ngcs-connection:hover {

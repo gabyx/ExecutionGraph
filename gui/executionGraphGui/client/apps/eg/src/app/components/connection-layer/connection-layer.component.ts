@@ -2,7 +2,6 @@ import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { isDefined } from '@eg/common';
 import { ConnectionDrawStyle, BezierConnectionDrawStyle, GraphComponent } from '@eg/graph';
 
 import { Connection } from '../../model';
@@ -21,6 +20,7 @@ export class ConnectionLayerComponent {
   @Input() drawStyle: ConnectionDrawStyle = new BezierConnectionDrawStyle();
 
   constructor(private graph: GraphComponent, private store: Store<UiState>) {
+
   }
 
   public getPathDescription(connection: Connection) {

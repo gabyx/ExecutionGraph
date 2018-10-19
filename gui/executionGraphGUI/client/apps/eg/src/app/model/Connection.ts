@@ -39,6 +39,7 @@ export class ConnectionId {
  * @class Connection
  */
 export class Connection {
+
   public readonly id: ConnectionId;
 
   constructor(public outputSocket: OutputSocket, public inputSocket: InputSocket, public isWriteLink: boolean = true) {
