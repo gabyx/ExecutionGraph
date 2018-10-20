@@ -61,8 +61,13 @@ export abstract class Socket {
     public readonly type: Long,
     public readonly name: string,
     public readonly index: SocketIndex,
+    public readonly typeName?: string,
     protected _parent?: Node
-  ) {}
+  ) {
+    if (!isDefined(typeName)) {
+      typeName = type.toString();
+    }
+  }
 
   public get parent(): Node {
     return this._parent;
@@ -75,7 +80,6 @@ export abstract class Socket {
     // Assign a new unique id to the socket, for debugging purposes
     this._id = this.createId();
   }
-
   public get id(): SocketId {
     return this._id;
   }
@@ -83,6 +87,44 @@ export abstract class Socket {
     return this._id.string;
   }
   protected abstract createId(): SocketId;
+
+  /** Type guard for InputSocket */
+  public static isInputSocket(socket: Socket): socket is InputSocket {
+    return socket.kind === 'input';
+  }
+
+  /** Type guard for OutputSocket */
+  public static isOutputSocket(socket: Socket): socket is OutputSocket {
+    return socket.kind === 'output';
+  }
+
+  /**
+   * Creator function for input/output sockets.
+   *
+   * @export
+   * @param {SocketType} kind
+   * @param {Long} type
+   * @param {string} typeName
+   * @param {string} name
+   * @param {SocketIndex} index
+   * @param {Node} [parent=undefined]
+   * @returns
+   */
+  public static createSocket(
+    kind: SocketType,
+    type: Long,
+    name: string,
+    index: SocketIndex,
+    typeName: string | undefined | null,
+    parent?: Node
+  ) {
+    switch (kind) {
+      case 'input':
+        return new InputSocket(type, name, index, isDefined(typeName) ? typeName : undefined, parent);
+      case 'output':
+        return new OutputSocket(type, name, index, isDefined(typeName) ? typeName : undefined, parent);
+    }
+  }
 }
 
 export type SocketType = 'input' | 'output';
@@ -112,35 +154,5 @@ export class OutputSocket extends Socket {
   public readonly kind: SocketType = 'output';
   protected createId(): SocketId {
     return new SocketId(`${this.parent.id.string}-o-${this.index.toInt()}`);
-  }
-}
-
-/** Type guard for InputSocket */
-export function isInputSocket(socket: Socket): socket is InputSocket {
-  return socket.kind === 'input';
-}
-
-/** Type guard for OutputSocket */
-export function isOutputSocket(socket: Socket): socket is OutputSocket {
-  return socket.kind === 'output';
-}
-
-/**
- * Creator function for input/output sockets.
- *
- * @export
- * @param {SocketType} kind
- * @param {Long} type
- * @param {string} name
- * @param {SocketIndex} index
- * @param {Node} [parent=undefined]
- * @returns
- */
-export function createSocket(kind: SocketType, type: Long, name: string, index: SocketIndex, parent?: Node) {
-  switch (kind) {
-    case 'input':
-      return new InputSocket(type, name, index, parent);
-    case 'output':
-      return new OutputSocket(type, name, index, parent);
   }
 }

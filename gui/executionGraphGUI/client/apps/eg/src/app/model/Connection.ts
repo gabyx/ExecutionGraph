@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { OutputSocket, InputSocket, SocketId, isInputSocket, isOutputSocket, Socket } from './Socket';
+import { OutputSocket, InputSocket, SocketId, Socket } from './Socket';
 
 /**
  * A class for defining a unique id for a `Connection`.
@@ -19,13 +19,11 @@ import { OutputSocket, InputSocket, SocketId, isInputSocket, isOutputSocket, Soc
  * @class ConnectionId
  */
 export class ConnectionId {
-
   public static FromSockets(outSocketId: SocketId, inSocketId: SocketId): ConnectionId {
     return new ConnectionId(`${outSocketId.string}-to-${inSocketId.string}`);
   }
 
-  constructor(public readonly idString) {
-  }
+  constructor(public readonly idString) {}
 
   public equal(id: ConnectionId) {
     return this.idString === id.idString;
@@ -39,7 +37,6 @@ export class ConnectionId {
  * @class Connection
  */
 export class Connection {
-
   public readonly id: ConnectionId;
 
   constructor(public outputSocket: OutputSocket, public inputSocket: InputSocket, public isWriteLink: boolean = true) {
@@ -55,16 +52,16 @@ export class Connection {
   public get idString(): string {
     return this.id.idString;
   }
-}
 
-export function createConnection(source: Socket, target: Socket) {
-  if (isOutputSocket(source) && isInputSocket(target)) {
-    // Make a Write-Link
-    return new Connection(source, target, true);
-  } else if (isInputSocket(source) && isOutputSocket(target)) {
-    // Make a Get-Link
-    return new Connection(target, source, false);
-  } else {
-    throw new Error('Connection not allowed: Output <-> Input!');
+  public static createConnection(source: Socket, target: Socket) {
+    if (Socket.isOutputSocket(source) && Socket.isInputSocket(target)) {
+      // Make a Write-Link
+      return new Connection(source, target, true);
+    } else if (Socket.isInputSocket(source) && Socket.isOutputSocket(target)) {
+      // Make a Get-Link
+      return new Connection(target, source, false);
+    } else {
+      throw new Error('Connection not allowed: Output <-> Input!');
+    }
   }
 }

@@ -49,7 +49,7 @@ namespace executionGraph
             EXECGRAPH_ASSERT(type < m_socketTypeDescription.size(),
                              "Index type: '{0}' out of range!",
                              type);
-            return m_socketTypeDescription[type].m_rtti;
+            return m_socketTypeDescription[type].m_type;
         }
 
         //! Get the graph id.

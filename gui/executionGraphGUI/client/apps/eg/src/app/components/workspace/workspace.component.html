@@ -21,7 +21,7 @@
             >
 
             <span class="header">
-                {{ node.name }}
+                {{ node.name }} : [{{node.type}}]
             </span>
 
             <div class="sockets">
@@ -32,7 +32,7 @@
                         [ngcsEventSource]="socket" [forwardTo]="socketEvents"
                         >
                         <span>
-                            {{ socket.name }}
+                             {{ socket.name }} : [{{ socket.typeName }}]
                         </span>
                         <ngcs-port [id]="socket.idString" class="left middle"></ngcs-port>
                     </div>
@@ -44,7 +44,7 @@
                         [ngcsEventSource]="socket" [forwardTo]="socketEvents"
                         >
                         <span>
-                            {{ socket.name }}
+                            [{{ socket.type }}] : {{ socket.typeName }}
                         </span>
                         <ngcs-port [id]="socket.idString" class="right middle"></ngcs-port>
                     </div>

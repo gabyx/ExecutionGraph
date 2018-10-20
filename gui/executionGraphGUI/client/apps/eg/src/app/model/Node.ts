@@ -12,7 +12,7 @@
 
 import { Point } from '@eg/graph';
 import * as Long from 'long';
-import { Socket, InputSocket, OutputSocket, isOutputSocket } from './Socket';
+import { Socket, InputSocket, OutputSocket } from './Socket';
 
 function isLong(value: any): value is Long {
   return value instanceof Long;
@@ -69,7 +69,7 @@ export class Node {
   ) {
     // Make
     sockets.forEach((s: InputSocket | OutputSocket) => {
-      if (isOutputSocket(s)) {
+      if (Socket.isOutputSocket(s)) {
         this.outputs.push(s);
       } else {
         this.inputs.push(s);

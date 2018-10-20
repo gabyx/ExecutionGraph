@@ -78,7 +78,7 @@ export function toNode(node: serialization.LogicNode): model.Node {
     }
     for (let i = 0; i < l; ++i) {
       let s = socks(i);
-      let socket = model.createSocket(kind, toULong(s.type()), s.name(), toULong(s.index()));
+      let socket = model.Socket.createSocket(kind, toULong(s.typeIndex()), s.name(), toULong(s.index()), s.typeName());
       sockets.push(socket);
     }
   };

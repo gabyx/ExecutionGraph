@@ -15,24 +15,13 @@ import { Observable } from 'rxjs';
 import { filter, tap, map } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 
-import {
-  Graph,
-  Node,
-  Connection,
-  SocketIndex,
-  InputSocket,
-  OutputSocket,
-  createConnection,
-  isOutputSocket,
-  NodeTypeDescription,
-  Socket
-} from '../../model';
+import { Graph, Node, Connection, NodeTypeDescription, Socket } from '../../model';
 
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { Point, ConnectionDrawStyle, EventSourceGateway, GraphComponent } from '@eg/graph';
 import { isDefined } from '@eg/common';
 import { GraphsState } from '../../+state/reducers';
-import * as graphQueries from '../../+state/selectors/graph.selectors'
+import * as graphQueries from '../../+state/selectors/graph.selectors';
 import { getConnectionDrawStyle, getSelection } from '../../+state/selectors/ui.selectors';
 import { Selection, UiState } from '../../+state/reducers/ui.reducers';
 import { CreateNode } from '../../+state/actions';
@@ -61,7 +50,10 @@ export class WorkspaceComponent implements OnInit {
   public connectionDrawStyle: Observable<ConnectionDrawStyle>;
 
   public get nodes(): Observable<Node[]> {
-    return this.graph.pipe(map(graph => graph.nodes), map(nodes => Object.keys(nodes).map(id => nodes[id])));
+    return this.graph.pipe(
+      map(graph => graph.nodes),
+      map(nodes => Object.keys(nodes).map(id => nodes[id]))
+    );
   }
 
   public get connections(): Observable<Connection[]> {
@@ -78,12 +70,12 @@ export class WorkspaceComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.graph = this.store.select(graphQueries.getSelectedGraph).pipe( filter(g => isDefined(g) && g!=null));
+    this.graph = this.store.select(graphQueries.getSelectedGraph).pipe(filter(g => isDefined(g) && g != null));
     this.connectionDrawStyle = this.store.select(getConnectionDrawStyle);
   }
 
   public createNode(nodeType: NodeTypeDescription, graph: Graph, position?: Point) {
-    this.store.dispatch(new CreateNode(nodeType, graph.id, position))
+    this.store.dispatch(new CreateNode(nodeType, graph.id, position));
   }
 
   public isNodeSelected(node: Node): Observable<boolean> {

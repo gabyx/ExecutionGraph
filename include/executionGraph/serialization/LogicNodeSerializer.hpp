@@ -134,7 +134,7 @@ namespace executionGraph
         static flatbuffers::Offset<serialization::LogicNode>
         write(flatbuffers::FlatBufferBuilder& builder,
               const NodeBaseType& node,
-              bool serializeAdditionalData = true)
+              bool serializeAdditionalData = true bool serializeFullSocketTypeSpec = false)
         {
             namespace s = serialization;
             using namespace s;
@@ -147,7 +147,7 @@ namespace executionGraph
             auto typeOffset  = builder.CreateString(type);
 
             // Build all input/output sockets
-            auto pairOffs   = writeSockets(builder, node);
+            auto pairOffs   = writeSockets(builder, node, serializeFullSocketTypeSpec);
             auto inputsOff  = std::get<0>(pairOffs);
             auto outputsOff = std::get<1>(pairOffs);
 
@@ -186,7 +186,8 @@ namespace executionGraph
     private:
         //! Write all input/output sockets.
         static auto writeSockets(flatbuffers::FlatBufferBuilder& builder,
-                                 const NodeBaseType& node)
+                                 const NodeBaseType& node,
+                                 bool fullTypeSpec = false)
         {
             namespace s = serialization;
             using namespace s;
@@ -198,12 +199,22 @@ namespace executionGraph
                 for(auto& socket : sockets)
                 {
                     auto nameOff = builder.CreateString(socket->getName());
-
                     EXECGRAPH_ASSERT(socket->getType() < socketDescriptions.size(), "Socket type wrong!");
 
+                    decltype(nameOff) typeOff, typeNameOff;
+                    if(fullTypeSpec)
+                    {
+                        typeOff     = builder.CreateString(socketDescriptions[socket->getType()].m_type);
+                        typeNameOff = builder.CreateString(socketDescriptions[socket->getType()].m_name);
+                    }
+
                     LogicSocketBuilder soBuilder(builder);
-                    soBuilder.add_type(socket->getType());
+                    soBuilder.add_typeIndex(socket->getType());
+                    soBuilder.add_type(typeOff);
+                    soBuilder.add_typeName(typeNameOff);
+
                     soBuilder.add_index(socket->getIndex());
+
                     soBuilder.add_name(nameOff);
                     socketOffs.emplace_back(soBuilder.Finish());
                 }

@@ -27,7 +27,7 @@ namespace executionGraph
         for(auto& nD : graphDescription.getNodeTypeDescriptions())
         {
             nodes.emplace_back(s::CreateNodeTypeDescriptionDirect(builder,
-                                                                  nD.m_rtti.c_str(),
+                                                                  nD.m_type.c_str(),
                                                                   nD.m_name.c_str()));
         }
 
@@ -36,7 +36,7 @@ namespace executionGraph
         for(auto& sD : graphDescription.getSocketTypeDescriptions())
         {
             sockets.emplace_back(s::CreateSocketTypeDescriptionDirect(builder,
-                                                                      sD.m_rtti.c_str(),
+                                                                      sD.m_type.c_str(),
                                                                       sD.m_name.c_str()));
         }
 

@@ -88,7 +88,7 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
 
         // Serialize the response
         NodeSerializer serializer;
-        auto nodeOffset = serializer.write(builder, node);
+        auto nodeOffset = serializer.write(builder, node, false, true);
 
         s::AddNodeResponseBuilder addResponse(builder);
         addResponse.add_node(nodeOffset);

@@ -4,15 +4,7 @@ import { Point, ConnectionDrawStyle, GraphComponent } from '@eg/graph';
 import { ILogger, LoggerFactory } from '@eg/logger';
 
 import { ToolComponent } from './tool-component';
-import {
-  OutputSocket,
-  InputSocket,
-  Connection,
-  isOutputSocket,
-  Socket,
-  createConnection,
-  SocketIndex
-} from '../../model';
+import { OutputSocket, InputSocket, Connection, Socket, SocketIndex } from '../../model';
 import { GraphsState } from '../../+state/reducers';
 import { AddConnection } from '../../+state/actions';
 
@@ -75,14 +67,14 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
 
       this.logger.info(`Initiating new connection from ${socket.idString}`);
       this.sourceSocket = socket;
-      if (isOutputSocket(this.sourceSocket)) {
+      if (Socket.isOutputSocket(this.sourceSocket)) {
         this.tempTargetSocket = new InputSocket(socket.type, socket.name, new SocketIndex(0));
       } else {
         this.tempTargetSocket = new OutputSocket(socket.type, socket.name, new SocketIndex(0));
       }
 
       this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
-      this.tempConnection = createConnection(socket, this.tempTargetSocket);
+      this.tempConnection = Connection.createConnection(socket, this.tempTargetSocket);
     });
     this.socketEvents.onDragContinue.subscribe(e => {
       if (!this.targetSocket) {
@@ -103,7 +95,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
         if (targetSocket !== this.sourceSocket && this.sourceSocket.kind !== targetSocket.kind) {
           console.log('Entering potential target socket');
           this.targetSocket = targetSocket;
-          this.tempConnection = createConnection(this.sourceSocket, this.targetSocket);
+          this.tempConnection = Connection.createConnection(this.sourceSocket, this.targetSocket);
         }
       }
     });
@@ -112,7 +104,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       if (this.targetSocket) {
         console.log('Leaving potential target Socket');
         this.targetSocket = null;
-        this.tempConnection = createConnection(this.sourceSocket, this.tempTargetSocket);
+        this.tempConnection = Connection.createConnection(this.sourceSocket, this.tempTargetSocket);
         this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
       }
     });

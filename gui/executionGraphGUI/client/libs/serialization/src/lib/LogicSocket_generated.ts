@@ -31,9 +31,31 @@ static getRootAsLogicSocket(bb:flatbuffers.ByteBuffer, obj?:LogicSocket):LogicSo
 /**
  * @returns flatbuffers.Long
  */
-type():flatbuffers.Long {
+typeIndex():flatbuffers.Long {
   var offset = this.bb!.__offset(this.bb_pos, 4);
   return offset ? this.bb!.readUint64(this.bb_pos + offset) : this.bb!.createLong(0, 0);
+};
+
+/**
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array|null
+ */
+type():string|null
+type(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+type(optionalEncoding?:any):string|Uint8Array|null {
+  var offset = this.bb!.__offset(this.bb_pos, 6);
+  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+};
+
+/**
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array|null
+ */
+typeName():string|null
+typeName(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+typeName(optionalEncoding?:any):string|Uint8Array|null {
+  var offset = this.bb!.__offset(this.bb_pos, 8);
+  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 };
 
 /**
@@ -43,7 +65,7 @@ type():flatbuffers.Long {
 name():string|null
 name(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
 name(optionalEncoding?:any):string|Uint8Array|null {
-  var offset = this.bb!.__offset(this.bb_pos, 6);
+  var offset = this.bb!.__offset(this.bb_pos, 10);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 };
 
@@ -51,7 +73,7 @@ name(optionalEncoding?:any):string|Uint8Array|null {
  * @returns flatbuffers.Long
  */
 index():flatbuffers.Long {
-  var offset = this.bb!.__offset(this.bb_pos, 8);
+  var offset = this.bb!.__offset(this.bb_pos, 12);
   return offset ? this.bb!.readUint64(this.bb_pos + offset) : this.bb!.createLong(0, 0);
 };
 
@@ -59,15 +81,31 @@ index():flatbuffers.Long {
  * @param flatbuffers.Builder builder
  */
 static startLogicSocket(builder:flatbuffers.Builder) {
-  builder.startObject(3);
+  builder.startObject(5);
 };
 
 /**
  * @param flatbuffers.Builder builder
- * @param flatbuffers.Long type
+ * @param flatbuffers.Long typeIndex
  */
-static addType(builder:flatbuffers.Builder, type:flatbuffers.Long) {
-  builder.addFieldInt64(0, type, builder.createLong(0, 0));
+static addTypeIndex(builder:flatbuffers.Builder, typeIndex:flatbuffers.Long) {
+  builder.addFieldInt64(0, typeIndex, builder.createLong(0, 0));
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset typeOffset
+ */
+static addType(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(1, typeOffset, 0);
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset typeNameOffset
+ */
+static addTypeName(builder:flatbuffers.Builder, typeNameOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(2, typeNameOffset, 0);
 };
 
 /**
@@ -75,7 +113,7 @@ static addType(builder:flatbuffers.Builder, type:flatbuffers.Long) {
  * @param flatbuffers.Offset nameOffset
  */
 static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(1, nameOffset, 0);
+  builder.addFieldOffset(3, nameOffset, 0);
 };
 
 /**
@@ -83,7 +121,7 @@ static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
  * @param flatbuffers.Long index
  */
 static addIndex(builder:flatbuffers.Builder, index:flatbuffers.Long) {
-  builder.addFieldInt64(2, index, builder.createLong(0, 0));
+  builder.addFieldInt64(4, index, builder.createLong(0, 0));
 };
 
 /**
