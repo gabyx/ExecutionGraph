@@ -62,7 +62,7 @@ export class TestBackend extends ITestBackend {
     this.graphTypeId = new Id('2992ebff-c950-4184-8876-5fe6ac029aa5');
 
     // Internal sockets
-    this.sockets = ['int', 'bool', 'double', 'Vector3', 'Matrix33'];
+    this.sockets = ['int', 'bool', 'double', 'Vector3', 'Matrix33', 'Scalar'];
 
     // Internal node map
     this.nodes = {
