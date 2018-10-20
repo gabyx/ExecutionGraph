@@ -1,24 +1,49 @@
-@import "app/variables";
+@import 'app/variables';
 
-::ng-deep .ngcs-connection {
+$stroke-color-get: rgb(84, 103, 245);
+$stroke-color-write: rgb(36, 36, 36);
+
+::ng-deep {
+  #markerWrite > use {
+    transform: scale(0.6);
+  }
+  #markerGet > use {
+    transform: scale(-0.6);
+  }
+
+  .markerWrite {
+    overflow: visible;
+    fill: $stroke-color-write;
+    stroke: $stroke-color-write;
+  }
+
+  .markerGet {
+    overflow: visible;
+    fill: $stroke-color-get;
+    stroke: $stroke-color-get;
+  }
+
+  .ngcs-connection {
     fill: none;
-    stroke: white;
     stroke-width: 2;
 
     &.selected {
-        stroke: $accent;
-        stroke-width: 3;
+      stroke: $accent;
+      stroke-width: 3;
     }
 
     &.write-link {
-        marker-start: url(#markerCurvedArrowS);
+      stroke: $stroke-color-write;
+      marker-start: url(#markerWrite);
     }
     &.get-link {
-        marker-end: url(#markerCurvedArrowE);
+      stroke: $stroke-color-get;
+      marker-end: url(#markerGet);
     }
-}
+  }
 
-::ng-deep .ngcs-connection:hover {
+  .ngcs-connection:hover {
     cursor: pointer;
     stroke: red;
+  }
 }

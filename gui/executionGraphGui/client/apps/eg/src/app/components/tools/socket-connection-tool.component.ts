@@ -4,13 +4,21 @@ import { Point, ConnectionDrawStyle, GraphComponent } from '@eg/graph';
 import { ILogger, LoggerFactory } from '@eg/logger';
 
 import { ToolComponent } from './tool-component';
-import { OutputSocket, InputSocket, Connection, isOutputSocket, Socket, createConnection, SocketIndex } from '../../model';
+import {
+  OutputSocket,
+  InputSocket,
+  Connection,
+  isOutputSocket,
+  Socket,
+  createConnection,
+  SocketIndex
+} from '../../model';
 import { GraphsState } from '../../+state/reducers';
 import { AddConnection } from '../../+state/actions';
 
 @Component({
-    selector: 'eg-socket-connection-tool',
-    template: `
+  selector: 'eg-socket-connection-tool',
+  template: `
     <ng-container *ngIf="tempConnection">
 
       <eg-connection-layer
@@ -33,18 +41,19 @@ import { AddConnection } from '../../+state/actions';
       </ngcs-html-layer>
     </ng-container>
     `,
-    styles: [`
-      ::ng-deep .new-connections .ngcs-connection {
-        stroke: green;
+  styles: [
+    `
+      ::ng-deep {
+        .new-connections.nondroppable .ngcs-connection {
+          stroke: #888;
+        }
       }
-      ::ng-deep .new-connections.nondroppable .ngcs-connection {
-        stroke: #888;
-      }
-    `]
+    `
+  ]
 })
 export class SocketConnectionToolComponent extends ToolComponent implements OnInit {
-
-  @Input() connectionDrawStyle: ConnectionDrawStyle;
+  @Input()
+  connectionDrawStyle: ConnectionDrawStyle;
 
   public tempTargetSocket: InputSocket | OutputSocket = null;
   public tempConnection: Connection = null;
@@ -76,24 +85,23 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       this.tempConnection = createConnection(socket, this.tempTargetSocket);
     });
     this.socketEvents.onDragContinue.subscribe(e => {
-      if(!this.targetSocket) {
+      if (!this.targetSocket) {
         this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
       }
     });
     this.socketEvents.onDragStop.subscribe(e => {
-      if(this.targetSocket) {
+      if (this.targetSocket) {
         this.addConnection(this.sourceSocket, this.targetSocket);
-      }
-      else {
-        this.abortConnection()
+      } else {
+        this.abortConnection();
       }
     });
 
     this.socketEvents.onEnter.subscribe(e => {
-      if(this.tempConnection) {
+      if (this.tempConnection) {
         const targetSocket = e.element;
-        if(targetSocket !== this.sourceSocket && this.sourceSocket.kind!==targetSocket.kind) {
-          console.log("Entering potential target socket");
+        if (targetSocket !== this.sourceSocket && this.sourceSocket.kind !== targetSocket.kind) {
+          console.log('Entering potential target socket');
           this.targetSocket = targetSocket;
           this.tempConnection = createConnection(this.sourceSocket, this.targetSocket);
         }
@@ -101,8 +109,8 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
     });
 
     this.socketEvents.onLeave.subscribe(e => {
-      if(this.targetSocket) {
-        console.log("Leaving potential target Socket");
+      if (this.targetSocket) {
+        console.log('Leaving potential target Socket');
         this.targetSocket = null;
         this.tempConnection = createConnection(this.sourceSocket, this.tempTargetSocket);
         this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
@@ -122,5 +130,4 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
     this.store.dispatch(new AddConnection(source, target));
     this.abortConnection();
   }
-
 }
