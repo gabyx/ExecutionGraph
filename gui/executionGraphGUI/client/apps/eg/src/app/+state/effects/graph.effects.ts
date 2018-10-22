@@ -101,7 +101,14 @@ export class GraphEffects {
   addConnection$ = this.actions$
     .ofType<fromGraph.AddConnection>(fromGraph.ADD_CONNECTION)
     .pipe(
-      map((action, state) => new fromGraph.ConnectionAdded(Connection.createConnection(action.source, action.target)))
+      map((action, state) => {
+        of(Connection.createConnection(action.source, action.target))
+      },
+      catchError((error) => {
+        this.log.error("Adding connection failed!");
+        return of();
+      })
+      )
     );
 
   private async createDummyGraph(): Promise<fromGraph.GraphsLoaded> {

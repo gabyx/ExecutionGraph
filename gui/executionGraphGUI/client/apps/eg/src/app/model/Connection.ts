@@ -23,7 +23,7 @@ export class ConnectionId {
     return new ConnectionId(`${outSocketId.string}-to-${inSocketId.string}`);
   }
 
-  constructor(public readonly idString) {}
+  constructor(public readonly idString) { }
 
   public equal(id: ConnectionId) {
     return this.idString === id.idString;
@@ -54,6 +54,13 @@ export class Connection {
   }
 
   public static createConnection(source: Socket, target: Socket) {
+    if (!source.type.equals(target.type)) {
+      throw new Error(
+        `Connection type mismatch: source type \
+        [${source.typeName}] ↭ [${target.typeName}] target type !`
+      )
+    }
+
     if (Socket.isOutputSocket(source) && Socket.isInputSocket(target)) {
       // Make a Write-Link
       return new Connection(source, target, true);
