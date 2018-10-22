@@ -98,16 +98,14 @@ export class GraphEffects {
   );
 
   @Effect()
-  addConnection$ = this.actions$
-    .ofType<fromGraph.AddConnection>(fromGraph.ADD_CONNECTION)
-    .pipe(
-      map((action, state) => {
-        of(Connection.createConnection(action.source, action.target))
-      }),
-      catchError((error) => {
-        return of(new fromNotifications.ShowNotification(`Adding connection failed!: ${error}`, 5000))
-      })
-    );
+  addConnection$ = this.actions$.ofType<fromGraph.AddConnection>(fromGraph.ADD_CONNECTION).pipe(
+    map((action, state) => {
+      return new fromGraph.ConnectionAdded(Connection.create(action.source, action.target));
+    }),
+    catchError(error => {
+      return of(new fromNotifications.ShowNotification(`Adding connection failed!: ${error}`, 5000));
+    })
+  );
 
   private async createDummyGraph(): Promise<fromGraph.GraphsLoaded> {
     // Get Graph Infos
@@ -129,7 +127,7 @@ export class GraphEffects {
       nodes[node.id.toString()] = node;
 
       if (lastNode) {
-        const connection = Connection.createConnection(lastNode.outputs[0], node.inputs[0]);
+        const connection = Connection.create(lastNode.outputs[0], node.inputs[0]);
         connections[connection.idString] = connection;
       }
       lastNode = node;
