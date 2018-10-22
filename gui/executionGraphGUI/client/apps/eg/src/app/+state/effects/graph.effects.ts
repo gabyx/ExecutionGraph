@@ -103,12 +103,10 @@ export class GraphEffects {
     .pipe(
       map((action, state) => {
         of(Connection.createConnection(action.source, action.target))
-      },
+      }),
       catchError((error) => {
-        this.log.error("Adding connection failed!");
-        return of();
+        return of(new fromNotifications.ShowNotification("Adding connection failed!"))
       })
-      )
     );
 
   private async createDummyGraph(): Promise<fromGraph.GraphsLoaded> {
