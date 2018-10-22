@@ -28,20 +28,10 @@ import { AddConnection } from '../../+state/actions';
         [style.top]="tempConnectionEndpoint.y+'px'">
 
           <ngcs-port [id]="tempTargetSocket.idString" class="right middle"></ngcs-port>
-
         </div>
       </ngcs-html-layer>
     </ng-container>
-    `,
-  styles: [
     `
-      ::ng-deep {
-        .new-connections.nondroppable .ngcs-connection {
-          stroke: #888;
-        }
-      }
-    `
-  ]
 })
 export class SocketConnectionToolComponent extends ToolComponent implements OnInit {
   @Input()
@@ -74,7 +64,8 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       }
 
       this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
-      this.tempConnection = Connection.createConnection(socket, this.tempTargetSocket);
+      this.tempConnection = Connection.create(socket, this.tempTargetSocket);
+      this.tempConnection.uiProps.isTemporary = true;
     });
     this.socketEvents.onDragContinue.subscribe(e => {
       if (!this.targetSocket) {
@@ -90,22 +81,35 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
     });
 
     this.socketEvents.onEnter.subscribe(e => {
+      this.logger.info('onEnter');
       if (this.tempConnection) {
         const targetSocket = e.element;
-        if (targetSocket !== this.sourceSocket && this.sourceSocket.kind !== targetSocket.kind) {
-          console.log('Entering potential target socket');
+        this.tempConnection.uiProps.isInvalid = Connection.isInvalid(this.sourceSocket, targetSocket);
+
+        if (!this.tempConnection.uiProps.isInvalid) {
+          this.logger.info('Making preview connection');
           this.targetSocket = targetSocket;
-          this.tempConnection = Connection.createConnection(this.sourceSocket, this.targetSocket);
+          this.tempConnection = Connection.create(this.sourceSocket, this.targetSocket, false);
+        } else {
+          /** Add notifcation icon next to cursor, to make
+           *  clear that this connection is impossible
+           */
+          this.logger.error(Connection.getValidationError(this.tempConnection.uiProps.isInvalid));
         }
       }
     });
 
     this.socketEvents.onLeave.subscribe(e => {
+      this.logger.info('onLeave');
       if (this.targetSocket) {
-        console.log('Leaving potential target Socket');
+        this.logger.info('Leaving potential target Socket');
         this.targetSocket = null;
-        this.tempConnection = Connection.createConnection(this.sourceSocket, this.tempTargetSocket);
+        this.tempConnection = Connection.create(this.sourceSocket, this.tempTargetSocket);
+        this.tempConnection.uiProps.isTemporary = true;
         this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
+      }
+      if (this.tempConnection) {
+        this.tempConnection.uiProps.isInvalid = Connection.Validity.Valid;
       }
     });
   }

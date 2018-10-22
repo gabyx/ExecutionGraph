@@ -66,14 +66,14 @@ export class GraphEffects {
   @Effect()
   createNode$ = this.actions$.ofType<fromGraph.CreateNode>(fromGraph.CREATE_NODE).pipe(
     mergeMap((action, state) =>
-      from(this.graphManipulationService.addNode(action.graphId, action.nodeType.name, 'Some new node')).pipe(
+      from(this.graphManipulationService.addNode(action.graphId, action.nodeType.name, 'Node')).pipe(
         map(node => ({ node, action }))
       )
     ),
     mergeMap(({ node, action }) => [
       new fromGraph.NodeAdded(node),
       new fromGraph.MoveNode(node, action.position ? action.position : { x: 0, y: 0 }),
-      new fromNotifications.ShowNotification(`Added the node ${node.name} for you \u{1F6EB}`)
+      new fromNotifications.ShowNotification(`Added the node '${node.name}' for you \u{1F6EB}`)
     ])
   );
 
@@ -98,11 +98,14 @@ export class GraphEffects {
   );
 
   @Effect()
-  addConnection$ = this.actions$
-    .ofType<fromGraph.AddConnection>(fromGraph.ADD_CONNECTION)
-    .pipe(
-      map((action, state) => new fromGraph.ConnectionAdded(Connection.createConnection(action.source, action.target)))
-    );
+  addConnection$ = this.actions$.ofType<fromGraph.AddConnection>(fromGraph.ADD_CONNECTION).pipe(
+    map((action, state) => {
+      return new fromGraph.ConnectionAdded(Connection.create(action.source, action.target));
+    }),
+    catchError(error => {
+      return of(new fromNotifications.ShowNotification(`Adding connection failed!: ${error}`, 5000));
+    })
+  );
 
   private async createDummyGraph(): Promise<fromGraph.GraphsLoaded> {
     // Get Graph Infos
@@ -124,7 +127,7 @@ export class GraphEffects {
       nodes[node.id.toString()] = node;
 
       if (lastNode) {
-        const connection = Connection.createConnection(lastNode.outputs[0], node.inputs[0]);
+        const connection = Connection.create(lastNode.outputs[0], node.inputs[0]);
         connections[connection.idString] = connection;
       }
       lastNode = node;
