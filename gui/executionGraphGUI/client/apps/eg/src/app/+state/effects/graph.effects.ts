@@ -105,7 +105,7 @@ export class GraphEffects {
         of(Connection.createConnection(action.source, action.target))
       }),
       catchError((error) => {
-        return of(new fromNotifications.ShowNotification("Adding connection failed!"))
+        return of(new fromNotifications.ShowNotification(`Adding connection failed!: ${error}`, 5000))
       })
     );
 
