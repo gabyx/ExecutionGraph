@@ -34,7 +34,9 @@ import { AddConnection } from '../../+state/actions';
           <div *ngIf="invalidity" class="invalidity-tooltip"
             [style.left]="tempConnectionEndpoint.x+'px'"
             [style.top]="tempConnectionEndpoint.y+'px'">
-            {{invalidityMessage}}
+            <ul>
+              <li *ngFor="let message of invalidityMessages">{{message}}</li>
+            </ul>
           </div>
       </ngcs-html-layer>
     </ng-container>
@@ -50,8 +52,8 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
   public tempConnectionEndpoint: Point = { x: 0, y: 0 };
 
   public invalidity = Connection.Validity.Valid;
-  public get invalidityMessage() {
-    return Connection.getValidationError(this.invalidity);
+  public get invalidityMessages() {
+    return Connection.getValidationErrors(this.invalidity);
   }
 
   private sourceSocket: Socket;
@@ -106,7 +108,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
           /** Add notifcation icon next to cursor, to make
            *  clear that this connection is impossible
            */
-          this.logger.error(Connection.getValidationError(this.invalidity));
+          this.logger.error(`Invalid connection: ${Connection.getValidationErrors(this.invalidity).join(", ")}`);
         }
       }
     });

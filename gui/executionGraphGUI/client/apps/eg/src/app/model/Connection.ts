@@ -52,6 +52,24 @@ export class Connection {
   public readonly id: ConnectionId;
   public uiProps: UIProps = new UIProps();
 
+  /**
+   * Get the error description for the invalidity of the connection (if any).
+   *
+   * @static
+   * @param {Validity} error
+   * @returns {string}
+   * @memberof Connection
+   */
+  public static getValidationErrors(error: Validity): string[] {
+    const errorMessages = [];
+    for(const validityFlag of [Validity.OneLengthCycle, Validity.InOutMismatch, Validity.TypeMismatch]) {
+      if (error & validityFlag) {
+        errorMessages.push(`${Validity[validityFlag]}`);
+      }
+    }
+    return errorMessages;
+  }
+
   constructor(
     public outputSocket: OutputSocket,
     public inputSocket: InputSocket,
@@ -60,7 +78,7 @@ export class Connection {
   ) {
     const invalid = validate ? this.isInvalid() : Connection.Validity.Valid /*just do it!*/;
     if (invalid) {
-      throw new Error(`Cannot construct an invalid connection: ${Connection.getValidationError(invalid)}`);
+      throw new Error(`Cannot construct an invalid connection: ${Connection.getValidationErrors(invalid).join(',')}`);
     }
     this.id = ConnectionId.create(outputSocket.id, inputSocket.id);
   }
@@ -99,24 +117,6 @@ export class Connection {
     return result;
   }
 
-  /**
-   * Get the error description for the invalidity of the connection (if any).
-   *
-   * @static
-   * @param {Validity} error
-   * @returns {string}
-   * @memberof Connection
-   */
-  public static getValidationError(error: Validity): string {
-    if (error & Validity.Invalid) {
-      let err = `${Validity[Validity.Invalid]}: `;
-      err += error & Validity.OneLengthCycle ? `-${Validity[Validity.OneLengthCycle]} ` : '';
-      err += error & Validity.InOutMismatch ? `-${Validity[Validity.InOutMismatch]} ` : '';
-      err += error & Validity.TypeMismatch ? `-${Validity[Validity.TypeMismatch]} ` : '';
-      return err;
-    }
-    return Validity[Validity.Valid];
-  }
 
   /**
    * Create a connection.
