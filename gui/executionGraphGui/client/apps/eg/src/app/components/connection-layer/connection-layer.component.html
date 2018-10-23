@@ -12,9 +12,7 @@
   <svg:path *ngFor="let connection of connections"
     class="ngcs-connection" [class.selected]="isSelected(connection) | async"
       [attr.d]="getPathDescription(connection)"
-      [class.write-link]="connection.isWriteLink && !connection.uiProps.isInvalid"
-      [class.get-link]="!connection.isWriteLink && !connection.uiProps.isInvalid"
-      [class.temporary]="connection.uiProps.isTemporary"
-      [class.invalid]="connection.uiProps.isInvalid"/>
+      [class.write-link]="connection.isWriteLink"
+      [class.get-link]="!connection.isWriteLink" />
 
 </ngcs-svg-layer>

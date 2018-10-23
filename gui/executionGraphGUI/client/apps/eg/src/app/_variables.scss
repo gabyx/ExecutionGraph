@@ -21,3 +21,7 @@ $app-warn:    mat-palette($mat-pink);
 $primary: mat-color($app-primary);
 $accent: mat-color($app-accent);
 $warn: mat-color($app-warn);
+
+$stroke-color-get: rgb(84, 103, 245);
+$stroke-color-write: rgb(36, 36, 36);
+$stroke-color-invalid: rgb(255, 0, 0);

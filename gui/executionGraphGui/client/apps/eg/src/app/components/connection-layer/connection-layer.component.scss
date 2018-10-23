@@ -2,7 +2,6 @@
 
 $stroke-color-get: rgb(84, 103, 245);
 $stroke-color-write: rgb(36, 36, 36);
-$stroke-color-invalid: rgb(255, 0, 0);
 
 ::ng-deep {
   #markerWrite > use {
@@ -40,12 +39,6 @@ $stroke-color-invalid: rgb(255, 0, 0);
     &.get-link {
       stroke: $stroke-color-get;
       marker-end: url(#markerGet);
-    }
-    &.temporary {
-      stroke-dasharray: 2;
-    }
-    &.invalid {
-      stroke: $stroke-color-invalid;
     }
   }
 

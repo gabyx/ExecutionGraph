@@ -39,8 +39,6 @@ enum Validity {
 }
 
 export class UIProps {
-  public isInvalid: Validity = Validity.Valid; /** The validity status. */
-  public isTemporary: boolean = false; /** If the connection is a temporary connection.*/
 }
 
 /**

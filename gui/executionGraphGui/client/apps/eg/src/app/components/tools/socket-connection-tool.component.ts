@@ -16,7 +16,8 @@ import { AddConnection } from '../../+state/actions';
       <eg-connection-layer
           [connections]="[tempConnection]"
           [drawStyle]="connectionDrawStyle"
-          class="new-connections"
+          class="temp"
+          [class.invalid]="invalidity"
           [class.nondroppable]="!targetSocket">
       </eg-connection-layer>
 
@@ -28,10 +29,17 @@ import { AddConnection } from '../../+state/actions';
         [style.top]="tempConnectionEndpoint.y+'px'">
 
           <ngcs-port [id]="tempTargetSocket.idString" class="right middle"></ngcs-port>
-        </div>
+
+          </div>
+          <div *ngIf="invalidity" class="invalidity-tooltip"
+            [style.left]="tempConnectionEndpoint.x+'px'"
+            [style.top]="tempConnectionEndpoint.y+'px'">
+            {{invalidityMessage}}
+          </div>
       </ngcs-html-layer>
     </ng-container>
-    `
+    `,
+  styleUrls: ['./socket-connection-tool.component.scss']
 })
 export class SocketConnectionToolComponent extends ToolComponent implements OnInit {
   @Input()
@@ -40,6 +48,11 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
   public tempTargetSocket: InputSocket | OutputSocket = null;
   public tempConnection: Connection = null;
   public tempConnectionEndpoint: Point = { x: 0, y: 0 };
+
+  public invalidity = Connection.Validity.Valid;
+  public get invalidityMessage() {
+    return Connection.getValidationError(this.invalidity);
+  }
 
   private sourceSocket: Socket;
   private targetSocket: Socket;
@@ -65,7 +78,6 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
 
       this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
       this.tempConnection = Connection.create(socket, this.tempTargetSocket);
-      this.tempConnection.uiProps.isTemporary = true;
     });
     this.socketEvents.onDragContinue.subscribe(e => {
       if (!this.targetSocket) {
@@ -84,9 +96,9 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       this.logger.info('onEnter');
       if (this.tempConnection) {
         const targetSocket = e.element;
-        this.tempConnection.uiProps.isInvalid = Connection.isInvalid(this.sourceSocket, targetSocket);
+        this.invalidity = Connection.isInvalid(this.sourceSocket, targetSocket);
 
-        if (!this.tempConnection.uiProps.isInvalid) {
+        if (!this.invalidity) {
           this.logger.info('Making preview connection');
           this.targetSocket = targetSocket;
           this.tempConnection = Connection.create(this.sourceSocket, this.targetSocket, false);
@@ -94,7 +106,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
           /** Add notifcation icon next to cursor, to make
            *  clear that this connection is impossible
            */
-          this.logger.error(Connection.getValidationError(this.tempConnection.uiProps.isInvalid));
+          this.logger.error(Connection.getValidationError(this.invalidity));
         }
       }
     });
@@ -105,16 +117,16 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
         this.logger.info('Leaving potential target Socket');
         this.targetSocket = null;
         this.tempConnection = Connection.create(this.sourceSocket, this.tempTargetSocket);
-        this.tempConnection.uiProps.isTemporary = true;
         this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
       }
       if (this.tempConnection) {
-        this.tempConnection.uiProps.isInvalid = Connection.Validity.Valid;
+        this.invalidity = Connection.Validity.Valid;
       }
     });
   }
 
   private abortConnection() {
+    this.invalidity = Connection.Validity.Valid;
     this.tempConnection = null;
     this.tempTargetSocket = null;
     this.sourceSocket = null;

@@ -1,0 +1,27 @@
+@import 'app/variables';
+
+.temp {
+    ::ng-deep {
+        .ngcs-connection {
+            stroke-dasharray: 2;
+        }
+    }
+
+}
+
+.invalid {
+    ::ng-deep {
+        .ngcs-connection {
+            marker-start: none;
+            marker-end: none;
+            stroke: $stroke-color-invalid;
+        }
+    }
+}
+
+.invalidity-tooltip {
+    pointer-events: none;
+    position: absolute;
+    margin: 50%;
+    background: rgba(0,0,0,0.4);
+}
