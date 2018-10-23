@@ -44,7 +44,7 @@
                         [ngcsEventSource]="socket" [forwardTo]="socketEvents"
                         >
                         <span>
-                            [{{ socket.type }}] : {{ socket.typeName }}
+                            [{{ socket.typeName }}] : {{ socket.name }}
                         </span>
                         <ngcs-port [id]="socket.idString" class="right middle"></ngcs-port>
                     </div>

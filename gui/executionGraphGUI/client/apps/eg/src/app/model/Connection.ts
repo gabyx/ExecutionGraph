@@ -30,7 +30,7 @@ export class ConnectionId {
   }
 }
 
-enum Validity {
+enum Invalidity {
   Valid = 0,
   Invalid = 1,
   InOutMismatch = 1 << 1,
@@ -38,8 +38,7 @@ enum Validity {
   TypeMismatch = 1 << 3
 }
 
-export class UIProps {
-}
+export class UIProps {}
 
 /**
  * Modelclass for a connection
@@ -48,7 +47,7 @@ export class UIProps {
  * @class Connection
  */
 export class Connection {
-  public static readonly Validity = Validity;
+  public static readonly Invalidity = Invalidity;
   public readonly id: ConnectionId;
   public uiProps: UIProps = new UIProps();
 
@@ -56,15 +55,15 @@ export class Connection {
    * Get the error description for the invalidity of the connection (if any).
    *
    * @static
-   * @param {Validity} error
+   * @param {Invalidity} error
    * @returns {string}
    * @memberof Connection
    */
-  public static getValidationErrors(error: Validity): string[] {
+  public static getValidationErrors(error: Invalidity): string[] {
     const errorMessages = [];
-    for(const validityFlag of [Validity.OneLengthCycle, Validity.InOutMismatch, Validity.TypeMismatch]) {
+    for (const validityFlag of [Invalidity.OneLengthCycle, Invalidity.InOutMismatch, Invalidity.TypeMismatch]) {
       if (error & validityFlag) {
-        errorMessages.push(`${Validity[validityFlag]}`);
+        errorMessages.push(`${Invalidity[validityFlag]}`);
       }
     }
     return errorMessages;
@@ -76,7 +75,7 @@ export class Connection {
     public isWriteLink: boolean = true,
     validate: boolean = true
   ) {
-    const invalid = validate ? this.isInvalid() : Connection.Validity.Valid /*just do it!*/;
+    const invalid = validate ? this.isInvalid() : Connection.Invalidity.Valid /*just do it!*/;
     if (invalid) {
       throw new Error(`Cannot construct an invalid connection: ${Connection.getValidationErrors(invalid).join(',')}`);
     }
@@ -93,7 +92,7 @@ export class Connection {
     return this.id.idString;
   }
 
-  public isInvalid(): Validity {
+  public isInvalid(): Invalidity {
     return Connection.isInvalid(this.outputSocket, this.inputSocket);
   }
 
@@ -103,20 +102,19 @@ export class Connection {
    * @static
    * @param {Socket} source
    * @param {Socket} target
-   * @returns {Validity}
+   * @returns {Invalidity}
    * @memberof Connection
    */
-  public static isInvalid(source: Socket, target: Socket): Validity {
-    let result = Validity.Valid;
+  public static isInvalid(source: Socket, target: Socket): Invalidity {
+    let result = Invalidity.Valid;
     /** input,output or vice versa */
-    result |= source.kind !== target.kind ? Validity.Valid : Validity.Invalid | Validity.InOutMismatch;
+    result |= source.kind !== target.kind ? Invalidity.Valid : Invalidity.Invalid | Invalidity.InOutMismatch;
     /** no 1-length-cycles, more elaborate cycle-detection in the backend */
-    result |= source.parent !== target.parent ? Validity.Valid : Validity.Invalid | Validity.OneLengthCycle;
+    result |= source.parent !== target.parent ? Invalidity.Valid : Invalidity.Invalid | Invalidity.OneLengthCycle;
     /** correct type */
-    result |= source.type.equals(target.type) ? Validity.Valid : Validity.Invalid | Validity.TypeMismatch;
+    result |= source.type.equals(target.type) ? Invalidity.Valid : Invalidity.Invalid | Invalidity.TypeMismatch;
     return result;
   }
-
 
   /**
    * Create a connection.

@@ -1,10 +1,9 @@
-@import "app/variables";
-
+@import 'app/variables';
 
 #graph-1 {
   height: 100%;
   .node {
-    font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace;
+    font-family: mat-font-family($app-graph-typography);
     width: 20em;
     background: rgba(255, 255, 255, 0.8);
 
@@ -13,10 +12,12 @@
       width: 100%;
       text-align: center;
       padding: 1em;
+      color: mat-color($app-secondary, darker);
     }
     .sockets {
       display: flex;
       font-size: 0.8em;
+      color: mat-color($app-secondary);
     }
 
     .inputs,
@@ -69,7 +70,6 @@
   &.dropping-forbidden {
     background: $warn;
   }
-
 }
 
 :host {

@@ -21,7 +21,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
   public tempConnection: Connection = null;
   public tempConnectionEndpoint: Point = { x: 0, y: 0 };
 
-  public invalidity = Connection.Validity.Valid;
+  public invalidity = Connection.Invalidity.Valid;
   public get invalidityMessages() {
     return Connection.getValidationErrors(this.invalidity);
   }
@@ -78,7 +78,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
           /** Add notifcation icon next to cursor, to make
            *  clear that this connection is impossible
            */
-          this.logger.error(`Invalid connection: ${Connection.getValidationErrors(this.invalidity).join(", ")}`);
+          this.logger.error(`Invalid connection: ${Connection.getValidationErrors(this.invalidity).join(', ')}`);
         }
       }
     });
@@ -92,13 +92,13 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
         this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
       }
       if (this.tempConnection) {
-        this.invalidity = Connection.Validity.Valid;
+        this.invalidity = Connection.Invalidity.Valid;
       }
     });
   }
 
   private abortConnection() {
-    this.invalidity = Connection.Validity.Valid;
+    this.invalidity = Connection.Invalidity.Valid;
     this.tempConnection = null;
     this.tempTargetSocket = null;
     this.sourceSocket = null;
