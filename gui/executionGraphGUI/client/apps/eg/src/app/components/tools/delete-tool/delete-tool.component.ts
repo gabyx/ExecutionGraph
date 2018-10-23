@@ -1,14 +1,15 @@
 import { Component, HostListener, OnInit, EventEmitter } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { ToolComponent, KEY_CODE } from './tool-component';
-import { GraphsState } from '../../+state/reducers';
 import { Observable } from 'rxjs';
-import { Selection } from '../../+state/reducers/ui.reducers';
-import { withLatestFrom, map } from 'rxjs/operators';
-import { RemoveNode, ClearSelection } from '../../+state/actions';
-import { getSelection } from '../../+state/selectors/ui.selectors';
-import { Graph } from '../../model';
-import { getSelectedGraph } from '../../+state/selectors';
+import { withLatestFrom } from 'rxjs/operators';
+
+import { ToolComponent, KEY_CODE } from '../tool-component';
+import { GraphsState } from '../../../+state/reducers';
+import { Selection } from '../../../+state/reducers/ui.reducers';
+import { RemoveNode, ClearSelection } from '../../../+state/actions';
+import { getSelection } from '../../../+state/selectors/ui.selectors';
+import { Graph } from '../../../model';
+import { getSelectedGraph } from '../../../+state/selectors';
 
 @Component({
   selector: 'eg-delete-tool',

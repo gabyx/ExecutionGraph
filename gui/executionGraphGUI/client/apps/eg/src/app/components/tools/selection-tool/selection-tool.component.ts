@@ -5,39 +5,19 @@ import { filter, tap, withLatestFrom } from 'rxjs/operators';
 
 import { Point, MouseButton, GraphComponent } from '@eg/graph';
 
-import { ToolComponent, KEY_CODE } from './tool-component';
-import { UiState, Selection } from '../../+state/reducers/ui.reducers';
-import * as fromUiSelectors from '../../+state/selectors/ui.selectors';
-import * as fromGraphSelectors from '../../+state/selectors/graph.selectors';
-import * as fromUiActions from '../../+state/actions/ui.actions';
-import { GraphsState } from '../../+state/reducers';
-import { Graph } from '../../model';
+import { ToolComponent, KEY_CODE } from './../tool-component';
+import { UiState, Selection } from '../../../+state/reducers/ui.reducers';
+import * as fromUiSelectors from '../../../+state/selectors/ui.selectors';
+import * as fromGraphSelectors from '../../../+state/selectors/graph.selectors';
+import * as fromUiActions from '../../../+state/actions/ui.actions';
+import { GraphsState } from '../../../+state/reducers';
+import { Graph } from '../../../model';
 
 
 @Component({
     selector: 'eg-selection-tool',
-    template: `
-    <ngcs-svg-layer *ngIf="isSelecting">
-
-        <svg:rect class="selection-preview"
-
-            [attr.x]="selectionAreaX"
-            [attr.y]="selectionAreaY"
-            [attr.width]="selectionAreaWidth"
-            [attr.height]="selectionAreaHeight"
-            ></svg:rect>
-
-    </ngcs-svg-layer>
-    `,
-    styles: [`
-    .selection-preview {
-        stroke: pink;
-        stroke-width: 1;
-        stroke-opacity: 0.9;
-        fill: black;
-        fill-opacity: 0.1;
-    }
-    `]
+    templateUrl: './selection-tool.component.html',
+    styleUrls: ['./selection-tool.component.scss']
 })
 export class SelectionToolComponent extends ToolComponent implements OnInit {
 

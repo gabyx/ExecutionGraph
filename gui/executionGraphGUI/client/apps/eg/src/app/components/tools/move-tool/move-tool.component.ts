@@ -2,9 +2,9 @@ import { Component, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
 
 import { Point, GraphComponent } from "@eg/graph";
-import { ToolComponent } from "./tool-component";
-import { GraphsState } from "../../+state/reducers";
-import { MoveNode } from "../../+state/actions";
+import { ToolComponent } from "../tool-component";
+import { GraphsState } from "../../../+state/reducers";
+import { MoveNode } from "../../../+state/actions";
 
 @Component({
   selector: 'eg-move-tool',

@@ -1,46 +1,16 @@
-import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Point, ConnectionDrawStyle, GraphComponent } from '@eg/graph';
 import { ILogger, LoggerFactory } from '@eg/logger';
 
-import { ToolComponent } from './tool-component';
-import { OutputSocket, InputSocket, Connection, Socket, SocketIndex } from '../../model';
-import { GraphsState } from '../../+state/reducers';
-import { AddConnection } from '../../+state/actions';
+import { ToolComponent } from '../tool-component';
+import { OutputSocket, InputSocket, Connection, Socket, SocketIndex } from '../../../model';
+import { GraphsState } from '../../../+state/reducers';
+import { AddConnection } from '../../../+state/actions';
 
 @Component({
   selector: 'eg-socket-connection-tool',
-  template: `
-    <ng-container *ngIf="tempConnection">
-
-      <eg-connection-layer
-          [connections]="[tempConnection]"
-          [drawStyle]="connectionDrawStyle"
-          class="temp"
-          [class.invalid]="invalidity"
-          [class.nondroppable]="!targetSocket">
-      </eg-connection-layer>
-
-      <ngcs-html-layer>
-        <div
-        *ngIf="!targetSocket"
-        style="position: absolute"
-        [style.left]="tempConnectionEndpoint.x+'px'"
-        [style.top]="tempConnectionEndpoint.y+'px'">
-
-          <ngcs-port [id]="tempTargetSocket.idString" class="right middle"></ngcs-port>
-
-          </div>
-          <div *ngIf="invalidity" class="invalidity-tooltip"
-            [style.left]="tempConnectionEndpoint.x+'px'"
-            [style.top]="tempConnectionEndpoint.y+'px'">
-            <ul>
-              <li *ngFor="let message of invalidityMessages">{{message}}</li>
-            </ul>
-          </div>
-      </ngcs-html-layer>
-    </ng-container>
-    `,
+  templateUrl: './socket-connection-tool.component.html',
   styleUrls: ['./socket-connection-tool.component.scss']
 })
 export class SocketConnectionToolComponent extends ToolComponent implements OnInit {

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Point, MouseButton, GraphComponent } from '@eg/graph';
 
-import { ToolComponent } from './tool-component';
+import { ToolComponent } from '../tool-component';
 
 @Component({
     selector: 'eg-navigation-tool',

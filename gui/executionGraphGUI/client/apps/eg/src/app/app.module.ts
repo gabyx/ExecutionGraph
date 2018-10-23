@@ -81,12 +81,12 @@ import { environment } from '../environments/environment';
 import { GraphLoadedGuard } from './guards/graphLoaded.guard';
 import { BackendTestComponent } from './components/backend-test/backend-test.component';
 import { AddNodeComponent } from './components/add-node/add-node.component'
-import { SelectionToolComponent } from './components/tools/selection-tool.component';
-import { NavigationToolComponent } from './components/tools/navigation-tool.component';
-import { SocketConnectionToolComponent } from './components/tools/socket-connection-tool.component';
+import { SelectionToolComponent } from './components/tools/selection-tool/selection-tool.component';
+import { NavigationToolComponent } from './components/tools/navigation-tool/navigation-tool.component';
+import { SocketConnectionToolComponent } from './components/tools/socket-connection-tool/socket-connection-tool.component';
 import { ConnectionLayerComponent } from './components/connection-layer/connection-layer.component';
-import { MoveToolComponent } from './components/tools/move-tool.component';
-import { DeleteToolComponent } from './components/tools/delete-tool.component';
+import { MoveToolComponent } from './components/tools/move-tool/move-tool.component';
+import { DeleteToolComponent } from './components/tools/delete-tool/delete-tool.component';
 
 //environment.production = true;
 
