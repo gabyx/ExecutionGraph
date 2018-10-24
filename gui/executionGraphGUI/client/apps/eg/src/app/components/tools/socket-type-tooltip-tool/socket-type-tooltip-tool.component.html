@@ -1,0 +1,9 @@
+<ng-container *ngIf="socketTypeTooltip">
+  <ngcs-html-layer>
+      <div class="socketTypeTooltip"
+          [style.left]="socketTypeTooltip.x+'px'"
+          [style.top]="socketTypeTooltip.y+'px'">
+          {{ socketTypeTooltip.message }}
+      </div>
+  </ngcs-html-layer>
+</ng-container>

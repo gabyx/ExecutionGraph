@@ -87,6 +87,7 @@ import { SocketConnectionToolComponent } from './components/tools/socket-connect
 import { ConnectionLayerComponent } from './components/connection-layer/connection-layer.component';
 import { MoveToolComponent } from './components/tools/move-tool/move-tool.component';
 import { DeleteToolComponent } from './components/tools/delete-tool/delete-tool.component';
+import { SocketTypeTooltipComponent } from './components/tools/socket-type-tooltip/socket-type-tooltip.component';
 
 //environment.production = true;
 
@@ -126,7 +127,8 @@ const routes: Route[] = [
     MoveToolComponent,
     SocketConnectionToolComponent,
     DeleteToolComponent,
-    ConnectionLayerComponent
+    ConnectionLayerComponent,
+    SocketTypeTooltipComponent
   ],
   imports: [
     HttpClientModule,
