@@ -1,7 +1,7 @@
 <mat-list>
 
-  <mat-list-item class="node-type"
-    *ngFor="let nodeType of nodeTypes | async"
+  <mat-list-item *ngFor="let nodeType of nodeTypes | async"
+    class="node-type"
     [ngcsDraggable]="nodeType">
 
     {{ nodeType.name }}
