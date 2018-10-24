@@ -20,10 +20,10 @@
 
 .invalidity-tooltip {
   position: absolute;
-  transform: translate(-50%, 0%);
+  transform: translate(-50%, -110%);
   pointer-events: none;
 
-  background: rgba(0, 0, 0, 0.4);
+  background: $overlay-background-color;
   color: $stroke-color-invalid;
   font-family: mat-font-family($app-graph-typography);
   font-size: mat-font-size($app-graph-typography, caption);
