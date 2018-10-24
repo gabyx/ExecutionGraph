@@ -1,6 +1,7 @@
 @import '~@angular/material/theming';
-@import url('https://fonts.googleapis.com/css?family=Fira+Sans');
-@import url('https://fonts.googleapis.com/css?family=Fira+Mono');
+//@import url('https://fonts.googleapis.com/css?family=Fira+Sans');
+//@import url('https://fonts.googleapis.com/css?family=Fira+Mono');
+@import 'fonts';
 
 // Palettes and Theme
 $app-primary: mat-palette($mat-pink, 700, 500, 900);
