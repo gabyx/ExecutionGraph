@@ -16,8 +16,8 @@ include "executionGraph/serialization/schemas/LogicNode.fbs";
 namespace executionGraphGUI.serialization;
 
 table NodeConstructionInfo {
-    type:string (id: 0, required);              //!< The rtti of the logic node.
-    name:string (id: 1, required);              //!< The name of the logic node.
+    type:string (id: 0, required);              //!< The rtti of the node.
+    name:string (id: 1, required);              //!< The name of the node.
     constructorArgs:[ConstructorKV] (id: 2);    //!< Key-value pairs for the cosntructor. (not yet used)
 }
 

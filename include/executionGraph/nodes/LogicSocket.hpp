@@ -25,7 +25,7 @@
 
 namespace executionGraph
 {
-    //! The socket base class for all input/output sockets of a logic node.
+    //! The socket base class for all input/output sockets of a node.
     template<typename TConfig>
     class LogicSocketBase
     {
@@ -56,13 +56,13 @@ namespace executionGraph
     protected:
         const IndexType m_type;     //!< The index in to the meta::list SocketTypes, which type this is!
         const SocketIndex m_index;  //!< The index of the slot at which this socket is installed in a LogicNode.
-        NodeBaseType& m_parent;     //!< The parent logic node of of this socket.
+        NodeBaseType& m_parent;     //!< The parent node of of this socket.
         const std::string m_name;   //!< The name of the socket.
 
         std::string getNameOfType() const;  //!< Returns the name of the current type.
     };
 
-    //! The input socket base class for all input/output sockets of a logic node.
+    //! The input socket base class for all input/output sockets of a node.
     template<typename TConfig>
     class LogicSocketInputBase : public LogicSocketBase<TConfig>
     {
@@ -176,7 +176,7 @@ namespace executionGraph
         std::unordered_set<SocketOutputBaseType*> m_writingParents;  //!< All parent output sockets which write to this input.
     };
 
-    //! The input socket base class for all input/output sockets of a logic node.
+    //! The input socket base class for all input/output sockets of a node.
     template<typename TConfig>
     class LogicSocketOutputBase : public LogicSocketBase<TConfig>
     {
@@ -207,9 +207,9 @@ namespace executionGraph
         }
 
         //! Cast to a logic socket of type `SocketOutputType`<T>*.
-        //! The cast fails at runtime (if NDEBUG defined) if the data type `T` does not match!
+        //! The cast fails at runtime if the data type `T` does not match!
         template<typename T>
-        auto* castToType() const
+        auto* castToType() const noexcept(throwIfBadSocketCast)
         {
             EXECGRAPH_THROW_BADSOCKETCAST_IF((this->m_type != meta::find_index<SocketTypes, T>::value),
                                              "Casting socket index '{0}' with type '{1}' into "
@@ -316,7 +316,7 @@ namespace executionGraph
         const DataType& getValue() const
         {
             EXECGRAPH_ASSERT(m_data,
-                             "Input socket: '{0}' of logic node id: '{1}' not connected",
+                             "Input socket: '{0}' of node id: '{1}' not connected",
                              this->getName(),
                              this->getParent().getId());
             return *static_cast<const DataType*>(m_data);

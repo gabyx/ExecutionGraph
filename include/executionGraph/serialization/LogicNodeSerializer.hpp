@@ -24,7 +24,7 @@ namespace executionGraph
 {
     /* ---------------------------------------------------------------------------------------*/
     /*!
-            Serializer which loads a Logic Node.
+            Serializer which loads a node.
             `NodeSerializerList` contains a type `Writer` and a type `Reader` which 
             both need to fullfill the requirements for `Type` in 
             `executionGrpah::StaticFactory<meta::list<Type,...>>`:
@@ -57,7 +57,7 @@ namespace executionGraph
         ~LogicNodeSerializer() = default;
 
     public:
-        //! Main load function for a logic node.
+        //! Main load function for a node.
         //! It first tries to construct it by the factory
         //! and uses RTTR construction as a fallback.
         static std::unique_ptr<NodeBaseType>
@@ -69,7 +69,7 @@ namespace executionGraph
              const flatbuffers::Vector<uint8_t>* additionalData                                        = nullptr)
         {
             // Dispatch to the correct serialization read function
-            // the factory reads and returns the logic node
+            // the factory reads and returns the node
             auto rttrType = rttr::type::get_by_name(type);
 
             auto optNode = FactoryRead::create(rttrType,
@@ -118,7 +118,7 @@ namespace executionGraph
             }
         }
 
-        //! Load a logic node from a `serialization::LogicNode`.
+        //! Load a node from a `serialization::LogicNode`.
         static std::unique_ptr<NodeBaseType>
         read(const serialization::LogicNode& logicNode)
         {
@@ -130,7 +130,7 @@ namespace executionGraph
                                              logicNode.data());
         }
 
-        //! Store a logic node by using the builder `builder`.
+        //! Store a node by using the builder `builder`.
         static flatbuffers::Offset<serialization::LogicNode>
         write(flatbuffers::FlatBufferBuilder& builder,
               const NodeBaseType& node,
@@ -170,7 +170,7 @@ namespace executionGraph
                 }
             }
 
-            // Build the logic node
+            // Build the node
             LogicNodeBuilder lnBuilder(builder);
             lnBuilder.add_id(id);
             lnBuilder.add_type(typeOffset);

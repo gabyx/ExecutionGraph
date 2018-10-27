@@ -326,7 +326,7 @@ namespace executionGraph
         }
 
         //! Constructs a Get-Link to get the data from output socket at index `outS`
-        //! of logic node `outN` at the input socket at index `inS`.
+        //! of node `outN` at the input socket at index `inS` of node `inN`.
         void setGetLink(NodeId outN, SocketIndex outS, NodeId inN, SocketIndex inS)
         {
             auto outNit = m_nodes.find(outN);
@@ -339,9 +339,44 @@ namespace executionGraph
             m_executionOrderUpToDate = false;
         }
 
-        //! Constructs a Write-Link to write the data of output socket at index \p
-        //! outS of logic node `outN` to the input socket at index `inS` of logic node \p
-        //! inN.
+        //! Removes a Get-Link to get the data from output socket at index `outS`
+        //! of node `outN` at the input socket at index `inS` of node `node`.
+        //! If `outN` and `outS` are set, the function throws if the get link does not match!
+        void removeGetLink(NodeId inN,
+                           SocketIndex inS,
+                           const NodeId* outN      = nullptr,
+                           const SocketIndex* outS = nullptr)
+        {
+            auto nodeIt = m_nodes.find(inN);
+            EXECGRAPH_THROW_IF(nodeIt == m_nodes.end(),
+                               "Node with id: '{0}' does not exist!",
+                               inN);
+
+            auto& node = *(nodeIt->second->m_node);
+            // There is only one get link! Check
+            if(!outN && !outS && node.hasISocket(inS))
+            {
+                auto* outSocket = node.getISocket(inS).followGetLink();
+                EXECGRAPH_THROW_TYPE_IF(!outSocket || (outSocket->getIndex() != *outS ||
+                                                       outSocket->getParent().getId() != *outN),
+                                        NodeConnectionException,
+                                        "The output socket '{0}' of node '{1}' of the get link does "
+                                        "not correspond to the one you want to remove "
+                                        "(node id: '{2}', output socket: '{3}')",
+                                        outSocket->getIndex(),
+                                        outSocket->getParent().getId(),
+                                        *outN,
+                                        *outS);
+            }
+
+            node.removeGetLink(inS);
+
+            m_executionOrderUpToDate = false;
+        }
+
+        //! Constructs a Write-Link to write the data of output socket at index
+        //! `outS` of node `outN` to the input socket at index `inS` of node
+        //! `inN`.
         void addWriteLink(NodeId outN, SocketIndex outS, NodeId inN, SocketIndex inS)
         {
             auto outNit = m_nodes.find(outN);
@@ -351,6 +386,21 @@ namespace executionGraph
                 EXECGRAPH_THROW("Node with id: '{0}' or '{1}' does not exist!", outN, inN);
             }
             NodeBaseType::addWriteLink(*outNit->second->m_node, outS, *inNit->second->m_node, inS);
+            m_executionOrderUpToDate = false;
+        }
+
+        //! Remove a Write-Link to write the data of output socket at index
+        //! `outS` of node `outN` to the input socket at index `inS` of node
+        //! `inN`.
+        void removeWriteLink(NodeId outN, SocketIndex outS, NodeId inN, SocketIndex inS)
+        {
+            auto outNit = m_nodes.find(outN);
+            auto inNit  = m_nodes.find(inN);
+            if(outNit == m_nodes.end() || inNit == m_nodes.end())
+            {
+                EXECGRAPH_THROW("Node with id: '{0}' or '{1}' does not exist!", outN, inN);
+            }
+            NodeBaseType::removeWriteLink(*outNit->second->m_node, outS, *inNit->second->m_node, inS);
             m_executionOrderUpToDate = false;
         }
 

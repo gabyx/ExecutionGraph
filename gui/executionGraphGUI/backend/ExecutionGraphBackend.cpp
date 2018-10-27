@@ -163,17 +163,17 @@ void ExecutionGraphBackend::removeConnection(const Id& graphId,
         {
             if(isWriteLink)
             {
-                // graphL->addWriteLink(outNodeId,
-                //                      outSocketIdx,
-                //                      inNodeId,
-                //                      inSocketIdx);
+                graph->wlock()->removeWriteLink(outNodeId,
+                                                outSocketIdx,
+                                                inNodeId,
+                                                inSocketIdx);
             }
             else
             {
-                // graphL->setGetLink(outNodeId,
-                //                    outSocketIdx,
-                //                    inNodeId,
-                //                    inSocketIdx);
+                graph->wlock()->removeGetLink(inNodeId,
+                                              inSocketIdx,
+                                              &outNodeId,
+                                              &outSocketIdx);
             }
         }
         catch(executionGraph::Exception& e)
