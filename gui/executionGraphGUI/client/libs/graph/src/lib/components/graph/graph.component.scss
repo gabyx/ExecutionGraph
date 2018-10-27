@@ -1,0 +1,24 @@
+:host {
+  display: block;
+  margin: 0px;
+  // border: 1px solid red;
+  overflow: visible;
+  position: relative;
+
+  .ngcs-graph.panning {
+    cursor: move;
+  }
+
+  ::ng-deep .ngcs-node {
+    display: inline-block;
+    position: absolute;
+    background: white;
+    border: 1px solid black;
+    cursor: pointer;
+    border-radius: 5pt;
+    // z-index: 1000;
+  }
+
+
+
+}

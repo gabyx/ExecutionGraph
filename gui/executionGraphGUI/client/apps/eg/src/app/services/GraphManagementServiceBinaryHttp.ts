@@ -11,13 +11,12 @@
 // =========================================================================================
 
 import { Inject, Injectable } from '@angular/core';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/first';
-
 import { flatbuffers } from 'flatbuffers';
+import { Graph } from '../model';
+import { Id } from '@eg/common';
+import { ILogger, LoggerFactory } from '@eg/logger';
 import { GraphManagementService, sz } from './GraphManagementService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import { ILogger, LoggerFactory } from '@eg/logger';
 import { VERBOSE_LOG_TOKEN } from '../tokens';
 
 @Injectable()
@@ -33,10 +32,10 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     this.logger = loggerFactory.create('GraphManagementServiceBinaryHttp');
   }
 
-  public async addGraph(graphTypeId: string): Promise<string> {
+  public async addGraph(graphTypeId: Id): Promise<Graph> {
     // Build the AddGraph request
     let builder = new flatbuffers.Builder(16);
-    let offGraphTypeId = builder.createString(graphTypeId);
+    let offGraphTypeId = builder.createString(graphTypeId.toString());
 
     sz.AddGraphRequest.startAddGraphRequest(builder);
     sz.AddGraphRequest.addGraphTypeId(builder, offGraphTypeId);
@@ -50,16 +49,21 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     const buf = new flatbuffers.ByteBuffer(result);
     const response = sz.AddGraphResponse.getRootAsAddGraphResponse(buf);
 
-    let graphId = response.graphId();
-    this.logger.info(`Added new graph with id: '${graphId}' and type id: '${graphTypeId}'`);
+    this.logger.info(`Added new graph [id: '${response.graphId()}', type: '${graphTypeId}'].`);
 
-    return graphId;
+    const graph: Graph = {
+      id: new Id(response.graphId()),
+      typeId: graphTypeId,
+      connections: {},
+      nodes: {}
+    };
+    return graph;
   }
 
-  public async removeGraph(graphId: string): Promise<void> {
+  public async removeGraph(graphId: Id): Promise<void> {
     // Build the RemoveGraph request
     let builder = new flatbuffers.Builder(16);
-    let offGraphId = builder.createString(graphId);
+    let offGraphId = builder.createString(graphId.toString());
 
     sz.RemoveGraphRequest.startRemoveGraphRequest(builder);
     sz.RemoveGraphRequest.addGraphId(builder, offGraphId);
@@ -70,7 +74,6 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
 
     // Send the request
     await this.binaryRouter.post('general/removeGraph', requestPayload);
-
-    this.logger.info(`Removed graph with id: '${graphId}'`);
+    this.logger.info(`Removed graph [id: '${graphId}'].`);
   }
 }

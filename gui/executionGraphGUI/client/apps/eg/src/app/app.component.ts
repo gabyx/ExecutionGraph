@@ -10,13 +10,63 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { RouterState, Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { filter, tap, take } from 'rxjs/operators';
+
+import { LoggerFactory, ILogger } from '@eg/logger';
+import * as actions from './+state/actions';
+import { GraphsState } from './+state/reducers';
+import * as graphQueries from './+state/selectors/graph.selectors';
+import { getDrawerRequired } from './+state/selectors';
 
 @Component({
-  selector: 'app-root',
+  selector: 'eg-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-  title = 'app';
+export class AppComponent implements OnInit {
+  private readonly log: ILogger;
+
+  public get hasDrawerContent() {
+    return this.store.select(getDrawerRequired);
+  }
+
+  constructor(private graphStore: Store<GraphsState>, private store: Store<RouterState>, private router: Router, loggerFactory: LoggerFactory) {
+    this.log = loggerFactory.create('AppComponent');
+  }
+
+  ngOnInit() {
+
+    this.graphStore.dispatch(new actions.LoadGraphDescriptions());
+    this.graphStore.dispatch(new actions.LoadGraphs());
+
+    this.store
+      .select(graphQueries.getGraphs)
+      .pipe(
+        filter(graphs => graphs.length > 0),
+        tap(graphs => {
+          this.log.debug(`Loaded graphs, auto-selecting first`);
+          if (graphs.length === 0) {
+            this.log.error(`Cannot select, since no graphs loaded!`);
+          } else {
+            this.router.navigate([{
+              outlets: {
+                primary: ['graph', graphs[0].id.toString()],
+                drawer: ['nodes']
+              }
+            }]);
+
+            this.graphStore.dispatch(new actions.ShowNotification(`To help you debug I created a dummy graph for you \u{1F64C}`, 7000));
+          }
+        }),
+        take(1)
+      )
+      .subscribe(graphs => {});
+  }
+
+  drawerClosed() {
+    this.router.navigate([{outlets: { drawer: null}}]);
+  }
 }

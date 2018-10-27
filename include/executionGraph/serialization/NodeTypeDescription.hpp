@@ -21,13 +21,13 @@ namespace executionGraph
     struct NodeTypeDescription
     {
         NodeTypeDescription(const std::string& rtti)
-            : m_rtti(rtti), m_name(m_rtti)
+            : m_type(rtti), m_name(m_type)
         {}
         NodeTypeDescription(const std::string& rtti, const std::string& name)
-            : m_rtti(rtti), m_name(name)
+            : m_type(rtti), m_name(name)
         {}
 
-        std::string m_rtti;  //!< The unique RTTI name of the node
+        std::string m_type;  //!< The unique RTTI name of the node
         std::string m_name;  //!< The readable name of the node.
     };
 }  // namespace executionGraph

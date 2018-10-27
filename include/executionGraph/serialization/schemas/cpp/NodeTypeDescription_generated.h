@@ -12,22 +12,22 @@ namespace serialization {
 struct NodeTypeDescription;
 
 struct NodeTypeDescription FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
-    VT_NAME = 4,
-    VT_TYPE = 6
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_TYPE = 4,
+    VT_NAME = 6
   };
-  const flatbuffers::String *name() const {
-    return GetPointer<const flatbuffers::String *>(VT_NAME);
-  }
   const flatbuffers::String *type() const {
     return GetPointer<const flatbuffers::String *>(VT_TYPE);
   }
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffsetRequired(verifier, VT_NAME) &&
-           verifier.VerifyString(name()) &&
            VerifyOffsetRequired(verifier, VT_TYPE) &&
            verifier.VerifyString(type()) &&
+           VerifyOffsetRequired(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
            verifier.EndTable();
   }
 };
@@ -35,11 +35,11 @@ struct NodeTypeDescription FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table 
 struct NodeTypeDescriptionBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
-    fbb_.AddOffset(NodeTypeDescription::VT_NAME, name);
-  }
   void add_type(flatbuffers::Offset<flatbuffers::String> type) {
     fbb_.AddOffset(NodeTypeDescription::VT_TYPE, type);
+  }
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(NodeTypeDescription::VT_NAME, name);
   }
   explicit NodeTypeDescriptionBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -49,30 +49,30 @@ struct NodeTypeDescriptionBuilder {
   flatbuffers::Offset<NodeTypeDescription> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<NodeTypeDescription>(end);
-    fbb_.Required(o, NodeTypeDescription::VT_NAME);
     fbb_.Required(o, NodeTypeDescription::VT_TYPE);
+    fbb_.Required(o, NodeTypeDescription::VT_NAME);
     return o;
   }
 };
 
 inline flatbuffers::Offset<NodeTypeDescription> CreateNodeTypeDescription(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> name = 0,
-    flatbuffers::Offset<flatbuffers::String> type = 0) {
+    flatbuffers::Offset<flatbuffers::String> type = 0,
+    flatbuffers::Offset<flatbuffers::String> name = 0) {
   NodeTypeDescriptionBuilder builder_(_fbb);
-  builder_.add_type(type);
   builder_.add_name(name);
+  builder_.add_type(type);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<NodeTypeDescription> CreateNodeTypeDescriptionDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const char *name = nullptr,
-    const char *type = nullptr) {
+    const char *type = nullptr,
+    const char *name = nullptr) {
   return executionGraph::serialization::CreateNodeTypeDescription(
       _fbb,
-      name ? _fbb.CreateString(name) : 0,
-      type ? _fbb.CreateString(type) : 0);
+      type ? _fbb.CreateString(type) : 0,
+      name ? _fbb.CreateString(name) : 0);
 }
 
 }  // namespace serialization

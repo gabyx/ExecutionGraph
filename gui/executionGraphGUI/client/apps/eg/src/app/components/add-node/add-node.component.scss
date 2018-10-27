@@ -1,0 +1,11 @@
+@import 'app/variables';
+
+.node-type {
+  box-sizing: border-box;
+  border: 1px solid transparent;
+
+  &:hover {
+    border-color: $primary;
+    cursor: copy;
+  }
+}

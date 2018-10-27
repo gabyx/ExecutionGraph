@@ -160,16 +160,16 @@ For more information about the development of the client application please refe
 
 ## Introduction
 
-The execution graph implemented in `ExecutionTree` is a directed acyclic graph consisting of several connected logic nodes derived from `LogicNode` which define a simple input/output control flow.
-Each logic node in the execution graph contains several input/output sockets (`LogicSocket`) with a certain type out of the predefined types defined in `LogicSocketTypes`. 
+The execution graph implemented in `ExecutionTree` is a directed acyclic graph consisting of several connected nodes derived from `LogicNode` which define a simple input/output control flow.
+Each node in the execution graph contains several input/output sockets (`LogicSocket`) with a certain type out of the predefined types defined in `LogicSocketTypes`. 
 
-An execution graph works in the way that each logic node contains a specific `compute` routine which provides values for the output sockets by using the values from the input sockets. 
-Each output of a logic node can be linked to an input of the same type of another logic node. This means an output socket of the arithmetic type `double` cannot be linked to an input socket of integral type `int` for example. 
-Each logic node can be assigned to one or more execution groups which are collections of logic nodes and form directed acyclic subgraphs. 
+An execution graph works in the way that each node contains a specific `compute` routine which provides values for the output sockets by using the values from the input sockets. 
+Each output of a node can be linked to an input of the same type of another node. This means an output socket of the arithmetic type `double` cannot be linked to an input socket of integral type `int` for example. 
+Each node can be assigned to one or more execution groups which are collections of nodes and form directed acyclic subgraphs. 
 
 For each execution group, an execution order is computed such that the data flow defined by the input/output links in the group is respected.
 
-An execution order of an execution group is called a *topological ordering* in computer science, and such an ordering always exists for a directed acyclic graph, despite being non-unique. A topological ordering of an execution group is an ordering of all logic nodes such that for all connections from a logic node `A` to `B`, `A` precedes `B` in the ordering. Each execution graph network consists of several input logic nodes whose output sockets are initialized before executing the network. 
+An execution order of an execution group is called a *topological ordering* in computer science, and such an ordering always exists for a directed acyclic graph, despite being non-unique. A topological ordering of an execution group is an ordering of all nodes such that for all connections from a node `A` to `B`, `A` precedes `B` in the ordering. Each execution graph network consists of several input nodes whose output sockets are initialized before executing the network. 
 The implementation in `LogicSocket` allows two types of directed links between an input and output socket, namely a *get* and a *write* connection. 
 
 A *write* link is a link from an output socket `i` of a node `A` to an input socket `j` of some node `B`, denoted as `{A,i} -> {j,B}`.
@@ -181,7 +181,7 @@ A *get* link basically forwards any read access on the input socket `j` of `B` t
 
 Most of the time only *get* links are necessary but as soon as the execution graph becomes more complex and certain switching behavior should be reproduced, the additional *write* links are a convenient tool to realize this. 
 
-Cyclic paths between logic nodes are detected and result in an error when building the execution network.
+Cyclic paths between nodes are detected and result in an error when building the execution network.
 The write and read access to input and output sockets is implemented using a fast static type dispatch system in `LogicSocket`.
 
 Static type dispatching avoids the use of virtual calls when using polymorphic objects in object-oriented programming languages.
@@ -241,7 +241,7 @@ public:
     };
 ```
 We start of by deriving our `IntegerNode` from `TConfig::NodeBaseType`. The template parameter `TConfig` lets us configure our execution graph (especially the socket type list).
-The type `TConfig::NodeBaseType` is the basis class for all logic nodes (resulting in `LogicNode<Config>`).
+The type `TConfig::NodeBaseType` is the basis class for all nodes (resulting in `LogicNode<Config>`).
 The two enumerations `Ins` and `Outs` let us define some handy abbreviations for our input sockets (`Value1` and `Value2`) and our output socket (`Result1`). The sequential ordering of the enumerations in `Ins` and `Outs` does not matter at all! So far so good. Now we use some macro for letting us specify the input/output ordering:
 ```c++
 private:
@@ -274,7 +274,7 @@ template<typename... Args>
         this->template addSockets<OutSockets>(std::make_tuple(0));
     }
 ```
-In the constructor, we create (add) the input and output sockets to the logic node. The parameter `std::tuple<...>` contains the default (constructor) values for the values stored in the sockets. So in the above snippet, we set the input sockets both to the value `2` and the output socket to the value `0`.
+In the constructor, we create (add) the input and output sockets to the node. The parameter `std::tuple<...>` contains the default (constructor) values for the values stored in the sockets. So in the above snippet, we set the input sockets both to the value `2` and the output socket to the value `0`.
 Next we define the actual computation which is performed when this node is executed:
 ```c++
     void compute() override {
@@ -314,10 +314,10 @@ Next we create the *get* links which connect the in- and outputs.
     node3b->setGetLink(*node2b,o0,i1);
 ```
 The syntax `node4a->setGetLink(*node3a,o0,i0);` denotes that the output node `node4a` gets its first input value `i0 = 0` from the single output `o0 = 0` of node `node3a`. The above snippet builds the execution tree given at the begining.
-Finally we create the ExecutionTree `ExecutionTreeInOut`, add all nodes to it, set the proper node classfication (if its an input or output node, setup the graph (which computes the execution order) and execute the default execution group `0` as
+Finally we create the ExecutionTree `ExecutionTree`, add all nodes to it, set the proper node classfication (if its an input or output node, setup the graph (which computes the execution order) and execute the default execution group `0` as
 ```c++
     // Make the execution tree and add all nodes
-    ExecutionTreeInOut<Config> execTree;
+    ExecutionTree<Config> execTree;
     execTree.addNode(std::move(node1a)); // The execution tree owns the nodes!
     execTree.addNode(std::move(node1b));
     execTree.addNode(std::move(node2a));
@@ -327,11 +327,11 @@ Finally we create the ExecutionTree `ExecutionTreeInOut`, add all nodes to it, s
     execTree.addNode(std::move(node4a));
 
     // Set all node classifications
-    execTree.setNodeClass(0, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(1, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(2, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(3, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(6, ExecutionTreeInOut<Config>::NodeClassification::OutputNode);
+    execTree.setNodeClass(0, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(1, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(2, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(3, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(6, ExecutionTree<Config>::NodeClassification::OutputNode);
     
     // Setup the execution tree
     execTree.setup();

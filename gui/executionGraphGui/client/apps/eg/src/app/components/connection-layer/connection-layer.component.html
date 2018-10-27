@@ -1,0 +1,18 @@
+<ngcs-svg-layer>
+  <svg:defs>
+    <svg:path id="curvedArrowPath" style="stroke-width:0.625;stroke-linejoin:round" d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z" />
+    <svg:marker orient="auto" refY="0.0" refX="0.0" id="markerWrite" class="markerWrite">
+      <svg:use xlink:href="#curvedArrowPath"/>
+    </svg:marker>
+    <svg:marker orient="auto" refY="0.0" refX="0.0" id="markerGet" class="markerGet">
+      <svg:use xlink:href="#curvedArrowPath"/>
+    </svg:marker>
+  </svg:defs>
+
+  <svg:path *ngFor="let connection of connections"
+    class="ngcs-connection" [class.selected]="isSelected(connection) | async"
+      [attr.d]="getPathDescription(connection)"
+      [class.write-link]="connection.isWriteLink"
+      [class.get-link]="!connection.isWriteLink" />
+
+</ngcs-svg-layer>

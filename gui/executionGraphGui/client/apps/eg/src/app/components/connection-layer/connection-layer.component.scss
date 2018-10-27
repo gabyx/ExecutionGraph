@@ -1,0 +1,47 @@
+@import 'app/variables';
+
+
+::ng-deep {
+  #markerWrite > use {
+    transform: scale(0.6);
+  }
+  #markerGet > use {
+    transform: scale(-0.6);
+  }
+
+  .markerWrite {
+    overflow: visible;
+    fill: $stroke-color-write;
+    stroke: $stroke-color-write;
+  }
+
+  .markerGet {
+    overflow: visible;
+    fill: $stroke-color-get;
+    stroke: $stroke-color-get;
+  }
+
+  .ngcs-connection {
+    fill: none;
+    stroke-width: 2;
+
+    &.selected {
+      stroke: $accent;
+      stroke-width: 3;
+    }
+
+    &.write-link {
+      stroke: $stroke-color-write;
+      marker-start: url(#markerWrite);
+    }
+    &.get-link {
+      stroke: $stroke-color-get;
+      marker-end: url(#markerGet);
+    }
+  }
+
+  .ngcs-connection:hover {
+    cursor: pointer;
+    stroke: red;
+  }
+}

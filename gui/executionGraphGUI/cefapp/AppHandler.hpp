@@ -74,6 +74,7 @@ public:
 
     void CloseAllBrowsers(bool forceClose);
     void ShowDeveloperTools();
+    void Reload();
 
 private:
     // List of existing browser windows. Only accessed on the CEF UI thread.

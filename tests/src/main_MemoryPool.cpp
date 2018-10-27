@@ -100,7 +100,6 @@ MY_TEST(MemoryPool, Test3)
     for(auto i = 0; i < 30; ++i)
     {
         vec.emplace_back(allocate_unique<uint8_t[]>(pool, 10u));
-        uint8_t* data = vec.back().get();
     }
 }
 

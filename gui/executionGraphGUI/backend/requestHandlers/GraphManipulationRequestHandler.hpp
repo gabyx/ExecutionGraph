@@ -26,6 +26,9 @@ class ExecutionGraphBackend;
         - "graph/addNodes"
         - "graph/removeNodes"
 
+        - "graph/addConnection"
+        - "graph/removeConnection"
+
     @date Sat Jul 07 2018
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
  */
@@ -53,6 +56,11 @@ private:
                        ResponsePromise& response);
     void handleRemoveNode(const Request& request,
                           ResponsePromise& response);
+
+    void handleAddConnection(const Request& request,
+                             ResponsePromise& response);
+    void handleRemoveConnection(const Request& request,
+                                ResponsePromise& response);
 
 private:
     static FunctionMap<Function> initFunctionMap();

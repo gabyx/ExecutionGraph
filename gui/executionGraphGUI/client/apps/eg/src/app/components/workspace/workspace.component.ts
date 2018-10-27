@@ -10,15 +10,21 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, OnInit, ElementRef, HostListener, Injectable } from '@angular/core';
+import { Component, OnInit, Injectable, ElementRef } from '@angular/core';
+import { Observable } from 'rxjs';
+import { filter, tap, map } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
 
-import { Point } from '@eg/graph';
-import { Node } from '../../model/Node';
-import { Connection } from '../../model/Connection';
-import { Socket } from '../../model/Socket';
-import { DragEvent } from '@eg/graph';
-import { GeneralInfoService } from '../../services/GeneralInfoService';
-import { GraphManipulationService } from '../../services/GraphManipulationService';
+import { Graph, Node, Connection, NodeTypeDescription, Socket } from '../../model';
+
+import { ILogger, LoggerFactory } from '@eg/logger';
+import { Point, ConnectionDrawStyle, EventSourceGateway, GraphComponent } from '@eg/graph';
+import { isDefined } from '@eg/common';
+import { GraphsState } from '../../+state/reducers';
+import * as graphQueries from '../../+state/selectors/graph.selectors';
+import { getConnectionDrawStyle, getSelection } from '../../+state/selectors/ui.selectors';
+import { Selection, UiState } from '../../+state/reducers/ui.reducers';
+import { CreateNode } from '../../+state/actions';
 
 @Injectable()
 @Component({
@@ -27,97 +33,56 @@ import { GraphManipulationService } from '../../services/GraphManipulationServic
   styleUrls: ['./workspace.component.scss']
 })
 export class WorkspaceComponent implements OnInit {
-  public nodes: Node[] = [];
+  private readonly logger: ILogger;
 
-  public connections: Connection[] = [];
+  private readonly selection: Observable<Selection>;
 
-  public newConnection: Connection = null;
-  public newConnectionEndpoint: Point = { x: 0, y: 0 };
+  public graph: Observable<Graph>;
 
-  constructor(
-    private elementRef: ElementRef,
-    private readonly generalInfoService: GeneralInfoService,
-    private readonly graphManipulationService: GraphManipulationService
-  ) {}
+  public readonly graphEvents = new EventSourceGateway<Graph>();
 
-  ngOnInit() {
-    const NODES = 3;
+  public readonly nodeEvents = new EventSourceGateway<Node>();
 
-    for (let i = 0; i < NODES; i++) {
-      this.generateNode(i);
-    }
+  public readonly socketEvents = new EventSourceGateway<Socket>();
 
-    for (let i = 0; i < NODES; i++) {
-      this.generateRandomConnection();
-    }
+  public readonly connectionEvents = new EventSourceGateway<Connection>();
 
-    // const n1 = new Node('n-1', 'Knoten Uno', [], [new Socket("n-1-o-1", "Some Output with text that is too long")], { x: 100, y: 150 });
-    // const n2 = new Node('n-2', 'Knoten Due', [new Socket("n-2-i-1", "Some Input")], [], { x: 300, y: 300 });
-    // this.nodes.push(n1);
-    // this.nodes.push(n2);
+  public connectionDrawStyle: Observable<ConnectionDrawStyle>;
 
-    // this.connections.push(new Connection(n1.outputs[0].id, n2.inputs[0].id));
-  }
-
-  public updateNodePosition(node: Node, event: DragEvent) {
-    // console.log(`[WorkspaceComponent] Updating node position to ${position.x}:${position.y}`);
-    node.uiProps.x = event.dragElementPosition.x;
-    node.uiProps.y = event.dragElementPosition.y;
-  }
-
-  public initConnectionFrom(socket: Socket, event: DragEvent) {
-    console.log(`[WorkspaceComponent] Initiating new connection from ${socket.id}`);
-    this.newConnection = new Connection(socket.id, 'tempTarget');
-    this.newConnectionEndpoint = {
-      x: event.dragElementPosition.x + event.mouseToElementOffset.x,
-      y: event.dragElementPosition.y + event.mouseToElementOffset.y
-    };
-  }
-
-  public movingConnection(event: DragEvent) {
-    this.newConnectionEndpoint = {
-      x: event.dragElementPosition.x + event.mouseToElementOffset.x,
-      y: event.dragElementPosition.y + event.mouseToElementOffset.y
-    };
-    // console.log(`Setting position to ${this.newConnectionEndpoint.x}:${this.newConnectionEndpoint.y}`)
-  }
-
-  public abortConnection() {
-    this.newConnection = null;
-  }
-
-  public createConnection(source: Socket, target: Socket) {
-    const connection = new Connection(source.id, target.id);
-    this.connections.push(connection);
-  }
-
-  public isOutputSocket(socket: Socket) {
-    return socket instanceof Socket && socket.id.indexOf('-o-') > 0;
-  }
-
-  public isInputSocket(socket: Socket) {
-    return socket instanceof Socket && socket.id.indexOf('-i-') > 0;
-  }
-
-  private generateNode(id: number) {
-    const x = Math.random() * this.elementRef.nativeElement.offsetWidth / 2;
-    const y = Math.random() * this.elementRef.nativeElement.offsetHeight / 2;
-    this.nodes.push(
-      new Node(
-        `n${id}`,
-        `Some test node ${id}`,
-        [new Socket(`n-${id}-i-1`, 'Some Input')],
-        [new Socket(`n-${id}-o-1`, 'Some Output with text that is too long')],
-        { x: x, y: y }
-      )
+  public get nodes(): Observable<Node[]> {
+    return this.graph.pipe(
+      map(graph => graph.nodes),
+      map(nodes => Object.keys(nodes).map(id => nodes[id]))
     );
   }
 
-  private generateRandomConnection() {
-    let source = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].outputs[0];
-    let target = this.nodes[Math.round(Math.random() * (this.nodes.length - 1))].inputs[0];
-    if (source !== target) {
-      this.connections.push(new Connection(source.id, target.id));
-    }
+  public get connections(): Observable<Connection[]> {
+    return this.graph.pipe(
+      map(graph => graph.connections),
+      map(connections => Object.keys(connections).map(id => connections[id]))
+    );
+  }
+
+  constructor(private store: Store<GraphsState>, uiStore: Store<UiState>, loggerFactory: LoggerFactory) {
+    this.logger = loggerFactory.create('Workspace');
+    this.selection = uiStore.select(getSelection);
+    // this.graph.subscribe(g => this.logger.debug(`Displaying graph ${g.id}`));
+  }
+
+  ngOnInit() {
+    this.graph = this.store.select(graphQueries.getSelectedGraph).pipe(filter(g => isDefined(g) && g != null));
+    this.connectionDrawStyle = this.store.select(getConnectionDrawStyle);
+  }
+
+  public createNode(nodeType: NodeTypeDescription, graph: Graph, position?: Point) {
+    this.store.dispatch(new CreateNode(nodeType, graph.id, position));
+  }
+
+  public isNodeSelected(node: Node): Observable<boolean> {
+    return this.selection.pipe(map(selection => selection.nodes.indexOf(node.id) >= 0));
+  }
+
+  public isNodeType(nodeType: NodeTypeDescription): boolean {
+    return isDefined(nodeType.type) && isDefined(nodeType.type);
   }
 }

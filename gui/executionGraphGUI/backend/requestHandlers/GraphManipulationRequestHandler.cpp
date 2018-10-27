@@ -82,13 +82,13 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
         AllocatorProxyFlatBuffer<Allocator> allocator(response.getAllocator());
         flatbuffers::FlatBufferBuilder builder(512, &allocator);
 
-        using GraphType      = std::remove_cv_t<std::remove_reference_t<decltype(graph)>>;
+        using GraphType      = typename std::remove_cv_t<std::remove_reference_t<decltype(graph)>>;
         using Config         = typename GraphType::Config;
         using NodeSerializer = typename ExecutionGraphBackendDefs<Config>::NodeSerializer;
 
         // Serialize the response
         NodeSerializer serializer;
-        auto nodeOffset = serializer.write(builder, node);
+        auto nodeOffset = serializer.write(builder, node, false, true);
 
         s::AddNodeResponseBuilder addResponse(builder);
         addResponse.add_node(nodeOffset);
@@ -96,9 +96,8 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
         builder.Finish(resOff);
 
         // Set the response.
-        auto detachedBuffer = builder.ReleaseRaw();
-        response.setReady(ResponsePromise::Payload{makeBinaryBuffer(std::move(allocator),
-                                                                    std::move(detachedBuffer)),
+        response.setReady(ResponsePromise::Payload{releaseIntoBinaryBuffer(std::move(allocator),
+                                                                           builder),
                                                    "application/octet-stream"});
     };
 
@@ -125,4 +124,65 @@ void GraphManipulationRequestHandler::handleRemoveNode(const Request& request,
     // Execute the request
     m_backend->removeNode(graphID,
                           nodeReq->nodeId());
+
+    // Set the response.
+    response.setReady();
+}
+
+//! Handle the operation of adding a connection.
+void GraphManipulationRequestHandler::handleAddConnection(const Request& request,
+                                                          ResponsePromise& response)
+{
+    // Request validation
+    auto* payload = request.getPayload();
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == nullptr,
+                                      "Request data is null!");
+
+    auto connectionReq = getRootOfPayloadAndVerify<s::AddConnectionRequest>(*payload);
+
+    Id graphID{connectionReq->graphId()->str()};
+
+    auto responseCreator = [](auto& graph, auto&& cycles) {
+
+    };
+
+    // Execute the request
+    auto socketLink = connectionReq->socketLink();
+    m_backend->addConnection(graphID,
+                             socketLink->outNodeId(),
+                             socketLink->outSocketIdx(),
+                             socketLink->inNodeId(),
+                             socketLink->inSocketIdx(),
+                             socketLink->isWriteLink(),
+                             connectionReq->checkForCycles(),
+                             responseCreator);
+
+    // Set the response.
+    response.setReady();
+}
+
+//! Handle the operation of removing a connection.
+void GraphManipulationRequestHandler::handleRemoveConnection(const Request& request,
+                                                             ResponsePromise& response)
+{
+    // Request validation
+    auto* payload = request.getPayload();
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == nullptr,
+                                      "Request data is null!");
+
+    auto connectionReq = getRootOfPayloadAndVerify<s::RemoveConnectionRequest>(*payload);
+
+    Id graphID{connectionReq->graphId()->str()};
+
+    // Execute the request
+    auto socketLink = connectionReq->socketLink();
+    m_backend->removeConnection(graphID,
+                                socketLink->outNodeId(),
+                                socketLink->outSocketIdx(),
+                                socketLink->inNodeId(),
+                                socketLink->inSocketIdx(),
+                                socketLink->isWriteLink());
+
+    // Set the response.
+    response.setReady();
 }

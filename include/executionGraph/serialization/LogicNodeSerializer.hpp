@@ -24,7 +24,7 @@ namespace executionGraph
 {
     /* ---------------------------------------------------------------------------------------*/
     /*!
-            Serializer which loads a Logic Node.
+            Serializer which loads a node.
             `NodeSerializerList` contains a type `Writer` and a type `Reader` which 
             both need to fullfill the requirements for `Type` in 
             `executionGrpah::StaticFactory<meta::list<Type,...>>`:
@@ -57,7 +57,7 @@ namespace executionGraph
         ~LogicNodeSerializer() = default;
 
     public:
-        //! Main load function for a logic node.
+        //! Main load function for a node.
         //! It first tries to construct it by the factory
         //! and uses RTTR construction as a fallback.
         static std::unique_ptr<NodeBaseType>
@@ -69,7 +69,7 @@ namespace executionGraph
              const flatbuffers::Vector<uint8_t>* additionalData                                        = nullptr)
         {
             // Dispatch to the correct serialization read function
-            // the factory reads and returns the logic node
+            // the factory reads and returns the node
             auto rttrType = rttr::type::get_by_name(type);
 
             auto optNode = FactoryRead::create(rttrType,
@@ -118,7 +118,7 @@ namespace executionGraph
             }
         }
 
-        //! Load a logic node from a `serialization::LogicNode`.
+        //! Load a node from a `serialization::LogicNode`.
         static std::unique_ptr<NodeBaseType>
         read(const serialization::LogicNode& logicNode)
         {
@@ -130,11 +130,12 @@ namespace executionGraph
                                              logicNode.data());
         }
 
-        //! Store a logic node by using the builder `builder`.
+        //! Store a node by using the builder `builder`.
         static flatbuffers::Offset<serialization::LogicNode>
         write(flatbuffers::FlatBufferBuilder& builder,
               const NodeBaseType& node,
-              bool serializeAdditionalData = true)
+              bool serializeAdditionalData     = true,
+              bool serializeFullSocketTypeSpec = false)
         {
             namespace s = serialization;
             using namespace s;
@@ -147,7 +148,7 @@ namespace executionGraph
             auto typeOffset  = builder.CreateString(type);
 
             // Build all input/output sockets
-            auto pairOffs   = writeSockets(builder, node);
+            auto pairOffs   = writeSockets(builder, node, serializeFullSocketTypeSpec);
             auto inputsOff  = std::get<0>(pairOffs);
             auto outputsOff = std::get<1>(pairOffs);
 
@@ -169,7 +170,7 @@ namespace executionGraph
                 }
             }
 
-            // Build the logic node
+            // Build the node
             LogicNodeBuilder lnBuilder(builder);
             lnBuilder.add_id(id);
             lnBuilder.add_type(typeOffset);
@@ -186,7 +187,8 @@ namespace executionGraph
     private:
         //! Write all input/output sockets.
         static auto writeSockets(flatbuffers::FlatBufferBuilder& builder,
-                                 const NodeBaseType& node)
+                                 const NodeBaseType& node,
+                                 bool fullTypeSpec = false)
         {
             namespace s = serialization;
             using namespace s;
@@ -198,12 +200,22 @@ namespace executionGraph
                 for(auto& socket : sockets)
                 {
                     auto nameOff = builder.CreateString(socket->getName());
-
                     EXECGRAPH_ASSERT(socket->getType() < socketDescriptions.size(), "Socket type wrong!");
 
+                    decltype(nameOff) typeOff, typeNameOff;
+                    if(fullTypeSpec)
+                    {
+                        typeOff     = builder.CreateString(socketDescriptions[socket->getType()].m_type);
+                        typeNameOff = builder.CreateString(socketDescriptions[socket->getType()].m_name);
+                    }
+
                     LogicSocketBuilder soBuilder(builder);
-                    soBuilder.add_type(socket->getType());
+                    soBuilder.add_typeIndex(socket->getType());
+                    soBuilder.add_type(typeOff);
+                    soBuilder.add_typeName(typeNameOff);
+
                     soBuilder.add_index(socket->getIndex());
+
                     soBuilder.add_name(nameOff);
                     socketOffs.emplace_back(soBuilder.Finish());
                 }

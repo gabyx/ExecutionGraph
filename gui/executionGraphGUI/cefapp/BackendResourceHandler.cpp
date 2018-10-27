@@ -111,9 +111,12 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
 
         m_payload = future.get();  // Set the payload!
 
-        response->SetMimeType(m_payload.getMIMEType());                   // set the mime type
         m_bufferSize = responseLength = m_payload.getBuffer().getSize();  // set the response byte size (can be empty)
-        m_buffer                      = m_payload.getBuffer().getData();  // set the buffer pointer (can be nullptr!)
+        if(responseLength)
+        {
+            response->SetMimeType(m_payload.getMIMEType());  // set the mime type
+            m_buffer = m_payload.getBuffer().getData();      // set the buffer pointer (can be nullptr!)
+        }
         response->SetStatusText("handled");
         response->SetStatus(200);  // http status code: 200 := The request has been handled! (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
         return;
@@ -123,7 +126,6 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
         EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler: Bad request: '{0}'", e.what());
         response->SetStatusText(e.what());
         response->SetStatus(400);  // http status code: 400 : Bad request!
-        //response->SetError(cef_errorcode_t::ERR_FAILED);
         return;
     }
     // Every other Exception is an internal server error!
@@ -140,7 +142,6 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
     EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler: Exception in GetResponseHeaders");
     response->SetStatusText(error);
     response->SetStatus(500);  // http status code: 500 : Internal server error!
-    //response->SetError(cef_errorcode_t::ERR_FAILED);
 }
 
 //! Process the request (see: http://magpcss.org/ceforum/apidocs3/projects/(default)/CefResourceHandler.html)

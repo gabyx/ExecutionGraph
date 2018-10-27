@@ -1,0 +1,31 @@
+:host {
+  box-sizing: border-box;
+  display: inline-block;
+  border: 2px solid black;
+  border-radius: 50%;
+  width: 6px;
+  height: 6px;
+  position: absolute;
+  margin: -3px -3px;
+
+  pointer-events: none;
+
+  &.left {
+    left: 0px;
+  }
+  &.top {
+    left: 0px;
+  }
+  &.right {
+    right: 0px;
+  }
+  &.bottom {
+    bottom: 0px;
+  }
+  &.middle {
+    top: 50%;
+  }
+  &.center {
+    left: 50%;
+  }
+}

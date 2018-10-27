@@ -7,28 +7,18 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es5",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "lib": [
-      "es2017",
-      "dom"
-    ],
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2017", "dom"],
     "baseUrl": ".",
     "paths": {
-      "@eg/*": [
-        "libs/*"
-      ],
-      "@messages/*": [
-        "../messages/schemas/ts/*"
-      ],
-      "@serialization/*": [
-        "../../../include/executionGraph/serialization/schemas/ts/*"
-      ]
+      "@eg/*": ["libs/*"],
+      "@eg/common": ["libs/common/src/index.ts"],
+      "@eg/graph": ["libs/graph/src/index.ts"],
+      "@eg/logger": ["libs/logger/src/index.ts"],
+      "@eg/messages": ["libs/messages/src/index.ts"],
+      "@eg/serialization": ["libs/serialization/src/index.ts"],
+      "@eg/serialization/*": ["libs/serialization/src/lib/*"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "tmp"
-  ]
+  "exclude": ["node_modules", "tmp"]
 }

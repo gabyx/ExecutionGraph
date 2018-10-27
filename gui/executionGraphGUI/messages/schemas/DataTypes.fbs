@@ -10,17 +10,5 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-namespace executionGraphGUI.serialization;
-
-struct Bool {
-    value:bool;
-}
-
-union ConstructorValue { Bool }
-
-//! Constructor key-value pairs used for node creation.
-table ConstructorKV
-{
-    key:string (id:0, required);
-    value:[ConstructorValue] (id:2, required);
-}
+include "executionGraphGUI/messages/schemas/ConstructorKeyValue.fbs";
+include "executionGraphGUI/messages/schemas/CycleDescription.fbs";

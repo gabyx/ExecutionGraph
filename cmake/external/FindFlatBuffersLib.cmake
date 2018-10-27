@@ -19,7 +19,7 @@ if(${USE_SUPERBUILD})
         
         ExternalProject_Add(flatbuffers
                             GIT_REPOSITORY      "${URL}"
-                            GIT_TAG             master
+                            GIT_TAG             "feature/keep-include-path-js-2"
                             GIT_SHALLOW         ON
                             PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/flatbuffers"
                             TIMEOUT 10

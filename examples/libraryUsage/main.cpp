@@ -9,7 +9,7 @@
 //!  License, v. 2.0. If a copy of the MPL was not distributed with this
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
-#include "executionGraph/graphs/ExecutionTreeInOut.hpp"
+#include "executionGraph/graphs/ExecutionTree.hpp"
 #include "executionGraph/nodes/LogicNode.hpp"
 #include "executionGraph/nodes/LogicSocket.hpp"
 
@@ -88,7 +88,7 @@ int main()
     //node1a->setGetLink(*node1a,0,0); // this would make cycle which is prohibited
 
     // Add all nodes to the execution tree
-    ExecutionTreeInOut<Config> execTree;
+    ExecutionTree<Config> execTree;
     execTree.addNode(std::move(node1a));
     execTree.addNode(std::move(node1b));
     execTree.addNode(std::move(node2a));
@@ -98,11 +98,11 @@ int main()
     execTree.addNode(std::move(node4a));
 
     // Set the classification of the nodes
-    execTree.setNodeClass(0, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(1, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(2, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(3, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(6, ExecutionTreeInOut<Config>::NodeClassification::OutputNode);
+    execTree.setNodeClass(0, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(1, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(2, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(3, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(6, ExecutionTree<Config>::NodeClassification::OutputNode);
 
     // Build the execution order
     execTree.setup();

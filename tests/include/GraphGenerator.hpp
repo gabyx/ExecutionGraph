@@ -18,7 +18,7 @@
 #include <executionGraph/common/Log.hpp>
 #include <executionGraph/common/TypeDefs.hpp>
 #include <executionGraph/config/Config.hpp>
-#include <executionGraph/graphs/ExecutionTreeInOut.hpp>
+#include <executionGraph/graphs/ExecutionTree.hpp>
 #include <executionGraph/nodes/LogicNode.hpp>
 #include <executionGraph/nodes/LogicSocket.hpp>
 

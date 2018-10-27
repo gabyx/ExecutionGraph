@@ -23,8 +23,8 @@
 namespace executionGraph
 {
     /**
- @brief The execution node (logic node) class which is the base class
-        for every logic node in an execution graph.
+ @brief The execution node (node) class which is the base class
+        for every node in an execution graph.
 
         // clang-format off
         General Concept
@@ -74,7 +74,7 @@ namespace executionGraph
         using SocketOutputListType = std::vector<SocketOutputBasePointer>;
 
     public:
-        //! The basic constructor of a logic node.
+        //! The basic constructor of a node.
         LogicNode(NodeId id, const std::string& name = "")
             : m_id(id), m_name(name.empty() ? std::to_string(id) : name)
         {}
@@ -126,7 +126,7 @@ namespace executionGraph
             return hasOSocket(idx) && getOSocket(idx).template isType<T>();
         }
 
-        //! Get the input socket at index \p idx.
+        //! Get the input socket at index `idx`.
         SocketInputBaseType& getISocket(SocketIndex idx)
         {
             EXECGRAPH_ASSERT(idx < m_inputs.size(), "Wrong index!");
@@ -136,7 +136,7 @@ namespace executionGraph
         {
             return const_cast<LogicNode*>(this)->getISocket(idx);
         }
-        //! Get the output socket at index \p idx.
+        //! Get the output socket at index `idx`.
         SocketOutputBaseType& getOSocket(SocketIndex idx)
         {
             EXECGRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
@@ -147,68 +147,89 @@ namespace executionGraph
             return const_cast<LogicNode*>(this)->getOSocket(idx);
         }
 
-        //! Get the input socket of type \p T at index \p idx.
+        //! Get the input socket of type `T` at index `idx`.
         template<typename T>
         auto& getISocket(SocketIndex idx);
         template<typename T>
         const auto& getISocket(SocketIndex idx) const;
 
-        //! Get the output socket of type \p T at index \p idx.
+        //! Get the output socket of type `T` at index `idx`.
         template<typename T>
         auto& getOSocket(SocketIndex idx);
         template<typename T>
         const auto& getOSocket(SocketIndex idx) const;
 
-        //! Get input socket value \p T at index \p idx.
+        //! Get input socket value `T` at index `idx`.
         template<typename T>
         const T& getInVal(SocketIndex idx) const;
 
-        //! Get the read/write output socket value \p T of the output socket at index \p idx.
+        //! Get the read/write output socket value `T` of the output socket at index `idx`.
         template<typename T>
         T& getOutVal(SocketIndex idx);
         template<typename T>
         const T& getOutVal(SocketIndex idx) const;
 
         //! Get the output socket value from a SocketDeclaration `OutputSocketDeclaration`.
-        template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF((meta::is<TSocketDeclaration, details::OutputSocketDeclaration>::value))>
+        template<typename TSocketDeclaration,
+                 EXECGRAPH_SFINAE_ENABLE_IF((meta::is<TSocketDeclaration, details::OutputSocketDeclaration>::value))>
         typename TSocketDeclaration::DataType& getValue();
         //! Get the output socket value from a SocketDeclaration `OutputSocketDeclaration`.
-        template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF((meta::is<TSocketDeclaration, details::OutputSocketDeclaration>::value))>
+        template<typename TSocketDeclaration,
+                 EXECGRAPH_SFINAE_ENABLE_IF((meta::is<TSocketDeclaration, details::OutputSocketDeclaration>::value))>
         const typename TSocketDeclaration::DataType& getValue() const;
 
         //! Get the input socket value from a SocketDeclaration `InputSocketDeclaration`.
-        template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF((meta::is<TSocketDeclaration, details::InputSocketDeclaration>::value))>
+        template<typename TSocketDeclaration,
+                 EXECGRAPH_SFINAE_ENABLE_IF((meta::is<TSocketDeclaration, details::InputSocketDeclaration>::value))>
         const typename TSocketDeclaration::DataType& getValue() const;
 
-        //! Constructs a Get-Link to get the data from output socket at index \p outS
-        //! of logic node \p outN at the input socket at index \p inS of logic node \p
-        //! inN.
+        //! Constructs a Get-Link to get the data from output socket at index `outS`
+        //! of node `outN` at the input socket at index `inS` of node
+        //! `inN`.
         static void setGetLink(LogicNode& outN, SocketIndex outS, LogicNode& inN, SocketIndex inS);
 
-        //! Constructs a Get-Link to get the data from output socket at index \p outS
-        //! of logic node \p outN at the input socket at index \p inS.
+        //! Constructs a Get-Link to get the data from output socket at index `outS`
+        //! of node `outN` at the input socket at index `inS` of this node.
         inline void setGetLink(LogicNode& outN, SocketIndex outS, SocketIndex inS)
         {
             setGetLink(outN, outS, *this, inS);
         }
 
-        //! Constructs a Write-Link to write the data of output socket at index \p
-        //! outS of logic node \p outN to the input socket at index \p inS of logic node \p
-        //! inN.
+        //! Remove an existing Get-Link from input socket at index `inS` of
+        //! node `node`.
+        static void removeGetLink(LogicNode& node, SocketIndex inS);
+        //! Remove an existing Get-Link from input socket at index `inS`.
+        inline void removeGetLink(SocketIndex inS)
+        {
+            removeGetLink(*this, inS);
+        }
+
+        //! Constructs a Write-Link to write the data of output socket at index
+        //! `outS` of node `outN` to the input socket at index `inS` of node `inN`.
         static void addWriteLink(LogicNode& outN, SocketIndex outS, LogicNode& inN, SocketIndex inS);
 
-        //! Constructs a Write-Link to write the data of output socket at index \p
-        //! outS
-        //! of logic node \p outN to the input socket at index \p inS.
-        inline void addWriteLink(IndexType outS, LogicNode& inN, SocketIndex inS)
+        //! Constructs a Write-Link to write the data of output socket at index
+        //! `outS`of this node to the input socket at index `inS`.
+        inline void addWriteLink(SocketIndex outS, LogicNode& inN, SocketIndex inS)
         {
             addWriteLink(*this, outS, inN, inS);
+        }
+
+        //! Remove a Write-Link to write the data of output socket at index
+        //! `outS` of node `outN` to the input socket at index `inS` of node `inN`.
+        static void removeWriteLink(LogicNode& outN, SocketIndex outS, LogicNode& inN, SocketIndex inS);
+
+        //! Remove a Write-Link to write the data of output socket at index
+        //! `outS` of this node to the input socket at index `inS` of node `inN`.
+        inline void removeWriteLink(SocketIndex outS, LogicNode& inN, SocketIndex inS)
+        {
+            removeWriteLink(*this, outS, inN, inS);
         }
 
         //! Adding of sockets is protected and should only be done in constructor!
         //@{
     protected:
-        //! Add an input socket with default value from the default output socket \p defaultOutputSocketId.
+        //! Add an input socket with default value from the default output socket `defaultOutputSocketId`.
         template<typename TData>
         void addISock(const std::string& name = "noname")
         {
@@ -220,7 +241,7 @@ namespace executionGraph
             m_inputs.push_back(std::move(p));
         }
 
-        //! Add an output socket with default value \p defaultValue.
+        //! Add an output socket with default value `defaultValue`.
         template<typename TData, typename T>
         void addOSock(T&& defaultValue,
                       const std::string& name = "noname")
@@ -233,7 +254,7 @@ namespace executionGraph
             m_outputs.push_back(std::move(p));
         }
 
-        //! Add all input sockets defined in the type list \p SocketDeclList.
+        //! Add all input sockets defined in the type list `SocketDeclList`.
         template<typename SocketDeclList,
                  EXECGRAPH_SFINAE_ENABLE_IF((meta::is<SocketDeclList, details::InputSocketDeclarationList>::value))>
         void addSockets()
@@ -246,8 +267,8 @@ namespace executionGraph
             meta::for_each(typename SocketDeclList::TypeList{}, add);
         }
 
-        //! Add all output sockets defined in the type list \p SocketDeclList where each socket has
-        //! the corresponding default value in \p defaultValues.
+        //! Add all output sockets defined in the type list `SocketDeclList` where each socket has
+        //! the corresponding default value in `defaultValues`.
         template<typename SocketDeclList,
                  typename... Args,
                  EXECGRAPH_SFINAE_ENABLE_IF((meta::is<SocketDeclList, details::OutputSocketDeclarationList>::value))>
@@ -266,8 +287,8 @@ namespace executionGraph
         virtual std::string getTypeName() const { return shortenTemplateBrackets(demangle(this)); }
 
     protected:
-        const NodeId m_id;               //!< The unique id of the logic node.
-        std::string m_name;              //!< The name of the logic node.
+        const NodeId m_id;               //!< The unique id of the node.
+        std::string m_name;              //!< The name of the node.
         SocketInputListType m_inputs;    //!< The input sockets.
         SocketOutputListType m_outputs;  //!< The output sockets.
     };
@@ -386,7 +407,7 @@ namespace executionGraph
     template<typename TConfig>
     void LogicNode<TConfig>::setGetLink(LogicNode& outN, SocketIndex outS, LogicNode& inN, SocketIndex inS)
     {
-        EXECGRAPH_THROW_TYPE_IF(outS >= outN.getOutputs().size() || inS >= inN.getInputs().size(),
+        EXECGRAPH_THROW_TYPE_IF(!outN.hasOSocket(outS) || !inN.hasISocket(inS),
                                 NodeConnectionException,
                                 "Wrong socket indices:  outNode: '{0}' outSocketIdx: '{1}' "
                                 "inNode: '{2}' inSocketIdx: '{3}'",
@@ -399,9 +420,23 @@ namespace executionGraph
     }
 
     template<typename TConfig>
+    void LogicNode<TConfig>::removeGetLink(LogicNode& node, SocketIndex inS)
+    {
+        EXECGRAPH_THROW_TYPE_IF(!node.hasISocket(inS),
+                                NodeConnectionException,
+                                "Wrong socket indices:"
+                                "node: '{0}' inSocketIdx: '{1}' (nIns: '{2}')",
+                                node.getId(),
+                                inS,
+                                node.getInputs().size());
+
+        node.getISocket(inS).removeGetLink();
+    }
+
+    template<typename TConfig>
     void LogicNode<TConfig>::addWriteLink(LogicNode& outN, SocketIndex outS, LogicNode& inN, SocketIndex inS)
     {
-        EXECGRAPH_THROW_TYPE_IF(outS >= outN.getOutputs().size() || inS >= inN.getInputs().size(),
+        EXECGRAPH_THROW_TYPE_IF(!outN.hasOSocket(outS) || !inN.hasISocket(inS),
                                 NodeConnectionException,
                                 "Wrong socket indices:  outNode: '{0}' outSocketIdx: '{1}' "
                                 "inNode: '{2}' inSocketIdx: '{3}' (nOuts: '{4}', nIns: '{5}' )",
@@ -413,6 +448,23 @@ namespace executionGraph
                                 inN.getInputs().size());
 
         outN.getOSocket(outS).addWriteLink(inN.getISocket(inS));
+    }
+
+    template<typename TConfig>
+    void LogicNode<TConfig>::removeWriteLink(LogicNode& outN, SocketIndex outS, LogicNode& inN, SocketIndex inS)
+    {
+        EXECGRAPH_THROW_TYPE_IF(!outN.hasOSocket(outS) || !inN.hasISocket(inS),
+                                NodeConnectionException,
+                                "Wrong socket indices:  outNode: '{0}' outSocketIdx: '{1}' "
+                                "inNode: '{2}' inSocketIdx: '{3}' (nOuts: '{4}', nIns: '{5}' )",
+                                outN.getId(),
+                                outS,
+                                inN.getId(),
+                                inS,
+                                outN.getOutputs().size(),
+                                inN.getInputs().size());
+
+        outN.getOSocket(outS).removeWriteLink(inN.getISocket(inS));
     }
 
 //! Some handy macros to redefine getters to shortcut the following ugly syntax inside a derivation of LogicNode:

@@ -1,6 +1,28 @@
 :host {
-    height: 100%;
+  height: 100%;
 
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+}
+
+.mat-drawer-container {
+  position: relative;
+  background: transparent;
+
+  .mat-drawer-content {
+    overflow:hidden;
+  }
+
+  .mat-drawer {
+    padding: 1rem;
+    background: rgba(255,255,255,0.3);
+  }
+}
+
+.sidenav-container {
+  height: 100%;
+}
+
+.mat-tab-link {
+  min-width: 0;
 }

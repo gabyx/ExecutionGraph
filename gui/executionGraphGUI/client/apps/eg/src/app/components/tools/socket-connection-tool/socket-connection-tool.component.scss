@@ -1,0 +1,46 @@
+@import 'app/variables';
+
+.temp {
+  ::ng-deep {
+    .ngcs-connection {
+      stroke-dasharray: 2;
+    }
+  }
+}
+
+.invalid {
+  ::ng-deep {
+    .ngcs-connection {
+      marker-start: none;
+      marker-end: none;
+      stroke: $stroke-color-invalid;
+    }
+  }
+}
+
+.invalidity-tooltip {
+  position: absolute;
+  transform: translate(-50%, -110%);
+  pointer-events: none;
+
+  background: $overlay-background-color;
+  color: $stroke-color-invalid;
+  font-family: mat-font-family($app-graph-typography);
+  font-size: mat-font-size($app-graph-typography, caption);
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    li {
+      padding: 0.5em;
+      margin: 0;
+      .error {
+        white-space: nowrap;
+      }
+      .alert-icon {
+        vertical-align: middle;
+        height: 100%;
+      }
+    }
+  }
+}

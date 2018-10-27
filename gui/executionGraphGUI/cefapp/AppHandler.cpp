@@ -195,3 +195,12 @@ void AppHandler::ShowDeveloperTools()
         showDevTools(browser);
     }
 }
+
+//! Reload all browsers
+void AppHandler::Reload()
+{
+    for(auto browser : m_browserList)
+    {
+        browser->Reload();
+    }
+}

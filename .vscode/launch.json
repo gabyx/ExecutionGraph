@@ -4,6 +4,7 @@
     // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "Python: Current File",
             "type": "python",
@@ -95,11 +96,25 @@
             "MIMode": "lldb"
         },
         {
+            "name": "(lldb) ExecutionGraphGUI [Release] (macOS App)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/gui/executionGraphGui/Release/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
+            "args": ["--cefFlags=--cache-path=''"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
             "name": "(lldb) ExecutionGraphGUI (client src from build folder)",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
-            "args": ["--clientSourcePath", "${workspaceFolder}/build/gui/executionGraphGui/client/build/client/", "--logPath", "${workspaceFolder}/build"],
+            "args": ["--clientSourcePath", "${workspaceFolder}/build/gui/executionGraphGui/client/build/apps/eg", 
+                     "--logPath", "${workspaceFolder}/build", 
+                     "--cefFlags=--cache-path=''"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -111,7 +126,9 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
-            "args": ["--clientSourcePath", "${workspaceFolder}/gui/executionGraphGui/client/dist/apps/eg", "--logPath", "${workspaceFolder}/build"],
+            "args": ["--clientSourcePath", "${workspaceFolder}/gui/executionGraphGui/client/dist/apps/eg", 
+                     "--logPath", "${workspaceFolder}/build",
+                     "--cefFlags=--cache-path=''"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -123,7 +140,8 @@
             "type": "chrome",
             "request": "launch",
             "url": "http://localhost:4200/#",
-            "webRoot": "${workspaceRoot}/gui/executionGraphGui/client"
+            "webRoot": "${workspaceRoot}/gui/executionGraphGui/client/apps/eg",
+            "skipFiles": ["ConsoleSink.ts", "MultiSinkLogger.ts"]
         }
     ]
 }

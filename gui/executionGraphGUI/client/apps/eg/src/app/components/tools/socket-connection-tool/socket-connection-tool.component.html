@@ -1,0 +1,28 @@
+<ng-container *ngIf="tempConnection">
+
+    <eg-connection-layer [connections]="[tempConnection]" [drawStyle]="connectionDrawStyle" class="temp"
+        [class.invalid]="invalidity" [class.nondroppable]="!targetSocket">
+    </eg-connection-layer>
+
+    <ngcs-html-layer>
+        <div *ngIf="!targetSocket" style="position: absolute" [style.left]="tempConnectionEndpoint.x+'px'"
+            [style.top]="tempConnectionEndpoint.y+'px'">
+
+            <ngcs-port [id]="tempTargetSocket.idString" class="right middle"></ngcs-port>
+
+        </div>
+        <div *ngIf="invalidity" class="invalidity-tooltip"
+              [style.left]="tempConnectionEndpoint.x+'px'"
+              [style.top]="tempConnectionEndpoint.y+'px'">
+            <ul>
+                <li *ngFor="let message of invalidityMessages">
+                  <div class="error">
+                    <i class="material-icons alert-icon">error_outline</i>
+                    <span>{{message}}</span>
+                  </div>
+                </li>
+            </ul>
+        </div>
+    </ngcs-html-layer>
+
+</ng-container>

@@ -13,10 +13,10 @@
 import { Injectable } from '@angular/core';
 import { flatbuffers } from 'flatbuffers';
 import { ILogger, LoggerFactory } from '@eg/logger';
-
-import { GeneralInfoService } from "./GeneralInfoService"
-import { GraphManipulationService } from "./GraphManipulationService"
-import { GraphManagementService } from "./GraphManagementService"
+import { GeneralInfoService } from './GeneralInfoService';
+import { GraphManipulationService } from './GraphManipulationService';
+import { GraphManagementService } from './GraphManagementService';
+import { NodeId } from './../model';
 
 /**
  * Stupid TestService class which can be quickly injected
@@ -46,18 +46,35 @@ export class TestService {
    */
   public async testAddRemove() {
     // Get the graph infos
-    console.debug('Get all graph type descriptions...');
-    var graphInfos = await this.generalInfoService.getAllGraphTypeDescriptions();
+    this.logger.debug('Get all graph type descriptions...');
+    let graphDescs = await this.generalInfoService.getAllGraphTypeDescriptions();
 
     // Add a node to the first graph
-    let graphInfo = graphInfos.graphsTypes(0);
-    let graphTypeId = graphInfo.id();
-    let nodeType = graphInfo.nodeTypeDescriptions(0).type();
+    let graphDesc = graphDescs[0];
+    let graphTypeId = graphDesc.id;
+    let nodeType = graphDesc.nodeTypeDescritptions[0].type;
 
     // Add a graph
-    let graphId = await this.graphManagementService.addGraph(graphTypeId)
+    let graph = await this.graphManagementService.addGraph(graphTypeId);
 
     // Add the node.
-    this.graphManipulationService.addNode(graphId, nodeType, 'MySuperDuperNode');
+    await this.graphManipulationService.addNode(graph.id, nodeType, 'MySuperDuperNode');
+
+    // Add a non existing node
+    try {
+      await this.graphManipulationService.addNode(
+        graph.id,
+        'BananaNode',
+        'MySupercalifragilisticexpialidociousBananaNode'
+      );
+    } catch (error) {
+      this.logger.error(error);
+    }
+
+    // Remove first node
+    await this.graphManipulationService.removeNode(graph.id, new NodeId(0));
+
+    // Remove graph
+    await this.graphManagementService.removeGraph(graph.id);
   }
 }

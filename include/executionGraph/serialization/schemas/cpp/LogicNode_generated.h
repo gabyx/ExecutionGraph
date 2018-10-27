@@ -15,7 +15,7 @@ namespace serialization {
 struct LogicNode;
 
 struct LogicNode FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ID = 4,
     VT_TYPE = 6,
     VT_NAME = 8,

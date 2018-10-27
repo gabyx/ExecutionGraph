@@ -12,26 +12,38 @@ namespace serialization {
 struct LogicSocket;
 
 struct LogicSocket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
-    VT_TYPE = 4,
-    VT_INDEX = 6,
-    VT_NAME = 8
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_TYPEINDEX = 4,
+    VT_TYPE = 6,
+    VT_TYPENAME = 8,
+    VT_NAME = 10,
+    VT_INDEX = 12
   };
-  uint64_t type() const {
-    return GetField<uint64_t>(VT_TYPE, 0);
+  uint64_t typeIndex() const {
+    return GetField<uint64_t>(VT_TYPEINDEX, 0);
   }
-  uint64_t index() const {
-    return GetField<uint64_t>(VT_INDEX, 0);
+  const flatbuffers::String *type() const {
+    return GetPointer<const flatbuffers::String *>(VT_TYPE);
+  }
+  const flatbuffers::String *typeName() const {
+    return GetPointer<const flatbuffers::String *>(VT_TYPENAME);
   }
   const flatbuffers::String *name() const {
     return GetPointer<const flatbuffers::String *>(VT_NAME);
   }
+  uint64_t index() const {
+    return GetField<uint64_t>(VT_INDEX, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<uint64_t>(verifier, VT_TYPE) &&
-           VerifyField<uint64_t>(verifier, VT_INDEX) &&
+           VerifyField<uint64_t>(verifier, VT_TYPEINDEX) &&
+           VerifyOffset(verifier, VT_TYPE) &&
+           verifier.VerifyString(type()) &&
+           VerifyOffset(verifier, VT_TYPENAME) &&
+           verifier.VerifyString(typeName()) &&
            VerifyOffset(verifier, VT_NAME) &&
            verifier.VerifyString(name()) &&
+           VerifyField<uint64_t>(verifier, VT_INDEX) &&
            verifier.EndTable();
   }
 };
@@ -39,14 +51,20 @@ struct LogicSocket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct LogicSocketBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_type(uint64_t type) {
-    fbb_.AddElement<uint64_t>(LogicSocket::VT_TYPE, type, 0);
+  void add_typeIndex(uint64_t typeIndex) {
+    fbb_.AddElement<uint64_t>(LogicSocket::VT_TYPEINDEX, typeIndex, 0);
   }
-  void add_index(uint64_t index) {
-    fbb_.AddElement<uint64_t>(LogicSocket::VT_INDEX, index, 0);
+  void add_type(flatbuffers::Offset<flatbuffers::String> type) {
+    fbb_.AddOffset(LogicSocket::VT_TYPE, type);
+  }
+  void add_typeName(flatbuffers::Offset<flatbuffers::String> typeName) {
+    fbb_.AddOffset(LogicSocket::VT_TYPENAME, typeName);
   }
   void add_name(flatbuffers::Offset<flatbuffers::String> name) {
     fbb_.AddOffset(LogicSocket::VT_NAME, name);
+  }
+  void add_index(uint64_t index) {
+    fbb_.AddElement<uint64_t>(LogicSocket::VT_INDEX, index, 0);
   }
   explicit LogicSocketBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -62,26 +80,34 @@ struct LogicSocketBuilder {
 
 inline flatbuffers::Offset<LogicSocket> CreateLogicSocket(
     flatbuffers::FlatBufferBuilder &_fbb,
-    uint64_t type = 0,
-    uint64_t index = 0,
-    flatbuffers::Offset<flatbuffers::String> name = 0) {
+    uint64_t typeIndex = 0,
+    flatbuffers::Offset<flatbuffers::String> type = 0,
+    flatbuffers::Offset<flatbuffers::String> typeName = 0,
+    flatbuffers::Offset<flatbuffers::String> name = 0,
+    uint64_t index = 0) {
   LogicSocketBuilder builder_(_fbb);
   builder_.add_index(index);
-  builder_.add_type(type);
+  builder_.add_typeIndex(typeIndex);
   builder_.add_name(name);
+  builder_.add_typeName(typeName);
+  builder_.add_type(type);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<LogicSocket> CreateLogicSocketDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    uint64_t type = 0,
-    uint64_t index = 0,
-    const char *name = nullptr) {
+    uint64_t typeIndex = 0,
+    const char *type = nullptr,
+    const char *typeName = nullptr,
+    const char *name = nullptr,
+    uint64_t index = 0) {
   return executionGraph::serialization::CreateLogicSocket(
       _fbb,
-      type,
-      index,
-      name ? _fbb.CreateString(name) : 0);
+      typeIndex,
+      type ? _fbb.CreateString(type) : 0,
+      typeName ? _fbb.CreateString(typeName) : 0,
+      name ? _fbb.CreateString(name) : 0,
+      index);
 }
 
 }  // namespace serialization

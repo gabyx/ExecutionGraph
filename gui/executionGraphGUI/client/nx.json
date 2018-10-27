@@ -1,0 +1,33 @@
+{
+  "npmScope": "eg",
+  "projects": {
+    "eg": {
+      "tags": []
+    },
+    "eg-e2e": {
+      "tags": []
+    },
+    "common": {
+      "tags": []
+    },
+    "graph": {
+      "tags": []
+    },
+    "logger": {
+      "tags": []
+    },
+    "messages": {
+      "tags": []
+    },
+    "serialization": {
+      "tags": []
+    }
+  },
+  "implicitDependencies": {
+    "angular.json": "*",
+    "package.json": "*",
+    "tsconfig.json": "*",
+    "tslint.json": "*",
+    "nx.json": "*"
+  }
+}
