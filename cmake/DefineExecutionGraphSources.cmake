@@ -90,14 +90,18 @@ function(setTargetCompileOptionsExecutionGraph target use_address_san use_leak_s
         message(STATUS "Setting Compile/Linker Options for Clang")
         list(APPEND CXX_FLAGS_DEBUG "-fno-omit-frame-pointer"
                                     "-Wall"
+                                    "-Werror"
                                     "-Wpedantic"
                                     "-Wno-documentation"
+                                    "-Wno-unused-local-typedef"
                                     "-ftemplate-backtrace-limit=0")
 
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         list(APPEND CXX_FLAGS_DEBUG "-fno-omit-frame-pointer"
                                     "-Wall"
+                                    "-Werror"
                                     "-Wpedantic"
+                                    "-Wno-unused-local-typedef"
                                     "-Wno-documentation")
     elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
         message(ERROR "MSVC is not yet supported!")

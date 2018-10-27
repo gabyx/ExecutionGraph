@@ -130,7 +130,7 @@ namespace executionGraph
         ExecutionTreeInOut(ExecutionTreeInOut&&) = default;
         ExecutionTreeInOut& operator=(ExecutionTreeInOut&&) = default;
 
-        //! Set the node class of a specific node id \p nodeId.
+        //! Set the node class of a specific node id `nodeId`.
         //! Invalidates the execution order.
         void setNodeClass(NodeId nodeId, NodeClassification newType)
         {
@@ -154,7 +154,7 @@ namespace executionGraph
             m_nodeClassifications[currType].emplace(node);  // Add to class.
         }
 
-        //! Set the node class of a specific \p node.
+        //! Set the node class of a specific `node`.
         //! Invalidates the execution order.
         void setNodeClass(NodeBaseType& node, NodeClassification newType)
         {
@@ -168,7 +168,7 @@ namespace executionGraph
                              "Maximal node count reached! (max() reserved for defaultOutputPool)");
             return m_nextNodeId;
         }
-        //! Get a specific node with id \p nodeId if it exists, nullptr otherwise.
+        //! Get a specific node with id `nodeId` if it exists, nullptr otherwise.
         //! This invalidates the execution order, since we cannot guarantee that the caller added other links.
         //! To circumvent that, use the const method.
         NodeBaseType* getNode(NodeId nodeId)
@@ -181,7 +181,7 @@ namespace executionGraph
             m_executionOrderUpToDate = false;
             return it->second->m_node.get();
         }
-        //! Get a specific node with id \p nodeId if it exists, nullptr otherwise.
+        //! Get a specific node with id `nodeId` if it exists, nullptr otherwise.
         //! Does not invalidate execution order.
         const NodeBaseType* getNode(NodeId nodeId) const
         {
@@ -194,10 +194,10 @@ namespace executionGraph
         //! All not connected input sockets will be hooked up to these default output sockets!
         LogicNodeDefaultOutputs& getDefaultOuputPool() { return *m_nodeDefaultOutputPool; }
 
-        //! Get all nodes classified as \p type.
+        //! Get all nodes classified as `type`.
         const NodeDataSet& getNodes(NodeClassification type) const { return m_nodeClassifications[type]; }
 
-        //! Get all nodes in the group with id \p groupId.
+        //! Get all nodes in the group with id `groupId`.
         const NodeDataSet& getNodes(GroupId groupId) const
         {
             auto it = m_nodeGroups.find(groupId);
@@ -311,7 +311,7 @@ namespace executionGraph
             return std::move(node);
         }
 
-        //! Add the node with id \p nodeId to the group with id \p groupId.
+        //! Add the node with id `nodeId` to the group with id `groupId`.
         void addNodeToGroup(NodeId nodeId, GroupId groupId)
         {
             auto it = m_nonConstNodes.find(nodeId);
@@ -325,8 +325,8 @@ namespace executionGraph
             m_executionOrderUpToDate = false;
         }
 
-        //! Constructs a Get-Link to get the data from output socket at index \p outS
-        //! of logic node \p outN at the input socket at index \p inS.
+        //! Constructs a Get-Link to get the data from output socket at index `outS`
+        //! of node `outN` at the input socket at index `inS` of node `inN`.
         void setGetLink(NodeId outN, SocketIndex outS, NodeId inN, SocketIndex inS)
         {
             auto outNit = m_nodes.find(outN);
@@ -339,9 +339,44 @@ namespace executionGraph
             m_executionOrderUpToDate = false;
         }
 
-        //! Constructs a Write-Link to write the data of output socket at index \p
-        //! outS of logic node \p outN to the input socket at index \p inS of logic node \p
-        //! inN.
+        //! Removes a Get-Link to get the data from output socket at index `outS`
+        //! of node `outN` at the input socket at index `inS` of node `node`.
+        //! If `outN` and `outS` are set, the function throws if the get link does not match!
+        void removeGetLink(NodeId inN,
+                           SocketIndex inS,
+                           const NodeId* outN      = nullptr,
+                           const SocketIndex* outS = nullptr)
+        {
+            auto nodeIt = m_nodes.find(inN);
+            EXECGRAPH_THROW_IF(nodeIt == m_nodes.end(),
+                               "Node with id: '{0}' does not exist!",
+                               inN);
+
+            auto& node = *(nodeIt->second->m_node);
+            // There is only one get link! Check
+            if(!outN && !outS && node.hasISocket(inS))
+            {
+                auto* outSocket = node.getISocket(inS).followGetLink();
+                EXECGRAPH_THROW_TYPE_IF(!outSocket || (outSocket->getIndex() != *outS ||
+                                                       outSocket->getParent().getId() != *outN),
+                                        NodeConnectionException,
+                                        "The output socket '{0}' of node '{1}' of the get link does "
+                                        "not correspond to the one you want to remove "
+                                        "(node id: '{2}', output socket: '{3}')",
+                                        outSocket->getIndex(),
+                                        outSocket->getParent().getId(),
+                                        *outN,
+                                        *outS);
+            }
+
+            node.removeGetLink(inS);
+
+            m_executionOrderUpToDate = false;
+        }
+
+        //! Constructs a Write-Link to write the data of output socket at index
+        //! `outS` of node `outN` to the input socket at index `inS` of node
+        //! `inN`.
         void addWriteLink(NodeId outN, SocketIndex outS, NodeId inN, SocketIndex inS)
         {
             auto outNit = m_nodes.find(outN);
@@ -354,7 +389,22 @@ namespace executionGraph
             m_executionOrderUpToDate = false;
         }
 
-        //! Reset all nodes in group with id: \p groupId.
+        //! Remove a Write-Link to write the data of output socket at index
+        //! `outS` of node `outN` to the input socket at index `inS` of node
+        //! `inN`.
+        void removeWriteLink(NodeId outN, SocketIndex outS, NodeId inN, SocketIndex inS)
+        {
+            auto outNit = m_nodes.find(outN);
+            auto inNit  = m_nodes.find(inN);
+            if(outNit == m_nodes.end() || inNit == m_nodes.end())
+            {
+                EXECGRAPH_THROW("Node with id: '{0}' or '{1}' does not exist!", outN, inN);
+            }
+            NodeBaseType::removeWriteLink(*outNit->second->m_node, outS, *inNit->second->m_node, inS);
+            m_executionOrderUpToDate = false;
+        }
+
+        //! Reset all nodes in group with id: `groupId`.
         void runReset(unsigned int groupId)
         {
             EXECGRAPH_THROW_IF(!m_executionOrderUpToDate,
@@ -373,7 +423,7 @@ namespace executionGraph
             executePrioritySet(m_execList, [](NodeBaseType& node) { node.reset(); });
         }
 
-        //! Execute all nodes in group with id: \p groupId in their determined order.
+        //! Execute all nodes in group with id: `groupId` in their determined order.
         void runExecute(unsigned int groupId)
         {
             EXECGRAPH_THROW_IF(!m_executionOrderUpToDate,

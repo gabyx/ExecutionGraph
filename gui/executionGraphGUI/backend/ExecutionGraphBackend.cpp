@@ -136,6 +136,64 @@ void ExecutionGraphBackend::removeNode(const Id& graphId,
     std::visit(remove, graphVar);
 }
 
+//! Add a connection to the graph with id `graphId`.
+void ExecutionGraphBackend::removeConnection(const Id& graphId,
+                                             NodeId outNodeId,
+                                             SocketIndex outSocketIdx,
+                                             NodeId inNodeId,
+                                             SocketIndex inSocketIdx,
+                                             bool isWriteLink)
+{
+    auto deferred = initRequest(graphId);
+
+    GraphVariant graphVar = getGraph(graphId);
+
+    // Remark: Here somebody could potentially call `removeGraph` (other thread)
+    // which waits till all requests on this graph are handled.
+
+    // Make a visitor to dispatch the "remove" over the variant...
+    auto remove = [&](auto& graph) {
+        using GraphType    = typename std::remove_cv_t<std::remove_reference_t<decltype(*graph)>>::DataType;
+        using Config       = typename GraphType::Config;
+        using NodeBaseType = typename Config::NodeBaseType;
+
+        // Locking start
+        // auto graphL = graph->wlock();
+        try
+        {
+            if(isWriteLink)
+            {
+                graph->wlock()->removeWriteLink(outNodeId,
+                                                outSocketIdx,
+                                                inNodeId,
+                                                inSocketIdx);
+            }
+            else
+            {
+                graph->wlock()->removeGetLink(inNodeId,
+                                              inSocketIdx,
+                                              &outNodeId,
+                                              &outSocketIdx);
+            }
+        }
+        catch(executionGraph::Exception& e)
+        {
+            EXECGRAPHGUI_THROW_BAD_REQUEST(
+                std::string("Removing connection from output node id '{0}' [socket idx: '{1}'] ") +
+                    (isWriteLink ? "<-- " : "--> ") +
+                    "input node id '{2}' [socket idx: '{3}' not successful!",
+                outNodeId,
+                outSocketIdx,
+                inNodeId,
+                inSocketIdx);
+        }
+
+        // Locking end
+    };
+
+    std::visit(remove, graphVar);
+}
+
 //! Initializes a request for graph id `graphId`.
 //! @post There exists a status entry for this graph id.
 Deferred ExecutionGraphBackend::initRequest(Id graphId)
@@ -189,4 +247,17 @@ void ExecutionGraphBackend::clearGraphData(Id graphId)
     // EXECGRAPH_ASSERT(nErased == 0,
     //                  "No such graph status with id: '{0}' removed!",
     //                  graphId.toString());
+}
+
+//! Get the graph corresponding to `graphId`.
+ExecutionGraphBackend::GraphVariant
+ExecutionGraphBackend::getGraph(const Id& graphId)
+{
+    return m_graphs.withRLock([&](auto& graphs) {
+        auto graphIt = graphs.find(graphId);
+        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(graphIt == graphs.cend(),
+                                          "Graph id: '{0}' does not exist!",
+                                          graphId.toString());
+        return graphIt->second;
+    });
 }

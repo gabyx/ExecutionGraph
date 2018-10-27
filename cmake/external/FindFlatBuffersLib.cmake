@@ -3,7 +3,7 @@ include(FindPackageHandleStandardArgs)
 
 # Try to find the library, if it is installed!
 # otherwise download it
-set(URL "https://github.com/google/flatbuffers.git")
+set(URL "https://github.com/gabyx/flatbuffers.git")
 set(INSTALL_DIR "${ExecutionGraph_EXTERNAL_INSTALL_DIR}/flatbuffers")
 
 message(STATUS "flatbuffers library finding ...")
@@ -19,7 +19,7 @@ if(${USE_SUPERBUILD})
         
         ExternalProject_Add(flatbuffers
                             GIT_REPOSITORY      "${URL}"
-                            GIT_TAG             master
+                            GIT_TAG             "feature/keep-include-path-js-2"
                             GIT_SHALLOW         ON
                             PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/flatbuffers"
                             TIMEOUT 10

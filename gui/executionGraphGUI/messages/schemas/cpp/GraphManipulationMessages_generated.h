@@ -7,9 +7,12 @@
 #include "flatbuffers/flatbuffers.h"
 #include "flatbuffers/flexbuffers.h"
 
+#include "executionGraphGUI/messages/schemas/cpp/ConstructorKeyValue_generated.h"
+#include "executionGraphGUI/messages/schemas/cpp/CycleDescription_generated.h"
 #include "executionGraphGUI/messages/schemas/cpp/DataTypes_generated.h"
 #include "executionGraph/serialization/schemas/cpp/LogicNode_generated.h"
 #include "executionGraph/serialization/schemas/cpp/LogicSocket_generated.h"
+#include "executionGraph/serialization/schemas/cpp/SocketLink_generated.h"
 
 namespace executionGraphGUI {
 namespace serialization {
@@ -22,8 +25,14 @@ struct AddNodeResponse;
 
 struct RemoveNodeRequest;
 
+struct AddConnectionRequest;
+
+struct AddConnectionResponse;
+
+struct RemoveConnectionRequest;
+
 struct NodeConstructionInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TYPE = 4,
     VT_NAME = 6,
     VT_CONSTRUCTORARGS = 8
@@ -101,7 +110,7 @@ inline flatbuffers::Offset<NodeConstructionInfo> CreateNodeConstructionInfoDirec
 }
 
 struct AddNodeRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_GRAPHID = 4,
     VT_NODE = 6
   };
@@ -165,7 +174,7 @@ inline flatbuffers::Offset<AddNodeRequest> CreateAddNodeRequestDirect(
 }
 
 struct AddNodeResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_NODE = 4
   };
   const executionGraph::serialization::LogicNode *node() const {
@@ -207,7 +216,7 @@ inline flatbuffers::Offset<AddNodeResponse> CreateAddNodeResponse(
 }
 
 struct RemoveNodeRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_GRAPHID = 4,
     VT_NODEID = 6
   };
@@ -266,6 +275,194 @@ inline flatbuffers::Offset<RemoveNodeRequest> CreateRemoveNodeRequestDirect(
       _fbb,
       graphId ? _fbb.CreateString(graphId) : 0,
       nodeId);
+}
+
+struct AddConnectionRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_GRAPHID = 4,
+    VT_SOCKETLINK = 6,
+    VT_CHECKFORCYCLES = 8
+  };
+  const flatbuffers::String *graphId() const {
+    return GetPointer<const flatbuffers::String *>(VT_GRAPHID);
+  }
+  const executionGraph::serialization::SocketLink *socketLink() const {
+    return GetStruct<const executionGraph::serialization::SocketLink *>(VT_SOCKETLINK);
+  }
+  bool checkForCycles() const {
+    return GetField<uint8_t>(VT_CHECKFORCYCLES, 0) != 0;
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_GRAPHID) &&
+           verifier.VerifyString(graphId()) &&
+           VerifyFieldRequired<executionGraph::serialization::SocketLink>(verifier, VT_SOCKETLINK) &&
+           VerifyField<uint8_t>(verifier, VT_CHECKFORCYCLES) &&
+           verifier.EndTable();
+  }
+};
+
+struct AddConnectionRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_graphId(flatbuffers::Offset<flatbuffers::String> graphId) {
+    fbb_.AddOffset(AddConnectionRequest::VT_GRAPHID, graphId);
+  }
+  void add_socketLink(const executionGraph::serialization::SocketLink *socketLink) {
+    fbb_.AddStruct(AddConnectionRequest::VT_SOCKETLINK, socketLink);
+  }
+  void add_checkForCycles(bool checkForCycles) {
+    fbb_.AddElement<uint8_t>(AddConnectionRequest::VT_CHECKFORCYCLES, static_cast<uint8_t>(checkForCycles), 0);
+  }
+  explicit AddConnectionRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  AddConnectionRequestBuilder &operator=(const AddConnectionRequestBuilder &);
+  flatbuffers::Offset<AddConnectionRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<AddConnectionRequest>(end);
+    fbb_.Required(o, AddConnectionRequest::VT_GRAPHID);
+    fbb_.Required(o, AddConnectionRequest::VT_SOCKETLINK);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<AddConnectionRequest> CreateAddConnectionRequest(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> graphId = 0,
+    const executionGraph::serialization::SocketLink *socketLink = 0,
+    bool checkForCycles = false) {
+  AddConnectionRequestBuilder builder_(_fbb);
+  builder_.add_socketLink(socketLink);
+  builder_.add_graphId(graphId);
+  builder_.add_checkForCycles(checkForCycles);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<AddConnectionRequest> CreateAddConnectionRequestDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *graphId = nullptr,
+    const executionGraph::serialization::SocketLink *socketLink = 0,
+    bool checkForCycles = false) {
+  return executionGraphGUI::serialization::CreateAddConnectionRequest(
+      _fbb,
+      graphId ? _fbb.CreateString(graphId) : 0,
+      socketLink,
+      checkForCycles);
+}
+
+struct AddConnectionResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_CYCLES = 4
+  };
+  const flatbuffers::Vector<flatbuffers::Offset<CycleDescription>> *cycles() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<CycleDescription>> *>(VT_CYCLES);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_CYCLES) &&
+           verifier.VerifyVector(cycles()) &&
+           verifier.VerifyVectorOfTables(cycles()) &&
+           verifier.EndTable();
+  }
+};
+
+struct AddConnectionResponseBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_cycles(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<CycleDescription>>> cycles) {
+    fbb_.AddOffset(AddConnectionResponse::VT_CYCLES, cycles);
+  }
+  explicit AddConnectionResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  AddConnectionResponseBuilder &operator=(const AddConnectionResponseBuilder &);
+  flatbuffers::Offset<AddConnectionResponse> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<AddConnectionResponse>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<AddConnectionResponse> CreateAddConnectionResponse(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<CycleDescription>>> cycles = 0) {
+  AddConnectionResponseBuilder builder_(_fbb);
+  builder_.add_cycles(cycles);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<AddConnectionResponse> CreateAddConnectionResponseDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<CycleDescription>> *cycles = nullptr) {
+  return executionGraphGUI::serialization::CreateAddConnectionResponse(
+      _fbb,
+      cycles ? _fbb.CreateVector<flatbuffers::Offset<CycleDescription>>(*cycles) : 0);
+}
+
+struct RemoveConnectionRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_GRAPHID = 4,
+    VT_SOCKETLINK = 6
+  };
+  const flatbuffers::String *graphId() const {
+    return GetPointer<const flatbuffers::String *>(VT_GRAPHID);
+  }
+  const executionGraph::serialization::SocketLink *socketLink() const {
+    return GetStruct<const executionGraph::serialization::SocketLink *>(VT_SOCKETLINK);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_GRAPHID) &&
+           verifier.VerifyString(graphId()) &&
+           VerifyFieldRequired<executionGraph::serialization::SocketLink>(verifier, VT_SOCKETLINK) &&
+           verifier.EndTable();
+  }
+};
+
+struct RemoveConnectionRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_graphId(flatbuffers::Offset<flatbuffers::String> graphId) {
+    fbb_.AddOffset(RemoveConnectionRequest::VT_GRAPHID, graphId);
+  }
+  void add_socketLink(const executionGraph::serialization::SocketLink *socketLink) {
+    fbb_.AddStruct(RemoveConnectionRequest::VT_SOCKETLINK, socketLink);
+  }
+  explicit RemoveConnectionRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  RemoveConnectionRequestBuilder &operator=(const RemoveConnectionRequestBuilder &);
+  flatbuffers::Offset<RemoveConnectionRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<RemoveConnectionRequest>(end);
+    fbb_.Required(o, RemoveConnectionRequest::VT_GRAPHID);
+    fbb_.Required(o, RemoveConnectionRequest::VT_SOCKETLINK);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<RemoveConnectionRequest> CreateRemoveConnectionRequest(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> graphId = 0,
+    const executionGraph::serialization::SocketLink *socketLink = 0) {
+  RemoveConnectionRequestBuilder builder_(_fbb);
+  builder_.add_socketLink(socketLink);
+  builder_.add_graphId(graphId);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<RemoveConnectionRequest> CreateRemoveConnectionRequestDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *graphId = nullptr,
+    const executionGraph::serialization::SocketLink *socketLink = 0) {
+  return executionGraphGUI::serialization::CreateRemoveConnectionRequest(
+      _fbb,
+      graphId ? _fbb.CreateString(graphId) : 0,
+      socketLink);
 }
 
 }  // namespace serialization

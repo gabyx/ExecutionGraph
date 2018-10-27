@@ -22,6 +22,7 @@
 #include <executionGraph/common/Deferred.hpp>
 #include <executionGraph/common/Identifier.hpp>
 #include <executionGraph/common/Synchronized.hpp>
+#include <executionGraph/graphs/CycleDescription.hpp>
 #include <executionGraph/graphs/ExecutionTreeInOut.hpp>
 #include <executionGraph/serialization/GraphTypeDescription.hpp>
 #include "executionGraphGUI/backend/Backend.hpp"
@@ -47,6 +48,7 @@ public:
     using IdNamed              = executionGraph::IdNamed;
     using GraphTypeDescription = executionGraph::GraphTypeDescription;
     using NodeId               = executionGraph::NodeId;
+    using SocketIndex          = executionGraph::SocketIndex;
     using Deferred             = executionGraph::Deferred;
 
     template<typename... Args>
@@ -79,6 +81,26 @@ public:
 
     void removeNode(const Id& graphId,
                     NodeId id);
+    //@}
+
+    //! Adding/removing connections.
+    //@{
+    template<typename ResponseCreator>
+    void addConnection(const Id& graphId,
+                       NodeId outNodeId,
+                       SocketIndex outSocketIdx,
+                       NodeId inNodeId,
+                       SocketIndex inSocketIdx,
+                       bool isWriteLink,
+                       bool checkForCycles,
+                       ResponseCreator&& responseCreator);
+
+    void removeConnection(const Id& graphId,
+                          NodeId outNodeId,
+                          SocketIndex outSocketIdx,
+                          NodeId inNodeId,
+                          SocketIndex inSocketIdx,
+                          bool isWriteLink);
     //@}
 
     //! Information about graphs.
@@ -164,6 +186,7 @@ private:
     };
 
     using GraphVariant = std::variant<std::shared_ptr<Synchronized<DefaultGraph>>>;
+    GraphVariant getGraph(const Id& graphId);
 
 private:
     SyncedUMap<Id, GraphVariant> m_graphs;                  //! Graphs identified by its id.
@@ -180,15 +203,7 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
 {
     auto deferred = initRequest(graphId);
 
-    GraphVariant graphVar;
-
-    m_graphs.withRLock([&](auto& graphs) {
-        auto graphIt = graphs.find(graphId);
-        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(graphIt == graphs.cend(),
-                                          "Graph id: '{0}' does not exist!",
-                                          graphId.toString());
-        graphVar = graphIt->second;
-    });
+    GraphVariant graphVar = getGraph(graphId);
 
     // Remark: Here somebody could potentially call `removeGraph` (other thread)
     // which waits till all requests on this graph are handled.
@@ -227,6 +242,73 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
 
         // Create the response (with the graph locked)
         responseCreator(*graphL, *node);
+
+        // Locking end
+    };
+
+    std::visit(add, graphVar);
+}
+
+//! Add a connection to the graph with id `graphId`.
+template<typename ResponseCreator>
+void ExecutionGraphBackend::addConnection(const Id& graphId,
+                                          NodeId outNodeId,
+                                          SocketIndex outSocketIdx,
+                                          NodeId inNodeId,
+                                          SocketIndex inSocketIdx,
+                                          bool isWriteLink,
+                                          bool checkForCycles,
+                                          ResponseCreator&& responseCreator)
+{
+    auto deferred = initRequest(graphId);
+
+    GraphVariant graphVar = getGraph(graphId);
+
+    // Remark: Here somebody could potentially call `removeGraph` (other thread)
+    // which waits till all requests on this graph are handled.
+
+    // Make a visitor to dispatch the "add" over the variant...
+    auto add = [&](auto& graph) {
+        using GraphType = typename std::remove_cv_t<std::remove_reference_t<decltype(*graph)>>::DataType;
+
+        // Potential cycles data structure
+        std::vector<executionGraph::CycleDescription> cycles;
+
+        // Locking start
+        auto graphL = graph->wlock();
+        try
+        {
+            EXECGRAPHGUI_THROW_BAD_REQUEST_IF(checkForCycles, "Checking cycles not yet implemented!");
+
+            if(isWriteLink)
+            {
+                graphL->addWriteLink(outNodeId,
+                                     outSocketIdx,
+                                     inNodeId,
+                                     inSocketIdx);
+            }
+            else
+            {
+                graphL->setGetLink(outNodeId,
+                                   outSocketIdx,
+                                   inNodeId,
+                                   inSocketIdx);
+            }
+        }
+        catch(executionGraph::Exception& e)
+        {
+            EXECGRAPHGUI_THROW_BAD_REQUEST(
+                std::string("Adding connection from output node id '{0}' [socket idx: '{1}'] ") +
+                    (isWriteLink ? "<-- " : "--> ") +
+                    "input node id '{2}' [socket idx: '{3}' not successful!",
+                outNodeId,
+                outSocketIdx,
+                inNodeId,
+                inSocketIdx);
+        }
+
+        // Create the response (with the graph locked)
+        responseCreator(*graphL, std::move(cycles));
 
         // Locking end
     };

@@ -16,7 +16,7 @@ namespace serialization {
 struct GetAllGraphTypeDescriptionsResponse;
 
 struct GetAllGraphTypeDescriptionsResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_GRAPHSTYPES = 4
   };
   const flatbuffers::Vector<flatbuffers::Offset<executionGraph::serialization::GraphTypeDescription>> *graphsTypes() const {

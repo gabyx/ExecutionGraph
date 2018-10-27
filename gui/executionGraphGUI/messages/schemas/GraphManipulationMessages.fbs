@@ -16,8 +16,8 @@ include "executionGraph/serialization/schemas/LogicNode.fbs";
 namespace executionGraphGUI.serialization;
 
 table NodeConstructionInfo {
-    type:string (id: 0, required);          //!< The rtti of the logic node.
-    name:string (id: 1, required);          //!< The name of the logic node.
+    type:string (id: 0, required);              //!< The rtti of the node.
+    name:string (id: 1, required);              //!< The name of the node.
     constructorArgs:[ConstructorKV] (id: 2);    //!< Key-value pairs for the cosntructor. (not yet used)
 }
 
@@ -48,7 +48,7 @@ table AddNodeResponse {
 //! Request data: 
 table RemoveNodeRequest {
     graphId:string (id:0, required);  //!< The graph guid.
-    nodeId:uint64 (id:1);                 //!< The node id to remove from the graph.
+    nodeId:uint64 (id:1);             //!< The node id to remove from the graph.
 }
 
 //! Response data: none
@@ -58,4 +58,52 @@ table RemoveNodeRequest {
 //!   - status code: 400 (Bad Request)
 //!     - node id is not found
 //!     - graph id is not found
+//! ======================================================================
+
+
+//! ======================================================================
+//! Message "graph/addConnection"
+//! ======================================================================
+//! Request data:
+table AddConnectionRequest {
+    graphId:string (id:0, required); //!< The graph guid.
+    socketLink: executionGraph.serialization.SocketLink (id:1, required); //!< The socket link description.
+
+    checkForCycles: bool (id:2);     /*!< If a cycle-detection is started to directly 
+                                        avoid cycles when construction the graph. */
+}
+//! Response data:
+//! Success: 
+//    - status code: 200 (OK)
+//      if AddConnectionRequest::checkForCycles == true && cycles != nullptr 
+//          -> adding connection failed!
+//      else:
+//          assert(cylces == nullptr);
+//          -> adding connection succeeded!
+//! Valid Errors:
+//!   - status code: 400 (Bad Request)
+//!     - graph id is not found
+//!     - input/output node or their socket index don't exist
+table AddConnectionResponse {
+    /*! Cycle description if AddConnectionRequest::checkForCycles == true
+        and cycles found. (at least one CycleDescription) */
+    cycles: [CycleDescription] (id:0);
+}
+//! ======================================================================
+
+//! ======================================================================
+//! Message "graph/removeConnection"
+//! ======================================================================
+//! Request data: 
+table RemoveConnectionRequest {
+    graphId:string (id:0, required);  //!< The graph guid.
+    socketLink: executionGraph.serialization.SocketLink (id:1, required); //!< The socket link description.
+}
+
+//! Response data: none
+//! Success: 
+//    - status code: 200 (OK)
+//! Valid Errors:
+//!   - status code: 400 (Bad Request)
+//!     - input/output node or their socket index don't exist
 //! ======================================================================
