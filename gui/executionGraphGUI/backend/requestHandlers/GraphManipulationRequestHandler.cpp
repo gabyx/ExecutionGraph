@@ -128,3 +128,19 @@ void GraphManipulationRequestHandler::handleRemoveNode(const Request& request,
     // Set the response.
     response.setReady();
 }
+
+//! Handle the operation of adding a connection.
+void GraphManipulationRequestHandler::handleAddConnection(const Request& request,
+                                                          ResponsePromise& response);
+{
+    // Set the response.
+    response.setReady();
+}
+
+//! Handle the operation of removing a connection.
+void GraphManipulationRequestHandler::handleRemoveConnection(const Request& request,
+                                                             ResponsePromise& response)
+{
+    // Set the response.
+    response.setReady();
+}
