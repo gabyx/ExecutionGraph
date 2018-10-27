@@ -93,8 +93,8 @@ namespace executionGraph
             }
         }
 
-        //! Cast to a logic socket of type \p SocketInputType<T>*.
-        //! The cast fails at runtime if the data type \p T does not match!
+        //! Cast to a logic socket of type `SocketInputType`<T>*.
+        //! The cast fails at runtime if the data type `T` does not match!
         template<typename T>
         auto* castToType() const
         {
@@ -206,8 +206,8 @@ namespace executionGraph
             }
         }
 
-        //! Cast to a logic socket of type \p SocketOutputType<T>*.
-        //! The cast fails at runtime (if NDEBUG defined) if the data type \p T does not match!
+        //! Cast to a logic socket of type `SocketOutputType`<T>*.
+        //! The cast fails at runtime (if NDEBUG defined) if the data type `T` does not match!
         template<typename T>
         auto* castToType() const
         {

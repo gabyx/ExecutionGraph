@@ -126,7 +126,7 @@ namespace executionGraph
             return hasOSocket(idx) && getOSocket(idx).template isType<T>();
         }
 
-        //! Get the input socket at index \p idx.
+        //! Get the input socket at index `idx`.
         SocketInputBaseType& getISocket(SocketIndex idx)
         {
             EXECGRAPH_ASSERT(idx < m_inputs.size(), "Wrong index!");
@@ -136,7 +136,7 @@ namespace executionGraph
         {
             return const_cast<LogicNode*>(this)->getISocket(idx);
         }
-        //! Get the output socket at index \p idx.
+        //! Get the output socket at index `idx`.
         SocketOutputBaseType& getOSocket(SocketIndex idx)
         {
             EXECGRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
@@ -147,23 +147,23 @@ namespace executionGraph
             return const_cast<LogicNode*>(this)->getOSocket(idx);
         }
 
-        //! Get the input socket of type \p T at index \p idx.
+        //! Get the input socket of type `T` at index `idx`.
         template<typename T>
         auto& getISocket(SocketIndex idx);
         template<typename T>
         const auto& getISocket(SocketIndex idx) const;
 
-        //! Get the output socket of type \p T at index \p idx.
+        //! Get the output socket of type `T` at index `idx`.
         template<typename T>
         auto& getOSocket(SocketIndex idx);
         template<typename T>
         const auto& getOSocket(SocketIndex idx) const;
 
-        //! Get input socket value \p T at index \p idx.
+        //! Get input socket value `T` at index `idx`.
         template<typename T>
         const T& getInVal(SocketIndex idx) const;
 
-        //! Get the read/write output socket value \p T of the output socket at index \p idx.
+        //! Get the read/write output socket value `T` of the output socket at index `idx`.
         template<typename T>
         T& getOutVal(SocketIndex idx);
         template<typename T>
@@ -180,26 +180,26 @@ namespace executionGraph
         template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF((meta::is<TSocketDeclaration, details::InputSocketDeclaration>::value))>
         const typename TSocketDeclaration::DataType& getValue() const;
 
-        //! Constructs a Get-Link to get the data from output socket at index \p outS
-        //! of logic node \p outN at the input socket at index \p inS of logic node \p
+        //! Constructs a Get-Link to get the data from output socket at index `outS`
+        //! of logic node `outN` at the input socket at index `inS` of logic node \p
         //! inN.
         static void setGetLink(LogicNode& outN, SocketIndex outS, LogicNode& inN, SocketIndex inS);
 
-        //! Constructs a Get-Link to get the data from output socket at index \p outS
-        //! of logic node \p outN at the input socket at index \p inS.
+        //! Constructs a Get-Link to get the data from output socket at index `outS`
+        //! of logic node `outN` at the input socket at index `inS`.
         inline void setGetLink(LogicNode& outN, SocketIndex outS, SocketIndex inS)
         {
             setGetLink(outN, outS, *this, inS);
         }
 
         //! Constructs a Write-Link to write the data of output socket at index \p
-        //! outS of logic node \p outN to the input socket at index \p inS of logic node \p
+        //! outS of logic node `outN` to the input socket at index `inS` of logic node \p
         //! inN.
         static void addWriteLink(LogicNode& outN, SocketIndex outS, LogicNode& inN, SocketIndex inS);
 
         //! Constructs a Write-Link to write the data of output socket at index \p
         //! outS
-        //! of logic node \p outN to the input socket at index \p inS.
+        //! of logic node `outN` to the input socket at index `inS`.
         inline void addWriteLink(IndexType outS, LogicNode& inN, SocketIndex inS)
         {
             addWriteLink(*this, outS, inN, inS);
@@ -208,7 +208,7 @@ namespace executionGraph
         //! Adding of sockets is protected and should only be done in constructor!
         //@{
     protected:
-        //! Add an input socket with default value from the default output socket \p defaultOutputSocketId.
+        //! Add an input socket with default value from the default output socket `defaultOutputSocketId`.
         template<typename TData>
         void addISock(const std::string& name = "noname")
         {
@@ -220,7 +220,7 @@ namespace executionGraph
             m_inputs.push_back(std::move(p));
         }
 
-        //! Add an output socket with default value \p defaultValue.
+        //! Add an output socket with default value `defaultValue`.
         template<typename TData, typename T>
         void addOSock(T&& defaultValue,
                       const std::string& name = "noname")
@@ -233,7 +233,7 @@ namespace executionGraph
             m_outputs.push_back(std::move(p));
         }
 
-        //! Add all input sockets defined in the type list \p SocketDeclList.
+        //! Add all input sockets defined in the type list `SocketDeclList`.
         template<typename SocketDeclList,
                  EXECGRAPH_SFINAE_ENABLE_IF((meta::is<SocketDeclList, details::InputSocketDeclarationList>::value))>
         void addSockets()
@@ -246,8 +246,8 @@ namespace executionGraph
             meta::for_each(typename SocketDeclList::TypeList{}, add);
         }
 
-        //! Add all output sockets defined in the type list \p SocketDeclList where each socket has
-        //! the corresponding default value in \p defaultValues.
+        //! Add all output sockets defined in the type list `SocketDeclList` where each socket has
+        //! the corresponding default value in `defaultValues`.
         template<typename SocketDeclList,
                  typename... Args,
                  EXECGRAPH_SFINAE_ENABLE_IF((meta::is<SocketDeclList, details::OutputSocketDeclarationList>::value))>
