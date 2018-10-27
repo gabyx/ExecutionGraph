@@ -7,14 +7,14 @@
 #include "flatbuffers/flatbuffers.h"
 #include "flatbuffers/flexbuffers.h"
 
-#include "executionGraph/serialization/schemas/cpp/DataTypes_generated.h"
-#include "executionGraph/serialization/schemas/cpp/GraphTypeDescription_generated.h"
-#include "executionGraph/serialization/schemas/cpp/GraphVisualization_generated.h"
-#include "executionGraph/serialization/schemas/cpp/LogicNode_generated.h"
-#include "executionGraph/serialization/schemas/cpp/LogicSocket_generated.h"
-#include "executionGraph/serialization/schemas/cpp/NodeTypeDescription_generated.h"
-#include "executionGraph/serialization/schemas/cpp/SocketLink_generated.h"
-#include "executionGraph/serialization/schemas/cpp/SocketTypeDescription_generated.h"
+#include "executionGraph/serialization/schemas/DataTypes_generated.h"
+#include "executionGraph/serialization/schemas/GraphTypeDescription_generated.h"
+#include "executionGraph/serialization/schemas/GraphVisualization_generated.h"
+#include "executionGraph/serialization/schemas/LogicNode_generated.h"
+#include "executionGraph/serialization/schemas/LogicSocket_generated.h"
+#include "executionGraph/serialization/schemas/NodeTypeDescription_generated.h"
+#include "executionGraph/serialization/schemas/SocketLink_generated.h"
+#include "executionGraph/serialization/schemas/SocketTypeDescription_generated.h"
 
 namespace executionGraph {
 namespace serialization {
@@ -54,12 +54,13 @@ inline const char * const *EnumNamesNodeClassification() {
 }
 
 inline const char *EnumNameNodeClassification(NodeClassification e) {
+  if (e < NodeClassification_NormalNode || e > NodeClassification_ConstantNode) return "";
   const size_t index = static_cast<int>(e);
   return EnumNamesNodeClassification()[index];
 }
 
 struct ExecutionGraphNodeProperties FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_NODEID = 4,
     VT_CLASSIFICATION = 6,
     VT_GROUPS = 8
@@ -132,7 +133,7 @@ inline flatbuffers::Offset<ExecutionGraphNodeProperties> CreateExecutionGraphNod
 }
 
 struct ExecutionGraph FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_GRAPHDESCRIPTION = 4,
     VT_NODES = 6,
     VT_LINKS = 8,

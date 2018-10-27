@@ -6,8 +6,8 @@
 
 #include "flatbuffers/flatbuffers.h"
 
-#include "executionGraph/serialization/schemas/cpp/DataTypes_generated.h"
-#include "executionGraph/serialization/schemas/cpp/SocketLink_generated.h"
+#include "executionGraph/serialization/schemas/DataTypes_generated.h"
+#include "executionGraph/serialization/schemas/SocketLink_generated.h"
 
 namespace executionGraph {
 namespace serialization {
@@ -21,7 +21,7 @@ struct LinkVisualization;
 struct GraphVisualization;
 
 struct WorkspaceVisualization FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_WORKSPACEID = 4,
     VT_BOX = 6
   };
@@ -72,7 +72,7 @@ inline flatbuffers::Offset<WorkspaceVisualization> CreateWorkspaceVisualization(
 }
 
 struct NodeVisualization FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_NODEID = 4,
     VT_POSITION = 6
   };
@@ -122,7 +122,7 @@ inline flatbuffers::Offset<NodeVisualization> CreateNodeVisualization(
 }
 
 struct LinkVisualization FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_SOCKET = 4
   };
   const SocketLink *socket() const {
@@ -163,7 +163,7 @@ inline flatbuffers::Offset<LinkVisualization> CreateLinkVisualization(
 }
 
 struct GraphVisualization FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_WORKSPACEVISUALIZATION = 4,
     VT_NODEVISUALIZATION = 6,
     VT_LINKVISUALIZATION = 8

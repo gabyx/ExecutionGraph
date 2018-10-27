@@ -7,9 +7,12 @@
 #include "flatbuffers/flatbuffers.h"
 #include "flatbuffers/flexbuffers.h"
 
-#include "executionGraphGUI/messages/schemas/cpp/DataTypes_generated.h"
-#include "executionGraph/serialization/schemas/cpp/LogicNode_generated.h"
-#include "executionGraph/serialization/schemas/cpp/LogicSocket_generated.h"
+#include "executionGraphGUI/messages/schemas/ConstructorKeyValue_generated.h"
+#include "executionGraphGUI/messages/schemas/CycleDescription_generated.h"
+#include "executionGraphGUI/messages/schemas/DataTypes_generated.h"
+#include "executionGraph/serialization/schemas/LogicNode_generated.h"
+#include "executionGraph/serialization/schemas/LogicSocket_generated.h"
+#include "executionGraph/serialization/schemas/SocketLink_generated.h"
 
 namespace executionGraphGUI {
 namespace serialization {
@@ -21,7 +24,7 @@ struct AddGraphResponse;
 struct RemoveGraphRequest;
 
 struct AddGraphRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_GRAPHTYPEID = 4
   };
   const flatbuffers::String *graphTypeId() const {
@@ -71,7 +74,7 @@ inline flatbuffers::Offset<AddGraphRequest> CreateAddGraphRequestDirect(
 }
 
 struct AddGraphResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_GRAPHID = 4
   };
   const flatbuffers::String *graphId() const {
@@ -121,7 +124,7 @@ inline flatbuffers::Offset<AddGraphResponse> CreateAddGraphResponseDirect(
 }
 
 struct RemoveGraphRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_GRAPHID = 4
   };
   const flatbuffers::String *graphId() const {

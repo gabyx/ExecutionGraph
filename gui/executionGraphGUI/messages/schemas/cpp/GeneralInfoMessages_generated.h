@@ -6,9 +6,9 @@
 
 #include "flatbuffers/flatbuffers.h"
 
-#include "executionGraph/serialization/schemas/cpp/GraphTypeDescription_generated.h"
-#include "executionGraph/serialization/schemas/cpp/NodeTypeDescription_generated.h"
-#include "executionGraph/serialization/schemas/cpp/SocketTypeDescription_generated.h"
+#include "executionGraph/serialization/schemas/GraphTypeDescription_generated.h"
+#include "executionGraph/serialization/schemas/NodeTypeDescription_generated.h"
+#include "executionGraph/serialization/schemas/SocketTypeDescription_generated.h"
 
 namespace executionGraphGUI {
 namespace serialization {
@@ -16,7 +16,7 @@ namespace serialization {
 struct GetAllGraphTypeDescriptionsResponse;
 
 struct GetAllGraphTypeDescriptionsResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_GRAPHSTYPES = 4
   };
   const flatbuffers::Vector<flatbuffers::Offset<executionGraph::serialization::GraphTypeDescription>> *graphsTypes() const {

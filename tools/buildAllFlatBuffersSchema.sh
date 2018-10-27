@@ -6,8 +6,6 @@ REPO_DIR="$(git rev-parse --show-toplevel)"
 
 flatcCompiler=$(find "$REPO_DIR/buildExternal/install" -type f -executable -path "*/bin/flatc")
 
-flatcCompiler="/Users/gabrielnuetzi/Desktop/Repos/flatbuffers/cmakeBUILD/flatc"
-
 if [[ "${flatcCompiler}" != "" ]]; then
     echo "Using flatc compiler: ${flatcCompiler}"
 else
@@ -30,21 +28,12 @@ echo "Building schemas in ${folder} ..."
 cd "$folder"
 "$flatcCompiler" -I "${REPO_DIR}/include/" -o "cpp"  --keep-prefix --cpp *.fbs 
 "$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" --keep-prefix -o "ts" --ts --no-fb-import *.fbs
-# "$flatcCompiler" -I "${REPO_DIR}/include/" -o "cpp"  -M --cpp *.fbs > flatbuffers.includes
 
-# python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
-#      --inputFile='./flatbuffers.includes' \
-#      --includePaths="${REPO_DIR}/include/executionGraph/serialization/schemas/"  \
-#      --generator='cpp' \
-#      --regex='.*(executionGraph.*)' --substitution='\1' 
-
-# python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
-#      --inputFile='./flatbuffers.includes' \
-#      --includePaths="${REPO_DIR}/include/executionGraph/serialization/schemas"  \
-#      --generator='ts' \
-#      --regex='.*executionGraph/.*/(\w+)' --substitution='./\1'
-
-# rm flatbuffers.includes
+python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
+    --input="${folder}/ts/*.ts" \
+    --includeRegex="(from\s+"'\")'"(.*exec.*)"'(\"'".*)" \
+    --includePath="${folder}/ts"  \
+    --regex='.*executionGraph/.*/(.*)' --substitution='./\1'
 
 # executionGraphGUI
 folder="${REPO_DIR}/gui/executionGraphGUI/messages/schemas"
@@ -52,23 +41,11 @@ echo "Building schemas in ${folder} ..."
 cd "$folder"
 "$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" --keep-prefix -o "cpp"  --cpp *.fbs
 "$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" --keep-prefix -o "ts" --ts --no-fb-import *.fbs
-# "$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" -o "cpp"  -M --cpp *.fbs > flatbuffers.includes
 
-# python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
-#      --inputFile='./flatbuffers.includes' \
-#      --includePaths="${REPO_DIR}/include/executionGraph/serialization/schemas"  \
-#      --includePaths="${REPO_DIR}/gui/executionGraphGUI/messages/schemas"  \
-#      --generator='cpp' \
-#      --regex='.*(executionGraph.*)' --substitution='\1' \
-#      --regex='.*(executionGraphGUI.*)' --substitution='\1'
-
-# python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
-#      --inputFile='./flatbuffers.includes' \
-#      --includePaths="${REPO_DIR}/include/executionGraph/serialization/schemas"  \
-#      --includePaths="${REPO_DIR}/gui/executionGraphGUI/messages/schemas"  \
-#      --generator='ts' \
-#      --regex='.*executionGraph/.*/(\w+)' --substitution='@eg/serialization/\1' \
-#      --regex='.*executionGraphGUI/.*/(\w+)' --substitution='./\1'
-
-# rm flatbuffers.includes
+python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
+    --input="${folder}/ts/*.ts" \
+    --includePath="${folder}/ts"  \
+    --includeRegex="(from\s+"'\")'"(.*exec.*)"'(\"'".*)" \
+    --regex='.*executionGraphGUI/.*/(.*)' --substitution='./\1' \
+    --regex='.*executionGraph/.*/(\w+)' --substitution='@eg/serialization/\1' 
 
