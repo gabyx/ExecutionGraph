@@ -314,10 +314,10 @@ Next we create the *get* links which connect the in- and outputs.
     node3b->setGetLink(*node2b,o0,i1);
 ```
 The syntax `node4a->setGetLink(*node3a,o0,i0);` denotes that the output node `node4a` gets its first input value `i0 = 0` from the single output `o0 = 0` of node `node3a`. The above snippet builds the execution tree given at the begining.
-Finally we create the ExecutionTree `ExecutionTreeInOut`, add all nodes to it, set the proper node classfication (if its an input or output node, setup the graph (which computes the execution order) and execute the default execution group `0` as
+Finally we create the ExecutionTree `ExecutionTree`, add all nodes to it, set the proper node classfication (if its an input or output node, setup the graph (which computes the execution order) and execute the default execution group `0` as
 ```c++
     // Make the execution tree and add all nodes
-    ExecutionTreeInOut<Config> execTree;
+    ExecutionTree<Config> execTree;
     execTree.addNode(std::move(node1a)); // The execution tree owns the nodes!
     execTree.addNode(std::move(node1b));
     execTree.addNode(std::move(node2a));
@@ -327,11 +327,11 @@ Finally we create the ExecutionTree `ExecutionTreeInOut`, add all nodes to it, s
     execTree.addNode(std::move(node4a));
 
     // Set all node classifications
-    execTree.setNodeClass(0, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(1, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(2, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(3, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(6, ExecutionTreeInOut<Config>::NodeClassification::OutputNode);
+    execTree.setNodeClass(0, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(1, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(2, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(3, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(6, ExecutionTree<Config>::NodeClassification::OutputNode);
     
     // Setup the execution tree
     execTree.setup();

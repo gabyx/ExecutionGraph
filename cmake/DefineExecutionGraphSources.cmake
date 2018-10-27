@@ -56,7 +56,7 @@ function(include_all_source_ExecutionGraph
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/LogicSocketDefaultTypes.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/LogicNode.hpp
         
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/graphs/ExecutionTreeInOut.hpp
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/graphs/ExecutionTree.hpp
 
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/ExecutionGraphSerializer.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/FileMapper.hpp

@@ -10,8 +10,8 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_graphs_ExecutionTreeInOut_hpp
-#define executionGraph_graphs_ExecutionTreeInOut_hpp
+#ifndef executionGraph_graphs_ExecutionTree_hpp
+#define executionGraph_graphs_ExecutionTree_hpp
 
 #include <algorithm>
 #include <deque>
@@ -42,7 +42,7 @@ namespace executionGraph
     */
     /* ---------------------------------------------------------------------------------------*/
     template<typename TConfig>
-    class ExecutionTreeInOut final
+    class ExecutionTree final
     {
     public:
         EXECGRAPH_DEFINE_CONFIG(TConfig);
@@ -120,15 +120,15 @@ namespace executionGraph
         };
 
     public:
-        ExecutionTreeInOut()
+        ExecutionTree()
         {
             addDefaultOutputPool();
         }
 
-        ~ExecutionTreeInOut() = default;
+        ~ExecutionTree() = default;
 
-        ExecutionTreeInOut(ExecutionTreeInOut&&) = default;
-        ExecutionTreeInOut& operator=(ExecutionTreeInOut&&) = default;
+        ExecutionTree(ExecutionTree&&) = default;
+        ExecutionTree& operator=(ExecutionTree&&) = default;
 
         //! Set the node class of a specific node id `nodeId`.
         //! Invalidates the execution order.
@@ -185,7 +185,7 @@ namespace executionGraph
         //! Does not invalidate execution order.
         const NodeBaseType* getNode(NodeId nodeId) const
         {
-            auto* p                  = static_cast<ExecutionTreeInOut<Config> const*>(this)->getNode(nodeId);
+            auto* p                  = static_cast<ExecutionTree<Config> const*>(this)->getNode(nodeId);
             m_executionOrderUpToDate = true;
             return p;
         }
@@ -1178,4 +1178,4 @@ namespace executionGraph
 }  // namespace executionGraph
 
 #    undef EXECGRAPH_EXECTREE_SOLVER_LOG
-#endif  // ExecutionTreeInOut_hpp
+#endif  // ExecutionTree_hpp

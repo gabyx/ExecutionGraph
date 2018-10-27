@@ -23,7 +23,7 @@
 #include <executionGraph/common/Identifier.hpp>
 #include <executionGraph/common/Synchronized.hpp>
 #include <executionGraph/graphs/CycleDescription.hpp>
-#include <executionGraph/graphs/ExecutionTreeInOut.hpp>
+#include <executionGraph/graphs/ExecutionTree.hpp>
 #include <executionGraph/serialization/GraphTypeDescription.hpp>
 #include "executionGraphGUI/backend/Backend.hpp"
 #include "executionGraphGUI/backend/ExecutionGraphBackendDefs.hpp"
@@ -42,7 +42,7 @@ class ExecutionGraphBackend final : public Backend
     RTTR_ENABLE()
 
 public:
-    using DefaultGraph = executionGraph::ExecutionTreeInOut<executionGraph::GeneralConfig<>>;
+    using DefaultGraph = executionGraph::ExecutionTree<executionGraph::GeneralConfig<>>;
 
     using Id                   = executionGraph::Id;
     using IdNamed              = executionGraph::IdNamed;

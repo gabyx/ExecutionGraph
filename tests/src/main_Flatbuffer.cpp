@@ -14,7 +14,7 @@
 #include <vector>
 #include <flatbuffers/flatbuffers.h>
 #include <executionGraph/common/Log.hpp>
-#include <executionGraph/graphs/ExecutionTreeInOut.hpp>
+#include <executionGraph/graphs/ExecutionTree.hpp>
 #include <executionGraph/nodes/LogicNode.hpp>
 #include <executionGraph/serialization/ExecutionGraphSerializer.hpp>
 #include <executionGraph/serialization/FileMapper.hpp>
@@ -61,7 +61,7 @@ MY_TEST(FlatBuffer, Test1)
 namespace s = executionGraph::serialization;
 
 using Config        = executionGraph::GeneralConfig<>;
-using GraphType     = executionGraph::ExecutionTreeInOut<Config>;
+using GraphType     = executionGraph::ExecutionTree<Config>;
 using DummyNodeType = DummyNode<Config>;
 static const DummyNodeType::AutoRegisterRTTR autoRegisterRTTR;
 
