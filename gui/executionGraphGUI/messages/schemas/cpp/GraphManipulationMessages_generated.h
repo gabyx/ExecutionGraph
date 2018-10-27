@@ -7,12 +7,12 @@
 #include "flatbuffers/flatbuffers.h"
 #include "flatbuffers/flexbuffers.h"
 
-#include "executionGraphGUI/messages/schemas/ConstructorKeyValue_generated.h"
-#include "executionGraphGUI/messages/schemas/CycleDescription_generated.h"
-#include "executionGraphGUI/messages/schemas/DataTypes_generated.h"
-#include "executionGraph/serialization/schemas/LogicNode_generated.h"
-#include "executionGraph/serialization/schemas/LogicSocket_generated.h"
-#include "executionGraph/serialization/schemas/SocketLink_generated.h"
+#include "executionGraphGUI/messages/schemas/cpp/ConstructorKeyValue_generated.h"
+#include "executionGraphGUI/messages/schemas/cpp/CycleDescription_generated.h"
+#include "executionGraphGUI/messages/schemas/cpp/DataTypes_generated.h"
+#include "executionGraph/serialization/schemas/cpp/LogicNode_generated.h"
+#include "executionGraph/serialization/schemas/cpp/LogicSocket_generated.h"
+#include "executionGraph/serialization/schemas/cpp/SocketLink_generated.h"
 
 namespace executionGraphGUI {
 namespace serialization {

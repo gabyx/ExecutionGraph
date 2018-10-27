@@ -134,7 +134,8 @@ namespace executionGraph
         static flatbuffers::Offset<serialization::LogicNode>
         write(flatbuffers::FlatBufferBuilder& builder,
               const NodeBaseType& node,
-              bool serializeAdditionalData = true bool serializeFullSocketTypeSpec = false)
+              bool serializeAdditionalData     = true,
+              bool serializeFullSocketTypeSpec = false)
         {
             namespace s = serialization;
             using namespace s;

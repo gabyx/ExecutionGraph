@@ -7,14 +7,14 @@
 #include "flatbuffers/flatbuffers.h"
 #include "flatbuffers/flexbuffers.h"
 
-#include "executionGraph/serialization/schemas/DataTypes_generated.h"
-#include "executionGraph/serialization/schemas/GraphTypeDescription_generated.h"
-#include "executionGraph/serialization/schemas/GraphVisualization_generated.h"
-#include "executionGraph/serialization/schemas/LogicNode_generated.h"
-#include "executionGraph/serialization/schemas/LogicSocket_generated.h"
-#include "executionGraph/serialization/schemas/NodeTypeDescription_generated.h"
-#include "executionGraph/serialization/schemas/SocketLink_generated.h"
-#include "executionGraph/serialization/schemas/SocketTypeDescription_generated.h"
+#include "executionGraph/serialization/schemas/cpp/DataTypes_generated.h"
+#include "executionGraph/serialization/schemas/cpp/GraphTypeDescription_generated.h"
+#include "executionGraph/serialization/schemas/cpp/GraphVisualization_generated.h"
+#include "executionGraph/serialization/schemas/cpp/LogicNode_generated.h"
+#include "executionGraph/serialization/schemas/cpp/LogicSocket_generated.h"
+#include "executionGraph/serialization/schemas/cpp/NodeTypeDescription_generated.h"
+#include "executionGraph/serialization/schemas/cpp/SocketLink_generated.h"
+#include "executionGraph/serialization/schemas/cpp/SocketTypeDescription_generated.h"
 
 namespace executionGraph {
 namespace serialization {

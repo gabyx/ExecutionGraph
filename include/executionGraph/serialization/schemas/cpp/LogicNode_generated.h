@@ -7,7 +7,7 @@
 #include "flatbuffers/flatbuffers.h"
 #include "flatbuffers/flexbuffers.h"
 
-#include "executionGraph/serialization/schemas/LogicSocket_generated.h"
+#include "executionGraph/serialization/schemas/cpp/LogicSocket_generated.h"
 
 namespace executionGraph {
 namespace serialization {

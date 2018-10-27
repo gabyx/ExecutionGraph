@@ -30,10 +30,16 @@ cd "$folder"
 "$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" --keep-prefix -o "ts" --ts --no-fb-import *.fbs
 
 python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
+    --input="${folder}/cpp/*.h" \
+    --includeRegex="(#include\s+"'\")'"(.*exec.*)"'(\"'".*)" \
+    --includePath="${folder}/cpp"  \
+    --regex='(.*executionGraph/.*/)(.*)' --substitution='\1cpp/\2'
+
+python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
     --input="${folder}/ts/*.ts" \
     --includeRegex="(from\s+"'\")'"(.*exec.*)"'(\"'".*)" \
     --includePath="${folder}/ts"  \
-    --regex='.*executionGraph/.*/(.*)' --substitution='./\1'
+    --regex='.*(executionGraph/.*/)(.*)' --substitution='./cpp/\1'
 
 # executionGraphGUI
 folder="${REPO_DIR}/gui/executionGraphGUI/messages/schemas"
@@ -41,6 +47,12 @@ echo "Building schemas in ${folder} ..."
 cd "$folder"
 "$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" --keep-prefix -o "cpp"  --cpp *.fbs
 "$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" --keep-prefix -o "ts" --ts --no-fb-import *.fbs
+
+python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
+    --input="${folder}/cpp/*.h" \
+    --includeRegex="(#include\s+"'\")'"(.*exec.*)"'(\"'".*)" \
+    --includePath="${folder}/cpp"  \
+    --regex='(.*executionGraph(?:GUI)?/.*/)(.*)' --substitution='\1cpp/\2'
 
 python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
     --input="${folder}/ts/*.ts" \

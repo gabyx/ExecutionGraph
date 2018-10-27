@@ -131,8 +131,32 @@ void GraphManipulationRequestHandler::handleRemoveNode(const Request& request,
 
 //! Handle the operation of adding a connection.
 void GraphManipulationRequestHandler::handleAddConnection(const Request& request,
-                                                          ResponsePromise& response);
+                                                          ResponsePromise& response)
 {
+    // Request validation
+    auto* payload = request.getPayload();
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == nullptr,
+                                      "Request data is null!");
+
+    auto connectionReq = getRootOfPayloadAndVerify<s::AddConnectionRequest>(*payload);
+
+    Id graphID{connectionReq->graphId()->str()};
+
+    auto responseCreator = [](auto& graph, auto&& cycles) {
+
+    };
+
+    // Execute the request
+    auto socketLink = connectionReq->socketLink();
+    m_backend->addConnection(graphID,
+                             socketLink->outNodeId(),
+                             socketLink->outSocketIdx(),
+                             socketLink->inNodeId(),
+                             socketLink->inSocketIdx(),
+                             socketLink->isWriteLink(),
+                             connectionReq->checkForCycles(),
+                             responseCreator);
+
     // Set the response.
     response.setReady();
 }
@@ -141,6 +165,24 @@ void GraphManipulationRequestHandler::handleAddConnection(const Request& request
 void GraphManipulationRequestHandler::handleRemoveConnection(const Request& request,
                                                              ResponsePromise& response)
 {
+    // Request validation
+    auto* payload = request.getPayload();
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == nullptr,
+                                      "Request data is null!");
+
+    auto connectionReq = getRootOfPayloadAndVerify<s::RemoveConnectionRequest>(*payload);
+
+    Id graphID{connectionReq->graphId()->str()};
+
+    // Execute the request
+    auto socketLink = connectionReq->socketLink();
+    m_backend->removeConnection(graphID,
+                                socketLink->outNodeId(),
+                                socketLink->outSocketIdx(),
+                                socketLink->inNodeId(),
+                                socketLink->inSocketIdx(),
+                                socketLink->isWriteLink());
+
     // Set the response.
     response.setReady();
 }
