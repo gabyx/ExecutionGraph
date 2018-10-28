@@ -17,7 +17,7 @@ import { ILogger, LoggerFactory, stringify } from '@eg/logger';
 import { Id } from '@eg/common';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import { Node, NodeId, OutputSocket, InputSocket, Connection } from '../model';
+import { Node, NodeId, Socket, Connection } from '../model';
 import * as conversions from './Conversions';
 import { isDefined } from '@angular/compiler/src/util';
 
@@ -84,26 +84,27 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
 
     // Send the request
     await this.binaryRouter.post('graph/removeNode', requestPayload);
-    this.logger.debug(`Removed node [id: '${nodeId}'] from graph [id '${graphId}']`);
+    this.logger.debug(`Removed node [id: '${nodeId}'] from graph [id: '${graphId.toString()}']`);
   }
 
   public async addConnection(
     graphId: Id,
-    outputSocket: OutputSocket,
-    inputSocket: InputSocket,
-    isWriteLink: boolean,
+    source: Socket,
+    target: Socket,
     cycleDetection: boolean
   ): Promise<Connection> {
+    const connection = Connection.create(source, target, true);
+
     const builder = new flatbuffers.Builder(356);
     const offGraphId = builder.createString(graphId.toString());
 
     const offSocketLink = sz.SocketLinkDescription.createSocketLinkDescription(
       builder,
-      conversions.toFbLong(outputSocket.parent.id),
-      conversions.toFbLong(outputSocket.index),
-      conversions.toFbLong(inputSocket.parent.id),
-      conversions.toFbLong(inputSocket.index),
-      isWriteLink
+      conversions.toFbLong(connection.outputSocket.parent.id),
+      conversions.toFbLong(connection.outputSocket.index),
+      conversions.toFbLong(connection.inputSocket.parent.id),
+      conversions.toFbLong(connection.inputSocket.index),
+      connection.isWriteLink
     );
 
     sz.AddConnectionRequest.startAddConnectionRequest(builder);
@@ -119,11 +120,10 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     if (!result.length) {
       // Succesfully added connection
       this.logger.info(
-        `Added new connection [out: '${outputSocket.idString}'` + isWriteLink
-          ? `⟵`
-          : `⟶` + `in: '${inputSocket.idString}']`
+        `Added connection: ['${source.idString}' ⟶ '${target.idString}'] from graph [id: '${graphId.toString()}']`
       );
-      return Connection.create(inputSocket, outputSocket, true);
+
+      return connection;
     } else {
       // Cycle detected, read the repsonse
       const buf = new flatbuffers.ByteBuffer(result);
@@ -132,22 +132,19 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     }
   }
 
-  public async removeConnection(
-    graphId: Id,
-    outputSocket: OutputSocket,
-    inputSocket: InputSocket,
-    isWriteLink: boolean
-  ): Promise<void> {
+  public async removeConnection(graphId: Id, source: Socket, target: Socket): Promise<void> {
+    const connection = Connection.create(source, target, false);
+
     const builder = new flatbuffers.Builder(356);
     const offGraphId = builder.createString(graphId.toString());
 
     const offSocketLink = sz.SocketLinkDescription.createSocketLinkDescription(
       builder,
-      conversions.toFbLong(outputSocket.parent.id),
-      conversions.toFbLong(outputSocket.index),
-      conversions.toFbLong(inputSocket.parent.id),
-      conversions.toFbLong(inputSocket.index),
-      isWriteLink
+      conversions.toFbLong(connection.outputSocket.parent.id),
+      conversions.toFbLong(connection.outputSocket.index),
+      conversions.toFbLong(connection.inputSocket.parent.id),
+      conversions.toFbLong(connection.inputSocket.index),
+      connection.isWriteLink
     );
 
     sz.RemoveConnectionRequest.startRemoveConnectionRequest(builder);
@@ -159,9 +156,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
 
     await this.binaryRouter.post('graph/removeConnection', requestPayload);
     this.logger.info(
-      `Removed new connection [out: '${outputSocket.idString}'` + isWriteLink
-        ? `⟵`
-        : `⟶` + `in: '${inputSocket.idString}']`
+      `Removed connection: ['${source.idString}' ⟶ '${target.idString}'] from graph [id: '${graphId.toString()}']`
     );
   }
 }

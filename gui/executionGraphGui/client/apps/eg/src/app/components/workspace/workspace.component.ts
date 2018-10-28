@@ -24,7 +24,7 @@ import { GraphsState } from '../../+state/reducers';
 import * as graphQueries from '../../+state/selectors/graph.selectors';
 import { getConnectionDrawStyle, getSelection } from '../../+state/selectors/ui.selectors';
 import { Selection, UiState } from '../../+state/reducers/ui.reducers';
-import { CreateNode } from '../../+state/actions';
+import { AddNode } from '../../+state/actions';
 
 @Injectable()
 @Component({
@@ -75,7 +75,7 @@ export class WorkspaceComponent implements OnInit {
   }
 
   public createNode(nodeType: NodeTypeDescription, graph: Graph, position?: Point) {
-    this.store.dispatch(new CreateNode(nodeType, graph.id, position));
+    this.store.dispatch(new AddNode(graph.id, nodeType, position));
   }
 
   public isNodeSelected(node: Node): Observable<boolean> {
