@@ -1,0 +1,13 @@
+namespace executionGraphGui.serialization;
+
+table NodeTypesRequest {
+  message:string;
+}
+
+table NodeTypesReply {
+  name:string;
+}
+
+rpc_service ExecutionGraphBackend {
+  GetNodeTypes(NodeTypesRequest):NodeTypesReply;
+}
