@@ -112,7 +112,8 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
       )
     );
     sz.AddConnectionRequest.addCheckForCycles(builder, cycleDetection);
-    sz.AddConnectionRequest.endAddConnectionRequest(builder);
+    const off = sz.AddConnectionRequest.endAddConnectionRequest(builder);
+    builder.finish(off);
 
     const requestPayload = builder.asUint8Array();
 
@@ -152,7 +153,8 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
         connection.isWriteLink
       )
     );
-    sz.RemoveConnectionRequest.endRemoveConnectionRequest(builder);
+    const off = sz.RemoveConnectionRequest.endRemoveConnectionRequest(builder);
+    builder.finish(off);
 
     const requestPayload = builder.asUint8Array();
 
