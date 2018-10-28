@@ -24,14 +24,26 @@ CefRefPtr<CefResourceHandler> ClientSchemeHandlerFactory::Create(CefRefPtr<CefBr
     CEF_REQUIRE_IO_THREAD();
 
     CefString url = request->GetURL();
+
+    EXECGRAPHGUI_APPLOG_DEBUG("ClientSchemeHandlerFactory: handling url: '{0}' ...",
+                              url.ToString());
     CefURLParts urlParts;
     if(CefParseURL(url, urlParts))
     {
         // e.g. temp := "/folderA/folderB/file.ext"
         std::path filePath = m_folderPath / CefString(urlParts.path.str).ToString();
+        if(!std::filesystem::exists(filePath) && std::filesystem::is_regular_file(filePath))
+        {
+            filePath = m_folderPath / "index.html";
+            EXECGRAPHGUI_APPLOG_WARN("ClientSchemeHandlerFactory: url '{0}' mapped to index: '{1}'",
+                                     url.ToString(),
+                                     filePath.string());
+        }
 
-        EXECGRAPHGUI_APPLOG_DEBUG("ClientSchemeHandlerFactory: make stream for file: '{0}' ...", filePath.string());
+        EXECGRAPHGUI_APPLOG_DEBUG("ClientSchemeHandlerFactory: make stream for file: '{0}' ...",
+                                  filePath.string());
         CefRefPtr<CefStreamReader> fileStream = CefStreamReader::CreateForFile(filePath.string());
+
         if(fileStream != nullptr)
         {
             // "ext"

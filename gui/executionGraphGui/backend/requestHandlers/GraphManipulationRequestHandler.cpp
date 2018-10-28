@@ -29,7 +29,9 @@ FunctionMap<GraphManipulationRequestHandler::Function> GraphManipulationRequestH
     using Entry = typename FunctionMap<Function>::Entry;
 
     auto r = {Entry("graph/addNode", Function(&GraphManipulationRequestHandler::handleAddNode)),
-              Entry("graph/removeNode", Function(&GraphManipulationRequestHandler::handleRemoveNode))};
+              Entry("graph/removeNode", Function(&GraphManipulationRequestHandler::handleRemoveNode)),
+              Entry("graph/addConnection", Function(&GraphManipulationRequestHandler::handleAddConnection)),
+              Entry("graph/removeConnection", Function(&GraphManipulationRequestHandler::handleRemoveConnection))};
     return {r};
 }
 

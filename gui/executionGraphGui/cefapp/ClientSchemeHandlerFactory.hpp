@@ -29,7 +29,8 @@ class ClientSchemeHandlerFactory final : public CefSchemeHandlerFactory
 {
     IMPLEMENT_REFCOUNTING(ClientSchemeHandlerFactory)
 public:
-    ClientSchemeHandlerFactory(std::path folderPath, std::path pathPrefix = "")
+    ClientSchemeHandlerFactory(const std::path& folderPath,
+                               const std::path& pathPrefix = "")
         : m_folderPath(folderPath)
         , m_pathPrefix(pathPrefix)
     {
@@ -42,8 +43,8 @@ public:
                                                  CefRefPtr<CefRequest> request) override;
 
 private:
-    const std::path m_folderPath;  //! Where the files this handler serves are located.
-    const std::path m_pathPrefix;  //! Prefix of the URL Path part.
+    const std::path m_folderPath;  //!< Where the files this handler serves are located.
+    const std::path m_pathPrefix;  //!< Prefix of the URL Path part.
 };
 
 #endif
