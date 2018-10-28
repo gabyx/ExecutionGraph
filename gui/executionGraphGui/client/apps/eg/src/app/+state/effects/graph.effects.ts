@@ -107,9 +107,10 @@ export class GraphEffects {
     map(({ conn, action }) => {
       return new fromGraph.ConnectionAdded(action.graphId, conn);
     }),
-    catchError((error, caught) =>
-      mergeObservables(of(new fromNotifications.ShowNotification(`Adding connection failed!: ${error}`, 5000)), caught)
-    )
+    catchError((error, caught) => {
+      this.store.dispatch(new fromNotifications.ShowNotification(`Adding connection failed!: ${error}`, 5000));
+      return caught;
+    })
   );
 
   private async createDummyGraph(): Promise<fromGraph.GraphsLoaded> {
