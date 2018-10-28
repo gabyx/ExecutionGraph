@@ -7,8 +7,8 @@
 # export CPPFLAGS="-I/usr/local/opt/$comp/include -I/usr/local/opt/$comp/include/c++/7.2.0"
 # export CXXFLAGS="$CPPFLAGS"
 
-# cd /Users/gabrielnuetzi/Desktop/ExecutionGraph/build/gui/executionGraphGUI && ${CXX}  -DRTTR_DLL -isystem /usr/local/opt/rttr/include $CPPFLAGS -g -std=c++17 -o Test.cpp.o -c /Users/gabrielnuetzi/Desktop/ExecutionGraph/gui/executionGraphGUI/backend/Test.cpp
+# cd /Users/gabrielnuetzi/Desktop/ExecutionGraph/build/gui/executionGraphGui && ${CXX}  -DRTTR_DLL -isystem /usr/local/opt/rttr/include $CPPFLAGS -g -std=c++17 -o Test.cpp.o -c /Users/gabrielnuetzi/Desktop/ExecutionGraph/gui/executionGraphGui/backend/Test.cpp
 
 comp="gcc"
 
-cd /Users/gabrielnuetzi/Desktop/ExecutionGraph/build/gui/executionGraphGUI && clang++  -DRTTR_DLL -isystem /usr/local/opt/rttr/include -g -std=c++17 -o Test.cpp.o -c /Users/gabrielnuetzi/Desktop/ExecutionGraph/gui/executionGraphGUI/backend/Test.cpp
+cd /Users/gabrielnuetzi/Desktop/ExecutionGraph/build/gui/executionGraphGui && clang++  -DRTTR_DLL -isystem /usr/local/opt/rttr/include -g -std=c++17 -o Test.cpp.o -c /Users/gabrielnuetzi/Desktop/ExecutionGraph/gui/executionGraphGui/backend/Test.cpp

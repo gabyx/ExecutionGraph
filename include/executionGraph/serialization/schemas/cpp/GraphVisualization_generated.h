@@ -7,7 +7,7 @@
 #include "flatbuffers/flatbuffers.h"
 
 #include "executionGraph/serialization/schemas/cpp/DataTypes_generated.h"
-#include "executionGraph/serialization/schemas/cpp/SocketLink_generated.h"
+#include "executionGraph/serialization/schemas/cpp/SocketLinkDescription_generated.h"
 
 namespace executionGraph {
 namespace serialization {
@@ -125,12 +125,12 @@ struct LinkVisualization FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_SOCKET = 4
   };
-  const SocketLink *socket() const {
-    return GetStruct<const SocketLink *>(VT_SOCKET);
+  const SocketLinkDescription *socket() const {
+    return GetStruct<const SocketLinkDescription *>(VT_SOCKET);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyFieldRequired<SocketLink>(verifier, VT_SOCKET) &&
+           VerifyFieldRequired<SocketLinkDescription>(verifier, VT_SOCKET) &&
            verifier.EndTable();
   }
 };
@@ -138,7 +138,7 @@ struct LinkVisualization FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct LinkVisualizationBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_socket(const SocketLink *socket) {
+  void add_socket(const SocketLinkDescription *socket) {
     fbb_.AddStruct(LinkVisualization::VT_SOCKET, socket);
   }
   explicit LinkVisualizationBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -156,7 +156,7 @@ struct LinkVisualizationBuilder {
 
 inline flatbuffers::Offset<LinkVisualization> CreateLinkVisualization(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const SocketLink *socket = 0) {
+    const SocketLinkDescription *socket = 0) {
   LinkVisualizationBuilder builder_(_fbb);
   builder_.add_socket(socket);
   return builder_.Finish();

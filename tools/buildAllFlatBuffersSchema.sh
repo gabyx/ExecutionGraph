@@ -39,10 +39,10 @@ python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
     --input="${folder}/ts/*.ts" \
     --includeRegex="(from\s+"'\")'"(.*exec.*)"'(\"'".*)" \
     --includePath="${folder}/ts"  \
-    --regex='.*(executionGraph/.*/)(.*)' --substitution='./cpp/\1'
+    --regex='.*executionGraph/.*/(.*)' --substitution='./\1' \
 
-# executionGraphGUI
-folder="${REPO_DIR}/gui/executionGraphGUI/messages/schemas"
+# executionGraphGui
+folder="${REPO_DIR}/gui/executionGraphGui/messages/schemas"
 echo "Building schemas in ${folder} ..."
 cd "$folder"
 "$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" --keep-prefix -o "cpp"  --cpp *.fbs
@@ -58,6 +58,6 @@ python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
     --input="${folder}/ts/*.ts" \
     --includePath="${folder}/ts"  \
     --includeRegex="(from\s+"'\")'"(.*exec.*)"'(\"'".*)" \
-    --regex='.*executionGraphGUI/.*/(.*)' --substitution='./\1' \
+    --regex='.*executionGraphGui/.*/(.*)' --substitution='./\1' \
     --regex='.*executionGraph/.*/(\w+)' --substitution='@eg/serialization/\1' 
 

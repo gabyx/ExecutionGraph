@@ -10,8 +10,8 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_logic_LogicTypes_hpp
-#define executionGraph_logic_LogicTypes_hpp
+#ifndef executionGraph_nodes_LogicTypes_hpp
+#define executionGraph_nodes_LogicTypes_hpp
 
 #include <string>
 #include <meta/meta.hpp>
