@@ -98,18 +98,19 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     const builder = new flatbuffers.Builder(356);
     const offGraphId = builder.createString(graphId.toString());
 
-    const offSocketLink = sz.SocketLinkDescription.createSocketLinkDescription(
-      builder,
-      conversions.toFbLong(connection.outputSocket.parent.id),
-      conversions.toFbLong(connection.outputSocket.index),
-      conversions.toFbLong(connection.inputSocket.parent.id),
-      conversions.toFbLong(connection.inputSocket.index),
-      connection.isWriteLink
-    );
-
     sz.AddConnectionRequest.startAddConnectionRequest(builder);
     sz.AddConnectionRequest.addGraphId(builder, offGraphId);
-    sz.AddConnectionRequest.addSocketLink(builder, offSocketLink);
+    sz.AddConnectionRequest.addSocketLink(
+      builder,
+      sz.SocketLinkDescription.createSocketLinkDescription(
+        builder,
+        conversions.toFbLong(connection.outputSocket.parent.id),
+        conversions.toFbLong(connection.outputSocket.index),
+        conversions.toFbLong(connection.inputSocket.parent.id),
+        conversions.toFbLong(connection.inputSocket.index),
+        connection.isWriteLink
+      )
+    );
     sz.AddConnectionRequest.addCheckForCycles(builder, cycleDetection);
     sz.AddConnectionRequest.endAddConnectionRequest(builder);
 
@@ -138,18 +139,19 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     const builder = new flatbuffers.Builder(356);
     const offGraphId = builder.createString(graphId.toString());
 
-    const offSocketLink = sz.SocketLinkDescription.createSocketLinkDescription(
-      builder,
-      conversions.toFbLong(connection.outputSocket.parent.id),
-      conversions.toFbLong(connection.outputSocket.index),
-      conversions.toFbLong(connection.inputSocket.parent.id),
-      conversions.toFbLong(connection.inputSocket.index),
-      connection.isWriteLink
-    );
-
     sz.RemoveConnectionRequest.startRemoveConnectionRequest(builder);
     sz.RemoveConnectionRequest.addGraphId(builder, offGraphId);
-    sz.RemoveConnectionRequest.addSocketLink(builder, offSocketLink);
+    sz.RemoveConnectionRequest.addSocketLink(
+      builder,
+      sz.SocketLinkDescription.createSocketLinkDescription(
+        builder,
+        conversions.toFbLong(connection.outputSocket.parent.id),
+        conversions.toFbLong(connection.outputSocket.index),
+        conversions.toFbLong(connection.inputSocket.parent.id),
+        conversions.toFbLong(connection.inputSocket.index),
+        connection.isWriteLink
+      )
+    );
     sz.RemoveConnectionRequest.endRemoveConnectionRequest(builder);
 
     const requestPayload = builder.asUint8Array();

@@ -4,8 +4,8 @@ import { Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 
-import { of, from, Observable } from 'rxjs';
-import { map, tap, switchMap, catchError, filter, withLatestFrom, exhaustMap, mergeMap } from 'rxjs/operators';
+import { of, from, Observable, merge as mergeObservables } from 'rxjs';
+import { map, tap, catchError, filter, withLatestFrom, mergeMap } from 'rxjs/operators';
 
 import { Id } from '@eg/common';
 import { LoggerFactory, ILogger } from '@eg/logger';
@@ -66,7 +66,7 @@ export class GraphEffects {
   @Effect()
   createNode$ = this.actions$.ofType<fromGraph.AddNode>(fromGraph.ADD_NODE).pipe(
     mergeMap((action, state) =>
-      from(this.graphManipulationService.addNode(action.graphId, action.nodeType.name, 'Node')).pipe(
+      from(this.graphManipulationService.addNode(action.graphId, action.nodeType.type, 'Node')).pipe(
         map(node => ({ node, action }))
       )
     ),
@@ -107,9 +107,9 @@ export class GraphEffects {
     map(({ conn, action }) => {
       return new fromGraph.ConnectionAdded(action.graphId, conn);
     }),
-    catchError(error => {
-      return of(new fromNotifications.ShowNotification(`Adding connection failed!: ${error}`, 5000));
-    })
+    catchError((error, caught) =>
+      mergeObservables(of(new fromNotifications.ShowNotification(`Adding connection failed!: ${error}`, 5000)), caught)
+    )
   );
 
   private async createDummyGraph(): Promise<fromGraph.GraphsLoaded> {
