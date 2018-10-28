@@ -42,6 +42,6 @@ endfunction()
 # NodeTests
 # TaskQueue Test
 # you need to `ln -s "$(pwd)" "Frameworks"` in `buildExternal/cefbinaries/cefbinaries-src/Debug`
-set(EXEC_NAME ${PROJECT_NAME}GUITest-MemoryPool)
+set(EXEC_NAME ${PROJECT_NAME}GuiTest-MemoryPool)
 add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_MemoryPool.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 defineCompileDefs(${EXEC_NAME})

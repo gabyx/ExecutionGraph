@@ -17,7 +17,7 @@ import { ILogger, LoggerFactory } from '@eg/logger';
 import { GeneralInfoService, sz } from './GeneralInfoService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 import * as model from '../model';
-import { toGraphTypeDescription } from './Conversions';
+import * as conversions from './Conversions';
 
 @Injectable()
 export class GeneralInfoServiceBinaryHttp extends GeneralInfoService {
@@ -42,7 +42,7 @@ export class GeneralInfoServiceBinaryHttp extends GeneralInfoService {
     let graphDesc: model.GraphTypeDescription[] = [];
 
     for (let g = 0; g < response.graphsTypesLength(); ++g) {
-      graphDesc.push(toGraphTypeDescription(response.graphsTypes(g)));
+      graphDesc.push(conversions.toGraphTypeDescription(response.graphsTypes(g)));
     }
 
     if (this.verboseResponseLog) {
