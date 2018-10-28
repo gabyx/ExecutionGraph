@@ -6,7 +6,7 @@
 
 #include "flatbuffers/flatbuffers.h"
 
-#include "executionGraph/serialization/schemas/cpp/SocketLink_generated.h"
+#include "executionGraph/serialization/schemas/cpp/SocketLinkDescription_generated.h"
 
 namespace executionGraphGUI {
 namespace serialization {
@@ -17,8 +17,8 @@ struct CycleDescription FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_CYCLEPATH = 4
   };
-  const flatbuffers::Vector<const executionGraph::serialization::SocketLink *> *cyclePath() const {
-    return GetPointer<const flatbuffers::Vector<const executionGraph::serialization::SocketLink *> *>(VT_CYCLEPATH);
+  const flatbuffers::Vector<const executionGraph::serialization::SocketLinkDescription *> *cyclePath() const {
+    return GetPointer<const flatbuffers::Vector<const executionGraph::serialization::SocketLinkDescription *> *>(VT_CYCLEPATH);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -31,7 +31,7 @@ struct CycleDescription FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct CycleDescriptionBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_cyclePath(flatbuffers::Offset<flatbuffers::Vector<const executionGraph::serialization::SocketLink *>> cyclePath) {
+  void add_cyclePath(flatbuffers::Offset<flatbuffers::Vector<const executionGraph::serialization::SocketLinkDescription *>> cyclePath) {
     fbb_.AddOffset(CycleDescription::VT_CYCLEPATH, cyclePath);
   }
   explicit CycleDescriptionBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -49,7 +49,7 @@ struct CycleDescriptionBuilder {
 
 inline flatbuffers::Offset<CycleDescription> CreateCycleDescription(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<const executionGraph::serialization::SocketLink *>> cyclePath = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<const executionGraph::serialization::SocketLinkDescription *>> cyclePath = 0) {
   CycleDescriptionBuilder builder_(_fbb);
   builder_.add_cyclePath(cyclePath);
   return builder_.Finish();
@@ -57,10 +57,10 @@ inline flatbuffers::Offset<CycleDescription> CreateCycleDescription(
 
 inline flatbuffers::Offset<CycleDescription> CreateCycleDescriptionDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<executionGraph::serialization::SocketLink> *cyclePath = nullptr) {
+    const std::vector<executionGraph::serialization::SocketLinkDescription> *cyclePath = nullptr) {
   return executionGraphGUI::serialization::CreateCycleDescription(
       _fbb,
-      cyclePath ? _fbb.CreateVectorOfStructs<executionGraph::serialization::SocketLink>(*cyclePath) : 0);
+      cyclePath ? _fbb.CreateVectorOfStructs<executionGraph::serialization::SocketLinkDescription>(*cyclePath) : 0);
 }
 
 }  // namespace serialization

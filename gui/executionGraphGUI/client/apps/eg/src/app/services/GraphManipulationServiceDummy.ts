@@ -16,8 +16,8 @@ import { ITestBackend } from './TestBackend';
 import { ILogger, LoggerFactory, stringify } from '@eg/logger';
 import { Id } from '@eg/common';
 import { GraphManipulationService, sz } from './GraphManipulationService';
-import { toNode } from './Conversions';
-import { Node, NodeId } from '../model';
+import * as conversions from './Conversions';
+import { Node, NodeId, InputSocket, OutputSocket, Connection } from '../model';
 
 @Injectable()
 export class GraphManipulationServiceDummy extends GraphManipulationService {
@@ -42,7 +42,7 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
                     outs: ${node.outputSocketsLength()}`);
     }
 
-    const nodeModel = toNode(node);
+    const nodeModel = conversions.toNode(node);
     if (this.verboseResponseLog) {
       this.logger.info(`Node: '${stringify(nodeModel)}'`);
     }
@@ -51,5 +51,28 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
 
   public async removeNode(graphId: Id, nodeId: NodeId): Promise<void> {
     this.logger.info(`Remove node [id: '${nodeId.toString()}'] from graph id '${graphId.toString()}'`);
+  }
+
+  public async addConnection(
+    graphId: Id,
+    outputSocket: OutputSocket,
+    inputSocket: InputSocket,
+    isWriteLink: boolean,
+    cycleDetection: boolean
+  ): Promise<Connection> {
+    return Connection.create(outputSocket, inputSocket, true);
+  }
+
+  public async removeConnection(
+    graphId: Id,
+    outputSocket: OutputSocket,
+    inputSocket: InputSocket,
+    isWriteLink: boolean
+  ): Promise<void> {
+    this.logger.info(
+      `Remove connection: '${outputSocket.idString}'` + isWriteLink
+        ? `⟵`
+        : `⟶` + `'${inputSocket.idString}' from graph id '${graphId.toString}'`
+    );
   }
 }

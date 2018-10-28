@@ -12,7 +12,7 @@
 
 namespace executionGraph.serialization;
 
-struct SocketLink {
+struct SocketLinkDescription {
     outNodeId:uint64 (id:1);
     outSocketIdx:uint64 (id:2);
 

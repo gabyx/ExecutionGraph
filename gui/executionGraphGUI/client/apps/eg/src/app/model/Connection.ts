@@ -42,7 +42,6 @@ export class UIProps {}
 
 /**
  * Modelclass for a connection
- * @todo see -> SocketLink.fbs
  * @export
  * @class Connection
  */

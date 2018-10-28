@@ -11,7 +11,7 @@
 // =========================================================================================
 
 import { Id } from '@eg/common';
-import { NodeId, Node } from '../model';
+import { NodeId, Node, Connection, InputSocket, OutputSocket } from '../model';
 import { GraphManipulationMessages } from '@eg/messages';
 
 export import sz = GraphManipulationMessages;
@@ -19,4 +19,19 @@ export import sz = GraphManipulationMessages;
 export abstract class GraphManipulationService {
   public abstract async addNode(graphId: Id, type: string, name: string): Promise<Node>;
   public abstract async removeNode(graphId: Id, nodeId: NodeId): Promise<void>;
+
+  public abstract async addConnection(
+    graphId: Id,
+    outputSocket: OutputSocket,
+    inputSocket: InputSocket,
+    isWriteLink: boolean,
+    cycleDetection: boolean
+  ): Promise<Connection>;
+
+  public abstract async removeConnection(
+    graphId: Id,
+    outputSocket: OutputSocket,
+    inputSocket: InputSocket,
+    isWriteLink: boolean
+  ): Promise<void>;
 }

@@ -13,7 +13,7 @@
 import { Injectable } from '@angular/core';
 import { flatbuffers } from 'flatbuffers';
 import { Id } from '@eg/common';
-import { toGraphTypeDescription } from './Conversions';
+import * as conversions from './Conversions';
 import { sz as szInfo } from './GeneralInfoService';
 import { sz as szMani } from './GraphManipulationService';
 import * as model from '../model';
@@ -137,7 +137,7 @@ export class TestBackend extends ITestBackend {
     let buf = new flatbuffers.ByteBuffer(builder.asUint8Array());
     let response = szInfo.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
 
-    this.graphTypeDesc = toGraphTypeDescription(response.graphsTypes(0));
+    this.graphTypeDesc = conversions.toGraphTypeDescription(response.graphsTypes(0));
 
     this.graphTypeDescs.push(this.graphTypeDesc);
     this.graphTypeDescsResponse = response;

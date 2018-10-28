@@ -29,10 +29,16 @@ export namespace GraphManipulationMessages {
 
   export import RemoveNodeRequest = exec2.serialization.RemoveNodeRequest;
 
+  export import AddConnectionRequest = exec2.serialization.AddConnectionRequest;
+  export import AddConnectionResponse = exec2.serialization.AddConnectionResponse;
+
+  export import RemoveConnectionRequest = exec2.serialization.RemoveConnectionRequest;
+
   export import NodeConstructionInfo = exec2.serialization.NodeConstructionInfo;
 
   export import LogicNode = serialization.LogicNode;
   export import LogicSocket = serialization.LogicSocket;
+  export import SocketLinkDescription = serialization.SocketLinkDescription;
 }
 
 // Export everything which is needed for GraphManagementMessages (into a namespace!)

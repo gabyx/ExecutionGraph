@@ -12,7 +12,7 @@
 #include "executionGraphGUI/messages/schemas/cpp/DataTypes_generated.h"
 #include "executionGraph/serialization/schemas/cpp/LogicNode_generated.h"
 #include "executionGraph/serialization/schemas/cpp/LogicSocket_generated.h"
-#include "executionGraph/serialization/schemas/cpp/SocketLink_generated.h"
+#include "executionGraph/serialization/schemas/cpp/SocketLinkDescription_generated.h"
 
 namespace executionGraphGUI {
 namespace serialization {

@@ -8,6 +8,6 @@
 
 #include "executionGraphGUI/messages/schemas/cpp/ConstructorKeyValue_generated.h"
 #include "executionGraphGUI/messages/schemas/cpp/CycleDescription_generated.h"
-#include "executionGraph/serialization/schemas/cpp/SocketLink_generated.h"
+#include "executionGraph/serialization/schemas/cpp/SocketLinkDescription_generated.h"
 
 #endif  // FLATBUFFERS_GENERATED_DATATYPES_H_
