@@ -67,7 +67,7 @@ table RemoveNodeRequest {
 //! Request data:
 table AddConnectionRequest {
     graphId:string (id:0, required); //!< The graph guid.
-    socketLink: executionGraph.serialization.SocketLink (id:1, required); //!< The socket link description.
+    socketLink: executionGraph.serialization.SocketLinkDescription (id:1, required); //!< The socket link description.
 
     checkForCycles: bool (id:2);     /*!< If a cycle-detection is started to directly 
                                         avoid cycles when construction the graph. */
@@ -97,7 +97,7 @@ table AddConnectionResponse {
 //! Request data: 
 table RemoveConnectionRequest {
     graphId:string (id:0, required);  //!< The graph guid.
-    socketLink: executionGraph.serialization.SocketLink (id:1, required); //!< The socket link description.
+    socketLink: executionGraph.serialization.SocketLinkDescription (id:1, required); //!< The socket link description.
 }
 
 //! Response data: none

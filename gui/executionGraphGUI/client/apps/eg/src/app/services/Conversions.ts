@@ -24,6 +24,10 @@ export function toULong(value: flatbuffers.Long): Long {
   return Long.fromBits(value.low, value.high, true);
 }
 
+export function toFbLong(value: Long): flatbuffers.Long {
+  return flatbuffers.Long.create(value.low, value.high);
+}
+
 /**
  * Convert a `serialized`-instance of a graph type description to a `model`-instance.
  *

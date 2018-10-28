@@ -157,25 +157,24 @@ void ExecutionGraphBackend::removeConnection(const Id& graphId,
         using Config       = typename GraphType::Config;
         using NodeBaseType = typename Config::NodeBaseType;
 
-        // Locking start
-        // auto graphL = graph->wlock();
         try
-        {
+        {  // Locking start
+            auto graphL = graph->wlock();
             if(isWriteLink)
             {
-                graph->wlock()->removeWriteLink(outNodeId,
-                                                outSocketIdx,
-                                                inNodeId,
-                                                inSocketIdx);
+                graphL->removeWriteLink(outNodeId,
+                                        outSocketIdx,
+                                        inNodeId,
+                                        inSocketIdx);
             }
             else
             {
-                graph->wlock()->removeGetLink(inNodeId,
-                                              inSocketIdx,
-                                              &outNodeId,
-                                              &outSocketIdx);
+                graphL->removeGetLink(inNodeId,
+                                      inSocketIdx,
+                                      &outNodeId,
+                                      &outSocketIdx);
             }
-        }
+        }  // Locking end
         catch(executionGraph::Exception& e)
         {
             EXECGRAPHGUI_THROW_BAD_REQUEST(
@@ -187,8 +186,6 @@ void ExecutionGraphBackend::removeConnection(const Id& graphId,
                 inNodeId,
                 inSocketIdx);
         }
-
-        // Locking end
     };
 
     std::visit(remove, graphVar);

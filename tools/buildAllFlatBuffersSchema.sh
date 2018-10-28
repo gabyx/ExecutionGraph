@@ -39,7 +39,7 @@ python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
     --input="${folder}/ts/*.ts" \
     --includeRegex="(from\s+"'\")'"(.*exec.*)"'(\"'".*)" \
     --includePath="${folder}/ts"  \
-    --regex='.*(executionGraph/.*/)(.*)' --substitution='./cpp/\1'
+    --regex='.*executionGraph/.*/(.*)' --substitution='./\1' \
 
 # executionGraphGUI
 folder="${REPO_DIR}/gui/executionGraphGUI/messages/schemas"

@@ -17,8 +17,9 @@ import { ILogger, LoggerFactory, stringify } from '@eg/logger';
 import { Id } from '@eg/common';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import { Node, NodeId } from '../model';
-import { toNode } from './Conversions';
+import { Node, NodeId, OutputSocket, InputSocket, Connection } from '../model';
+import * as conversions from './Conversions';
+import { isDefined } from '@angular/compiler/src/util';
 
 @Injectable()
 export class GraphManipulationServiceBinaryHttp extends GraphManipulationService {
@@ -62,7 +63,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     this.logger.info(`Added new node [type: '${node.type()}', name: '${node.name()}', ins: ${node.inputSocketsLength()},
                   outs: ${node.outputSocketsLength()}].`);
 
-    let nodeModel = toNode(node);
+    let nodeModel = conversions.toNode(node);
     if (this.verboseResponseLog) {
       this.logger.info(`Node: '${stringify(nodeModel)}'`);
     }
@@ -84,5 +85,83 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     // Send the request
     await this.binaryRouter.post('graph/removeNode', requestPayload);
     this.logger.debug(`Removed node [id: '${nodeId}'] from graph [id '${graphId}']`);
+  }
+
+  public async addConnection(
+    graphId: Id,
+    outputSocket: OutputSocket,
+    inputSocket: InputSocket,
+    isWriteLink: boolean,
+    cycleDetection: boolean
+  ): Promise<Connection> {
+    const builder = new flatbuffers.Builder(356);
+    const offGraphId = builder.createString(graphId.toString());
+
+    const offSocketLink = sz.SocketLinkDescription.createSocketLinkDescription(
+      builder,
+      conversions.toFbLong(outputSocket.parent.id),
+      conversions.toFbLong(outputSocket.index),
+      conversions.toFbLong(inputSocket.parent.id),
+      conversions.toFbLong(inputSocket.index),
+      isWriteLink
+    );
+
+    sz.AddConnectionRequest.startAddConnectionRequest(builder);
+    sz.AddConnectionRequest.addGraphId(builder, offGraphId);
+    sz.AddConnectionRequest.addSocketLink(builder, offSocketLink);
+    sz.AddConnectionRequest.addCheckForCycles(builder, cycleDetection);
+    sz.AddConnectionRequest.endAddConnectionRequest(builder);
+
+    const requestPayload = builder.asUint8Array();
+
+    const result = await this.binaryRouter.post('graph/addConnection', requestPayload);
+
+    if (!result.length) {
+      // Succesfully added connection
+      this.logger.info(
+        `Added new connection [out: '${outputSocket.idString}'` + isWriteLink
+          ? `⟵`
+          : `⟶` + `in: '${inputSocket.idString}']`
+      );
+      return Connection.create(inputSocket, outputSocket, true);
+    } else {
+      // Cycle detected, read the repsonse
+      const buf = new flatbuffers.ByteBuffer(result);
+      const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
+      throw 'Cycle detection not yet implemented!';
+    }
+  }
+
+  public async removeConnection(
+    graphId: Id,
+    outputSocket: OutputSocket,
+    inputSocket: InputSocket,
+    isWriteLink: boolean
+  ): Promise<void> {
+    const builder = new flatbuffers.Builder(356);
+    const offGraphId = builder.createString(graphId.toString());
+
+    const offSocketLink = sz.SocketLinkDescription.createSocketLinkDescription(
+      builder,
+      conversions.toFbLong(outputSocket.parent.id),
+      conversions.toFbLong(outputSocket.index),
+      conversions.toFbLong(inputSocket.parent.id),
+      conversions.toFbLong(inputSocket.index),
+      isWriteLink
+    );
+
+    sz.RemoveConnectionRequest.startRemoveConnectionRequest(builder);
+    sz.RemoveConnectionRequest.addGraphId(builder, offGraphId);
+    sz.RemoveConnectionRequest.addSocketLink(builder, offSocketLink);
+    sz.RemoveConnectionRequest.endRemoveConnectionRequest(builder);
+
+    const requestPayload = builder.asUint8Array();
+
+    await this.binaryRouter.post('graph/removeConnection', requestPayload);
+    this.logger.info(
+      `Removed new connection [out: '${outputSocket.idString}'` + isWriteLink
+        ? `⟵`
+        : `⟶` + `in: '${inputSocket.idString}']`
+    );
   }
 }
