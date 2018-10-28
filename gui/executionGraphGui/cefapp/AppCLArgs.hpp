@@ -37,11 +37,13 @@ public:
     //@{
 public:
     std::path getClientSourcePath() { return args::get(m_clientSourcePath); }
+    std::string getClientLoadUrl() { return args::get(m_clientLoadUrl); }
     std::path getLogPath() { return args::get(m_logPath); }
     std::vector<char*>& getCEFArgs();
 
 private:
     args::ValueFlag<std::string> m_clientSourcePath;  //!< Path to the client source files (anuglar application)
+    args::ValueFlag<std::string> m_clientLoadUrl;     //!< The url which the client loads at startup ("client://executiongraph/index.html");
     args::ValueFlag<std::string> m_logPath;           //!< Path where all logs are placed
 
     args::ValueFlag<std::string> m_cefArgs;         //!< All forwarded command line args to CEF.

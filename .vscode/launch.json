@@ -12,7 +12,7 @@
             "program": "${file}"
         },
         {
-            "name": "(lldb) ExecutionGraphTests-ExecutionTree",
+            "name": "[lldb] ExecutionGraphTests-ExecutionTree",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/tests/ExecutionGraphTest-ExecutionTree",
@@ -24,7 +24,7 @@
             "MIMode": "lldb"
         },
         {
-            "name": "(lldb) ExecutionGraphTests-CustomSocketTypes",
+            "name": "[lldb] ExecutionGraphTests-CustomSocketTypes",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/tests/ExecutionGraphTest-CustomSocketTypes",
@@ -36,7 +36,7 @@
             "MIMode": "lldb"
         },
         {
-            "name": "(lldb) ExecutionGraphTests-TaskQueue",
+            "name": "[lldb] ExecutionGraphTests-TaskQueue",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/tests/ExecutionGraphTest-TaskQueue",
@@ -48,7 +48,7 @@
             "MIMode": "lldb"
         },
         {
-            "name": "(lldb) ExecutionGraphTests-Flatbuffer",
+            "name": "[lldb] ExecutionGraphTests-Flatbuffer",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/tests/ExecutionGraphTest-Flatbuffer",
@@ -60,7 +60,7 @@
             "MIMode": "lldb"
         },
         {
-            "name": "(lldb) ExecutionGraphTests-MetaProgramming",
+            "name": "[lldb] ExecutionGraphTests-MetaProgramming",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/tests/ExecutionGraphTest-MetaProgramming",
@@ -72,7 +72,7 @@
             "MIMode": "lldb"
         },
         {
-            "name": "(lldb) ExecutionGraphTests-CEFSimple",
+            "name": "[lldb] ExecutionGraphTests-CEFSimple",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/gui/cefsimple/Debug/cefsimple.app/Contents/MacOS/cefsimple",
@@ -84,7 +84,7 @@
             "MIMode": "lldb"
         },
         {
-            "name": "(lldb) ExecutionGraphGUI (macOS App)",
+            "name": "[lldb] ExecutionGraphGUI (macOS App)",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
@@ -96,7 +96,7 @@
             "MIMode": "lldb"
         },
         {
-            "name": "(lldb) ExecutionGraphGUI [Release] (macOS App)",
+            "name": "[lldb] ExecutionGraphGUI [Release] (macOS App)",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/gui/executionGraphGui/Release/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
@@ -108,7 +108,7 @@
             "MIMode": "lldb"
         },
         {
-            "name": "(lldb) ExecutionGraphGUI (client src from build folder)",
+            "name": "[lldb] ExecutionGraphGUI (client src from build folder)",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
@@ -122,7 +122,7 @@
             "MIMode": "lldb"
         },
         {
-            "name": "(lldb) ExecutionGraphGUI (client src from dist folder)",
+            "name": "[lldb] ExecutionGraphGUI (client src from dist folder)",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
@@ -136,7 +136,21 @@
             "MIMode": "lldb"
         },
         {
-            "name": "Launch ExecutionGraphGUI client (ng serve)",
+            "name": "[lldb] ExecutionGraphGUI (client localhost:4200)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
+            "args": ["--clientLoadUrl", "localhost:4200", 
+                     "--logPath", "${workspaceFolder}/build",
+                     "--cefFlags=--cache-path=''"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
+            "name": "[ts] ExecutionGraphGUI Client (ng serve)",
             "type": "chrome",
             "request": "launch",
             "url": "http://localhost:4200/#",

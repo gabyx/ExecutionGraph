@@ -111,7 +111,8 @@ namespace
 
     //! Setup tht CEF Browser
     template<typename Dispatcher>
-    CefRefPtr<AppHandler> setupBrowser(std::shared_ptr<Dispatcher> requestDispatcher)
+    CefRefPtr<AppHandler> setupBrowser(std::shared_ptr<Dispatcher> requestDispatcher,
+                                       const std::string& clientLoadUrl)
     {
         CefRefPtr<CefCommandLine> command_line = CefCommandLine::GetGlobalCommandLine();
 
@@ -133,7 +134,7 @@ namespace
         CefBrowserSettings browserSettings;
         // Disable security, such that http:// XHRequests do not trigger a CORS Preflight Request (if special headers are used)
         browserSettings.web_security = cef_state_t::STATE_DISABLED;
-        CefString url                = "client://executiongraph/index.html";
+        CefString url                = clientLoadUrl;
 
         if(useViews)
         {
@@ -178,7 +179,7 @@ void App::OnContextInitialized()
     setupBackends(requestDispatcher);
 
     // Setup the browser
-    m_appHandler = setupBrowser(requestDispatcher);
+    m_appHandler = setupBrowser(requestDispatcher, m_clientLoadUrl);
 }
 
 void App::OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)

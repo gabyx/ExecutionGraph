@@ -163,7 +163,8 @@ endif()
 if(OS_MACOSX)
 
     set(executionGraphGui_TARGET_OUTPUTNAME "ExecutionGraphGui")
-    set(executionGraphGui_HELPER_TARGET_OUTPUTNAME "ExecutionGraphGui-Helper") # This is hardcoded as described in <cef_types.h> browser_subprocess_path.
+    # This is hardcoded as described in <cef_types.h> browser_subprocess_path.
+    set(executionGraphGui_HELPER_TARGET_OUTPUTNAME "ExecutionGraphGui Helper") 
 
     # Output paths for the app bundles.
     set(CEF_APP "${executionGraphGui_TARGET_OUT_DIR}/${executionGraphGui_TARGET_OUTPUTNAME}.app")

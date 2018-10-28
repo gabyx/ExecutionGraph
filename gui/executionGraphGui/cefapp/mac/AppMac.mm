@@ -222,7 +222,9 @@ int main(int argc, char* argv[])
     // It will create the first browser instance in OnContextInitialized() after
     // CEF has initialized.
     application =
-        std::make_unique<App>(appCLArgs->getClientSourcePath()).release();
+        std::make_unique<App>(appCLArgs->getClientLoadUrl(),
+                              appCLArgs->getClientSourcePath())
+            .release();
 
     // Initialize CEF for the browser process.
     CefInitialize(mainArgs, settings, application, nullptr);
