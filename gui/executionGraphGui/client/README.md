@@ -2,33 +2,18 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) using [Nrwl Nx](https://nrwl.io/nx).
 
-## Nrwl Extensions for Angular (Nx)
-
-<a href="https://nrwl.io/nx"><img src="https://preview.ibb.co/mW6sdw/nx_logo.png"></a>
-
-Nx is an open source toolkit for enterprise Angular applications.
-
-Nx is designed to help you create and build enterprise grade Angular applications. It provides an opinionated approach to application project structure and patterns.
-
-## Quick Start & Documentation
-
-[Watch a 5-minute video on how to get started with Nx.](http://nrwl.io/nx)
-
-## Generate your first application
-
-Run `ng generate app myapp` to generate an application. When using Nx, you can create multiple applications and libraries in the same CLI workspace. Read more [here](http://nrwl.io/nx).
-
-## Development server
-
-Run `ng serve --app=myapp` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng generate component component-name --app=myapp` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-
-Run `ng build --app=myapp` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+## Build commands
+The following table illustrates the various build commands defined in `package.json`:
+| Command | Description |
+| ------- | ----------- |
+| `npm run start` | **Client App Simulation Build**: Runs the angular build (in memory) and provides a development server under `http://localhost:4200`. This build uses all *dummy* services to simulate the backend.
+| `npm run build-dev` | **Client Development Build**:  Runs the angular build which stores the output in `./dist`. This build uses no *dummy* services, meaning it tries to connect to the backend.
+| `npm run build-prod` | **Client App Production Build**: Runs the angular build which stores the output in `./dist`. This build uses no *dummy* services, meaning it tries to connect to the backend.
+| `npm run build-prod-watch` | **Client App Production Build**: Runs the angular build *continuously* on file changes and stores the output in `./dist`. This build uses no *dummy* services, meaning it tries to connect to the backend.
+| `npm run start-native` | **Native App Simulation Build**: Runs the angular build and stores the output in `./native-app/dist` for the electron gui application and starts the application afterwards. This build uses all *dummy* services to simulate the backend.
+| `npm run build-native` | **Native App Simulation Build**: Runs the angular build and stores the output in `./native-app/dist` for the electron gui application. This build uses no *dummy* services, meaning it tries to connect to the backend.
+| `npm run build-dev-native` | **Native App Development Build**: Runs the angular build and stores the output in `./native-app/dist` for the electron gui application. This build uses no *dummy* services, meaning it tries to connect to the backend.
+| `npm run build-prod-native` | **Native App Production Build**: Runs the angular build and stores the output in `./native-app/dist` for the electron gui application. This build uses no *dummy* services, meaning it tries to connect to the backend.
 
 ## Running unit tests
 

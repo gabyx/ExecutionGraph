@@ -4,13 +4,6 @@
     // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
-        {
-            "name": "Python: Current File",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}"
-        },
         {
             "name": "[lldb] ExecutionGraphTests-ExecutionTree",
             "type": "cppdbg",
@@ -150,11 +143,23 @@
             "MIMode": "lldb"
         },
         {
-            "name": "[ts] ExecutionGraphGUI Client (ng serve)",
+            "name": "[chrome] ExecutionGraphGUI Client (ng serve)",
             "type": "chrome",
             "request": "launch",
             "url": "http://localhost:4200/#",
             "webRoot": "${workspaceRoot}/gui/executionGraphGui/client/apps/eg",
+            "skipFiles": ["ConsoleSink.ts", "MultiSinkLogger.ts"]
+        },
+        {
+            "name": "[node] ExecutionGraphGUI Client Native-App (electron)",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/gui/executionGraphGui/client/native-app",
+            "runtimeExecutable": "${workspaceRoot}/gui/executionGraphGui/client/node_modules/.bin/electron",
+            "windows": {
+                "runtimeExecutable": "${workspaceRoot}/gui/executionGraphGui/client/node_modules/.bin/electron.cmd"
+            },
+            "args" : ["."],
             "skipFiles": ["ConsoleSink.ts", "MultiSinkLogger.ts"]
         }
     ]

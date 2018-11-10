@@ -19,8 +19,8 @@ if(${USE_SUPERBUILD})
         
         ExternalProject_Add(flatbuffers
                             GIT_REPOSITORY      "${URL}"
-                            GIT_TAG             "master"
-                            GIT_SHALLOW         ON
+                            GIT_TAG             master
+                            GIT_SHALLOW         OFF
                             PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/flatbuffers"
                             TIMEOUT 10
                             UPDATE_DISCONNECTED  ON

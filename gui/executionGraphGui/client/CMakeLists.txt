@@ -13,7 +13,7 @@ add_custom_target(${executionGraphGui_CLIENT_TARGET} ALL
                   COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/cmake/RunAngularBuild.sh"
                           "${NODE_PACKAGE_MANAGER_EXECUTABLE}"
                           "${executionGraphGui_CLIENT_TARGET_OUT_DIR}/apps/eg"
-                          "build-prod-app-eg"
+                          "build-prod"
                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_custom_target("${executionGraphGui_CLIENT_TARGET}-Clean"
