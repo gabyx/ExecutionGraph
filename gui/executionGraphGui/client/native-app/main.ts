@@ -44,16 +44,16 @@ function createWindow(clientSourcePath: string) {
   if (!clientSourcePath.endsWith('index.html')) {
     clientSourcePath = path.join(clientSourcePath, 'index.html');
   }
-  if (clientSourcePath.startsWith('file://') || clientSourcePath.startsWith('http://')) {
-    console.info(`Load url: '${clientSourcePath}'`);
-    window.loadURL(clientSourcePath);
-  } else {
+  console.info(`Load url: '${clientSourcePath}'`);
+  if (!clientSourcePath.startsWith('http://') && !clientSourcePath.startsWith('https://')) {
     if (!path.isAbsolute(clientSourcePath)) {
       clientSourcePath = path.join(__dirname, clientSourcePath);
     }
-    console.info(`Load file: '${clientSourcePath}'`);
-    window.loadFile(clientSourcePath);
+    clientSourcePath = 'file://' + clientSourcePath;
   }
+
+  console.info(`Load url: '${clientSourcePath}'`);
+  window.loadURL(clientSourcePath);
 
   // Open the DevTools.
   window.webContents.openDevTools();
