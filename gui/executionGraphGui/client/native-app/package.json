@@ -6,10 +6,6 @@
   "repository": "https://github.com/gabyx/ExecutionGraph",
   "author": "GitHub",
   "license": "MPL 2.0",
-  "main": "main.js",
-  "files": [
-    "./src/main.js"
-  ],
   "scripts": {
     "build": "tsc && cp -r resources dist && cp package.json.template dist/package.json",
     "build-start": "npm run build && electron ./dist/main.js",

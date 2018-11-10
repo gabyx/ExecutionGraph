@@ -30,6 +30,5 @@ function parseArgs(): any {
 }
 
 const args = parseArgs();
-
 const myApp = new Application(args, app, BrowserWindow);
 myApp.run();
