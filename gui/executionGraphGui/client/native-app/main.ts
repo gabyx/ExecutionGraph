@@ -24,7 +24,8 @@ function parseArgs(): any {
     description: 'ExecutionGraphGui'
   });
   parser.addArgument(['-c', '--clientSourcePath'], {
-    help: 'foo bar'
+    help: 'The source path to the client application.',
+    defaultValue: `${__dirname}/client/app/eg`
   });
   return parser.parseArgs();
 }
@@ -38,8 +39,21 @@ function createWindow(clientSourcePath: string) {
     icon: `file://${__dirname}/resources/icon.png`
   });
 
-  // and load the index.html of the app.
-  window.loadFile(path.join(__dirname, clientSourcePath));
+  // Load the index.html of the app.
+  clientSourcePath = clientSourcePath.trim();
+  if (!clientSourcePath.endsWith('index.html')) {
+    clientSourcePath = path.join(clientSourcePath, 'index.html');
+  }
+  if (clientSourcePath.startsWith('file://') || clientSourcePath.startsWith('http://')) {
+    console.info(`Load url: '${clientSourcePath}'`);
+    window.loadURL(clientSourcePath);
+  } else {
+    if (!path.isAbsolute(clientSourcePath)) {
+      clientSourcePath = path.join(__dirname, clientSourcePath);
+    }
+    console.info(`Load file: '${clientSourcePath}'`);
+    window.loadFile(clientSourcePath);
+  }
 
   // Open the DevTools.
   window.webContents.openDevTools();
