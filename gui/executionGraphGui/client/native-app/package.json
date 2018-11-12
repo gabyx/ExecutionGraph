@@ -13,10 +13,10 @@
     "webpack": "electron-webpack main",
     "package": "electron-builder",
     "compile": "tsc && cp -r resources dist",
-    "build-test": "rm -r dist ; npm run build-client && npm run compile",
+    "build-test": "rm -rf dist ; npm run build-client && npm run compile",
     "start-electron": "electron ./dist/main/main.js",
-    "build": "rm -r dist ; npm run build-client && npm run webpack",
-    "build-prod": "rm -r dist ; npm run build-client-prod && npm run webpack",
+    "build": "rm -rf dist ; npm run build-client; npm run webpack",
+    "build-prod": "rm -rf dist ; npm run build-client-prod && npm run webpack",
     "build-package": "npm run build && npm run package",
     "build-prod-package": "npm run build-prod && npm run package"
   },
