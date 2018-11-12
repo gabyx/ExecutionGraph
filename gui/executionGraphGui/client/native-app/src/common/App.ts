@@ -14,7 +14,7 @@ import { BrowserWindow, App } from 'electron';
 import * as path from 'path';
 
 export default class Application {
-  private mainWindow: BrowserWindow;
+  private mainWindow: BrowserWindow | null = null;
 
   constructor(private readonly args: any, private app: App, private BrowserWindowCls: typeof BrowserWindow) {
     // we pass the App object and the
@@ -24,8 +24,8 @@ export default class Application {
   }
 
   public run() {
-    this.app.on('window-all-closed', this.onWindowAllClosed);
-    this.app.on('ready', this.onReady);
+    this.app.on('window-all-closed', this.onWindowAllClosed.bind(this));
+    this.app.on('ready', this.onReady.bind(this));
     this.app.on('activate', () => {
       // On OS X it"s common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
@@ -37,7 +37,7 @@ export default class Application {
 
   private createWindow(clientSourcePath: string) {
     // Create the browser window.
-    let window = new this.BrowserWindowCls({
+    let window: BrowserWindow | null = new this.BrowserWindowCls({
       width: 1680,
       height: 1050,
       backgroundColor: '#ffffff',
@@ -85,6 +85,6 @@ export default class Application {
 
   private onReady() {
     this.mainWindow = this.createWindow(this.args['clientSourcePath']);
-    this.mainWindow.on('closed', this.onClose);
+    this.mainWindow.on('closed', this.onClose.bind(this));
   }
 }
