@@ -12,22 +12,27 @@
 
 // This is the electron main.ts to start the client application.
 
+import * as path from 'path';
 import { app, BrowserWindow } from 'electron';
-import Application from '../common/App';
 import { ArgumentParser } from 'argparse';
-//require('source-map-support').install();
+import Application from '../common/App';
 
 function parseArgs(): any {
   const parser = new ArgumentParser({
     version: '0.0.1',
     addHelp: true,
-    description: 'ExecutionGraphGui'
+    prog: 'ExecutionGraphGui',
+    description: 'GUI of the execution graph'
   });
+  const defaultClientSourcePath = path.join(__dirname, `client/apps/eg`);
+  console.log(`Defaulting client source path to ${defaultClientSourcePath}`);
+
   parser.addArgument(['-c', '--clientSourcePath'], {
     help: 'The source path to the client app.',
-    defaultValue: `${__dirname}/../client/apps/eg`
+    defaultValue: defaultClientSourcePath
   });
-  return parser.parseArgs(process.argv.splice(2));
+  console.log(process.argv)
+  return parser.parseArgs(process.argv.slice(2));
 }
 
 const args = parseArgs();

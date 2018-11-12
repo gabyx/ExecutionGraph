@@ -45,7 +45,7 @@ export default class Application {
     });
 
     // Load the index.html of the app.
-    clientSourcePath = clientSourcePath.trim();
+    clientSourcePath = clientSourcePath ? clientSourcePath.trim() : '';
     if (!clientSourcePath.endsWith('index.html')) {
       clientSourcePath = path.join(clientSourcePath, 'index.html');
     }
