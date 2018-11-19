@@ -35,17 +35,21 @@ namespace executionGraph
         LogicSocketBase(IndexType type,
                         SocketIndex index,
                         NodeBaseType& parent,
-                        const std::string& name = "")
+                        std::string name = "")
             : m_type(type)
             , m_index(index)
             , m_parent(parent)
-            , m_name(name.empty() ? name : "[" + std::to_string(index) + "]")
+            , m_name(std::move(name))
         {
+            if(m_name.empty())
+            {
+                m_name =  "[" + std::to_string(index) + "]";
+            }
         }
 
         IndexType getType() const { return m_type; }
         SocketIndex getIndex() const { return m_index; }
-        std::string getName() const { return m_name; }
+        const std::string& getName() const { return m_name; }
 
         const NodeBaseType& getParent() const { return m_parent; }
         NodeBaseType& getParent() { return m_parent; }

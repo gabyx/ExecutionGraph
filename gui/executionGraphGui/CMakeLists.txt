@@ -5,7 +5,7 @@
 
 # App Sources
 # -------------
-set(executionGraphGui_SRCS
+set(ExecutionGraphGui_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/App.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/App.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/AppCLArgs.cpp
@@ -49,53 +49,53 @@ set(executionGraphGui_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/ExecutionGraphBackend.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backend/ExecutionGraphBackend.cpp
 )
-set(executionGraphGui_SRCS_LINUX
+set(ExecutionGraphGui_SRCS_LINUX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/linux/AppLinux.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/linux/Handlerlinux.cpp
 )
-set(executionGraphGui_SRCS_MACOSX
+set(ExecutionGraphGui_SRCS_MACOSX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/AppMac.mm
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/PlatformSpecificImplementations.mm
 )
-set(executionGraphGui_SRCS_WINDOWS
+set(ExecutionGraphGui_SRCS_WINDOWS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/App.exe.manifest
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/App.rc
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/AppWin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/resource.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/HandlerWin.cpp
 )
-append_platform_sources(executionGraphGui_SRCS)
+append_platform_sources(ExecutionGraphGui_SRCS)
 
-set(executionGraphGui_RES_SRCS_WINDOWS
+set(ExecutionGraphGui_RES_SRCS_WINDOWS
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/resources/cefApp.ico
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/windows/resources/small.ico
 )
-append_platform_sources(executionGraphGui_RES_SRCS)
+append_platform_sources(ExecutionGraphGui_RES_SRCS)
 
-set(executionGraphGui_SRCS ${executionGraphGui_SRCS} ${executionGraphGui_RES_SRCS})
+set(ExecutionGraphGui_SRCS ${ExecutionGraphGui_SRCS} ${ExecutionGraphGui_RES_SRCS})
 # -------------
 
 # App Helper Sources
 # -------------
-set(executionGraphGui_HELPER_SRCS_MACOSX
+set(ExecutionGraphGui_HELPER_SRCS_MACOSX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/ProcessHelperMac.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/RendererApp.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/SchemeHandlerHelper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/SchemeHandlerHelper.hpp
 )
-append_platform_sources(executionGraphGui_HELPER_SRCS)
+append_platform_sources(ExecutionGraphGui_HELPER_SRCS)
 # -------------
 
 # App Resources.
 # -------------
-set(executionGraphGui_RESOURCES_SRCS_MACOSX
+set(ExecutionGraphGui_RESOURCES_SRCS_MACOSX
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/Info.plist
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/App.icns
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/English.lproj/InfoPlist.strings
     ${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/English.lproj/MainMenu.xib
 )
-append_platform_sources(executionGraphGui_RESOURCES_SRCS)
+append_platform_sources(ExecutionGraphGui_RESOURCES_SRCS)
 # -------------
 
 
@@ -107,17 +107,17 @@ append_platform_sources(executionGraphGui_RESOURCES_SRCS)
 if(GEN_NINJA OR GEN_MAKEFILES)
     # By default Ninja and Make builds don't create a subdirectory named after
     # the configuration.
-    set(executionGraphGui_TARGET_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
+    set(ExecutionGraphGui_TARGET_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
 
     # Output binaries (executables, libraries) to the correct directory.
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${executionGraphGui_TARGET_OUT_DIR})
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${executionGraphGui_TARGET_OUT_DIR})
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${ExecutionGraphGui_TARGET_OUT_DIR})
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${ExecutionGraphGui_TARGET_OUT_DIR})
 else()
-    set(executionGraphGui_TARGET_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIGURATION>")
+    set(ExecutionGraphGui_TARGET_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIGURATION>")
 endif()
 
 
-set(executionGraphGui_INC_DIRS
+set(ExecutionGraphGui_INC_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/../
 )
 
@@ -132,25 +132,28 @@ add_subdirectory(client)
 if(OS_LINUX)
     message(STATUS "Configuring target: ExecutionGraphGui ...")
     # Executable target.
-    add_executable(ExecutionGraphGui ${executionGraphGui_SRCS})
+    add_executable(ExecutionGraphGui ${ExecutionGraphGui_SRCS})
     # Compile Options
     setTargetCompileOptionsExecutionGraph(ExecutionGraphGui ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
     # Additional Include Directories
-    target_include_directories(ExecutionGraphGui PRIVATE ${executionGraphGui_INC_DIRS})
+    target_include_directories(ExecutionGraphGui PRIVATE ${ExecutionGraphGui_INC_DIRS})
     add_dependencies(ExecutionGraphGui libcef_dll_wrapper)
-    target_link_libraries(ExecutionGraphGui libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ExecutionGraph::Core)
+    target_link_libraries(ExecutionGraphGui 
+                          libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} 
+                          ExecutionGraph::Core 
+                          ExecutionGraphGui::Core-Dependencies)
 
     # Set rpath so that libraries can be placed next to the executable.
     set_target_properties(ExecutionGraphGui PROPERTIES INSTALL_RPATH "$ORIGIN")
     set_target_properties(ExecutionGraphGui PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE)
-    set_target_properties(ExecutionGraphGui PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${executionGraphGui_TARGET_OUT_DIR})
+    set_target_properties(ExecutionGraphGui PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${ExecutionGraphGui_TARGET_OUT_DIR})
 
     # Copy binary and resource files to the target output directory.
-    copy_files("ExecutionGraphGui" "${CEF_BINARY_FILES}" "${CEF_BINARY_DIR}" "${executionGraphGui_TARGET_OUT_DIR}")
-    copy_files("ExecutionGraphGui" "${CEF_RESOURCE_FILES}" "${CEF_RESOURCE_DIR}" "${executionGraphGui_TARGET_OUT_DIR}")
+    copy_files("ExecutionGraphGui" "${CEF_BINARY_FILES}" "${CEF_BINARY_DIR}" "${ExecutionGraphGui_TARGET_OUT_DIR}")
+    copy_files("ExecutionGraphGui" "${CEF_RESOURCE_FILES}" "${CEF_RESOURCE_DIR}" "${ExecutionGraphGui_TARGET_OUT_DIR}")
 
     # Set SUID permissions on the chrome-sandbox target.
-    set_linux_suid_permissions("ExecutionGraphGui" "${executionGraphGui_TARGET_OUT_DIR}/chrome-sandbox")
+    set_linux_suid_permissions("ExecutionGraphGui" "${ExecutionGraphGui_TARGET_OUT_DIR}/chrome-sandbox")
 
     print_target_properties(ExecutionGraphGui)
 endif()
@@ -162,30 +165,32 @@ endif()
 
 if(OS_MACOSX)
 
-    set(executionGraphGui_TARGET_OUTPUTNAME "ExecutionGraphGui")
+    set(ExecutionGraphGui_TARGET_OUTPUTNAME "ExecutionGraphGui")
     # This is hardcoded as described in <cef_types.h> browser_subprocess_path.
-    set(executionGraphGui_HELPER_TARGET_OUTPUTNAME "ExecutionGraphGui Helper") 
+    set(ExecutionGraphGui_HELPER_TARGET_OUTPUTNAME "ExecutionGraphGui Helper") 
 
     # Output paths for the app bundles.
-    set(CEF_APP "${executionGraphGui_TARGET_OUT_DIR}/${executionGraphGui_TARGET_OUTPUTNAME}.app")
-    set(CEF_HELPER_APP "${executionGraphGui_TARGET_OUT_DIR}/${executionGraphGui_HELPER_TARGET_OUTPUTNAME}.app")
+    set(CEF_APP "${ExecutionGraphGui_TARGET_OUT_DIR}/${ExecutionGraphGui_TARGET_OUTPUTNAME}.app")
+    set(CEF_HELPER_APP "${ExecutionGraphGui_TARGET_OUT_DIR}/${ExecutionGraphGui_HELPER_TARGET_OUTPUTNAME}.app")
 
     # Variable referenced from Info.plist files.
     set(PRODUCT_NAME "ExecutionGraphGui")
 
     message(STATUS "Configuring target: executionGraphGuiHelper ...")
     # Helper executable target.
-    add_executable(executionGraphGuiHelper MACOSX_BUNDLE ${executionGraphGui_HELPER_SRCS})
+    add_executable(executionGraphGuiHelper MACOSX_BUNDLE ${ExecutionGraphGui_HELPER_SRCS})
     # Compile Options
     setTargetCompileOptionsExecutionGraph(executionGraphGuiHelper ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
     # Additional Include Directories
-    target_include_directories(executionGraphGuiHelper PRIVATE ${executionGraphGui_INC_DIRS})
+    target_include_directories(executionGraphGuiHelper PRIVATE ${ExecutionGraphGui_INC_DIRS})
     set_target_properties(executionGraphGuiHelper    PROPERTIES
                                                      MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/helper-Info.plist"
-                                                     OUTPUT_NAME "${executionGraphGui_HELPER_TARGET_OUTPUTNAME}"
-                                                     RUNTIME_OUTPUT_DIRECTORY "${executionGraphGui_TARGET_OUT_DIR}")
+                                                     OUTPUT_NAME "${ExecutionGraphGui_HELPER_TARGET_OUTPUTNAME}"
+                                                     RUNTIME_OUTPUT_DIRECTORY "${ExecutionGraphGui_TARGET_OUT_DIR}")
 
-    target_link_libraries(executionGraphGuiHelper cefLib ExecutionGraph::Core-Headers fmtLib)
+    target_link_libraries(executionGraphGuiHelper cefLib 
+                          ExecutionGraph::Core-Headers
+                          fmtLib)
     
     # Fix the framework rpath in the helper executable.
     # The helper is in $app_name.app/Contents/Frameworks/$app_name Helper.app/Contents/MacOS/
@@ -197,17 +202,20 @@ if(OS_MACOSX)
 
     message(STATUS "Configuring target: ExecutionGraphGui ...")
     # Main executable target.
-    add_executable(ExecutionGraphGui MACOSX_BUNDLE ${executionGraphGui_RESOURCES_SRCS} ${executionGraphGui_SRCS})
+    add_executable(ExecutionGraphGui MACOSX_BUNDLE ${ExecutionGraphGui_RESOURCES_SRCS} ${ExecutionGraphGui_SRCS})
     # Compile Options
     setTargetCompileOptionsExecutionGraph(ExecutionGraphGui ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
 
     # Additional Include Directories
-    target_include_directories(ExecutionGraphGui PRIVATE ${executionGraphGui_INC_DIRS})
-    add_dependencies(ExecutionGraphGui executionGraphGuiHelper ${executionGraphGui_CLIENT_TARGET})
-    target_link_libraries(ExecutionGraphGui cefLib ExecutionGraph::Core)
+    target_include_directories(ExecutionGraphGui PRIVATE ${ExecutionGraphGui_INC_DIRS})
+    add_dependencies(ExecutionGraphGui executionGraphGuiHelper ${ExecutionGraphGui_CLIENT_TARGET})
+    target_link_libraries(ExecutionGraphGui 
+                          cefLib 
+                          ExecutionGraph::Core
+                          ExecutionGraphGui::Core-Dependencies)
     set_target_properties(ExecutionGraphGui PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/Info.plist"
-                                                        OUTPUT_NAME "${executionGraphGui_TARGET_OUTPUTNAME}"
-                                                        RUNTIME_OUTPUT_DIRECTORY "${executionGraphGui_TARGET_OUT_DIR}")
+                                                        OUTPUT_NAME "${ExecutionGraphGui_TARGET_OUTPUTNAME}"
+                                                        RUNTIME_OUTPUT_DIRECTORY "${ExecutionGraphGui_TARGET_OUT_DIR}")
 
     # Copy files into the main app bundle.
     add_custom_command(
@@ -216,7 +224,7 @@ if(OS_MACOSX)
         # Copy the helper app bundle into the Frameworks directory.
         COMMAND ${CMAKE_COMMAND} -E copy_directory
                 "${CEF_HELPER_APP}"
-                "${CEF_APP}/Contents/Frameworks/${executionGraphGui_HELPER_TARGET_OUTPUTNAME}.app"
+                "${CEF_APP}/Contents/Frameworks/${ExecutionGraphGui_HELPER_TARGET_OUTPUTNAME}.app"
         # Copy the CEF framework into the Frameworks directory.
         COMMAND ${CMAKE_COMMAND} -E copy_directory
                 "${CEF_BINARY_DIR}/Chromium Embedded Framework.framework"
@@ -225,7 +233,7 @@ if(OS_MACOSX)
         COMMAND ${CMAKE_COMMAND} -E make_directory
                 "${CEF_APP}/Contents/client"
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-                "${executionGraphGui_CLIENT_TARGET_OUT_DIR}"
+                "${ExecutionGraphGui_CLIENT_TARGET_OUT_DIR}"
                 "${CEF_APP}/Contents/client"
         # Copy libraries into the Contents/libs folder
         COMMAND ${CMAKE_COMMAND} -E make_directory
@@ -247,7 +255,7 @@ if(OS_MACOSX)
     # directive but that doesn't properly handle nested resource directories.
     # Remove these prefixes from input file paths.
     set(PREFIXES "${CMAKE_CURRENT_SOURCE_DIR}/cefapp/mac/resources/")
-    copy_macosx_resources("${executionGraphGui_RESOURCES_SRCS}" "${PREFIXES}" "ExecutionGraphGui" "${CMAKE_CURRENT_SOURCE_DIR}" "${CEF_APP}")
+    copy_macosx_resources("${ExecutionGraphGui_RESOURCES_SRCS}" "${PREFIXES}" "ExecutionGraphGui" "${CMAKE_CURRENT_SOURCE_DIR}" "${CEF_APP}")
 
     # Link the dSYM file into the bundle
     # if configured in FindCEFLib.cmake
@@ -273,11 +281,11 @@ if(OS_WINDOWS)
     message(STATUS "Configuring target: ExecutionGraphGui ...")
 
     # Executable target.
-    add_executable(ExecutionGraphGui WIN32 ${executionGraphGui_SRCS})
+    add_executable(ExecutionGraphGui WIN32 ${ExecutionGraphGui_SRCS})
     # Compile Options
     setTargetCompileOptionsExecutionGraph(ExecutionGraphGui ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
     add_dependencies(ExecutionGraphGui libcef_dll_wrapper)
-    target_link_libraries(ExecutionGraphGui libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ExecutionGraph::Core)
+    target_link_libraries(ExecutionGraphGui libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ExecutionGraph::Core ExecutionGraphGui::Core-Dependencies)
 
     if(USE_SANDBOX)
         # Logical target used to link the cef_sandbox library.
@@ -289,8 +297,8 @@ if(OS_WINDOWS)
     add_windows_manifest("${CMAKE_CURRENT_SOURCE_DIR}" "ExecutionGraphGui" "exe")
 
     # Copy binary and resource files to the target output directory.
-    copy_files("ExecutionGraphGui" "${CEF_BINARY_FILES}" "${CEF_BINARY_DIR}" "${executionGraphGui_TARGET_OUT_DIR}")
-    copy_files("ExecutionGraphGui" "${CEF_RESOURCE_FILES}" "${CEF_RESOURCE_DIR}" "${executionGraphGui_TARGET_OUT_DIR}")
+    copy_files("ExecutionGraphGui" "${CEF_BINARY_FILES}" "${CEF_BINARY_DIR}" "${ExecutionGraphGui_TARGET_OUT_DIR}")
+    copy_files("ExecutionGraphGui" "${CEF_RESOURCE_FILES}" "${CEF_RESOURCE_DIR}" "${ExecutionGraphGui_TARGET_OUT_DIR}")
 
     print_target_properties(ExecutionGraphGui)
 endif()

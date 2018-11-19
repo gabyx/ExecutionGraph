@@ -170,8 +170,10 @@
         "**/buildExternal/**" : true,
         "**/dist/**" : true
     },
+    "cmake.buildDirectory": "${workspaceRoot}/build",
     "cmake.configureArgs": ["-DExecutionGraph_BUILD_TESTS=ON",
-                            "-DExecutionGraph_BUILD_GUI=ON",
+                            "-DExecutionGraph_BUILD_GUI=OFF",
+                            "-DExecutionGraph_BUILD_LIBRARY=ON",
                             "-DExecutionGraph_EXTERNAL_BUILD_DIR_POSTFIX=../buildExternal",
                             "-DExecutionGraph_USE_CEF_DSYM_FILE=ON",
                             "-DExecutionGraph_USE_ADDRESS_SANITIZER=ON"
@@ -194,4 +196,5 @@
     "gitlens.hovers.enabled": false,
     "gitlens.mode.active": "review",
     "python.formatting.provider": "yapf",
+    
 }
