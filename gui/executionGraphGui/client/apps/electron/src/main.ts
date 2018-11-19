@@ -2,9 +2,10 @@ import { app, BrowserWindow, screen } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 
-let win, serve;
+let win: BrowserWindow = null;
+
 const args = process.argv.slice(1);
-serve = args.some(val => val === '--serve');
+const serve = args.some(val => val === '--serve');
 
 function createWindow() {
 
@@ -16,16 +17,34 @@ function createWindow() {
     x: 0,
     y: 0,
     width: size.width,
-    height: size.height
+    height: size.height,
+    webPreferences: {
+      nodeIntegration: false
+    }
   });
 
+  win.center();
+
   if (serve) {
+    const ngServeUrl = 'http://localhost:4200';
     const projectPath = path.join(__dirname, "..");
     console.log(`Serving form ${projectPath}`);
-    require('electron-reload')(projectPath, {
-      electron: require(`${projectPath}/node_modules/electron`)
+
+    // Reload initial page to not get mixed up with client side routing
+    win.webContents.on('devtools-reload-page', (event) => {
+      win.loadURL(ngServeUrl);
     });
-    win.loadURL('http://localhost:4200');
+
+    // Hijack this event, which is triggered by the HMR feature of Angular CLI
+    // This will reload the index instead of trying to refresh the page at the current route.
+    win.webContents.on('will-navigate', (event, navigationUrl) => {
+      console.log(`will-navigate url to '${navigationUrl}'`);
+      event.preventDefault();
+      win.loadURL(ngServeUrl);
+    });
+
+    win.loadURL(ngServeUrl);
+
   } else {
     win.loadURL(url.format({
       pathname: path.join(__dirname, 'apps/eg/index.html'),
@@ -33,6 +52,7 @@ function createWindow() {
       slashes: true
     }));
   }
+
 
   win.webContents.openDevTools();
 
