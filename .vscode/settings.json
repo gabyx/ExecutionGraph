@@ -86,10 +86,6 @@
         "mutex": "cpp"
     },
     "cmake.useCMakeServer": true,
-    "cmake.preferredGenerators": [
-        "Ninja",
-        "Unix Makefiles"
-    ],
     // "C_Cpp.clang_format_fallbackStyle": "none",
     // "C_Cpp.clang_format_style": "file",
     "editor.formatOnSave": false,

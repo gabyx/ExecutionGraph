@@ -164,36 +164,35 @@ list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "eigenLib")
 find_package(MetaLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "metaLib")
 
-# Try to find the spdlog
-find_package(SpdLogLib REQUIRED)
-list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "spdlogLib")
 # Try to find the fmt library
 find_package(FmtLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "fmtLib")
 # Try to find the Argumentparser
 find_package(ArgsLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "argsLib")
+# Try to find the RTTR library 
+find_package(RTTRLib REQUIRED)
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "rttrLib")
+# Try to find flatbuffer library
+find_package(FlatBuffersLib REQUIRED)
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "flatbuffersLib")
+# Try to find the crossguid library
+find_package(CrossGUIDLib REQUIRED)
+ list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "crossguidLib")
 
 set_target_properties(ExecutionGraph::Core-Dependencies PROPERTIES INTERFACE_LINK_LIBRARIES "${ExecutionGraph_LINK_TARGETS_CORE_DEP}")
 
 if(${ExecutionGraph_BUILD_GUI})
     add_library(ExecutionGraphGui::Core-Dependencies INTERFACE IMPORTED)
-    # Try to find the RTTR Library (use our own script)
-    find_package(RTTRLib REQUIRED)
-    list(APPEND ExecutionGraphGui_LINK_TARGETS_CORE_DEP "rttrLib")
-    # Try to find the crossguid Library (use our own script)
-    find_package(CrossGUIDLib REQUIRED)
-    list(APPEND ExecutionGraphGui_LINK_TARGETS_CORE_DEP "crossguidLib")
-    # Try to find the crossguid Library (use our own script)
+    
+    # Try to find the spdlog
+    find_package(SpdLogLib REQUIRED)
+    list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "spdlogLib")
+
+    # Try to find the memory library
     find_package(MemoryLib REQUIRED)
     list(APPEND ExecutionGraphGui_LINK_TARGETS_CORE_DEP "memoryLib")
 
-    find_package(FlatBuffersLib REQUIRED)
-    list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "flatbuffersLib")
-    # Try find cereal
-    # find_package(CerealLib REQUIRED)
-    # list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "cerealLib")
-    # Try find flatbuffer
     set_target_properties(ExecutionGraphGui::Core-Dependencies PROPERTIES INTERFACE_LINK_LIBRARIES "${ExecutionGraphGui_LINK_TARGETS_CORE_DEP}")
 endif()
 

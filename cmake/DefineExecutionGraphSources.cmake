@@ -132,8 +132,10 @@ function(setTargetCompileOptionsExecutionGraph target use_address_san use_leak_s
     endif()
 
     # Link with experimental library
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         set(LINKER_FLAGS "${LINKER_FLAGS} -lc++experimental")
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set(LINKER_FLAGS "${LINKER_FLAGS} -lstdc++fs")
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
         set(LINKER_FLAGS "${LINKER_FLAGS} -lc++experimental")
     elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")

@@ -7,7 +7,7 @@ set(URL "https://github.com/google/flatbuffers.git")
 set(INSTALL_DIR "${ExecutionGraph_EXTERNAL_INSTALL_DIR}/flatbuffers")
 
 message(STATUS "flatbuffers library finding ...")
-find_package(FlatBuffers QUIET PATHS ${INSTALL_DIR})
+find_package(Flatbuffers QUIET PATHS ${INSTALL_DIR})
 
 if(${USE_SUPERBUILD})
 

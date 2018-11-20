@@ -12,16 +12,16 @@ find_package(MetaLib) # needed
 
 #find_package(CerealLib) # for serialization
 find_package(FmtLib REQUIRED) # string formatting library
+find_package(FlatBuffersLib REQUIRED)
+find_package(RTTRLib REQUIRED) 
+find_package(CrossGUIDLib REQUIRED)
 
 if(${ExecutionGraph_BUILD_GUI})
     find_package(SpdLogLib REQUIRED) # for logging
     find_package(ArgsLib REQUIRED) # for commandline args
-    find_package(CrossGUIDLib REQUIRED) # guid
     find_package(MemoryLib REQUIRED) # memory pool
 
     find_package(CEFLib REQUIRED)
-    find_package(RTTRLib REQUIRED) 
-    find_package(FlatBuffersLib REQUIRED)
     find_package(BoostBeastLib REQUIRED)
 endif()
 
