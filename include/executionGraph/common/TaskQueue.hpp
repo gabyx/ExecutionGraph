@@ -17,6 +17,7 @@
 #include <mutex>
 #include <optional>
 #include <queue>
+#include <condition_variable>
 
 namespace executionGraph
 {

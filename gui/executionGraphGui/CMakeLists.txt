@@ -138,7 +138,7 @@ if(OS_LINUX)
     # Additional Include Directories
     target_include_directories(ExecutionGraphGui PRIVATE ${ExecutionGraphGui_INC_DIRS})
     add_dependencies(ExecutionGraphGui libcef_dll_wrapper)
-    target_link_libraries(ExecutionGraphGui 
+    target_link_libraries(ExecutionGraphGui PRIVATE
                           libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} 
                           ExecutionGraph::Core 
                           ExecutionGraphGui::Core-Dependencies)
@@ -188,7 +188,7 @@ if(OS_MACOSX)
                                                      OUTPUT_NAME "${ExecutionGraphGui_HELPER_TARGET_OUTPUTNAME}"
                                                      RUNTIME_OUTPUT_DIRECTORY "${ExecutionGraphGui_TARGET_OUT_DIR}")
 
-    target_link_libraries(executionGraphGuiHelper cefLib 
+    target_link_libraries(executionGraphGuiHelper PRIVATE cefLib 
                           ExecutionGraph::Core-Headers
                           fmtLib)
     
@@ -209,7 +209,7 @@ if(OS_MACOSX)
     # Additional Include Directories
     target_include_directories(ExecutionGraphGui PRIVATE ${ExecutionGraphGui_INC_DIRS})
     add_dependencies(ExecutionGraphGui executionGraphGuiHelper ${ExecutionGraphGui_CLIENT_TARGET})
-    target_link_libraries(ExecutionGraphGui 
+    target_link_libraries(ExecutionGraphGui PRIVATE
                           cefLib 
                           ExecutionGraph::Core
                           ExecutionGraphGui::Core-Dependencies)
@@ -285,12 +285,12 @@ if(OS_WINDOWS)
     # Compile Options
     setTargetCompileOptionsExecutionGraph(ExecutionGraphGui ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
     add_dependencies(ExecutionGraphGui libcef_dll_wrapper)
-    target_link_libraries(ExecutionGraphGui libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ExecutionGraph::Core ExecutionGraphGui::Core-Dependencies)
+    target_link_libraries(ExecutionGraphGui PRIVATE libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ExecutionGraph::Core ExecutionGraphGui::Core-Dependencies)
 
     if(USE_SANDBOX)
         # Logical target used to link the cef_sandbox library.
         add_logical_target("cef_sandbox_lib" "${CEF_SANDBOX_LIB_DEBUG}" "${CEF_SANDBOX_LIB_RELEASE}")
-        target_link_libraries(ExecutionGraphGui cef_sandbox_lib ${CEF_SANDBOX_STANDARD_LIBS})
+        target_link_libraries(ExecutionGraphGui PRIVATE cef_sandbox_lib ${CEF_SANDBOX_STANDARD_LIBS})
     endif()
 
     # Add the custom manifest files to the executable.

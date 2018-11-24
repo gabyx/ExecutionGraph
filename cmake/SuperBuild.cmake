@@ -19,10 +19,9 @@ find_package(CrossGUIDLib REQUIRED)
 if(${ExecutionGraph_BUILD_GUI})
     find_package(SpdLogLib REQUIRED) # for logging
     find_package(ArgsLib REQUIRED) # for commandline args
-    find_package(MemoryLib REQUIRED) # memory pool
-
     find_package(CEFLib REQUIRED)
     find_package(BoostBeastLib REQUIRED)
+    find_package(MemoryLib REQUIRED) # memory pool
 endif()
 
 if(${ExecutionGraph_BUILD_TESTS})
