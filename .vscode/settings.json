@@ -167,13 +167,16 @@
         "**/dist/**" : true
     },
     "cmake.buildDirectory": "${workspaceRoot}/build",
-    "cmake.configureArgs": ["-DExecutionGraph_BUILD_TESTS=ON",
-                            "-DExecutionGraph_BUILD_GUI=OFF",
-                            "-DExecutionGraph_BUILD_LIBRARY=ON",
-                            "-DExecutionGraph_EXTERNAL_BUILD_DIR_POSTFIX=../buildExternal",
-                            "-DExecutionGraph_USE_CEF_DSYM_FILE=ON",
-                            "-DExecutionGraph_USE_ADDRESS_SANITIZER=ON"
-                            ],
+    "cmake.configureSettings": {
+                            "ExecutionGraph_BUILD_TESTS" : true,
+                            "ExecutionGraph_BUILD_LIBRARY" : true,
+                            "ExecutionGraph_BUILD_GUI" : false,
+                            "ExecutionGraph_EXTERNAL_BUILD_DIR" : "${workspaceRoot}/buildExternal",
+                            "ExecutionGraph_USE_CEF_DSYM_FILE" : false,
+                            "ExecutionGraph_USE_ADDRESS_SANITIZER" : true,
+                            "CMAKE_EXPORT_COMPILE_COMMANDS" : true
+    },
+    "cmake.configureArgs": ["--parallel"],
     "plantuml.exportFormat": "svg",
     "plantuml.exportSubFolder": false,
     "markdown-preview-enhanced.previewTheme": "github-dark.css",
