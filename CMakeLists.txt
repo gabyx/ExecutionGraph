@@ -173,6 +173,9 @@ if(${ExecutionGraph_BUILD_GUI})
     find_package(MemoryLib REQUIRED)
     list(APPEND ExecutionGraphGui_LINK_TARGETS_CORE_DEP "memoryLib")
 
+    find_package(BoostBeastLib REQUIRED)
+    list(APPEND ExecutionGraphGui_LINK_TARGETS_CORE_DEP "boostBeastLib")
+
     set_target_properties(ExecutionGraphGui::Core-Dependencies PROPERTIES INTERFACE_LINK_LIBRARIES "${ExecutionGraphGui_LINK_TARGETS_CORE_DEP}")
 endif()
 

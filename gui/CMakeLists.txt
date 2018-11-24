@@ -27,8 +27,12 @@ print_target_properties("libcef_dll_wrapper")
 message(STATUS "cef standart libs: ${CEF_STANDARD_LIBS}")
 ###########################################################
 
-add_subdirectory(cefsimple)
-add_subdirectory(executionGraphGui)
+if(OS_MACOSX)
+    add_subdirectory(cefsimple)
+    add_subdirectory(executionGraphGui)
+else()
+    message(WARNING "GUI Targets: Not yet setup to build under anything else then OS X")
+endif()
 
 if(ExecutionGraph_BUILD_TESTS)
     add_subdirectory(tests)

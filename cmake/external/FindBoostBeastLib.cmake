@@ -6,7 +6,8 @@ set(URL_HASH "7f6130bc3cf65f56a618888ce9d5ea704fa10b462be126ad053e80e553d6d8b7")
 set(INSTALL_DIR "${ExecutionGraph_EXTERNAL_INSTALL_DIR}/boost")
 
 message(STATUS "boost library finding ...")
-find_package(Boost COMPONENTS date_time system CONFIG PATHS ${INSTALL_DIR})
+set(BOOST_ROOT ${INSTALL_DIR})
+find_package(Boost COMPONENTS date_time system)
 
 if(${USE_SUPERBUILD})
     if(NOT TARGET "Boost::boost")
@@ -15,7 +16,7 @@ if(${USE_SUPERBUILD})
         ExternalProject_Add(boost
                             PREFIX "${ExecutionGraph_EXTERNAL_BUILD_DIR}/boost"
                             URL ${URL}
-                            URL_HASH SHA1=${URL_HASH}
+                            URL_HASH SHA256=${URL_HASH}
                             BUILD_IN_SOURCE 1
                             CONFIGURE_COMMAND ./bootstrap.sh
                                 --with-libraries=system
@@ -40,9 +41,9 @@ else()
 endif()
 
 if(TARGET "Boost::boost")
-    add_library(boostbeastLib INTERFACE IMPORTED)
-    set_property(TARGET boostbeastLib PROPERTY INTERFACE_LINK_LIBRARIES "Boost::system")
+    add_library(boostBeastLib INTERFACE IMPORTED)
+    set_property(TARGET boostBeastLib PROPERTY INTERFACE_LINK_LIBRARIES "Boost::boost" "Boost::system")
 
     message(STATUS "boostbeast library found! Config File: ${Boost_CONFIG}")
-    message(STATUS "boostbeast library added targets: boostbeastLib")
+    message(STATUS "boostbeast library added targets: boostBeastLib")
 endif()

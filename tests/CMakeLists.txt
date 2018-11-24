@@ -36,7 +36,7 @@ function(defineCompileDefs target)
 
     setTargetCompileOptionsExecutionGraph(${target} ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
     target_include_directories(${target} PRIVATE ${INCLUDE_DIRS})
-    target_link_libraries(${target} ExecutionGraph::CoreForTests gtest gmock_main)
+    target_link_libraries(${target} PRIVATE ExecutionGraph::CoreForTests gtest gmock_main)
     add_dependencies(build_and_test ${target})
 
     cotire(${target})
@@ -75,11 +75,6 @@ defineCompileDefs(${EXEC_NAME})
 # TaskQueue Test
 set(EXEC_NAME ${PROJECT_NAME}Test-TaskQueue)
 add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_TaskQueue.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-defineCompileDefs(${EXEC_NAME})
-
-# TaskQueue Test
-set(EXEC_NAME ${PROJECT_NAME}Test-MemoryPool)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_MemoryPool.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 defineCompileDefs(${EXEC_NAME})
 
 # Flatbuffer Test
