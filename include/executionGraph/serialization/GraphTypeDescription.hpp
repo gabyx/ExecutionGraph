@@ -78,7 +78,7 @@ namespace executionGraph
         description.getNodeTypeDescriptions() = std::move(nodeTypeDescription);
 
         return description;
-    };
+    }
 
 }  // namespace executionGraph
 #endif

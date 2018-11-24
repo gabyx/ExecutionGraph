@@ -88,7 +88,7 @@ function(setTargetCompileOptionsExecutionGraph target use_address_san use_leak_s
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
        CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
         message(STATUS "Setting Compile/Linker Options for Clang")
-        list(APPEND CXX_FLAGS_DEBUG "-fno-omit-frame-pointer"
+        list(APPEND CXX_FLAGS       "-fno-omit-frame-pointer"
                                     "-Wall"
                                     "-Werror"
                                     "-Wpedantic"
@@ -97,7 +97,7 @@ function(setTargetCompileOptionsExecutionGraph target use_address_san use_leak_s
                                     "-ftemplate-backtrace-limit=0")
 
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        list(APPEND CXX_FLAGS_DEBUG "-fno-omit-frame-pointer"
+        list(APPEND CXX_FLAGS       "-fno-omit-frame-pointer"
                                     "-Wall"
                                     "-Werror"
                                     "-Wpedantic"
@@ -106,6 +106,7 @@ function(setTargetCompileOptionsExecutionGraph target use_address_san use_leak_s
     elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
         message(ERROR "MSVC is not yet supported!")
     endif()
+
 
     if(${use_address_san})
         if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -131,22 +132,16 @@ function(setTargetCompileOptionsExecutionGraph target use_address_san use_leak_s
         endif()
     endif()
 
-    # Link with experimental library
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        set(LINKER_FLAGS "${LINKER_FLAGS} -lc++experimental")
-    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-        set(LINKER_FLAGS "${LINKER_FLAGS} -lc++experimental")
-    elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
-        message(ERROR "MSVC is not yet supported!")
-    endif()
-
     target_compile_features(${target} PUBLIC cxx_std_17)
 
     # Compile flags.
-    target_compile_options(${target} PRIVATE $<$<CONFIG:Debug>:${CXX_FLAGS_DEBUG}> )
+    target_compile_options(${target} PRIVATE ${CXX_FLAGS} $<$<CONFIG:Debug>:${CXX_FLAGS_DEBUG}>)
 
     # Linker flags.
     set_property(TARGET ${target} PROPERTY LINK_FLAGS ${LINKER_FLAGS})
+
+    # Linking std-libraries
+    target_link_libraries(${target}  PUBLIC "stdc++fs" PUBLIC "c++experimental")
 
     if(OS_MACOSX)
         set_target_properties(${target} PROPERTIES

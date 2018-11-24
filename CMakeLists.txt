@@ -5,7 +5,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_CURR
 message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
 
 # Define the Project ===============================================
-set(ExecutionGraphProjectName "ExecutionGraph")
+set(ExecutionGraphProjectName "ExecutionGraph" CXX)
 message(STATUS "Project name is: " ${ExecutionGraphProjectName})
 project(${ExecutionGraphProjectName})
 
@@ -55,8 +55,7 @@ set(ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS ON CACHE BOOL "Force an exception i
 #mark_as_advanced( ExecutionGraph_USE_OPENMP)
 #set(ExecutionGraph_USE_OPENMP ON CACHE BOOL "Try to use OpenMp for parallel speedup")
 
-set(ExecutionGraph_EXTERNAL_BUILD_DIR_POSTFIX "external" CACHE STRING "Folder where all external shit is build!")
-set(ExecutionGraph_EXTERNAL_BUILD_DIR "${CMAKE_BINARY_DIR}/${ExecutionGraph_EXTERNAL_BUILD_DIR_POSTFIX}" )
+set(ExecutionGraph_EXTERNAL_BUILD_DIR "${CMAKE_BINARY_DIR}/external" CACHE STRING "Folder where all external shit is build!")
 set(ExecutionGraph_EXTERNAL_INSTALL_DIR "${ExecutionGraph_EXTERNAL_BUILD_DIR}/install")
 #=======================================================================
 
@@ -136,25 +135,6 @@ endif(CCACHE_FOUND)
 message("Default Compiler Flags: '${CMAKE_CXX_FLAGS}' | '${CMAKE_CXX_FLAGS_DEBUG}' | '${CMAKE_CXX_FLAGS_RELEASE}'")
 message("Default Linker Flags: '${CMAKE_EXE_LINKER_FLAGS}' | '${CMAKE_SHARED_LINKER_FLAGS}' | '${CMAKE_STATIC_LINKER_FLAGS}'")
 
-#Add some multithreaded build support 
-mark_as_advanced(MULTITHREADED_BUILD)
-set(MULTITHREADED_BUILD ON CACHE BOOL "Parallel build with as many threads as possible!")
-if(MULTITHREADED_BUILD)
-	if(${CMAKE_GENERATOR} MATCHES "Unix Makefiles")
-            file(COPY ${ExecutionGraph_ROOT_DIR}/cmake/parallelmake.sh DESTINATION ${PROJECT_BINARY_DIR}
-                FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-                NO_SOURCE_PERMISSIONS
-            )
-            set(CMAKE_MAKE_PROGRAM "${PROJECT_BINARY_DIR}/parallelmake.sh")
-            message(STATUS "Set make program to ${PROJECT_BINARY_DIR}/parallelmake.sh")
-    elseif(MSVC)
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" "/MP")
-      message(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-    endif()
-endif()
-# ======================================================================
-
-
 # Dependencies =========================================================
 add_library(ExecutionGraph::Core-Dependencies INTERFACE IMPORTED)
 # Define Eigen
@@ -164,33 +144,41 @@ list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "eigenLib")
 find_package(MetaLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "metaLib")
 
-# Try to find the spdlog
-find_package(SpdLogLib REQUIRED)
-list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "spdlogLib")
 # Try to find the fmt library
 find_package(FmtLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "fmtLib")
-
 # Try to find the Argumentparser
 find_package(ArgsLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "argsLib")
-# Try to find the RTTR Library (use our own script)
+# Try to find the RTTR library 
 find_package(RTTRLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "rttrLib")
-# Try to find the crossguid Library (use our own script)
-find_package(CrossGUIDLib REQUIRED)
-list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "crossguidLib")
-# Try to find the crossguid Library (use our own script)
-find_package(MemoryLib REQUIRED)
-list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "memoryLib")
-# Try find cereal
-# find_package(CerealLib REQUIRED)
-# list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "cerealLib")
-# Try find flatbuffer
+# Try to find flatbuffer library
 find_package(FlatBuffersLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "flatbuffersLib")
+# Try to find the crossguid library
+find_package(CrossGUIDLib REQUIRED)
+ list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "crossguidLib")
 
 set_target_properties(ExecutionGraph::Core-Dependencies PROPERTIES INTERFACE_LINK_LIBRARIES "${ExecutionGraph_LINK_TARGETS_CORE_DEP}")
+
+if(${ExecutionGraph_BUILD_GUI})
+    add_library(ExecutionGraphGui::Core-Dependencies INTERFACE IMPORTED)
+    
+    # Try to find the spdlog
+    find_package(SpdLogLib REQUIRED)
+    list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "spdlogLib")
+
+    # Try to find the memory library
+    find_package(MemoryLib REQUIRED)
+    list(APPEND ExecutionGraphGui_LINK_TARGETS_CORE_DEP "memoryLib")
+
+    find_package(BoostBeastLib REQUIRED)
+    list(APPEND ExecutionGraphGui_LINK_TARGETS_CORE_DEP "boostBeastLib")
+
+    set_target_properties(ExecutionGraphGui::Core-Dependencies PROPERTIES INTERFACE_LINK_LIBRARIES "${ExecutionGraphGui_LINK_TARGETS_CORE_DEP}")
+endif()
+
 
 if(ExecutionGraph_USE_OPENMP)
 

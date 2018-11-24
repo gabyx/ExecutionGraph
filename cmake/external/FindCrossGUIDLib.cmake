@@ -19,8 +19,11 @@ if(${USE_SUPERBUILD})
                             GIT_SHALLOW         ON
                             TIMEOUT 10
                             UPDATE_DISCONNECTED  ON
-                            CMAKE_ARGS "-DCMAKE_BUILD_TYPE=Release" "-DCMAKE_VERBOSE_MAKEFILE=ON" "-DCROSSGUID_TESTS=OFF" 
-                                       "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
+                            CMAKE_ARGS "-DCMAKE_BUILD_TYPE=Release" 
+                                       "-DCMAKE_VERBOSE_MAKEFILE=ON" 
+                                       "-DCROSSGUID_TESTS=OFF" 
+                                       "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}" 
+                                       "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
                             INSTALL_DIR "${INSTALL_DIR}")
                             
         message(STATUS "crossguid library setup -> build it!")

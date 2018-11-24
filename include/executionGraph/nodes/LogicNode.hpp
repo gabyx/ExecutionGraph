@@ -75,9 +75,14 @@ namespace executionGraph
 
     public:
         //! The basic constructor of a node.
-        LogicNode(NodeId id, const std::string& name = "")
-            : m_id(id), m_name(name.empty() ? std::to_string(id) : name)
-        {}
+        LogicNode(NodeId id, std::string name = "")
+            : m_id(id), m_name(std::move(name))
+        {
+            if(m_name.empty())
+            {
+                m_name = std::to_string(id);
+            }
+        }
 
         LogicNode(const LogicNode&) = default;
         LogicNode(LogicNode&&)      = default;
@@ -94,7 +99,7 @@ namespace executionGraph
         virtual void compute() = 0;
 
         inline NodeId getId() const { return m_id; }
-        inline std::string getName() const { return m_name; }
+        inline const std::string& getName() const { return m_name; }
 
         //! Get the list of input sockets.
         const SocketInputListType& getInputs() const { return m_inputs; }

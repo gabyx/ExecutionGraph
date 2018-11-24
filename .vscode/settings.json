@@ -86,10 +86,6 @@
         "mutex": "cpp"
     },
     "cmake.useCMakeServer": true,
-    "cmake.preferredGenerators": [
-        "Ninja",
-        "Unix Makefiles"
-    ],
     // "C_Cpp.clang_format_fallbackStyle": "none",
     // "C_Cpp.clang_format_style": "file",
     "editor.formatOnSave": false,
@@ -170,12 +166,17 @@
         "**/buildExternal/**" : true,
         "**/dist/**" : true
     },
-    "cmake.configureArgs": ["-DExecutionGraph_BUILD_TESTS=ON",
-                            "-DExecutionGraph_BUILD_GUI=ON",
-                            "-DExecutionGraph_EXTERNAL_BUILD_DIR_POSTFIX=../buildExternal",
-                            "-DExecutionGraph_USE_CEF_DSYM_FILE=ON",
-                            "-DExecutionGraph_USE_ADDRESS_SANITIZER=ON"
-                            ],
+    "cmake.buildDirectory": "${workspaceRoot}/build",
+    "cmake.configureSettings": {
+                            "ExecutionGraph_BUILD_TESTS" : true,
+                            "ExecutionGraph_BUILD_LIBRARY" : true,
+                            "ExecutionGraph_BUILD_GUI" : true,
+                            "ExecutionGraph_EXTERNAL_BUILD_DIR" : "${workspaceRoot}/buildExternal",
+                            "ExecutionGraph_USE_CEF_DSYM_FILE" : false,
+                            "ExecutionGraph_USE_ADDRESS_SANITIZER" : true,
+                            "CMAKE_EXPORT_COMPILE_COMMANDS" : true
+    },
+    "cmake.configureArgs": ["--parallel"],
     "plantuml.exportFormat": "svg",
     "plantuml.exportSubFolder": false,
     "markdown-preview-enhanced.previewTheme": "github-dark.css",
@@ -194,4 +195,5 @@
     "gitlens.hovers.enabled": false,
     "gitlens.mode.active": "review",
     "python.formatting.provider": "yapf",
+    
 }

@@ -96,7 +96,7 @@ if(OS_LINUX)
   add_executable(${CEF_TARGET} ${CEFSIMPLE_SRCS})
   SET_EXECUTABLE_TARGET_PROPERTIES(${CEF_TARGET} ${CMAKE_CURRENT_SOURCE_DIR})
   add_dependencies(${CEF_TARGET} libcef_dll_wrapper)
-  target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
+  target_link_libraries(${CEF_TARGET} PRIVATE libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
 
   # Set rpath so that libraries can be placed next to the executable.
   set_target_properties(${CEF_TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN")
@@ -132,7 +132,7 @@ if(OS_MACOSX)
   )
   #SET_EXECUTABLE_TARGET_PROPERTIES(${CEF_HELPER_TARGET} ${CMAKE_CURRENT_SOURCE_DIR})
   add_dependencies(${CEF_HELPER_TARGET} libcef_dll_wrapper)
-  target_link_libraries(${CEF_HELPER_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
+  target_link_libraries(${CEF_HELPER_TARGET} PRIVATE libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
   
 
   # Fix the framework rpath in the helper executable.
@@ -142,7 +142,7 @@ if(OS_MACOSX)
   add_executable(${CEF_TARGET} MACOSX_BUNDLE ${CEFSIMPLE_RESOURCES_SRCS} ${CEFSIMPLE_SRCS})
   #SET_EXECUTABLE_TARGET_PROPERTIES(${CEF_TARGET} ${CMAKE_CURRENT_SOURCE_DIR})
   add_dependencies(${CEF_TARGET} libcef_dll_wrapper "${CEF_HELPER_TARGET}")
-  target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
+  target_link_libraries(${CEF_TARGET} PRIVATE libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
   set_target_properties(${CEF_TARGET} PROPERTIES
     MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/mac/Info.plist
     )
@@ -183,12 +183,12 @@ if(OS_WINDOWS)
   add_executable(${CEF_TARGET} WIN32 ${CEFSIMPLE_SRCS})
   add_dependencies(${CEF_TARGET} libcef_dll_wrapper)
   SET_EXECUTABLE_TARGET_PROPERTIES(${CEF_TARGET} ${CMAKE_CURRENT_SOURCE_DIR})
-  target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
+  target_link_libraries(${CEF_TARGET} PRIVATE libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
 
   if(USE_SANDBOX)
     # Logical target used to link the cef_sandbox library.
     ADD_LOGICAL_TARGET("cef_sandbox_lib" "${CEF_SANDBOX_LIB_DEBUG}" "${CEF_SANDBOX_LIB_RELEASE}")
-    target_link_libraries(${CEF_TARGET} cef_sandbox_lib ${CEF_SANDBOX_STANDARD_LIBS})
+    target_link_libraries(${CEF_TARGET} PRIVATE cef_sandbox_lib ${CEF_SANDBOX_STANDARD_LIBS})
   endif()
 
   # Add the custom manifest files to the executable.
