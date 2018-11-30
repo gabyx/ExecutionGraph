@@ -1,0 +1,10 @@
+set(ExecutionGraphGUICommon_SRCS
+    ${CMAKE_CURRENT_SOURCE_DIR}/common/Loggers.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/common/Loggers.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/common/BinaryBuffer.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/common/BinaryPayload.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/common/BufferPool.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/common/RequestDispatcher.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/common/Request.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/common/Response.hpp
+)

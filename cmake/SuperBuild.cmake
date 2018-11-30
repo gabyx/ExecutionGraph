@@ -19,7 +19,6 @@ find_package(CrossGUIDLib REQUIRED)
 if(${ExecutionGraph_BUILD_GUI})
     find_package(SpdLogLib REQUIRED) # for logging
     find_package(ArgsLib REQUIRED) # for commandline args
-    find_package(CEFLib REQUIRED)
     find_package(BoostBeastLib REQUIRED)
     find_package(MemoryLib REQUIRED) # memory pool
 endif()
@@ -27,15 +26,6 @@ endif()
 if(${ExecutionGraph_BUILD_TESTS})
     find_package(GoogleTestLib)
 endif()
-
-
-# ExternalProject_Add(ExecutionGraph
-#                     DEPENDS ${DEPENDENCIES}
-#                     SOURCE_DIR ${PROJECT_SOURCE_DIR}
-#                     BINARY_DIR ${CMAKE_BINARY_DIR}
-#                     CMAKE_ARGS -DUSE_SUPERBUILD=OFF ${EXTRA_CMAKE_ARGS}
-#                     INSTALL_COMMAND "")
-
 
 message(STATUS "=================================================================")
 message(STATUS "                      SUPER BUILD CONFIGURE [DONE]                ")
