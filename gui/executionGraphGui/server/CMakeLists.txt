@@ -8,18 +8,16 @@ set(ExecutionGraphGUIServer_SRCS
 
 
 set(ExecutionGraphServer_INC_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}/../common
-    ${CMAKE_CURRENT_SOURCE_DIR}/../backend
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../..
 )
 
-function(defineCompileDefs target)
+function(defineCompileDefs target includeDirs)
 
     message(STATUS "====================================================")
     message(STATUS "Configuring target: ${target}")
 
     setTargetCompileOptionsExecutionGraph(${target} ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
-    target_include_directories(${target} PRIVATE ${inlcudeDirs})
+    target_include_directories(${target} PRIVATE ${includeDirs})
     target_link_libraries(${target} PRIVATE ExecutionGraph::Core 
                                             ExecutionGraphGui::Core-Dependencies 
                                             boostBeastLib)
@@ -31,6 +29,6 @@ function(defineCompileDefs target)
 endfunction()
 
 add_executable(ExecutionGraphServer ${ExecutionGraphGUIServer_SRCS})
-defineCompileDefs(ExecutionGraphServer)
+defineCompileDefs(ExecutionGraphServer ${ExecutionGraphServer_INC_DIRS})
 
 

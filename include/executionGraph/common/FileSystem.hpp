@@ -14,14 +14,21 @@
 #define executionGraph_common_FileSystem_hpp
 
 #include <optional>
-#include <experimental/filesystem>
+#if __has_include(<filesystem>)
+#    include <filesystem>
+#else
+#    include <experimental/filesystem>
+#endif
 #include "executionGraph/common/Platform.hpp"
 #include "executionGraph/config/Config.hpp"
 
 namespace std
 {
+#if !(__has_include(<filesystem>))
     namespace filesystem = std::experimental::filesystem;
-    using path           = std::filesystem::path;
+#endif
+
+    using path = std::filesystem::path;
 
 }  // namespace std
 
