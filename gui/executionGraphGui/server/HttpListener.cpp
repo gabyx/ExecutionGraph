@@ -14,6 +14,8 @@
 #include "executionGraphGui/server/HttpCommon.hpp"
 #include "executionGraphGui/server/HttpSession.hpp"
 
+#include <boost/asio/strand.hpp>
+
 namespace executionGraphGui
 {
     using tcp      = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>

@@ -5,9 +5,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_CURR
 message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
 
 # Define the Project ===============================================
-set(ExecutionGraphProjectName "ExecutionGraph" CXX)
+set(ExecutionGraphProjectName "ExecutionGraph")
 message(STATUS "Project name is: " ${ExecutionGraphProjectName})
-project(${ExecutionGraphProjectName})
+project(${ExecutionGraphProjectName} LANGUAGE CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
