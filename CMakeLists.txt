@@ -7,7 +7,7 @@ message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
 # Define the Project ===============================================
 set(ExecutionGraphProjectName "ExecutionGraph")
 message(STATUS "Project name is: " ${ExecutionGraphProjectName})
-project(${ExecutionGraphProjectName} LANGUAGE CXX)
+project(${ExecutionGraphProjectName})
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

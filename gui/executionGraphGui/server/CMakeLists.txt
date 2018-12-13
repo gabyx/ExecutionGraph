@@ -3,6 +3,10 @@ set(ExecutionGraphGUIServer_SRCS
     ${ExecutionGraphGUICommon_SRCS}
     ${ExecutionGraphGUIBackend_SRCS}
 
+    ${CMAKE_CURRENT_SOURCE_DIR}/MimeType.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/HttpCommon.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/HttpSession.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/HttpListener.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
 )
 
@@ -20,7 +24,8 @@ function(defineCompileDefs target includeDirs)
     target_include_directories(${target} PRIVATE ${includeDirs})
     target_link_libraries(${target} PRIVATE ExecutionGraph::Core 
                                             ExecutionGraphGui::Core-Dependencies 
-                                            boostBeastLib)
+                                            boostBeastLib 
+                                            spdlogLib)
 
     cotire(${target})
 

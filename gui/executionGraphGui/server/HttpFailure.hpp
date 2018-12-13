@@ -2,7 +2,7 @@
 //  ExecutionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 //
-//  @date Sun Dec 02 2018
+//  @date Thu Dec 13 2018
 //  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
 //
 //  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,21 +10,20 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_server_HttpCommon_hpp
-#define executionGraphGui_server_HttpCommon_hpp
+#ifndef executionGraphGui_server_HttpFailure_hpp
+#define executionGraphGui_server_HttpFailure_hpp
 
-#include <boost/beast/core.hpp>
-
-#include "executionGraphGui/server/HttpFailure.hpp"
-#include "executionGraphGui/server/MimeType.hpp"
+#include <boost/system/error_code.hpp>
+#include <executionGraphGui/common/Loggers.hpp>
 
 namespace executionGraphGui
 {
-    // Append an HTTP rel-path to a local filesystem path.
-    // The returned path is normalized for the platform.
-    std::string path_cat(boost::beast::string_view base,
-                         boost::beast::string_view path);
-
+    // Report a failure
+    template<typename T>
+    void fail(boost::system::error_code ec, const T& what)
+    {
+        EXECGRAPHGUI_BACKENDLOG_ERROR("Failure: {0} : {1}", what, ec.message());
+    }
 }  // namespace executionGraphGui
 
 #endif

@@ -11,12 +11,31 @@
 // =========================================================================================
 
 #include "executionGraphGui/server/HttpSession.hpp"
-#include "executionGraphGui/server/HttpCommon.hpp"
+#include <functional>
+#include <tuple>
+#include <boost/asio/bind_executor.hpp>
+#include <boost/beast/version.hpp>
+#include "executionGraphGui/server/MimeType.hpp"
+
+namespace http = boost::beast::http;  // from <boost/beast/http.hpp>
 
 namespace executionGraphGui
 {
-    using tcp      = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
-    namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
+    // This is the C++11 equivalent of a generic lambda.
+    // The function object is used to send an HTTP message.
+    struct HttpSession::Send
+    {
+        HttpSession& m_self;
+
+        explicit Send(HttpSession& self)
+            : m_self(self)
+        {
+        }
+
+        template<bool isRequest, class Body, class Fields>
+        void
+        operator()(http::message<isRequest, Body, Fields>&& msg) const;
+    };
 
     // This function produces an HTTP response for the given
     // request. The type of the response object depends on the
@@ -121,25 +140,35 @@ namespace executionGraphGui
         return send(std::move(res));
     }
 
+}  // namespace executionGraphGui
+
+namespace executionGraphGui
+{
     // Start the asynchronous operation
-    void HtppSession::run()
+    void HttpSession::run()
     {
         do_read();
     }
 
-    void HtppSession::do_read()
+    void HttpSession::do_read()
     {
         // Make the request empty before reading,
         // otherwise the operation behavior is undefined.
         m_req = {};
 
         // Read a request
-        http::async_read(m_socket, m_buffer, m_req, boost::asio::bind_executor(m_strand, std::bind(&HttpSession::on_read, shared_from_this(), std::placeholders::_1, std::placeholders::_2)));
+        http::async_read(m_socket,
+                         m_buffer,
+                         m_req,
+                         boost::asio::bind_executor(m_strand,
+                                                    std::bind(&HttpSession::on_read,
+                                                              shared_from_this(),
+                                                              std::placeholders::_1,
+                                                              std::placeholders::_2)));
     }
 
-    void HtppSession::on_read(
-        boost::system::error_code ec,
-        std::size_t bytes_transferred)
+    void HttpSession::on_read(boost::system::error_code ec,
+                              std::size_t bytes_transferred)
     {
         boost::ignore_unused(bytes_transferred);
 
@@ -151,13 +180,14 @@ namespace executionGraphGui
             return fail(ec, "read");
 
         // Send the response
-        handle_request(*m_doc_root, std::move(m_req), m_lambda);
+        handle_request(m_doc_root,
+                       std::move(m_req),
+                       Send{*this});
     }
 
-    void HtppSession::on_write(
-        boost::system::error_code ec,
-        std::size_t bytes_transferred,
-        bool close)
+    void HttpSession::on_write(boost::system::error_code ec,
+                               std::size_t bytes_transferred,
+                               bool close)
     {
         boost::ignore_unused(bytes_transferred);
 
@@ -178,7 +208,7 @@ namespace executionGraphGui
         do_read();
     }
 
-    void HtppSession::do_close()
+    void HttpSession::do_close()
     {
         // Send a TCP shutdown
         boost::system::error_code ec;
@@ -186,4 +216,32 @@ namespace executionGraphGui
 
         // At this point the connection is closed gracefully
     }
+
+    template<bool isRequest, class Body, class Fields>
+    void HttpSession::Send::operator()(http::message<isRequest, Body, Fields>&& msg) const
+    {
+        // The lifetime of the message has to extend
+        // for the duration of the async operation so
+        // we use a shared_ptr to manage it.
+        auto sp = std::make_shared<
+            http::message<isRequest, Body, Fields>>(std::move(msg));
+
+        // Store a type-erased version of the shared
+        // pointer in the class to keep it alive.
+        m_self.m_res = sp;
+
+        // Write the response
+        http::async_write(
+            m_self.m_socket,
+            *sp,
+            boost::asio::bind_executor(
+                m_self.m_strand,
+                std::bind(
+                    &HttpSession::on_write,
+                    m_self.shared_from_this(),
+                    std::placeholders::_1,
+                    std::placeholders::_2,
+                    sp->need_eof())));
+    }
+
 }  // namespace executionGraphGui

@@ -11,20 +11,15 @@
 // =========================================================================================
 
 #include "executionGraphGui/server/HttpListener.hpp"
-#include "executionGraphGui/server/HttpCommon.hpp"
 #include "executionGraphGui/server/HttpSession.hpp"
 
-#include <boost/asio/strand.hpp>
+namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
 
 namespace executionGraphGui
 {
-    using tcp      = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
-    namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
-
-    HttpListener::HttpListener(
-        boost::asio::io_context& ioc,
-        tcp::endpoint endpoint,
-        const std::string& doc_root)
+    HttpListener::HttpListener(boost::asio::io_context& ioc,
+                               tcp::endpoint endpoint,
+                               const std::string& doc_root)
         : m_acceptor(ioc)
         , m_socket(ioc)
         , m_doc_root(doc_root)
@@ -94,7 +89,7 @@ namespace executionGraphGui
         else
         {
             // Create the session and run it
-            std::make_shared<session>(
+            std::make_shared<HttpSession>(
                 std::move(m_socket),
                 m_doc_root)
                 ->run();
