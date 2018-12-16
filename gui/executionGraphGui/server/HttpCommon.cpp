@@ -11,3 +11,9 @@
 // =========================================================================================
 
 #include "executionGraphGui/server/HttpCommon.hpp"
+#include <executionGraph/config/Config.hpp>
+
+std::string getServerVersion()
+{
+    return std::string{"ExecutionGraph Server "} + executionGraph::versionString;
+}

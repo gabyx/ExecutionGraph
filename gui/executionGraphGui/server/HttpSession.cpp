@@ -14,7 +14,6 @@
 #include <functional>
 #include <tuple>
 #include <boost/asio/bind_executor.hpp>
-#include <boost/beast/version.hpp>
 #include "executionGraphGui/server/MimeType.hpp"
 
 namespace http = boost::beast::http;  // from <boost/beast/http.hpp>
@@ -38,11 +37,13 @@ namespace
                        Request&& req,
                        Send&& send)
     {
+        static const auto versionString = getServerVersion();
+
         // Returns a bad Request response.
         auto const badRequest =
             [&req](boost::beast::string_view why) {
                 ResponseString res{http::status::bad_request, req.version()};
-                res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+                res.set(http::field::server, versionString);
                 res.set(http::field::content_type, "text/html");
                 res.keep_alive(req.keep_alive());
                 res.body() = why.to_string();
@@ -52,24 +53,24 @@ namespace
 
         // Returns a not found response.
         auto const notFound =
-            [&req](boost::beast::string_view target) {
+            [&req](auto target) {
                 ResponseString res{http::status::not_found, req.version()};
-                res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+                res.set(http::field::server, versionString);
                 res.set(http::field::content_type, "text/html");
                 res.keep_alive(req.keep_alive());
-                res.body() = "The resource '" + target.to_string() + "' was not found.";
+                res.body() = fmt::format("The resource '{0}' was not found. ('{1}')", target.to_string());
                 res.prepare_payload();
                 return res;
             };
 
         // Returns a server error response.
         auto const serverError =
-            [&req](boost::beast::string_view what) {
+            [&req](auto what) {
                 ResponseString res{http::status::internal_server_error, req.version()};
-                res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+                res.set(http::field::server, versionString);
                 res.set(http::field::content_type, "text/html");
                 res.keep_alive(req.keep_alive());
-                res.body() = "An error occurred: '" + what.to_string() + "'";
+                res.body() = fmt::format("An error occurred: '{0}'", what);
                 res.prepare_payload();
                 return res;
             };
@@ -77,7 +78,7 @@ namespace
         // Make sure we can handle the method.
         if(req.method() != http::verb::get &&
            req.method() != http::verb::head)
-           
+
         {
             return send(badRequest("Unknown HTTP-method"));
         }
@@ -87,7 +88,7 @@ namespace
            req.target()[0] != '/' ||
            req.target().find("..") != boost::beast::string_view::npos)
         {
-            return send(badRequest("Illegal Request-target"));
+            return send(badRequest("Illegal request-target"));
         }
 
         // Build the path to the requested file.
@@ -123,7 +124,7 @@ namespace
         if(req.method() == http::verb::head)
         {
             ResponseEmpty res{http::status::ok, req.version()};
-            res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+            res.set(http::field::server, versionString);
             res.set(http::field::content_type, getMimeType(path));
             res.content_length(size);
             res.keep_alive(req.keep_alive());
@@ -134,7 +135,7 @@ namespace
         ResponseFile res{std::piecewise_construct,
                          std::make_tuple(std::move(body)),
                          std::make_tuple(http::status::ok, req.version())};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        res.set(http::field::server, versionString);
         res.set(http::field::content_type, getMimeType(path));
         res.content_length(size);
         res.keep_alive(req.keep_alive());
@@ -162,7 +163,6 @@ struct HttpSession::Send
     template<typename Message>
     void operator()(Message&& msg) const;
 };
-
 
 // Start the asynchronous operation
 void HttpSession::run()

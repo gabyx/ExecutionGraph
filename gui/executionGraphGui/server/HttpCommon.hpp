@@ -13,8 +13,12 @@
 #ifndef executionGraphGui_server_HttpCommon_hpp
 #define executionGraphGui_server_HttpCommon_hpp
 
+#include <string>
 #include <boost/beast/core.hpp>
 #include "executionGraphGui/server/HttpFailure.hpp"
 #include "executionGraphGui/server/MimeType.hpp"
+
+
+std::string getServerVersion();
 
 #endif
