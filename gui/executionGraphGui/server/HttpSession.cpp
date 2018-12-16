@@ -91,7 +91,7 @@ namespace
         }
 
         // Build the path to the requested file.
-        std::path path = rootPath / (std::string{"."} + std::string{req.target()});
+        std::path path = std::filesystem::canonical(rootPath / (std::string{"."} + std::string{req.target()}));
         if(req.target().back() == '/')
         {
             path.append("index.html");
