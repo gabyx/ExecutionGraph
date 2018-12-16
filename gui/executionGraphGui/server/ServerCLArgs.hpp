@@ -17,36 +17,35 @@
 #include <executionGraph/common/FileSystem.hpp>
 #include <executionGraph/common/Singleton.hpp>
 
-namespace executionGraphGui
-{
-    /* ---------------------------------------------------------------------------------------*/
-    /*!
+/* ---------------------------------------------------------------------------------------*/
+/*!
         Commandline Arguments for the Server Application
         No need to make it thread-safe, since everything is read only!
 
         @date Fr Dez 14 2018
         @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
     */
-    /* ---------------------------------------------------------------------------------------*/
-    class ServerCLArgs final : public executionGraph::CommandLineArguments,
-                               public executionGraph::Singleton<ServerCLArgs>
-    {
-    public:
-        ServerCLArgs(int argc, const char* argv[]);
-        virtual ~ServerCLArgs() = default;
+/* ---------------------------------------------------------------------------------------*/
+class ServerCLArgs final : public executionGraph::CommandLineArguments,
+                           public executionGraph::Singleton<ServerCLArgs>
+{
+public:
+    ServerCLArgs(int argc, const char* argv[]);
+    virtual ~ServerCLArgs() = default;
 
-    public:
-        std::path rootPath() { return args::get(m_rootPath); }
-        const std::string& address() { return args::get(m_address); }
-        unsigned short port() { return args::get(m_port); }
-        std::size_t threads() { return args::get(m_threads); }
+public:
+    std::path rootPath() { return m_rootPath.Get(); }
+    const std::string& address() { return m_address.Get(); }
+    unsigned short port() { return m_port.Get(); }
+    std::size_t threads() { return m_threads.Get(); }
+    const std::string& logPath() { return m_logPath.Get(); }
 
-    private:
-        args::ValueFlag<std::string> m_rootPath;  //!< Server root path.
-        args::ValueFlag<std::string> m_address;   //!< Server address.
-        args::ValueFlag<unsigned short> m_port;   //!< Server port.
-        args::ValueFlag<std::size_t> m_threads;   //!< Number of threads used for async. operations.
-    };
-}  // namespace executionGraphGui
+private:
+    args::ValueFlag<std::string> m_rootPath;  //!< Server root path.
+    args::ValueFlag<std::string> m_address;   //!< Server address.
+    args::ValueFlag<unsigned short> m_port;   //!< Server port.
+    args::ValueFlag<std::size_t> m_threads;   //!< Number of threads used for async. operations.
+    args::ValueFlag<std::string> m_logPath;   //!< Server log path.
+};
 
 #endif

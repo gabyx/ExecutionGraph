@@ -14,39 +14,36 @@
 #include <string_view>
 #include <unordered_map>
 
-namespace executionGraphGui
+// Return a reasonable mime type based on the extension of a file.
+std::string_view getMimeType(const std::path& path)
 {
-    // Return a reasonable mime type based on the extension of a file.
-    std::string_view getMimeType(const std::path& path)
+    static const std::unordered_map<std::string, std::string> mapping = {
+        {".htm", "text/html"},
+        {".html", "text/html"},
+        {".php", "text/html"},
+        {".css", "text/css"},
+        {".txt", "text/plain"},
+        {".js", "application/javascript"},
+        {".json", "application/json"},
+        {".xml", "application/xml"},
+        {".swf", "application/x-shockwave-flash"},
+        {".flv", "video/x-flv"},
+        {".png", "image/png"},
+        {".jpe", "image/jpeg"},
+        {".jpeg", "image/jpeg"},
+        {".jpg", "image/jpeg"},
+        {".bmp", "image/bmp"},
+        {".gif", "image/gif"},
+        {".ico", "image/vnd.microsoft.icon"},
+        {".tiff", "image/tiff"},
+        {".tif", "image/tiff"},
+        {".svg", "image/svg+xml"},
+        {".svgz", "image/svg+xml"}};
+
+    auto it = mapping.find(path.extension().c_str());
+    if(it != mapping.end())
     {
-        static const std::unordered_map<std::string, std::string> mapping = {
-            {".htm", "text/html"},
-            {".html", "text/html"},
-            {".php", "text/html"},
-            {".css", "text/css"},
-            {".txt", "text/plain"},
-            {".js", "application/javascript"},
-            {".json", "application/json"},
-            {".xml", "application/xml"},
-            {".swf", "application/x-shockwave-flash"},
-            {".flv", "video/x-flv"},
-            {".png", "image/png"},
-            {".jpe", "image/jpeg"},
-            {".jpeg", "image/jpeg"},
-            {".jpg", "image/jpeg"},
-            {".bmp", "image/bmp"},
-            {".gif", "image/gif"},
-            {".ico", "image/vnd.microsoft.icon"},
-            {".tiff", "image/tiff"},
-            {".tif", "image/tiff"},
-            {".svg", "image/svg+xml"},
-            {".svgz", "image/svg+xml"}};
-            
-        auto it = mapping.find(path.extension().c_str());
-        if(it != mapping.end())
-        {
-            return it->second;
-        }
-        return "application/text";
+        return it->second;
     }
-}  // namespace executionGraphGui
+    return "application/text";
+}

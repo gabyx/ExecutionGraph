@@ -44,7 +44,8 @@ public:
     enum Ins
     {
         Value1,
-        Value2
+        Value2,
+        Value3NotAdded
     };
     enum Outs
     {
@@ -77,7 +78,8 @@ public:
         //        this->template getValue<typename OutSockets::template Get<Result1>>() =
         //            this->template getValue<typename InSockets::template Get<Value1>>() +
         //            this->template getValue<typename InSockets::template Get<Value2>>();
-        getOutVal<Result1>() = getInVal<Value1>() + getInVal<Value2>();
+        getOutVal<Result1>() = getInVal<Value1>() + getInVal<Value2>(); 
+        /* + getInVal<Value3NotAdded>() // would be a compile error */
     }
 };
 

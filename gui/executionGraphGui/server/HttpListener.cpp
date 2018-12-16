@@ -13,90 +13,86 @@
 #include "executionGraphGui/server/HttpListener.hpp"
 #include "executionGraphGui/server/HttpSession.hpp"
 
-namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
+namespace http = boost::beast::http;  // from <boost/beast/http.hpp>
 
-namespace executionGraphGui
+HttpListener::HttpListener(boost::asio::io_context& ioc,
+                           tcp::endpoint endpoint,
+                           const std::string& doc_root)
+    : m_acceptor(ioc)
+    , m_socket(ioc)
+    , m_rootPath(doc_root)
 {
-    HttpListener::HttpListener(boost::asio::io_context& ioc,
-                               tcp::endpoint endpoint,
-                               const std::string& doc_root)
-        : m_acceptor(ioc)
-        , m_socket(ioc)
-        , m_rootPath(doc_root)
+    boost::system::error_code ec;
+
+    // Open the acceptor
+    m_acceptor.open(endpoint.protocol(), ec);
+    if(ec)
     {
-        boost::system::error_code ec;
-
-        // Open the acceptor
-        m_acceptor.open(endpoint.protocol(), ec);
-        if(ec)
-        {
-            fail(ec, "open");
-            return;
-        }
-
-        // Allow address reuse
-        m_acceptor.set_option(boost::asio::socket_base::reuse_address(true), ec);
-        if(ec)
-        {
-            fail(ec, "set_option");
-            return;
-        }
-
-        // Bind to the server address
-        m_acceptor.bind(endpoint, ec);
-        if(ec)
-        {
-            fail(ec, "bind");
-            return;
-        }
-
-        // Start listening for connections
-        m_acceptor.listen(
-            boost::asio::socket_base::max_listen_connections, ec);
-        if(ec)
-        {
-            fail(ec, "listen");
-            return;
-        }
+        fail(ec, "HttpListener:: open");
+        return;
     }
 
-    // Start accepting incoming connections
-    void HttpListener::run()
+    // Allow address reuse
+    m_acceptor.set_option(boost::asio::socket_base::reuse_address(true), ec);
+    if(ec)
     {
-        if(!m_acceptor.is_open())
-        {
-            return;
-        }
-        doAccept();
+        fail(ec, "HttpListener:: set_option");
+        return;
     }
 
-    void HttpListener::doAccept()
+    // Bind to the server address
+    m_acceptor.bind(endpoint, ec);
+    if(ec)
     {
-        m_acceptor.async_accept(
-            m_socket,
-            std::bind(
-                &HttpListener::onAccept,
-                shared_from_this(),
-                std::placeholders::_1));
+        fail(ec, "HttpListener:: bind");
+        return;
     }
 
-    void HttpListener::onAccept(boost::system::error_code ec)
+    // Start listening for connections
+    m_acceptor.listen(
+        boost::asio::socket_base::max_listen_connections, ec);
+    if(ec)
     {
-        if(ec)
-        {
-            fail(ec, "accept");
-        }
-        else
-        {
-            // Create the session and run it
-            std::make_shared<HttpSession>(
-                std::move(m_socket),
-                m_rootPath)
-                ->run();
-        }
+        fail(ec, "HttpListener:: listen");
+        return;
+    }
+}
 
-        // Accept another connection
-        doAccept();
+// Start accepting incoming connections
+void HttpListener::run()
+{
+    if(!m_acceptor.is_open())
+    {
+        return;
+    }
+    doAccept();
+}
+
+void HttpListener::doAccept()
+{
+    m_acceptor.async_accept(
+        m_socket,
+        std::bind(
+            &HttpListener::onAccept,
+            shared_from_this(),
+            std::placeholders::_1));
+}
+
+void HttpListener::onAccept(boost::system::error_code ec)
+{
+    if(ec)
+    {
+        fail(ec, "HttpListener:: accept");
+    }
+    else
+    {
+        // Create the session and run it
+        std::make_shared<HttpSession>(
+            std::move(m_socket),
+            m_rootPath)
+            ->run();
     }
 
-}  // namespace executionGraphGui
+    // Accept another connection
+    doAccept();
+}

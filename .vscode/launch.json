@@ -65,88 +65,15 @@
       "MIMode": "lldb"
     },
     {
-      "name": "[lldb] ExecutionGraphTests-CEFSimple",
+      "name": "[lldb] ExecutionGraphServer",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/gui/cefsimple/Debug/cefsimple.app/Contents/MacOS/cefsimple",
-      "args": [],
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "lldb"
-    },
-    {
-      "name": "[lldb] ExecutionGraphGUI (macOS App)",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
-      "args": [],
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "lldb"
-    },
-    {
-      "name": "[lldb] ExecutionGraphGUI [Release] (macOS App)",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${workspaceFolder}/build/gui/executionGraphGui/Release/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
-      "args": ["--cefFlags=--cache-path=''"],
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "lldb"
-    },
-    {
-      "name": "[lldb] ExecutionGraphGUI (client src from build folder)",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
+      "program": "${workspaceFolder}/build/gui/executionGraphGui/server/ExecutionGraphServer",
       "args": [
-        "--clientSourcePath",
-        "${workspaceFolder}/build/gui/executionGraphGui/client/build/apps/eg",
-        "--logPath",
-        "${workspaceFolder}/build",
-        "--cefFlags=--cache-path=''"
-      ],
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "lldb"
-    },
-    {
-      "name": "[lldb] ExecutionGraphGUI (client src from dist folder)",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
-      "args": [
-        "--clientSourcePath",
-        "${workspaceFolder}/gui/executionGraphGui/client/dist/apps/eg",
-        "--logPath",
-        "${workspaceFolder}/build",
-        "--cefFlags=--cache-path=''"
-      ],
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "lldb"
-    },
-    {
-      "name": "[lldb] ExecutionGraphGUI (client localhost:4200)",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${workspaceFolder}/build/gui/executionGraphGui/Debug/ExecutionGraphGui.app/Contents/MacOS/ExecutionGraphGui",
-      "args": [
-        "--clientLoadUrl",
-        "localhost:4200",
-        "--logPath",
-        "${workspaceFolder}/build",
-        "--cefFlags=--cache-path=''"
+        "--address", "127.0.0.1",
+        "--rootPath", "${workspaceFolder}/gui/executionGraphGui/client/dist/apps/eg",
+        "--port", "8089",
+        "--threads", "2"
       ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",

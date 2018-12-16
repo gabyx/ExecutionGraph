@@ -16,14 +16,11 @@
 #include <boost/system/error_code.hpp>
 #include "executionGraphGui/common/Loggers.hpp"
 
-namespace executionGraphGui
+// Report a failure
+template<typename T>
+void fail(boost::system::error_code ec, const T& what)
 {
-    // Report a failure
-    template<typename T>
-    void fail(boost::system::error_code ec, const T& what)
-    {
-        EXECGRAPHGUI_BACKENDLOG_ERROR("Failure: {0} : {1}", what, ec.message());
-    }
-}  // namespace executionGraphGui
+    EXECGRAPHGUI_BACKENDLOG_ERROR("Failure: {0} : {1}", what, ec.message());
+}
 
 #endif

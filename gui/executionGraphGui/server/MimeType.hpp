@@ -16,11 +16,7 @@
 #include <string_view>
 #include <executionGraph/common/FileSystem.hpp>
 
-namespace executionGraphGui
-{
-    // Return a reasonable mime type based on the extension of a file.
-    std::string_view getMimeType(const std::path& path);
-
-}  // namespace executionGraphGui
+// Return a reasonable mime type based on the extension of a file.
+std::string_view getMimeType(const std::path& path);
 
 #endif

@@ -19,7 +19,7 @@
 
 namespace http = boost::beast::http;  // from <boost/beast/http.hpp>
 
-namespace executionGraphGui
+namespace
 {
     using Body    = HttpSession::Body;
     using Request = HttpSession::Request;
@@ -27,26 +27,6 @@ namespace executionGraphGui
     using ResponseString = HttpSession::ResponseString;
     using ResponseEmpty  = HttpSession::ResponseEmpty;
     using ResponseFile   = HttpSession::ResponseFile;
-
-    /* ---------------------------------------------------------------------------------------*/
-    /*!
-        Send functor which sends the response.
-
-        @date Fri Dec 14 2018
-        @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
-    */
-    /* ---------------------------------------------------------------------------------------*/
-    struct HttpSession::Send
-    {
-        HttpSession& m_self;
-
-        explicit Send(HttpSession& self)
-            : m_self(self)
-        {}
-
-        template<typename Message>
-        void operator()(Message&& msg) const;
-    };
 
     //! @brief Handle the request.
     //! This function produces an HTTP response for the given
@@ -58,7 +38,7 @@ namespace executionGraphGui
                        Request&& req,
                        Send&& send)
     {
-        // Returns a bad Request response
+        // Returns a bad Request response.
         auto const badRequest =
             [&req](boost::beast::string_view why) {
                 ResponseString res{http::status::bad_request, req.version()};
@@ -70,7 +50,7 @@ namespace executionGraphGui
                 return res;
             };
 
-        // Returns a not found response
+        // Returns a not found response.
         auto const notFound =
             [&req](boost::beast::string_view target) {
                 ResponseString res{http::status::not_found, req.version()};
@@ -82,7 +62,7 @@ namespace executionGraphGui
                 return res;
             };
 
-        // Returns a server error response
+        // Returns a server error response.
         auto const serverError =
             [&req](boost::beast::string_view what) {
                 ResponseString res{http::status::internal_server_error, req.version()};
@@ -94,9 +74,10 @@ namespace executionGraphGui
                 return res;
             };
 
-        // Make sure we can handle the method
+        // Make sure we can handle the method.
         if(req.method() != http::verb::get &&
            req.method() != http::verb::head)
+           
         {
             return send(badRequest("Unknown HTTP-method"));
         }
@@ -109,36 +90,36 @@ namespace executionGraphGui
             return send(badRequest("Illegal Request-target"));
         }
 
-        // Build the path to the Requested file
-        std::path path = rootPath / std::string{req.target()};
+        // Build the path to the requested file.
+        std::path path = rootPath / (std::string{"."} + std::string{req.target()});
         if(req.target().back() == '/')
         {
             path.append("index.html");
         }
 
-        // Attempt to open the file
+        // Attempt to open the file.
         boost::beast::error_code ec;
         http::file_body::value_type body;
         body.open(path.string().c_str(),
                   boost::beast::file_mode::scan,
                   ec);
 
-        // Handle the case where the file doesn't exist
+        // Handle the case where the file doesn't exist.
         if(ec == boost::system::errc::no_such_file_or_directory)
         {
             return send(notFound(req.target()));
         }
 
-        // Handle an unknown error
+        // Handle an unknown error.
         if(ec)
         {
             return send(serverError(ec.message()));
         }
 
-        // Cache the size since we need it after the move
+        // Cache the size since we need it after the move.
         auto const size = body.size();
 
-        // Respond to HEAD Request
+        // Respond to HEAD request.
         if(req.method() == http::verb::head)
         {
             ResponseEmpty res{http::status::ok, req.version()};
@@ -149,7 +130,7 @@ namespace executionGraphGui
             return send(std::move(res));
         }
 
-        // Respond to GET Request
+        // Respond to GET request.
         ResponseFile res{std::piecewise_construct,
                          std::make_tuple(std::move(body)),
                          std::make_tuple(http::status::ok, req.version())};
@@ -160,114 +141,130 @@ namespace executionGraphGui
         return send(std::move(res));
     }
 
-}  // namespace executionGraphGui
+}  // namespace
 
-namespace executionGraphGui
+/* ---------------------------------------------------------------------------------------*/
+/*!
+    Send functor which sends the response.
+
+    @date Fri Dec 14 2018
+    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+*/
+/* ---------------------------------------------------------------------------------------*/
+struct HttpSession::Send
 {
-    // Start the asynchronous operation
-    void HttpSession::run()
-    {
-        doRead();
-    }
+    HttpSession& m_self;
 
-    void HttpSession::doRead()
-    {
-        // Make the Request empty before reading,
-        // otherwise the operation behavior is undefined.
-        m_request = {};
-
-        // Read a Request
-        http::async_read(m_socket,
-                         m_buffer,
-                         m_request,
-                         boost::asio::bind_executor(m_strand,
-                                                    std::bind(&HttpSession::onRead,
-                                                              shared_from_this(),
-                                                              std::placeholders::_1,
-                                                              std::placeholders::_2)));
-    }
-
-    void HttpSession::onRead(boost::system::error_code ec,
-                             std::size_t bytesTransferred)
-    {
-        boost::ignore_unused(bytesTransferred);
-
-        // This means they closed the connection
-        if(ec == http::error::end_of_stream)
-        {
-            return doClose();
-        }
-
-        if(ec)
-        {
-            return fail(ec, "read");
-        }
-
-        // Send the response
-        handleRequest(m_rootPath,
-                      std::move(m_request),
-                      Send{*this});
-    }
-
-    void HttpSession::onWrite(boost::system::error_code ec,
-                              std::size_t bytesTransferred,
-                              bool close)
-    {
-        boost::ignore_unused(bytesTransferred);
-
-        if(ec)
-        {
-            return fail(ec, "write");
-        }
-
-        if(close)
-        {
-            // This means we should close the connection, usually because
-            // the response indicated the "Connection: close" semantic.
-            return doClose();
-        }
-
-        // We're done with the response so delete it
-        m_response = nullptr;
-
-        // Read another Request
-        doRead();
-    }
-
-    void HttpSession::doClose()
-    {
-        // Send a TCP shutdown
-        boost::system::error_code ec;
-        m_socket.shutdown(tcp::socket::shutdown_send, ec);
-
-        // At this point the connection is closed gracefully
-    }
+    explicit Send(HttpSession& self)
+        : m_self(self)
+    {}
 
     template<typename Message>
-    void HttpSession::Send::operator()(Message&& msg) const
+    void operator()(Message&& msg) const;
+};
+
+
+// Start the asynchronous operation
+void HttpSession::run()
+{
+    doRead();
+}
+
+void HttpSession::doRead()
+{
+    // Make the Request empty before reading,
+    // otherwise the operation behavior is undefined.
+    m_request = {};
+
+    // Read a Request
+    http::async_read(m_socket,
+                     m_buffer,
+                     m_request,
+                     boost::asio::bind_executor(m_strand,
+                                                std::bind(&HttpSession::onRead,
+                                                          shared_from_this(),
+                                                          std::placeholders::_1,
+                                                          std::placeholders::_2)));
+}
+
+void HttpSession::onRead(boost::system::error_code ec,
+                         std::size_t bytesTransferred)
+{
+    boost::ignore_unused(bytesTransferred);
+
+    // This means they closed the connection
+    if(ec == http::error::end_of_stream)
     {
-        // The lifetime of the message has to extend
-        // for the duration of the async operation so
-        // we use a shared_ptr to manage it.
-        auto sp = std::make_shared<Message>(std::move(msg));
-
-        // Store a type-erased version of the shared
-        // pointer in the class to keep it alive.
-        m_self.m_response = sp;
-
-        // Write the response
-        http::async_write(
-            m_self.m_socket,
-            *sp,
-            boost::asio::bind_executor(
-                m_self.m_strand,
-                std::bind(
-                    &HttpSession::onWrite,
-                    m_self.shared_from_this(),
-                    std::placeholders::_1,
-                    std::placeholders::_2,
-                    sp->need_eof())));
+        return doClose();
     }
 
+    if(ec)
+    {
+        return fail(ec, "read");
+    }
 
-}  // namespace executionGraphGui
+    // Send the response
+    handleRequest(m_rootPath,
+                  std::move(m_request),
+                  Send{*this});
+}
+
+void HttpSession::onWrite(boost::system::error_code ec,
+                          std::size_t bytesTransferred,
+                          bool close)
+{
+    boost::ignore_unused(bytesTransferred);
+
+    if(ec)
+    {
+        return fail(ec, "write");
+    }
+
+    if(close)
+    {
+        // This means we should close the connection, usually because
+        // the response indicated the "Connection: close" semantic.
+        return doClose();
+    }
+
+    // We're done with the response so delete it
+    m_response = nullptr;
+
+    // Read another Request
+    doRead();
+}
+
+void HttpSession::doClose()
+{
+    // Send a TCP shutdown
+    boost::system::error_code ec;
+    m_socket.shutdown(tcp::socket::shutdown_send, ec);
+
+    // At this point the connection is closed gracefully
+}
+
+template<typename Message>
+void HttpSession::Send::operator()(Message&& msg) const
+{
+    // The lifetime of the message has to extend
+    // for the duration of the async operation so
+    // we use a shared_ptr to manage it.
+    auto sp = std::make_shared<Message>(std::move(msg));
+
+    // Store a type-erased version of the shared
+    // pointer in the class to keep it alive.
+    m_self.m_response = sp;
+
+    // Write the response
+    http::async_write(
+        m_self.m_socket,
+        *sp,
+        boost::asio::bind_executor(
+            m_self.m_strand,
+            std::bind(
+                &HttpSession::onWrite,
+                m_self.shared_from_this(),
+                std::placeholders::_1,
+                std::placeholders::_2,
+                sp->need_eof())));
+}

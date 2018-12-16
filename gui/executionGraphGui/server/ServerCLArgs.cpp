@@ -12,63 +12,69 @@
 
 #include "executionGraphGui/server/ServerCLArgs.hpp"
 #include <cstdlib>
-#include <regex>
 #include <iostream>
+#include <regex>
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 #include "executionGraphGui/common/Exception.hpp"
-#include "executionGraphGui/common/Loggers.hpp"
 
-namespace executionGraphGui
+ServerCLArgs::ServerCLArgs(int argc, const char* argv[])
+    : executionGraph::CommandLineArguments(argc,
+                                           argv,
+                                           "ExecutionGraphServer Application",
+                                           "No detailed description")
+    , m_rootPath(m_parser,
+                 "root",
+                 "Root path of the server application.",
+                 {'r', "rootPath"},
+                 this->getApplicationPath().parent_path())
+    , m_address(m_parser,
+                "address",
+                "The IP address to use.",
+                {'a', "address"},
+                "127.0.0.1")
+    , m_port(m_parser,
+             "port",
+             "The port to use.",
+             {'p', "port"},
+             8089)
+    , m_threads(m_parser,
+                "threads",
+                "The number of threads to use.",
+                {'t', "threads"},
+                2)
+    , m_logPath(m_parser,
+                "logPath",
+                "Where the logs are placed.",
+                {'l', "logPath"},
+                this->getApplicationPath().parent_path() / "logs")
+
 {
-    ServerCLArgs::ServerCLArgs(int argc, const char* argv[])
-        : executionGraph::CommandLineArguments(argc,
-                                               argv,
-                                               "ExecutionGraphServer Application",
-                                               "No detailed description")
-        , m_rootPath(m_parser,
-                     "root",
-                     "Root path of the server application.",
-                     {'r', "rootPath"},
-                     this->getApplicationPath().parent_path())
-        , m_address(m_parser,
-                    "address",
-                    "The IP address to use.",
-                    {'a', "address"},
-                    "127.0.0.1")
-        , m_port(m_parser,
-                 "port",
-                 "The port to use.",
-                 {'p', "port"},
-                 8089)
-        , m_threads(m_parser,
-                    "threads",
-                    "The number of threads to use.",
-                    {'t', "threads"},
-                    2)
+    args::HelpFlag help(m_parser, "help", "Display this help menu.", {'h', "help"});
 
+    try
     {
-        args::HelpFlag help(m_parser, "help", "Display this help menu.", {'h', "help"});
+        m_parser.ParseCLI(argc, argv);
 
-        try
-        {
-            m_parser.ParseCLI(argc, argv);
+        // Validate
+        m_threads.Get() = std::max(m_threads.Get(), {1});
 
-            // Validate
-            m_threads.Get() = std::max(m_threads.Get(), {1});
-
-            std::regex ip("(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])");
-            EXECGRAPHGUI_THROW_TYPE_IF(std::regex_match(m_address.Get(), ip),
-                                       args::ParseError,
-                                       "IP Address '{0}' has wrong format!",
-                                       m_address.Get());
-        }
-        catch(args::Help)
-        {
-            std::cerr << m_parser;
-            std::exit(EXIT_SUCCESS);
-        }
-        catch(args::ParseError e)
-        {
-            EXECGRAPHGUI_THROW("Parser Error: '{0}'\n{1}", e.what(), m_parser);
-        }
+        std::regex ip("(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])");
+        EXECGRAPHGUI_THROW_TYPE_IF(!std::regex_match(m_address.Get(), ip),
+                                   args::ParseError,
+                                   "IP Address '{0}' has wrong format!",
+                                   m_address.Get());
     }
-}  // namespace executionGraphGui
+    catch(args::Help)
+    {
+        std::cerr << m_parser;
+        std::exit(EXIT_SUCCESS);
+    }
+    catch(args::ParseError e)
+    {
+        std::cerr << fmt::format("Parser Error: '{0}'\n{1}",
+                                 e.what(),
+                                 m_parser);
+        std::exit(EXIT_FAILURE);
+    }
+}
