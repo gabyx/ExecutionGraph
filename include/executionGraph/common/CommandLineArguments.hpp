@@ -23,7 +23,7 @@ namespace executionGraph
     {
     public:
         CommandLineArguments(int argc,
-                             char* argv[],
+                             const char* argv[],
                              const std::string& briefDescription,
                              const std::string& detailedDescription)
             : m_parser(briefDescription, detailedDescription)
@@ -42,7 +42,7 @@ namespace executionGraph
         args::ArgumentParser m_parser;  //! Argument parser
 
         int m_argc;
-        char** m_argv;
+        const char** m_argv;
 
     private:
         std::path m_applicationPath;  //!< Application path: argv[0]

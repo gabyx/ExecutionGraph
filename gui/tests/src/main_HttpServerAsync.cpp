@@ -249,7 +249,7 @@ class session : public std::enable_shared_from_this<session>
                 boost::asio::bind_executor(
                     self_.strand_,
                     std::bind(
-                        &session::on_write,
+                        &session::onWrite,
                         self_.shared_from_this(),
                         std::placeholders::_1,
                         std::placeholders::_2,
@@ -283,11 +283,11 @@ public:
     void
     run()
     {
-        do_read();
+        doRead();
     }
 
     void
-    do_read()
+    doRead()
     {
         // Make the request empty before reading,
         // otherwise the operation behavior is undefined.
@@ -298,14 +298,14 @@ public:
             boost::asio::bind_executor(
                 strand_,
                 std::bind(
-                    &session::on_read,
+                    &session::onRead,
                     shared_from_this(),
                     std::placeholders::_1,
                     std::placeholders::_2)));
     }
 
     void
-    on_read(
+    onRead(
         boost::system::error_code ec,
         std::size_t bytes_transferred)
     {
@@ -313,7 +313,7 @@ public:
 
         // This means they closed the connection
         if(ec == http::error::end_of_stream)
-            return do_close();
+            return doClose();
 
         if(ec)
             return fail(ec, "read");
@@ -323,7 +323,7 @@ public:
     }
 
     void
-    on_write(
+    onWrite(
         boost::system::error_code ec,
         std::size_t bytes_transferred,
         bool close)
@@ -337,18 +337,18 @@ public:
         {
             // This means we should close the connection, usually because
             // the response indicated the "Connection: close" semantic.
-            return do_close();
+            return doClose();
         }
 
         // We're done with the response so delete it
         res_ = nullptr;
 
         // Read another request
-        do_read();
+        doRead();
     }
 
     void
-    do_close()
+    doClose()
     {
         // Send a TCP shutdown
         boost::system::error_code ec;
@@ -418,22 +418,22 @@ public:
     {
         if(! acceptor_.is_open())
             return;
-        do_accept();
+        doAccept();
     }
 
     void
-    do_accept()
+    doAccept()
     {
         acceptor_.async_accept(
             socket_,
             std::bind(
-                &listener::on_accept,
+                &listener::onAccept,
                 shared_from_this(),
                 std::placeholders::_1));
     }
 
     void
-    on_accept(boost::system::error_code ec)
+    onAccept(boost::system::error_code ec)
     {
         if(ec)
         {
@@ -448,7 +448,7 @@ public:
         }
 
         // Accept another connection
-        do_accept();
+        doAccept();
     }
 };
 

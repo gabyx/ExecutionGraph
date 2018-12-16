@@ -13,37 +13,32 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
-#include <string>
 #include <thread>
 #include <vector>
+#include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include "executionGraphGui/server/HttpCommon.hpp"
 #include "executionGraphGui/server/HttpListener.hpp"
+#include "executionGraphGui/server/ServerCLArgs.hpp"
 
-using tcp      = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
-namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
-
-int main(int argc, char* argv[])
+//! Main function of the execution graph server backend.
+int main(int argc, const char* argv[])
 {
-    // Check command line arguments.
-    if(argc != 5)
-    {
-        std::cerr << "Usage: http-server-async <address> <port> <doc_root> <threads>\n"
-                  << "Example:\n"
-                  << "    http-server-async 0.0.0.0 8080 . 1\n";
-        return EXIT_FAILURE;
-    }
-    auto const address  = boost::asio::ip::make_address(argv[1]);
-    auto const port     = static_cast<unsigned short>(std::atoi(argv[2]));
-    auto const doc_root = std::string(argv[3]);
-    auto const threads  = std::max<int>(1, std::atoi(argv[4]));
+    using namespace executionGraphGui;
+
+    // Parse command line arguments
+    EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(ServerCLArgs, args, (argc, argv));
 
     // The io_context is required for all I/O
-    boost::asio::io_context ioc{threads};
+    const auto threads = args->threads();
+    boost::asio::io_context ioc{static_cast<int>(threads)};
 
     // Create and launch a listening port
-    std::make_shared<executionGraphGui::HttpListener>(ioc,
-                                                      tcp::endpoint{address, port},
-                                                      doc_root)
+    const auto address = boost::asio::ip::make_address(args->address());
+    std::make_shared<executionGraphGui::HttpListener>(
+        ioc,
+        boost::asio::ip::tcp::endpoint{address, args->port()},
+        args->rootPath())
         ->run();
 
     // Run the I/O service on the requested number of threads

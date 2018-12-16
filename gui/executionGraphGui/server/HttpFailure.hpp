@@ -14,7 +14,7 @@
 #define executionGraphGui_server_HttpFailure_hpp
 
 #include <boost/system/error_code.hpp>
-#include <executionGraphGui/common/Loggers.hpp>
+#include "executionGraphGui/common/Loggers.hpp"
 
 namespace executionGraphGui
 {

@@ -13,11 +13,11 @@
 #define executionGraphGui_server_HttpSession_hpp
 
 #include <memory>
-
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/strand.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
+#include "executionGraph/common/FileSystem.hpp"
 #include "executionGraphGui/server/HttpCommon.hpp"
 
 namespace executionGraphGui
@@ -25,40 +25,48 @@ namespace executionGraphGui
     // Handles an HTTP server connection
     class HttpSession : public std::enable_shared_from_this<HttpSession>
     {
-        template<typename Body>
-        using request     = boost::beast::http::request<Body>;
-        using string_body = boost::beast::http::string_body;
-        using tcp         = boost::asio::ip::tcp;
+    public:
+        using Body    = boost::beast::http::string_body;
+        using Request = boost::beast::http::request<Body>;
 
-        tcp::socket m_socket;
-        boost::asio::strand<boost::asio::io_context::executor_type> m_strand;
-        boost::beast::flat_buffer m_buffer;
-        const std::string m_doc_root;
-        request<string_body> m_req;
-        std::shared_ptr<void> m_res;
+        using ResponseString = boost::beast::http::response<Body>;
+        using ResponseFile   = boost::beast::http::response<boost::beast::http::file_body>;
+        using ResponseEmpty  = boost::beast::http::response<boost::beast::http::empty_body>;
 
-        struct Send;
+    private:
+        using tcp = boost::asio::ip::tcp;
+        struct Send;  //!< Functor to send the response.
+
+    private:
+        tcp::socket m_socket;                                                  //!< The socket this session is running on.
+        boost::asio::strand<boost::asio::io_context::executor_type> m_strand;  //!< The executor strand.
+
+        boost::beast::flat_buffer m_buffer;  //!< A flat buffer where the request is stored.
+        Request m_request;                   //!< The incoming request we are handling.
+        std::shared_ptr<void> m_response;    //!< Response we are sending back.
+
+        const std::path m_rootPath;  //!< Root file path for the server.
 
     public:
         explicit HttpSession(tcp::socket socket,
-                             const std::string& doc_root)
+                             const std::path& rootPath)
             : m_socket(std::move(socket))
             , m_strand(m_socket.get_executor())
-            , m_doc_root(doc_root)
+            , m_rootPath(rootPath)
         {}
 
         void run();
 
-        void do_read();
+        void doRead();
 
-        void on_read(boost::system::error_code ec,
-                     std::size_t bytes_transferred);
+        void onRead(boost::system::error_code ec,
+                    std::size_t bytes_transferred);
 
-        void on_write(boost::system::error_code ec,
-                      std::size_t bytes_transferred,
-                      bool close);
+        void onWrite(boost::system::error_code ec,
+                     std::size_t bytes_transferred,
+                     bool close);
 
-        void do_close();
+        void doClose();
     };
 
 }  // namespace executionGraphGui

@@ -22,7 +22,7 @@ namespace executionGraphGui
                                const std::string& doc_root)
         : m_acceptor(ioc)
         , m_socket(ioc)
-        , m_doc_root(doc_root)
+        , m_rootPath(doc_root)
     {
         boost::system::error_code ec;
 
@@ -67,20 +67,20 @@ namespace executionGraphGui
         {
             return;
         }
-        do_accept();
+        doAccept();
     }
 
-    void HttpListener::do_accept()
+    void HttpListener::doAccept()
     {
         m_acceptor.async_accept(
             m_socket,
             std::bind(
-                &HttpListener::on_accept,
+                &HttpListener::onAccept,
                 shared_from_this(),
                 std::placeholders::_1));
     }
 
-    void HttpListener::on_accept(boost::system::error_code ec)
+    void HttpListener::onAccept(boost::system::error_code ec)
     {
         if(ec)
         {
@@ -91,12 +91,12 @@ namespace executionGraphGui
             // Create the session and run it
             std::make_shared<HttpSession>(
                 std::move(m_socket),
-                m_doc_root)
+                m_rootPath)
                 ->run();
         }
 
         // Accept another connection
-        do_accept();
+        doAccept();
     }
 
 }  // namespace executionGraphGui

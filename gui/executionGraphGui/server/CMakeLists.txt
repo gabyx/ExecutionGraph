@@ -3,6 +3,7 @@ set(ExecutionGraphGUIServer_SRCS
     ${ExecutionGraphGUICommon_SRCS}
     ${ExecutionGraphGUIBackend_SRCS}
 
+    ${CMAKE_CURRENT_SOURCE_DIR}/ServerCLArgs.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MimeType.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/HttpCommon.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/HttpSession.cpp

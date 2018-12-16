@@ -33,13 +33,13 @@ namespace executionGraphGui
                      const std::string& doc_root);
 
         void run();
-        void do_accept();
-        void on_accept(boost::system::error_code ec);
+        void doAccept();
+        void onAccept(boost::system::error_code ec);
 
     private:
-        tcp::acceptor m_acceptor;
-        tcp::socket m_socket;
-        const std::string m_doc_root;
+        tcp::acceptor m_acceptor;      //!< Accpetor.
+        tcp::socket m_socket;          //!< The socket we use to listen for incoming requests.
+        const std::string m_rootPath;  //!< The root path of the server.
     };
 
 }  // namespace executionGraphGui

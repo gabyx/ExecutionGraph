@@ -13,12 +13,13 @@
 #ifndef executionGraphGui_server_MimeType_hpp
 #define executionGraphGui_server_MimeType_hpp
 
-#include <boost/beast/core.hpp>
+#include <string_view>
+#include <executionGraph/common/FileSystem.hpp>
 
 namespace executionGraphGui
 {
     // Return a reasonable mime type based on the extension of a file.
-    boost::beast::string_view mime_type(boost::beast::string_view path);
+    std::string_view getMimeType(const std::path& path);
 
 }  // namespace executionGraphGui
 

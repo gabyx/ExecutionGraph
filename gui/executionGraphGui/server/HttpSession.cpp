@@ -21,38 +21,47 @@ namespace http = boost::beast::http;  // from <boost/beast/http.hpp>
 
 namespace executionGraphGui
 {
-    // This is the C++11 equivalent of a generic lambda.
-    // The function object is used to send an HTTP message.
+    using Body    = HttpSession::Body;
+    using Request = HttpSession::Request;
+
+    using ResponseString = HttpSession::ResponseString;
+    using ResponseEmpty  = HttpSession::ResponseEmpty;
+    using ResponseFile   = HttpSession::ResponseFile;
+
+    /* ---------------------------------------------------------------------------------------*/
+    /*!
+        Send functor which sends the response.
+
+        @date Fri Dec 14 2018
+        @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+    */
+    /* ---------------------------------------------------------------------------------------*/
     struct HttpSession::Send
     {
         HttpSession& m_self;
 
         explicit Send(HttpSession& self)
             : m_self(self)
-        {
-        }
+        {}
 
-        template<bool isRequest, class Body, class Fields>
-        void
-        operator()(http::message<isRequest, Body, Fields>&& msg) const;
+        template<typename Message>
+        void operator()(Message&& msg) const;
     };
 
-    // This function produces an HTTP response for the given
-    // request. The type of the response object depends on the
-    // contents of the request, so the interface requires the
-    // caller to pass a generic lambda for receiving the response.
-    template<class Body,
-             class Allocator,
-             class Send>
-    void handle_request(
-        boost::beast::string_view doc_root,
-        http::request<Body, http::basic_fields<Allocator>>&& req,
-        Send&& send)
+    //! @brief Handle the request.
+    //! This function produces an HTTP response for the given
+    //! Request. The type of the response object depends on the
+    //! contents of the Request, so the interface requires the
+    //! caller to pass a generic lambda for receiving the response.
+    template<class Request, class Send>
+    void handleRequest(const std::path& rootPath,
+                       Request&& req,
+                       Send&& send)
     {
-        // Returns a bad request response
-        auto const bad_request =
+        // Returns a bad Request response
+        auto const badRequest =
             [&req](boost::beast::string_view why) {
-                http::response<http::string_body> res{http::status::bad_request, req.version()};
+                ResponseString res{http::status::bad_request, req.version()};
                 res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
                 res.set(http::field::content_type, "text/html");
                 res.keep_alive(req.keep_alive());
@@ -62,9 +71,9 @@ namespace executionGraphGui
             };
 
         // Returns a not found response
-        auto const not_found =
+        auto const notFound =
             [&req](boost::beast::string_view target) {
-                http::response<http::string_body> res{http::status::not_found, req.version()};
+                ResponseString res{http::status::not_found, req.version()};
                 res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
                 res.set(http::field::content_type, "text/html");
                 res.keep_alive(req.keep_alive());
@@ -74,9 +83,9 @@ namespace executionGraphGui
             };
 
         // Returns a server error response
-        auto const server_error =
+        auto const serverError =
             [&req](boost::beast::string_view what) {
-                http::response<http::string_body> res{http::status::internal_server_error, req.version()};
+                ResponseString res{http::status::internal_server_error, req.version()};
                 res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
                 res.set(http::field::content_type, "text/html");
                 res.keep_alive(req.keep_alive());
@@ -88,53 +97,64 @@ namespace executionGraphGui
         // Make sure we can handle the method
         if(req.method() != http::verb::get &&
            req.method() != http::verb::head)
-            return send(bad_request("Unknown HTTP-method"));
+        {
+            return send(badRequest("Unknown HTTP-method"));
+        }
 
         // Request path must be absolute and not contain "..".
         if(req.target().empty() ||
            req.target()[0] != '/' ||
            req.target().find("..") != boost::beast::string_view::npos)
-            return send(bad_request("Illegal request-target"));
+        {
+            return send(badRequest("Illegal Request-target"));
+        }
 
-        // Build the path to the requested file
-        std::string path = path_cat(doc_root, req.target());
+        // Build the path to the Requested file
+        std::path path = rootPath / std::string{req.target()};
         if(req.target().back() == '/')
+        {
             path.append("index.html");
+        }
 
         // Attempt to open the file
         boost::beast::error_code ec;
         http::file_body::value_type body;
-        body.open(path.c_str(), boost::beast::file_mode::scan, ec);
+        body.open(path.string().c_str(),
+                  boost::beast::file_mode::scan,
+                  ec);
 
         // Handle the case where the file doesn't exist
         if(ec == boost::system::errc::no_such_file_or_directory)
-            return send(not_found(req.target()));
+        {
+            return send(notFound(req.target()));
+        }
 
         // Handle an unknown error
         if(ec)
-            return send(server_error(ec.message()));
+        {
+            return send(serverError(ec.message()));
+        }
 
         // Cache the size since we need it after the move
         auto const size = body.size();
 
-        // Respond to HEAD request
+        // Respond to HEAD Request
         if(req.method() == http::verb::head)
         {
-            http::response<http::empty_body> res{http::status::ok, req.version()};
+            ResponseEmpty res{http::status::ok, req.version()};
             res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-            res.set(http::field::content_type, mime_type(path));
+            res.set(http::field::content_type, getMimeType(path));
             res.content_length(size);
             res.keep_alive(req.keep_alive());
             return send(std::move(res));
         }
 
-        // Respond to GET request
-        http::response<http::file_body> res{
-            std::piecewise_construct,
-            std::make_tuple(std::move(body)),
-            std::make_tuple(http::status::ok, req.version())};
+        // Respond to GET Request
+        ResponseFile res{std::piecewise_construct,
+                         std::make_tuple(std::move(body)),
+                         std::make_tuple(http::status::ok, req.version())};
         res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, mime_type(path));
+        res.set(http::field::content_type, getMimeType(path));
         res.content_length(size);
         res.keep_alive(req.keep_alive());
         return send(std::move(res));
@@ -147,68 +167,74 @@ namespace executionGraphGui
     // Start the asynchronous operation
     void HttpSession::run()
     {
-        do_read();
+        doRead();
     }
 
-    void HttpSession::do_read()
+    void HttpSession::doRead()
     {
-        // Make the request empty before reading,
+        // Make the Request empty before reading,
         // otherwise the operation behavior is undefined.
-        m_req = {};
+        m_request = {};
 
-        // Read a request
+        // Read a Request
         http::async_read(m_socket,
                          m_buffer,
-                         m_req,
+                         m_request,
                          boost::asio::bind_executor(m_strand,
-                                                    std::bind(&HttpSession::on_read,
+                                                    std::bind(&HttpSession::onRead,
                                                               shared_from_this(),
                                                               std::placeholders::_1,
                                                               std::placeholders::_2)));
     }
 
-    void HttpSession::on_read(boost::system::error_code ec,
-                              std::size_t bytes_transferred)
+    void HttpSession::onRead(boost::system::error_code ec,
+                             std::size_t bytesTransferred)
     {
-        boost::ignore_unused(bytes_transferred);
+        boost::ignore_unused(bytesTransferred);
 
         // This means they closed the connection
         if(ec == http::error::end_of_stream)
-            return do_close();
+        {
+            return doClose();
+        }
 
         if(ec)
+        {
             return fail(ec, "read");
+        }
 
         // Send the response
-        handle_request(m_doc_root,
-                       std::move(m_req),
-                       Send{*this});
+        handleRequest(m_rootPath,
+                      std::move(m_request),
+                      Send{*this});
     }
 
-    void HttpSession::on_write(boost::system::error_code ec,
-                               std::size_t bytes_transferred,
-                               bool close)
+    void HttpSession::onWrite(boost::system::error_code ec,
+                              std::size_t bytesTransferred,
+                              bool close)
     {
-        boost::ignore_unused(bytes_transferred);
+        boost::ignore_unused(bytesTransferred);
 
         if(ec)
+        {
             return fail(ec, "write");
+        }
 
         if(close)
         {
             // This means we should close the connection, usually because
             // the response indicated the "Connection: close" semantic.
-            return do_close();
+            return doClose();
         }
 
         // We're done with the response so delete it
-        m_res = nullptr;
+        m_response = nullptr;
 
-        // Read another request
-        do_read();
+        // Read another Request
+        doRead();
     }
 
-    void HttpSession::do_close()
+    void HttpSession::doClose()
     {
         // Send a TCP shutdown
         boost::system::error_code ec;
@@ -217,18 +243,17 @@ namespace executionGraphGui
         // At this point the connection is closed gracefully
     }
 
-    template<bool isRequest, class Body, class Fields>
-    void HttpSession::Send::operator()(http::message<isRequest, Body, Fields>&& msg) const
+    template<typename Message>
+    void HttpSession::Send::operator()(Message&& msg) const
     {
         // The lifetime of the message has to extend
         // for the duration of the async operation so
         // we use a shared_ptr to manage it.
-        auto sp = std::make_shared<
-            http::message<isRequest, Body, Fields>>(std::move(msg));
+        auto sp = std::make_shared<Message>(std::move(msg));
 
         // Store a type-erased version of the shared
         // pointer in the class to keep it alive.
-        m_self.m_res = sp;
+        m_self.m_response = sp;
 
         // Write the response
         http::async_write(
@@ -237,11 +262,12 @@ namespace executionGraphGui
             boost::asio::bind_executor(
                 m_self.m_strand,
                 std::bind(
-                    &HttpSession::on_write,
+                    &HttpSession::onWrite,
                     m_self.shared_from_this(),
                     std::placeholders::_1,
                     std::placeholders::_2,
                     sp->need_eof())));
     }
+
 
 }  // namespace executionGraphGui
