@@ -18,9 +18,9 @@
 #include <fmt/ostream.h>
 
 #ifdef __clang__
+#    pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wweak-vtables"
-#    pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #endif
 
 namespace executionGraph

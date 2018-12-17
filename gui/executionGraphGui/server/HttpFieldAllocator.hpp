@@ -18,26 +18,9 @@
 #include <stdexcept>
 #include <executionGraphGui/common/Exception.hpp>
 
-/** A non-thread-safe allocator optimized for @ref basic_fields.
-
-    This allocator obtains memory from a pre-allocated memory block
-    of a given size. It does nothing in deallocate until all
-    previously allocated blocks are deallocated, upon which it
-    resets the internal memory block for re-use.
-
-    To use this allocator declare an instance persistent to the
-    connection or session, and construct with the block size.
-    A good rule of thumb is 20% more than the maximum allowed
-    header size. For example if the application only allows up
-    to an 8,000 byte header, the block size could be 9,600.
-
-    Then, for every instance of `message` construct the header
-    with a copy of the previously declared allocator instance.
-*/
-template<typename T>
-class HttpFieldAllocator
+namespace details
 {
-    struct StaticPool
+      struct StaticPool
     {
     public:
         std::size_t size_;
@@ -103,9 +86,30 @@ class HttpFieldAllocator
             p_ = reinterpret_cast<char*>(this + 1);
         }
     };
+}
+
+/** A non-thread-safe allocator optimized for @ref basic_fields.
+
+    This allocator obtains memory from a pre-allocated memory block
+    of a given size. It does nothing in deallocate until all
+    previously allocated blocks are deallocated, upon which it
+    resets the internal memory block for re-use.
+
+    To use this allocator declare an instance persistent to the
+    connection or session, and construct with the block size.
+    A good rule of thumb is 20% more than the maximum allowed
+    header size. For example if the application only allows up
+    to an 8,000 byte header, the block size could be 9,600.
+
+    Then, for every instance of `message` construct the header
+    with a copy of the previously declared allocator instance.
+*/
+template<typename T>
+class HttpFieldAllocator
+{
 
 public:
-    StaticPool* m_pool;
+    details::StaticPool* m_pool;
 
 public:
     using value_type      = T;
@@ -124,7 +128,7 @@ public:
     };
 
     explicit HttpFieldAllocator(std::size_t size)
-        : m_pool(&StaticPool::construct(size))
+        : m_pool(&details::StaticPool::construct(size))
     {
     }
 
