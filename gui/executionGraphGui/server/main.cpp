@@ -14,6 +14,7 @@
 #include <iostream>
 #include <memory>
 #include <thread>
+#include <list>
 #include <vector>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -21,6 +22,7 @@
 #include "executionGraphGui/common/Loggers.hpp"
 #include "executionGraphGui/server/HttpCommon.hpp"
 #include "executionGraphGui/server/HttpListener.hpp"
+#include "executionGraphGui/server/HttpWorker.hpp"
 #include "executionGraphGui/server/ServerCLArgs.hpp"
 
 //! Main function of the execution graph server backend.
@@ -40,6 +42,7 @@ int main(int argc, const char* argv[])
         args->threads(),
         args->logPath());
 
+#if 0
     // The io_context is required for all I/O
     const auto threads = args->threads();
     boost::asio::io_context ioc{static_cast<int>(threads)};
@@ -84,6 +87,37 @@ int main(int argc, const char* argv[])
     {
         th.join();
     }
+#else
+    using tcp = boost::asio::ip::tcp;
+
+    // The io_context is required for all I/O
+    const auto threads = args->threads();
+    boost::asio::io_context ioc{1};
+
+    // Capture SIGINT and SIGTERM to perform a clean shutdown
+    boost::asio::signal_set signals(ioc, SIGINT, SIGTERM);
+    signals.async_wait(
+        [&](boost::system::error_code const&, int) {
+            EXECGRAPHGUI_BACKENDLOG_INFO("ExecutionGraph Server shutting down ...");
+            // Stop the `io_context`. This will cause `run()`
+            // to return immediately, eventually destroying the
+            // `io_context` and all of the sockets in it.
+            ioc.stop();
+        });
+
+    // Create and launch a listening port
+    const auto address = boost::asio::ip::make_address(args->address());
+    tcp::acceptor acceptor{ioc, {address, args->port()}};
+
+    std::list<HttpWorker> workers;
+    for(auto i = 0u; i < threads; ++i)
+    {
+        workers.emplace_back(acceptor, args->rootPath());
+        workers.back().start();
+    }
+    ioc.run();
+
+#endif
 
     EXECGRAPHGUI_BACKENDLOG_INFO("ExecutionGraph Server shutdown.");
     return EXIT_SUCCESS;

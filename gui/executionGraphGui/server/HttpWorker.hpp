@@ -47,15 +47,15 @@ private:
     using ResponseFileSerializer = boost::beast::http::response_serializer<ResponseFileBody, BasicFields>;
 
 public:
-    HttpWorker(HttpWorker const&) = delete;
-    HttpWorker& operator=(HttpWorker const&) = delete;
-
     HttpWorker(Acceptor& acceptor,
-               const std::string& rootPath)
-        : m_acceptor(acceptor), m_rootPath(rootPath)
-    {
-    }
+               const std::path& rootPath)
+        : m_acceptor(acceptor)
+        , m_rootPath(rootPath)
+    {}
 
+    HttpWorker(const HttpWorker&) = delete;
+    HttpWorker& operator=(const HttpWorker&) = delete;
+    
     void start();
 
 private:

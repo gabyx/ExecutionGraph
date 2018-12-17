@@ -15,6 +15,8 @@
 #include <boost/asio.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
+#include "executionGraphGui/common/Loggers.hpp"
+#include "executionGraphGui/server/MimeType.hpp"
 #include "executionGraphGui/server/HttpCommon.hpp"
 
 namespace beast = boost::beast;          // from <boost/beast.hpp>
@@ -87,16 +89,18 @@ void HttpWorker::processRequest(const Request& request)
     switch(request.method())
     {
         case http::verb::get:
+        {
             sendFile(request.target());
             break;
-
+        }
         default:
-            // We return responses indicating an error if
+        {  // We return responses indicating an error if
             // we do not recognize the request method.
             sendBadResponse(
                 http::status::bad_request,
                 fmt::format("Invalid request-method '{0}'", request.method()));
             break;
+        }
     }
 }
 
