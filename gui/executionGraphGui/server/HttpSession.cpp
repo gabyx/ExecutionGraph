@@ -37,35 +37,36 @@ namespace
                        Request&& req,
                        Send&& send)
     {
+        EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession::Send::handleRequest(...)");
         static const auto versionString = getServerVersion();
 
         // Returns a bad Request response.
         auto const badRequest =
-            [&req](boost::beast::string_view why) {
+            [&req](auto&& why) {
                 ResponseString res{http::status::bad_request, req.version()};
                 res.set(http::field::server, versionString);
                 res.set(http::field::content_type, "text/html");
                 res.keep_alive(req.keep_alive());
-                res.body() = why.to_string();
+                res.body() = std::forward<decltype(why)>(why);
                 res.prepare_payload();
                 return res;
             };
 
         // Returns a not found response.
         auto const notFound =
-            [&req](auto target) {
+            [&req](auto&& path) {
                 ResponseString res{http::status::not_found, req.version()};
                 res.set(http::field::server, versionString);
                 res.set(http::field::content_type, "text/html");
                 res.keep_alive(req.keep_alive());
-                res.body() = fmt::format("The resource '{0}' was not found. ('{1}')", target.to_string());
+                res.body() = fmt::format("The requested resource '{0}' was not found.", path);
                 res.prepare_payload();
                 return res;
             };
 
         // Returns a server error response.
         auto const serverError =
-            [&req](auto what) {
+            [&req](auto&& what) {
                 ResponseString res{http::status::internal_server_error, req.version()};
                 res.set(http::field::server, versionString);
                 res.set(http::field::content_type, "text/html");
@@ -80,7 +81,7 @@ namespace
            req.method() != http::verb::head)
 
         {
-            return send(badRequest("Unknown HTTP-method"));
+            return send(badRequest("Unknown HTTP-method."));
         }
 
         // Request path must be absolute and not contain "..".
@@ -88,11 +89,13 @@ namespace
            req.target()[0] != '/' ||
            req.target().find("..") != boost::beast::string_view::npos)
         {
-            return send(badRequest("Illegal request-target"));
+            return send(badRequest("Illegal request-target."));
         }
 
         // Build the path to the requested file.
-        std::path path = std::filesystem::canonical(rootPath / (std::string{"."} + std::string{req.target()}));
+        std::path path = (rootPath / (std::string{"."} + std::string{req.target()}))
+                             .lexically_normal();
+
         if(req.target().back() == '/')
         {
             path.append("index.html");
@@ -164,7 +167,21 @@ struct HttpSession::Send
     void operator()(Message&& msg) const;
 };
 
-// Start the asynchronous operation
+HttpSession::HttpSession(tcp::socket socket,
+                         const std::path& rootPath)
+    : m_socket(std::move(socket))
+    , m_strand(m_socket.get_executor())
+    , m_rootPath(rootPath)
+{
+    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: Ctor", fmt::ptr(this));
+}
+
+HttpSession::~HttpSession()
+{
+    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: Dtor", fmt::ptr(this));
+}
+
+//! Start the asynchronous operation.
 void HttpSession::run()
 {
     doRead();
@@ -172,11 +189,12 @@ void HttpSession::run()
 
 void HttpSession::doRead()
 {
-    // Make the Request empty before reading,
+    // Make the request empty before reading,
     // otherwise the operation behavior is undefined.
     m_request = {};
 
-    // Read a Request
+    // Read a request.
+    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: async read request ...", fmt::ptr(this));
     http::async_read(m_socket,
                      m_buffer,
                      m_request,
@@ -192,18 +210,24 @@ void HttpSession::onRead(boost::system::error_code ec,
 {
     boost::ignore_unused(bytesTransferred);
 
-    // This means they closed the connection
+    // This means they closed the connection.
     if(ec == http::error::end_of_stream)
     {
+        EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}::onRead : end of stream --> close()", fmt::ptr(this));
         return doClose();
     }
 
     if(ec)
     {
-        return fail(ec, "read");
+        return fail(ec, "HttpSession:: read");
     }
 
-    // Send the response
+    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0} ::onRead : Request[ method: '{1}' target: '{2}']",
+                                  fmt::ptr(this),
+                                  m_request.method(),
+                                  m_request.target());
+
+    // Send the response.
     handleRequest(m_rootPath,
                   std::move(m_request),
                   Send{*this});
@@ -213,11 +237,12 @@ void HttpSession::onWrite(boost::system::error_code ec,
                           std::size_t bytesTransferred,
                           bool close)
 {
+    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}::onWrite(...)", fmt::ptr(this));
     boost::ignore_unused(bytesTransferred);
 
     if(ec)
     {
-        return fail(ec, "write");
+        return fail(ec, "HttpSession:: write");
     }
 
     if(close)
@@ -227,15 +252,16 @@ void HttpSession::onWrite(boost::system::error_code ec,
         return doClose();
     }
 
-    // We're done with the response so delete it
+    // We're done with the response so delete it.
     m_response = nullptr;
 
-    // Read another Request
+    // Read another request.
     doRead();
 }
 
 void HttpSession::doClose()
 {
+    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: doClose()", fmt::ptr(this));
     // Send a TCP shutdown
     boost::system::error_code ec;
     m_socket.shutdown(tcp::socket::shutdown_send, ec);
@@ -246,6 +272,8 @@ void HttpSession::doClose()
 template<typename Message>
 void HttpSession::Send::operator()(Message&& msg) const
 {
+    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: async send response ...", fmt::ptr(&m_self));
+
     // The lifetime of the message has to extend
     // for the duration of the async operation so
     // we use a shared_ptr to manage it.
@@ -253,6 +281,7 @@ void HttpSession::Send::operator()(Message&& msg) const
 
     // Store a type-erased version of the shared
     // pointer in the class to keep it alive.
+    //@todo why store in class, make lambda!
     m_self.m_response = sp;
 
     // Write the response

@@ -47,11 +47,9 @@ private:
 
 public:
     explicit HttpSession(tcp::socket socket,
-                         const std::path& rootPath)
-        : m_socket(std::move(socket))
-        , m_strand(m_socket.get_executor())
-        , m_rootPath(rootPath)
-    {}
+                         const std::path& rootPath);
+
+    ~HttpSession();
 
     void run();
 

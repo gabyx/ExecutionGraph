@@ -27,7 +27,7 @@ ServerCLArgs::ServerCLArgs(int argc, const char* argv[])
                  "root",
                  "Root path of the server application.",
                  {'r', "rootPath"},
-                 this->getApplicationPath().parent_path())
+                 this->initialPath())
     , m_address(m_parser,
                 "address",
                 "The IP address to use.",
@@ -47,7 +47,7 @@ ServerCLArgs::ServerCLArgs(int argc, const char* argv[])
                 "logPath",
                 "Where the logs are placed.",
                 {'l', "logPath"},
-                this->getApplicationPath().parent_path() / "logs")
+                this->initialPath() / "logs")
 
 {
     args::HelpFlag help(m_parser, "help", "Display this help menu.", {'h', "help"});
@@ -56,14 +56,21 @@ ServerCLArgs::ServerCLArgs(int argc, const char* argv[])
     {
         m_parser.ParseCLI(argc, argv);
 
-        // Validate
+        // Validation.
         m_threads.Get() = std::max(m_threads.Get(), {1});
 
+        // Check address.
         std::regex ip("(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])");
         EXECGRAPHGUI_THROW_TYPE_IF(!std::regex_match(m_address.Get(), ip),
                                    args::ParseError,
                                    "IP Address '{0}' has wrong format!",
                                    m_address.Get());
+
+        // Adjust root path if relative.
+        if(m_rootPath.Get().is_relative())
+        {
+            m_rootPath.Get() = this->initialPath() / m_rootPath.Get();
+        }
     }
     catch(args::Help)
     {

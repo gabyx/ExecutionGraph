@@ -70,6 +70,7 @@ void HttpListener::run()
 
 void HttpListener::doAccept()
 {
+    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpListener:: async accept ...");
     m_acceptor.async_accept(
         m_socket,
         std::bind(
@@ -86,6 +87,7 @@ void HttpListener::onAccept(boost::system::error_code ec)
     }
     else
     {
+        EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpListener:: accept ...");
         // Create the session and run it
         std::make_shared<HttpSession>(
             std::move(m_socket),
