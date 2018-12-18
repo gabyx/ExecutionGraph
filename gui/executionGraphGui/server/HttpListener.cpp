@@ -13,14 +13,13 @@
 #include "executionGraphGui/server/HttpListener.hpp"
 #include "executionGraphGui/server/HttpSession.hpp"
 
-namespace http = boost::beast::http; 
-
-HttpListener::HttpListener(boost::asio::io_context& ioc,
-                           tcp::endpoint endpoint,
-                           const std::path& rootPath)
+template<typename HttpSessionFactory>
+HttpListener<HttpSessionFactory>::HttpListener(boost::asio::io_context& ioc,
+                                               tcp::endpoint endpoint,
+                                               HttpSessionFactory factory)
     : m_acceptor(ioc)
     , m_socket(ioc)
-    , m_rootPath(rootPath)
+    , m_httpSessionFactory(std::move(factory))
 {
     boost::system::error_code ec;
 
@@ -58,7 +57,8 @@ HttpListener::HttpListener(boost::asio::io_context& ioc,
 }
 
 // Start accepting incoming connections
-void HttpListener::run()
+template<typename HttpSessionFactory>
+void HttpListener<HttpSessionFactory>::run()
 {
     if(!m_acceptor.is_open())
     {
@@ -67,7 +67,8 @@ void HttpListener::run()
     doAccept();
 }
 
-void HttpListener::doAccept()
+template<typename HttpSessionFactory>
+void HttpListener<HttpSessionFactory>::doAccept()
 {
     m_acceptor.async_accept(
         m_socket,
@@ -77,7 +78,8 @@ void HttpListener::doAccept()
             std::placeholders::_1));
 }
 
-void HttpListener::onAccept(boost::system::error_code ec)
+template<typename HttpSessionFactory>
+void HttpListener<HttpSessionFactory>::onAccept(boost::system::error_code ec)
 {
     if(ec)
     {
@@ -85,10 +87,9 @@ void HttpListener::onAccept(boost::system::error_code ec)
     }
     else
     {
-        // Create the session and run it
-        std::make_shared<HttpSession>(std::move(m_socket),
-                                      m_rootPath)
-            ->run();
+        // Create the session and run it.
+        auto session = m_httpSessionFactory.create(std::move(m_socket));
+        session->run();
     }
 
     // Accept another connection

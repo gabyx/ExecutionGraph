@@ -10,12 +10,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_cefapp_BackendRequestDispatcher_hpp
-#define executionGraphGui_cefapp_BackendRequestDispatcher_hpp
+#ifndef executionGraphGui_backend_BackendRequestDispatcher_hpp
+#define executionGraphGui_backend_BackendRequestDispatcher_hpp
 
 #include "executionGraphGui/backend/BackendRequestHandler.hpp"
-#include "executionGraphGui/cefapp/RequestCef.hpp"
-#include "executionGraphGui/cefapp/ResponseCef.hpp"
 #include "executionGraphGui/common/RequestDispatcher.hpp"
 
 /* ---------------------------------------------------------------------------------------*/

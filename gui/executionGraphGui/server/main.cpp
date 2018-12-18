@@ -12,18 +12,34 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <list>
 #include <memory>
 #include <thread>
-#include <list>
 #include <vector>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/signal_set.hpp>
+#include "executionGraphGui/backend/BackendFactory.hpp"
+#include "executionGraphGui/backend/BackendRequestDispatcher.hpp"
+#include "executionGraphGui/backend/ExecutionGraphBackend.hpp"
 #include "executionGraphGui/common/Loggers.hpp"
 #include "executionGraphGui/server/HttpCommon.hpp"
 #include "executionGraphGui/server/HttpListener.hpp"
+#include "executionGraphGui/server/HttpSession.hpp"
 #include "executionGraphGui/server/HttpWorker.hpp"
 #include "executionGraphGui/server/ServerCLArgs.hpp"
+
+//! Install various backends and setup all of them.
+template<typename Dispatcher>
+void setupBackends(std::shared_ptr<Dispatcher> requestDispatcher)
+{
+    // Install the executionGraph backend
+    BackendFactory::BackendData messageHandlers = BackendFactory::Create<ExecutionGraphBackend>();
+    for(auto& backendHandler : messageHandlers.second)
+    {
+        requestDispatcher->addHandler(backendHandler);
+    }
+}
 
 //! Main function of the execution graph server backend.
 int main(int argc, const char* argv[])
@@ -33,6 +49,11 @@ int main(int argc, const char* argv[])
 
     // Make all loggers
     EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(Loggers, loggers, (args->logPath()));
+
+    // Make the backend request dispatcher.
+    auto dispatcher = std::make_shared<BackendRequestDispatcher>();
+    setupBackends(dispatcher);
+    dispatcher->start();  // Start the dispatcher thread
 
     EXECGRAPHGUI_BACKENDLOG_INFO(
         "Starting ExecutionGraph Server at '{0}:{1} with '{2}' threads.\n"
@@ -60,11 +81,13 @@ int main(int argc, const char* argv[])
 
     // Create and launch a listening port
     const auto address = boost::asio::ip::make_address(args->address());
-    std::make_shared<HttpListener>(
+
+    using SessionFactory = HttpSession::Factory;
+    auto listener        = std::make_shared<HttpListener<SessionFactory>>(
         ioc,
         boost::asio::ip::tcp::endpoint{address, args->port()},
-        args->rootPath())
-        ->run();
+        HttpSession::Factory{dispatcher});
+    listener->run();
 
     auto run = [&ioc](auto threadIdx) {
         EXECGRAPHGUI_BACKENDLOG_INFO("Start thread '{0}' ...", threadIdx);

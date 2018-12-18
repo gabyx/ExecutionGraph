@@ -21,14 +21,15 @@
 #include "executionGraphGui/server/HttpCommon.hpp"
 
 // Accepts incoming connections and launches the sessions
-class HttpListener : public std::enable_shared_from_this<HttpListener>
+template<typename HttpSessionFactory>
+class HttpListener : public std::enable_shared_from_this<HttpListener<HttpSessionFactory>>
 {
     using tcp = boost::asio::ip::tcp;
 
 public:
     HttpListener(boost::asio::io_context& ioc,
-                 tcp::endpoint endpoint,
-                 const std::path& rootPath);
+                 tcp::endpoint endpoint, 
+                 HttpSessionFactory factory);
 
     void run();
     void doAccept();
@@ -37,7 +38,10 @@ public:
 private:
     tcp::acceptor m_acceptor;     //!< Accpetor.
     tcp::socket m_socket;         //!< The socket we use to listen for incoming requests.
-    const std::path& m_rootPath;  //!< The root path of the server.
+
+    HttpSessionFactory m_httpSessionFactory; //!< Creating a HTTP Session.
 };
+
+#include "executionGraphGui/server/HttpListener.cpp"
 
 #endif

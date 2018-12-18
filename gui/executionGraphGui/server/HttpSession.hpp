@@ -20,9 +20,32 @@
 #include "executionGraph/common/FileSystem.hpp"
 #include "executionGraphGui/server/HttpCommon.hpp"
 
+class BackendRequestDispatcher;
+
 // Handles an HTTP server connection
 class HttpSession : public std::enable_shared_from_this<HttpSession>
 {
+public:
+    //! A simple factory creating HTTP Sessions.
+    struct Factory
+    {
+        Factory(std::shared_ptr<BackendRequestDispatcher> dispatcher), m_dispatcher(dispatcher) {}
+        Factory(Factory&) = delete;
+        Factory& operator=(Factory&) = delete;
+        Factory(Factory&&)           = default;
+        Factory& operator=(Factory&&) = default;
+
+        template<typename... Args>
+        auto create(Args&&... args)
+        {
+            return std::make_shared<HttpSession>(m_dispatcher,
+                                                 std::forward<Args>(args)...);
+        }
+
+    private:
+        std::shared_ptr<BackendRequestDispatcher> m_dispatcher;
+    };
+
 public:
     using Body    = boost::beast::http::string_body;
     using Request = boost::beast::http::request<Body>;
@@ -46,10 +69,12 @@ private:
     boost::beast::flat_buffer m_buffer;  //!< A linear continuous buffer where the request is stored.
     Request m_request;                   //!< The incoming request we are handling.
 
-    const std::path& m_rootPath;  //!< Root file path for the server.
+    std::shared_ptr<BackendRequestDispatcher> m_dispatcher;  //!< The backend request dispatcher.
 
 public:
-    explicit HttpSession(tcp::socket socket, const std::path& rootPath);
+    explicit HttpSession(const std::path& rootPath,
+                         std::shared_ptr<BackendRequestDispatcher> dispatcher,
+                         tcp::socket socket);
 
     ~HttpSession();
 
