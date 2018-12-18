@@ -13,14 +13,14 @@
 #include "executionGraphGui/server/HttpListener.hpp"
 #include "executionGraphGui/server/HttpSession.hpp"
 
-namespace http = boost::beast::http;  // from <boost/beast/http.hpp>
+namespace http = boost::beast::http; 
 
 HttpListener::HttpListener(boost::asio::io_context& ioc,
                            tcp::endpoint endpoint,
-                           const std::string& doc_root)
+                           const std::path& rootPath)
     : m_acceptor(ioc)
     , m_socket(ioc)
-    , m_rootPath(doc_root)
+    , m_rootPath(rootPath)
 {
     boost::system::error_code ec;
 
@@ -49,8 +49,7 @@ HttpListener::HttpListener(boost::asio::io_context& ioc,
     }
 
     // Start listening for connections
-    m_acceptor.listen(
-        boost::asio::socket_base::max_listen_connections, ec);
+    m_acceptor.listen(boost::asio::socket_base::max_listen_connections, ec);
     if(ec)
     {
         fail(ec, "HttpListener:: listen");
@@ -70,7 +69,6 @@ void HttpListener::run()
 
 void HttpListener::doAccept()
 {
-    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpListener:: async accept ...");
     m_acceptor.async_accept(
         m_socket,
         std::bind(
@@ -87,11 +85,9 @@ void HttpListener::onAccept(boost::system::error_code ec)
     }
     else
     {
-        EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpListener:: accept ...");
         // Create the session and run it
-        std::make_shared<HttpSession>(
-            std::move(m_socket),
-            m_rootPath)
+        std::make_shared<HttpSession>(std::move(m_socket),
+                                      m_rootPath)
             ->run();
     }
 

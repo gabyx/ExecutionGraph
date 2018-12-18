@@ -65,9 +65,6 @@ void HttpWorker::readRequest()
     // forwarded to the message object. A single argument
     // is forwarded to the body constructor.
     //
-    // We construct the dynamic body with a 1MB limit
-    // to prevent vulnerability to buffer attacks.
-    //
     m_parser.emplace(std::piecewise_construct,
                      std::make_tuple(),
                      std::make_tuple(m_alloc));
@@ -80,7 +77,6 @@ void HttpWorker::readRequest()
             if(ec)
             {
                 EXECGRAPHGUI_BACKENDLOG_ERROR("{0}:: '{1}'", m_name, ec.message());
-                m_socket.close();
                 accept();
             }
             else
@@ -102,7 +98,8 @@ void HttpWorker::processRequest(const Request& request)
             break;
         }
         default:
-        {  // We return responses indicating an error if
+        {
+            // We return responses indicating an error if
             // we do not recognize the request method.
             sendBadResponse(
                 http::status::bad_request,

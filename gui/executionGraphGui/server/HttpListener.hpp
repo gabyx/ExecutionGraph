@@ -28,16 +28,16 @@ class HttpListener : public std::enable_shared_from_this<HttpListener>
 public:
     HttpListener(boost::asio::io_context& ioc,
                  tcp::endpoint endpoint,
-                 const std::string& doc_root);
+                 const std::path& rootPath);
 
     void run();
     void doAccept();
     void onAccept(boost::system::error_code ec);
 
 private:
-    tcp::acceptor m_acceptor;      //!< Accpetor.
-    tcp::socket m_socket;          //!< The socket we use to listen for incoming requests.
-    const std::string m_rootPath;  //!< The root path of the server.
+    tcp::acceptor m_acceptor;     //!< Accpetor.
+    tcp::socket m_socket;         //!< The socket we use to listen for incoming requests.
+    const std::path& m_rootPath;  //!< The root path of the server.
 };
 
 #endif

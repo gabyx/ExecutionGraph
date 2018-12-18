@@ -42,7 +42,7 @@ int main(int argc, const char* argv[])
         args->threads(),
         args->logPath());
 
-#if 0
+#if 1
     // The io_context is required for all I/O
     const auto threads = args->threads();
     boost::asio::io_context ioc{static_cast<int>(threads)};

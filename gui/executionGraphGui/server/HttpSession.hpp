@@ -33,21 +33,23 @@ public:
 
 private:
     using tcp = boost::asio::ip::tcp;
-    struct Send;  //!< Functor to send the response.
+
+    struct Send;
 
 private:
-    tcp::socket m_socket;                                                  //!< The socket this session is running on.
-    boost::asio::strand<boost::asio::io_context::executor_type> m_strand;  //!< The executor strand.
+    tcp::socket m_socket;  //!< The socket this session is running on.
 
-    boost::beast::flat_buffer m_buffer;  //!< A flat buffer where the request is stored.
+    boost::asio::strand<
+        boost::asio::io_context::executor_type>
+        m_strand;  //!< The executor strand (serialized completion handler dispatch).
+
+    boost::beast::flat_buffer m_buffer;  //!< A linear continuous buffer where the request is stored.
     Request m_request;                   //!< The incoming request we are handling.
-    std::shared_ptr<void> m_response;    //!< Response we are sending back.
 
-    const std::path m_rootPath;  //!< Root file path for the server.
+    const std::path& m_rootPath;  //!< Root file path for the server.
 
 public:
-    explicit HttpSession(tcp::socket socket,
-                         const std::path& rootPath);
+    explicit HttpSession(tcp::socket socket, const std::path& rootPath);
 
     ~HttpSession();
 

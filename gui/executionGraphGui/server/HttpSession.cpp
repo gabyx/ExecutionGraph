@@ -37,7 +37,6 @@ namespace
                        Request&& req,
                        Send&& send)
     {
-        EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession::Send::handleRequest(...)");
         static const auto versionString = getServerVersion();
 
         // Returns a bad Request response.
@@ -144,7 +143,6 @@ namespace
         res.keep_alive(req.keep_alive());
         return send(std::move(res));
     }
-
 }  // namespace
 
 /* ---------------------------------------------------------------------------------------*/
@@ -157,14 +155,31 @@ namespace
 /* ---------------------------------------------------------------------------------------*/
 struct HttpSession::Send
 {
-    HttpSession& m_self;
+    Send(std::shared_ptr<HttpSession> session)
+        : m_session(session) {}
 
-    explicit Send(HttpSession& self)
-        : m_self(self)
-    {}
+    std::shared_ptr<HttpSession> m_session;
 
     template<typename Message>
-    void operator()(Message&& msg) const;
+    void operator()(Message&& msg)
+    {
+        EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: post send response ...",
+                                      m_session);
+
+        // The lifetime of the message has to extend
+        // for the duration of the async operation so
+        // we use a shared_ptr to manage it.
+        auto m = std::make_shared<Message>(std::move(msg));
+
+        auto onCompletion = [session = m_session, m](auto ec, std::size_t bytesTransferred) {
+            session->onWrite(ec, bytesTransferred, m->need_eof());
+        };
+
+        // Write the response.
+        http::async_write(m_session->m_socket,
+                          *m,
+                          boost::asio::bind_executor(m_session->m_strand, onCompletion));
+    }
 };
 
 HttpSession::HttpSession(tcp::socket socket,
@@ -193,16 +208,17 @@ void HttpSession::doRead()
     // otherwise the operation behavior is undefined.
     m_request = {};
 
+    auto onCompletion = [session = shared_from_this()](auto ec, std::size_t bytesTransferred) {
+        session->onRead(ec, bytesTransferred);
+    };
+
     // Read a request.
-    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: async read request ...", fmt::ptr(this));
+    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: post read request ...", fmt::ptr(this));
     http::async_read(m_socket,
                      m_buffer,
                      m_request,
                      boost::asio::bind_executor(m_strand,
-                                                std::bind(&HttpSession::onRead,
-                                                          shared_from_this(),
-                                                          std::placeholders::_1,
-                                                          std::placeholders::_2)));
+                                                onCompletion));
 }
 
 void HttpSession::onRead(boost::system::error_code ec,
@@ -222,7 +238,7 @@ void HttpSession::onRead(boost::system::error_code ec,
         return fail(ec, "HttpSession:: read");
     }
 
-    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0} ::onRead : Request[ method: '{1}' target: '{2}']",
+    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0} ::handleRequest : Request[ method: '{1}' target: '{2}']",
                                   fmt::ptr(this),
                                   m_request.method(),
                                   m_request.target());
@@ -230,7 +246,7 @@ void HttpSession::onRead(boost::system::error_code ec,
     // Send the response.
     handleRequest(m_rootPath,
                   std::move(m_request),
-                  Send{*this});
+                  Send{shared_from_this()});
 }
 
 void HttpSession::onWrite(boost::system::error_code ec,
@@ -252,9 +268,6 @@ void HttpSession::onWrite(boost::system::error_code ec,
         return doClose();
     }
 
-    // We're done with the response so delete it.
-    m_response = nullptr;
-
     // Read another request.
     doRead();
 }
@@ -267,33 +280,4 @@ void HttpSession::doClose()
     m_socket.shutdown(tcp::socket::shutdown_send, ec);
 
     // At this point the connection is closed gracefully
-}
-
-template<typename Message>
-void HttpSession::Send::operator()(Message&& msg) const
-{
-    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: async send response ...", fmt::ptr(&m_self));
-
-    // The lifetime of the message has to extend
-    // for the duration of the async operation so
-    // we use a shared_ptr to manage it.
-    auto sp = std::make_shared<Message>(std::move(msg));
-
-    // Store a type-erased version of the shared
-    // pointer in the class to keep it alive.
-    //@todo why store in class, make lambda!
-    m_self.m_response = sp;
-
-    // Write the response
-    http::async_write(
-        m_self.m_socket,
-        *sp,
-        boost::asio::bind_executor(
-            m_self.m_strand,
-            std::bind(
-                &HttpSession::onWrite,
-                m_self.shared_from_this(),
-                std::placeholders::_1,
-                std::placeholders::_2,
-                sp->need_eof())));
 }
