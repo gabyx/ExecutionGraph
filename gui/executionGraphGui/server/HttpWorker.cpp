@@ -16,8 +16,8 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include "executionGraphGui/common/Loggers.hpp"
-#include "executionGraphGui/server/MimeType.hpp"
 #include "executionGraphGui/server/HttpCommon.hpp"
+#include "executionGraphGui/server/MimeType.hpp"
 
 namespace beast = boost::beast;          // from <boost/beast.hpp>
 namespace http  = beast::http;           // from <boost/beast/http.hpp>
@@ -26,12 +26,15 @@ using tcp       = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
 
 void HttpWorker::start()
 {
+    EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}::start()", m_name);
     accept();
     checkDeadline();
 }
 
 void HttpWorker::accept()
 {
+    EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}::post async_accept()", m_name);
+
     // Clean up any previous connection.
     beast::error_code ec;
     m_socket.close(ec);
@@ -55,6 +58,7 @@ void HttpWorker::accept()
 
 void HttpWorker::readRequest()
 {
+    EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}::post async_read()", m_name);
     // On each read the parser needs to be destroyed and
     // recreated.
     // Arguments passed to the parser constructor are
@@ -75,6 +79,8 @@ void HttpWorker::readRequest()
         [this](beast::error_code ec, std::size_t) {
             if(ec)
             {
+                EXECGRAPHGUI_BACKENDLOG_ERROR("{0}:: '{1}'", m_name, ec.message());
+                m_socket.close();
                 accept();
             }
             else
@@ -86,6 +92,8 @@ void HttpWorker::readRequest()
 
 void HttpWorker::processRequest(const Request& request)
 {
+    EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}::processRequest()", m_name);
+
     switch(request.method())
     {
         case http::verb::get:
@@ -107,13 +115,18 @@ void HttpWorker::processRequest(const Request& request)
 void HttpWorker::sendBadResponse(http::status status,
                                  std::string const& error)
 {
+    EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}::sendBadResponse()", m_name);
+
+    m_responseStringSerializer.reset();
+    m_responseString.reset();
+
     m_responseString.emplace(std::piecewise_construct,
                              std::make_tuple(),
                              std::make_tuple(m_alloc));
 
     m_responseString->result(status);
     m_responseString->keep_alive(false);
-    m_responseString->set(http::field::server, "Beast");
+    m_responseString->set(http::field::server, getServerVersion());
     m_responseString->set(http::field::content_type, "text/plain");
     m_responseString->body() = error;
     m_responseString->prepare_payload();
@@ -123,9 +136,8 @@ void HttpWorker::sendBadResponse(http::status status,
     http::async_write(m_socket,
                       *m_responseStringSerializer,
                       [this](beast::error_code ec, std::size_t) {
+                          EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}:: write completed -> socket shutdown", m_name);
                           m_socket.shutdown(tcp::socket::shutdown_send, ec);
-                          m_responseStringSerializer.reset();
-                          m_responseString.reset();
                           accept();
                       });
 }
@@ -137,19 +149,21 @@ void HttpWorker::sendFile(beast::string_view target)
        target[0] != '/' ||
        target.find("..") != std::string::npos)
     {
-        sendBadResponse(
-            http::status::not_found,
-            fmt::format("Wrong request path: '{0}", target));
+        sendBadResponse(http::status::not_found,
+                        fmt::format("Wrong request path: '{0}", target));
         return;
     }
 
     // Build the path to the requested file.
-    std::path path = (m_rootPath / (std::string{"."} + target.to_string())).lexically_normal();
-
-    if(target.back() == '/')
+    std::path path = m_rootPath / target.substr(1).to_string();
+    if(!std::filesystem::is_regular_file(path))
     {
-        path.append("index.html");
+        path = m_rootPath / "index.html";
     }
+
+    EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}::sendFile() : '{1}'",
+                                  m_name,
+                                  target);
 
     http::file_body::value_type file;
     beast::error_code ec;
@@ -163,13 +177,16 @@ void HttpWorker::sendFile(beast::string_view target)
         return;
     }
 
+    m_responseFileSerializer.reset();
+    m_responseFile.reset();
+
     m_responseFile.emplace(std::piecewise_construct,
                            std::make_tuple(),
                            std::make_tuple(m_alloc));
 
     m_responseFile->result(http::status::ok);
     m_responseFile->keep_alive(false);
-    m_responseFile->set(http::field::server, "Beast");
+    m_responseFile->set(http::field::server, getServerVersion());
     m_responseFile->set(http::field::content_type, getMimeType(path));
     m_responseFile->body() = std::move(file);
     m_responseFile->prepare_payload();
@@ -179,18 +196,20 @@ void HttpWorker::sendFile(beast::string_view target)
     http::async_write(m_socket,
                       *m_responseFileSerializer,
                       [this](beast::error_code ec, std::size_t) {
+                          EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}:: write completed -> socket shutdown send", m_name);
                           m_socket.shutdown(tcp::socket::shutdown_send, ec);
-                          m_responseFileSerializer.reset();
-                          m_responseFile.reset();
                           accept();
                       });
 }
 
 void HttpWorker::checkDeadline()
 {
+    // EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}:: check deadline", m_name);
     // The deadline may have moved, so check it has really passed.
     if(m_requestDeadline.expiry() <= std::chrono::steady_clock::now())
     {
+        EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}:: deadline expired -> close socket",
+                                      m_name);
         // Close socket to cancel any outstanding operation.
         m_socket.close();
 

@@ -13,6 +13,7 @@
 #ifndef executionGraphGui_server_HttpWorker_hpp
 #define executionGraphGui_server_HttpWorker_hpp
 
+#include <memory>
 #include <optional>
 #include <string>
 #include <boost/asio.hpp>
@@ -28,7 +29,7 @@ private:
     using Acceptor = boost::asio::ip::tcp::acceptor;
     using Socket   = boost::asio::ip::tcp::socket;
 
-    using FieldAllocator = HttpFieldAllocator<char>;
+    using FieldAllocator = std::allocator<char>;
     using BasicFields    = boost::beast::http::basic_fields<FieldAllocator>;
 
     //using RequestBody = boost::beast::http::basic_dynamic_body<beast::flat_static_buffer<1024 * 1024>>;
@@ -48,14 +49,16 @@ private:
 
 public:
     HttpWorker(Acceptor& acceptor,
-               const std::path& rootPath)
+               const std::path& rootPath,
+               const std::string& name = "HttpWorker")
         : m_acceptor(acceptor)
         , m_rootPath(rootPath)
+        , m_name(name)
     {}
 
     HttpWorker(const HttpWorker&) = delete;
     HttpWorker& operator=(const HttpWorker&) = delete;
-    
+
     void start();
 
 private:
@@ -74,8 +77,8 @@ private:
     Acceptor& m_acceptor;                                  //!< The acceptor used to listen for incoming connections.
     Socket m_socket{m_acceptor.get_executor().context()};  //!< The socket for the currently connected client.
 
-    boost::beast::flat_static_buffer<8192> m_buffer;  //!< The buffer for performing reads.
-    FieldAllocator m_alloc{8192};                     //!< The allocator used for the fields in the request and reply.
+    boost::beast::flat_buffer m_buffer;  //!< The linear dynamic buffer for performing reads.
+    FieldAllocator m_alloc;              //!< The allocator used for the fields in the request and reply.
 
     std::optional<RequestParser> m_parser;  //!< The parser for reading the requests.
 
@@ -89,7 +92,8 @@ private:
         m_acceptor.get_executor().context(),
         (std::chrono::steady_clock::time_point::max)()};  //!< The timer putting a time limit on requests.
 
-    std::path m_rootPath;  //!< The path to the root of the document directory.
+    const std::path m_rootPath;  //!< The path to the root of the document directory.
+    const std::string m_name;    //! The name of this worker.
 };
 
 #endif

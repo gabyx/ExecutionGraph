@@ -20,7 +20,7 @@
 
 namespace details
 {
-      struct StaticPool
+    struct StaticPool
     {
     public:
         std::size_t size_;
@@ -28,8 +28,7 @@ namespace details
         std::size_t count_ = 0;
         char* p_;
 
-        char*
-        end()
+        char* end()
         {
             return reinterpret_cast<char*>(this + 1) + size_;
         }
@@ -48,15 +47,13 @@ namespace details
             return *(::new(p) StaticPool{size});
         }
 
-        StaticPool&
-        share()
+        StaticPool& share()
         {
             ++refs_;
             return *this;
         }
 
-        void
-        destroy()
+        void destroy()
         {
             if(refs_--)
                 return;
@@ -64,8 +61,7 @@ namespace details
             delete[] reinterpret_cast<char*>(this);
         }
 
-        void*
-        alloc(std::size_t n)
+        void* alloc(std::size_t n)
         {
             auto last = p_ + n;
             if(last >= end())
@@ -78,15 +74,14 @@ namespace details
             return p;
         }
 
-        void
-        dealloc()
+        void dealloc()
         {
             if(--count_)
                 return;
             p_ = reinterpret_cast<char*>(this + 1);
         }
     };
-}
+}  // namespace details
 
 /** A non-thread-safe allocator optimized for @ref basic_fields.
 
@@ -107,7 +102,6 @@ namespace details
 template<typename T>
 class HttpFieldAllocator
 {
-
 public:
     details::StaticPool* m_pool;
 
@@ -148,33 +142,29 @@ public:
         m_pool->destroy();
     }
 
-    value_type*
-    allocate(size_type n)
+    value_type* allocate(size_type n)
     {
         return static_cast<value_type*>(
             m_pool->alloc(n * sizeof(T)));
     }
 
-    void
-    deallocate(value_type*, size_type)
+    void deallocate(value_type*, size_type)
     {
         m_pool->dealloc();
     }
 
     template<class U>
     friend bool
-    operator==(
-        HttpFieldAllocator const& lhs,
-        HttpFieldAllocator<U> const& rhs)
+    operator==(HttpFieldAllocator const& lhs,
+               HttpFieldAllocator<U> const& rhs)
     {
         return &lhs.m_pool == &rhs.m_pool;
     }
 
     template<class U>
     friend bool
-    operator!=(
-        HttpFieldAllocator const& lhs,
-        HttpFieldAllocator<U> const& rhs)
+    operator!=(HttpFieldAllocator const& lhs,
+               HttpFieldAllocator<U> const& rhs)
     {
         return !(lhs == rhs);
     }

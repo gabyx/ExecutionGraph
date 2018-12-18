@@ -112,7 +112,7 @@ int main(int argc, const char* argv[])
     std::list<HttpWorker> workers;
     for(auto i = 0u; i < threads; ++i)
     {
-        workers.emplace_back(acceptor, args->rootPath());
+        workers.emplace_back(acceptor, args->rootPath(), fmt::format("Worker {0}", i));
         workers.back().start();
     }
     ioc.run();
