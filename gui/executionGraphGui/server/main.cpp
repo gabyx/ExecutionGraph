@@ -20,14 +20,56 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/signal_set.hpp>
 #include "executionGraphGui/backend/BackendFactory.hpp"
-#include "executionGraphGui/backend/BackendRequestDispatcher.hpp"
 #include "executionGraphGui/backend/ExecutionGraphBackend.hpp"
 #include "executionGraphGui/common/Loggers.hpp"
+#include "executionGraphGui/server/BackendRequestDispatcher.hpp"
 #include "executionGraphGui/server/HttpCommon.hpp"
 #include "executionGraphGui/server/HttpListener.hpp"
 #include "executionGraphGui/server/HttpSession.hpp"
 #include "executionGraphGui/server/HttpWorker.hpp"
 #include "executionGraphGui/server/ServerCLArgs.hpp"
+
+//! Runs all workers.
+template<typename IOContext>
+auto runWorkers(IOContext& ioc, std::size_t threads)
+{
+    // Capture SIGINT and SIGTERM to perform a clean shutdown
+    boost::asio::signal_set signals(ioc, SIGINT, SIGTERM);
+    signals.async_wait(
+        [&](boost::system::error_code const&, int) {
+            EXECGRAPHGUI_BACKENDLOG_INFO("ExecutionGraph Server shutting down ...");
+            // Stop the `io_context`. This will cause `run()`
+            // to return immediately, eventually destroying the
+            // `io_context` and all of the sockets in it.
+            ioc.stop();
+        });
+
+    auto run = [&ioc](auto threadIdx) {
+        // If an exception is not handled and
+        EXECGRAPHGUI_BACKENDLOG_INFO("Start thread '{0}' ...", threadIdx);
+        try
+        {
+            ioc.run();  // Blocking!
+        }
+        catch(std::exception& e)
+        {
+            EXECGRAPHGUI_BACKENDLOG_FATAL("Stop Executor: Exception on thread '{0}' : '{1}'", threadIdx, e.what());
+            ioc.stop();  // Non blocking!
+        }
+        EXECGRAPHGUI_BACKENDLOG_INFO("End thread '{0}' ...", threadIdx);
+    };
+
+    // Run the I/O service on the requested number of threads.
+    std::vector<std::thread> ths;
+    ths.reserve(threads - 1);
+    for(auto i = threads - 1; i > 0; --i)
+    {
+        ths.emplace_back(std::bind(run, i));
+    }
+    run(0);
+
+    return ths;
+}
 
 //! Install various backends and setup all of them.
 template<typename Dispatcher>
@@ -68,43 +110,17 @@ int main(int argc, const char* argv[])
     const auto threads = args->threads();
     boost::asio::io_context ioc{static_cast<int>(threads)};
 
-    // Capture SIGINT and SIGTERM to perform a clean shutdown
-    boost::asio::signal_set signals(ioc, SIGINT, SIGTERM);
-    signals.async_wait(
-        [&](boost::system::error_code const&, int) {
-            EXECGRAPHGUI_BACKENDLOG_INFO("ExecutionGraph Server shutting down ...");
-            // Stop the `io_context`. This will cause `run()`
-            // to return immediately, eventually destroying the
-            // `io_context` and all of the sockets in it.
-            ioc.stop();
-        });
-
     // Create and launch a listening port
     const auto address = boost::asio::ip::make_address(args->address());
-
-    using SessionFactory = HttpSession::Factory;
-    auto listener        = std::make_shared<HttpListener<SessionFactory>>(
+    auto listener      = std::make_shared<HttpListener<HttpSession>>(
         ioc,
         boost::asio::ip::tcp::endpoint{address, args->port()},
-        HttpSession::Factory{dispatcher});
+        HttpSession::Factory{args->rootPath(), dispatcher});
     listener->run();
 
-    auto run = [&ioc](auto threadIdx) {
-        EXECGRAPHGUI_BACKENDLOG_INFO("Start thread '{0}' ...", threadIdx);
-        ioc.run();
-        EXECGRAPHGUI_BACKENDLOG_INFO("End thread '{0}' ...", threadIdx);
-    };
+    auto ths = runWorkers(ioc, threads);
 
-    // Run the I/O service on the requested number of threads
-    std::vector<std::thread> ths;
-    ths.reserve(threads - 1);
-    for(auto i = threads - 1; i > 0; --i)
-    {
-        ths.emplace_back(std::bind(run, i));
-    }
-    run(0);
-
-    // If we get here, it means we got a SIGINT or SIGTERM
+    // If we get here, it means we got a SIGINT or SIGTERM or an E
     // Block until all the threads exit
     for(auto& th : ths)
     {

@@ -21,8 +21,6 @@
 #include <executionGraph/common/ThreadPool.hpp>
 #include "executionGraphGui/common/Exception.hpp"
 #include "executionGraphGui/common/Loggers.hpp"
-#include "executionGraphGui/common/Request.hpp"
-#include "executionGraphGui/common/Response.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -49,6 +47,9 @@ public:
     using HandlerType  = THandlerType;
     using RequestType  = TRequestType;
     using ResponseType = TResponseType;
+    
+    static_assert(std::is_move_constructible_v<RequestType>);
+    static_assert(std::is_move_constructible_v<ResponseType>);
 
     using Id = typename HandlerType::Id;
 
@@ -66,13 +67,17 @@ public:
         if(bUseThreadsForDispatch)
         {
             // Run the dispatch in
-            m_pool.getQueue()->emplace(*this, std::forward<Request>(request), std::forward<Response>(response));
+            m_pool.getQueue()->emplace(*this,
+                                       std::forward<Request>(request),
+                                       std::forward<Response>(response));
         }
         else
         {
             // Run the task in this thread
             Pool::Consumer::Run(
-                Task(*this, std::forward<Request>(request), std::forward<Response>(response)),
+                Task(*this,
+                     std::forward<Request>(request),
+                     std::forward<Response>(response)),
                 std::this_thread::get_id());
         }
     }
@@ -181,7 +186,7 @@ private:
             {  // Lock start
                 std::scoped_lock<std::mutex> lock(m_d.m_access);
                 // Get the request type
-                requestType = m_request->getURL().string();
+                requestType = m_request.getTarget().string();
 
                 // Find handler
                 auto it = m_d.m_specificHandlers.find(requestType);
@@ -195,34 +200,34 @@ private:
             // Handling the request
             if(handler)
             {
-                handler->handleRequest(*m_request, *m_response);
-                if(!m_response->isResolved())
+                handler->handleRequest(m_request, m_response);
+                if(!m_response.isResolved())
                 {
-                    EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: Request id: '{0}' (url: '{1}') has not been handled correctly, it will be cancled!",
-                                                 m_request->getId().toString(),
-                                                 requestType);
+                    EXECGRAPHGUI_THROW("RequestDispatcher: Request id: '{0}' (url: '{1}') has not been handled correctly, it will be cancled!",
+                                       m_request.getId().toString(),
+                                       requestType);
                 }
             }
             else
             {
-                EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: No handler found for request id: '{0}' (url: '{1}')!, it will be cancled!",
-                                             m_request->getId().toString(),
-                                             requestType);
+                EXECGRAPHGUI_THROW("RequestDispatcher: No handler found for request id: '{0}' (url: '{1}')!, it will be cancled!",
+                                   m_request.getId().toString(),
+                                   requestType);
             }
         };
 
         void onTaskException(std::exception_ptr e)
         {
             EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: Request id: '{0}' (url: '{1}') has thrown exception, it will be cancled!",
-                                         m_request->getId().toString(),
-                                         m_request->getURL().string());
-            m_response->setCanceled(e);
+                                         m_request.getId().toString(),
+                                         m_request.getTarget().string());
+            m_response.setCanceled(e);
         };
 
     private:
-        RequestDispatcher& m_d;                    //!< Dispatcher.
-        std::unique_ptr<RequestType> m_request;    //!< The request to handle.
-        std::unique_ptr<ResponseType> m_response;  //!< The response to handle.
+        RequestDispatcher& m_d;   //!< Dispatcher.
+        RequestType m_request;    //!< The request to handle.
+        ResponseType m_response;  //!< The response to handle.
     };
 
     class TaskForwardRequest
@@ -248,7 +253,7 @@ private:
             {  // Lock start
                 std::scoped_lock<std::mutex> lock(m_d.m_access);
                 // Get the request type
-                const std::string requestType = m_request->getURL().string();
+                const std::string requestType = m_request.getTarget().string();
 
                 // Find handler
                 auto it = m_d.m_specificHandlers.find(requestType);
@@ -259,6 +264,7 @@ private:
                 }
             }  // Lock end
 
+            auto id = m_request.getId();
             // Handling the request
             if(handler)
             {
@@ -267,7 +273,7 @@ private:
             else
             {
                 EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: No handler found for request id: '{0}'!, it will be cancled!",
-                                             m_request->getId().toString());
+                                             id.toString());
             }
         }
 
@@ -277,9 +283,9 @@ private:
         };
 
     private:
-        RequestDispatcher& m_d;                    //!< Dispatcher.
-        std::unique_ptr<RequestType> m_request;    //!< The request to handle.
-        std::unique_ptr<ResponseType> m_response;  //!< The response to handle.
+        RequestDispatcher& m_d;   //!< Dispatcher.
+        RequestType m_request;    //!< The request to handle.
+        ResponseType m_response;  //!< The response to handle.
     };
 
 private:

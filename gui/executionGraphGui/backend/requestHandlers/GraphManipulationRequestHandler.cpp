@@ -58,7 +58,7 @@ void GraphManipulationRequestHandler::handleRequest(const Request& request,
     EXECGRAPHGUI_BACKENDLOG_INFO("GraphManipulationRequestHandler::handleRequest");
 
     // Dispatch to the correct function
-    auto it = m_functionMap.m_map.find(request.getURL().string());
+    auto it = m_functionMap.m_map.find(request.getTarget().string());
     if(it != m_functionMap.m_map.end())
     {
         it->second(*this, request, response);
@@ -79,7 +79,7 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
     Id graphID{nodeReq->graphId()->str()};
 
     // Callback to create the response
-    auto responseCreator = [&response, graphID](auto& graph, auto& node) {
+    auto responseCreator = [&response](auto& graph, auto& node) {
         using Allocator = ResponsePromise::Allocator;
         AllocatorProxyFlatBuffer<Allocator> allocator(response.getAllocator());
         flatbuffers::FlatBufferBuilder builder(512, &allocator);

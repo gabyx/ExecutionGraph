@@ -11,12 +11,12 @@
 // =========================================================================================
 
 #include "executionGraphGui/server/HttpListener.hpp"
-#include "executionGraphGui/server/HttpSession.hpp"
 
-template<typename HttpSessionFactory>
-HttpListener<HttpSessionFactory>::HttpListener(boost::asio::io_context& ioc,
-                                               tcp::endpoint endpoint,
-                                               HttpSessionFactory factory)
+template<typename HttpSession>
+template<typename Factory>
+HttpListener<HttpSession>::HttpListener(boost::asio::io_context& ioc,
+                                        tcp::endpoint endpoint,
+                                        Factory factory)
     : m_acceptor(ioc)
     , m_socket(ioc)
     , m_httpSessionFactory(std::move(factory))
@@ -57,8 +57,8 @@ HttpListener<HttpSessionFactory>::HttpListener(boost::asio::io_context& ioc,
 }
 
 // Start accepting incoming connections
-template<typename HttpSessionFactory>
-void HttpListener<HttpSessionFactory>::run()
+template<typename HttpSession>
+void HttpListener<HttpSession>::run()
 {
     if(!m_acceptor.is_open())
     {
@@ -67,19 +67,19 @@ void HttpListener<HttpSessionFactory>::run()
     doAccept();
 }
 
-template<typename HttpSessionFactory>
-void HttpListener<HttpSessionFactory>::doAccept()
+template<typename HttpSession>
+void HttpListener<HttpSession>::doAccept()
 {
     m_acceptor.async_accept(
         m_socket,
         std::bind(
             &HttpListener::onAccept,
-            shared_from_this(),
+            this->shared_from_this(),
             std::placeholders::_1));
 }
 
-template<typename HttpSessionFactory>
-void HttpListener<HttpSessionFactory>::onAccept(boost::system::error_code ec)
+template<typename HttpSession>
+void HttpListener<HttpSession>::onAccept(boost::system::error_code ec)
 {
     if(ec)
     {
@@ -88,8 +88,7 @@ void HttpListener<HttpSessionFactory>::onAccept(boost::system::error_code ec)
     else
     {
         // Create the session and run it.
-        auto session = m_httpSessionFactory.create(std::move(m_socket));
-        session->run();
+        m_httpSessionFactory(std::move(m_socket))->run();
     }
 
     // Accept another connection

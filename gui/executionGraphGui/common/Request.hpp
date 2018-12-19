@@ -24,7 +24,7 @@ class BinaryPayload;
     General Request Message
 
     A BackendRequestHandler is handling such a request. It can be registered in
-    the message dispatcher for handling one or several request ids (see `m_requestURL`)
+    the message dispatcher for handling one or several request ids (see `m_requestTarget`)
     The request id is in the form "category/subcategory" (e.g. "graphManip/addNode").
     We use a category and a subcategory to be able to structure requests into groups.
     Also for the future, when more and more requests get added.
@@ -45,19 +45,18 @@ public:
     using Payload = BinaryPayload;
 
 protected:
-    Request(const std::path& requestURL)
+    Request(const std::path& requestTarget)
         : m_id()
-        , m_requestURL(requestURL)
+        , m_requestTarget(requestTarget)
     {}
 
 public:
     virtual ~Request() = default;
+    Request(Request&&) = default;
 
 public:
     //! Get the request url describing this message.
-    const std::path& getURL() const { return m_requestURL; }
-    //! Set the request url describing this message.
-    void setURL(const std::path& requestURL) { m_requestURL = requestURL; }
+    const std::path& getTarget() const { return m_requestTarget; }
 
 public:
     //! Get the payload of this request. Nullptr if there is no payload for this request.
@@ -68,7 +67,7 @@ private:
     //! The request URL (it will get adjusted during request forwarding)
     //! e.g. "graph/addNode"
     //! e.g. "general/addGraph"
-    std::path m_requestURL;
+    std::path m_requestTarget;
 };
 
 #endif

@@ -170,7 +170,7 @@ bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
     // over to the message dispatcher.
     ////////////////////////////////////////////////////
     // Make a RequestCef (move the payload into it)
-    auto requestCef = std::make_unique<RequestCef>(m_requestURL, std::move(payload));
+    auto requestCef = std::make_unique<RequestCef>(m_requestTarget, std::move(payload));
     // Make a ResponseCef
     auto responseCef = std::make_unique<ResponsePromiseCef>(cbResponseHeaderReady, requestCef->getId(), m_allocator, true);
     // Get the future out
@@ -226,10 +226,10 @@ bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
     }
 
     // Exctract requestId
-    // e.g. m_requestURL := "catergory/subcategory/command"
-    m_requestURL = executionGraph::splitLeadingSlashes(CefString(urlParts.path.str).ToString());
+    // e.g. m_requestTarget := "catergory/subcategory/command"
+    m_requestTarget = executionGraph::splitLeadingSlashes(CefString(urlParts.path.str).ToString());
 
-    if(m_requestURL.empty())
+    if(m_requestTarget.empty())
     {
         EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler '{0}' : url '{1}': requestId extract failed!",
                                   getName(),
@@ -265,7 +265,7 @@ bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
 //! Finish handling the request: Reset everything and signal callback.
 void BackendResourceHandler::reset()
 {
-    m_requestURL.clear();
+    m_requestTarget.clear();
     m_query.clear();
     m_mimeType.clear();
     m_buffer     = nullptr;

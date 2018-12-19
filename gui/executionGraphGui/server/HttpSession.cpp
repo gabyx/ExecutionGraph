@@ -14,7 +14,7 @@
 #include <functional>
 #include <tuple>
 #include <boost/asio/bind_executor.hpp>
-#include "executionGraphGui/backend/BackendRequestDispatcher.hpp"
+#include "executionGraphGui/server/BackendRequestDispatcher.hpp"
 #include "executionGraphGui/server/MimeType.hpp"
 
 namespace http = boost::beast::http;  // from <boost/beast/http.hpp>
@@ -131,10 +131,20 @@ namespace
     //! @brief Handle the request.
 
     template<typename Request, typename Send, typename Dispatcher>
-    void handleRequestBackend(Request&& req,
+    void handleRequestBackend(const std::path& rootPath,
+                              Request&& req,
                               Dispatcher&& dispatcher,
                               Send&& send)
     {
+        EXECGRAPHGUI_THROW("handleRequestBackendFailed!");
+
+        // Request is read
+        // post a task on the IOContext which executes 
+        // ioc.post( dispatcher->handleRequest(request, response), sendResponse() )
+        // the dispatcher is not threaded, so runs in the current thread.
+
+        
+
     }
 }  // namespace
 
@@ -175,9 +185,9 @@ struct HttpSession::Send
     }
 };
 
-HttpSession::HttpSession(const std::path& rootPath,
-                         std::shared_ptr<BackendRequestDispatcher> dispatcher,
-                         tcp::socket socket)
+HttpSession::HttpSession(tcp::socket socket,
+                         const std::path& rootPath,
+                         std::shared_ptr<BackendRequestDispatcher> dispatcher)
     : m_socket(std::move(socket))
     , m_strand(m_socket.get_executor())
     , m_rootPath(rootPath)
@@ -239,7 +249,8 @@ void HttpSession::onRead(boost::system::error_code ec,
                                   m_request.target());
 
     // Send the response.
-    handleRequestBackend(std::move(m_request),
+    handleRequestBackend(m_rootPath,
+                         std::move(m_request),
                          m_dispatcher,
                          Send{shared_from_this()});
 }

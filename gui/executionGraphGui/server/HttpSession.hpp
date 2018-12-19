@@ -26,23 +26,25 @@ class BackendRequestDispatcher;
 class HttpSession : public std::enable_shared_from_this<HttpSession>
 {
 public:
-    //! A simple factory creating HTTP Sessions.
+    //! A simple factory creating this HTTP Sessions.
     struct Factory
     {
-        Factory(std::shared_ptr<BackendRequestDispatcher> dispatcher), m_dispatcher(dispatcher) {}
-        Factory(Factory&) = delete;
-        Factory& operator=(Factory&) = delete;
-        Factory(Factory&&)           = default;
-        Factory& operator=(Factory&&) = default;
+        Factory(const std::path& rootPath,
+                std::shared_ptr<BackendRequestDispatcher> dispatcher)
+            : m_rootPath(rootPath)
+            , m_dispatcher(dispatcher)
+        {}
 
         template<typename... Args>
-        auto create(Args&&... args)
+        auto operator()(Args&&... args)
         {
-            return std::make_shared<HttpSession>(m_dispatcher,
-                                                 std::forward<Args>(args)...);
+            return std::make_shared<HttpSession>(std::forward<Args>(args)...,
+                                                 m_rootPath,
+                                                 m_dispatcher);
         }
 
     private:
+        const std::path& m_rootPath;
         std::shared_ptr<BackendRequestDispatcher> m_dispatcher;
     };
 
@@ -69,12 +71,13 @@ private:
     boost::beast::flat_buffer m_buffer;  //!< A linear continuous buffer where the request is stored.
     Request m_request;                   //!< The incoming request we are handling.
 
+    const std::path& m_rootPath;
     std::shared_ptr<BackendRequestDispatcher> m_dispatcher;  //!< The backend request dispatcher.
 
 public:
-    explicit HttpSession(const std::path& rootPath,
-                         std::shared_ptr<BackendRequestDispatcher> dispatcher,
-                         tcp::socket socket);
+    explicit HttpSession(tcp::socket socket,
+                         const std::path& rootPath,
+                         std::shared_ptr<BackendRequestDispatcher> dispatcher);
 
     ~HttpSession();
 

@@ -53,7 +53,8 @@ public:
     using Allocator = BufferPool;
     using Id        = executionGraph::Id;
 
-protected:
+public:
+
     ResponsePromise(const Id& requestId,
                     std::shared_ptr<Allocator> allocator,
                     bool bCancelOnDestruction = true)
@@ -81,7 +82,6 @@ protected:
         return *this;
     };
 
-public:
     virtual ~ResponsePromise() = default;
 
 public:
@@ -117,8 +117,8 @@ public:
     auto getAllocator() { return m_allocator; }
 
 protected:
-    virtual void setReadyImpl()                                = 0;
-    virtual void setCanceledImpl(std::exception_ptr exception) = 0;
+    virtual void setReadyImpl(){};
+    virtual void setCanceledImpl(std::exception_ptr exception){};
 
     //! Function to be called in derived classed, which want to automatically
     //! resolve on destruction!

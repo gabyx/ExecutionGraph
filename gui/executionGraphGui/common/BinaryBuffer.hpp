@@ -45,11 +45,8 @@ public:
     BinaryBuffer(std::shared_ptr<RawAllocator> allocator,
                  std::size_t bytes)
         : m_allocator(allocator)
-        , m_buffer(foonathan::memory::allocate_unique<uint8_t[]>(*allocator, bytes))
-        , m_allocatedBytes(bytes)
-        , m_data(m_buffer.get())
-        , m_bytes(bytes)
     {
+        resize(bytes);
     }
 
     //! Constructor for handing over a buffer `data` which was 'array-like'-allocated by `allocator`.
@@ -84,13 +81,25 @@ public:
     const_iterator cend() const { return end(); }
     //@}
 
+    void resize(std::uint64_t bytes)
+    {
+        if(bytes > m_allocatedBytes)
+        {
+            // reallocate
+            m_buffer = foonathan::memory::allocate_unique<uint8_t[]>(*allocator, bytes));
+            m_allocatedBytes = bytes;
+            m_data = m_buffer.get();
+        }
+        m_bytes = bytes;
+    }
+
     //! Get the data pointer.
     uint8_t* getData() { return m_data; }
     //! Get the constant data pointer.
     const uint8_t* getData() const { return m_data; }
 
     //! Get the size in bytes of the current held data.
-    std::size_t getSize() const { return m_bytes; }
+    std::uint64_t getSize() const { return m_bytes; }
 
     //! Check if buffer is empty (nullptr or no bytes)
     bool isEmpty() const { return getSize() == 0 || getData() == nullptr; }
@@ -101,10 +110,10 @@ private:
     /*! Buffer pointer. It is guaranteed by this declaration order 
         that `m_buffer` is destroyed first, and then possibly the `m_allocator`! */
     BufferPtr m_buffer;
-    std::size_t m_allocatedBytes = 0;  //!< The current allocated number of bytes in `m_buffer`.
+    std::uint64_t m_allocatedBytes = 0;  //!< The current allocated number of bytes in `m_buffer`.
 
     uint8_t* m_data;          //!< The pointer to the actual data in `m_buffer`.
-    std::size_t m_bytes = 0;  //!< The size of the buffer.
+    std::uint64_t m_bytes = 0;  //!< The size of the buffer.
 };
 
 //! Helper to quickly make a BinaryBuffer, forwards to the constructor.
