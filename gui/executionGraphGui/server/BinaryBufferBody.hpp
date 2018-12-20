@@ -20,7 +20,7 @@
 #include <boost/beast/http/message.hpp>
 #include <boost/optional.hpp>
 
-#include <executionGraphGui/common/BinaryBuffer.hpp>
+#include <executionGraphGui/common/BinaryPayload.hpp>
 
 //! A @b Body using a `BinaryBuffer`
 //!
@@ -29,12 +29,17 @@
 //!  may be serialized and parsed.
 struct BinaryBufferBody
 {
+    template<bool isRequest, class Fields>
+    using header     = boost::beast::http::header<isRequest, Fields>;
+    using error_code = boost::beast::error_code;
+    using error      = boost::beast::http::error;
+
 public:
     //! The type of container used for the body
     //! This determines the type of @ref message::body
     //! when this body type is used with a message container.
     //!
-    using value_type = BinaryBuffer;
+    using value_type = BinaryPayload::Buffer;
 
     //! Returns the payload size of the body
     //! When this body is used with @ref message::prepare_payload,
@@ -81,7 +86,7 @@ public:
             using boost::asio::buffer_copy;
             using boost::asio::buffer_size;
             auto const n   = buffer_size(buffers);
-            auto const len = m_body.size();
+            auto const len = m_body.getSize();
             try
             {
                 m_body.resize(len + n);
@@ -92,7 +97,7 @@ public:
                 return 0;
             }
             ec.assign(0, ec.category());
-            return buffer_copy(boost::asio::buffer(body.getData() + len, n), buffers);
+            return buffer_copy(boost::asio::buffer(m_body.getData() + len, n), buffers);
         }
 
         void
@@ -114,9 +119,8 @@ public:
 
         template<bool isRequest, class Fields>
         explicit writer(const header<isRequest, Fields>&, const value_type& b)
-            : body_(b)
-        {
-        }
+            : m_body(b)
+        {}
 
         void init(error_code& ec)
         {

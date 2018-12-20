@@ -92,6 +92,9 @@ int main(int argc, const char* argv[])
     // Make all loggers
     EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(Loggers, loggers, (args->logPath()));
 
+    // Make a allocator for messages (requests/responses etc.)
+    auto allocator = std::make_shared<BufferPool>();
+
     // Make the backend request dispatcher.
     auto dispatcher = std::make_shared<BackendRequestDispatcher>();
     setupBackends(dispatcher);
@@ -115,7 +118,7 @@ int main(int argc, const char* argv[])
     auto listener      = std::make_shared<HttpListener<HttpSession>>(
         ioc,
         boost::asio::ip::tcp::endpoint{address, args->port()},
-        HttpSession::Factory{args->rootPath(), dispatcher});
+        HttpSession::Factory{args->rootPath(), dispatcher, allocator});
     listener->run();
 
     auto ths = runWorkers(ioc, threads);

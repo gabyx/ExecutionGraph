@@ -82,7 +82,7 @@ public:
         if(bytes > getAllocatedSize())
         {
             // reallocate
-            m_buffer = foonathan::memory::allocate_unique<uint8_t[]>(*allocator, bytes));
+            m_buffer = foonathan::memory::allocate_unique<uint8_t[]>(*m_allocator, bytes);
             m_allocatedBytes = bytes;
             m_data           = m_buffer.get();
         }

@@ -21,10 +21,8 @@ namespace http = boost::beast::http;  // from <boost/beast/http.hpp>
 
 namespace
 {
-    using Body    = HttpSession::Body;
-    using Request = HttpSession::Request;
-
-    using Response = HttpSession::Response;
+    using RequestBinary  = HttpSession::RequestBinary;
+    using ResponseString = HttpSession::ResponseString;
     using ResponseEmpty  = HttpSession::ResponseEmpty;
     using ResponseFile   = HttpSession::ResponseFile;
 
@@ -34,10 +32,9 @@ namespace
     template<typename Request, typename T>
     auto makeBadRequest(const Request& req, T&& why)
     {
-        Response res{http::status::bad_request, req.version()};
+        ResponseString res{http::status::bad_request, req.version()};
         res.set(http::field::server, versionString);
         res.set(http::field::content_type, "text/html");
-        res.set(http::field::, "text/html");
         res.keep_alive(req.keep_alive());
         res.body() = std::forward<decltype(why)>(why);
         res.prepare_payload();
@@ -48,7 +45,7 @@ namespace
     template<typename Request, typename T>
     auto makeNotFound(const Request& req, T&& path)
     {
-        Response res{http::status::not_found, req.version()};
+        ResponseString res{http::status::not_found, req.version()};
         res.set(http::field::server, versionString);
         res.set(http::field::content_type, "text/html");
         res.keep_alive(req.keep_alive());
@@ -61,7 +58,7 @@ namespace
     template<typename Request, typename T>
     auto makeServerError(const Request& req, T&& what)
     {
-        Response res{http::status::internal_server_error, req.version()};
+        ResponseString res{http::status::internal_server_error, req.version()};
         res.set(http::field::server, versionString);
         res.set(http::field::content_type, "text/html");
         res.keep_alive(req.keep_alive());
@@ -140,12 +137,9 @@ namespace
         EXECGRAPHGUI_THROW("handleRequestBackendFailed!");
 
         // Request is read
-        // post a task on the IOContext which executes 
+        // post a task on the IOContext which executes
         // ioc.post( dispatcher->handleRequest(request, response), sendResponse() )
         // the dispatcher is not threaded, so runs in the current thread.
-
-        
-
     }
 }  // namespace
 
@@ -188,11 +182,14 @@ struct HttpSession::Send
 
 HttpSession::HttpSession(tcp::socket socket,
                          const std::path& rootPath,
-                         std::shared_ptr<BackendRequestDispatcher> dispatcher)
+                         std::shared_ptr<BackendRequestDispatcher> dispatcher,
+                         std::shared_ptr<BufferPool> allocator)
     : m_socket(std::move(socket))
     , m_strand(m_socket.get_executor())
+    , m_request({}, allocator)
     , m_rootPath(rootPath)
     , m_dispatcher(dispatcher)
+    , m_allocator(allocator)
 {
     EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: Ctor", fmt::ptr(this));
 }
@@ -212,7 +209,7 @@ void HttpSession::doRead()
 {
     // Make the request empty before reading,
     // otherwise the operation behavior is undefined.
-    m_request = {};
+    m_request = RequestBinary{{}, m_allocator};
 
     auto onCompletion = [session = shared_from_this()](auto ec, std::size_t bytesTransferred) {
         session->onRead(ec, bytesTransferred);
