@@ -48,8 +48,10 @@ public:
     using RequestType  = TRequestType;
     using ResponseType = TResponseType;
 
-    static_assert(std::is_move_constructible_v<RequestType>);
-    static_assert(std::is_move_constructible_v<ResponseType>);
+    static_assert(std::is_move_constructible_v<RequestType>,
+                  "Request needs to be movable constructible into the task");
+    static_assert(std::is_move_constructible_v<ResponseType>,
+                  "Response needs to be movable constructible into the task");
 
     using Id = typename HandlerType::Id;
 
@@ -71,7 +73,7 @@ public:
 
         if(handler)
         {
-            if(useThreadsForDispatch)
+            if constexpr(useThreadsForDispatch)
             {
                 // Run the handler in the thread pool.
                 m_pool.getQueue()->emplace(handler,
@@ -81,6 +83,7 @@ public:
             else
             {
                 // Run the task in this thread.
+                // here no move into the Task is necessary!
                 Pool::Consumer::Run(
                     Task{handler,
                          std::move(request),
@@ -245,7 +248,11 @@ private:
     using Task = TaskHandleRequest<doForwardRequest>;
 
 private:
-    using Pool = executionGraph::ThreadPool<Task>;
+    struct NoPool
+    {
+        NoPool(std::size_t) {}
+    };
+    using Pool = std::conditional_t<useThreadsForDispatch, executionGraph::ThreadPool<Task>, NoPool>;
     Pool m_pool{1};  //! One seperate thread will handle all messages for this dispatcher.
 };
 

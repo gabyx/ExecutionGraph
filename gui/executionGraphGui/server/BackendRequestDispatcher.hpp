@@ -23,7 +23,7 @@ class MyRequest final : public Request
 public:
     //! Get the payload of this request. Nullptr if there is no payload for this request.
     //! The return value does not need to be thread-safe.
-    const Payload* getPayload() const override  { return nullptr; };
+    const Payload* getPayload() const override { return nullptr; };
 };
 
 /* ---------------------------------------------------------------------------------------*/
@@ -37,12 +37,14 @@ public:
 /* ---------------------------------------------------------------------------------------*/
 class BackendRequestDispatcher final : public RequestDispatcher<BackendRequestHandler,
                                                                 MyRequest,
-                                                                ResponsePromise>
+                                                                ResponsePromise,
+                                                                false>
 {
 public:
     using Base = RequestDispatcher<BackendRequestHandler,
                                    MyRequest,
-                                   ResponsePromise>;
+                                   ResponsePromise,
+                                   false>;
 
 public:
     template<typename... Args>

@@ -98,7 +98,6 @@ int main(int argc, const char* argv[])
     // Make the backend request dispatcher.
     auto dispatcher = std::make_shared<BackendRequestDispatcher>();
     setupBackends(dispatcher);
-    dispatcher->start();  // Start the dispatcher thread
 
     EXECGRAPHGUI_BACKENDLOG_INFO(
         "Starting ExecutionGraph Server at '{0}:{1} with '{2}' threads.\n"
