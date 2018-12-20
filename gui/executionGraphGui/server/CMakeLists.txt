@@ -8,7 +8,8 @@ set(ExecutionGraphGUIServer_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/MimeType.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/HttpCommon.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/HttpSession.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/HttpListener.cpp
+    #${CMAKE_CURRENT_SOURCE_DIR}/HttpListener.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/HttpWorker.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
 )
 

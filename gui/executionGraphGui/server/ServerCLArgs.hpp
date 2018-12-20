@@ -34,14 +34,14 @@ public:
     virtual ~ServerCLArgs() = default;
 
 public:
-    std::path rootPath() { return m_rootPath.Get(); }
+    const std::path& rootPath() { return m_rootPath.Get(); }
     const std::string& address() { return m_address.Get(); }
     unsigned short port() { return m_port.Get(); }
     std::size_t threads() { return m_threads.Get(); }
     const std::string& logPath() { return m_logPath.Get(); }
 
 private:
-    args::ValueFlag<std::string> m_rootPath;  //!< Server root path.
+    args::ValueFlag<std::path> m_rootPath;  //!< Server root path.
     args::ValueFlag<std::string> m_address;   //!< Server address.
     args::ValueFlag<unsigned short> m_port;   //!< Server port.
     args::ValueFlag<std::size_t> m_threads;   //!< Number of threads used for async. operations.

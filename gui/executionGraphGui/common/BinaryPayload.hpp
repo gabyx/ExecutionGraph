@@ -31,9 +31,6 @@ public:
     using Buffer = BinaryBuffer<BufferPool>;
 
 public:
-    //! Representing an empty payload.
-    BinaryPayload() = default;
-
     //! Representing a meaningful payload.
     template<typename TBuffer>
     BinaryPayload(TBuffer&& buffer, const std::string& mimeType)
@@ -41,8 +38,12 @@ public:
     {
     }
 
-    void setMIMEType(const std::string& mimeType) { m_mimeType = mimeType; }
-
+    template<typename TBuffer>
+    BinaryPayload(TBuffer&& buffer)
+        : m_buffer(std::forward<TBuffer>(buffer))
+    {
+    }
+    
     //! No copy
     BinaryPayload(const BinaryPayload&) = delete;
     BinaryPayload& operator=(const BinaryPayload&) = delete;

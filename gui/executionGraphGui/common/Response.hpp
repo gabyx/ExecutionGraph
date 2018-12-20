@@ -53,7 +53,7 @@ public:
     using Allocator = BufferPool;
     using Id        = executionGraph::Id;
 
-protected:
+public:
     ResponsePromise(const Id& requestId,
                     std::shared_ptr<Allocator> allocator,
                     bool bCancelOnDestruction = true)
@@ -81,14 +81,26 @@ protected:
         return *this;
     };
 
-public:
     virtual ~ResponsePromise() = default;
 
 public:
     //! Callback for signaling that the response object is available with payload `payload` (default=empty).
-    void setReady(Payload&& payload = {})
+    void setReady(Payload&& payload)
     {
         m_promisePayload.set_value(std::move(payload));
+        if(m_state != State::Nothing)
+        {
+            EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', is already set to a state!", m_requestId.toString());
+            return;
+        }
+        m_state = State::Ready;
+        setReadyImpl();  // forward to actual instance
+    }
+
+    //! Callback for signaling that the response object is available with payload `payload` (default=empty).
+    void setReady()
+    {
+        m_promisePayload.set_value(Payload{Payload::Buffer{m_allocator}});
         if(m_state != State::Nothing)
         {
             EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', is already set to a state!", m_requestId.toString());
@@ -117,8 +129,8 @@ public:
     auto getAllocator() { return m_allocator; }
 
 protected:
-    virtual void setReadyImpl()                                = 0;
-    virtual void setCanceledImpl(std::exception_ptr exception) = 0;
+    virtual void setReadyImpl(){};
+    virtual void setCanceledImpl(std::exception_ptr exception){};
 
     //! Function to be called in derived classed, which want to automatically
     //! resolve on destruction!

@@ -15,12 +15,20 @@
 
 #include <boost/system/error_code.hpp>
 #include "executionGraphGui/common/Loggers.hpp"
+#include "executionGraphGui/common/Exception.hpp"
 
-// Report a failure
-template<typename T>
-void fail(boost::system::error_code ec, const T& what)
+//! Report a failure.
+template<bool doThrow = false, typename ErrorCode, typename T>
+void fail(const ErrorCode& ec, const T& what)
 {
-    EXECGRAPHGUI_BACKENDLOG_ERROR("Failure: {0} : {1}", what, ec.message());
+    if constexpr(doThrow)
+    {
+        EXECGRAPH_THROW("Failure: {0} : {1}", what, ec.message());
+    }
+    else
+    {
+        EXECGRAPHGUI_BACKENDLOG_ERROR("Failure: {0} : {1}", what, ec.message());
+    }
 }
 
 #endif

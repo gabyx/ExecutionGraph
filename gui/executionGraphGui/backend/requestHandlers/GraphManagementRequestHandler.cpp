@@ -56,7 +56,7 @@ void GraphManagementRequestHandler::handleRequest(const Request& request,
     EXECGRAPHGUI_BACKENDLOG_INFO("GraphManagementRequestHandler::handleRequest");
 
     // Dispatch to the correct function
-    auto it = m_functionMap.m_map.find(request.getURL().string());
+    auto it = m_functionMap.m_map.find(request.getTarget().string());
     if(it != m_functionMap.m_map.end())
     {
         it->second(*this, request, response);

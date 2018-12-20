@@ -21,8 +21,6 @@
 #include <executionGraph/common/ThreadPool.hpp>
 #include "executionGraphGui/common/Exception.hpp"
 #include "executionGraphGui/common/Loggers.hpp"
-#include "executionGraphGui/common/Request.hpp"
-#include "executionGraphGui/common/Response.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -41,14 +39,19 @@
 template<typename THandlerType,
          typename TRequestType,
          typename TResponseType,
-         bool bUseThreadsForDispatch = true,
-         bool bDoFowardRequest       = false>
+         bool useThreadsForDispatch = true,
+         bool doForwardRequest      = false>
 class RequestDispatcher
 {
 public:
     using HandlerType  = THandlerType;
     using RequestType  = TRequestType;
     using ResponseType = TResponseType;
+
+    static_assert(std::is_move_constructible_v<RequestType>,
+                  "Request needs to be movable constructible into the task");
+    static_assert(std::is_move_constructible_v<ResponseType>,
+                  "Response needs to be movable constructible into the task");
 
     using Id = typename HandlerType::Id;
 
@@ -59,22 +62,37 @@ public:
     virtual ~RequestDispatcher() = default;
 
 public:
-    //! Handle a general request/response. Can be called on any thread!
+    //! Handle a general request/response.
+    //! Can be called on any thread!
+    //! Request/Response are always moved(not forwarded) if a handler is found
+    //! in which case the result is `true`.
     template<typename Request, typename Response>
-    void handleRequest(Request&& request, Response&& response)
+    bool handleRequest(Request&& request, Response&& response)
     {
-        if(bUseThreadsForDispatch)
+        auto handler = matchHandler(request);
+
+        if(handler)
         {
-            // Run the dispatch in
-            m_pool.getQueue()->emplace(*this, std::forward<Request>(request), std::forward<Response>(response));
+            if constexpr(useThreadsForDispatch)
+            {
+                // Run the handler in the thread pool.
+                m_pool.getQueue()->emplace(handler,
+                                           std::move(request),
+                                           std::move(response));
+            }
+            else
+            {
+                // Run the task in this thread.
+                // here no move into the Task is necessary!
+                Pool::Consumer::Run(
+                    Task{handler,
+                         std::move(request),
+                         std::move(response)},
+                    std::this_thread::get_id());
+            }
         }
-        else
-        {
-            // Run the task in this thread
-            Pool::Consumer::Run(
-                Task(*this, std::forward<Request>(request), std::forward<Response>(response)),
-                std::this_thread::get_id());
-        }
+
+        return handler != nullptr;
     }
 
 public:
@@ -126,7 +144,7 @@ public:
     //! Starts the dispatcher thread.
     void start()
     {
-        if(bUseThreadsForDispatch)
+        if constexpr(useThreadsForDispatch)
         {
             m_pool.start();
         }
@@ -135,13 +153,31 @@ public:
     //! Stops the dispatcher thread.
     void stop()
     {
-        if(bUseThreadsForDispatch)
+        if constexpr(useThreadsForDispatch)
         {
             m_pool.join();
         }
     }
 
 private:
+    //! Get the first handler which matches the request.
+    std::shared_ptr<HandlerType> matchHandler(const RequestType& request)
+    {
+        // Lock start
+        std::scoped_lock<std::mutex> lock(m_access);
+        // Get the request type
+        auto requestType = request.getTarget().string();
+
+        // Find handler
+        auto it = m_specificHandlers.find(requestType);
+
+        if(it != m_specificHandlers.end())
+        {
+            return it->second->m_handler;
+        }
+        return nullptr;
+    }
+
     struct HandlerData
     {
         HandlerData(const std::unordered_set<std::string>& requestTypes, std::shared_ptr<HandlerType> handler)
@@ -158,138 +194,65 @@ private:
     std::mutex m_access;
 
 private:
-    class TaskHandleRequest
+    template<bool doForwarding>
+    struct TaskHandleRequest
     {
-    public:
-        template<typename Request, typename Response>
-        TaskHandleRequest(RequestDispatcher& d,
-                          Request&& request,
-                          Response&& response)
-            : m_d(d)
-            , m_request(std::forward<Request>(request))
-            , m_response(std::forward<Response>(response))
+        TaskHandleRequest(std::shared_ptr<HandlerType> handler,
+                          RequestType&& request,
+                          ResponseType&& response)
+            : m_handler(handler)
+            , m_request(std::move(request))
+            , m_response(std::move(response))
         {
         }
 
         TaskHandleRequest(TaskHandleRequest&&) = default;
-        TaskHandleRequest& operator=(TaskHandleRequest&&) = default;
 
         void runTask(std::thread::id threadId)
         {
-            std::shared_ptr<HandlerType> handler;
-            std::string requestType;
-            {  // Lock start
-                std::scoped_lock<std::mutex> lock(m_d.m_access);
-                // Get the request type
-                requestType = m_request->getURL().string();
-
-                // Find handler
-                auto it = m_d.m_specificHandlers.find(requestType);
-
-                if(it != m_d.m_specificHandlers.end())
-                {
-                    handler = it->second->m_handler;
-                }
-            }  // Lock end
-
-            // Handling the request
-            if(handler)
+            if constexpr(!doForwarding)
             {
-                handler->handleRequest(*m_request, *m_response);
-                if(!m_response->isResolved())
+                m_handler->handleRequest(m_request, m_response);
+                if(!m_response.isResolved())
                 {
-                    EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: Request id: '{0}' (url: '{1}') has not been handled correctly, it will be cancled!",
-                                                 m_request->getId().toString(),
-                                                 requestType);
+                    EXECGRAPHGUI_THROW(
+                        "RequestDispatcher: Request id: '{0}' (url: '{1}') "
+                        "has not been handled correctly, it will be cancled!",
+                        m_request.getId().toString(),
+                        m_request.getTarget());
                 }
             }
             else
             {
-                EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: No handler found for request id: '{0}' (url: '{1}')!, it will be cancled!",
-                                             m_request->getId().toString(),
-                                             requestType);
+                m_handler->handleRequest(std::move(m_request), std::move(m_response));
             }
         };
 
         void onTaskException(std::exception_ptr e)
         {
-            EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: Request id: '{0}' (url: '{1}') has thrown exception, it will be cancled!",
-                                         m_request->getId().toString(),
-                                         m_request->getURL().string());
-            m_response->setCanceled(e);
+            EXECGRAPHGUI_BACKENDLOG_WARN(
+                "RequestDispatcher: Request id: '{0}' (url: '{1}') "
+                "has thrown exception, it will be cancled!",
+                m_request.getId().toString(),
+                m_request.getTarget());
+            m_response.setCanceled(e);
         };
 
     private:
-        RequestDispatcher& m_d;                    //!< Dispatcher.
-        std::unique_ptr<RequestType> m_request;    //!< The request to handle.
-        std::unique_ptr<ResponseType> m_response;  //!< The response to handle.
+        std::shared_ptr<HandlerType> m_handler;  //!< Dispatcher.
+        RequestType m_request;                   //!< The request to handle.
+        ResponseType m_response;                 //!< The response to handle.
     };
 
-    class TaskForwardRequest
+private:
+    using Task = TaskHandleRequest<doForwardRequest>;
+
+private:
+    struct NoPool
     {
-    public:
-        template<typename Request, typename Response>
-        TaskForwardRequest(RequestDispatcher& d,
-                           Request&& request,
-                           Response&& response)
-            : m_d(d)
-            , m_request(std::forward<Request>(request))
-            , m_response(std::forward<Response>(response))
-        {
-        }
-
-        TaskForwardRequest(TaskForwardRequest&&) = default;
-        TaskForwardRequest& operator=(TaskForwardRequest&&) = default;
-
-        void runTask(std::thread::id threadId)
-        {
-            std::shared_ptr<HandlerType> handler;
-
-            {  // Lock start
-                std::scoped_lock<std::mutex> lock(m_d.m_access);
-                // Get the request type
-                const std::string requestType = m_request->getURL().string();
-
-                // Find handler
-                auto it = m_d.m_specificHandlers.find(requestType);
-
-                if(it != m_d.m_specificHandlers.end())
-                {
-                    handler = it->m_handler;
-                }
-            }  // Lock end
-
-            // Handling the request
-            if(handler)
-            {
-                handler->handleRequest(std::move(m_request), std::move(m_response));
-            }
-            else
-            {
-                EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: No handler found for request id: '{0}'!, it will be cancled!",
-                                             m_request->getId().toString());
-            }
-        }
-
-        void onTaskException(std::exception_ptr e)
-        {
-            EXECGRAPHGUI_BACKENDLOG_WARN("RequestDispatcher: Forwarding request has thrown exception!");
-        };
-
-    private:
-        RequestDispatcher& m_d;                    //!< Dispatcher.
-        std::unique_ptr<RequestType> m_request;    //!< The request to handle.
-        std::unique_ptr<ResponseType> m_response;  //!< The response to handle.
+        NoPool(std::size_t) {}
     };
-
-private:
-    friend class TaskHandleRequest;
-    friend class TaskForwardRequest;
-
-    using Task = meta::if_<meta::bool_<bDoFowardRequest>, TaskForwardRequest, TaskHandleRequest>;
-
-private:
-    using Pool = executionGraph::ThreadPool<Task>;
+    using Pool = std::conditional_t<useThreadsForDispatch, executionGraph::ThreadPool<Task>, NoPool>;
     Pool m_pool{1};  //! One seperate thread will handle all messages for this dispatcher.
 };
 

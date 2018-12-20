@@ -18,40 +18,75 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include "executionGraph/common/FileSystem.hpp"
+#include "executionGraphGui/common/BufferPool.hpp"
+#include "executionGraphGui/server/BinaryBufferBody.hpp"
 #include "executionGraphGui/server/HttpCommon.hpp"
+
+class BackendRequestDispatcher;
 
 // Handles an HTTP server connection
 class HttpSession : public std::enable_shared_from_this<HttpSession>
 {
 public:
-    using Body    = boost::beast::http::string_body;
-    using Request = boost::beast::http::request<Body>;
+    //! A simple factory creating this HTTP Sessions.
+    struct Factory
+    {
+        Factory(const std::path& rootPath,
+                std::shared_ptr<BackendRequestDispatcher> dispatcher,
+                std::shared_ptr<BufferPool> allocator)
+            : m_rootPath(rootPath)
+            , m_dispatcher(dispatcher)
+            , m_allocator(allocator)
+        {}
 
-    using ResponseString = boost::beast::http::response<Body>;
+        template<typename... Args>
+        auto operator()(Args&&... args)
+        {
+            return std::make_shared<HttpSession>(std::forward<Args>(args)...,
+                                                 m_rootPath,
+                                                 m_dispatcher,
+                                                 m_allocator);
+        }
+
+    private:
+        const std::path& m_rootPath;
+        std::shared_ptr<BackendRequestDispatcher> m_dispatcher;
+        std::shared_ptr<BufferPool> m_allocator;
+    };
+
+public:
+    using RequestBinary  = boost::beast::http::request<BinaryBufferBody>;
+    using ResponseBinary = boost::beast::http::response<BinaryBufferBody>;
+    using ResponseString = boost::beast::http::response<boost::beast::http::string_body>;
     using ResponseFile   = boost::beast::http::response<boost::beast::http::file_body>;
     using ResponseEmpty  = boost::beast::http::response<boost::beast::http::empty_body>;
 
 private:
     using tcp = boost::asio::ip::tcp;
-    struct Send;  //!< Functor to send the response.
+
+    struct Send;
 
 private:
-    tcp::socket m_socket;                                                  //!< The socket this session is running on.
-    boost::asio::strand<boost::asio::io_context::executor_type> m_strand;  //!< The executor strand.
+    tcp::socket m_socket;  //!< The socket this session is running on.
 
-    boost::beast::flat_buffer m_buffer;  //!< A flat buffer where the request is stored.
-    Request m_request;                   //!< The incoming request we are handling.
-    std::shared_ptr<void> m_response;    //!< Response we are sending back.
+    boost::asio::strand<
+        boost::asio::io_context::executor_type>
+        m_strand;  //!< The executor strand (serialized completion handler dispatch).
 
-    const std::path m_rootPath;  //!< Root file path for the server.
+    boost::beast::flat_buffer m_buffer;  //!< A linear continuous buffer where the request is stored.
+    RequestBinary m_request;             //!< The incoming request we are handling.
+
+    const std::path& m_rootPath;
+    std::shared_ptr<BackendRequestDispatcher> m_dispatcher;  //!< The backend request dispatcher.
+    std::shared_ptr<BufferPool> m_allocator;                 //!< Buffer allocator.
 
 public:
     explicit HttpSession(tcp::socket socket,
-                         const std::path& rootPath)
-        : m_socket(std::move(socket))
-        , m_strand(m_socket.get_executor())
-        , m_rootPath(rootPath)
-    {}
+                         const std::path& rootPath,
+                         std::shared_ptr<BackendRequestDispatcher> dispatcher,
+                         std::shared_ptr<BufferPool> allocator);
+
+    ~HttpSession();
 
     void run();
 
