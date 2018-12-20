@@ -86,11 +86,11 @@ void setupBackends(std::shared_ptr<Dispatcher> requestDispatcher)
 //! Main function of the execution graph server backend.
 int main(int argc, const char* argv[])
 {
-    // Parse command line arguments
-    EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(ServerCLArgs, args, (argc, argv));
+    // Parse command line arguments.
+    ServerCLArgs args(argc, argv);
 
-    // Make all loggers
-    EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(Loggers, loggers, (args->logPath()));
+    // Make all loggers.
+    EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(Loggers, loggers, (args.logPath()));
 
     // Make a allocator for messages (requests/responses etc.)
     auto allocator = std::make_shared<BufferPool>();
@@ -103,22 +103,22 @@ int main(int argc, const char* argv[])
     EXECGRAPHGUI_BACKENDLOG_INFO(
         "Starting ExecutionGraph Server at '{0}:{1} with '{2}' threads.\n"
         "Logs located at '{3}'",
-        args->address(),
-        args->port(),
-        args->threads(),
-        args->logPath());
+        args.address(),
+        args.port(),
+        args.threads(),
+        args.logPath());
 
 #if 1
     // The io_context is required for all I/O
-    const auto threads = args->threads();
+    const auto threads = args.threads();
     boost::asio::io_context ioc{static_cast<int>(threads)};
 
     // Create and launch a listening port
-    const auto address = boost::asio::ip::make_address(args->address());
+    const auto address = boost::asio::ip::make_address(args.address());
     auto listener      = std::make_shared<HttpListener<HttpSession>>(
         ioc,
-        boost::asio::ip::tcp::endpoint{address, args->port()},
-        HttpSession::Factory{args->rootPath(), dispatcher, allocator});
+        boost::asio::ip::tcp::endpoint{address, args.port()},
+        HttpSession::Factory{args.rootPath(), dispatcher, allocator});
     listener->run();
 
     auto ths = runWorkers(ioc, threads);
