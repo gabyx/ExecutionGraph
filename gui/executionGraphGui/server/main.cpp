@@ -66,7 +66,7 @@ auto runWorkers(IOContext& ioc, std::size_t threads)
     {
         ths.emplace_back(std::bind(run, i));
     }
-    run(0);
+    run(0); // Blocking
 
     return ths;
 }
@@ -108,13 +108,14 @@ int main(int argc, const char* argv[])
         args.logPath());
 
 #if 1
-    // The io_context is required for all I/O
+    // The io_context is required for all I/O.
     const auto threads = args.threads();
     boost::asio::io_context ioc{static_cast<int>(threads)};
 
-    // Create and launch a listening port
+    // Create and launch a listening port.
     const auto address = boost::asio::ip::make_address(args.address());
-    auto listener      = std::make_shared<HttpListener<HttpSession>>(
+
+    auto listener = std::make_shared<HttpListener<HttpSession>>(
         ioc,
         boost::asio::ip::tcp::endpoint{address, args.port()},
         HttpSession::Factory{args.rootPath(), dispatcher, allocator});
