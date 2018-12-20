@@ -40,9 +40,9 @@ public:
     //! When this body is used with @ref message::prepare_payload,
     //! the Content-Length will be set to the payload size, and
     //! any chunked Transfer-Encoding will be removed.
-    //!    static std::uint64_t size(value_type const& body)
+    static std::uint64_t size(const value_type& body)
     {
-        return body.size();
+        return body.getSize();
     }
 
     //! The algorithm for parsing the body
@@ -58,14 +58,13 @@ public:
         {
         }
 
-        void init(boost::optional<std::uint64_t> const& length,
-                  error_code& ec)
+        void init(const boost::optional<std::uint64_t>& length, error_code& ec)
         {
             if(length)
             {
                 try
                 {
-                    m_body.reserve(*length);
+                    m_body.resize(*length);
                 }
                 catch(std::exception const&)
                 {
@@ -77,7 +76,7 @@ public:
         }
 
         template<class ConstBufferSequence>
-        std::size_t put(ConstBufferSequence const& buffers, error_code& ec)
+        std::size_t put(const ConstBufferSequence& buffers, error_code& ec)
         {
             using boost::asio::buffer_copy;
             using boost::asio::buffer_size;
@@ -93,7 +92,7 @@ public:
                 return 0;
             }
             ec.assign(0, ec.category());
-            return buffer_copy(boost::asio::buffer(&body_[0] + len, n), buffers);
+            return buffer_copy(boost::asio::buffer(body.getData() + len, n), buffers);
         }
 
         void
@@ -107,14 +106,14 @@ public:
     //! Meets the requirements of @b BodyWriter.
     class writer
     {
-        value_type const& m_body;
+        const value_type& m_body;
 
     public:
         using const_buffers_type =
             boost::asio::const_buffer;
 
         template<bool isRequest, class Fields>
-        explicit writer(header<isRequest, Fields> const&, value_type const& b)
+        explicit writer(const header<isRequest, Fields>&, const value_type& b)
             : body_(b)
         {
         }
@@ -128,9 +127,7 @@ public:
         get(error_code& ec)
         {
             ec.assign(0, ec.category());
-            return {{const_buffers_type{
-                         m_body.data(), m_body.size()},
-                     false}};
+            return {{const_buffers_type{m_body.getData(), m_body.getSize()}, false}};
         }
     };
 };

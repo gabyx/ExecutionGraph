@@ -24,7 +24,7 @@ namespace
     using Body    = HttpSession::Body;
     using Request = HttpSession::Request;
 
-    using ResponseString = HttpSession::ResponseString;
+    using Response = HttpSession::Response;
     using ResponseEmpty  = HttpSession::ResponseEmpty;
     using ResponseFile   = HttpSession::ResponseFile;
 
@@ -34,9 +34,10 @@ namespace
     template<typename Request, typename T>
     auto makeBadRequest(const Request& req, T&& why)
     {
-        ResponseString res{http::status::bad_request, req.version()};
+        Response res{http::status::bad_request, req.version()};
         res.set(http::field::server, versionString);
         res.set(http::field::content_type, "text/html");
+        res.set(http::field::, "text/html");
         res.keep_alive(req.keep_alive());
         res.body() = std::forward<decltype(why)>(why);
         res.prepare_payload();
@@ -47,7 +48,7 @@ namespace
     template<typename Request, typename T>
     auto makeNotFound(const Request& req, T&& path)
     {
-        ResponseString res{http::status::not_found, req.version()};
+        Response res{http::status::not_found, req.version()};
         res.set(http::field::server, versionString);
         res.set(http::field::content_type, "text/html");
         res.keep_alive(req.keep_alive());
@@ -60,7 +61,7 @@ namespace
     template<typename Request, typename T>
     auto makeServerError(const Request& req, T&& what)
     {
-        ResponseString res{http::status::internal_server_error, req.version()};
+        Response res{http::status::internal_server_error, req.version()};
         res.set(http::field::server, versionString);
         res.set(http::field::content_type, "text/html");
         res.keep_alive(req.keep_alive());

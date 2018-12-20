@@ -38,12 +38,9 @@ public:
     using const_iterator = const uint8_t*;
 
 public:
-    //! Constructor for an empty buffer!
-    BinaryBuffer() = default;
-
     //! Constructor for a meaningful buffer with size `bytes` allocated by `allocator`.
     BinaryBuffer(std::shared_ptr<RawAllocator> allocator,
-                 std::size_t bytes)
+                 std::size_t bytes = 0)
         : m_allocator(allocator)
     {
         resize(bytes);
@@ -60,8 +57,7 @@ public:
         , m_allocatedBytes(allocatedBytes)
         , m_data(data)
         , m_bytes(bytes)
-    {
-    }
+    {}
 
     //! Copy prohibited
     BinaryBuffer(const BinaryBuffer&) = delete;
@@ -83,12 +79,12 @@ public:
 
     void resize(std::uint64_t bytes)
     {
-        if(bytes > m_allocatedBytes)
+        if(bytes > getAllocatedSize())
         {
             // reallocate
             m_buffer = foonathan::memory::allocate_unique<uint8_t[]>(*allocator, bytes));
             m_allocatedBytes = bytes;
-            m_data = m_buffer.get();
+            m_data           = m_buffer.get();
         }
         m_bytes = bytes;
     }
@@ -101,6 +97,9 @@ public:
     //! Get the size in bytes of the current held data.
     std::uint64_t getSize() const { return m_bytes; }
 
+    //! Get the size in bytes of the current allocated memory.
+    std::uint64_t getAllocatedSize() const { return m_allocatedBytes; }
+
     //! Check if buffer is empty (nullptr or no bytes)
     bool isEmpty() const { return getSize() == 0 || getData() == nullptr; }
 
@@ -112,7 +111,7 @@ private:
     BufferPtr m_buffer;
     std::uint64_t m_allocatedBytes = 0;  //!< The current allocated number of bytes in `m_buffer`.
 
-    uint8_t* m_data;          //!< The pointer to the actual data in `m_buffer`.
+    uint8_t* m_data;            //!< The pointer to the actual data in `m_buffer`.
     std::uint64_t m_bytes = 0;  //!< The size of the buffer.
 };
 

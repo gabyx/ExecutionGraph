@@ -49,10 +49,10 @@ public:
     };
 
 public:
-    using Body    = boost::beast::http::string_body;
-    using Request = boost::beast::http::request<Body>;
+    using Request = boost::beast::http::request<BinaryBufferBody>;
 
-    using ResponseString = boost::beast::http::response<Body>;
+    using ResponseBinary = boost::beast::http::response<Body>;
+    using ResponseString = boost::beast::http::response<boost::beast::http::string_body>;
     using ResponseFile   = boost::beast::http::response<boost::beast::http::file_body>;
     using ResponseEmpty  = boost::beast::http::response<boost::beast::http::empty_body>;
 
