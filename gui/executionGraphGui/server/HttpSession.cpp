@@ -103,7 +103,7 @@ namespace
         // Handle the case where the file doesn't exist.
         if(ec == boost::system::errc::no_such_file_or_directory)
         {
-            send(notFound(req, req.target()));
+            send(makeNotFound(req, req.target()));
         }
 
         // Handle an unknown error.
@@ -134,12 +134,14 @@ namespace
                               Dispatcher&& dispatcher,
                               Send&& send)
     {
-        EXECGRAPHGUI_THROW("handleRequestBackendFailed!");
+        //EXECGRAPHGUI_THROW("handleRequestBackendFailed!");
 
         // Request is read
         // post a task on the IOContext which executes
         // ioc.post( dispatcher->handleRequest(request, response), sendResponse() )
         // the dispatcher is not threaded, so runs in the current thread.
+
+        send(makeNotFound(req, req.target()));
     }
 }  // namespace
 
