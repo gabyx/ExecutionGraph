@@ -13,5 +13,7 @@
 export const environment = {
   production: false,
   logReponsesVerbose: true,
-  useServiceDummys: true
+
+  useServiceDummys: true,
+  backendUrl: "this url is not needed since we use service dummies!"
 };

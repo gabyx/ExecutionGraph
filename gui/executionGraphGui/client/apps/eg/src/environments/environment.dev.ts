@@ -13,5 +13,6 @@
 export const environment = {
   production: false,
   logReponsesVerbose: true,
-  useServiceDummys: false
+  useServiceDummys: false,
+  backendUrl: "http://localhost:8098"
 };

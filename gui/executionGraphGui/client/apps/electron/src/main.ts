@@ -8,7 +8,6 @@ const args = process.argv.slice(1);
 const serve = args.some(val => val === '--serve');
 
 function createWindow() {
-
   const electronScreen = screen;
   const size = electronScreen.getPrimaryDisplay().workAreaSize;
 
@@ -27,11 +26,11 @@ function createWindow() {
 
   if (serve) {
     const ngServeUrl = 'http://localhost:4200';
-    const projectPath = path.join(__dirname, "..");
+    const projectPath = path.join(__dirname, '..');
     console.log(`Serving form ${projectPath}`);
 
     // Reload initial page to not get mixed up with client side routing
-    win.webContents.on('devtools-reload-page', (event) => {
+    win.webContents.on('devtools-reload-page', event => {
       win.loadURL(ngServeUrl);
     });
 
@@ -44,15 +43,15 @@ function createWindow() {
     });
 
     win.loadURL(ngServeUrl);
-
   } else {
-    win.loadURL(url.format({
-      pathname: path.join(__dirname, 'apps/eg/index.html'),
-      protocol: 'file:',
-      slashes: true
-    }));
+    win.loadURL(
+      url.format({
+        pathname: path.join(__dirname, 'apps/eg/index.html'),
+        protocol: 'file:',
+        slashes: true
+      })
+    );
   }
-
 
   win.webContents.openDevTools();
 
@@ -63,11 +62,9 @@ function createWindow() {
     // when you should delete the corresponding element.
     win = null;
   });
-
 }
 
 try {
-
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
@@ -89,7 +86,6 @@ try {
       createWindow();
     }
   });
-
 } catch (e) {
   // Catch Error
   // throw e;
