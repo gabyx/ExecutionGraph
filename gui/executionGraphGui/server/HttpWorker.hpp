@@ -69,7 +69,7 @@ private:
     void sendBadResponse(boost::beast::http::status status,
                          const std::string& error);
 
-    void sendFile(boost::beast::string_view target);
+    void sendFile(std::string_view target);
 
     void checkDeadline();
 

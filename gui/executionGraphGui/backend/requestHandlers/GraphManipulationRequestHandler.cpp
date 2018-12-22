@@ -28,10 +28,10 @@ FunctionMap<GraphManipulationRequestHandler::Function> GraphManipulationRequestH
 {
     using Entry = typename FunctionMap<Function>::Entry;
 
-    auto r = {Entry("graph/addNode", Function(&GraphManipulationRequestHandler::handleAddNode)),
-              Entry("graph/removeNode", Function(&GraphManipulationRequestHandler::handleRemoveNode)),
-              Entry("graph/addConnection", Function(&GraphManipulationRequestHandler::handleAddConnection)),
-              Entry("graph/removeConnection", Function(&GraphManipulationRequestHandler::handleRemoveConnection))};
+    auto r = {Entry(targetBase / "graph/addNode", Function(&GraphManipulationRequestHandler::handleAddNode)),
+              Entry(targetBase / "graph/removeNode", Function(&GraphManipulationRequestHandler::handleRemoveNode)),
+              Entry(targetBase / "graph/addConnection", Function(&GraphManipulationRequestHandler::handleAddConnection)),
+              Entry(targetBase / "graph/removeConnection", Function(&GraphManipulationRequestHandler::handleRemoveConnection))};
     return {r};
 }
 
@@ -70,8 +70,8 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
                                                     ResponsePromise& response)
 {
     // Request validation
-    auto* payload = request.getPayload();
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == nullptr,
+    auto& payload = request.getPayload();
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request data is null!");
 
     auto nodeReq = getRootOfPayloadAndVerify<s::AddNodeRequest>(*payload);
@@ -115,8 +115,8 @@ void GraphManipulationRequestHandler::handleRemoveNode(const Request& request,
                                                        ResponsePromise& response)
 {
     // Request validation
-    auto* payload = request.getPayload();
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == nullptr,
+    auto& payload = request.getPayload();
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request data is null!");
 
     auto nodeReq = getRootOfPayloadAndVerify<s::RemoveNodeRequest>(*payload);
@@ -136,8 +136,8 @@ void GraphManipulationRequestHandler::handleAddConnection(const Request& request
                                                           ResponsePromise& response)
 {
     // Request validation
-    auto* payload = request.getPayload();
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == nullptr,
+    auto& payload = request.getPayload();
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request data is null!");
 
     auto connectionReq = getRootOfPayloadAndVerify<s::AddConnectionRequest>(*payload);
@@ -168,8 +168,8 @@ void GraphManipulationRequestHandler::handleRemoveConnection(const Request& requ
                                                              ResponsePromise& response)
 {
     // Request validation
-    auto* payload = request.getPayload();
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == nullptr,
+    auto& payload = request.getPayload();
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request data is null!");
 
     auto connectionReq = getRootOfPayloadAndVerify<s::RemoveConnectionRequest>(*payload);

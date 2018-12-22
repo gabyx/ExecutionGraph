@@ -139,7 +139,7 @@ void HttpWorker::sendBadResponse(http::status status,
                       });
 }
 
-void HttpWorker::sendFile(beast::string_view target)
+void HttpWorker::sendFile(std::string_view target)
 {
     // Request path must be absolute and not contain "..".
     if(target.empty() ||
@@ -152,7 +152,7 @@ void HttpWorker::sendFile(beast::string_view target)
     }
 
     // Build the path to the requested file.
-    std::path path = m_rootPath / target.substr(1).to_string();
+    std::path path = m_rootPath / target.substr(1);
     if(!std::filesystem::is_regular_file(path))
     {
         path = m_rootPath / "index.html";

@@ -13,7 +13,7 @@
 #ifndef executionGraphGui_common_BinaryPayload_hpp
 #define executionGraphGui_common_BinaryPayload_hpp
 
-#include <string>
+#include <string_view>
 #include "executionGraphGui/common/BinaryBuffer.hpp"
 #include "executionGraphGui/common/BufferPool.hpp"
 
@@ -33,14 +33,8 @@ public:
 public:
     //! Representing a meaningful payload.
     template<typename TBuffer>
-    BinaryPayload(TBuffer&& buffer, const std::string& mimeType)
+    BinaryPayload(TBuffer&& buffer, const std::string_view& mimeType)
         : m_buffer(std::forward<TBuffer>(buffer)), m_mimeType(mimeType)
-    {
-    }
-
-    template<typename TBuffer>
-    BinaryPayload(TBuffer&& buffer)
-        : m_buffer(std::forward<TBuffer>(buffer))
     {
     }
     
@@ -52,10 +46,10 @@ public:
     BinaryPayload(BinaryPayload&&) = default;
     BinaryPayload& operator=(BinaryPayload&&) = default;
 
-    Buffer& getBuffer() { return m_buffer; }
-    const Buffer& getBuffer() const { return m_buffer; }
+    Buffer& buffer() { return m_buffer; }
+    const Buffer& buffer() const { return m_buffer; }
 
-    const std::string& getMIMEType() const { return m_mimeType; }
+    const std::string& mimeType() const { return m_mimeType; }
 
 private:
     Buffer m_buffer;         //!< The binary buffer.

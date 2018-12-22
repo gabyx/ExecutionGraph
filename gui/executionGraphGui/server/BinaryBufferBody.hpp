@@ -19,8 +19,8 @@
 #include <boost/beast/http/error.hpp>
 #include <boost/beast/http/message.hpp>
 #include <boost/optional.hpp>
-
 #include <executionGraphGui/common/BinaryPayload.hpp>
+#include <executionGraphGui/common/Loggers.hpp>
 
 //! A @b Body using a `BinaryBuffer`
 //!
@@ -47,7 +47,7 @@ public:
     //! any chunked Transfer-Encoding will be removed.
     static std::uint64_t size(const value_type& body)
     {
-        return body.getSize();
+        return body.size();
     }
 
     //! The algorithm for parsing the body
@@ -69,7 +69,7 @@ public:
             {
                 try
                 {
-                    m_body.resize(*length);
+                    m_body.reserve(*length);
                 }
                 catch(std::exception const&)
                 {
@@ -86,7 +86,7 @@ public:
             using boost::asio::buffer_copy;
             using boost::asio::buffer_size;
             auto const n   = buffer_size(buffers);
-            auto const len = m_body.getSize();
+            auto const len = m_body.size();
             try
             {
                 m_body.resize(len + n);
@@ -97,7 +97,7 @@ public:
                 return 0;
             }
             ec.assign(0, ec.category());
-            return buffer_copy(boost::asio::buffer(m_body.getData() + len, n), buffers);
+            return buffer_copy(boost::asio::buffer(m_body.data() + len, n), buffers);
         }
 
         void
@@ -131,7 +131,7 @@ public:
         get(error_code& ec)
         {
             ec.assign(0, ec.category());
-            return {{const_buffers_type{m_body.getData(), m_body.getSize()}, false}};
+            return {{const_buffers_type{m_body.data(), m_body.size()}, false}};
         }
     };
 };

@@ -14,6 +14,7 @@
 #include <functional>
 #include <tuple>
 #include <boost/asio/bind_executor.hpp>
+#include "executionGraphGui/common/RequestError.hpp"
 #include "executionGraphGui/server/BackendRequestDispatcher.hpp"
 #include "executionGraphGui/server/MimeType.hpp"
 
@@ -22,6 +23,7 @@ namespace http = boost::beast::http;  // from <boost/beast/http.hpp>
 namespace
 {
     using RequestBinary  = HttpSession::RequestBinary;
+    using ResponseBinary = HttpSession::ResponseBinary;
     using ResponseString = HttpSession::ResponseString;
     using ResponseEmpty  = HttpSession::ResponseEmpty;
     using ResponseFile   = HttpSession::ResponseFile;
@@ -30,7 +32,7 @@ namespace
 
     //! Returns a bad request response.
     template<typename Request, typename T>
-    auto makeBadRequest(const Request& req, T&& why)
+    auto makeBadResponse(const Request& req, T&& why)
     {
         ResponseString res{http::status::bad_request, req.version()};
         res.set(http::field::server, versionString);
@@ -67,6 +69,15 @@ namespace
         return res;
     }
 
+    template<typename Request>
+    bool isTargetInvalid(Request&& req)
+    {
+        // Request path must be absolute and not contain "..".
+        return req.target().empty() ||
+               req.target()[0] != '/' ||
+               req.target().find("..") != std::string_view::npos;
+    }
+
     template<typename Request, typename Send>
     bool handleRequestFileFallback(const std::path& rootPath,
                                    Request&& req,
@@ -75,15 +86,14 @@ namespace
         // Make sure we can handle the method.
         if(req.method() != http::verb::get)
         {
-            return send(makeBadRequest(req, "Unknown HTTP-method."));
+            send(makeBadResponse(req, "Unknown HTTP-method."));
+            return false;
         }
 
-        // Request path must be absolute and not contain "..".
-        if(req.target().empty() ||
-           req.target()[0] != '/' ||
-           req.target().find("..") != boost::beast::string_view::npos)
+        if(isTargetInvalid(req))
         {
-            return send(makeBadRequest(req, "Illegal request-target."));
+            send(makeBadResponse(req, "Illegal request-target."));
+            return false;
         }
 
         // Build the path to the requested file.
@@ -103,7 +113,7 @@ namespace
         // Handle the case where the file doesn't exist.
         if(ec == boost::system::errc::no_such_file_or_directory)
         {
-            send(notFound(req, req.target()));
+            send(makeNotFound(req, req.target()));
         }
 
         // Handle an unknown error.
@@ -128,18 +138,68 @@ namespace
 
     //! @brief Handle the request.
 
-    template<typename Request, typename Send, typename Dispatcher>
+    template<typename Request,
+             typename Send,
+             typename Dispatcher,
+             typename Executor,
+             typename Allocator>
     void handleRequestBackend(const std::path& rootPath,
                               Request&& req,
+                              std::uint64_t payLoadSize,
                               Dispatcher&& dispatcher,
-                              Send&& send)
+                              Send&& send,
+                              Executor& executor,
+                              Allocator& allocator)
     {
-        EXECGRAPHGUI_THROW("handleRequestBackendFailed!");
+        if(isTargetInvalid(req))
+        {
+            send(makeBadResponse(req, "Illegal request-target."));
+            return;
+        }
 
-        // Request is read
-        // post a task on the IOContext which executes
-        // ioc.post( dispatcher->handleRequest(request, response), sendResponse() )
-        // the dispatcher is not threaded, so runs in the current thread.
+        BackendRequest request(req.target(),
+                               payLoadSize ? std::make_optional(
+                                                 BackendRequest::Payload{
+                                                     std::move(req.body()),
+                                                     req[http::field::content_type]})
+                                           : std::nullopt);
+
+        BackendResponsePromise responsePromise{executionGraph::Id{}, allocator};
+        ResponseFuture responeFuture(responsePromise);
+
+        if(!dispatcher.handleRequest(request, responsePromise))
+        {
+            send(makeBadResponse(req, "Request not handled in dispatcher!"));
+        }
+
+        try
+        {
+            EXECGRAPHGUI_THROW_IF(!responeFuture.isValid(), "Future is not valid!")
+            auto payload  = responeFuture.payload();
+            auto mimeType = payload.mimeType();
+
+            // Send the response
+            ResponseBinary res{std::piecewise_construct,
+                               std::make_tuple(std::move(payload.buffer())),
+                               std::make_tuple(http::status::ok, req.version())};
+            res.set(http::field::server, versionString);
+            res.set(http::field::content_type, mimeType);
+            res.content_length(res.payload_size());
+            res.keep_alive(req.keep_alive());
+            return send(std::move(res));
+        }
+        catch(const BadRequestError& e)
+        {
+            send(makeBadResponse(req, fmt::format("BadRequest: '{0}'", e.what())));
+        }
+        catch(const InternalBackendError& e)
+        {
+            send(makeServerError(req, fmt::format("InternalBackendError: '{0}'", e.what())));
+        }
+        catch(std::exception& e)
+        {
+            send(makeServerError(req, fmt::format("Unknown Error: '{0}'", e.what())));
+        }
     }
 }  // namespace
 
@@ -209,7 +269,8 @@ void HttpSession::doRead()
 {
     // Make the request empty before reading,
     // otherwise the operation behavior is undefined.
-    m_request = RequestBinary{{}, m_allocator};
+    m_request.base() = {};
+    m_request.body().resize(0);
 
     auto onCompletion = [session = shared_from_this()](auto ec, std::size_t bytesTransferred) {
         session->onRead(ec, bytesTransferred);
@@ -241,16 +302,24 @@ void HttpSession::onRead(boost::system::error_code ec,
         return fail(ec, "HttpSession:: read");
     }
 
-    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0} ::handleRequest : Request[ method: '{1}' target: '{2}']",
-                                  fmt::ptr(this),
-                                  m_request.method(),
-                                  m_request.target());
+    auto payloadSize = m_request.payload_size();
+
+    EXECGRAPHGUI_BACKENDLOG_DEBUG(
+        "HttpSession @{0} ::handleRequest : "
+        "Request[ method: '{1}' target: '{2}', payload: '{3}' bytes ]",
+        fmt::ptr(this),
+        m_request.method(),
+        m_request.target(),
+        payloadSize ? *payloadSize : 0);
 
     // Send the response.
     handleRequestBackend(m_rootPath,
                          std::move(m_request),
-                         m_dispatcher,
-                         Send{shared_from_this()});
+                         payloadSize ? *payloadSize : 0,
+                         *m_dispatcher,
+                         Send{shared_from_this()},
+                         m_strand,
+                         m_allocator);
 }
 
 void HttpSession::onWrite(boost::system::error_code ec,

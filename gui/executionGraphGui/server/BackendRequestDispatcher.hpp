@@ -14,17 +14,9 @@
 #define executionGraphGui_server_BackendRequestDispatcher_hpp
 
 #include "executionGraphGui/backend/BackendRequestHandler.hpp"
-#include "executionGraphGui/common/Request.hpp"
 #include "executionGraphGui/common/RequestDispatcher.hpp"
-#include "executionGraphGui/common/Response.hpp"
-
-class MyRequest final : public Request
-{
-public:
-    //! Get the payload of this request. Nullptr if there is no payload for this request.
-    //! The return value does not need to be thread-safe.
-    const Payload* getPayload() const override { return nullptr; };
-};
+#include "executionGraphGui/server/BackendRequest.hpp"
+#include "executionGraphGui/server/BackendResponse.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -36,14 +28,14 @@ public:
  */
 /* ---------------------------------------------------------------------------------------*/
 class BackendRequestDispatcher final : public RequestDispatcher<BackendRequestHandler,
-                                                                MyRequest,
-                                                                ResponsePromise,
+                                                                BackendRequest,
+                                                                BackendResponsePromise,
                                                                 false>
 {
 public:
     using Base = RequestDispatcher<BackendRequestHandler,
-                                   MyRequest,
-                                   ResponsePromise,
+                                   BackendRequest,
+                                   BackendResponsePromise,
                                    false>;
 
 public:

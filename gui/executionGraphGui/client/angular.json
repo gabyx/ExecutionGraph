@@ -61,6 +61,12 @@
           "configurations": {
             "production": {
               "browserTarget": "eg:build:production"
+            },
+            "dev": {
+              "browserTarget": "eg:build:dev"
+            },
+            "staging": {
+              "browserTarget": "eg:build:staging"
             }
           }
         },

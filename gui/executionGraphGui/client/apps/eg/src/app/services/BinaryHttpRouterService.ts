@@ -10,24 +10,26 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-
 import { throwError } from 'rxjs';
 import { tap, map, catchError, first } from 'rxjs/operators';
-
 import { LoggerFactory, ILogger } from '@eg/logger';
+import { BINARY_HTTP_ROUTER_BASE_URL } from '../tokens';
 
 /**
  * Router which sends binary payload to the backend using HTTP requests.
  */
 @Injectable()
 export class BinaryHttpRouterService {
-  public baseUrl: string = `http://executiongraph-backend`;
   public binaryMimeType: string = 'application/octet-stream';
   private logger: ILogger;
 
-  constructor(private httpClient: HttpClient, private loggerFactory: LoggerFactory) {
+  constructor(
+    private httpClient: HttpClient,
+    private loggerFactory: LoggerFactory,
+    @Inject(BINARY_HTTP_ROUTER_BASE_URL) private readonly baseUrl: string
+  ) {
     this.logger = loggerFactory.create('BinaryHttpRouterService');
   }
 

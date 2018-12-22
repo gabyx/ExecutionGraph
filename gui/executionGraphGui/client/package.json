@@ -5,11 +5,10 @@
   "author": "Gabriel Nützi, Simon Spörri",
   "description": "Write execution graphs n shit yo",
   "scripts": {
-    "ng": "ng",
-    "ng:serve": "ng s",
     "copy-flatbuffer-files": "bash scripts/copyFlatBuffersBuildFiles.sh",
     "prebuild": "npm run copy-flatbuffer-files",
-    "start": "ng serve --project=eg",
+    "serve": "ng serve --project=eg",
+    "serve-dev": "ng serve --project=eg --configuration=dev --proxy-config=proxy.conf.json",
     "build": "ng build --project=eg",
     "build-dev": "npm run build -- --configuration=dev",
     "build-prod": "npm run build -- --prod",
@@ -19,7 +18,7 @@
     "affected:apps": "./node_modules/.bin/nx affected:apps",
     "affected:build": "./node_modules/.bin/nx affected:build",
     "affected:e2e": "./node_modules/.bin/nx affected:e2e",
-    "format": "./node_modules/.bin/nx format:write",
+    "format": "./node_modules/.bin/nx `ormat:write",
     "format:write": "./node_modules/.bin/nx format:write",
     "format:check": "./node_modules/.bin/nx format:check",
     "update": "ng update @nrwl/schematics",
@@ -30,11 +29,15 @@
     "help": "./node_modules/.bin/nx help",
     "affected:test": "./node_modules/.bin/nx affected:test",
     "affected:lint": "./node_modules/.bin/nx affected:lint",
+
     "electron:build": "tsc -p apps/electron/tsconfig.electron.json",
     "electron:start": "electron dist/main.js",
     "electron:serve": "npm run electron:build && electron dist/main.js --serve",
-    "electron:start:local": "npm-run-all -p ng:serve electron:serve",
-    "electron:package": "electron-builder --dir dist"
+    "electron:serve:local": "npm-run-all -p serve electron:serve",
+    "electron:serve:local-dev": "npm-run-all -p serve-dev electron:serve",
+
+    "electron:package": "electron-builder --dir dist",
+    "native:package": "npm run build-prod && npm run electron:package"
   },
   "private": true,
   "dependencies": {

@@ -13,11 +13,12 @@
 #ifndef executionGraphGui_common_Request_hpp
 #define executionGraphGui_common_Request_hpp
 
+#include <optional>
 #include <string>
 #include <rttr/type>
 #include <executionGraph/common/FileSystem.hpp>
 #include <executionGraph/common/IObjectID.hpp>
-class BinaryPayload;
+#include "executionGraphGui/common/BinaryPayload.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -44,30 +45,39 @@ class Request : public executionGraph::IObjectID
 public:
     using Payload = BinaryPayload;
 
-protected:
-    Request(const std::path& requestTarget)
+public:
+    Request(std::path requestTarget,
+            std::optional<Payload> payload = std::nullopt)
         : m_id()
-        , m_requestTarget(requestTarget)
+        , m_requestTarget(std::move(requestTarget))
+        , m_payload{std::move(payload)}
     {}
 
-public:
     virtual ~Request() = default;
+
     Request(Request&&) = default;
+    Request& operator=(Request&&) = default;
+
+    Request(const Request&) = delete;
+    Request& operator=(const Request&&) = delete;
 
 public:
-    //! Get the request url describing this message.
+    //! Get the request target describing this message.
     const std::path& getTarget() const { return m_requestTarget; }
 
 public:
-    //! Get the payload of this request. Nullptr if there is no payload for this request.
-    //! The return value does not need to be thread-safe.
-    virtual const Payload* getPayload() const = 0;
+    //! Get the payload of this request.
+    const std::optional<Payload>& getPayload() const { return m_payload; }
+    //! Get the payload of this request.
+    std::optional<Payload>& getPayload() { return m_payload; }
 
 private:
-    //! The request URL (it will get adjusted during request forwarding)
-    //! e.g. "graph/addNode"
-    //! e.g. "general/addGraph"
+    //! The request target path
+    //! e.g. "graph/addNode", "general/addGraph" etc.
     std::path m_requestTarget;
+
+    //! The optional payload.
+    std::optional<Payload> m_payload;
 };
 
 #endif

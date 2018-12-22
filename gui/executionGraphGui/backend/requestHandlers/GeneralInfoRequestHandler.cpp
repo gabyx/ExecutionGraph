@@ -27,7 +27,7 @@ namespace sG = executionGraphGui::serialization;
 FunctionMap<GeneralInfoRequestHandler::Function> GeneralInfoRequestHandler::initFunctionMap()
 {
     using Entry = typename FunctionMap<Function>::Entry;
-    auto r      = {Entry{"general/getAllGraphTypeDescriptions",
+    auto r      = {Entry{targetBase / "general/getAllGraphTypeDescriptions",
                     Function{&GeneralInfoRequestHandler::handleGetAllGraphTypeDescriptions}}};
     return {r};
 }
@@ -66,7 +66,7 @@ void GeneralInfoRequestHandler::handleRequest(const Request& request,
 void GeneralInfoRequestHandler::handleGetAllGraphTypeDescriptions(const Request& request,
                                                                   ResponsePromise& response)
 {
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(request.getPayload() != nullptr,
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(request.getPayload() != std::nullopt,
                                       "There should not be any request payload for this request");
     using Allocator = ResponsePromise::Allocator;
 

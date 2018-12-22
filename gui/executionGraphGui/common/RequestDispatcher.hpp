@@ -251,6 +251,7 @@ private:
     struct NoPool
     {
         NoPool(std::size_t) {}
+        using Consumer = typename executionGraph::ThreadPool<Task>::Consumer;
     };
     using Pool = std::conditional_t<useThreadsForDispatch, executionGraph::ThreadPool<Task>, NoPool>;
     Pool m_pool{1};  //! One seperate thread will handle all messages for this dispatcher.
