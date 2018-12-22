@@ -8,7 +8,7 @@
     "copy-flatbuffer-files": "bash scripts/copyFlatBuffersBuildFiles.sh",
     "prebuild": "npm run copy-flatbuffer-files",
     "serve": "ng serve --project=eg",
-    "serve-dev": "ng serve --project=eg --configuration=dev",
+    "serve-dev": "ng serve --project=eg --configuration=dev --proxy-config=proxy.conf.json",
     "build": "ng build --project=eg",
     "build-dev": "npm run build -- --configuration=dev",
     "build-prod": "npm run build -- --prod",

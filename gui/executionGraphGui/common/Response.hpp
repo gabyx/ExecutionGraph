@@ -54,7 +54,7 @@ public:
     using Id        = executionGraph::Id;
 
 public:
-    ResponsePromise(const Id& requestId,
+    ResponsePromise(const Id& requestId, 
                     std::shared_ptr<Allocator> allocator,
                     bool bCancelOnDestruction = true)
         : m_requestId(requestId)
@@ -148,7 +148,7 @@ protected:
 
 private:
     friend class ResponseFuture;
-    Id m_requestId;                          //! The id of the corresponding request.
+    Id m_requestId;                          //!< The id of the corresponding request.
     std::promise<Payload> m_promisePayload;  //!< Response Data which gets set in `setReady`.
 
     // todo: Up to now: Hand over the buffer to Dispatcher thread, it will be used in the FlatBufferBuilder

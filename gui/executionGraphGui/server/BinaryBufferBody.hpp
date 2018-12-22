@@ -19,8 +19,8 @@
 #include <boost/beast/http/error.hpp>
 #include <boost/beast/http/message.hpp>
 #include <boost/optional.hpp>
-
 #include <executionGraphGui/common/BinaryPayload.hpp>
+#include <executionGraphGui/common/Loggers.hpp>
 
 //! A @b Body using a `BinaryBuffer`
 //!
@@ -65,11 +65,12 @@ public:
 
         void init(const boost::optional<std::uint64_t>& length, error_code& ec)
         {
+            EXECGRAPHGUI_BACKENDLOG_DEBUG("BinaryBufferBody::init(...)");
             if(length)
             {
                 try
                 {
-                    m_body.resize(*length);
+                    m_body.reserve(*length);
                 }
                 catch(std::exception const&)
                 {
@@ -83,6 +84,8 @@ public:
         template<class ConstBufferSequence>
         std::size_t put(const ConstBufferSequence& buffers, error_code& ec)
         {
+            EXECGRAPHGUI_BACKENDLOG_DEBUG("BinaryBufferBody::init(...)");
+
             using boost::asio::buffer_copy;
             using boost::asio::buffer_size;
             auto const n   = buffer_size(buffers);

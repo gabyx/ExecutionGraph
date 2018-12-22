@@ -17,6 +17,7 @@
 #include <unordered_set>
 #include <rttr/type>
 #include <executionGraph/common/IObjectID.hpp>
+#include "executionGraph/common/FileSystem.hpp"
 #include "executionGraphGui/backend/Backend.hpp"
 #include "executionGraphGui/common/Assert.hpp"
 #include "executionGraphGui/common/Request.hpp"
@@ -26,6 +27,9 @@ class BackendRequestHandler : public executionGraph::IObjectID
 {
     RTTR_ENABLE()
     EXECGRAPH_NAMED_OBJECT_ID_DECLARATION
+
+public:
+    static const std::path targetBase; //!< The base targe path for all request targets.
 
 public:
     BackendRequestHandler(const IdNamed& id)

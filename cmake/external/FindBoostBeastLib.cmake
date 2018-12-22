@@ -1,8 +1,8 @@
 # Try to find the boost Library Library 
 include(FindPackageHandleStandardArgs)
 
-set(URL "https://dl.bintray.com/boostorg/release/1.68.0/source/boost_1_68_0.tar.bz2")
-set(URL_HASH "7f6130bc3cf65f56a618888ce9d5ea704fa10b462be126ad053e80e553d6d8b7")
+set(URL "https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.bz2")
+set(URL_HASH "8f32d4617390d1c2d16f26a27ab60d97807b35440d45891fa340fc2648b04406")
 set(INSTALL_DIR "${ExecutionGraph_EXTERNAL_INSTALL_DIR}/boost")
 
 message(STATUS "boost library finding ...")
@@ -43,7 +43,7 @@ endif()
 if(TARGET "Boost::boost")
     add_library(boostBeastLib INTERFACE IMPORTED)
     set_property(TARGET boostBeastLib PROPERTY INTERFACE_LINK_LIBRARIES "Boost::boost" "Boost::system")
-
+    set_property(TARGET boostBeastLib PROPERTY INTERFACE_COMPILE_DEFINITIONS BOOST_BEAST_USE_STD_STRING_VIEW)
     message(STATUS "boostbeast library found! Config File: ${Boost_CONFIG}")
     message(STATUS "boostbeast library added targets: boostBeastLib")
 endif()

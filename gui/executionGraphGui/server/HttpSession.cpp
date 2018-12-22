@@ -30,7 +30,7 @@ namespace
 
     //! Returns a bad request response.
     template<typename Request, typename T>
-    auto makeBadRequest(const Request& req, T&& why)
+    auto makeBadResponse(const Request& req, T&& why)
     {
         ResponseString res{http::status::bad_request, req.version()};
         res.set(http::field::server, versionString);
@@ -67,6 +67,15 @@ namespace
         return res;
     }
 
+    template<typename Request>
+    bool isTargetInvalid(Request&& req)
+    {
+        // Request path must be absolute and not contain "..".
+        return req.target().empty() ||
+               req.target()[0] != '/' ||
+               req.target().find("..") != std::string_view::npos;
+    }
+
     template<typename Request, typename Send>
     bool handleRequestFileFallback(const std::path& rootPath,
                                    Request&& req,
@@ -75,15 +84,14 @@ namespace
         // Make sure we can handle the method.
         if(req.method() != http::verb::get)
         {
-            return send(makeBadRequest(req, "Unknown HTTP-method."));
+            send(makeBadResponse(req, "Unknown HTTP-method."));
+            return false;
         }
 
-        // Request path must be absolute and not contain "..".
-        if(req.target().empty() ||
-           req.target()[0] != '/' ||
-           req.target().find("..") != boost::beast::string_view::npos)
+        if(isTargetInvalid(req))
         {
-            return send(makeBadRequest(req, "Illegal request-target."));
+            send(makeBadResponse(req, "Illegal request-target."));
+            return false;
         }
 
         // Build the path to the requested file.
@@ -128,12 +136,23 @@ namespace
 
     //! @brief Handle the request.
 
-    template<typename Request, typename Send, typename Dispatcher>
+    template<typename Request,
+             typename Send,
+             typename Dispatcher,
+             typename Executor,
+             typename Allocator>
     void handleRequestBackend(const std::path& rootPath,
                               Request&& req,
                               Dispatcher&& dispatcher,
-                              Send&& send)
+                              Send&& send,
+                              Executor& executor,
+                              Allocator& allocator)
     {
+        if(isTargetInvalid(req))
+        {
+            send(makeBadResponse(req, "Illegal request-target."));
+            return;
+        }
         //EXECGRAPHGUI_THROW("handleRequestBackendFailed!");
 
         // Request is read
@@ -141,7 +160,19 @@ namespace
         // ioc.post( dispatcher->handleRequest(request, response), sendResponse() )
         // the dispatcher is not threaded, so runs in the current thread.
 
-        send(makeNotFound(req, req.target()));
+        BackendRequest request(std::path{req.target()},
+                               std::move(req.body()));
+
+        BackendResponsePromise responsePromise{executionGraph::Id{},
+                                               allocator};
+        ResponseFuture responeFuture(responsePromise);
+
+        if(!dispatcher.handleRequest(request, responsePromise))
+        {
+            send(makeBadResponse(req, "Request not handled in dispatcher!"));
+        }
+
+        send(makeBadResponse(req, "Request handled in dispatcher!"));
     }
 }  // namespace
 
@@ -211,7 +242,8 @@ void HttpSession::doRead()
 {
     // Make the request empty before reading,
     // otherwise the operation behavior is undefined.
-    m_request = RequestBinary{{}, m_allocator};
+    m_request.base() = {};
+    m_request.body().resize(0);
 
     auto onCompletion = [session = shared_from_this()](auto ec, std::size_t bytesTransferred) {
         session->onRead(ec, bytesTransferred);
@@ -251,8 +283,10 @@ void HttpSession::onRead(boost::system::error_code ec,
     // Send the response.
     handleRequestBackend(m_rootPath,
                          std::move(m_request),
-                         m_dispatcher,
-                         Send{shared_from_this()});
+                         *m_dispatcher,
+                         Send{shared_from_this()},
+                         m_strand,
+                         m_allocator);
 }
 
 void HttpSession::onWrite(boost::system::error_code ec,

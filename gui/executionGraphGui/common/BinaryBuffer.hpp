@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <memory>
 #include <foonathan/memory/smart_ptr.hpp>
+#include "executionGraphGui/common/Assert.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -43,7 +44,7 @@ public:
                  std::size_t bytes = 0)
         : m_allocator(allocator)
     {
-        resize(bytes);
+        reserve(bytes);
     }
 
     //! Constructor for handing over a buffer `data` which was 'array-like'-allocated by `allocator`.
@@ -59,13 +60,29 @@ public:
         , m_bytes(bytes)
     {}
 
-    //! Copy prohibited
+    //! Copy prohibited.
     BinaryBuffer(const BinaryBuffer&) = delete;
     BinaryBuffer& operator=(const BinaryBuffer&) = delete;
 
-    //! Move allowed
-    BinaryBuffer(BinaryBuffer&&) = default;
-    BinaryBuffer& operator=(BinaryBuffer&&) = default;
+    //! Move-construct the buffer. 
+    //! Buffer `o` stays valid and can be reused again.
+    BinaryBuffer(BinaryBuffer&& o)
+    {
+        *this = std::move(o);
+    };
+    //! Move-assign to the buffer. 
+    //! Buffer `o` stays valid and can be reused again.
+    BinaryBuffer& operator=(BinaryBuffer&& o)
+    {
+        m_buffer         = std::move(o.m_buffer);
+        m_allocator      = o.m_allocator;  // no move: beacause it would null o.m_allocator
+        m_allocatedBytes = o.m_allocatedBytes;
+        m_bytes          = o.m_bytes;
+        m_data           = o.m_data;
+
+        o.clear();
+        return *this;
+    };
 
     //! Begin/End Iterators
     //@{
@@ -77,16 +94,29 @@ public:
     const_iterator cend() const { return end(); }
     //@}
 
+    //! Resize the buffer to containe `bytes` bytes.
     void resize(std::uint64_t bytes)
+    {
+        reserve(bytes);
+        m_bytes = bytes;
+    }
+
+    //! Make sure the allocated bytes are at least `bytes`.
+    void reserve(std::uint64_t bytes)
     {
         if(bytes > getAllocatedSize())
         {
-            // reallocate
-            m_buffer = foonathan::memory::allocate_unique<uint8_t[]>(*m_allocator, bytes);
-            m_allocatedBytes = bytes;
-            m_data           = m_buffer.get();
+            reallocate(bytes);
         }
-        m_bytes = bytes;
+    }
+
+    //! Clears the whole buffer (allocator stays valid).
+    void clear()
+    {
+        m_buffer         = nullptr;
+        m_allocatedBytes = 0;
+        m_bytes          = 0;
+        m_data           = 0;
     }
 
     //! Get the data pointer.
@@ -102,6 +132,26 @@ public:
 
     //! Check if buffer is empty (nullptr or no bytes)
     bool isEmpty() const { return getSize() == 0 || getData() == nullptr; }
+
+private:
+    //! Allocates a buffer with size `bytes` and copies over the current bytes to the new buffer.
+    void reallocate(std::uint64_t bytes)
+    {
+        EXECGRAPHGUI_ASSERT(bytes > 0, "Invalid size!");
+        // allocate (`allocate_unique` only captures allocator by reference, there we store the allocator here)
+        auto buffer = foonathan::memory::allocate_unique<uint8_t[]>(*m_allocator, bytes);
+        // copy data m_buffer -> buffer
+        auto bytesToCopy = std::min(getSize(), bytes);
+        if(bytesToCopy)
+        {
+            std::memcpy(buffer.get(), m_buffer.get(), bytesToCopy);
+        }
+
+        // reset state
+        m_buffer         = std::move(buffer);
+        m_allocatedBytes = bytes;
+        m_data           = m_buffer.get();
+    }
 
 private:
     std::shared_ptr<RawAllocator> m_allocator;  //!< Reference to the allocator.
