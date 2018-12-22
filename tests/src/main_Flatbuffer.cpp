@@ -170,7 +170,7 @@ MY_TEST(FlatBuffer, Test2)
     {
         EXECGRAPH_LOG_TRACE("Read graph simple");
         executionGraph::FileMapper mapper("myGraph.eg");
-        std::tie(buf, size) = mapper.getData();
+        std::tie(buf, size) = mapper.data();
         auto graph          = s::GetExecutionGraph(buf);
         ASSERT_TRUE(graph->nodes() != nullptr && graph->nodes()->size() == nNodes) << " Wupi, wrong serialization!";
     }

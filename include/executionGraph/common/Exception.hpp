@@ -18,6 +18,7 @@
 #include <fmt/ostream.h>
 
 #ifdef __clang__
+#    pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
@@ -29,14 +30,19 @@ namespace executionGraph
         template<typename Type, typename Message, typename... Args>
         void throwException(Message&& message, Args&&... args)
         {
-            if constexpr(sizeof...(Args) > 0)
+            if constexpr (sizeof...(Args) > 0)
             {
                 throw Type(fmt::format(message, std::forward<Args>(args)...));
             }
             else
             {
-                throw Type(message);
+                throw Type{message};
             }
+        }
+        template<typename Type>
+        void throwException()
+        {
+            throw Type{};
         }
     }  // namespace details
 }  // namespace executionGraph

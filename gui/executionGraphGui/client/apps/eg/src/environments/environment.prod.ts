@@ -13,5 +13,7 @@
 export const environment = {
   production: true,
   logReponsesVerbose: false,
-  useServiceDummys: false
+
+  useServiceDummys: false,
+  backendUrl: "http://localhost:8089/eg-backend"
 };

@@ -11,3 +11,5 @@
 //! ========================================================================================
 
 #include "executionGraphGui/backend/BackendRequestHandler.hpp"
+
+const std::path BackendRequestHandler::targetBase = "/eg-backend";

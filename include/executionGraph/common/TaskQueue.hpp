@@ -38,9 +38,10 @@ namespace executionGraph
     {
         //! No move/copy allowed!
         EXECGRAPH_DISALLOW_COPY_AND_MOVE(TaskQueue)
-
+        
     public:
         using Task = TTask;
+        static_assert(std::is_move_constructible_v<Task>);
 
     public:
         TaskQueue()          = default;

@@ -81,7 +81,7 @@
 #    undef EXECGRAPHGUI_APPLOG_ERROR
 #    define EXECGRAPHGUI_APPLOG_ERROR(...) Loggers::getInstance().getAppLogger().error(__VA_ARGS__)
 #    undef EXECGRAPHGUI_BACKENDLOG_ERROR
-#    define EXECGRAPHGUI_BACKENDLOG_ERROR(...) Loggers::getInstance().getBackendLogger().error(MSG, __VA_ARGS__)
+#    define EXECGRAPHGUI_BACKENDLOG_ERROR(...) Loggers::getInstance().getBackendLogger().error(__VA_ARGS__)
 #    undef EXECGRAPHGUI_LOGCODE_ERROR
 #    define EXECGRAPHGUI_LOGCODE_ERROR(expr) expr
 #endif
@@ -114,7 +114,7 @@ public:
 
 private:
     std::unique_ptr<spdlog::logger> m_backendLog;  //! Log for the backend (mutli-threaded)
-    std::unique_ptr<spdlog::logger> m_appLog;      //! Log for the app (mutlti-threaded)
+    std::unique_ptr<spdlog::logger> m_appLog;      //! Log for the app (multi-threaded)
 };
 
 #endif

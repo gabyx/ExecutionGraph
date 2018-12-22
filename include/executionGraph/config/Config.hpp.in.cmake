@@ -17,6 +17,9 @@
 namespace executionGraph{
 
     //! Library Version
+    static const char* versionString       = "@ExecutionGraph_VERSION_MAJOR@."
+                                             "@ExecutionGraph_VERSION_MINOR@."
+                                             "@ExecutionGraph_VERSION_PATCH@";
     static const unsigned int versionMajor =  @ExecutionGraph_VERSION_MAJOR@ ;
     static const unsigned int versionMinor =  @ExecutionGraph_VERSION_MINOR@ ;
     static const unsigned int versionPatch =  @ExecutionGraph_VERSION_PATCH@ ;

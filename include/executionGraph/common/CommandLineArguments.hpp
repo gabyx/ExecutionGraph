@@ -23,29 +23,37 @@ namespace executionGraph
     {
     public:
         CommandLineArguments(int argc,
-                             char* argv[],
+                             const char* argv[],
                              const std::string& briefDescription,
                              const std::string& detailedDescription)
             : m_parser(briefDescription, detailedDescription)
             , m_argc(argc)
             , m_argv(argv)
             , m_applicationPath(argv[0])
+            , m_initialPath(std::filesystem::current_path())
         {
+            if(m_applicationPath.is_relative())
+            {
+                m_applicationPath = m_initialPath / m_applicationPath.filename();
+            }
         }
         virtual ~CommandLineArguments() = default;
 
     public:
-        //! Get the application path. (can be relative)
-        const std::path& getApplicationPath() { return m_applicationPath; }
+        //! Get the absolute application path.
+        const std::path& applicationPath() { return m_applicationPath; }
+        //! Get the absolute initial path.
+        const std::path& initialPath() { return m_initialPath; }
 
     protected:
-        args::ArgumentParser m_parser;  //! Argument parser
+        args::ArgumentParser m_parser;  //!< Argument parser
 
-        int m_argc;
-        char** m_argv;
+        int m_argc;           //!< main() argument count.
+        const char** m_argv;  //!< main() argument array.
 
     private:
-        std::path m_applicationPath;  //!< Application path: argv[0]
+        std::path m_applicationPath;  //!< Absolute application path from argv[0].
+        std::path m_initialPath;      //!< Absolute initial path.
     };
 }  // namespace executionGraph
 

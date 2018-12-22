@@ -13,3 +13,4 @@
 import { InjectionToken } from '@angular/core';
 
 export const VERBOSE_LOG_TOKEN = new InjectionToken<boolean>('VERBOSE_LOG_TOKEN');
+export const BINARY_HTTP_ROUTER_BASE_URL = new InjectionToken<string>('BINARY_HTTP_ROUTER_BASE_URL');

@@ -14,6 +14,7 @@
 #define executionGraphGui_common_BufferPool_hpp
 
 #include <foonathan/memory/heap_allocator.hpp>
+#include <foonathan/memory/threading.hpp>
 
 /* ---------------------------------------------------------------------------------------*/
 /*!

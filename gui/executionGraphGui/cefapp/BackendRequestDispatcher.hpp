@@ -13,9 +13,10 @@
 #ifndef executionGraphGui_cefapp_BackendRequestDispatcher_hpp
 #define executionGraphGui_cefapp_BackendRequestDispatcher_hpp
 
+#include <memory>
 #include "executionGraphGui/backend/BackendRequestHandler.hpp"
 #include "executionGraphGui/cefapp/RequestCef.hpp"
-#include "executionGraphGui/cefapp/ResponseCef.hpp"
+#include "executionGraphGui/cefapp/ResponsePromiseCef.hpp"
 #include "executionGraphGui/common/RequestDispatcher.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
@@ -27,13 +28,13 @@
  */
 /* ---------------------------------------------------------------------------------------*/
 class BackendRequestDispatcher final : public RequestDispatcher<BackendRequestHandler,
-                                                                Request,
-                                                                ResponsePromise>
+                                                                RequestCef,
+                                                                ResponsePromiseCef>
 {
 public:
     using Base = RequestDispatcher<BackendRequestHandler,
-                                   Request,
-                                   ResponsePromise>;
+                                   RequestCef,
+                                   ResponsePromiseCef>;
 
 public:
     template<typename... Args>
@@ -43,5 +44,4 @@ public:
 
     virtual ~BackendRequestDispatcher() = default;
 };
-
 #endif

@@ -39,7 +39,7 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { storeFreeze } from 'ngrx-store-freeze';
 
-import { VERBOSE_LOG_TOKEN } from './tokens';
+import { VERBOSE_LOG_TOKEN, BINARY_HTTP_ROUTER_BASE_URL} from './tokens';
 
 import { GraphModule } from '@eg/graph';
 import { SimpleConsoleLoggerFactory, LoggerFactory } from '@eg/logger';
@@ -163,13 +163,14 @@ const routes: Route[] = [
     environment.production ? [] : StoreDevtoolsModule.instrument()
   ],
   providers: [
+    { provide: VERBOSE_LOG_TOKEN, useValue: environment.logReponsesVerbose },
+    { provide: BINARY_HTTP_ROUTER_BASE_URL, useValue: environment.backendUrl },
     { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory },
     { provide: ITestBackend, useClass: TestBackend },
     BinaryHttpRouterService,
     CefMessageRouterService,
     TestService,
     GraphLoadedGuard,
-    { provide: VERBOSE_LOG_TOKEN, useValue: environment.logReponsesVerbose },
     {
       provide: ExecutionService,
       useClass: !environment.useServiceDummys ? ExecutionServiceBinaryHttp : ExecutionServiceDummy

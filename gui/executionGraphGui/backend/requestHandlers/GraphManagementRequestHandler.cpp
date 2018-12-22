@@ -28,8 +28,8 @@ FunctionMap<GraphManagementRequestHandler::Function> GraphManagementRequestHandl
 {
     using Entry = typename FunctionMap<Function>::Entry;
 
-    auto r = {Entry("general/addGraph", Function(&GraphManagementRequestHandler::handleAddGraph)),
-              Entry("general/removeGraph", Function(&GraphManagementRequestHandler::handleRemoveGraph))};
+    auto r = {Entry(targetBase / "general/addGraph", Function(&GraphManagementRequestHandler::handleAddGraph)),
+              Entry(targetBase / "general/removeGraph", Function(&GraphManagementRequestHandler::handleRemoveGraph))};
     return {r};
 }
 
@@ -56,7 +56,7 @@ void GraphManagementRequestHandler::handleRequest(const Request& request,
     EXECGRAPHGUI_BACKENDLOG_INFO("GraphManagementRequestHandler::handleRequest");
 
     // Dispatch to the correct function
-    auto it = m_functionMap.m_map.find(request.getURL().string());
+    auto it = m_functionMap.m_map.find(request.getTarget().string());
     if(it != m_functionMap.m_map.end())
     {
         it->second(*this, request, response);
@@ -68,8 +68,8 @@ void GraphManagementRequestHandler::handleAddGraph(const Request& request,
                                                    ResponsePromise& response)
 {
     // Request validation
-    auto* payload = request.getPayload();
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == nullptr,
+    auto& payload = request.getPayload();
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request data is null!");
 
     auto graphReq = getRootOfPayloadAndVerify<s::AddGraphRequest>(*payload);
@@ -98,8 +98,8 @@ void GraphManagementRequestHandler::handleRemoveGraph(const Request& request,
                                                       ResponsePromise& response)
 {
     // Request validation
-    auto* payload = request.getPayload();
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == nullptr,
+    auto& payload = request.getPayload();
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request data is null!");
 
     auto nodeReq = getRootOfPayloadAndVerify<s::RemoveGraphRequest>(*payload);

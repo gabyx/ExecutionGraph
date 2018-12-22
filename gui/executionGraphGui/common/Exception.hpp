@@ -20,18 +20,15 @@
 #include <executionGraph/common/Exception.hpp>
 
 #ifdef __clang__
+#    pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 
 #define EXECGRAPHGUI_THROW(...) EXECGRAPH_THROW(__VA_ARGS__)
 #define EXECGRAPHGUI_THROW_IF(condition, ...) EXECGRAPH_THROW_TYPE_IF(condition, executionGraph::Exception, __VA_ARGS__)
-#define EXECGRAPHGUI_THROW_TYPE(Type, ...) EXECGRAPH_THROW_TYPE(Type, __VA_ARGS__)
-#define EXECGRAPHGUI_THROW_TYPE_IF(condition, Type, ...) EXECGRAPH_THROW_TYPE_IF(condition, Type, __VA_ARGS__)
-
-#ifdef __clang__
-#    pragma clang diagnostic pop
-#endif
+#define EXECGRAPHGUI_THROW_TYPE(Type, ...) EXECGRAPH_THROW_TYPE(Type, __VA_ARGS__) // Args: Type, ...
+#define EXECGRAPHGUI_THROW_TYPE_IF(condition, Type, ...) EXECGRAPH_THROW_TYPE_IF(condition, Type, __VA_ARGS__) // Args: Type, ...
 
 class InternalBackendError final : public executionGraph::Exception
 {
@@ -42,5 +39,9 @@ public:
 
 #    define EXECGRAPHGUI_THROW_BACKEND_ERROR_IF(condition, ...) EXECGRAPHGGUI_THROW_TYPE_IF(condition, InternalBackendError, __VA_ARGS__)
 #    define EXECGRAPHGUI_THROW_BACKEND_ERROR(...) EXECGRAPHGGUI_THROW_TYPE(InternalBackendError, __VA_ARGS__)
+
+#ifdef __clang__
+#    pragma clang diagnostic pop
+#endif
 
 #endif

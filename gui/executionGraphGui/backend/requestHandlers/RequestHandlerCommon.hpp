@@ -21,14 +21,14 @@
 template<typename MessageType, bool verifyBuffer = devFlags::verifyAllFlatbufferMessages>
 auto getRootOfPayloadAndVerify(const BinaryPayload& payload)
 {
-    const auto& buffer = payload.getBuffer();
+    const auto& buffer = payload.buffer();
     if(verifyBuffer)
     {
-        flatbuffers::Verifier v(buffer.getData(), buffer.getSize());
+        flatbuffers::Verifier v(buffer.data(), buffer.size());
         EXECGRAPHGUI_THROW_BAD_REQUEST_IF(!v.VerifyBuffer<MessageType>(),
                                           "Flatbuffer corrupt!");
     }
-    return flatbuffers::GetRoot<MessageType>(buffer.getData());
+    return flatbuffers::GetRoot<MessageType>(buffer.data());
 }
 
 #endif

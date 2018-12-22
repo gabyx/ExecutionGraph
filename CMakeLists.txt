@@ -5,7 +5,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_CURR
 message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
 
 # Define the Project ===============================================
-set(ExecutionGraphProjectName "ExecutionGraph" CXX)
+set(ExecutionGraphProjectName "ExecutionGraph")
 message(STATUS "Project name is: " ${ExecutionGraphProjectName})
 project(${ExecutionGraphProjectName})
 
@@ -176,7 +176,8 @@ if(${ExecutionGraph_BUILD_GUI})
     find_package(BoostBeastLib REQUIRED)
     list(APPEND ExecutionGraphGui_LINK_TARGETS_CORE_DEP "boostBeastLib")
 
-    set_target_properties(ExecutionGraphGui::Core-Dependencies PROPERTIES INTERFACE_LINK_LIBRARIES "${ExecutionGraphGui_LINK_TARGETS_CORE_DEP}")
+    set_target_properties(ExecutionGraphGui::Core-Dependencies PROPERTIES
+                          INTERFACE_LINK_LIBRARIES "${ExecutionGraphGui_LINK_TARGETS_CORE_DEP}")
 endif()
 
 
