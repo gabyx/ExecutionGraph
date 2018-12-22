@@ -59,7 +59,7 @@ namespace executionGraph
             FileMapper mapper(m_filePath);
             const uint8_t* buffer = nullptr;
             std::size_t size;
-            std::tie(buffer, size) = mapper.getData();
+            std::tie(buffer, size) = mapper.data();
             EXECGRAPH_ASSERT(buffer != nullptr,
                              "FileMapper returned nullptr for file '{0}'",
                              m_filePath);

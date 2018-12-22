@@ -118,7 +118,7 @@ export class GraphEffects {
     const graphDescs = await this.generalInfoService.getAllGraphTypeDescriptions();
     const graphDesc = graphDescs[0];
     const graphTypeId = graphDesc.id;
-    const nodeType = 'Normalize';
+    const nodeType = graphDesc.nodeTypeDescritptions[0].type;
 
     // Add a graph
     let graph = await this.graphManagementService.addGraph(graphTypeId);

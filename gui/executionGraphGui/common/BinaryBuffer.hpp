@@ -86,11 +86,11 @@ public:
 
     //! Begin/End Iterators
     //@{
-    iterator begin() { return getData(); }
-    const_iterator begin() const { return getData(); }
+    iterator begin() { return data(); }
+    const_iterator begin() const { return data(); }
     const_iterator cbegin() const { return begin(); }
-    iterator end() { return getData() + getSize(); }
-    const_iterator end() const { return getData() + getSize(); }
+    iterator end() { return data() + size(); }
+    const_iterator end() const { return data() + size(); }
     const_iterator cend() const { return end(); }
     //@}
 
@@ -104,7 +104,7 @@ public:
     //! Make sure the allocated bytes are at least `bytes`.
     void reserve(std::uint64_t bytes)
     {
-        if(bytes > getAllocatedSize())
+        if(bytes > allocatedSize())
         {
             reallocate(bytes);
         }
@@ -120,18 +120,18 @@ public:
     }
 
     //! Get the data pointer.
-    uint8_t* getData() { return m_data; }
+    uint8_t* data() { return m_data; }
     //! Get the constant data pointer.
-    const uint8_t* getData() const { return m_data; }
+    const uint8_t* data() const { return m_data; }
 
     //! Get the size in bytes of the current held data.
-    std::uint64_t getSize() const { return m_bytes; }
+    std::uint64_t size() const { return m_bytes; }
 
     //! Get the size in bytes of the current allocated memory.
-    std::uint64_t getAllocatedSize() const { return m_allocatedBytes; }
+    std::uint64_t allocatedSize() const { return m_allocatedBytes; }
 
     //! Check if buffer is empty (nullptr or no bytes)
-    bool isEmpty() const { return getSize() == 0 || getData() == nullptr; }
+    bool isEmpty() const { return size() == 0 || data() == nullptr; }
 
 private:
     //! Allocates a buffer with size `bytes` and copies over the current bytes to the new buffer.
@@ -141,7 +141,7 @@ private:
         // allocate (`allocate_unique` only captures allocator by reference, there we store the allocator here)
         auto buffer = foonathan::memory::allocate_unique<uint8_t[]>(*m_allocator, bytes);
         // copy data m_buffer -> buffer
-        auto bytesToCopy = std::min(getSize(), bytes);
+        auto bytesToCopy = std::min(size(), bytes);
         if(bytesToCopy)
         {
             std::memcpy(buffer.get(), m_buffer.get(), bytesToCopy);

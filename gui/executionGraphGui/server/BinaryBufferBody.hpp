@@ -47,7 +47,7 @@ public:
     //! any chunked Transfer-Encoding will be removed.
     static std::uint64_t size(const value_type& body)
     {
-        return body.getSize();
+        return body.size();
     }
 
     //! The algorithm for parsing the body
@@ -65,7 +65,6 @@ public:
 
         void init(const boost::optional<std::uint64_t>& length, error_code& ec)
         {
-            EXECGRAPHGUI_BACKENDLOG_DEBUG("BinaryBufferBody::init(...)");
             if(length)
             {
                 try
@@ -84,12 +83,10 @@ public:
         template<class ConstBufferSequence>
         std::size_t put(const ConstBufferSequence& buffers, error_code& ec)
         {
-            EXECGRAPHGUI_BACKENDLOG_DEBUG("BinaryBufferBody::init(...)");
-
             using boost::asio::buffer_copy;
             using boost::asio::buffer_size;
             auto const n   = buffer_size(buffers);
-            auto const len = m_body.getSize();
+            auto const len = m_body.size();
             try
             {
                 m_body.resize(len + n);
@@ -100,7 +97,7 @@ public:
                 return 0;
             }
             ec.assign(0, ec.category());
-            return buffer_copy(boost::asio::buffer(m_body.getData() + len, n), buffers);
+            return buffer_copy(boost::asio::buffer(m_body.data() + len, n), buffers);
         }
 
         void
@@ -134,7 +131,7 @@ public:
         get(error_code& ec)
         {
             ec.assign(0, ec.category());
-            return {{const_buffers_type{m_body.getData(), m_body.getSize()}, false}};
+            return {{const_buffers_type{m_body.data(), m_body.size()}, false}};
         }
     };
 };

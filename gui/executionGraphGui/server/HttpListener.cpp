@@ -27,7 +27,7 @@ HttpListener<HttpSession>::HttpListener(boost::asio::io_context& ioc,
     m_acceptor.open(endpoint.protocol(), ec);
     if(ec)
     {
-        fail(ec, "HttpListener:: open");
+        fail<true>(ec, "HttpListener:: open");
         return;
     }
 
@@ -35,7 +35,7 @@ HttpListener<HttpSession>::HttpListener(boost::asio::io_context& ioc,
     m_acceptor.set_option(boost::asio::socket_base::reuse_address(true), ec);
     if(ec)
     {
-        fail(ec, "HttpListener:: set_option");
+        fail<true>(ec, "HttpListener:: set_option");
         return;
     }
 
@@ -43,7 +43,7 @@ HttpListener<HttpSession>::HttpListener(boost::asio::io_context& ioc,
     m_acceptor.bind(endpoint, ec);
     if(ec)
     {
-        fail(ec, "HttpListener:: bind");
+        fail<true>(ec, "HttpListener:: bind");
         return;
     }
 
@@ -51,7 +51,7 @@ HttpListener<HttpSession>::HttpListener(boost::asio::io_context& ioc,
     m_acceptor.listen(boost::asio::socket_base::max_listen_connections, ec);
     if(ec)
     {
-        fail(ec, "HttpListener:: listen");
+        fail<true>(ec, "HttpListener:: listen");
         return;
     }
 }
@@ -83,7 +83,7 @@ void HttpListener<HttpSession>::onAccept(boost::system::error_code ec)
 {
     if(ec)
     {
-        fail(ec, "HttpListener:: accept");
+        fail<true>(ec, "HttpListener:: accept");
     }
     else
     {

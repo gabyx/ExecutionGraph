@@ -54,7 +54,7 @@ public:
     using Id        = executionGraph::Id;
 
 public:
-    ResponsePromise(const Id& requestId, 
+    ResponsePromise(const Id& requestId,
                     std::shared_ptr<Allocator> allocator,
                     bool bCancelOnDestruction = true)
         : m_requestId(requestId)
@@ -100,7 +100,7 @@ public:
     //! Callback for signaling that the response object is available with payload `payload` (default=empty).
     void setReady()
     {
-        m_promisePayload.set_value(Payload{Payload::Buffer{m_allocator}});
+        m_promisePayload.set_value(Payload{Payload::Buffer{m_allocator}, "application/octet-stream"});
         if(m_state != State::Nothing)
         {
             EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', is already set to a state!", m_requestId.toString());
@@ -193,11 +193,12 @@ public:
     ~ResponseFuture() = default;
 
 public:
-    auto& getFuture() { return m_payloadFuture; }
+    bool isValid() { return m_payloadFuture.valid(); }
+    auto payload() { return m_payloadFuture.get(); }
 
 private:
-    Id m_requestId;  //!< The id of the corresponding request.
-    std::future<Payload> m_payloadFuture;
+    Id m_requestId;                        //!< The id of the corresponding request.
+    std::future<Payload> m_payloadFuture;  //!< The futur
 };
 
 #endif

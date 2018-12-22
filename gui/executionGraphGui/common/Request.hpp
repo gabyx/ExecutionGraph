@@ -62,7 +62,7 @@ public:
     Request& operator=(const Request&&) = delete;
 
 public:
-    //! Get the request url describing this message.
+    //! Get the request target describing this message.
     const std::path& getTarget() const { return m_requestTarget; }
 
 public:

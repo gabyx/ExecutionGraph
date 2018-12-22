@@ -17,7 +17,7 @@ import { GeneralInfoService } from './GeneralInfoService';
 import { GraphManipulationService } from './GraphManipulationService';
 import { GraphManagementService } from './GraphManagementService';
 import { NodeId } from './../model';
-import { Id } from '@eg/common';
+
 /**
  * Stupid TestService class which can be quickly injected
  * for testing pruposes into components which shouldnt have these
@@ -45,36 +45,36 @@ export class TestService {
    * @memberof TestService
    */
   public async testAddRemove() {
-    // // Get the graph infos
-    // this.logger.debug('Get all graph type descriptions...');
-    // let graphDescs = await this.generalInfoService.getAllGraphTypeDescriptions();
+    // Get the graph infos
+    this.logger.debug('Get all graph type descriptions...');
+    let graphDescs = await this.generalInfoService.getAllGraphTypeDescriptions();
 
-    // // Add a node to the first graph
-    // let graphDesc = graphDescs[0];
-    // let graphTypeId = graphDesc.id;
-    // let nodeType = graphDesc.nodeTypeDescritptions[0].type;
+    // Add a node to the first graph
+    let graphDesc = graphDescs[0];
+    let graphTypeId = graphDesc.id;
+    let nodeType = graphDesc.nodeTypeDescritptions[0].type;
 
     // Add a graph
-    let graph = await this.graphManagementService.addGraph(new Id());
+    let graph = await this.graphManagementService.addGraph(graphTypeId);
 
-    // // Add the node.
-    // await this.graphManipulationService.addNode(graph.id, nodeType, 'MySuperDuperNode');
+    // Add the node.
+    await this.graphManipulationService.addNode(graph.id, nodeType, 'MySuperDuperNode');
 
-    // // Add a non existing node
-    // try {
-    //   await this.graphManipulationService.addNode(
-    //     graph.id,
-    //     'BananaNode',
-    //     'MySupercalifragilisticexpialidociousBananaNode'
-    //   );
-    // } catch (error) {
-    //   this.logger.error(error);
-    // }
+    // Add a non existing node
+    try {
+      await this.graphManipulationService.addNode(
+        graph.id,
+        'BananaNode',
+        'MySupercalifragilisticexpialidociousBananaNode'
+      );
+    } catch (error) {
+      this.logger.error(error);
+    }
 
-    // // Remove first node
-    // await this.graphManipulationService.removeNode(graph.id, new NodeId(0));
+    // Remove first node
+    await this.graphManipulationService.removeNode(graph.id, new NodeId(0));
 
-    // // Remove graph
-    // await this.graphManagementService.removeGraph(graph.id);
+    // Remove graph
+    await this.graphManagementService.removeGraph(graph.id);
   }
 }
