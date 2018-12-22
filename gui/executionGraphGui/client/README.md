@@ -6,14 +6,17 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 The following table illustrates the various build commands defined in `package.json`:
 | Command | Description |
 | ------- | ----------- |
-| `npm run start` | **Client App Simulation Build**: Runs the angular build (in memory) and provides a development server under `http://localhost:4200`. This build uses all *dummy* services to simulate the backend.
-| `npm run build-dev` | **Client Development Build**:  Runs the angular build which stores the output in `./dist`. This build uses no *dummy* services, meaning it tries to connect to the backend.
-| `npm run build-prod` | **Client App Production Build**: Runs the angular build which stores the output in `./dist`. This build uses no *dummy* services, meaning it tries to connect to the backend.
-| `npm run build-prod` | **Client App Production Build**: Runs the angular build *continuously* on file changes and stores the output in `./dist`. This build uses no *dummy* services, meaning it tries to connect to the backend.
-| `npm run start-native` | **Native App Simulation Build**: Runs the angular build and stores the output in `./native-app/dist` for the electron gui application and starts the application afterwards. This build uses all *dummy* services to simulate the backend.
-| `npm run build-native` | **Native App Simulation Build**: Runs the angular build and stores the output in `./native-app/dist` for the electron gui application. This build uses no *dummy* services, meaning it tries to connect to the backend.
-| `npm run build-dev-native` | **Native App Development Build**: Runs the angular build and stores the output in `./native-app/dist` for the electron gui application. This build uses no *dummy* services, meaning it tries to connect to the backend.
-| `npm run build-prod-native` | **Native App Production Build**: Runs the angular build and stores the output in `./native-app/dist` for the electron gui application. This build uses no *dummy* services, meaning it tries to connect to the backend.
+| `npm run serve` | **Client App Sim**: Runs the angular build (in memory) and provides a development server under `http://localhost:4200`. This build uses all *dummy* services to simulate the backend.
+| `npm run serve-dev` | **Client App Dev**: Runs the angular build (in memory) and provides a development server under `http://localhost:4200`. This build uses no *dummy* services, meaning it tries to connect to the backend.
+| `npm run build` | **Client App Sim**:  Runs the angular build which stores the output in `./dist`. This build uses all *dummy* services to simulate the backend.
+| `npm run build-dev` | **Client App Dev**:  Runs the angular build which stores the output in `./dist`. This build uses no *dummy* services, meaning it tries to connect to the backend.
+| `npm run build-prod` | **Client App Prod**: Runs the angular build which stores the output in `./dist`. This build uses no *dummy* services, meaning it tries to connect to the backend.
+
+| `npm run electron:serve` | **Native App Serve**: Serves an electron app and uses what ever configuration you build into the `dist` folder.
+| `npm run electron:build` | **Native App Build**: Builds an electron app and uses what ever configuration you build into the `dist` folder.
+| `npm run electorn:package` | **Native App Package**: Packages an electron app and uses what ever configuration you build into the `dist` folder.
+| `npm run electron:serve:local-dev` | **Native App Serve + Local-Dev**: Serves an electron app and also serves a `developement` build (no dummy services) under `http://localhost:4200`.
+| `npm run native:package` | **Native App Prod**: Builds and packages a full production version of the electron app.
 
 ## Running unit tests
 
