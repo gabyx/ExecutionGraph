@@ -101,11 +101,13 @@ int main(int argc, const char* argv[])
 
     EXECGRAPHGUI_BACKENDLOG_INFO(
         "Starting ExecutionGraph Server at '{0}:{1} with '{2}' threads.\n"
-        "Logs located at '{3}'",
+        "Logs located at '{3}'\n"
+        "Root path: '{4}'",
         args.address(),
         args.port(),
         args.threads(),
-        args.logPath());
+        args.logPath(),
+        args.rootPath());
 
 #if 1
     // The io_context is required for all I/O.

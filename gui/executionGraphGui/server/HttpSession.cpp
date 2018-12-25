@@ -79,7 +79,7 @@ namespace
     }
 
     template<typename Request, typename Send>
-    bool handleRequestFileFallback(const std::path& rootPath,
+    void handleRequestFileFallback(const std::path& rootPath,
                                    Request&& req,
                                    Send&& send)
     {
@@ -87,17 +87,17 @@ namespace
         if(req.method() != http::verb::get)
         {
             send(makeBadResponse(req, "Unknown HTTP-method."));
-            return false;
+            return;
         }
 
         if(isTargetInvalid(req))
         {
             send(makeBadResponse(req, "Illegal request-target."));
-            return false;
+            return;
         }
 
         // Build the path to the requested file.
-        std::path path = rootPath / req.target().substr(1).to_string();
+        std::path path = rootPath / req.target().substr(1);
         if(!std::filesystem::is_regular_file(path))
         {
             path = rootPath / "index.html";
@@ -114,12 +114,14 @@ namespace
         if(ec == boost::system::errc::no_such_file_or_directory)
         {
             send(makeNotFound(req, req.target()));
+            return;
         }
 
         // Handle an unknown error.
         if(ec)
         {
-            return send(makeServerError(req, ec.message()));
+            send(makeServerError(req, ec.message()));
+            return;
         }
 
         // Cache the size since we need it after the move.
@@ -132,8 +134,10 @@ namespace
         res.set(http::field::server, versionString);
         res.set(http::field::content_type, getMimeType(path));
         res.content_length(size);
+        res.prepare_payload();
         res.keep_alive(req.keep_alive());
-        return send(std::move(res));
+        send(std::move(res));
+        return;
     }
 
     //! @brief Handle the request.
@@ -170,34 +174,37 @@ namespace
         {
             send(makeBadResponse(req, "Request not handled in dispatcher!"));
         }
+        else
+        {
+            try
+            {
+                EXECGRAPHGUI_THROW_IF(!responeFuture.isValid(), "Future is not valid!");
+                auto payload  = responeFuture.waitForPayload();
+                auto mimeType = payload.mimeType();
 
-        try
-        {
-            EXECGRAPHGUI_THROW_IF(!responeFuture.isValid(), "Future is not valid!");
-            auto payload  = responeFuture.waitForPayload();
-            auto mimeType = payload.mimeType();
-
-            // Send the response.
-            ResponseBinary res{std::piecewise_construct,
-                               std::make_tuple(std::move(payload.buffer())),
-                               std::make_tuple(http::status::ok, req.version())};
-            res.set(http::field::server, versionString);
-            res.set(http::field::content_type, mimeType);
-            res.content_length(res.payload_size());
-            res.keep_alive(req.keep_alive());
-            return send(std::move(res));
-        }
-        catch(const BadRequestError& e)
-        {
-            send(makeBadResponse(req, fmt::format("BadRequest: '{0}'", e.what())));
-        }
-        catch(const InternalBackendError& e)
-        {
-            send(makeServerError(req, fmt::format("InternalBackendError: '{0}'", e.what())));
-        }
-        catch(std::exception& e)
-        {
-            send(makeServerError(req, fmt::format("Unknown Error: '{0}'", e.what())));
+                // Send the response.
+                ResponseBinary res{std::piecewise_construct,
+                                   std::make_tuple(std::move(payload.buffer())),
+                                   std::make_tuple(http::status::ok, req.version())};
+                res.set(http::field::server, versionString);
+                res.set(http::field::content_type, mimeType);
+                res.content_length(res.payload_size());
+                res.keep_alive(req.keep_alive());
+                res.prepare_payload();
+                send(std::move(res));
+            }
+            catch(const BadRequestError& e)
+            {
+                send(makeBadResponse(req, fmt::format("BadRequest: '{0}'", e.what())));
+            }
+            catch(const InternalBackendError& e)
+            {
+                send(makeServerError(req, fmt::format("InternalBackendError: '{0}'", e.what())));
+            }
+            catch(const std::exception& e)
+            {
+                send(makeServerError(req, fmt::format("Unknown Error: '{0}'", e.what())));
+            }
         }
     }
 }  // namespace
@@ -310,6 +317,8 @@ void HttpSession::onRead(boost::system::error_code ec,
         m_request.method(),
         m_request.target(),
         payloadSize ? *payloadSize : 0);
+
+    //handleRequestFileFallback(m_rootPath, std::move(m_request), Send{shared_from_this()});
 
     // Send the response.
     handleRequestBackend(m_rootPath,

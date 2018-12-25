@@ -51,22 +51,19 @@ public:
 public:
     ResponsePromise(const Id& requestId,
                     std::shared_ptr<Allocator> allocator,
-                    bool bCancelOnDestruction = true)
+                    bool bResolveOnDestruction = true)
         : m_requestId(requestId)
         , m_allocator(allocator)
-        , m_resolveOnDestruction(bCancelOnDestruction)
+        , m_resolveOnDestruction(bResolveOnDestruction)
     {
     }
 
     virtual ~ResponsePromise()
     {
-        if(!isResolved())
+        if(m_resolveOnDestruction && !isResolved())
         {
-            if(m_resolveOnDestruction)
-            {
-                EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', has not been resolved. It will be cancled!", m_requestId.toString());
-                setCanceled(std::make_exception_ptr(std::runtime_error("Cancled promise on destruction, because not handled properly!")));
-            }
+            EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', has not been resolved. It will be cancled!", m_requestId.toString());
+            setCanceled(std::make_exception_ptr(std::runtime_error("Cancled promise on destruction, because not handled properly!")));
         }
     };
 
@@ -184,11 +181,10 @@ public:
     ~ResponseFuture() = default;
 
 public:
-
     //! See if payload future is valid (a state has been set!).
     bool isValid() { return m_payloadFuture.valid(); }
 
-    //! Wait for the payload to be resolved (blocking), 
+    //! Wait for the payload to be resolved (blocking),
     //! throwing exception if any happens.
     auto waitForPayload() { return m_payloadFuture.get(); }
 
