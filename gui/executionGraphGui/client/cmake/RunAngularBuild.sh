@@ -14,5 +14,5 @@ else
     echo "Launching npm install ..."
     $npmCmd install
     echo "Launching npm run ... "
-    $npmCmd run "$target" -- "--output-path" "$folder"
+    $npmCmd run "$target"
 fi

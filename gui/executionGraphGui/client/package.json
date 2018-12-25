@@ -36,8 +36,9 @@
     "electron:serve:local": "npm-run-all -p serve electron:serve",
     "electron:serve:local-dev": "npm-run-all -p serve-dev electron:serve",
 
-    "electron:package": "electron-builder --dir dist",
-    "native:package": "npm run build-prod && npm run electron:package"
+    "electron:package-test": "electron-builder --dir dist",
+    "electron:package": "electron-builder",
+    "native:package": "npm-run-all -s build-prod electron:build electron:package"
   },
   "private": true,
   "dependencies": {
@@ -107,14 +108,29 @@
     "appId": "executionGraphGui",
     "productName": "ExecutionGraphGui",
     "copyright": "Copyright © 2018 ${author}",
-    "mac": {
-      "category": "com.${name}.app"
-    },
     "directories": {
       "output": "build"
     },
+    "linux":
+    {
+      "target" : "tar.gz",
+      "icon" : "apps/electron/resources/icon.png"
+    },
+    "mac" : {
+      "target" : "dmg",
+      "category": "com.${name}.app",
+      "icon" : "apps/electron/resources/icon.png"
+    },
+    "win" :
+    {
+      "target" : "zip",
+      "icon" : "apps/electron/resources/icon.png"
+    },
     "files": [
       "dist"
+    ],
+    "extraFiles" : [
+      "apps/electron/resources/icon.png"
     ]
   },
   "main": "dist/main.js"

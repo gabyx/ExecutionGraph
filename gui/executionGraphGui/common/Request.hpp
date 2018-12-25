@@ -24,14 +24,13 @@
 /*!
     General Request Message
 
-    A BackendRequestHandler is handling such a request. It can be registered in
-    the message dispatcher for handling one or several request ids (see `m_requestTarget`)
-    The request id is in the form "category/subcategory" (e.g. "graphManip/addNode").
-    We use a category and a subcategory to be able to structure requests into groups.
-    Also for the future, when more and more requests get added.
+    A `BackendRequestHandler` is handling such a request. It can be registered in
+    the message dispatcher for handling one or several request targets 
+    (see `m_requestTarget`).
+    The request target is a normal absolute path.
 
-    The serializer which decodes the payload is kept outside of this class and other derived
-    ones.
+    The serializer which decodes the payload is kept outside of this class 
+    and other derived ones.
 
     @date Thu Feb 22 2018
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
@@ -73,7 +72,9 @@ public:
 
 private:
     //! The request target path
-    //! e.g. "graph/addNode", "general/addGraph" etc.
+    //! e.g. "/executiongraph-backend/graph/addNode", 
+    //! e.g. "/executiongraph-backend/general/addGraph" 
+    //! etc.
     std::path m_requestTarget;
 
     //! The optional payload.

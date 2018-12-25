@@ -1,6 +1,8 @@
 import { app, BrowserWindow, screen } from 'electron';
+import { execFile } from 'child_process';
 import * as path from 'path';
 import * as url from 'url';
+import * as fs from 'fs';
 
 let win: BrowserWindow = null;
 
@@ -26,13 +28,13 @@ function createWindow() {
   win.center();
 
   if (serve) {
-    const ngServeUrl = 'http://localhost:4200';
+    const loadUrl = 'http://localhost:4200';
     const projectPath = path.join(__dirname, '..');
     console.log(`Serving form ${projectPath}`);
 
     // Reload initial page to not get mixed up with client side routing
     win.webContents.on('devtools-reload-page', event => {
-      win.loadURL(ngServeUrl);
+      win.loadURL(loadUrl);
     });
 
     // Hijack this event, which is triggered by the HMR feature of Angular CLI
@@ -40,10 +42,10 @@ function createWindow() {
     win.webContents.on('will-navigate', (event, navigationUrl) => {
       console.log(`will-navigate url to '${navigationUrl}'`);
       event.preventDefault();
-      win.loadURL(ngServeUrl);
+      win.loadURL(loadUrl);
     });
 
-    win.loadURL(ngServeUrl);
+    win.loadURL(loadUrl);
   } else {
     win.loadURL(
       url.format({
@@ -55,6 +57,19 @@ function createWindow() {
   }
 
   win.webContents.openDevTools();
+
+  // Start Execution Graph Server
+  const serverExec = path.join(__dirname, 'ExecutionGraphServer');
+  if (fs.existsSync(serverExec)) {
+    console.log(`Starting up server: '${serverExec}'`);
+    execFile(serverExec, (err, data) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      console.log(data.toString());
+    });
+  }
 
   // Emitted when the window is closed.
   win.on('closed', () => {

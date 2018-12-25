@@ -29,10 +29,12 @@ class ResponsePromiseCef final : public ResponsePromise
 {
 public:
     using Payload = ResponsePromise::Payload;
+    using Base    = ResponsePromise;
 
 public:
     template<typename... Args>
-    ResponsePromiseCef(CefRefPtr<CefCallback> cbResponseHeaderReady, Args&&... args)
+    ResponsePromiseCef(CefRefPtr<CefCallback> cbResponseHeaderReady,
+                       Args&&... args)
         : ResponsePromise(std::forward<Args>(args)...)
         , m_cbResponseHeaderReady(cbResponseHeaderReady)
     {}
@@ -46,15 +48,17 @@ public:
     ResponsePromiseCef& operator=(ResponsePromiseCef&&) = default;
 
 private:
-    virtual void setReadyImpl() override
+    void setReady(Payload&& payload) override
     {
+        Base::setReady(std::move(payload));
         // Signal that the response is available
         m_cbResponseHeaderReady->Continue();
         m_cbResponseHeaderReady = nullptr;  // Set to nullptr to mark that it has been called!
     }
 
-    virtual void setCanceledImpl(std::exception_ptr exception) override
+    void setCanceled(std::exception_ptr exception) override
     {
+        Base::setCanceled(exception);
         // Signal that the response is available (an exception is set in the promise!)
         m_cbResponseHeaderReady->Continue();
         m_cbResponseHeaderReady = nullptr;  // Set to nullptr to mark that it has been called!
