@@ -122,7 +122,7 @@ public:
     //! Handle a general request/response [thread-safe]
     //! Request/Response are moved (not forwarded) if a handler is found
     //! and `useThreadsForDispatch` is used.
-    //! @return True if it gets handled (what ever outcome).
+    //! @return `rrue` if it gets handled (what ever outcome).
     template<typename TTRequest, typename TTResponse>
     bool handleRequest(TTRequest&& request, TTResponse&& response)
     {
