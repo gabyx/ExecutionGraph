@@ -1,7 +1,7 @@
 {
     "configurations": [
         {
-            "name": "Mac",
+            "name": "Mac/Linux",
             "includePath": [
                 "${workspaceRoot}/include",
                 "${workspaceRoot}/gui",
