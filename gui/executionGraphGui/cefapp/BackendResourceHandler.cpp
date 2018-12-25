@@ -108,7 +108,7 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
     {
         EXECGRAPHGUI_THROW_IF(!m_responseFuture.isValid(), "Future is invalid!");
 
-        m_payload = m_responseFuture.payload();  // Get the payload!
+        m_payload = m_responseFuture.waitForPayload();  // Get the payload!
 
         m_bufferSize = responseLength = m_payload.buffer().size();  // set the response byte size (can be empty)
         if(responseLength)

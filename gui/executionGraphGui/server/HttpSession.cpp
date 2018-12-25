@@ -137,7 +137,6 @@ namespace
     }
 
     //! @brief Handle the request.
-
     template<typename Request,
              typename Send,
              typename Dispatcher,
@@ -174,11 +173,11 @@ namespace
 
         try
         {
-            EXECGRAPHGUI_THROW_IF(!responeFuture.isValid(), "Future is not valid!")
-            auto payload  = responeFuture.payload();
+            EXECGRAPHGUI_THROW_IF(!responeFuture.isValid(), "Future is not valid!");
+            auto payload  = responeFuture.waitForPayload();
             auto mimeType = payload.mimeType();
 
-            // Send the response
+            // Send the response.
             ResponseBinary res{std::piecewise_construct,
                                std::make_tuple(std::move(payload.buffer())),
                                std::make_tuple(http::status::ok, req.version())};
