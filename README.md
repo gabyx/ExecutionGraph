@@ -1,8 +1,9 @@
-This library is in alpha and still under development. First usable version will be `v1.0.1`.
-Note: This library is under heavy development on the `devGUI` branch! :-) Forking should mainly be considered for looking around :-), or contributing of course :)
+**This library is in alpha and still under development. First usable version will be `v1.1`. Note: This library is under heavy development on the `devGUI` branch! Forking should mainly be considered for looking around, or contributing of course.**
 
-#<img src="gui/executionGraphGui/client/apps/electron/resources/icon.svg" height="200%" style="display: inline;vertical-align: middle;"/> ExecutionGraph [![Build Status](https://travis-ci.org/gabyx/ExecutionGraph.svg?branch=master)](https://travis-ci.org/gabyx/ExecutionGraph) ![System](https://img.shields.io/badge/system-linux,osx-lightgrey.svg)
-Fast Execution Graph consisting of Execution Nodes
+<img src="gui/executionGraphGui/client/apps/electron/resources/icon.svg" height="150px" style="display: inline;vertical-align: middle; horizontal-align:center"/>
+
+# ExecutionGraph [![Build Status](https://travis-ci.org/gabyx/ExecutionGraph.svg?branch=master)](https://travis-ci.org/gabyx/ExecutionGraph) ![System](https://img.shields.io/badge/system-linux,osx-lightgrey.svg)
+**Fast Execution Graph consisting of Execution Nodes**
 
 Be able to design and run such input/output graphs, such as the ones used for the work [here](http://gabyx.github.io/GRSFramework/#videos) (using this [graph](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)). A GUI is provided in from of a single-page Angular application with a backend HTTP server which allows interactive design/manipulation and execution of graphs: 
 
