@@ -29,13 +29,11 @@
     "help": "./node_modules/.bin/nx help",
     "affected:test": "./node_modules/.bin/nx affected:test",
     "affected:lint": "./node_modules/.bin/nx affected:lint",
-
     "electron:build": "tsc -p apps/electron/tsconfig.electron.json",
     "electron:start": "electron dist/main.js",
     "electron:serve": "npm run electron:build && electron dist/main.js --serve",
     "electron:serve:local": "npm-run-all -p serve electron:serve",
     "electron:serve:local-dev": "npm-run-all -p serve-dev electron:serve",
-
     "electron:package-test": "electron-builder --dir dist",
     "electron:package": "electron-builder",
     "native:package": "npm-run-all -s build-prod electron:build electron:package"
@@ -111,25 +109,23 @@
     "directories": {
       "output": "build"
     },
-    "linux":
-    {
-      "target" : "tar.gz",
-      "icon" : "apps/electron/resources/icon.png"
+    "linux": {
+      "target": "tar.gz",
+      "icon": "apps/electron/resources/icon.png"
     },
-    "mac" : {
-      "target" : "dmg",
+    "mac": {
+      "target": "dmg",
       "category": "com.${name}.app",
-      "icon" : "apps/electron/resources/icon.png"
+      "icon": "apps/electron/resources/icon.png"
     },
-    "win" :
-    {
-      "target" : "zip",
-      "icon" : "apps/electron/resources/icon.png"
+    "win": {
+      "target": "zip",
+      "icon": "apps/electron/resources/icon.png"
     },
     "files": [
       "dist"
     ],
-    "extraFiles" : [
+    "extraFiles": [
       "apps/electron/resources/icon.png"
     ]
   },

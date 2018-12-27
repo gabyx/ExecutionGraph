@@ -1,11 +1,13 @@
-This library is in alpha and still under development. First usable version will be `v1.0.1`.
-Note: This library is under heavy development on the `devGUI` branch! :-) Forking should mainly be considered for looking around :-), or contributing of course :)
+**This library is in alpha and still under development. First usable version will be `v1.1`. Note: This library is under heavy development on the `devGUI` branch! Forking should mainly be considered for looking around, or contributing of course.**
 
-# ExecutionGraph [![Build Status](https://travis-ci.org/gabyx/ExecutionGraph.svg?branch=master)](https://travis-ci.org/gabyx/ExecutionGraph) ![Deps](https://img.shields.io/badge/dependencies-eigen3,meta-blue.svg) ![System](https://img.shields.io/badge/system-linux,osx-lightgrey.svg)
-Fast Execution Graph consisting of Execution Nodes
+<img src="gui/executionGraphGui/client/apps/electron/resources/icon.svg" height="150px" style="display: inline;vertical-align: middle; horizontal-align:center"/>
 
-Be able to design and run such input/output graphs, such as this one used in [http://gabyx.github.io/GRSFramework/#videos] :
-![Execution Graphs like this](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)
+# ExecutionGraph [![Build Status](https://travis-ci.org/gabyx/ExecutionGraph.svg?branch=master)](https://travis-ci.org/gabyx/ExecutionGraph) ![System](https://img.shields.io/badge/system-linux,osx-lightgrey.svg)
+**Fast Execution Graph consisting of Execution Nodes**
+
+Be able to design and run such input/output graphs, such as the ones used for the work [here](http://gabyx.github.io/GRSFramework/#videos) (using this [graph](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)). A GUI is provided in from of a single-page Angular application with a backend HTTP server which allows interactive design/manipulation and execution of graphs: 
+
+![Current GUI](doc/ExecutionGraphGui.png)
 
 * [Installing and Dependencies](#installing-and-dependencies)
     * [OS X](#os-x)
@@ -17,6 +19,7 @@ Be able to design and run such input/output graphs, such as this one used in [ht
 * [Introduction](#introduction)
 * [Example 1:](#example-1)
 * [Contributors](#contributors)
+
 
 ## Installing and Dependencies
 To build the library, the tests and the example you need the build tool [cmake](
@@ -123,7 +126,7 @@ and configure the actual project. This works also with VS Code and the cmake ext
 ## General Development Setup
 If you start developing, install the pre-commit/post-commit hooks with:
 ```bash
-    npm install -g typescript-formatter json-fmt xmllint
+    npm install -g json-fmt xmllint
     brew install plantuml
     cd .git && mv hooks hooks.old && ln -s ../tools/git-hooks hooks
 ```
@@ -136,25 +139,20 @@ If you start developing, install the pre-commit/post-commit hooks with:
 ### On OS X
 Install XCode and the CommandLine Tools from [Apple](https://developer.apple.com/download/more/)  
 Install [Visual Studio Code](https://code.visualstudio.com/)  
-Install the following extensions for VS Code:
-- [C++ Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
-- [CMake Language Ext.](https://marketplace.visualstudio.com/items?itemName=twxs.cmake)
-- [CMake Build Ext.](https://marketplace.visualstudio.com/items?itemName=vector-of-bool.cmake-tools)
-- [CMake Tool Helper Ext.](https://marketplace.visualstudio.com/items?itemName=vector-of-bool.cmake-tools)
 
 **Note:** Dont use the [multi-root workspaces](https://code.visualstudio.com/docs/editor/multi-root-workspaces) feature in VS Code since the C++ Extension does not yet support this and code completion won't work properly.
 
 ## GUI Development Setup
-The UI is made up of an [Angular](https://angular.io) application that uses the [Angular CLI](https://cli.angular.io) to create the web assets that are ultimately displayed in a [CEF](https://bitbucket.org/chromiumembedded/cef) browser.
-Please visit the Angular CLI website for its prerequisites (node.js and npm respectively, also a globally installed Angular CLI aka `ng` ).
+The UI is made up of an [Angular](https://angular.io) application that uses the [Angular CLI](https://cli.angular.io) to create the web assets that are ultimately displayed in an [electron app](https://electronjs.org/) browser.
+The client backend consists of a http server which provides the executiong graph.
+Please visit the Angular CLI website for its prerequisites (node.js and npm respectively, also a globally installed Angular CLI aka `ng`).
 Once you installed the prerequisites build the client application by navigating to the client directory and starting the build process.
 
 ```bash
 cd gui/client
-npm run build
+npm install
+npm run serve
 ```
-
-![Screenshot](doc/executionGraphGui.png)
 
 For more information about the development of the client application please refer to the dedicated [client documentation](gui/client/README.md)
 
