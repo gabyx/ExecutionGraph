@@ -85,8 +85,8 @@ endfunction()
 
 function(setTargetCompileOptionsExecutionGraph target use_address_san use_leak_san)
 
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
-       CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+    if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR
+       ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
         message(STATUS "Setting Compile/Linker Options for Clang")
         list(APPEND CXX_FLAGS       "-fno-omit-frame-pointer"
                                     "-Wall"
@@ -96,24 +96,25 @@ function(setTargetCompileOptionsExecutionGraph target use_address_san use_leak_s
                                     "-Wno-unused-local-typedef"
                                     "-ftemplate-backtrace-limit=0")
 
-    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
         list(APPEND CXX_FLAGS       "-fno-omit-frame-pointer"
                                     "-Wall"
                                     "-Werror"
                                     "-Wpedantic"
                                     "-Wno-unused-local-typedef"
-                                    "-Wno-documentation")
+                                    "-Wno-documentation"
+                                    "-Wno-unused-variable")
     elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
         message(ERROR "MSVC is not yet supported!")
     endif()
 
 
     if(${use_address_san})
-        if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
             # with clang 5.0.1: -fsanitize=address produces weird output in lldb for std::string ...
             list(APPEND CXX_FLAGS_DEBUG  "-fsanitize=address")
             set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address")
-        elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+        elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
             list(APPEND CXX_FLAGS_DEBUG "-fsanitize=address")
             set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address")
         elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
@@ -122,10 +123,10 @@ function(setTargetCompileOptionsExecutionGraph target use_address_san use_leak_s
     endif()
 
     if(${use_leak_san})
-        if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
             list(APPEND CXX_FLAGS_DEBUG  "-fsanitize=leak")
             set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=leak")
-        elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+        elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
             message(FATAL_ERROR "AppleClang does not support -fsanitize=leak (please check)")
         elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
             message(FATAL_ERROR "MSVC is not yet supported!")
@@ -141,7 +142,7 @@ function(setTargetCompileOptionsExecutionGraph target use_address_san use_leak_s
     set_property(TARGET ${target} PROPERTY LINK_FLAGS ${LINKER_FLAGS})
 
     # Linking std-libraries
-    target_link_libraries(${target}  PUBLIC "stdc++fs" PUBLIC "c++experimental")
+    target_link_libraries(${target}  PUBLIC "c++fs" PUBLIC "c++experimental")
 
     if(OS_MACOSX)
         set_target_properties(${target} PROPERTIES

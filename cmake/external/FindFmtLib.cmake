@@ -7,7 +7,7 @@ set(URL "https://github.com/fmtlib/fmt.git")
 set(INSTALL_DIR "${ExecutionGraph_EXTERNAL_INSTALL_DIR}/fmt")
 
 message(STATUS "fmt library finding ...")
-find_package(fmt QUIET CONFIG PATHS ${INSTALL_DIR})
+find_package(fmt CONFIG PATHS ${INSTALL_DIR})
 
 if(${USE_SUPERBUILD})
 

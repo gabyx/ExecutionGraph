@@ -35,7 +35,7 @@ macro(add_ExecutionGraph_lib STATICorSHARED TARGETNAME EXPORTNAME DOINSTALL)
         ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR 
         ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
         target_compile_options(${TARGETNAME} PRIVATE -DExecutionGraph_BUILD_LIBRARY -fvisibility=hidden -fPIC)
-    elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MVCC")
+    elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
         target_compile_options(${TARGETNAME} PRIVATE /DExecutionGraph_BUILD_LIBRARY)
     else()
         message(FATAL_ERROR "Could not set compile options for compiler id: '${CMAKE_CXX_COMPILER_ID}'")

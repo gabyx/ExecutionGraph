@@ -6,7 +6,7 @@ set(URL "https://github.com/gabime/spdlog")
 if(NOT EXISTS "${spdlog_INCLUDE_DIR}")
     message(STATUS "spdlog library: finding...")
     find_path(spdlog_INCLUDE_DIR
-            NAMES spdlog/spdlog.hpp 
+            NAMES spdlog/spdlog.h
             DOC "spdlog library header files"
             PATHS "${spdlog_DIR}/include")
 endif()

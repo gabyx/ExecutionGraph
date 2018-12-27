@@ -7,7 +7,7 @@ include (ExternalProject)
 set(ExecutionGraph_DEPENDENCIES)
 set(EXTRA_CMAKE_ARGS)
 
-find_package(Eigen3Lib) # not really dependency yet
+# find_package(Eigen3Lib) # not really dependency yet
 find_package(MetaLib) # needed
 
 #find_package(CerealLib) # for serialization

@@ -13,8 +13,8 @@
 #ifndef executionGraph_common_TypeDefs_hpp
 #define executionGraph_common_TypeDefs_hpp
 
-#include "executionGraph/common/MyContainerTypeDefs.hpp"
-#include "executionGraph/common/MyMatrixTypeDefs.hpp"
+// #include "executionGraph/common/MyContainerTypeDefs.hpp"
+// #include "executionGraph/common/MyMatrixTypeDefs.hpp"
 #include "executionGraph/common/Platform.hpp"
 #include "executionGraph/config/Config.hpp"
 
@@ -27,7 +27,7 @@ namespace executionGraph
 
 #define EXECGRAPH_DEFINE_MATRIX_TYPES                 \
     using PREC = ExecutionGraph::GlobalConfigs::PREC; \
-    EXECGRAPH_DEFINE_MATRIX_TYPES_OF(PREC)            \
-    EXECGRAPH_DEFINE_CONTAINER_TYPES
+    /* EXECGRAPH_DEFINE_MATRIX_TYPES_OF(PREC)  */     \
+    /* EXECGRAPH_DEFINE_CONTAINER_TYPES */
 }  // namespace executionGraph
 #endif

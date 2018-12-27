@@ -8,6 +8,7 @@ message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
 set(ExecutionGraphProjectName "ExecutionGraph")
 message(STATUS "Project name is: " ${ExecutionGraphProjectName})
 project(${ExecutionGraphProjectName})
+enable_language(CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -138,8 +139,8 @@ message("Default Linker Flags: '${CMAKE_EXE_LINKER_FLAGS}' | '${CMAKE_SHARED_LIN
 # Dependencies =========================================================
 add_library(ExecutionGraph::Core-Dependencies INTERFACE IMPORTED)
 # Define Eigen
-find_package(Eigen3Lib REQUIRED)
-list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "eigenLib")
+# find_package(Eigen3Lib REQUIRED)
+# list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "eigenLib")
 # Try to find Meta 
 find_package(MetaLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "metaLib")
