@@ -19,7 +19,7 @@
 #include "executionGraphGui/common/Exception.hpp"
 
 ServerCLArgs::ServerCLArgs(int argc, const char* argv[])
-    : executionGraph::CommandLineArguments(argc,
+    : CommandLineArguments(argc,
                                            argv,
                                            "ExecutionGraphServer Application",
                                            "No detailed description")

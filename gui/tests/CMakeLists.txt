@@ -21,7 +21,7 @@ set(INCLUDE_DIRS
 )
 
 # Define function to define compile definitions for all tests
-function(defineCompileDefs target addLibs)
+function(defineCompileDefs target addLibs addTest)
 
     message(STATUS "====================================================")
     message(STATUS "Configuring target: ${target}")
@@ -35,26 +35,23 @@ function(defineCompileDefs target addLibs)
 
     print_target_properties(${target})
 
-    add_test(NAME ${target} COMMAND ${target})
+    if(${addTest})
+        add_test(NAME ${target} COMMAND ${target})
+    endif()
 
 endfunction()
 
-# NodeTests
-# TaskQueue Test
-# you need to `ln -s "$(pwd)" "Frameworks"` in `buildExternal/cefbinaries/cefbinaries-src/Debug`
-set(EXEC_NAME ${PROJECT_NAME}GuiTest-MemoryPool)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_MemoryPool.cpp ${SOURCE_FILES} ${INCLUDE_FILES})
-defineCompileDefs(${EXEC_NAME} cefLib)
-
+# Memory Tests
 set(EXEC_NAME ${PROJECT_NAME}GuiTest-MemoryPoolNormal)
 add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_MemoryPoolNormal.cpp ${SOURCE_FILES} ${INCLUDE_FILES})
-defineCompileDefs(${EXEC_NAME} "")
+defineCompileDefs(${EXEC_NAME} "memoryLib" "on")
 
 # Http Server
 set(EXEC_NAME ${PROJECT_NAME}GuiTest-HttpServer)
 add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_HttpServer.cpp ${SOURCE_FILES} ${INCLUDE_FILES})
-defineCompileDefs(${EXEC_NAME} boostBeastLib)
+defineCompileDefs(${EXEC_NAME} "boostBeastLib", "off")
+
 # Http Server Async
 set(EXEC_NAME ${PROJECT_NAME}GuiTest-HttpServerAsync)
 add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_HttpServerAsync.cpp ${SOURCE_FILES} ${INCLUDE_FILES})
-defineCompileDefs(${EXEC_NAME} boostBeastLib)
+defineCompileDefs(${EXEC_NAME} "boostBeastLib" "off")

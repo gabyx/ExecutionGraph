@@ -7,5 +7,7 @@ set(ExecutionGraphGUICommon_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/RequestDispatcher.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Request.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Response.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/CommandLineArguments.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/CommandLineArguments.cpp
     PARENT_SCOPE
 )

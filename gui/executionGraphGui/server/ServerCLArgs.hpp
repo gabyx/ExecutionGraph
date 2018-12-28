@@ -13,9 +13,9 @@
 #ifndef executionGraphGui_server_ServerCLArgs_hpp
 #define executionGraphGui_server_ServerCLArgs_hpp
 
-#include <executionGraph/common/CommandLineArguments.hpp>
 #include <executionGraph/common/FileSystem.hpp>
 #include <executionGraph/common/Singleton.hpp>
+#include <executionGraphGui/common/CommandLineArguments.hpp>
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
@@ -26,7 +26,7 @@
         @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
     */
 /* ---------------------------------------------------------------------------------------*/
-class ServerCLArgs final : public executionGraph::CommandLineArguments,
+class ServerCLArgs final : public CommandLineArguments,
                            public executionGraph::Singleton<ServerCLArgs>
 {
 public:
@@ -41,11 +41,11 @@ public:
     const std::string& logPath() { return m_logPath.Get(); }
 
 private:
-    args::ValueFlag<std::path> m_rootPath;  //!< Server root path.
-    args::ValueFlag<std::string> m_address;   //!< Server address.
-    args::ValueFlag<unsigned short> m_port;   //!< Server port.
-    args::ValueFlag<std::size_t> m_threads;   //!< Number of threads used for async. operations.
-    args::ValueFlag<std::string> m_logPath;   //!< Server log path.
+    args::ValueFlag<std::path> m_rootPath;   //!< Server root path.
+    args::ValueFlag<std::string> m_address;  //!< Server address.
+    args::ValueFlag<unsigned short> m_port;  //!< Server port.
+    args::ValueFlag<std::size_t> m_threads;  //!< Number of threads used for async. operations.
+    args::ValueFlag<std::string> m_logPath;  //!< Server log path.
 };
 
 #endif

@@ -67,11 +67,6 @@ set(EXEC_NAME ${PROJECT_NAME}Test-Factory)
 add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Factory.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 defineCompileDefs(${EXEC_NAME})
 
-# JSON Test
-set(EXEC_NAME ${PROJECT_NAME}Test-Json)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Json.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-defineCompileDefs(${EXEC_NAME})
-
 # TaskQueue Test
 set(EXEC_NAME ${PROJECT_NAME}Test-TaskQueue)
 add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_TaskQueue.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )

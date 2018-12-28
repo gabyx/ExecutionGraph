@@ -18,7 +18,6 @@ function(include_all_source_ExecutionGraph
     
     set(${SRC}
         ${ExecutionGraph_ROOT_DIR}/src/DemangleTypes.cpp
-        ${ExecutionGraph_ROOT_DIR}/src/CommandLineArguments.cpp
 
         ${ExecutionGraph_ROOT_DIR}/src/LogicSocket.cpp
         ${ExecutionGraph_ROOT_DIR}/src/LogicNode.cpp
@@ -45,7 +44,6 @@ function(include_all_source_ExecutionGraph
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Platform.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/SfinaeMacros.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/TypeDefs.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/CommandLineArguments.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Identifier.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/IObjectID.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Factory.hpp

@@ -8,10 +8,8 @@ set(ExecutionGraph_DEPENDENCIES)
 set(EXTRA_CMAKE_ARGS)
 
 # find_package(Eigen3Lib) # not really dependency yet
-find_package(MetaLib) # needed
-
-#find_package(CerealLib) # for serialization
-find_package(FmtLib REQUIRED) # string formatting library
+find_package(MetaLib REQUIRED) 
+find_package(FmtLib REQUIRED)
 find_package(FlatBuffersLib REQUIRED)
 find_package(RTTRLib REQUIRED) 
 find_package(CrossGUIDLib REQUIRED)

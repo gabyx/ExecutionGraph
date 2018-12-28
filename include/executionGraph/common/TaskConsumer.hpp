@@ -46,8 +46,9 @@ namespace executionGraph
         using Task      = typename TTaskQueue::Task;
 
     private:
-        template<typename T>
-        using IsPointerType = meta::or_<meta::is<T, std::shared_ptr>, meta::is<T, std::unique_ptr>>;
+        template<typename TIn, typename T = std::decay_t<TIn>>
+        using IsPointerType = meta::or_<meta::is<T, std::shared_ptr>, 
+                                        meta::is<T, std::unique_ptr>>;
 
     public:
         TaskConsumer(const std::shared_ptr<TaskQueue>& queue)
@@ -82,12 +83,12 @@ namespace executionGraph
         struct Dispatch<T, EXECGRAPH_SFINAE_ENABLE_IF_CLASS(IsPointerType<T>{})>
         {
             template<typename... Args>
-            static void runTask(T& task, Args&&... args)
+            static void runTask(T&& task, Args&&... args)
             {
                 task->runTask(std::forward<Args>(args)...);
             }
             template<typename... Args>
-            static void onTaskException(T& task, Args&&... args)
+            static void onTaskException(T&& task, Args&&... args)
             {
                 task->onTaskException(std::forward<Args>(args)...);
             }

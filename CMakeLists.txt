@@ -148,9 +148,7 @@ list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "metaLib")
 # Try to find the fmt library
 find_package(FmtLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "fmtLib")
-# Try to find the Argumentparser
-find_package(ArgsLib REQUIRED)
-list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "argsLib")
+
 # Try to find the RTTR library 
 find_package(RTTRLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "rttrLib")
@@ -166,9 +164,13 @@ set_target_properties(ExecutionGraph::Core-Dependencies PROPERTIES INTERFACE_LIN
 if(${ExecutionGraph_BUILD_GUI})
     add_library(ExecutionGraphGui::Core-Dependencies INTERFACE IMPORTED)
     
+    # Try to find the Argumentparser
+    find_package(ArgsLib REQUIRED)
+    list(APPEND ExecutionGraphGui_LINK_TARGETS_CORE_DEP "argsLib")
+
     # Try to find the spdlog
     find_package(SpdLogLib REQUIRED)
-    list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "spdlogLib")
+    list(APPEND ExecutionGraphGui_LINK_TARGETS_CORE_DEP "spdlogLib")
 
     # Try to find the memory library
     find_package(MemoryLib REQUIRED)

@@ -13,16 +13,11 @@
 #ifndef executionGraph_common_Asserts_hpp
 #define executionGraph_common_Asserts_hpp
 
-#include <iostream>
-#include <stdlib.h>
-#include <typeinfo>
-
 #include "executionGraph/common/Exception.hpp"
 #include "executionGraph/common/Log.hpp"
 #include "executionGraph/config/Config.hpp"
 
 //! Some assert macro.
-
 #ifdef NDEBUG
 #    define EXECGRAPH_DEBUG_ONLY(code)
 #    define EXECGRAPH_ASSERT(condition, ...)

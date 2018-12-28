@@ -1,0 +1,26 @@
+#!/bin/bash
+
+export OLD_PATH="$PATH"
+function enableCompiler(){
+  comp="$1"
+  if [[ ${comp} == "clang" ]] ; then
+    echo "enabling clang7.0"
+    export PATH="/usr/local/opt/llvm/bin:$OLD_PATH"
+    export CC="/usr/local/opt/llvm/bin/clang"
+    export CXX="${CC}++"
+    export LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
+    export CPPFLAGS="-I/usr/local/opt/llvm/include -I/usr/local/opt/llvm/include/c++/v1/"
+    export CXXFLAGS="$CPPFLAGS"
+  else
+    echo "enabling no compiler"
+    export PATH="$OLD_PATH"
+    export CC=
+    export CXX=
+    export LDFLAGS=
+    export CPPFLAGS=
+    export CXXFLAGS=
+  fi
+}
+export -f enableCompiler
+
+enableCompiler "clang"
