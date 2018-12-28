@@ -67,7 +67,7 @@ Now you should be ready to configure with cmake:
     cd <pathToRepo>
     mkdir build
     cd build
-    # configuring the superbuild (-DUSE_SUPERBUILD=ON is optional)
+    # configuring the superbuild (-DUSE_SUPERBUILD=ON is default)
     cmake .. -DUSE_SUPERBUILD=ON \
          -DExecutionGraph_BUILD_TESTS=true \
          -DExecutionGraph_BUILD_LIBRARY=true \
