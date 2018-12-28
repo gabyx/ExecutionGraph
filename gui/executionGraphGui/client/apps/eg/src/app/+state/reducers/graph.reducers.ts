@@ -1,102 +1,96 @@
-import { Id, isDefined } from "@eg/common";
+import { Id, isDefined } from '@eg/common';
 
 import * as fromActions from '../actions/graph.actions';
-import { Graph, Connection } from "../../model";
-import { ConnectionMap } from "../../model/Graph";
+import { Graph, Connection } from '../../model';
+import { ConnectionMap } from '../../model/Graph';
 
 export interface GraphMap {
-    [id: string]: Graph
+  [id: string]: Graph;
 }
 
 export interface GraphsState {
-    entities: GraphMap;
+  entities: GraphMap;
 
-    loaded: boolean; // Has the AppState been loaded
-    error?: any; // Last none error (if any)
-    selectedGraphId?: Id; // Which Graph has been selected
+  loaded: boolean; // Has the AppState been loaded
+  error?: any; // Last none error (if any)
+  selectedGraphId?: Id; // Which Graph has been selected
 }
 
 export const initialState: GraphsState = {
-    entities: {},
-    loaded: false
+  entities: {},
+  loaded: false
 };
 
 export function reducer(state: GraphsState = initialState, action: fromActions.GraphAction): GraphsState {
-    switch (action.type) {
+  switch (action.type) {
+    case fromActions.GRAPHS_LOADED: {
+      const entities = action.graphs.reduce(
+        (existing: GraphMap, graph: Graph) => ({ ...existing, [graph.id.toString()]: graph }),
+        { ...state.entities }
+      );
 
-        case fromActions.GRAPHS_LOADED: {
-            const entities = action.graphs.reduce(
-                (existing: GraphMap, graph: Graph) => ({...existing, [graph.id.toString()]: graph}),
-                {...state.entities});
+      return {
+        ...state,
+        loaded: true,
+        error: null,
+        entities
+      };
+    }
 
-            return {
-                ...state,
-                loaded: true,
-                error: null,
-                entities
-            }
-        }
+    case fromActions.GRAPHS_LOAD_ERROR: {
+      return {
+        ...state,
+        loaded: true,
+        error: action.error
+      };
+    }
 
-        case fromActions.GRAPHS_LOAD_ERROR: {
-            return {
-                ...state,
-                loaded: true,
-                error: action.error
-            }
-        }
+    case fromActions.GRAPH_ADDED: {
+      const entities = { ...state.entities, [action.graph.id.toString()]: action.graph };
 
-        case fromActions.GRAPH_ADDED: {
-            const entities = { ...state.entities, [action.graph.id.toString()]: action.graph };
+      return {
+        ...state,
+        entities
+      };
+    }
 
-            return {
-                ...state,
-                entities
-            }
-        }
+    case fromActions.OPEN_GRAPH: {
+      return {
+        ...state,
+        selectedGraphId: action.id
+      };
+    }
 
-        case fromActions.OPEN_GRAPH: {
-            return {
-                ...state,
-                selectedGraphId: action.id
-            }
-        }
-
-        case fromActions.CONNECTION_ADDED:
-        case fromActions.CONNECTION_REMOVED:
-        case fromActions.NODE_ADDED:
-        case fromActions.NODE_REMOVED:
-        {
-          if(!isDefined(state.selectedGraphId))
-          {
-              throw new Error(`No active graph to operate on, ${action.type} cannot be handled`);
-          }
-          const graph = state.entities[state.selectedGraphId.toString()];
-          if(!isDefined(graph))
-          {
-              throw new Error(`No graph with the id ${state.selectedGraphId} exists`);
-          }
-
-          // Let the graph reducer handle the rest
-          const updatedGraph = graphReducer(graph, action);
-          return {
-            ...state,
-            entities: {
-              ...state.entities,
-              [state.selectedGraphId.toString()]: updatedGraph
-            }
-          };
-        }
-      default: {
-        return state;
+    case fromActions.CONNECTION_ADDED:
+    case fromActions.CONNECTION_REMOVED:
+    case fromActions.NODE_ADDED:
+    case fromActions.NODE_REMOVED: {
+      if (!isDefined(state.selectedGraphId)) {
+        throw new Error(`No active graph to operate on, ${action.type} cannot be handled`);
+      }
+      const graph = state.entities[state.selectedGraphId.toString()];
+      if (!isDefined(graph)) {
+        throw new Error(`No graph with the id ${state.selectedGraphId} exists`);
       }
 
+      // Let the graph reducer handle the rest
+      const updatedGraph = graphReducer(graph, action);
+      return {
+        ...state,
+        entities: {
+          ...state.entities,
+          [state.selectedGraphId.toString()]: updatedGraph
+        }
+      };
     }
-};
+    default: {
+      return state;
+    }
+  }
+}
 
 export function graphReducer(graph: Graph, action: fromActions.GraphAction): Graph {
-
-  switch(action.type) {
-
+  switch (action.type) {
     case fromActions.NODE_UPDATED: {
       const { node } = action;
       console.log('node updated', node);
@@ -106,7 +100,7 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
           ...graph.nodes,
           [node.id.toString()]: node
         }
-      }
+      };
     }
 
     case fromActions.NODE_ADDED: {
@@ -117,12 +111,12 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
           ...graph.nodes,
           [node.id.toString()]: node
         }
-      }
+      };
     }
 
     case fromActions.NODE_REMOVED: {
       // Remove by destructuring to the removed and the rest
-      const {[action.id.toString()]: removed, ...nodes} = graph.nodes;
+      const { [action.nodeId.toString()]: removed, ...nodes } = graph.nodes;
       //@todo cmonspqr -> gabnue:
       // Either the backend should report removed connections due to
       // removed nodes to keep the model consistent, or the backend should
@@ -131,15 +125,16 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
       // Anyway we deleting obsolete connections here is just a hack
       const connections = Object.keys(graph.connections)
         .map(id => graph.connections[id])
-        .filter(connection => connection.inputSocket.parent.id.toString() !== action.id.toString())
-        .filter(connection => connection.outputSocket.parent.id.toString() !== action.id.toString());
+        .filter(connection => connection.inputSocket.parent.id.toString() !== action.nodeId.toString())
+        .filter(connection => connection.outputSocket.parent.id.toString() !== action.nodeId.toString());
       return {
         ...graph,
         nodes: nodes,
         connections: connections.reduce(
-          (existing: ConnectionMap, connection: Connection) => ({...existing, [connection.idString]: connection}),
-          {})
-      }
+          (existing: ConnectionMap, connection: Connection) => ({ ...existing, [connection.idString]: connection }),
+          {}
+        )
+      };
     }
 
     case fromActions.CONNECTION_ADDED: {
@@ -150,17 +145,16 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
           ...graph.connections,
           [connection.idString]: connection
         }
-      }
+      };
     }
 
     case fromActions.CONNECTION_REMOVED: {
-        // Remove by destructuring to the removed and the rest
-      const {[action.connectionId.idString]: removed, ...connections} = graph.connections;
+      // Remove by destructuring to the removed and the rest
+      const { [action.connectionId.idString]: removed, ...connections } = graph.connections;
       return {
         ...graph,
         connections: connections
-      }
+      };
     }
   }
-
 }

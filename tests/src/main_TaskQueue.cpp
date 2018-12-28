@@ -203,6 +203,23 @@ MY_TEST(ProducerConsumer, VirtualTasks)
     pool.join();
 }
 
+MY_TEST(TaskQueue, MovableTasksOnly)
+{
+    struct A
+    {
+        A(int a)
+            : b(a) {}
+        A(A&& a)
+            : b(a.b) { std::cout << "A::movector\n"; };
+        A(A&) = delete;
+
+        const int b;
+    };
+    static_assert(std::is_move_constructible_v<A>);
+    TaskQueue<A> q;
+    q.emplace(3);
+}
+
 int main(int argc, char** argv)
 {
     testing::InitGoogleTest(&argc, argv);

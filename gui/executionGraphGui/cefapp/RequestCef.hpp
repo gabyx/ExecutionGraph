@@ -18,30 +18,6 @@
 #include <optional>
 #include "executionGraphGui/common/Request.hpp"
 
-class RequestCef final : public Request
-{
-public:
-    using Payload = Request::Payload;
-
-public:
-    template<typename Payload>
-    RequestCef(const std::string& requestId,
-               Payload&& payload)
-        : Request(requestId), m_payload(std::forward<Payload>(payload))
-    {}
-
-    virtual ~RequestCef() = default;
-
-    RequestCef(RequestCef&&) = default;
-    RequestCef& operator=(RequestCef&&) = default;
-
-    virtual const Payload* getPayload() const override
-    {
-        return m_payload ? &(*m_payload) : nullptr;
-    };
-
-private:
-    std::optional<Payload> m_payload;  //!< The payload of the message;
-};
+using RequestCef = Request;
 
 #endif

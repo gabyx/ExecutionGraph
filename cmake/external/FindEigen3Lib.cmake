@@ -3,6 +3,10 @@
 # defines EIGEN_INCLUDE_DIR
 include(FindPackageHandleStandardArgs)
 
+set(URL "http://bitbucket.org/eigen/eigen/get/3.3.4.zip")
+set(TAG "3.2")
+set(INSTALL_DIR "${ExecutionGraph_EXTERNAL_INSTALL_DIR}/memory")
+
 # Try to find the library, if it is installed!
 # otherwise download it
 find_package(Eigen3)
@@ -14,11 +18,11 @@ if(NOT EXISTS "${EIGEN3_INCLUDE_DIR}")
     include(DownloadProject)
     download_project(PROJ              eigen3
                     PREFIX             "${ExecutionGraph_EXTERNAL_BUILD_DIR}/eigen"
-                    # HG_REPOSITORY     https://bitbucket.org/eigen/eigen
-                    # HG_TAG            3.2
-                    URL                 http://bitbucket.org/eigen/eigen/get/3.3.4.zip
+                    # HG_REPOSITORY     ${URL}
+                    # HG_TAG            ${TAG}
+                    URL                 ${URL}
                     UPDATE_DISCONNECTED 1
-                    INSTALL_DIR "${CMAKE_BINARY_DIR}/external/install/eigen")
+                    INSTALL_DIR "${INSTALL_DIR}")
 
     set(EIGEN3_INCLUDE_DIR "${eigen3_SOURCE_DIR}" CACHE STRING "eigen library (https://bitbucket.org/eigen/eigen) include directory" FORCE)
     # define a path in the cache where to find this downloaded library

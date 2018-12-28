@@ -18,7 +18,6 @@ function(include_all_source_ExecutionGraph
     
     set(${SRC}
         ${ExecutionGraph_ROOT_DIR}/src/DemangleTypes.cpp
-        ${ExecutionGraph_ROOT_DIR}/src/CommandLineArguments.cpp
 
         ${ExecutionGraph_ROOT_DIR}/src/LogicSocket.cpp
         ${ExecutionGraph_ROOT_DIR}/src/LogicNode.cpp
@@ -45,7 +44,6 @@ function(include_all_source_ExecutionGraph
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Platform.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/SfinaeMacros.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/TypeDefs.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/CommandLineArguments.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Identifier.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/IObjectID.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Factory.hpp
@@ -85,10 +83,10 @@ endfunction()
 
 function(setTargetCompileOptionsExecutionGraph target use_address_san use_leak_san)
 
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
-       CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+    if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR
+       ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
         message(STATUS "Setting Compile/Linker Options for Clang")
-        list(APPEND CXX_FLAGS_DEBUG "-fno-omit-frame-pointer"
+        list(APPEND CXX_FLAGS       "-fno-omit-frame-pointer"
                                     "-Wall"
                                     "-Werror"
                                     "-Wpedantic"
@@ -96,23 +94,25 @@ function(setTargetCompileOptionsExecutionGraph target use_address_san use_leak_s
                                     "-Wno-unused-local-typedef"
                                     "-ftemplate-backtrace-limit=0")
 
-    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        list(APPEND CXX_FLAGS_DEBUG "-fno-omit-frame-pointer"
+    elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+        list(APPEND CXX_FLAGS       "-fno-omit-frame-pointer"
                                     "-Wall"
                                     "-Werror"
                                     "-Wpedantic"
                                     "-Wno-unused-local-typedef"
-                                    "-Wno-documentation")
+                                    "-Wno-documentation"
+                                    "-Wno-unused-variable")
     elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
         message(ERROR "MSVC is not yet supported!")
     endif()
 
+
     if(${use_address_san})
-        if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
             # with clang 5.0.1: -fsanitize=address produces weird output in lldb for std::string ...
             list(APPEND CXX_FLAGS_DEBUG  "-fsanitize=address")
             set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address")
-        elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+        elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
             list(APPEND CXX_FLAGS_DEBUG "-fsanitize=address")
             set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address")
         elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
@@ -121,32 +121,26 @@ function(setTargetCompileOptionsExecutionGraph target use_address_san use_leak_s
     endif()
 
     if(${use_leak_san})
-        if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
             list(APPEND CXX_FLAGS_DEBUG  "-fsanitize=leak")
             set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=leak")
-        elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+        elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
             message(FATAL_ERROR "AppleClang does not support -fsanitize=leak (please check)")
         elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
             message(FATAL_ERROR "MSVC is not yet supported!")
         endif()
     endif()
 
-    # Link with experimental library
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        set(LINKER_FLAGS "${LINKER_FLAGS} -lc++experimental")
-    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-        set(LINKER_FLAGS "${LINKER_FLAGS} -lc++experimental")
-    elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
-        message(ERROR "MSVC is not yet supported!")
-    endif()
-
     target_compile_features(${target} PUBLIC cxx_std_17)
 
     # Compile flags.
-    target_compile_options(${target} PRIVATE $<$<CONFIG:Debug>:${CXX_FLAGS_DEBUG}> )
+    target_compile_options(${target} PRIVATE ${CXX_FLAGS} $<$<CONFIG:Debug>:${CXX_FLAGS_DEBUG}>)
 
     # Linker flags.
     set_property(TARGET ${target} PROPERTY LINK_FLAGS ${LINKER_FLAGS})
+
+    # Linking std-libraries
+    target_link_libraries(${target}  PUBLIC "c++fs" PUBLIC "c++experimental")
 
     if(OS_MACOSX)
         set_target_properties(${target} PROPERTIES

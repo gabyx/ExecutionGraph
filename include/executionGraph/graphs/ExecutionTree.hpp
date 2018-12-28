@@ -17,7 +17,7 @@
 #include <deque>
 #include <set>
 #include <unordered_set>
-
+#include <fmt/printf.h>
 #include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/DemangleTypes.hpp"
 #include "executionGraph/common/StringFormat.hpp"
@@ -488,24 +488,24 @@ namespace executionGraph
         {
             // Print execution order
             std::stringstream s;
-            std::string fmtH = "%-15s  |  %-6s  | %-8s   |  %-20s";
-            std::string fmt  = "%-15s  |  %-6i  | %-8i   |  %-20s";
+            std::string fmtH = "%-15s  |  %-6s  | %-8s   |  %-20s\n";
+            std::string fmt  = "%-15s  |  %-6i  | %-8i   |  %-20s\n";
             for(auto& g : m_groupExecList)
             {
                 s << "Execution order for group id: " << g.first << std::endl;
-                s << suffix << stringFormat(fmtH, "Name", "NodeId", "Priority", "NodeType") << std::endl;
-                s << suffix << stringFormat(fmtH, "---------------", "------", "--------", "--------") << std::endl;
+                s << suffix << fmt::printf(fmtH, "Name", "NodeId", "Priority", "NodeType") << std::endl;
+                s << suffix << fmt::printf(fmtH, "---------------", "------", "--------", "--------") << std::endl;
                 for(auto& p : g.second)
                 {
                     for(NodeData* nodeData : p.second)
                     {
                         auto* n = nodeData->m_node.get();
                         s << suffix
-                          << stringFormat(fmt, n->getName().c_str(), n->getId(), nodeData->m_priority, n->getTypeName().c_str())
+                          << fmt::printf(fmt, n->getName().c_str(), n->getId(), nodeData->m_priority, n->getTypeName().c_str())
                           << std::endl;
                     }
                 }
-                s << suffix << stringFormat(fmtH, "---------------", "------", "--------", "--------") << std::endl;
+                s << suffix << fmt::printf(fmtH, "---------------", "------", "--------", "--------") << std::endl;
             }
             return s.str();
         }
@@ -1177,5 +1177,5 @@ namespace executionGraph
     };
 }  // namespace executionGraph
 
-#    undef EXECGRAPH_EXECTREE_SOLVER_LOG
+#undef EXECGRAPH_EXECTREE_SOLVER_LOG
 #endif  // ExecutionTree_hpp

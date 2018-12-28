@@ -39,7 +39,8 @@
                   "replace": "apps/eg/src/environments/environment.ts",
                   "with": "apps/eg/src/environments/environment.prod.ts"
                 }
-              ]
+              ],
+              "baseHref": "./"
             },
             "dev": {
               "optimization": false,
@@ -60,6 +61,12 @@
           "configurations": {
             "production": {
               "browserTarget": "eg:build:production"
+            },
+            "dev": {
+              "browserTarget": "eg:build:dev"
+            },
+            "staging": {
+              "browserTarget": "eg:build:staging"
             }
           }
         },

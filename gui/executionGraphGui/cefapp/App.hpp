@@ -26,8 +26,9 @@ class App : public CefApp,
     IMPLEMENT_REFCOUNTING(App)
 
 public:
-    App(const std::path& clientSourcePath)
-        : m_clientSourcePath(clientSourcePath)
+    App(const std::string clientLoadUrl,
+        const std::path& clientSourcePath)
+        : m_clientLoadUrl(clientLoadUrl), m_clientSourcePath(clientSourcePath)
     {
     }
 
@@ -47,7 +48,8 @@ public:
 
 private:
     CefRefPtr<AppHandler> m_appHandler;  //!< The application handler.
-    std::path m_clientSourcePath;        //!< Client source path.
+    std::string m_clientLoadUrl;         //!< Client load url.
+    std::path m_clientSourcePath;        //!< Client source path (where to get the files from).
 };
 
 #endif

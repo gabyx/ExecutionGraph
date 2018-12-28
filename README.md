@@ -1,11 +1,13 @@
-This library is in alpha and still under development. First usable version will be `v1.0.1`.
-Note: This library is under heavy development on the `devGUI` branch! :-) Forking should mainly be considered for looking around :-), or contributing of course :)
+**This library is in alpha and still under development. First usable version will be `v1.1`. Note: This library is under heavy development on the `devGUI` branch! Forking should mainly be considered for looking around, or contributing of course.**
 
-# ExecutionGraph [![Build Status](https://travis-ci.org/gabyx/ExecutionGraph.svg?branch=master)](https://travis-ci.org/gabyx/ExecutionGraph) ![Deps](https://img.shields.io/badge/dependencies-eigen3,meta-blue.svg) ![System](https://img.shields.io/badge/system-linux,osx-lightgrey.svg)
-Fast Execution Graph consisting of Execution Nodes
+<img src="gui/executionGraphGui/client/apps/electron/resources/icon.svg" height="150px" style="display: inline;vertical-align: middle; horizontal-align:center"/>
 
-Be able to design and run such input/output graphs, such as this one used in [http://gabyx.github.io/GRSFramework/#videos] :
-![Execution Graphs like this](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)
+# ExecutionGraph [![Build Status](https://travis-ci.org/gabyx/ExecutionGraph.svg?branch=master)](https://travis-ci.org/gabyx/ExecutionGraph) ![System](https://img.shields.io/badge/system-linux,osx-lightgrey.svg)
+**Fast Execution Graph consisting of Execution Nodes**
+
+Be able to design and run such input/output graphs, such as the ones used for the work [here](http://gabyx.github.io/GRSFramework/#videos) (using this [graph](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)). A GUI is provided in from of a single-page Angular application with a backend HTTP server which allows interactive design/manipulation and execution of graphs: 
+
+![Current GUI](doc/ExecutionGraphGui.png)
 
 * [Installing and Dependencies](#installing-and-dependencies)
     * [OS X](#os-x)
@@ -18,23 +20,27 @@ Be able to design and run such input/output graphs, such as this one used in [ht
 * [Example 1:](#example-1)
 * [Contributors](#contributors)
 
+
 ## Installing and Dependencies
 To build the library, the tests and the example you need the build tool [cmake](
 http://www.cmake.org).
 This library has these dependencies:
 
-- [Eigen](http://eigen.tuxfamily.org) at least version 3, 
-- [meta](https://github.com/ericniebler/meta)
-- [googletest](https://github.com/google/googletest) (for tests)
-- [benchmark](https://github.com/google/benchmark) {benchmarks}
+#### Library
+- [meta](https://github.com/ericniebler/meta) (meta programming)
 - [crossguid](https://github.com/graeme-hill/crossguid) (guid implementation)
+- [rttr](https://github.com/rttrorg/rttr) (runtime type information, serialization only)
+#### GUI Backend
 - [args](https://github.com/Taywee/args) (argument parser)
 - [memory](https://github.com/foonathan/memory.git) (memory allocators)
-- [CEF](https://github.com/chromiumembedded/cef-project) (chrome embedded framwork, for GUI only)
-- [rttr](https://github.com/rttrorg/rttr) (runtime type information, for GUI only)
-- [spdlog](https://github.com/gabime/spdlog) (logs, for GUI only)
+- [spdlog](https://github.com/gabime/spdlog) (logs)
+#### GUI Client
+- [node](https://nodejs.org/) (client build)
+#### Testing
+- [googletest](https://github.com/google/googletest) (for tests)
+- [benchmark](https://github.com/google/benchmark) (for benchmarks)
 
-The library `Eigen`, `meta`, `rttr`, `memory` can be installed in some system specific location. However, all dependencies are searched, downloaded and build if not found, during the first super build run.
+For easy building, all dependencies are searched, downloaded and build if not found, during the first super build run.
 
 ### OS X
 Install `clang` with [homebrew](https://brew.sh) by **updateing your xcode installation**, 
@@ -42,64 +48,18 @@ installing a [code-sign certificate](https://llvm.org/svn/llvm-project/lldb/trun
 for lldb and then running:
 ```bash
     brew install --HEAD llvm --with-toolchain --with-lldb
-    brew install eigen
+```
+or manually install
+```bash
+git clone https://github.com/llvm-project/llvm-project-20170507 llvm-project
+mkdir llvm-build && cd llvm-build
+cmake ../llvm-project/llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS="clang;libcxx;libcxxabi;lldb;compiler-rt;lld;polly" -DCMAKE_INSTALL_PREFIX="/usr/local/opt/llvm-7.0"
+make -j install
 ```
 We install the latest llvm build, since clang5.0.1 has problems showing `std::string` correctly while using `-fsanitize=address`.
 With Clang 7.0 no problems have been detected.
 
-Set the `CXX` and `CC` variables in your `~/.bash_profile` or similar to 
-```bash
-export OLD_PATH="$PATH"
-function enableCompiler(){
-  comp="$1"
-  if [[ ${comp} == "clang" ]] ; then
-    echo "enabling clang7.0"
-    export PATH="/usr/local/opt/llvm/bin:$OLD_PATH"
-    export CC="/usr/local/opt/llvm/bin/clang"
-    export CXX="${CC}++"
-    export LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
-    export CPPFLAGS="-I/usr/local/opt/llvm/include -I/usr/local/opt/llvm/include/c++/v1/"
-    export CXXFLAGS="$CPPFLAGS"
-  elif [[ ${comp} == "clang6" ]] ; then
-    echo "enabling clang6"
-     export PATH="/usr/local/opt/myllvm6.0rc1/bin:$OLD_PATH"
-    export CC="/usr/local/opt/myllvm6.0rc1/bin/clang"
-    export CXX="${CC}++"
-    export LDFLAGS="-L/usr/local/opt/myllvm6.0rc1/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
-    export CPPFLAGS="-I/usr/local/opt/myllvm6.0rc1/include -I/usr/local/opt/myllvm6.0rc1/include/c++/v1/"
-    export CXXFLAGS="$CPPFLAGS"
-  elif [[ ${comp} == "gcc" ]] ; then
-    echo "enabling gcc7.2"
-    export PATH="/usr/local/opt/$comp/bin:$OLD_PATH"
-    export CC="/usr/local/opt/$comp/bin/gcc-7"
-    export CXX="/usr/local/opt/$comp/bin/g++-7"
-    export LDFLAGS="-L/usr/local/opt/$comp/lib/gcc/7 -Wl,-rpath,/usr/local/opt/$comp/lib/gcc/7"
-    export CPPFLAGS="-I/usr/local/opt/$comp/include -I/usr/local/opt/$comp/include/c++/7.2.0"
-    export CXXFLAGS="$CPPFLAGS"
-  elif [[ ${comp} == "gcc@4.9" ]] ; then
-    echo "enabling gcc@4.9"
-    export PATH="/usr/local/opt/$comp/bin:$OLD_PATH"
-    export CC="/usr/local/opt/$comp/bin/gcc-4.9"
-    export CXX="/usr/local/opt/$comp/bin/g++-4.9"
-    export LDFLAGS="-L/usr/local/opt/$comp/lib/gcc/4.9 -Wl,-rpath,/usr/local/opt/$comp/lib/gcc/4.9"
-    export CPPFLAGS="-I/usr/local/opt/$comp/include -I/usr/local/opt/$comp/include/c++/4.9.4/"
-    export CXXFLAGS="$CPPFLAGS"
-  else
-    echo "enabling no compiler"
-    export PATH="$OLD_PATH"
-    export CC=
-    export CXX=
-    export LDFLAGS=
-    export CPPFLAGS=
-    export CXXFLAGS=
-  fi
-}
-export -f enableCompiler
-
-enableCompiler "clang"
-```
-Use the `enableCompiler` function to quickly switch to another compiler, e.g. `gcc`.
-Restart VS Code if you reconfigured!
+Set the `CXX` and `CC` variables in your `~/.bash_profile` or similar to `tools/.compiler_profile`.
 Now you should be ready to configure with cmake:
 
 ## Buidling
@@ -107,8 +67,14 @@ Now you should be ready to configure with cmake:
     cd <pathToRepo>
     mkdir build
     cd build
-    # configuring the superbuild
-    cmake .. -DUSE_SUPERBUILD=ON
+    # configuring the superbuild (-DUSE_SUPERBUILD=ON is optional)
+    cmake .. -DUSE_SUPERBUILD=ON \
+         -DExecutionGraph_BUILD_TESTS=true \
+         -DExecutionGraph_BUILD_LIBRARY=true \
+         -DExecutionGraph_BUILD_GUI=true \
+         -DExecutionGraph_EXTERNAL_BUILD_DIR="$(pwd)/external" \
+         -DExecutionGraph_USE_ADDRESS_SANITIZER=true \
+         -DCMAKE_EXPORT_COMPILE_COMMANDS=true
     # building the superbuild configuration 
     make -j all
     # configuring the actual build
@@ -116,45 +82,44 @@ Now you should be ready to configure with cmake:
     # building the library/gui
     make -j <targetName>
 ```
-We use a super build setup. The first cmake configure and build by using `-DUSE_SUPERBUILD=ON` (automatically set at first run) will download every dependency and build the ones which need installing (currently [rttr](http://www.rttr.org/), [memory](https://github.com/foonathan/memory.git), [crossguid](https://github.com/graeme-hill/crossguid)). See the path `build/external`. The path `build/external/install` is used for all built dependencies during the super build. If you configure cmake in VS Code with the extension, the external build path is set to `buildFolder` for convenience to be able to quickly delete certain dependencies without deleting the normal build folder `build`).   
+We use a super build setup. The first cmake configure and build by using `-DUSE_SUPERBUILD=ON` (automatically set at first run) will download every dependency and build the ones which need installing.
+ See the cmake variable `ExecutionGraph_EXTERNAL_BUILD_DIR` which is used for building all external dependencies to be able to quickly delete certain dependencies without deleting the normal build folder `build`). 
 After the super build, the cmake cache file `CMakeCache.txt` is setup with all necessary variables, that **later** cmake *configure* invocations will find all dependencies 
 and configure the actual project. This works also with VS Code and the cmake extension.
+
+# Contributing
+This project supports [Visual Studio Code](https://code.visualstudio.com/).
+and is warmly recommended.
+
+**Note:** Dont use the [multi-root workspaces](https://code.visualstudio.com/docs/editor/multi-root-workspaces) feature in VS Code since the C++ Extension does not yet support this and code completion won't work properly.
+
 
 ## General Development Setup
 If you start developing, install the pre-commit/post-commit hooks with:
 ```bash
-    npm install -g typescript-formatter json-fmt xmllint
+    npm install -g json-fmt xmllint
     brew install plantuml
     cd .git && mv hooks hooks.old && ln -s ../tools/git-hooks hooks
 ```
 
 ### Codeformatting
+You can run the same pre-commit hook by doing 
 ``` 
     tools/formatAll.sh
 ```
-
-### On OS X
-Install XCode and the CommandLine Tools from [Apple](https://developer.apple.com/download/more/)  
-Install [Visual Studio Code](https://code.visualstudio.com/)  
-Install the following extensions for VS Code:
-- [C++ Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
-- [CMake Language Ext.](https://marketplace.visualstudio.com/items?itemName=twxs.cmake)
-- [CMake Build Ext.](https://marketplace.visualstudio.com/items?itemName=vector-of-bool.cmake-tools)
-- [CMake Tool Helper Ext.](https://marketplace.visualstudio.com/items?itemName=vector-of-bool.cmake-tools)
-
-**Note:** Dont use the [multi-root workspaces](https://code.visualstudio.com/docs/editor/multi-root-workspaces) feature in VS Code since the C++ Extension does not yet support this and code completion won't work properly.
+which will format all files for which formatting styles have been defined in the repository.
 
 ## GUI Development Setup
-The UI is made up of an [Angular](https://angular.io) application that uses the [Angular CLI](https://cli.angular.io) to create the web assets that are ultimately displayed in a [CEF](https://bitbucket.org/chromiumembedded/cef) browser.
-Please visit the Angular CLI website for its prerequisites (node.js and npm respectively, also a globally installed Angular CLI aka `ng` ).
+The UI is made up of an [Angular](https://angular.io) application that uses the [Angular CLI](https://cli.angular.io) to create the web assets that are ultimately displayed in an [electron app](https://electronjs.org/) browser.
+The client backend consists of a http server which provides the executiong graph.
+Please visit the Angular CLI website for its prerequisites (node.js and npm respectively, also a globally installed Angular CLI aka `ng`).
 Once you installed the prerequisites build the client application by navigating to the client directory and starting the build process.
 
 ```bash
-cd gui/client
-npm run build
+cd gui/executionGraphGui/client
+npm install
+npm run serve
 ```
-
-![Screenshot](doc/executionGraphGui.png)
 
 For more information about the development of the client application please refer to the dedicated [client documentation](gui/client/README.md)
 

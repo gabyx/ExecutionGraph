@@ -24,6 +24,11 @@ AppCLArgs::AppCLArgs(int argc, char* argv[])
                          "Source path to the client application.",
                          {'c', "clientSourcePath"},
                          this->getApplicationPath().parent_path().append("/../client/apps/eg"))
+    , m_clientLoadUrl(m_parser,
+                      "clientUrl",
+                      "Url which is loaded at startup.",
+                      {'u', "clientLoadUrl"},
+                      "client://executiongraph/index.html")
     , m_logPath(m_parser,
                 "logPath",
                 "Directory path where all logs are placed.",

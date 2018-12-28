@@ -24,13 +24,8 @@
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
-    A move-only response promise wrapper.
-
-    Such an instance is created by a `BackendResourceHandler`, 
-    which will move it to the BackendRequestHandler.
-
-    The `BackendResourceHandler` will extract the future for read access to the payload
-    once the `ResponsePromise` has been resolved. 
+    A response object corresponding to a request which is handled
+    by handler in the `RequestDispatcher`.
 
     @date Thu Feb 22 2018
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
@@ -53,13 +48,24 @@ public:
     using Allocator = BufferPool;
     using Id        = executionGraph::Id;
 
-protected:
+public:
     ResponsePromise(const Id& requestId,
                     std::shared_ptr<Allocator> allocator,
-                    bool bCancelOnDestruction = true)
+                    bool bResolveOnDestruction = true)
         : m_requestId(requestId)
         , m_allocator(allocator)
-        , m_bCancelOnDestruction(bCancelOnDestruction){};
+        , m_resolveOnDestruction(bResolveOnDestruction)
+    {
+    }
+
+    virtual ~ResponsePromise()
+    {
+        if(m_resolveOnDestruction && !isResolved())
+        {
+            EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', has not been resolved. It will be cancled!", m_requestId.toString());
+            setCanceled(std::make_exception_ptr(std::runtime_error("Cancled promise on destruction, because not handled properly!")));
+        }
+    };
 
     ResponsePromise(const ResponsePromise&) = delete;
     ResponsePromise& operator=(const ResponsePromise&) = delete;
@@ -74,19 +80,17 @@ protected:
         m_promisePayload       = std::move(other.m_promisePayload);
         m_allocator            = other.m_allocator;
         m_state                = other.m_state;
-        m_bCancelOnDestruction = other.m_bCancelOnDestruction;
+        m_resolveOnDestruction = other.m_resolveOnDestruction;
 
-        // dont do anything in the moved-from object.
-        other.m_bCancelOnDestruction = false;
+        // Don't do anything in the moved-from object.
+        other.m_resolveOnDestruction = false;
         return *this;
     };
 
 public:
-    virtual ~ResponsePromise() = default;
-
-public:
-    //! Callback for signaling that the response object is available with payload `payload` (default=empty).
-    void setReady(Payload&& payload = {})
+    //! Callback for signaling that the response object
+    //! is available with payload `payload` (default=empty).
+    virtual void setReady(Payload&& payload)
     {
         m_promisePayload.set_value(std::move(payload));
         if(m_state != State::Nothing)
@@ -95,11 +99,23 @@ public:
             return;
         }
         m_state = State::Ready;
-        setReadyImpl();  // forward to actual instance
+    }
+
+    //! Callback for signaling that the response object is available with payload `payload` (default=empty).
+    virtual void setReady()
+    {
+        m_promisePayload.set_value(Payload{Payload::Buffer{m_allocator}, "application/octet-stream"});
+        if(m_state != State::Nothing)
+        {
+            EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', is already set to a state!", m_requestId.toString());
+            return;
+        }
+        m_state = State::Ready;
     }
 
     //! Callback for signaling that this request is cancled.
-    void setCanceled(std::exception_ptr exception)
+    //! Exception can be nullptr.
+    virtual void setCanceled(std::exception_ptr exception)
     {
         if(m_state != State::Nothing)
         {
@@ -107,8 +123,10 @@ public:
             return;
         }
         m_state = State::Canceled;
-        m_promisePayload.set_exception(exception);
-        setCanceledImpl(exception);  // forward to actual instance
+        if(exception)
+        {
+            m_promisePayload.set_exception(exception);
+        }
     }
 
     bool isResolved() { return m_state != State::Nothing; }
@@ -116,27 +134,9 @@ public:
     //! Return the allocator for allocating the payload.
     auto getAllocator() { return m_allocator; }
 
-protected:
-    virtual void setReadyImpl()                                = 0;
-    virtual void setCanceledImpl(std::exception_ptr exception) = 0;
-
-    //! Function to be called in derived classed, which want to automatically
-    //! resolve on destruction!
-    virtual void setResolveOnDestruction()
-    {
-        if(!isResolved())
-        {
-            if(m_bCancelOnDestruction)
-            {
-                EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', has not been resolved. It will be cancled!", m_requestId.toString());
-                setCanceled(std::make_exception_ptr(std::runtime_error("Cancled promise on destruction, because not handled properly!")));
-            }
-        }
-    }
-
 private:
     friend class ResponseFuture;
-    Id m_requestId;                          //! The id of the corresponding request.
+    Id m_requestId;                          //!< The id of the corresponding request.
     std::promise<Payload> m_promisePayload;  //!< Response Data which gets set in `setReady`.
 
     // todo: Up to now: Hand over the buffer to Dispatcher thread, it will be used in the FlatBufferBuilder
@@ -145,7 +145,7 @@ private:
     std::shared_ptr<Allocator> m_allocator;  //! Thread-safe allocator which allocates a buffer for us.
 
     State m_state               = State::Nothing;  //!< The state of this promise
-    bool m_bCancelOnDestruction = false;           //!< If the promise should be cancled on destruction.
+    bool m_resolveOnDestruction = false;           //!< If the promise should be cancled on destruction.
 };
 
 /* ---------------------------------------------------------------------------------------*/
@@ -170,22 +170,27 @@ public:
         : m_requestId(responsePromise.m_requestId)
         , m_payloadFuture(responsePromise.m_promisePayload.get_future()){};
 
-    //! Copy forbidden
+    //! Copy forbidden.
     ResponseFuture(const ResponseFuture&) = delete;
     ResponseFuture& operator=(const ResponseFuture&) = delete;
 
-    //! Move allowed
+    //! Move allowed.
     ResponseFuture(ResponseFuture&&) = default;
     ResponseFuture& operator=(ResponseFuture&&) = default;
 
     ~ResponseFuture() = default;
 
 public:
-    auto& getFuture() { return m_payloadFuture; }
+    //! See if payload future is valid (a state has been set!).
+    bool isValid() { return m_payloadFuture.valid(); }
+
+    //! Wait for the payload to be resolved (blocking),
+    //! throwing exception if any happens.
+    auto waitForPayload() { return m_payloadFuture.get(); }
 
 private:
-    Id m_requestId;  //!< The id of the corresponding request.
-    std::future<Payload> m_payloadFuture;
+    Id m_requestId;                        //!< The id of the corresponding request.
+    std::future<Payload> m_payloadFuture;  //!< The future object refering to the payload promise (possibly in another thread).
 };
 
 #endif

@@ -13,24 +13,24 @@
 #ifndef executionGraphGui_common_Request_hpp
 #define executionGraphGui_common_Request_hpp
 
+#include <optional>
 #include <string>
 #include <rttr/type>
 #include <executionGraph/common/FileSystem.hpp>
 #include <executionGraph/common/IObjectID.hpp>
-class BinaryPayload;
+#include "executionGraphGui/common/BinaryPayload.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
 /*!
     General Request Message
 
-    A BackendRequestHandler is handling such a request. It can be registered in
-    the message dispatcher for handling one or several request ids (see `m_requestURL`)
-    The request id is in the form "category/subcategory" (e.g. "graphManip/addNode").
-    We use a category and a subcategory to be able to structure requests into groups.
-    Also for the future, when more and more requests get added.
+    A `BackendRequestHandler` is handling such a request. It can be registered in
+    the message dispatcher for handling one or several request targets 
+    (see `m_requestTarget`).
+    The request target is a normal absolute path.
 
-    The serializer which decodes the payload is kept outside of this class and other derived
-    ones.
+    The serializer which decodes the payload is kept outside of this class 
+    and other derived ones.
 
     @date Thu Feb 22 2018
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
@@ -44,31 +44,41 @@ class Request : public executionGraph::IObjectID
 public:
     using Payload = BinaryPayload;
 
-protected:
-    Request(const std::path& requestURL)
+public:
+    Request(std::path requestTarget,
+            std::optional<Payload> payload = std::nullopt)
         : m_id()
-        , m_requestURL(requestURL)
+        , m_requestTarget(std::move(requestTarget))
+        , m_payload{std::move(payload)}
     {}
 
-public:
     virtual ~Request() = default;
 
-public:
-    //! Get the request url describing this message.
-    const std::path& getURL() const { return m_requestURL; }
-    //! Set the request url describing this message.
-    void setURL(const std::path& requestURL) { m_requestURL = requestURL; }
+    Request(Request&&) = default;
+    Request& operator=(Request&&) = default;
+
+    Request(const Request&) = delete;
+    Request& operator=(const Request&&) = delete;
 
 public:
-    //! Get the payload of this request. Nullptr if there is no payload for this request.
-    //! The return value does not need to be thread-safe.
-    virtual const Payload* getPayload() const = 0;
+    //! Get the request target describing this message.
+    const std::path& getTarget() const { return m_requestTarget; }
+
+public:
+    //! Get the payload of this request.
+    const std::optional<Payload>& getPayload() const { return m_payload; }
+    //! Get the payload of this request.
+    std::optional<Payload>& getPayload() { return m_payload; }
 
 private:
-    //! The request URL (it will get adjusted during request forwarding)
-    //! e.g. "graph/addNode"
-    //! e.g. "general/addGraph"
-    std::path m_requestURL;
+    //! The request target path
+    //! e.g. "/executiongraph-backend/graph/addNode", 
+    //! e.g. "/executiongraph-backend/general/addGraph" 
+    //! etc.
+    std::path m_requestTarget;
+
+    //! The optional payload.
+    std::optional<Payload> m_payload;
 };
 
 #endif

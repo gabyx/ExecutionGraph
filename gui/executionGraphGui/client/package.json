@@ -1,22 +1,24 @@
 {
   "name": "eg",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "license": "MIT",
+  "author": "Gabriel Nützi, Simon Spörri",
+  "description": "Write execution graphs n shit yo",
   "scripts": {
-    "ng": "ng",
     "copy-flatbuffer-files": "bash scripts/copyFlatBuffersBuildFiles.sh",
     "prebuild": "npm run copy-flatbuffer-files",
-    "start": "npm run prebuild && ng serve --project=eg",
-    "build": "npm run prebuild && ng build --project=eg --configuration=dev --watch",
-    "build-prod": "npm run prebuild &&  ng build --project=eg --prod --watch",
-    "build-prod-app-eg": "npm run prebuild && ng build --project=eg --prod",
-    "test": "npm run prebuild && ng test",
+    "serve": "ng serve --project=eg",
+    "serve-dev": "ng serve --project=eg --configuration=dev --proxy-config=proxy.conf.json",
+    "build": "ng build --project=eg",
+    "build-dev": "npm run build -- --configuration=dev",
+    "build-prod": "npm run build -- --prod",
+    "test": "ng test",
     "lint": "./node_modules/.bin/nx lint && ng lint",
     "e2e": "ng e2e",
     "affected:apps": "./node_modules/.bin/nx affected:apps",
     "affected:build": "./node_modules/.bin/nx affected:build",
     "affected:e2e": "./node_modules/.bin/nx affected:e2e",
-    "format": "./node_modules/.bin/nx format:write",
+    "format": "./node_modules/.bin/nx `ormat:write",
     "format:write": "./node_modules/.bin/nx format:write",
     "format:check": "./node_modules/.bin/nx format:check",
     "update": "ng update @nrwl/schematics",
@@ -26,7 +28,15 @@
     "workspace-schematic": "./node_modules/.bin/nx workspace-schematic",
     "help": "./node_modules/.bin/nx help",
     "affected:test": "./node_modules/.bin/nx affected:test",
-    "affected:lint": "./node_modules/.bin/nx affected:lint"
+    "affected:lint": "./node_modules/.bin/nx affected:lint",
+    "electron:build": "tsc -p apps/electron/tsconfig.electron.json",
+    "electron:start": "electron dist/main.js",
+    "electron:serve": "npm run electron:build && electron dist/main.js --serve",
+    "electron:serve:local": "npm-run-all -p serve electron:serve",
+    "electron:serve:local-dev": "npm-run-all -p serve-dev electron:serve",
+    "electron:package-test": "electron-builder --dir dist",
+    "electron:package": "electron-builder",
+    "native:package": "npm-run-all -s build-prod electron:build electron:package"
   },
   "private": true,
   "dependencies": {
@@ -53,6 +63,7 @@
     "guid-typescript": "^1.0.7",
     "long": "^4.0.0",
     "material-design-icons": "^3.0.1",
+    "minimist": "^1.2.0",
     "msgpack-lite": "^0.1.26",
     "npm": "^5.10.0",
     "rxjs": "6.3.3",
@@ -65,13 +76,16 @@
     "@angular/cli": "7.0.1",
     "@angular/compiler-cli": "7.0.0",
     "@angular/language-service": "7.0.0",
-    "@ngrx/store-devtools": "6.0.1",
+    "@ngrx/store-devtools": "6.1.0",
     "@nrwl/schematics": "^6.2.0",
     "@types/flatbuffers": "^1.9.0",
     "@types/jasmine": "~2.8.6",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
     "codelyzer": "~4.2.1",
+    "electron": "^3.0.9",
+    "electron-builder": "^20.34.0",
+    "electron-reload": "^1.3.0",
     "jasmine-core": "~2.99.1",
     "jasmine-marbles": "0.3.1",
     "jasmine-spec-reporter": "~4.2.1",
@@ -81,10 +95,39 @@
     "karma-jasmine": "~1.1.0",
     "karma-jasmine-html-reporter": "^0.2.2",
     "ngrx-store-freeze": "0.2.4",
+    "npm-run-all": "^4.1.3",
     "prettier": "^1.10.2",
     "protractor": "^5.4.0",
     "ts-node": "~5.0.1",
     "tslint": "~5.9.1",
     "typescript": "3.1.3"
-  }
+  },
+  "build": {
+    "appId": "executionGraphGui",
+    "productName": "ExecutionGraphGui",
+    "copyright": "Copyright © 2018 ${author}",
+    "directories": {
+      "output": "build"
+    },
+    "linux": {
+      "target": "tar.gz",
+      "icon": "apps/electron/resources/icon.png"
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "com.${name}.app",
+      "icon": "apps/electron/resources/icon.png"
+    },
+    "win": {
+      "target": "zip",
+      "icon": "apps/electron/resources/icon.png"
+    },
+    "files": [
+      "dist"
+    ],
+    "extraFiles": [
+      "apps/electron/resources/icon.png"
+    ]
+  },
+  "main": "dist/main.js"
 }

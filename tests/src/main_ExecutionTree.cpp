@@ -82,7 +82,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 
     execTree.setup();
 
-    EXECGRAPH_LOG_TRACE(execTree.getExecutionOrderInfo());
+    EXECGRAPH_LOG_TRACE("\n" + execTree.getExecutionOrderInfo());
 
     execTree.runExecute(0);
 

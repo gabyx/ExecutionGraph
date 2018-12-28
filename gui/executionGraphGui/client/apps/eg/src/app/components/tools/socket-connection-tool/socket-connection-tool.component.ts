@@ -4,9 +4,11 @@ import { Point, ConnectionDrawStyle, GraphComponent } from '@eg/graph';
 import { ILogger, LoggerFactory } from '@eg/logger';
 
 import { ToolComponent } from '../tool-component';
+import { Id } from '@eg/common';
 import { OutputSocket, InputSocket, Connection, Socket, SocketIndex } from '../../../model';
 import { GraphsState } from '../../../+state/reducers';
 import { AddConnection } from '../../../+state/actions';
+import { getSelectedGraph } from '../../../+state/selectors';
 
 @Component({
   selector: 'eg-socket-connection-tool',
@@ -29,11 +31,13 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
   private sourceSocket: Socket;
   private targetSocket: Socket;
 
+  private selectedGraphId: Id;
   private readonly logger: ILogger;
 
   constructor(private graph: GraphComponent, private store: Store<GraphsState>, loggerFactory: LoggerFactory) {
     super();
     this.logger = loggerFactory.create('SocketConnectionToolComponent');
+    store.select(getSelectedGraph).subscribe(graph => (this.selectedGraphId = graph.id));
   }
 
   ngOnInit() {
@@ -107,7 +111,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
 
   private addConnection(source: Socket, target: Socket) {
     // Create the connection
-    this.store.dispatch(new AddConnection(source, target));
+    this.store.dispatch(new AddConnection(this.selectedGraphId, source, target, false));
     this.abortConnection();
   }
 }

@@ -1,7 +1,5 @@
 <mat-toolbar>
   <mat-toolbar-row>
-    <h1>Execution Graph</h1>
-
     <mat-menu #fileMenu="matMenu">
       <button mat-menu-item routerLink="/graph/new">
         <mat-icon>add</mat-icon>
@@ -57,7 +55,7 @@
       <mat-icon>info</mat-icon> View
     </button>
     <button mat-button [matMenuTriggerFor]="executionMenu">
-      <mat-icon>play_arrow</mat-icon> Execution
+      <mat-icon>play_arrow</mat-icon> Run
     </button>
 
   </mat-toolbar-row>

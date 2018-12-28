@@ -65,7 +65,7 @@ namespace
 
             // Allocate BinaryBuffer
             BinaryBuffer<BufferPool> buffer(allocator, element->GetBytesCount());
-            element->GetBytes(buffer.getSize(), static_cast<void*>(buffer.getData()));
+            element->GetBytes(buffer.size(), static_cast<void*>(buffer.data()));
             EXECGRAPHGUI_LOGCODE_DEBUG(printPostData(buffer));
             EXECGRAPHGUI_APPLOG_DEBUG("BackendResourceHandler: Read last post data element: bytes: '{0}'.", element->GetBytesCount());
             payload = RequestCef::Payload{std::move(buffer), mimeType};
@@ -99,7 +99,6 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
 {
     CEF_REQUIRE_IO_THREAD();
 
-    auto& future      = m_responseFuture.getFuture();
     std::string error = "Unknown Exception";
 
     responseLength = 0;
@@ -107,15 +106,15 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
 
     try
     {
-        EXECGRAPHGUI_THROW_IF(!future.valid(), "Future is invalid!");
+        EXECGRAPHGUI_THROW_IF(!m_responseFuture.isValid(), "Future is invalid!");
 
-        m_payload = future.get();  // Set the payload!
+        m_payload = m_responseFuture.waitForPayload();  // Get the payload!
 
-        m_bufferSize = responseLength = m_payload.getBuffer().getSize();  // set the response byte size (can be empty)
+        m_bufferSize = responseLength = m_payload.buffer().size();  // set the response byte size (can be empty)
         if(responseLength)
         {
-            response->SetMimeType(m_payload.getMIMEType());  // set the mime type
-            m_buffer = m_payload.getBuffer().getData();      // set the buffer pointer (can be nullptr!)
+            response->SetMimeType(m_payload.mimeType());  // set the mime type
+            m_buffer = m_payload.buffer().data();      // set the buffer pointer (can be nullptr!)
         }
         response->SetStatusText("handled");
         response->SetStatus(200);  // http status code: 200 := The request has been handled! (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
@@ -170,7 +169,7 @@ bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
     // over to the message dispatcher.
     ////////////////////////////////////////////////////
     // Make a RequestCef (move the payload into it)
-    auto requestCef = std::make_unique<RequestCef>(m_requestURL, std::move(payload));
+    auto requestCef = std::make_unique<RequestCef>(m_requestTarget, std::move(payload));
     // Make a ResponseCef
     auto responseCef = std::make_unique<ResponsePromiseCef>(cbResponseHeaderReady, requestCef->getId(), m_allocator, true);
     // Get the future out
@@ -226,10 +225,10 @@ bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
     }
 
     // Exctract requestId
-    // e.g. m_requestURL := "catergory/subcategory/command"
-    m_requestURL = executionGraph::splitLeadingSlashes(CefString(urlParts.path.str).ToString());
+    // e.g. m_requestTarget := "catergory/subcategory/command"
+    m_requestTarget = executionGraph::splitLeadingSlashes(CefString(urlParts.path.str).ToString());
 
-    if(m_requestURL.empty())
+    if(m_requestTarget.empty())
     {
         EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler '{0}' : url '{1}': requestId extract failed!",
                                   getName(),
@@ -265,7 +264,7 @@ bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
 //! Finish handling the request: Reset everything and signal callback.
 void BackendResourceHandler::reset()
 {
-    m_requestURL.clear();
+    m_requestTarget.clear();
     m_query.clear();
     m_mimeType.clear();
     m_buffer     = nullptr;

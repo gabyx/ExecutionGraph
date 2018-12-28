@@ -4,8 +4,8 @@ import { Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 
-import { of, from, Observable } from 'rxjs';
-import { map, tap, switchMap, catchError, filter, withLatestFrom, exhaustMap, mergeMap } from 'rxjs/operators';
+import { of, from, Observable, merge as mergeObservables } from 'rxjs';
+import { map, tap, catchError, filter, withLatestFrom, mergeMap } from 'rxjs/operators';
 
 import { Id } from '@eg/common';
 import { LoggerFactory, ILogger } from '@eg/logger';
@@ -64,14 +64,14 @@ export class GraphEffects {
   );
 
   @Effect()
-  createNode$ = this.actions$.ofType<fromGraph.CreateNode>(fromGraph.CREATE_NODE).pipe(
+  createNode$ = this.actions$.ofType<fromGraph.AddNode>(fromGraph.ADD_NODE).pipe(
     mergeMap((action, state) =>
-      from(this.graphManipulationService.addNode(action.graphId, action.nodeType.name, 'Node')).pipe(
+      from(this.graphManipulationService.addNode(action.graphId, action.nodeType.type, 'Node')).pipe(
         map(node => ({ node, action }))
       )
     ),
     mergeMap(({ node, action }) => [
-      new fromGraph.NodeAdded(node),
+      new fromGraph.NodeAdded(action.graphId, node),
       new fromGraph.MoveNode(node, action.position ? action.position : { x: 0, y: 0 }),
       new fromNotifications.ShowNotification(`Added the node '${node.name}' for you \u{1F6EB}`)
     ])
@@ -92,18 +92,24 @@ export class GraphEffects {
       from(this.graphManipulationService.removeNode(action.graphId, action.nodeId)).pipe(map(() => action))
     ),
     mergeMap(action => [
-      new fromGraph.NodeRemoved(action.nodeId),
+      new fromGraph.NodeRemoved(action.graphId, action.nodeId),
       new fromNotifications.ShowNotification(`Removed the node for you \u{1F6EB}`)
     ])
   );
 
   @Effect()
   addConnection$ = this.actions$.ofType<fromGraph.AddConnection>(fromGraph.ADD_CONNECTION).pipe(
-    map((action, state) => {
-      return new fromGraph.ConnectionAdded(Connection.create(action.source, action.target));
+    mergeMap(action =>
+      from(
+        this.graphManipulationService.addConnection(action.graphId, action.source, action.target, action.cycleDetection)
+      ).pipe(map(conn => ({ conn, action })))
+    ),
+    map(({ conn, action }) => {
+      return new fromGraph.ConnectionAdded(action.graphId, conn);
     }),
-    catchError(error => {
-      return of(new fromNotifications.ShowNotification(`Adding connection failed!: ${error}`, 5000));
+    catchError((error, caught) => {
+      this.store.dispatch(new fromNotifications.ShowNotification(`Adding connection failed!: ${error}`, 5000));
+      return caught;
     })
   );
 
@@ -112,7 +118,7 @@ export class GraphEffects {
     const graphDescs = await this.generalInfoService.getAllGraphTypeDescriptions();
     const graphDesc = graphDescs[0];
     const graphTypeId = graphDesc.id;
-    const nodeType = 'Normalize';
+    const nodeType = graphDesc.nodeTypeDescritptions[0].type;
 
     // Add a graph
     let graph = await this.graphManagementService.addGraph(graphTypeId);
