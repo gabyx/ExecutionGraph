@@ -88,8 +88,7 @@ After the super build, the cmake cache file `CMakeCache.txt` is setup with all n
 and configure the actual project. This works also with VS Code and the cmake extension.
 
 # Contributing
-This project supports [Visual Studio Code](https://code.visualstudio.com/).
-and is warmly recommended.
+This project supports [Visual Studio Code](https://code.visualstudio.com/) which is warmly recommended.
 
 **Note:** Dont use the [multi-root workspaces](https://code.visualstudio.com/docs/editor/multi-root-workspaces) feature in VS Code since the C++ Extension does not yet support this and code completion won't work properly.
 
@@ -153,35 +152,10 @@ Static type dispatching avoids the use of virtual calls when using polymorphic o
 
 ## Example 1: 
 Source: `examples/libraryUsage`   
-Let us build the simple directed graph below:
-```
-Node 1a,0
-+-------+
-|i0     |
-|     o0+------+   Node 3a,4
-|i1     |      |   +-------+
-+-------+      +--->i0     |
-Node 1b,1          |     o0+-----+
-+-------+      +--->i1     |     |
-|i0     |      |   +-------+     |
-|     o0+------+                 |
-|i1     |                        |   Node 4a,6
-+-------+                        |   +-------+
-                                 +--->i0     |
-                                     |     o0|
-Node 2a,2                        +--->i1     |
-+-------+                        |   +-------+
-|i0     |                        |
-|     o0+------+   Node 3b,5     |
-|i1     |      |   +-------+     |
-+-------+      +--->i0     |     |
-Node 2b,3          |     o0+-----+
-+-------+      +--->i1     |
-|i0     |      |   +-------+
-|     o0+------+
-|i1     |
-+-------+
-```
+Let us build the simple directed graph below: 
+
+![Example1](doc/Example1.svg)
+
 This execution tree consists of 4 input nodes, e.g. Node `1a`, `1b`, `2a`, `2b`, and 1 output node `4a`.
 Each node has 2 input sockets, e.g. denoted as `i0` and `i1`, and one output socket `o0`.
 The type of the input and output sockets in this example is simply `int`.
