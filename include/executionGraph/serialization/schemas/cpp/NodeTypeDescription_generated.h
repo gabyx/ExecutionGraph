@@ -12,7 +12,7 @@ namespace serialization {
 struct NodeTypeDescription;
 
 struct NodeTypeDescription FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TYPE = 4,
     VT_NAME = 6
   };

@@ -12,7 +12,7 @@ namespace serialization {
 struct LogicSocket;
 
 struct LogicSocket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TYPEINDEX = 4,
     VT_TYPE = 6,
     VT_TYPENAME = 8,

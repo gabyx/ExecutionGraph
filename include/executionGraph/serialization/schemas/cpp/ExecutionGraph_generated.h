@@ -13,7 +13,7 @@
 #include "executionGraph/serialization/schemas/cpp/LogicNode_generated.h"
 #include "executionGraph/serialization/schemas/cpp/LogicSocket_generated.h"
 #include "executionGraph/serialization/schemas/cpp/NodeTypeDescription_generated.h"
-#include "executionGraph/serialization/schemas/cpp/SocketLink_generated.h"
+#include "executionGraph/serialization/schemas/cpp/SocketLinkDescription_generated.h"
 #include "executionGraph/serialization/schemas/cpp/SocketTypeDescription_generated.h"
 
 namespace executionGraph {
@@ -54,12 +54,13 @@ inline const char * const *EnumNamesNodeClassification() {
 }
 
 inline const char *EnumNameNodeClassification(NodeClassification e) {
+  if (e < NodeClassification_NormalNode || e > NodeClassification_ConstantNode) return "";
   const size_t index = static_cast<int>(e);
   return EnumNamesNodeClassification()[index];
 }
 
 struct ExecutionGraphNodeProperties FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_NODEID = 4,
     VT_CLASSIFICATION = 6,
     VT_GROUPS = 8
@@ -132,7 +133,7 @@ inline flatbuffers::Offset<ExecutionGraphNodeProperties> CreateExecutionGraphNod
 }
 
 struct ExecutionGraph FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_GRAPHDESCRIPTION = 4,
     VT_NODES = 6,
     VT_LINKS = 8,
@@ -145,8 +146,8 @@ struct ExecutionGraph FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::Vector<flatbuffers::Offset<LogicNode>> *nodes() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<LogicNode>> *>(VT_NODES);
   }
-  const flatbuffers::Vector<const SocketLink *> *links() const {
-    return GetPointer<const flatbuffers::Vector<const SocketLink *> *>(VT_LINKS);
+  const flatbuffers::Vector<const SocketLinkDescription *> *links() const {
+    return GetPointer<const flatbuffers::Vector<const SocketLinkDescription *> *>(VT_LINKS);
   }
   const flatbuffers::Vector<flatbuffers::Offset<ExecutionGraphNodeProperties>> *nodeProperties() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<ExecutionGraphNodeProperties>> *>(VT_NODEPROPERTIES);
@@ -181,7 +182,7 @@ struct ExecutionGraphBuilder {
   void add_nodes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<LogicNode>>> nodes) {
     fbb_.AddOffset(ExecutionGraph::VT_NODES, nodes);
   }
-  void add_links(flatbuffers::Offset<flatbuffers::Vector<const SocketLink *>> links) {
+  void add_links(flatbuffers::Offset<flatbuffers::Vector<const SocketLinkDescription *>> links) {
     fbb_.AddOffset(ExecutionGraph::VT_LINKS, links);
   }
   void add_nodeProperties(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<ExecutionGraphNodeProperties>>> nodeProperties) {
@@ -206,7 +207,7 @@ inline flatbuffers::Offset<ExecutionGraph> CreateExecutionGraph(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<GraphTypeDescription> graphDescription = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<LogicNode>>> nodes = 0,
-    flatbuffers::Offset<flatbuffers::Vector<const SocketLink *>> links = 0,
+    flatbuffers::Offset<flatbuffers::Vector<const SocketLinkDescription *>> links = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<ExecutionGraphNodeProperties>>> nodeProperties = 0,
     flatbuffers::Offset<GraphVisualization> visualization = 0) {
   ExecutionGraphBuilder builder_(_fbb);
@@ -222,14 +223,14 @@ inline flatbuffers::Offset<ExecutionGraph> CreateExecutionGraphDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<GraphTypeDescription> graphDescription = 0,
     const std::vector<flatbuffers::Offset<LogicNode>> *nodes = nullptr,
-    const std::vector<SocketLink> *links = nullptr,
+    const std::vector<SocketLinkDescription> *links = nullptr,
     const std::vector<flatbuffers::Offset<ExecutionGraphNodeProperties>> *nodeProperties = nullptr,
     flatbuffers::Offset<GraphVisualization> visualization = 0) {
   return executionGraph::serialization::CreateExecutionGraph(
       _fbb,
       graphDescription,
       nodes ? _fbb.CreateVector<flatbuffers::Offset<LogicNode>>(*nodes) : 0,
-      links ? _fbb.CreateVectorOfStructs<SocketLink>(*links) : 0,
+      links ? _fbb.CreateVectorOfStructs<SocketLinkDescription>(*links) : 0,
       nodeProperties ? _fbb.CreateVector<flatbuffers::Offset<ExecutionGraphNodeProperties>>(*nodeProperties) : 0,
       visualization);
 }

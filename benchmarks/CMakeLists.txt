@@ -54,7 +54,7 @@ function(defineCompileDefs target)
     message(STATUS "Configuring target: ${target}")
 
     target_include_directories(${target} PRIVATE ${INCLUDE_DIRS})
-    target_link_libraries(${target} ExecutionGraph::Core benchmark)
+    target_link_libraries(${target} PRIVATE ExecutionGraph::Core benchmark)
 
     if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
         target_compile_options(${target} PRIVATE -DExecutionGraph_BUILD_TESTS )

@@ -11,7 +11,7 @@
 // =========================================================================================
 
 include "executionGraph/serialization/schemas/DataTypes.fbs";
-include "executionGraph/serialization/schemas/SocketLink.fbs";
+include "executionGraph/serialization/schemas/SocketLinkDescription.fbs";
 
 namespace executionGraph.serialization;
 
@@ -31,7 +31,7 @@ table NodeVisualization
 
 table LinkVisualization
 {
-    socket:SocketLink (id:0, required);
+    socket:SocketLinkDescription (id:0, required);
     // and more visualization stuff
     // ...
 }

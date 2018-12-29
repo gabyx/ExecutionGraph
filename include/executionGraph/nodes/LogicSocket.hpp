@@ -25,27 +25,33 @@
 
 namespace executionGraph
 {
-    //! The socket base class for all input/output sockets of a logic node.
+    //! The socket base class for all input/output sockets of a node.
     template<typename TConfig>
     class LogicSocketBase
     {
     public:
         EXECGRAPH_DEFINE_CONFIG(TConfig);
 
+    protected:
         LogicSocketBase(IndexType type,
                         SocketIndex index,
                         NodeBaseType& parent,
-                        const std::string& name = "")
+                        std::string name = "")
             : m_type(type)
             , m_index(index)
             , m_parent(parent)
-            , m_name(name.empty() ? name : "[" + std::to_string(index) + "]")
+            , m_name(std::move(name))
         {
+            if(m_name.empty())
+            {
+                m_name = std::string("[") + std::to_string(index) + "]";
+            }
         }
-
+    
+    public:
         IndexType getType() const { return m_type; }
         SocketIndex getIndex() const { return m_index; }
-        std::string getName() const { return m_name; }
+        const std::string& getName() const { return m_name; }
 
         const NodeBaseType& getParent() const { return m_parent; }
         NodeBaseType& getParent() { return m_parent; }
@@ -56,13 +62,13 @@ namespace executionGraph
     protected:
         const IndexType m_type;     //!< The index in to the meta::list SocketTypes, which type this is!
         const SocketIndex m_index;  //!< The index of the slot at which this socket is installed in a LogicNode.
-        NodeBaseType& m_parent;     //!< The parent logic node of of this socket.
-        const std::string m_name;   //!< The name of the socket.
+        NodeBaseType& m_parent;     //!< The parent node of of this socket.
+        std::string m_name;         //!< The name of the socket.
 
         std::string getNameOfType() const;  //!< Returns the name of the current type.
     };
 
-    //! The input socket base class for all input/output sockets of a logic node.
+    //! The input socket base class for all input/output sockets of a node.
     template<typename TConfig>
     class LogicSocketInputBase : public LogicSocketBase<TConfig>
     {
@@ -93,8 +99,8 @@ namespace executionGraph
             }
         }
 
-        //! Cast to a logic socket of type \p SocketInputType<T>*.
-        //! The cast fails at runtime if the data type \p T does not match!
+        //! Cast to a logic socket of type `SocketInputType`<T>*.
+        //! The cast fails at runtime if the data type `T` does not match!
         template<typename T>
         auto* castToType() const
         {
@@ -176,7 +182,7 @@ namespace executionGraph
         std::unordered_set<SocketOutputBaseType*> m_writingParents;  //!< All parent output sockets which write to this input.
     };
 
-    //! The input socket base class for all input/output sockets of a logic node.
+    //! The input socket base class for all input/output sockets of a node.
     template<typename TConfig>
     class LogicSocketOutputBase : public LogicSocketBase<TConfig>
     {
@@ -187,9 +193,11 @@ namespace executionGraph
         static_assert(std::is_same<LogicSocketOutputBase, SocketOutputBaseType>::value,
                       "SocketOutputBaseType not the same as this base!");
 
+    protected:
         template<typename T, typename... Args>
         LogicSocketOutputBase(const T& data, Args&&... args)
-            : LogicSocketBase<TConfig>(std::forward<Args>(args)...), m_data(static_cast<const void*>(&data))
+            : LogicSocketBase<TConfig>(std::forward<Args>(args)...)
+            , m_data(static_cast<const void*>(&data))
         {
         }
 
@@ -206,10 +214,11 @@ namespace executionGraph
             }
         }
 
-        //! Cast to a logic socket of type \p SocketOutputType<T>*.
-        //! The cast fails at runtime (if NDEBUG defined) if the data type \p T does not match!
+    public:
+        //! Cast to a logic socket of type `SocketOutputType`<T>*.
+        //! The cast fails at runtime if the data type `T` does not match!
         template<typename T>
-        auto* castToType() const
+        auto* castToType() const noexcept(throwIfBadSocketCast)
         {
             EXECGRAPH_THROW_BADSOCKETCAST_IF((this->m_type != meta::find_index<SocketTypes, T>::value),
                                              "Casting socket index '{0}' with type '{1}' into "
@@ -310,13 +319,21 @@ namespace executionGraph
         {
         }
 
+        //! Copy not allowed (since parent pointer)
+        LogicSocketInput(LogicSocketInput& other) = delete;
+        LogicSocketInput& operator=(LogicSocketInput& other) = delete;
+
+        //! Move allowed
+        LogicSocketInput& operator=(LogicSocketInput&& other) = default;
+        LogicSocketInput(LogicSocketInput&& other) = default;
+
         //! Get the data value of the socket. (follow Get-Link).
         //! If this input socket has not been connected, this results in an access violation!
         //! The graph checks that all input nodes ar connected when solving the execution order!
         const DataType& getValue() const
         {
             EXECGRAPH_ASSERT(m_data,
-                             "Input socket: '{0}' of logic node id: '{1}' not connected",
+                             "Input socket: '{0}' of node id: '{1}' not connected",
                              this->getName(),
                              this->getParent().getId());
             return *static_cast<const DataType*>(m_data);
@@ -363,6 +380,14 @@ namespace executionGraph
                                              std::forward<Args>(args)...)
         {
         }
+
+        //! Copy not allowed (since parent pointer)
+        LogicSocketOutput(LogicSocketOutput& other) = delete;
+        LogicSocketOutput& operator=(LogicSocketOutput& other) = delete;
+
+        //! Move allowed
+        LogicSocketOutput& operator=(LogicSocketOutput&& other) = default;
+        LogicSocketOutput(LogicSocketOutput&& other) = default;
 
         //! Set the data value of the socket.
         template<typename T>

@@ -15,9 +15,9 @@ include "executionGraph/serialization/schemas/LogicSocket.fbs";
 namespace executionGraph.serialization;
 
 table LogicNode {
-    id:uint64 (id:0);                   //!< The unique logic node id.
-    type:string (id: 1, required);      //!< The rtti of the logic node.
-    name:string (id: 2);                //!< The name of the logic node.
+    id:uint64 (id:0);                   //!< The unique node id.
+    type:string (id: 1, required);      //!< The rtti of the node.
+    name:string (id: 2);                //!< The name of the node.
 
     inputSockets:[LogicSocket] (id:3);  //!< The input logic sockets.
     outputSockets:[LogicSocket] (id:4); //!< The output logic sockets.

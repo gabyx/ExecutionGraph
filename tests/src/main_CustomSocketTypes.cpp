@@ -13,7 +13,7 @@
 
 #include <memory>
 #include <meta/meta.hpp>
-#include "executionGraph/graphs/ExecutionTreeInOut.hpp"
+#include "executionGraph/graphs/ExecutionTree.hpp"
 #include "executionGraph/nodes/LogicNode.hpp"
 #include "executionGraph/nodes/LogicSocket.hpp"
 
@@ -131,7 +131,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     node3b->setGetLink(*node1a, 0, 0);
     node3b->setGetLink(*node1b, 0, 1);
 
-    ExecutionTreeInOut<Config> execTree;
+    ExecutionTree<Config> execTree;
     execTree.getDefaultOuputPool().setDefaultValue<std::shared_ptr<A>>(std::make_shared<A>());
     execTree.addNode(std::move(node1a));
     execTree.addNode(std::move(node1b));
@@ -141,11 +141,11 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     execTree.addNode(std::move(node3b));
     execTree.addNode(std::move(node4a));
 
-    execTree.setNodeClass(0, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(1, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(2, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(3, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(6, ExecutionTreeInOut<Config>::NodeClassification::OutputNode);
+    execTree.setNodeClass(0, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(1, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(2, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(3, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(6, ExecutionTree<Config>::NodeClassification::OutputNode);
 
     execTree.setup();
 

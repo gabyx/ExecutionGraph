@@ -1,0 +1,8 @@
+{
+  "/eg-backend/*": {
+    "target": "http://localhost:8089",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true
+  }
+}

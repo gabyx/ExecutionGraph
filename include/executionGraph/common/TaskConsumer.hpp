@@ -46,8 +46,9 @@ namespace executionGraph
         using Task      = typename TTaskQueue::Task;
 
     private:
-        template<typename T>
-        using IsPointerType = meta::or_<meta::is<T, std::shared_ptr>, meta::is<T, std::unique_ptr>>;
+        template<typename TIn, typename T = std::decay_t<TIn>>
+        using IsPointerType = meta::or_<meta::is<T, std::shared_ptr>, 
+                                        meta::is<T, std::unique_ptr>>;
 
     public:
         TaskConsumer(const std::shared_ptr<TaskQueue>& queue)
@@ -82,12 +83,12 @@ namespace executionGraph
         struct Dispatch<T, EXECGRAPH_SFINAE_ENABLE_IF_CLASS(IsPointerType<T>{})>
         {
             template<typename... Args>
-            static void runTask(T& task, Args&&... args)
+            static void runTask(T&& task, Args&&... args)
             {
                 task->runTask(std::forward<Args>(args)...);
             }
             template<typename... Args>
-            static void onTaskException(T& task, Args&&... args)
+            static void onTaskException(T&& task, Args&&... args)
             {
                 task->onTaskException(std::forward<Args>(args)...);
             }
@@ -110,17 +111,17 @@ namespace executionGraph
         };
 
     public:
-        // Static run loop, to execute the task right away in calling thread.
-        template<typename T, typename... Args>
-        static void Run(T&& task, std::thread::id threadId)
+        //! Static run loop, to execute the task right away in the calling thread.
+        template<typename TTask, typename... Args>
+        static void Run(TTask&& task, std::thread::id threadId)
         {
             try
             {
-                Dispatch<Task>::runTask(std::forward<T>(task), threadId);  // run the task
+                Dispatch<TTask>::runTask(std::forward<TTask>(task), threadId);  // run the task
             }
             catch(...)
             {
-                Dispatch<Task>::onTaskException(std::forward<T>(task), std::current_exception());
+                Dispatch<TTask>::onTaskException(std::forward<TTask>(task), std::current_exception());
             }
         }
 

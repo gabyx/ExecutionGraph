@@ -11,7 +11,7 @@
 //! ========================================================================================
 
 #include <meta/meta.hpp>
-#include <executionGraph/graphs/ExecutionTreeInOut.hpp>
+#include <executionGraph/graphs/ExecutionTree.hpp>
 #include <executionGraph/nodes/LogicNode.hpp>
 #include <executionGraph/nodes/LogicSocket.hpp>
 #include "DummyNode.hpp"
@@ -64,7 +64,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     node3b->setGetLink(*node2b, 0, 1);
     //node1a->setGetLink(*node3a, 0, 0);  // cycle
 
-    ExecutionTreeInOut<Config> execTree;
+    ExecutionTree<Config> execTree;
     execTree.getDefaultOuputPool().setDefaultValue<int>(2);
     execTree.addNode(std::move(node1a));
     execTree.addNode(std::move(node1b));
@@ -74,15 +74,15 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     execTree.addNode(std::move(node3b));
     execTree.addNode(std::move(node4a));
 
-    execTree.setNodeClass(0, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(1, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(2, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(3, ExecutionTreeInOut<Config>::NodeClassification::InputNode);
-    execTree.setNodeClass(6, ExecutionTreeInOut<Config>::NodeClassification::OutputNode);
+    execTree.setNodeClass(0, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(1, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(2, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(3, ExecutionTree<Config>::NodeClassification::InputNode);
+    execTree.setNodeClass(6, ExecutionTree<Config>::NodeClassification::OutputNode);
 
     execTree.setup();
 
-    EXECGRAPH_LOG_TRACE(execTree.getExecutionOrderInfo());
+    EXECGRAPH_LOG_TRACE("\n" + execTree.getExecutionOrderInfo());
 
     execTree.runExecute(0);
 
@@ -107,11 +107,11 @@ MY_TEST(ExecutionTree_Test, IntBig)
     for(int seed = 0; seed < 10; ++seed)
     {
         {
-            auto execTree = createRandomTree<ExecutionTreeInOut<Config>, IntNode>(nNodes, seed, false, false);
+            auto execTree = createRandomTree<ExecutionTree<Config>, IntNode>(nNodes, seed, false, false);
             execTree->setup(true);
         }
         {
-            auto execTree = createRandomTree<ExecutionTreeInOut<Config>, IntNode>(nNodes, seed, true, true);
+            auto execTree = createRandomTree<ExecutionTree<Config>, IntNode>(nNodes, seed, true, true);
             try
             {
                 execTree->setup(true);

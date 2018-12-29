@@ -42,7 +42,7 @@ namespace executionGraph
         FileMapper& operator=(const FileMapper&&) = delete;
 
         //! Get the mapped address and size of the file.
-        std::pair<const uint8_t*, std::size_t> getData() { return {static_cast<const uint8_t*>(m_mappedAddress),
+        std::pair<const uint8_t*, std::size_t> data() { return {static_cast<const uint8_t*>(m_mappedAddress),
                                                                    m_mappedBytes}; }
 
     private:

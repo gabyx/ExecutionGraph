@@ -1,0 +1,50 @@
+// =========================================================================================
+//  ExecutionGraph
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+// 
+//  @date Tue Aug 14 2018
+//  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+// 
+//  This Source Code Form is subject to the terms of the Mozilla Public
+//  License, v. 2.0. If a copy of the MPL was not distributed with this
+//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// =========================================================================================
+
+include "executionGraphGui/messages/schemas/DataTypes.fbs";
+include "executionGraph/serialization/schemas/LogicNode.fbs";
+
+namespace executionGraphGui.serialization;
+
+//! ======================================================================
+//! Message "general/addGraph"
+//! ======================================================================
+//! Request data:
+table AddGraphRequest {
+    graphTypeId:string (id:0, required); //!< The graph type guid.
+}
+//! Response data:
+//! Success: 
+//    - status code: 200 (OK)
+//! Valid Errors:
+//!   - status code: 400 (Bad Request)
+//!     - graph type id is not found
+table AddGraphResponse {
+    graphId:string (id:0, required); //!< The graph guid.
+}
+//! ======================================================================
+
+//! ======================================================================
+//! Message "general/removeGraph"
+//! ======================================================================
+//! Request data: 
+table RemoveGraphRequest {
+    graphId:string (id:0, required);  //!< The graph guid.
+}
+
+//! Response data: none
+//! Success: 
+//    - status code: 200 (OK)
+//! Valid Errors:
+//!   - status code: 400 (Bad Request)
+//!     - graph id is not found
+//! ======================================================================

@@ -4,9 +4,9 @@ include(FindPackageHandleStandardArgs)
 set(URL "https://github.com/gabime/spdlog")
 
 if(NOT EXISTS "${spdlog_INCLUDE_DIR}")
-    message(STATUS "meta library: finding...")
+    message(STATUS "spdlog library: finding...")
     find_path(spdlog_INCLUDE_DIR
-            NAMES spdlog/spdlog.hpp 
+            NAMES spdlog/spdlog.h
             DOC "spdlog library header files"
             PATHS "${spdlog_DIR}/include")
 endif()
@@ -18,7 +18,7 @@ if(NOT EXISTS spdlog_INCLUDE_DIR)
     download_project(PROJ               spdlog
                     PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/spdlog"
                     GIT_REPOSITORY      ${URL}
-                    GIT_TAG             "v1.x"
+                    GIT_TAG             "v1.2.1"
                     GIT_SHALLOW         ON
                     UPDATE_DISCONNECTED 1)
 

@@ -59,7 +59,7 @@ namespace executionGraph
             FileMapper mapper(m_filePath);
             const uint8_t* buffer = nullptr;
             std::size_t size;
-            std::tie(buffer, size) = mapper.getData();
+            std::tie(buffer, size) = mapper.data();
             EXECGRAPH_ASSERT(buffer != nullptr,
                              "FileMapper returned nullptr for file '{0}'",
                              m_filePath);
@@ -199,7 +199,7 @@ namespace executionGraph
             namespace s = serialization;
             using namespace s;
 
-            std::vector<SocketLink> socketLinks;
+            std::vector<SocketLinkDescription> socketLinks;
 
             auto& nonConstantNodes = execGraph.getNodes().first;
             // Iterate over all non-constant nodes.
@@ -212,21 +212,21 @@ namespace executionGraph
                     // Serialize all Write-Links
                     for(auto& writeSocket : inputSocket->getWritingSockets())
                     {
-                        socketLinks.emplace_back(SocketLink{writeSocket->getParent().getId(),
-                                                            writeSocket->getIndex(),
-                                                            node->getId(),
-                                                            inputSocket->getIndex(),
-                                                            true});
+                        socketLinks.emplace_back(SocketLinkDescription{writeSocket->getParent().getId(),
+                                                                       writeSocket->getIndex(),
+                                                                       node->getId(),
+                                                                       inputSocket->getIndex(),
+                                                                       true});
                     }
                     // Serialize Get-Link
                     if(inputSocket->hasGetLink())
                     {
                         SocketOutputBaseType* outSocket = inputSocket->followGetLink();
-                        socketLinks.emplace_back(SocketLink{outSocket->getParent().getId(),
-                                                            outSocket->getIndex(),
-                                                            node->getId(),
-                                                            inputSocket->getIndex(),
-                                                            false});
+                        socketLinks.emplace_back(SocketLinkDescription{outSocket->getParent().getId(),
+                                                                       outSocket->getIndex(),
+                                                                       node->getId(),
+                                                                       inputSocket->getIndex(),
+                                                                       false});
                     }
                 }
             }

@@ -14,7 +14,7 @@
 #include <vector>
 #include <flatbuffers/flatbuffers.h>
 #include <executionGraph/common/Log.hpp>
-#include <executionGraph/graphs/ExecutionTreeInOut.hpp>
+#include <executionGraph/graphs/ExecutionTree.hpp>
 #include <executionGraph/nodes/LogicNode.hpp>
 #include <executionGraph/serialization/ExecutionGraphSerializer.hpp>
 #include <executionGraph/serialization/FileMapper.hpp>
@@ -61,7 +61,7 @@ MY_TEST(FlatBuffer, Test1)
 namespace s = executionGraph::serialization;
 
 using Config        = executionGraph::GeneralConfig<>;
-using GraphType     = executionGraph::ExecutionTreeInOut<Config>;
+using GraphType     = executionGraph::ExecutionTree<Config>;
 using DummyNodeType = DummyNode<Config>;
 static const DummyNodeType::AutoRegisterRTTR autoRegisterRTTR;
 
@@ -109,7 +109,7 @@ struct DummyNodeSerializer
     };
 };
 
-MY_TEST(FlatBuffer, Test2)
+MY_TEST(FlatBuffer, GraphSimple)
 {
     using namespace executionGraph;
     unsigned int nNodes = 500;
@@ -121,8 +121,6 @@ MY_TEST(FlatBuffer, Test2)
         for(int i = 0; i < nNodes; ++i)
         {
             uint64_t id = i;
-            // DummyNodeType a(1, "asd");
-            // int aa = DummyNodeType::autoRegisterRTTR.m_a + 1;
             auto dummy = builder.CreateString(rttr::type::get<DummyNodeType>().get_name().to_string());
 
             // make some sepcific flexbuffer and add it as data()
@@ -170,7 +168,7 @@ MY_TEST(FlatBuffer, Test2)
     {
         EXECGRAPH_LOG_TRACE("Read graph simple");
         executionGraph::FileMapper mapper("myGraph.eg");
-        std::tie(buf, size) = mapper.getData();
+        std::tie(buf, size) = mapper.data();
         auto graph          = s::GetExecutionGraph(buf);
         ASSERT_TRUE(graph->nodes() != nullptr && graph->nodes()->size() == nNodes) << " Wupi, wrong serialization!";
     }
@@ -194,7 +192,7 @@ MY_TEST(FlatBuffer, Test2)
     std::filesystem::remove("myGraph.eg");
 }
 
-MY_TEST(FlatBuffer, Test3)
+MY_TEST(FlatBuffer, RandomTree)
 {
     using namespace executionGraph;
 

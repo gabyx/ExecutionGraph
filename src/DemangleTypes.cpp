@@ -11,6 +11,7 @@
 //! ========================================================================================
 
 #include "executionGraph/common/DemangleTypes.hpp"
+#include <sstream>
 
 #if defined(__GNUG__) || defined(__clang__)
 #    include <cstdlib>
