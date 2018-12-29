@@ -17,7 +17,7 @@ import { Connection, Node } from '../../model';
 import { GeneralInfoService, GraphManipulationService, GraphManagementService } from '../../services';
 import { GraphsState } from '../reducers';
 import { RouterStateUrl } from '../reducers/app.reducers';
-import { arraysEqual } from '@eg/common';
+import { arraysEqual, isDefined } from '@eg/common';
 
 @Injectable()
 export class GraphEffects {
@@ -132,7 +132,7 @@ export class GraphEffects {
       node.uiProps.position.y = 50 + 100 * i;
       nodes[node.id.toString()] = node;
 
-      if (lastNode) {
+      if (lastNode && isDefined(node.inputs[0])) {
         const connection = Connection.create(lastNode.outputs[0], node.inputs[0]);
         connections[connection.idString] = connection;
       }

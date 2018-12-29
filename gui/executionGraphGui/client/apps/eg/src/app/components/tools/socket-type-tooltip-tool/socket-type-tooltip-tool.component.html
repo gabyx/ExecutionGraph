@@ -1,9 +1,16 @@
-<ng-container *ngIf="socketTypeTooltip">
+<ng-container *ngIf="toolTipSocket">
   <ngcs-html-layer>
-      <div class="socketTypeTooltip"
-          [style.left]="socketTypeTooltip.x+'px'"
-          [style.top]="socketTypeTooltip.y+'px'">
-          {{ socketTypeTooltip.message }}
+      <div class="tooltip fadeIn"
+          [style.left]="toolTipPosition.x+'px'"
+          [style.top]="toolTipPosition.y+'px'">
+          <ul>
+                <li>
+                  <div class="info">
+                    <span>Type: [{{ toolTipSocket.typeName }}]</span>
+                  </div>
+                </li>
+          </ul>
+
       </div>
   </ngcs-html-layer>
 </ng-container>

@@ -1,4 +1,27 @@
 #!/bin/bash
+
+cleanup() {
+    echo "Post-Commit Hook: cleanup()"
+    [ -f "${preCommitFileChanged}" ] && rm -f "${preCommitFileChanged}"
+   
+    echo "Post-Commit Hook [DONE]"
+    exit 0
+}
+trap cleanup EXIT
+
+error() {
+    local parent_lineno="$1"
+    local message="$2"
+    local code="${3:-1}"
+    if [[ -n "$message" ]] ; then
+    echo "Post-Commit Hook: Error on or near line ${parent_lineno}: ${message}; exiting with status ${code}"
+    else
+    echo "Post-Commit Hook: Error on or near line ${parent_lineno}; exiting with status ${code}"
+    fi
+    exit "${code}"
+}
+trap 'error ${LINENO}' ERR
+
 root="$(git rev-parse --show-toplevel)"
 [ -d "$root" ] || exit 1
 preCommitFileChanged="${root}/.pre-commit-changed"
@@ -16,17 +39,15 @@ function addFile()
 }
 export -f addFile
 
-cat "${preCommitFileChanged}" | xargs -n 1 -0 -I {} bash -c 'addFile "${@}"' _ {} || (deleteFile; echo "Error!"; exit 0)
-
-# Delete the file
-rm "${preCommitFileChanged}"
+cat "${preCommitFileChanged}" | xargs -n 1 -I {} bash -c 'addFile "${@}"' _ {}
+rm -f "${preCommitFileChanged}"
 
 # Show the status
 git status
 
 # Allows us to read user input below, assigns stdin to keyboard
 # exec < /dev/tty
-# read -p "Post-Commit Hook: Do you want to auto amend-commit the changed files? (Y/n) (default: n) " yn
+# read -p "Post-Commit Hook: Do you want to auto amend-commit the changed files? (Y/n) (default: Y) " yn
 if [ "$yn" = "" ]; then
     yn='Y'
 fi
@@ -34,6 +55,4 @@ case $yn in
     [Y] ) git commit --amend -C HEAD --no-verify
 esac
 
-echo "Post-Commit Hook [DONE]"
-
-
+exit 0
