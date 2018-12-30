@@ -1,13 +1,13 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Point, ConnectionDrawStyle, GraphComponent } from '@eg/graph';
+import { Point, GraphComponent } from '@eg/graph';
 import { ILogger, LoggerFactory } from '@eg/logger';
 
 import { ToolComponent } from '../tool-component';
-import { OutputSocket, InputSocket, Connection, Socket, SocketIndex } from '../../../model';
 import { GraphsState } from '../../../+state/reducers';
-import { AddConnection } from '../../../+state/actions';
-import { resetComponentState } from '@angular/core/src/render3/instructions';
+import { Observable, never } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { IElementEvents } from '@eg/graph';
 
 @Component({
   selector: 'eg-type-tooltip-tool',
@@ -25,26 +25,37 @@ export class SocketTypeToolTipToolComponent extends ToolComponent implements OnI
     this.logger = loggerFactory.create('SocketTypeToolTipToolComponent');
   }
 
-  ngOnInit() {
-    this.socketEvents.onEnter.subscribe(e => {
-      this.toolTipMessages.push(`Type: [${e.element.type}]`);
-      this.toolTipPosition = this.graph.convertMouseToGraphPosition(e.mousePosition);
-    });
-    this.socketEvents.onLeave.subscribe(e => {
-      this.reset();
-    });
+  private makeEnabled<Event>(obs: Observable<Event>) {
+    return this.enabled.pipe(
+      switchMap(enable => {
+        if (enable) {
+          return obs;
+        } else {
+          this.reset();
+          return never();
+        }
+      })
+    );
+  }
 
-    this.nodeEvents.onEnter.subscribe(e => {
-      this.toolTipMessages.push(`Type: [${e.element.type}]`);
+  private subscribe<TElement extends { type?: string }>(events: IElementEvents<TElement>) {
+    this.makeEnabled(events.onEnter).subscribe(e => {
+      console.log('ToolTip: next');
+      this.toolTipMessages = [`Type: [${e.element.type}]`];
       this.toolTipPosition = this.graph.convertMouseToGraphPosition(e.mousePosition);
     });
-    this.nodeEvents.onLeave.subscribe(e => {
-      this.reset();
-    });
+    this.makeEnabled(events.onLeave).subscribe(e => this.reset());
+  }
+
+  ngOnInit() {
+    this.subscribe(this.socketEvents);
+    this.subscribe(this.nodeEvents);
   }
 
   private reset() {
-    this.toolTipMessages = [];
-    this.toolTipPosition = { x: 0, y: 0 };
+    if (this.toolTipMessages) {
+      this.toolTipMessages = null;
+      this.toolTipPosition = { x: 0, y: 0 };
+    }
   }
 }
