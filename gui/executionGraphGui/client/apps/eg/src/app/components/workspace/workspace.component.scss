@@ -4,12 +4,11 @@
   height: 100%;
   .node {
     font-family: mat-font-family($app-graph-typography);
-    width: 20em;
+    width: 15em;
     background: rgba(255, 255, 255, 0.8);
 
     .header {
       display: block;
-      width: 100%;
       text-align: center;
       padding: 1em;
       color: mat-color($app-secondary, darker);

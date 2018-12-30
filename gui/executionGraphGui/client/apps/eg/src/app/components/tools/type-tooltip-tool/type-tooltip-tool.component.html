@@ -1,0 +1,13 @@
+<ng-container *ngIf="toolTipMessages">
+  <ngcs-html-layer>
+    <div class="tooltip fadeIn" [style.left]="toolTipPosition.x + 'px'" [style.top]="toolTipPosition.y + 'px'">
+      <ul>
+        <li *ngFor="let message of toolTipMessages">
+          <div class="info">
+            <span>{{ message }}</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </ngcs-html-layer>
+</ng-container>

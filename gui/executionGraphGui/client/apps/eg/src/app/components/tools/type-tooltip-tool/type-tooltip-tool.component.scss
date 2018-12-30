@@ -38,6 +38,7 @@
   position: absolute;
   transform: translate(-50%, 100%);
   pointer-events: none;
+  border-radius: 5pt;
   background: $overlay-background-color;
   color: mat-color($app-secondary);
   font-family: mat-font-family($app-graph-typography);

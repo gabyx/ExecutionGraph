@@ -127,7 +127,7 @@ export class GraphEffects {
     let lastNode: Node = null;
     const connections = {};
     for (let i = 0; i < 3; ++i) {
-      const node = await this.graphManipulationService.addNode(graph.id, nodeType, `${i}`);
+      const node = await this.graphManipulationService.addNode(graph.id, nodeType, `Node ${i}`);
       node.uiProps.position.x = 200 * i;
       node.uiProps.position.y = 50 + 100 * i;
       nodes[node.id.toString()] = node;

@@ -10,15 +10,14 @@ import { AddConnection } from '../../../+state/actions';
 import { resetComponentState } from '@angular/core/src/render3/instructions';
 
 @Component({
-  selector: 'eg-socket-type-tooltip-tool',
-  templateUrl: './socket-type-tooltip-tool.component.html',
-  styleUrls: ['./socket-type-tooltip-tool.component.scss']
+  selector: 'eg-type-tooltip-tool',
+  templateUrl: './type-tooltip-tool.component.html',
+  styleUrls: ['./type-tooltip-tool.component.scss']
 })
 export class SocketTypeToolTipToolComponent extends ToolComponent implements OnInit {
-  @Input()
   private readonly logger: ILogger;
 
-  private toolTipSocket: Socket | null = null;
+  private toolTipMessages: string[] = [];
   private toolTipPosition: Point = { x: 0, y: 0 };
 
   constructor(private graph: GraphComponent, private store: Store<GraphsState>, loggerFactory: LoggerFactory) {
@@ -28,19 +27,24 @@ export class SocketTypeToolTipToolComponent extends ToolComponent implements OnI
 
   ngOnInit() {
     this.socketEvents.onEnter.subscribe(e => {
-      this.toolTipSocket = e.element;
-      this.toolTipPosition = this.graph.convertMouseToGraphPosition(e.mousePosition);
-    });
-    this.socketEvents.onMove.subscribe(e => {
+      this.toolTipMessages.push(`Type: [${e.element.type}]`);
       this.toolTipPosition = this.graph.convertMouseToGraphPosition(e.mousePosition);
     });
     this.socketEvents.onLeave.subscribe(e => {
       this.reset();
     });
+
+    this.nodeEvents.onEnter.subscribe(e => {
+      this.toolTipMessages.push(`Type: [${e.element.type}]`);
+      this.toolTipPosition = this.graph.convertMouseToGraphPosition(e.mousePosition);
+    });
+    this.nodeEvents.onLeave.subscribe(e => {
+      this.reset();
+    });
   }
 
   private reset() {
-    this.toolTipSocket = null;
+    this.toolTipMessages = [];
     this.toolTipPosition = { x: 0, y: 0 };
   }
 }
