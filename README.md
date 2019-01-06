@@ -7,7 +7,7 @@
 
 Be able to design and run such input/output graphs, such as the ones used for the work [here](http://gabyx.github.io/GRSFramework/#videos) (using this [graph](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)). A GUI is provided in from of a single-page Angular application with a backend HTTP server which allows interactive design/manipulation and execution of graphs: 
 
-![Current GUI](doc/ExecutionGraphGui.png)
+![Current GUI](docs/ExecutionGraphGui.png)
 
 * [Installing and Dependencies](#installing-and-dependencies)
     * [OS X](#os-x)
@@ -154,7 +154,7 @@ Static type dispatching avoids the use of virtual calls when using polymorphic o
 Source: `examples/libraryUsage`   
 Let us build the simple directed graph below: 
 
-![Example1](doc/Example1.svg)
+![Example1](docs/Example1.svg)
 
 This execution tree consists of 4 input nodes, e.g. Node `1a`, `1b`, `2a`, `2b`, and 1 output node `4a`.
 Each node has 2 input sockets, e.g. denoted as `i0` and `i1`, and one output socket `o0`.

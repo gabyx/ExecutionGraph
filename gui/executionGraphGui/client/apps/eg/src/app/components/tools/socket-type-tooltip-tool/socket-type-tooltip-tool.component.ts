@@ -18,7 +18,7 @@ export class SocketTypeToolTipToolComponent extends ToolComponent implements OnI
   @Input()
   private readonly logger: ILogger;
 
-  private toolTipSocket: Socket | null = null;
+  public toolTipSocket: Socket | null = null;
   private toolTipPosition: Point = { x: 0, y: 0 };
 
   constructor(private graph: GraphComponent, private store: Store<GraphsState>, loggerFactory: LoggerFactory) {
