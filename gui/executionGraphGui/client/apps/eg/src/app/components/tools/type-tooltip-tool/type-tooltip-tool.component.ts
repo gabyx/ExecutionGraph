@@ -14,7 +14,7 @@ import { IElementEvents } from '@eg/graph';
   templateUrl: './type-tooltip-tool.component.html',
   styleUrls: ['./type-tooltip-tool.component.scss']
 })
-export class SocketTypeToolTipToolComponent extends ToolComponent implements OnInit {
+export class TypeToolTipToolComponent extends ToolComponent implements OnInit {
   private readonly logger: ILogger;
 
   private toolTipMessages: string[] = [];
@@ -22,7 +22,7 @@ export class SocketTypeToolTipToolComponent extends ToolComponent implements OnI
 
   constructor(private graph: GraphComponent, private store: Store<GraphsState>, loggerFactory: LoggerFactory) {
     super();
-    this.logger = loggerFactory.create('SocketTypeToolTipToolComponent');
+    this.logger = loggerFactory.create('TypeToolTipToolComponent');
   }
 
   /**
@@ -32,7 +32,7 @@ export class SocketTypeToolTipToolComponent extends ToolComponent implements OnI
    * @template Event
    * @param {Observable<Event>} obs
    * @returns Observable<Event> | never()
-   * @memberof SocketTypeToolTipToolComponent
+   * @memberof TypeToolTipToolComponent
    */
   private makeEnabled<Event>(obs: Observable<Event>) {
     return this.enabled.pipe(
