@@ -296,5 +296,5 @@ Execution order for group id: 0
 ```
 
 ## Contributors
-- Gabriel Nützi (graph)
-- Simon Spörri (gui, graph)
+**Gabriel Nützi** (graph) and many thanks to **[Simon Spörri](https://github.com/simonspoerri)**
+for his nice and ellaborate take on the client gui application!
