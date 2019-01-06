@@ -11,7 +11,7 @@ export class DroppableDirective implements OnInit, OnDestroy {
   @Output()
   draggableLeft = new EventEmitter<any>();
   @Output()
-  draggableDropped = new EventEmitter<{event: DragEvent, data: any}>();
+  draggableDropped = new EventEmitter<{ event: DragEvent; data: any }>();
 
   @Input('ngcsDroppable')
   dropAcceptanceFilter: (data: any) => boolean;
@@ -26,13 +26,14 @@ export class DroppableDirective implements OnInit, OnDestroy {
   private isActive = false;
   private isAccepted = false;
 
-  private onMouseEnterRegistration: any;
-  private onMouseLeaveRegistration: any;
+  private onMouseEnterRegistration = this.onMouseEnter.bind(this);
+  private onMouseLeaveRegistration = this.onMouseLeave.bind(this);
 
-  constructor(public element: ElementRef, private renderer: Renderer2, private dragAndDropService: DragAndDropService) {
-    this.onMouseEnterRegistration = this.onMouseEnter.bind(this);
-    this.onMouseLeaveRegistration = this.onMouseLeave.bind(this);
-  }
+  constructor(
+    public element: ElementRef,
+    private renderer: Renderer2,
+    private dragAndDropService: DragAndDropService
+  ) {}
 
   ngOnInit() {
     this.dragAndDropService.registerDroppable(this);
@@ -55,7 +56,7 @@ export class DroppableDirective implements OnInit, OnDestroy {
 
     if (this.isActive) {
       if (this.isAccepted) {
-        this.draggableDropped.emit({event: dragEvent, data: this.draggable.data});
+        this.draggableDropped.emit({ event: dragEvent, data: this.draggable.data });
       }
       this.isActive = false;
     }
@@ -63,7 +64,7 @@ export class DroppableDirective implements OnInit, OnDestroy {
   }
 
   onMouseEnter(event: MouseEvent) {
-    console.log("Entering droppable");
+    console.log('Entering droppable');
     this.isActive = true;
     this.renderer.addClass(this.element.nativeElement, this.droppingClass);
     if (this.dropAcceptanceFilter) {

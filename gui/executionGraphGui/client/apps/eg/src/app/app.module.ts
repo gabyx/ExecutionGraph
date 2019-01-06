@@ -39,7 +39,7 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { storeFreeze } from 'ngrx-store-freeze';
 
-import { VERBOSE_LOG_TOKEN, BINARY_HTTP_ROUTER_BASE_URL} from './tokens';
+import { VERBOSE_LOG_TOKEN, BINARY_HTTP_ROUTER_BASE_URL } from './tokens';
 
 import { GraphModule } from '@eg/graph';
 import { SimpleConsoleLoggerFactory, LoggerFactory } from '@eg/logger';
@@ -80,13 +80,14 @@ import { effects } from './+state/effects';
 import { environment } from '../environments/environment';
 import { GraphLoadedGuard } from './guards/graphLoaded.guard';
 import { BackendTestComponent } from './components/backend-test/backend-test.component';
-import { AddNodeComponent } from './components/add-node/add-node.component'
+import { AddNodeComponent } from './components/add-node/add-node.component';
 import { SelectionToolComponent } from './components/tools/selection-tool/selection-tool.component';
 import { NavigationToolComponent } from './components/tools/navigation-tool/navigation-tool.component';
 import { SocketConnectionToolComponent } from './components/tools/socket-connection-tool/socket-connection-tool.component';
 import { ConnectionLayerComponent } from './components/connection-layer/connection-layer.component';
 import { MoveToolComponent } from './components/tools/move-tool/move-tool.component';
 import { DeleteToolComponent } from './components/tools/delete-tool/delete-tool.component';
+import { SocketTypeToolTipToolComponent } from './components/tools/socket-type-tooltip-tool/socket-type-tooltip-tool.component';
 
 //environment.production = true;
 
@@ -99,16 +100,15 @@ const routes: Route[] = [
         path: ':graphId',
         component: WorkspaceComponent,
         canActivate: [GraphLoadedGuard],
-        children: [
-        ]
-      },
-    ],
+        children: []
+      }
+    ]
   },
   { path: 'inspector', component: InspectorComponent, outlet: 'drawer' },
   { path: 'lines', component: ConnectionStyleOptionsComponent, outlet: 'drawer' },
   { path: 'nodes', component: AddNodeComponent, outlet: 'drawer' },
   { path: 'backend-test', component: BackendTestComponent, outlet: 'drawer' },
-  { path: '**', redirectTo: 'graph/new' },
+  { path: '**', redirectTo: 'graph/new' }
 ];
 
 @NgModule({
@@ -125,6 +125,7 @@ const routes: Route[] = [
     NavigationToolComponent,
     MoveToolComponent,
     SocketConnectionToolComponent,
+    SocketTypeToolTipToolComponent,
     DeleteToolComponent,
     ConnectionLayerComponent
   ],
@@ -150,15 +151,12 @@ const routes: Route[] = [
     MatToolbarModule,
     GraphModule,
     NxModule.forRoot(),
-    RouterModule.forRoot(routes, { enableTracing: false}),
+    RouterModule.forRoot(routes, { enableTracing: false }),
     StoreRouterConnectingModule.forRoot({}),
-    StoreModule.forRoot(
-      reducers,
-      {
-        initialState: { }
-        //metaReducers : !environment.production ? [storeFreeze] : []
-      }
-    ),
+    StoreModule.forRoot(reducers, {
+      initialState: {}
+      //metaReducers : !environment.production ? [storeFreeze] : []
+    }),
     EffectsModule.forRoot(effects),
     environment.production ? [] : StoreDevtoolsModule.instrument()
   ],

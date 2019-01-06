@@ -198,7 +198,7 @@
     "gitlens.currentLine.enabled": false,
     "gitlens.hovers.currentLine.over": "line",
     "gitlens.hovers.enabled": false,
-    "gitlens.mode.active": "review",
+    "gitlens.mode.active": "zen",
     "python.formatting.provider": "yapf",
     "gitlens.views.fileHistory.enabled": false,
     "gitlens.views.lineHistory.enabled": false,

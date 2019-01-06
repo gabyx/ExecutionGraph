@@ -1,74 +1,64 @@
-<ngcs-graph id="graph-1"
-    #graphComponent
-    *ngIf="graph | async as syncGraph"
+<ngcs-graph
+  id="graph-1"
+  #graphComponent
+  *ngIf="(graph | async) as syncGraph"
+  [ngcsEventSource]="syncGraph"
+  [forwardTo]="graphEvents"
+  [ngcsDroppable]="isNodeType"
+  (draggableDropped)="
+    createNode($event.data, syncGraph, graphComponent.convertMouseToGraphPosition($event.event.mousePosition))
+  "
+>
+  <!-- All the nodes of the graph-->
+  <ngcs-html-layer>
+    <div
+      *ngFor="let node of (nodes | async)"
+      #nodeElement
+      class="node ngcs-node"
+      [class.selected]="isNodeSelected(node) | async"
+      [attr.id]="node.idString"
+      [style.left]="node.uiProps.position.x + 'px'"
+      [style.top]="node.uiProps.position.y + 'px'"
+      [ngcsEventSource]="node"
+      [forwardTo]="nodeEvents"
+    >
+      <span class="header"> {{ node.name }} : [{{ node.type }}] </span>
 
-    [ngcsEventSource]="syncGraph" [forwardTo]="graphEvents"
-
-    [ngcsDroppable]="isNodeType"
-    (draggableDropped)="createNode($event.data, syncGraph, graphComponent.convertMouseToGraphPosition($event.event.mousePosition))">
-
-    <!-- All the nodes of the graph-->
-    <ngcs-html-layer>
-
-        <div *ngFor="let node of nodes | async"
-            #nodeElement
-            class="node ngcs-node"
-            [class.selected]="isNodeSelected(node) | async"
-            [attr.id]="node.idString"
-            [style.left]="node.uiProps.position.x+'px'"
-            [style.top]="node.uiProps.position.y+'px'"
-            [ngcsEventSource]="node" [forwardTo]="nodeEvents"
-            >
-
-            <span class="header">
-                {{ node.name }} : [{{node.type}}]
-            </span>
-
-            <div class="sockets">
-
-                <div class="inputs">
-                    <div class="socket"
-                        *ngFor="let socket of node.inputs"
-                        [ngcsEventSource]="socket" [forwardTo]="socketEvents"
-                        >
-                        <span>
-                             {{ socket.name }} : [{{ socket.typeName }}]
-                        </span>
-                        <ngcs-port [id]="socket.idString" class="left middle"></ngcs-port>
-                    </div>
-                </div>
-
-                <div class="outputs">
-                    <div class="socket"
-                        *ngFor="let socket of node.outputs"
-                        [ngcsEventSource]="socket" [forwardTo]="socketEvents"
-                        >
-                        <span>
-                            [{{ socket.typeName }}] : {{ socket.name }}
-                        </span>
-                        <ngcs-port [id]="socket.idString" class="right middle"></ngcs-port>
-                    </div>
-                </div>
-
-            </div>
-
+      <div class="sockets">
+        <div class="inputs">
+          <div class="socket" *ngFor="let socket of node.inputs" [ngcsEventSource]="socket" [forwardTo]="socketEvents">
+            <span>{{ socket.name }}</span>
+            <ngcs-port [id]="socket.idString" class="left middle"></ngcs-port>
+          </div>
         </div>
 
-    </ngcs-html-layer>
+        <div class="outputs">
+          <div class="socket" *ngFor="let socket of node.outputs" [ngcsEventSource]="socket" [forwardTo]="socketEvents">
+            <span>{{ socket.name }}</span>
+            <ngcs-port [id]="socket.idString" class="right middle"></ngcs-port>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ngcs-html-layer>
 
-    <!-- All the connections of the graph -->
-    <eg-connection-layer
-        [connections]="connections | async"
-        [drawStyle]="connectionDrawStyle | async">
+  <!-- All the connections of the graph -->
+  <eg-connection-layer [connections]="connections | async" [drawStyle]="connectionDrawStyle | async">
+  </eg-connection-layer>
 
-    </eg-connection-layer>
-
-    <!-- Tools are embedded in the graph, so they can add content to it too -->
-    <eg-selection-tool [nodeEvents]="nodeEvents" [graphEvents]="graphEvents" [connectionEvents]="connectionEvents"></eg-selection-tool>
-    <eg-navigation-tool [nodeEvents]="nodeEvents" [graphEvents]="graphEvents"></eg-navigation-tool>
-    <eg-move-tool [nodeEvents]="nodeEvents"></eg-move-tool>
-    <eg-socket-connection-tool [socketEvents]="socketEvents" [graphEvents]="graphEvents" [connectionDrawStyle]="connectionDrawStyle | async"></eg-socket-connection-tool>
-    <eg-delete-tool></eg-delete-tool>
-
+  <!-- Tools are embedded in the graph, so they can add content to it too -->
+  <eg-selection-tool
+    [nodeEvents]="nodeEvents"
+    [graphEvents]="graphEvents"
+    [connectionEvents]="connectionEvents"
+  ></eg-selection-tool>
+  <eg-navigation-tool [nodeEvents]="nodeEvents" [graphEvents]="graphEvents"></eg-navigation-tool>
+  <eg-move-tool [nodeEvents]="nodeEvents"></eg-move-tool>
+  <eg-socket-connection-tool
+    [socketEvents]="socketEvents"
+    [graphEvents]="graphEvents"
+    [connectionDrawStyle]="connectionDrawStyle | async"
+  ></eg-socket-connection-tool>
+  <eg-socket-type-tooltip-tool [socketEvents]="socketEvents"></eg-socket-type-tooltip-tool>
+  <eg-delete-tool></eg-delete-tool>
 </ngcs-graph>
-

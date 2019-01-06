@@ -1,0 +1,64 @@
+@import 'app/variables';
+
+@keyframes fadeOut {
+  from {
+    background: $overlay-background-color;
+    color: mat-color($app-secondary);
+  }
+  to {
+    background: transparent;
+    color: transparent;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    background: transparent;
+    color: transparent;
+  }
+  50% {
+    background: transparent;
+    color: transparent;
+  }
+  100% {
+    background: $overlay-background-color;
+    color: mat-color($app-secondary);
+  }
+}
+
+.fadeIn {
+  animation: 1.4s fadeIn;
+}
+
+.fadeOut {
+  animation: 0.8s fadeOut;
+}
+
+.tooltip {
+  position: absolute;
+  transform: translate(-50%, 100%);
+  pointer-events: none;
+  background: $overlay-background-color;
+  color: mat-color($app-secondary);
+  font-family: mat-font-family($app-graph-typography);
+  font-size: mat-font-size($app-graph-typography, caption);
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    li {
+      padding: 0.5em;
+      margin: 0;
+      .info {
+        white-space: nowrap;
+      }
+      .alert-icon {
+        vertical-align: middle;
+        height: 100%;
+      }
+    }
+  }
+  .ng-hide {
+    animation: 1s fadeOut;
+  }
+}
