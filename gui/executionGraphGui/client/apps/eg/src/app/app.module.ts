@@ -42,6 +42,8 @@ import { storeFreeze } from 'ngrx-store-freeze';
 import { VERBOSE_LOG_TOKEN, BINARY_HTTP_ROUTER_BASE_URL } from './tokens';
 
 import { GraphModule } from '@eg/graph';
+import { CommonModule } from '@eg/common';
+
 import { SimpleConsoleLoggerFactory, LoggerFactory } from '@eg/logger';
 
 import { BinaryHttpRouterService } from './services/BinaryHttpRouterService';
@@ -148,6 +150,7 @@ const routes: Route[] = [
     MatTabsModule,
     MatToolbarModule,
     GraphModule,
+    CommonModule,
     NxModule.forRoot(),
     RouterModule.forRoot(routes, { enableTracing: false }),
     StoreRouterConnectingModule.forRoot({}),

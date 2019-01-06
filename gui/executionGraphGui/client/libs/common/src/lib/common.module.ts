@@ -12,12 +12,12 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule as ngCommonModule } from '@angular/common';
-import { FileBrowserDirective } from './directives/file-browser.directive';
+import { FileBrowserComponent } from './components/file-browser/file-browser.component';
 
 @NgModule({
   imports: [ngCommonModule],
-  declarations: [FileBrowserDirective],
-  exports: [FileBrowserDirective],
+  declarations: [FileBrowserComponent],
+  exports: [FileBrowserComponent],
   providers: []
 })
 export class CommonModule {}

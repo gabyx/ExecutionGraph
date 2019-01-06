@@ -5,13 +5,14 @@
         <mat-icon>add</mat-icon>
         <span>Create new</span>
       </button>
-      <button mat-menu-item>
+      <button mat-menu-item (click)="fileBrowser.open()">
         <mat-icon>mode_edit</mat-icon>
         <span>Open</span>
       </button>
       <button mat-menu-item [matMenuTriggerFor]="openRecentMenu">
         <span>Open recent</span>
       </button>
+      <file-browser #fileBrowser></file-browser>
     </mat-menu>
 
     <mat-menu #viewMenu="matMenu">
