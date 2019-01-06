@@ -25,6 +25,15 @@ export class SocketTypeToolTipToolComponent extends ToolComponent implements OnI
     this.logger = loggerFactory.create('SocketTypeToolTipToolComponent');
   }
 
+  /**
+   * Turns the observable (on/off) depending on the
+   * `enabled` observable.
+   * @private
+   * @template Event
+   * @param {Observable<Event>} obs
+   * @returns Observable<Event> | never()
+   * @memberof SocketTypeToolTipToolComponent
+   */
   private makeEnabled<Event>(obs: Observable<Event>) {
     return this.enabled.pipe(
       switchMap(enable => {
@@ -40,10 +49,10 @@ export class SocketTypeToolTipToolComponent extends ToolComponent implements OnI
 
   private subscribe<TElement extends { type?: string }>(events: IElementEvents<TElement>) {
     this.makeEnabled(events.onEnter).subscribe(e => {
-      console.log('ToolTip: next');
       this.toolTipMessages = [`Type: [${e.element.type}]`];
       this.toolTipPosition = this.graph.convertMouseToGraphPosition(e.mousePosition);
     });
+
     this.makeEnabled(events.onLeave).subscribe(e => this.reset());
   }
 

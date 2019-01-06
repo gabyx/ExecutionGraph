@@ -1,7 +1,7 @@
 import { IElementEvents } from '@eg/graph';
 import { Input, Output, EventEmitter } from '@angular/core';
 import { Socket, Node, Graph, Connection } from '../../model';
-import { Observable, of } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
 export enum KEY_CODE {
@@ -23,21 +23,45 @@ export abstract class ToolComponent {
   @Input()
   connectionEvents: IElementEvents<Connection>;
 
+  /**
+   * Output observable which defines the enabled state of the tool.
+   * BehaviorSubject because each subscriber should directly get the current value.
+   *
+   * @type {Observable<boolean>}
+   * @memberof ToolComponent
+   */
   @Output()
-  enabled: Observable<boolean> = of(true);
+  enabled: Observable<boolean> = new BehaviorSubject<boolean>(true);
+
+  /**
+   * This input can be used to set
+   * the enabled state ot the tool depending
+   * on another observable.
+   *
+   * @memberof ToolComponent
+   */
   @Input()
   set enable(o: Observable<boolean>) {
-    this.enabled = o.pipe(startWith(true));
+    this.enabled = o;
   }
 
+  /**
+   * This input can be used to set
+   * the disabled state ot the tool depending
+   * on another observable.
+   *
+   * @memberof ToolComponent
+   */
   @Input()
   set disable(o: Observable<boolean>) {
-    this.enabled = o.pipe(
-      startWith(false),
-      map(enable => !enable)
-    );
+    this.enabled = o.pipe(map(disable => !disable));
   }
 
+  /**
+   * Output Observable which defines if the tool is currently active, e.g. meaning
+   * the user is using it.
+   * @memberof ToolComponent
+   */
   @Output()
   activated = new EventEmitter<boolean>();
 }
