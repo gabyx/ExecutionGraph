@@ -89,8 +89,6 @@ import { MoveToolComponent } from './components/tools/move-tool/move-tool.compon
 import { DeleteToolComponent } from './components/tools/delete-tool/delete-tool.component';
 import { SocketTypeToolTipToolComponent } from './components/tools/type-tooltip-tool/type-tooltip-tool.component';
 
-//environment.production = true;
-
 const routes: Route[] = [
   {
     path: 'graph',
