@@ -47,9 +47,9 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       this.logger.info(`Initiating new connection from ${socket.idString}`);
       this.sourceSocket = socket;
       if (Socket.isOutputSocket(this.sourceSocket)) {
-        this.tempTargetSocket = new InputSocket(socket.type, socket.name, new SocketIndex(0));
+        this.tempTargetSocket = new InputSocket(socket.typeIndex, socket.name, new SocketIndex(0));
       } else {
-        this.tempTargetSocket = new OutputSocket(socket.type, socket.name, new SocketIndex(0));
+        this.tempTargetSocket = new OutputSocket(socket.typeIndex, socket.name, new SocketIndex(0));
       }
 
       this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);

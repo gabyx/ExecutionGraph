@@ -22,19 +22,25 @@
       [ngcsEventSource]="node"
       [forwardTo]="nodeEvents"
     >
-      <span class="header"> {{ node.name }} : [{{ node.type }}] </span>
+      <div class="header">
+        <span [ngcsEventSource]="node" [forwardTo]="nodeNameEvents" [cancelBubble]="false">{{ node.name }}</span>
+      </div>
 
       <div class="sockets">
         <div class="inputs">
           <div class="socket" *ngFor="let socket of node.inputs" [ngcsEventSource]="socket" [forwardTo]="socketEvents">
-            <span>{{ socket.name }}</span>
+            <span [ngcsEventSource]="socket" [forwardTo]="socketNameEvents" [cancelBubble]="false">{{
+              socket.name
+            }}</span>
             <ngcs-port [id]="socket.idString" class="left middle"></ngcs-port>
           </div>
         </div>
 
         <div class="outputs">
           <div class="socket" *ngFor="let socket of node.outputs" [ngcsEventSource]="socket" [forwardTo]="socketEvents">
-            <span>{{ socket.name }}</span>
+            <span [ngcsEventSource]="socket" [forwardTo]="socketNameEvents" [cancelBubble]="false">{{
+              socket.name
+            }}</span>
             <ngcs-port [id]="socket.idString" class="right middle"></ngcs-port>
           </div>
         </div>
@@ -53,12 +59,16 @@
     [connectionEvents]="connectionEvents"
   ></eg-selection-tool>
   <eg-navigation-tool [nodeEvents]="nodeEvents" [graphEvents]="graphEvents"></eg-navigation-tool>
-  <eg-move-tool [nodeEvents]="nodeEvents"></eg-move-tool>
+  <eg-move-tool #moveTool [nodeEvents]="nodeEvents"></eg-move-tool>
   <eg-socket-connection-tool
     [socketEvents]="socketEvents"
     [graphEvents]="graphEvents"
     [connectionDrawStyle]="connectionDrawStyle | async"
   ></eg-socket-connection-tool>
-  <eg-socket-type-tooltip-tool [socketEvents]="socketEvents"></eg-socket-type-tooltip-tool>
+  <eg-type-tooltip-tool
+    [socketEvents]="socketNameEvents"
+    [nodeEvents]="nodeNameEvents"
+    [disable]="moveTool.activated"
+  ></eg-type-tooltip-tool>
   <eg-delete-tool></eg-delete-tool>
 </ngcs-graph>

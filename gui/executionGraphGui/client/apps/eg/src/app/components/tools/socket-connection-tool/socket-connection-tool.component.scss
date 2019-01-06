@@ -22,7 +22,7 @@
   position: absolute;
   transform: translate(-50%, -110%);
   pointer-events: none;
-
+  border-radius: 5pt;
   background: $overlay-background-color;
   color: $stroke-color-invalid;
   font-family: mat-font-family($app-graph-typography);

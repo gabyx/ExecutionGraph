@@ -111,7 +111,9 @@ export class Connection {
     /** no 1-length-cycles, more elaborate cycle-detection in the backend */
     result |= source.parent !== target.parent ? Invalidity.Valid : Invalidity.Invalid | Invalidity.OneLengthCycle;
     /** correct type */
-    result |= source.type.equals(target.type) ? Invalidity.Valid : Invalidity.Invalid | Invalidity.TypeMismatch;
+    result |= source.typeIndex.equals(target.typeIndex)
+      ? Invalidity.Valid
+      : Invalidity.Invalid | Invalidity.TypeMismatch;
     return result;
   }
 

@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SocketTypeTooltipComponent } from './socket-type-tooltip.component';
+import { SocketTypeTooltipComponent } from './type-tooltip.component';
 
 describe('SocketTypeTooltipComponent', () => {
   let component: SocketTypeTooltipComponent;
@@ -8,9 +8,8 @@ describe('SocketTypeTooltipComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SocketTypeTooltipComponent ]
-    })
-    .compileComponents();
+      declarations: [SocketTypeTooltipComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

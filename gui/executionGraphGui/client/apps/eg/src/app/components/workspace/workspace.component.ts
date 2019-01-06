@@ -42,8 +42,10 @@ export class WorkspaceComponent implements OnInit {
   public readonly graphEvents = new EventSourceGateway<Graph>();
 
   public readonly nodeEvents = new EventSourceGateway<Node>();
+  public readonly nodeNameEvents = new EventSourceGateway<Node>();
 
   public readonly socketEvents = new EventSourceGateway<Socket>();
+  public readonly socketNameEvents = new EventSourceGateway<Socket>();
 
   public readonly connectionEvents = new EventSourceGateway<Connection>();
 
