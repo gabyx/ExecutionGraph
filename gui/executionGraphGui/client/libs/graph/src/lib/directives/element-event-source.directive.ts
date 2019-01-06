@@ -172,8 +172,8 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
     this.documentMouseReleased.emit(this.convertButtonEvent(event));
   }
 
-  @HostListener('mousewheel', ['$event'])
-  onMouseScroll(e: MouseWheelEvent) {
+  @HostListener('wheel', ['$event'])
+  onMouseScroll(e: WheelEvent) {
     e.preventDefault();
     this.mouseScrolled.emit(this.convertScrollEvent(e));
   }
@@ -202,11 +202,12 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
     };
   }
 
-  private convertScrollEvent(mouseEvent: MouseWheelEvent): ElementMouseScrollEvent<TElement> {
-    const event = this.convertEvent(mouseEvent);
+  private convertScrollEvent(wheelEvent: WheelEvent): ElementMouseScrollEvent<TElement> {
+    const event = this.convertEvent(wheelEvent);
     return {
       ...event,
-      delta: mouseEvent.wheelDelta
+      deltaX: wheelEvent.deltaX,
+      deltaY: wheelEvent.deltaY
     };
   }
 }
