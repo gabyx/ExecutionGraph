@@ -11,12 +11,8 @@ export interface ConnectionMap {
 }
 
 export interface Graph {
-
   readonly id: Id;
-
   readonly typeId: Id;
-
   readonly connections: ConnectionMap;
-
   readonly nodes: NodeMap;
 }
