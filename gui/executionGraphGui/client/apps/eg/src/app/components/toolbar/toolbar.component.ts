@@ -33,4 +33,12 @@ export class ToolbarComponent implements OnInit {
   }
 
   ngOnInit() {}
+
+  public openFile(file: File) {
+    // @todo cmonspqr -> gabyx: Dispatch file load action
+    // For security reasons we won't have access to the actual file path in the Browser.
+    // Thus we should consider reading the file in the client using the FileReader API
+    // and transmitting the bytestream to the backend.
+    console.log(`Opening graph from ${file.name}`);
+  }
 }
