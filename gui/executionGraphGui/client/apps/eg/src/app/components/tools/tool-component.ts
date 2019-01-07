@@ -2,7 +2,6 @@ import { IElementEvents } from '@eg/graph';
 import { Input, Output, EventEmitter } from '@angular/core';
 import { Socket, Node, Graph, Connection } from '../../model';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
 
 export enum KEY_CODE {
   BACKSPACE = 8,
@@ -30,8 +29,11 @@ export abstract class ToolComponent {
    * @type {Observable<boolean>}
    * @memberof ToolComponent
    */
-  @Output()
-  enabled: Observable<boolean> = new BehaviorSubject<boolean>(true);
+  get enabled(): Observable<boolean> {
+    return this._enabled.asObservable();
+  }
+
+  private readonly _enabled = new BehaviorSubject<boolean>(true);
 
   /**
    * This input can be used to set
@@ -41,8 +43,8 @@ export abstract class ToolComponent {
    * @memberof ToolComponent
    */
   @Input()
-  set enable(o: Observable<boolean>) {
-    this.enabled = o;
+  set enable(o: boolean) {
+    this._enabled.next(o);
   }
 
   /**
@@ -53,8 +55,8 @@ export abstract class ToolComponent {
    * @memberof ToolComponent
    */
   @Input()
-  set disable(o: Observable<boolean>) {
-    this.enabled = o.pipe(map(disable => !disable));
+  set disable(o: boolean) {
+    this._enabled.next(!o);
   }
 
   /**
@@ -63,5 +65,13 @@ export abstract class ToolComponent {
    * @memberof ToolComponent
    */
   @Output()
-  activated = new EventEmitter<boolean>();
+  readonly activated = new EventEmitter<boolean>();
+
+  protected activate() {
+    this.activated.emit(true);
+  }
+
+  protected deactivate() {
+    this.activated.emit(false);
+  }
 }

@@ -60,12 +60,15 @@
   ></eg-selection-tool>
   <eg-navigation-tool [nodeEvents]="nodeEvents" [graphEvents]="graphEvents"></eg-navigation-tool>
   <eg-move-tool #moveTool [nodeEvents]="nodeEvents"></eg-move-tool>
-  <eg-socket-connection-tool
+  <eg-socket-connection-tool *ngIf="isEnabled"
     [socketEvents]="socketEvents"
     [graphEvents]="graphEvents"
     [connectionDrawStyle]="connectionDrawStyle | async"
+    (enabled)="typeTooltipTool.enable = $event"
+    [enabled]="typeTooltipTool.enabled | async"
   ></eg-socket-connection-tool>
   <eg-type-tooltip-tool
+    #typeTooltipTool
     [socketEvents]="socketNameEvents"
     [nodeEvents]="nodeNameEvents"
     [disable]="moveTool.activated"

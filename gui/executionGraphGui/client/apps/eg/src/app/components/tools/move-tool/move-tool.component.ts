@@ -18,9 +18,10 @@ export class MoveToolComponent extends ToolComponent implements OnInit {
   ngOnInit() {
     let elementOffset: Point;
     this.nodeEvents.onDragStart.subscribe(e => {
-      this.activated.emit(true);
+      this.activate();
       elementOffset = e.elementOffset;
     });
+
     this.nodeEvents.onDragContinue.subscribe(dragEvent => {
       const nodePosition = {
         x: dragEvent.mousePosition.x - elementOffset.x,
@@ -32,7 +33,7 @@ export class MoveToolComponent extends ToolComponent implements OnInit {
     });
 
     this.nodeEvents.onDragStop.subscribe(e => {
-      this.activated.emit(false);
+      this.deactivate();
     });
   }
 }

@@ -1,13 +1,14 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
+
+import { merge, combineLatest } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
+
 import { Point, GraphComponent } from '@eg/graph';
 import { ILogger, LoggerFactory } from '@eg/logger';
 
 import { ToolComponent } from '../tool-component';
 import { GraphsState } from '../../../+state/reducers';
-import { Observable, never } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-import { IElementEvents } from '@eg/graph';
 
 @Component({
   selector: 'eg-type-tooltip-tool',
@@ -25,46 +26,25 @@ export class TypeToolTipToolComponent extends ToolComponent implements OnInit {
     this.logger = loggerFactory.create('TypeToolTipToolComponent');
   }
 
-  /**
-   * Turns the observable (on/off) depending on the
-   * `enabled` observable.
-   * @private
-   * @template Event
-   * @param {Observable<Event>} obs
-   * @returns Observable<Event> | never()
-   * @memberof TypeToolTipToolComponent
-   */
-  private makeEnabled<Event>(obs: Observable<Event>) {
-    return this.enabled.pipe(
-      switchMap(enable => {
-        if (enable) {
-          return obs;
-        } else {
-          this.reset();
-          return never();
-        }
-      })
-    );
-  }
-
-  private subscribe<TElement extends { type?: string }>(events: IElementEvents<TElement>) {
-    this.makeEnabled(events.onEnter).subscribe(e => {
-      this.toolTipMessages = [`Type: [${e.element.type}]`];
-      this.toolTipPosition = this.graph.convertMouseToGraphPosition(e.mousePosition);
-    });
-
-    this.makeEnabled(events.onLeave).subscribe(e => this.reset());
-  }
 
   ngOnInit() {
-    this.subscribe(this.socketEvents);
-    this.subscribe(this.nodeEvents);
-  }
+    const enterEvents = merge(this.socketEvents.onEnter, this.nodeEvents.onEnter);
+    const leaveEvents = merge(this.socketEvents.onLeave, this.nodeEvents.onLeave);
 
-  private reset() {
-    if (this.toolTipMessages) {
-      this.toolTipMessages = null;
-      this.toolTipPosition = { x: 0, y: 0 };
-    }
+    // On entering, (or if enabled changed after enter and before leave)
+    combineLatest(enterEvents, this.enabled).pipe(
+      tap(([e, enabled]) => {
+        if(enabled) {
+          this.toolTipMessages = [`Type: [${e.element.type}]`];
+          this.toolTipPosition = this.graph.convertMouseToGraphPosition(e.mousePosition);
+        }
+      }),
+      // After it was entereed, only listen to leave again
+      switchMap(() => leaveEvents),
+      tap(() => {
+        this.toolTipMessages = null;
+        this.toolTipPosition = { x: 0, y: 0 };
+      })
+    ).subscribe();
   }
 }
