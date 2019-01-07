@@ -30,15 +30,14 @@ export abstract class ToolComponent {
    * @memberof ToolComponent
    */
   get enabled(): Observable<boolean> {
-    return this._enabled.asObservable();
+    return this._enabled;
   }
 
   private readonly _enabled = new BehaviorSubject<boolean>(true);
 
   /**
    * This input can be used to set
-   * the enabled state ot the tool depending
-   * on another observable.
+   * the enabled state of the tool.
    *
    * @memberof ToolComponent
    */
@@ -49,8 +48,7 @@ export abstract class ToolComponent {
 
   /**
    * This input can be used to set
-   * the disabled state ot the tool depending
-   * on another observable.
+   * the disabled state ot the tool.
    *
    * @memberof ToolComponent
    */
