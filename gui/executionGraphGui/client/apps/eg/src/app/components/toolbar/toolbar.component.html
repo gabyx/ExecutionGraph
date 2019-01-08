@@ -12,7 +12,7 @@
       <button mat-menu-item [matMenuTriggerFor]="openRecentMenu">
         <span>Open recent</span>
       </button>
-      <file-browser #fileBrowser></file-browser>
+      <eg-file-browser #fileBrowser (fileChanged)="openFile($event)"></eg-file-browser>
     </mat-menu>
 
     <mat-menu #viewMenu="matMenu">
