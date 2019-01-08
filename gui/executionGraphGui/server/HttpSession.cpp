@@ -160,53 +160,67 @@ namespace
             return;
         }
 
-        BackendRequest request(req.target(),
-                               payLoadSize ? std::make_optional(
-                                                 BackendRequest::Payload{
-                                                     std::move(req.body()),
-                                                     req[http::field::content_type]})
-                                           : std::nullopt);
+        // Split read target into "/eg-backend/<category>/<subcategory>" and "additionalArgs"
+        auto splitPath = [](const auto& target) {
+            std::path p = target;
+            auto it     = p.begin();
+            auto end    = p.end();
+            std::path first;
+            for(auto i = 0u; i < 4 && it != end; ++i, ++it)
+            {
+                first /= *it;
+            }
 
-        BackendResponsePromise responsePromise{executionGraph::Id{}, allocator};
-        ResponseFuture responeFuture(responsePromise);
+            return std::make_pair(first, target.substr(first.native().length());});
+    }
 
-        if(!dispatcher.handleRequest(request, responsePromise))
+    autp p = splitPath(req.target());
+    BackendRequest request(p.first,
+                           p.second,
+                           payLoadSize ? std::make_optional(BackendRequest::Payload{std::move(req.body()),
+                                                                                    req[http::field::content_type]})
+                                       : std::nullopt);
+
+    BackendResponsePromise responsePromise{{}, allocator};
+    ResponseFuture responeFuture(responsePromise);
+
+    if(!dispatcher.handleRequest(request, responsePromise))
+    {
+        send(makeBadResponse(req, "Request is not handled in dispatcher!"));
+    }
+    else
+    {
+        try
         {
-            send(makeBadResponse(req, "Request is not handled in dispatcher!"));
+            EXECGRAPHGUI_THROW_IF(!responeFuture.isValid(), "Future is not valid!");
+            auto payload  = responeFuture.waitForPayload();
+            auto mimeType = payload.mimeType();
+
+            // Send the response.
+            ResponseBinary res{std::piecewise_construct,
+                               std::make_tuple(std::move(payload.buffer())),
+                               std::make_tuple(http::status::ok, req.version())};
+            res.set(http::field::server, versionString);
+            res.set(http::field::content_type, mimeType);
+            res.content_length(res.payload_size());
+            res.keep_alive(req.keep_alive());
+            res.prepare_payload();
+            send(std::move(res));
         }
-        else
+        catch(const BadRequestError& e)
         {
-            try
-            {
-                EXECGRAPHGUI_THROW_IF(!responeFuture.isValid(), "Future is not valid!");
-                auto payload  = responeFuture.waitForPayload();
-                auto mimeType = payload.mimeType();
-
-                // Send the response.
-                ResponseBinary res{std::piecewise_construct,
-                                   std::make_tuple(std::move(payload.buffer())),
-                                   std::make_tuple(http::status::ok, req.version())};
-                res.set(http::field::server, versionString);
-                res.set(http::field::content_type, mimeType);
-                res.content_length(res.payload_size());
-                res.keep_alive(req.keep_alive());
-                res.prepare_payload();
-                send(std::move(res));
-            }
-            catch(const BadRequestError& e)
-            {
-                send(makeBadResponse(req, fmt::format("BadRequest: '{0}'", e.what())));
-            }
-            catch(const InternalBackendError& e)
-            {
-                send(makeServerError(req, fmt::format("InternalBackendError: '{0}'", e.what())));
-            }
-            catch(const std::exception& e)
-            {
-                send(makeServerError(req, fmt::format("Unknown Error: '{0}'", e.what())));
-            }
+            send(makeBadResponse(req, fmt::format("BadRequest: '{0}'", e.what())));
+        }
+        catch(const InternalBackendError& e)
+        {
+            send(makeServerError(req, fmt::format("InternalBackendError: '{0}'", e.what())));
+        }
+        catch(const std::exception& e)
+        {
+            send(makeServerError(req, fmt::format("Unknown Error: '{0}'", e.what())));
         }
     }
+}  // namespace
 }  // namespace
 
 /* ---------------------------------------------------------------------------------------*/

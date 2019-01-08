@@ -217,13 +217,10 @@ private:
     //! Get the first handler which matches the request.
     std::shared_ptr<Handler> matchHandler(const Request& request)
     {
-        // Lock start
         std::scoped_lock<std::mutex> lock(m_access);
-        // Get the request type
-        auto Request = request.getTarget().string();
 
-        // Find handler
-        auto it = m_specificHandlers.find(Request);
+        auto& target = request.getTarget().native();
+        auto it      = m_specificHandlers.find(target);
 
         if(it != m_specificHandlers.end())
         {
