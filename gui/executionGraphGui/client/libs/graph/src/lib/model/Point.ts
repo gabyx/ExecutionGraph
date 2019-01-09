@@ -16,3 +16,26 @@ export interface Point {
 };
 
 export type Position = Point;
+
+export function diff(a: Point, b: Point): Point {
+  return {
+    x: a.x - b.x,
+    y: a.y - b.y
+  };
+}
+
+export function norm2(v: Point): number {
+  return v.x * v.x + v.y * v.y;
+}
+
+export function norm(v: Point): number {
+  return Math.sqrt(norm2(v));
+}
+
+export function normalize(v: Point): Point {
+  const length = norm(v);
+  return {
+    x: v.x / length,
+    y: v.y / length
+  };
+}
