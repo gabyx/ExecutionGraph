@@ -25,6 +25,7 @@ import * as graphQueries from '../../+state/selectors/graph.selectors';
 import { getConnectionDrawStyle, getSelection } from '../../+state/selectors/ui.selectors';
 import { Selection, UiState } from '../../+state/reducers/ui.reducers';
 import { AddNode } from '../../+state/actions';
+import { AutoLayoutService } from '../../services/AutoLayoutService';
 
 @Injectable()
 @Component({

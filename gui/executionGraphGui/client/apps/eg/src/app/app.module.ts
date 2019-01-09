@@ -158,7 +158,7 @@ const routes: Route[] = [
       //metaReducers : !environment.production ? [storeFreeze] : []
     }),
     EffectsModule.forRoot(effects),
-    environment.production ? [] : StoreDevtoolsModule.instrument()
+    environment.production ? [] : StoreDevtoolsModule.instrument({serialize: false})
   ],
   providers: [
     { provide: VERBOSE_LOG_TOKEN, useValue: environment.logReponsesVerbose },

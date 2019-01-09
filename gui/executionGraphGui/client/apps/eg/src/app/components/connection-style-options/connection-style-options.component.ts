@@ -11,6 +11,8 @@
 // =========================================================================================
 
 import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
 import {
   ConnectionDrawStyle,
   DirectConnectionDrawStyle,
@@ -18,11 +20,14 @@ import {
   BezierConnectionDrawStyle
 } from '@eg/graph';
 import { ILogger, LoggerFactory } from '@eg/logger';
-import { Store } from '@ngrx/store';
+
+import { Graph } from '../../model';
 import { UiState } from '../../+state/reducers/ui.reducers';
 import { SetConnectionDrawStyle } from '../../+state/actions/ui.actions';
-import { Observable } from 'rxjs';
 import { getConnectionDrawStyleName } from '../../+state/selectors/ui.selectors';
+import { AutoLayoutService } from '../../services/AutoLayoutService';
+import { AppState } from '../../+state/reducers/app.reducers';
+import { getSelectedGraph } from '../../+state/selectors';
 
 export type ConnectionDrawStyleName = 'direct' | 'manhatten' | 'bezier';
 
@@ -41,11 +46,14 @@ export class ConnectionStyleOptionsComponent implements OnInit {
 
   drawStyle: Observable<ConnectionDrawStyleName>;
 
+  graph: Observable<Graph>;
+
   private readonly log: ILogger;
 
-  constructor(private store: Store<UiState>, loggerFactory: LoggerFactory) {
+  constructor(private store: Store<AppState>, loggerFactory: LoggerFactory) {
     this.log = loggerFactory.create('ConnectionStyleOptionsComponent');
     this.drawStyle = store.select(getConnectionDrawStyleName);
+    this.graph = store.select(getSelectedGraph);
   }
 
   ngOnInit() {}
@@ -53,5 +61,9 @@ export class ConnectionStyleOptionsComponent implements OnInit {
   setDrawStyle(drawStyleName: ConnectionDrawStyleName) {
     this.log.info(`Draw Style changed to ${drawStyleName}`);
     this.store.dispatch(new SetConnectionDrawStyle(drawStyleName));
+  }
+
+  autoLayoutGraph(graph: Graph) {
+    new AutoLayoutService(this.store).layoutGraph(graph, 500)
   }
 }

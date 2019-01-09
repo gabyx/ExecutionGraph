@@ -1,4 +1,4 @@
-import { Point } from "../model/Point";
+import { Point, diff, norm2, normalize, norm } from "../model/Point";
 
 export interface Node {
     readonly position: Point;
@@ -16,6 +16,7 @@ export interface Graph {
 
 export class ForceDirectedGraphLayout {
 
+    private readonly k: number;
     private readonly k2: number;
 
     private edgeMap: Map<Node, Set<Node>> = new Map();
@@ -23,10 +24,9 @@ export class ForceDirectedGraphLayout {
 
     constructor(
         private graph: Graph,
-        private k: number = 1.0) {
-        this.k2 = k * k;
+        private optimalDistance: number = 200) {
 
-        this.initEdgeMap();
+
     }
 
     private initEdgeMap() {
@@ -52,34 +52,63 @@ export class ForceDirectedGraphLayout {
         }
     }
 
+    public execute() {
+        this.initEdgeMap();
+        this.calculateSpringModel();
+    }
+
     private calculateSpringModel() {
         const MIN_ADJUSTMENT = 5;
 
-        let step = 100;
+        let step = 10;
         let energy = Number.POSITIVE_INFINITY;
         let positionAdjustments = Number.POSITIVE_INFINITY;
 
         while (positionAdjustments >= MIN_ADJUSTMENT) {
+            positionAdjustments = 0;
             const energy0 = energy;
             energy = 0;
             for(const node of this.graph.nodes) {
                 const nodeForce = {x: 0, y: 0};
-                for(const connectedNode of this.edgeMap.get(node)) {
-                    const attractionForce = this.calculateSpringForce(node.position, connectedNode.position);
+                if(this.edgeMap.has(node)) {
+                    for(const connectedNode of Array.from(this.edgeMap.get(node))) {
+                        const fEdge = this.calculateSpringForce(node.position, connectedNode.position);
+                        nodeForce.x += fEdge.x;
+                        nodeForce.y += fEdge.y;
+                    }
                 }
+                if (this.noEdgeMap.has(node)) {
+                    for (const disconnectedNode of Array.from(this.noEdgeMap.get(node))) {
+                        const fEdge = this.calculateSpringForce(node.position, disconnectedNode.position);
+                        nodeForce.x += fEdge.x;
+                        nodeForce.y += fEdge.y;
+                    }
+                }
+
+                const f2 = norm(nodeForce);
+                const f = Math.sqrt(f2);
+
+                const adjustementX = step * nodeForce.x / f;
+                const adjustementY = step * nodeForce.y / f;
+                positionAdjustments += norm({x: adjustementX, y: adjustementY });
+                node.position.x -= adjustementX;
+                node.position.y -= adjustementY;
+                energy += f2;
             }
+
+            step *= 0.9;
         }
     }
 
-    private calculateSpringForce(a: Point, b: Point): number {
-        const d: Point = {
-            x: a.x - b.x,
-            y: a.y - b.y
-        };
-        const d2 = d.x * d.x + d.y * d.y;
-        const d1 = Math.sqrt(d2);
+    private calculateSpringForce(a: Point, b: Point): Point {
+        const d = diff(a, b);
+        const length = norm(d);
 
-        return this.k - d1;
+        const f = length - this.optimalDistance;
+        return {
+            x: f * d.x / length,
+            y: f * d.y / length
+        };
     }
 
     private calculateSpringElectriclForce(node: Node): Point {
