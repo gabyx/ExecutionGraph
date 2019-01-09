@@ -22,6 +22,49 @@ export class ForceDirectedGraphLayout {
     private edgeMap: Map<Node, Set<Node>> = new Map();
     private noEdgeMap: Map<Node, Set<Node>> = new Map();
 
+
+    private static calculateSpringForce(a: Point, b: Point, distance: number): Point {
+        const d = diff(a, b);
+        const length = norm(d);
+
+        const f = length - distance;
+        return {
+            x: f * d.x / length,
+            y: f * d.y / length
+        };
+    }
+
+    private static calculateAttractiveForce(a: Point, b: Point, k: number): Point {
+        const d: Point = {
+            x: a.x - b.x,
+            y: a.y - b.y
+        };
+        const d2 = d.x * d.x + d.y * d.y;
+
+        const factor = -(d2 / k);
+
+        return {
+            x: d.x * factor,
+            y: d.y * factor
+        };
+    }
+
+    private static calculateRepulsiveForce(a: Point, b: Point, k2: number): Point {
+        const d: Point = {
+            x: a.x - b.x,
+            y: a.y - b.y
+        };
+        const d2 = d.x * d.x + d.y * d.y;
+        const d1 = Math.sqrt(d2);
+
+        const factor = (k2 / d1);
+
+        return {
+            x: d.x * factor,
+            y: d.y * factor
+        };
+    }
+
     constructor(
         private graph: Graph,
         private optimalDistance: number = 200) {
@@ -70,20 +113,21 @@ export class ForceDirectedGraphLayout {
             energy = 0;
             for(const node of this.graph.nodes) {
                 const nodeForce = {x: 0, y: 0};
-                if(this.edgeMap.has(node)) {
-                    for(const connectedNode of Array.from(this.edgeMap.get(node))) {
-                        const fEdge = this.calculateSpringForce(node.position, connectedNode.position);
+                if (this.edgeMap.has(node)) {
+                    for (const connectedNode of Array.from(this.edgeMap.get(node))) {
+                        const fEdge = ForceDirectedGraphLayout.calculateSpringForce(node.position, connectedNode.position, this.optimalDistance);
                         nodeForce.x += fEdge.x;
                         nodeForce.y += fEdge.y;
                     }
                 }
                 if (this.noEdgeMap.has(node)) {
                     for (const disconnectedNode of Array.from(this.noEdgeMap.get(node))) {
-                        const fEdge = this.calculateSpringForce(node.position, disconnectedNode.position);
+                        const fEdge = ForceDirectedGraphLayout.calculateSpringForce(node.position, disconnectedNode.position, 2 * this.optimalDistance);
                         nodeForce.x += fEdge.x;
                         nodeForce.y += fEdge.y;
                     }
                 }
+                // const nodeForce = this.calculateSpringElectricalForce(node);
 
                 const f2 = norm(nodeForce);
                 const f = Math.sqrt(f2);
@@ -100,63 +144,26 @@ export class ForceDirectedGraphLayout {
         }
     }
 
-    private calculateSpringForce(a: Point, b: Point): Point {
-        const d = diff(a, b);
-        const length = norm(d);
-
-        const f = length - this.optimalDistance;
-        return {
-            x: f * d.x / length,
-            y: f * d.y / length
-        };
-    }
-
-    private calculateSpringElectriclForce(node: Node): Point {
+    private calculateSpringElectricalForce(node: Node): Point {
         const force = { x: 0, y: 0 };
 
-        for (const noEdge of this.noEdgeMap.get(node)) {
-            const fR = this.calculateRepulsiveForce(node.position, noEdge.position);
-            force.x += fR.x;
-            force.y += fR.y;
+        if (this.noEdgeMap.has(node)) {
+            for (const noEdge of Array.from(this.noEdgeMap.get(node))) {
+                const fR = ForceDirectedGraphLayout.calculateRepulsiveForce(node.position, noEdge.position, 1.2**2);
+                force.x += fR.x;
+                force.y += fR.y;
+            }
         }
-        for (const edge of this.edgeMap.get(node)) {
-            const fA = this.calculateAttractiveForce(node.position, edge.position);
-            force.x += fA.x;
-            force.y += fA.y;
+        if (this.edgeMap.has(node)) {
+            for (const edge of Array.from(this.edgeMap.get(node))) {
+                const fA = ForceDirectedGraphLayout.calculateAttractiveForce(node.position, edge.position, 1.2);
+                force.x += fA.x;
+                force.y += fA.y;
+            }
         }
 
         return force;
     }
 
-    private calculateAttractiveForce(a: Point, b: Point): Point {
-        const d: Point = {
-            x: a.x - b.x,
-            y: a.y - b.y
-        };
-        const d2 = d.x * d.x + d.y * d.y;
-
-        const factor = -(d2 / this.k);
-
-        return {
-            x: d.x * factor,
-            y: d.y * factor
-        };
-    }
-
-    private calculateRepulsiveForce(a: Point, b: Point): Point {
-        const d: Point = {
-            x: a.x - b.x,
-            y: a.y - b.y
-        };
-        const d2 = d.x * d.x + d.y * d.y;
-        const d1 = Math.sqrt(d2);
-
-        const factor = (this.k2 / d1);
-
-        return {
-            x: d.x * factor,
-            y: d.y * factor
-        };
-    }
 
 }

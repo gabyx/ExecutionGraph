@@ -64,6 +64,6 @@ export class ConnectionStyleOptionsComponent implements OnInit {
   }
 
   autoLayoutGraph(graph: Graph) {
-    new AutoLayoutService(this.store).layoutGraph(graph, 500)
+    new AutoLayoutService(this.store).layoutGraph(graph, 300)
   }
 }
