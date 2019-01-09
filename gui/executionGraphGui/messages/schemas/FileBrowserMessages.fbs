@@ -2,7 +2,7 @@
 //  ExecutionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 // 
-//  @date Tue Aug 14 2018
+//  @date Wed Jan 09 2019
 //  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
 // 
 //  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,41 +10,25 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-include "executionGraphGui/messages/schemas/DataTypes.fbs";
-include "executionGraph/serialization/schemas/LogicNode.fbs";
+include "executionGraphGui/messages/schemas/FileSystemInfo.fbs";
 
 namespace executionGraphGui.serialization;
 
 //! ======================================================================
-//! Message "/eg-backend/general/addGraph"
+//! Message "/eg-backend/files/browse"
 //! ======================================================================
 //! Request data:
-table AddGraphRequest {
-    graphTypeId:string (id:0, required); //!< The graph type guid.
+table BrowseRequest {
+    path: string (id:0, required);    //!< A relative/absolute path for which information should be gathered.
+    recursive: bool = false (id:1);    //!< If the directory structure is traversed recursively.
 }
 //! Response data:
 //! Success: 
 //    - status code: 200 (OK)
 //! Valid Errors:
 //!   - status code: 400 (Bad Request)
-//!     - graph type id is not found
-table AddGraphResponse {
-    graphId:string (id:0, required); //!< The graph guid.
+//!     - path not found, or bad permission if its a directory.
+table BrowseResponse {
+    info: PathInfo (id:0, required); //!< The info for the requested path.
 }
-//! ======================================================================
-
-//! ======================================================================
-//! Message "/eg-backend/general/removeGraph"
-//! ======================================================================
-//! Request data: 
-table RemoveGraphRequest {
-    graphId:string (id:0, required);  //!< The graph guid.
-}
-
-//! Response data: none
-//! Success: 
-//    - status code: 200 (OK)
-//! Valid Errors:
-//!   - status code: 400 (Bad Request)
-//!     - graph id is not found
 //! ======================================================================

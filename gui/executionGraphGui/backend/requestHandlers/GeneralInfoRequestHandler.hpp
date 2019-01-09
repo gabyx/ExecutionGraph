@@ -23,7 +23,7 @@ class ExecutionGraphBackend;
     Request handler for information on graphs in the backend.
 
     Handles the request URLs: 
-        - "general/getAllGraphTypeDescriptions"
+        - "/eg-backend/general/getAllGraphTypeDescriptions"
 
     @date Sat Jul 07 2018
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com

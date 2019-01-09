@@ -66,17 +66,18 @@ auto runWorkers(IOContext& ioc, std::size_t threads)
     {
         ths.emplace_back(std::bind(run, i));
     }
-    run(0); // Blocking
+    run(0);  // Blocking
 
     return ths;
 }
 
 //! Install various backends and setup all of them.
 template<typename Dispatcher>
-void setupBackends(std::shared_ptr<Dispatcher> requestDispatcher)
+void setupBackends(std::shared_ptr<Dispatcher> requestDispatcher,
+                   const std::path& rootPath)
 {
     // Install the executionGraph backend
-    BackendFactory::BackendData messageHandlers = BackendFactory::Create<ExecutionGraphBackend>();
+    BackendFactory::BackendData messageHandlers = BackendFactory::Create<ExecutionGraphBackend>(rootPath);
     for(auto& backendHandler : messageHandlers.second)
     {
         requestDispatcher->addHandler(backendHandler);
@@ -97,7 +98,7 @@ int main(int argc, const char* argv[])
 
     // Make the backend request dispatcher.
     auto dispatcher = std::make_shared<BackendRequestDispatcher>();
-    setupBackends(dispatcher);
+    setupBackends(dispatcher, args.rootPath());
 
     EXECGRAPHGUI_BACKENDLOG_INFO(
         "Starting ExecutionGraph Server at '{0}:{1} with '{2}' threads.\n"

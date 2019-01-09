@@ -18,6 +18,7 @@
 #include "executionGraphGui/common/DevFlags.hpp"
 #include "executionGraphGui/common/RequestError.hpp"
 
+//! Get the root of the flatbuffer payload.
 template<typename MessageType, bool verifyBuffer = devFlags::verifyAllFlatbufferMessages>
 auto getRootOfPayloadAndVerify(const BinaryPayload& payload)
 {
@@ -31,4 +32,16 @@ auto getRootOfPayloadAndVerify(const BinaryPayload& payload)
     return flatbuffers::GetRoot<MessageType>(buffer.data());
 }
 
+//! Dispatch over the function map with the request target as key.
+template<typename Map, typename Request, typename Response>
+bool dispatch(Map&& map, const Request& request, Response& response)
+{
+    auto it = map.find(request.getTarget().string());
+    if(it != map.end())
+    {
+        it->second(*this, request, response);
+        return true;
+    }
+    return false;
+}
 #endif

@@ -10,8 +10,8 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_backend_requestHandlers_FileBrowserHandler_hpp
-#define executionGraphGui_backend_requestHandlers_FileBrowserHandler_hpp
+#ifndef executionGraphGui_backend_requestHandlers_FileBrowserRequestHandler_hpp
+#define executionGraphGui_backend_requestHandlers_FileBrowserRequestHandler_hpp
 
 #include "executionGraphGui/backend/BackendRequestHandler.hpp"
 #include "executionGraphGui/common/FunctionMap.hpp"
@@ -23,26 +23,27 @@ class ExecutionGraphBackend;
     Request handler for information on graphs in the backend.
 
     Handles the request URLs: 
-        - "general/getAllGraphTypeDescriptions"
+        - "/eg-backend/files/browse"
 
     @date Sat Jul 07 2018
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
  */
 /* ---------------------------------------------------------------------------------------*/
 
-class FileBrowserHandler final : public BackendRequestHandler
+class FileBrowserRequestHandler final : public BackendRequestHandler
 {
     RTTR_ENABLE(BackendRequestHandler)
 
 public:
     using IdNamed  = BackendRequestHandler::IdNamed;
-    using Function = std::function<void(FileBrowserHandler&,
+    using Function = std::function<void(FileBrowserRequestHandler&,
                                         const Request& request,
                                         ResponsePromise& response)>;
 
 public:
-    FileBrowserHandler(std::shared_ptr<ExecutionGraphBackend> backend,
-                       const IdNamed& id = IdNamed("FileBrowserHandler"));
+    FileBrowserRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,
+                              std::path rootPath,
+                              const IdNamed& id = IdNamed("FileBrowserRequestHandler"));
 
     void handleRequest(const Request& request, ResponsePromise& response) override;
     const std::unordered_set<std::string>& getRequestTypes() const override;
@@ -50,11 +51,14 @@ public:
 private:
     void handle(const Request& request, ResponsePromise& response);
 
+    void handleBrowse(const Request& request, ResponsePromise& response);
+
 private:
     static FunctionMap<Function> initFunctionMap();
     static const FunctionMap<Function> m_functionMap;
 
     std::shared_ptr<ExecutionGraphBackend> m_backend;
+    std::path m_rootPath;
 };
 
 #endif

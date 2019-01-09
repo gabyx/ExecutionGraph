@@ -23,11 +23,11 @@ class ExecutionGraphBackend;
     Request handler for manipulation operations on graphs in the backend.
 
     Handles the request URLs: 
-        - "graph/addNodes"
-        - "graph/removeNodes"
+        - "/eg-backend/graph/addNodes"
+        - "/eg-backend/graph/removeNodes"
 
-        - "graph/addConnection"
-        - "graph/removeConnection"
+        - "/eg-backend/graph/addConnection"
+        - "/eg-backend/graph/removeConnection"
 
     @date Sat Jul 07 2018
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com

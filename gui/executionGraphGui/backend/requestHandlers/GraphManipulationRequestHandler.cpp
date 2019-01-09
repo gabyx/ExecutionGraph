@@ -48,7 +48,7 @@ GraphManipulationRequestHandler::GraphManipulationRequestHandler(std::shared_ptr
 //! Get the request types for which this handler is registered.
 const std::unordered_set<std::string>& GraphManipulationRequestHandler::getRequestTypes() const
 {
-    return m_functionMap.m_keys;
+    return m_functionMap.keys();
 }
 
 //! Handle the request.
@@ -56,13 +56,7 @@ void GraphManipulationRequestHandler::handleRequest(const Request& request,
                                                     ResponsePromise& response)
 {
     EXECGRAPHGUI_BACKENDLOG_INFO("GraphManipulationRequestHandler::handleRequest");
-
-    // Dispatch to the correct function
-    auto it = m_functionMap.m_map.find(request.getTarget().string());
-    if(it != m_functionMap.m_map.end())
-    {
-        it->second(*this, request, response);
-    }
+    dispatch(m_functionMap.map(), request, response);
 }
 
 //! Handle the operation of adding a node.

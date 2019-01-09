@@ -13,18 +13,16 @@
 #include "executionGraphGui/backend/BackendFactory.hpp"
 #include <utility>
 #include "executionGraphGui/backend/requestHandlers/DummyRequestHandler.hpp"
+#include "executionGraphGui/backend/requestHandlers/FileBrowserRequestHandler.hpp"
 #include "executionGraphGui/backend/requestHandlers/GeneralInfoRequestHandler.hpp"
 #include "executionGraphGui/backend/requestHandlers/GraphManagementRequestHandler.hpp"
 #include "executionGraphGui/backend/requestHandlers/GraphManipulationRequestHandler.hpp"
 
 BackendFactory::BackendData
-BackendFactory::CreatorExecutionGraphBackend::create()
+BackendFactory::CreatorExecutionGraphBackend::create(const std::path& rootPath)
 {
     // Create the executionGraph backend
     auto backend = std::make_shared<ExecutionGraphBackend>();
-
-    // Create a simple dummy handler
-    auto dummyHandler = std::make_shared<DummyRequestHandler>(backend);
 
     // Create a general info handler
     auto generalInfoHandler = std::make_shared<GeneralInfoRequestHandler>(backend);
@@ -35,9 +33,13 @@ BackendFactory::CreatorExecutionGraphBackend::create()
     // Create a graph management handler
     auto graphManagementHandler = std::make_shared<GraphManagementRequestHandler>(backend);
 
+    // Create file-browser handler
+    auto fileBrowserHandler = std::make_shared<FileBrowserRequestHandler>(backend, rootPath);
+
     return BackendData{backend,
                        {dummyHandler,
                         generalInfoHandler,
                         graphManipHandler,
-                        graphManagementHandler}};
+                        graphManagementHandler,
+                        fileBrowserHandler}};
 }

@@ -42,7 +42,7 @@ private:
     {
         using Key = ExecutionGraphBackend;
         //! The actual creator function which creates all handlers and the backend for this key.
-        static BackendData create();
+        static BackendData create(const std::path& rootPath);
     };
 
     //! The used factory itself.
@@ -52,6 +52,7 @@ public:
     //! Create all handlers for the backend `BackendType`.
     template<typename BackendType, typename... Args>
     static BackendData Create(Args&&... args) { return Factory::create<BackendType>(std::forward<Args>(args)...); }
+
     //! Create all handlers for the backend type given by an `rttr::type`.
     template<typename... Args>
     static std::optional<BackendData> Create(const rttr::type& type, Args&&... args)

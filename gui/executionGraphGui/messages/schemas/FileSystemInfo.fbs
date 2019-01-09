@@ -2,7 +2,7 @@
 //  ExecutionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 // 
-//  @date Sat Jul 07 2018
+//  @date Sat Oct 27 2018
 //  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
 // 
 //  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,17 +10,18 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-include "executionGraph/serialization/schemas/GraphTypeDescription.fbs";
-
 namespace executionGraphGui.serialization;
 
-//! ======================================================================
-//! Message "/eg-backend/general/getAllGraphTypeDescriptions"
-//! ======================================================================
-//! Request data: 
-//!  -> no data
-//! Response data:
-table GetAllGraphTypeDescriptionsResponse {
-    graphsTypes:[executionGraph.serialization.GraphTypeDescription] (id:0);
+enum Permissions : byte { None = 0, OwnerRead, OwnerWrite, OwnerReadWrite }
+
+table PathInfo
+{
+    path: string (id:0, required);
+
+    permissions: Permissions (id:1);
+    size: uint64 (id:2);
+    modified: string (id:3, required);
+
+    containedFiles:       [PathInfo] (id:4);
+    containedDirectories: [PathInfo] (id:5);
 }
-//! ======================================================================

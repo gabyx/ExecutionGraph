@@ -23,8 +23,8 @@ class ExecutionGraphBackend;
     Request handler for graph management operations in the backend. 
 
     Handles the request URLs: 
-        - "general/addGraph"
-        - "general/removeGraph"
+        - "/eg-backend/general/addGraph"
+        - "/eg-backend/general/removeGraph"
 
     @date Sat Jul 07 2018
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com

@@ -232,11 +232,13 @@ inline flatbuffers::Offset<GraphVisualization> CreateGraphVisualizationDirect(
     flatbuffers::Offset<WorkspaceVisualization> workspaceVisualization = 0,
     const std::vector<flatbuffers::Offset<NodeVisualization>> *nodeVisualization = nullptr,
     const std::vector<flatbuffers::Offset<LinkVisualization>> *linkVisualization = nullptr) {
+  auto nodeVisualization__ = nodeVisualization ? _fbb.CreateVector<flatbuffers::Offset<NodeVisualization>>(*nodeVisualization) : 0;
+  auto linkVisualization__ = linkVisualization ? _fbb.CreateVector<flatbuffers::Offset<LinkVisualization>>(*linkVisualization) : 0;
   return executionGraph::serialization::CreateGraphVisualization(
       _fbb,
       workspaceVisualization,
-      nodeVisualization ? _fbb.CreateVector<flatbuffers::Offset<NodeVisualization>>(*nodeVisualization) : 0,
-      linkVisualization ? _fbb.CreateVector<flatbuffers::Offset<LinkVisualization>>(*linkVisualization) : 0);
+      nodeVisualization__,
+      linkVisualization__);
 }
 
 }  // namespace serialization

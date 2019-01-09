@@ -27,8 +27,9 @@
  */
 /* ---------------------------------------------------------------------------------------*/
 template<typename TFunction>
-struct FunctionMap final
+class FunctionMap final
 {
+public:
     using Function = TFunction;
     using Map      = std::unordered_map<std::string, Function>;
     using Entry    = typename Map::value_type;
@@ -43,7 +44,11 @@ struct FunctionMap final
         }
     }
 
-    Map m_map;                               //! Request URL to function mapping.
-    std::unordered_set<std::string> m_keys;  //! All request URLs.
+    const auto& map() const { return m_map; }
+    const auto& keys() const { return m_keys; }
+
+private:
+    Map m_map;                               //! Key to function mapping.
+    std::unordered_set<std::string> m_keys;  //! All keys.
 };
 #endif
