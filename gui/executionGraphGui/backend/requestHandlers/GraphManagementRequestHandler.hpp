@@ -13,6 +13,7 @@
 #ifndef executionGraphGui_backend_requestHandlers_GraphManagementRequestHandler_hpp
 #define executionGraphGui_backend_requestHandlers_GraphManagementRequestHandler_hpp
 
+#include "executionGraph/common/FileSystem.hpp"
 #include "executionGraphGui/backend/BackendRequestHandler.hpp"
 #include "executionGraphGui/common/FunctionMap.hpp"
 
@@ -40,13 +41,14 @@ public:
     using Function = std::function<void(GraphManagementRequestHandler&,
                                         const Request& request,
                                         ResponsePromise& response)>;
+    using FuncMap  = FunctionMap<Function, HandlerKey>;
 
 public:
     GraphManagementRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,
                                   const IdNamed& id = IdNamed("GraphManagementRequestHandler"));
 
     void handleRequest(const Request& request, ResponsePromise& response) override;
-    const std::unordered_set<std::string>& getRequestTypes() const override;
+    const std::unordered_set<HandlerKey>& requestTargets() const override;
 
 private:
     void handleAddGraph(const Request& request,
@@ -55,8 +57,8 @@ private:
                            ResponsePromise& response);
 
 private:
-    static FunctionMap<Function> initFunctionMap();
-    static const FunctionMap<Function> m_functionMap;
+    static FuncMap initFunctionMap();
+    static const FuncMap m_functionMap;
 
     std::shared_ptr<ExecutionGraphBackend> m_backend;
 };

@@ -37,8 +37,7 @@ BackendFactory::CreatorExecutionGraphBackend::create(const std::path& rootPath)
     auto fileBrowserHandler = std::make_shared<FileBrowserRequestHandler>(backend, rootPath);
 
     return BackendData{backend,
-                       {dummyHandler,
-                        generalInfoHandler,
+                       {generalInfoHandler,
                         graphManipHandler,
                         graphManagementHandler,
                         fileBrowserHandler}};

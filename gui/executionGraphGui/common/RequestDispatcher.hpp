@@ -53,7 +53,7 @@ namespace details
                         "RequestDispatcher: Request id: '{0}' (url: '{1}') "
                         "has not been handled correctly, it will be cancled!",
                         m_request.getId().toString(),
-                        m_request.getTarget());
+                        m_request.target());
                 }
             }
             else
@@ -68,7 +68,7 @@ namespace details
             EXECGRAPHGUI_BACKENDLOG_WARN(
                 "RequestDispatcher: Cancel request id: '{0}' [url: '{1}']",
                 m_request.getId().toString(),
-                m_request.getTarget());
+                m_request.target());
             m_response.setCanceled(e);
         };
 
@@ -101,7 +101,9 @@ template<typename THandler,
 class RequestDispatcher
 {
 public:
-    using Handler  = THandler;
+    using Handler    = THandler;
+    using HandlerKey = typename Handler::HandlerKey;
+
     using Request  = TRequest;
     using Response = TResponse;
 
@@ -155,15 +157,15 @@ public:
     {
         std::scoped_lock<std::mutex> lock(m_access);
 
-        const auto& requestTypes = handler->getRequestTypes();
-        EXECGRAPHGUI_THROW_IF(!handler || requestTypes.size() == 0, "nullptr or no Requests");
+        const auto& requestTargets = handler->requestTargets();
+        EXECGRAPHGUI_THROW_IF(!handler || requestTargets.size() == 0, "nullptr or no Requests");
 
         const Id& id = handler->getId();
         EXECGRAPHGUI_THROW_IF(m_handlerStorage.find(id) != m_handlerStorage.end(),
                               "MessageHandler with id: '{0}' already exists!",
                               id.toString());
 
-        auto p = m_handlerStorage.emplace(id, HandlerData{std::move(requestTypes), handler});
+        auto p = m_handlerStorage.emplace(id, HandlerData{std::move(requestTargets), handler});
 
         for(auto& target : p.first->second.m_targets)
         {
@@ -219,7 +221,7 @@ private:
     {
         std::scoped_lock<std::mutex> lock(m_access);
 
-        auto& target = request.getTarget().native();
+        auto& target = request.target().native();
         auto it      = m_specificHandlers.find(target);
 
         if(it != m_specificHandlers.end())
@@ -231,17 +233,12 @@ private:
 
     struct HandlerData
     {
-        HandlerData(const std::unordered_set<std::string>& requestTargets,
-                    std::shared_ptr<Handler> handler)
-            : m_targets(requestTargets), m_handler(handler)
-        {}
-
-        const std::unordered_set<std::string> m_targets;  //!< The request if it is a specific handler.
-        const std::shared_ptr<Handler> m_handler;         //!< The message handler.
+        const std::unordered_set<HandlerKey> m_targets;  //!< The request if it is a specific handler.
+        const std::shared_ptr<Handler> m_handler;        //!< The message handler.
     };
 
 private:
-    std::unordered_map<std::string, HandlerData*> m_specificHandlers;        //!< Handlers for a specific request type (handled first).
+    std::unordered_map<HandlerKey, HandlerData*> m_specificHandlers;         //!< Handlers for a specific request type.
     std::unordered_map<typename Handler::Id, HandlerData> m_handlerStorage;  //!< Storage for handlers.
     std::mutex m_access;
 

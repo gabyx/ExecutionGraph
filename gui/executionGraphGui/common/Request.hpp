@@ -64,15 +64,15 @@ public:
 
 public:
     //! Get the request target describing this message.
-    const std::path& getTarget() const { return m_requestTarget; }
+    const std::path& target() const { return m_requestTarget; }
     //! Get the request target additional arguments.
-    const std::string& getTargetArgs() const { return m_requestTargetArgs; }
+    const std::string& targetArgs() const { return m_requestTargetArgs; }
 
 public:
     //! Get the payload of this request.
-    const std::optional<Payload>& getPayload() const { return m_payload; }
+    const std::optional<Payload>& payload() const { return m_payload; }
     //! Get the payload of this request.
-    std::optional<Payload>& getPayload() { return m_payload; }
+    std::optional<Payload>& payload() { return m_payload; }
 
 private:
     //! The request target path in the form

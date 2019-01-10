@@ -127,7 +127,7 @@ struct PathInfoBuilder {
   }
 };
 
-inline flatbuffers::Offset<PathInfo> CreatePathInfo(
+inline flatbuffers::Offset<PathInfo>  CreatePathInfo(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> path = 0,
     Permissions permissions = Permissions_None,

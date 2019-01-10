@@ -26,12 +26,12 @@
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
  */
 /* ---------------------------------------------------------------------------------------*/
-template<typename TFunction>
+template<typename TFunction, typename TKey = std::string>
 class FunctionMap final
 {
 public:
     using Function = TFunction;
-    using Map      = std::unordered_map<std::string, Function>;
+    using Map      = std::unordered_map<TKey, Function>;
     using Entry    = typename Map::value_type;
 
     template<typename Container>
@@ -47,8 +47,21 @@ public:
     const auto& map() const { return m_map; }
     const auto& keys() const { return m_keys; }
 
+    //! Dispatch over the function map.
+    template<typename Key, typename... Args>
+    bool dispatch(Key&& key, Args&&... args) const
+    {
+        auto it = m_map.find(key);
+        if(it != m_map.end())
+        {
+            it->second(std::forward<Args>(args)...);
+            return true;
+        }
+        return false;
+    }
+
 private:
-    Map m_map;                               //! Key to function mapping.
-    std::unordered_set<std::string> m_keys;  //! All keys.
+    Map m_map;                        //! Key to function mapping.
+    std::unordered_set<TKey> m_keys;  //! All keys.
 };
 #endif
