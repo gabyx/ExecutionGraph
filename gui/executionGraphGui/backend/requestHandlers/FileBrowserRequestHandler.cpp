@@ -74,10 +74,11 @@ namespace
         auto buildFileInfo = [&getStats](auto& builder, auto& e) {
             auto t = getStats(builder, e);
             return sG::CreatePathInfo(builder,
-                                      builder.CreateString(e.path().native()),
+                                      builder.CreateString(e.path().filename().native()),
                                       std::get<0>(t),
                                       std::uint64_t(std::get<1>(t)),
-                                      std::get<2>(t));
+                                      std::get<2>(t),
+                                      true);
         };
 
         // Serialize directory info.
@@ -86,10 +87,11 @@ namespace
                                               Data* d = nullptr) {
             auto t = getStats(builder, e);
             return sG::CreatePathInfo(builder,
-                                      builder.CreateString(e.path().native()),
+                                      builder.CreateString(e.path().filename().native()),
                                       std::get<0>(t),
                                       std::uint64_t(std::get<1>(t)),
                                       std::get<2>(t),
+                                      false,
                                       d ? builder.CreateVector(d->fileInfos) : 0,
                                       d ? builder.CreateVector(d->dirInfos) : 0);
         };

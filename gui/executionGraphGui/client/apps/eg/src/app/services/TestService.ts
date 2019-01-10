@@ -16,6 +16,7 @@ import { ILogger, LoggerFactory } from '@eg/logger';
 import { GeneralInfoService } from './GeneralInfoService';
 import { GraphManipulationService } from './GraphManipulationService';
 import { GraphManagementService } from './GraphManagementService';
+import { FileBrowserService } from './FileBrowserService';
 import { NodeId } from './../model';
 
 /**
@@ -34,7 +35,8 @@ export class TestService {
     loggerFactory: LoggerFactory,
     private readonly generalInfoService: GeneralInfoService,
     private readonly graphManipulationService: GraphManipulationService,
-    private readonly graphManagementService: GraphManagementService
+    private readonly graphManagementService: GraphManagementService,
+    private readonly fileBrowserService: FileBrowserService
   ) {
     this.logger = loggerFactory.create('TestService');
   }
@@ -76,5 +78,9 @@ export class TestService {
 
     // Remove graph
     await this.graphManagementService.removeGraph(graph.id);
+  }
+
+  public async testFileBrowser() {
+    await this.fileBrowserService.browse('./');
   }
 }

@@ -53,8 +53,9 @@ struct PathInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_PERMISSIONS = 6,
     VT_SIZE = 8,
     VT_MODIFIED = 10,
-    VT_CONTAINEDFILES = 12,
-    VT_CONTAINEDDIRECTORIES = 14
+    VT_ISFILE = 12,
+    VT_FILES = 14,
+    VT_DIRECTORIES = 16
   };
   const flatbuffers::String *path() const {
     return GetPointer<const flatbuffers::String *>(VT_PATH);
@@ -68,11 +69,14 @@ struct PathInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::String *modified() const {
     return GetPointer<const flatbuffers::String *>(VT_MODIFIED);
   }
-  const flatbuffers::Vector<flatbuffers::Offset<PathInfo>> *containedFiles() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<PathInfo>> *>(VT_CONTAINEDFILES);
+  bool isFile() const {
+    return GetField<uint8_t>(VT_ISFILE, 0) != 0;
   }
-  const flatbuffers::Vector<flatbuffers::Offset<PathInfo>> *containedDirectories() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<PathInfo>> *>(VT_CONTAINEDDIRECTORIES);
+  const flatbuffers::Vector<flatbuffers::Offset<PathInfo>> *files() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<PathInfo>> *>(VT_FILES);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<PathInfo>> *directories() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<PathInfo>> *>(VT_DIRECTORIES);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -82,12 +86,13 @@ struct PathInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint64_t>(verifier, VT_SIZE) &&
            VerifyOffsetRequired(verifier, VT_MODIFIED) &&
            verifier.VerifyString(modified()) &&
-           VerifyOffset(verifier, VT_CONTAINEDFILES) &&
-           verifier.VerifyVector(containedFiles()) &&
-           verifier.VerifyVectorOfTables(containedFiles()) &&
-           VerifyOffset(verifier, VT_CONTAINEDDIRECTORIES) &&
-           verifier.VerifyVector(containedDirectories()) &&
-           verifier.VerifyVectorOfTables(containedDirectories()) &&
+           VerifyField<uint8_t>(verifier, VT_ISFILE) &&
+           VerifyOffset(verifier, VT_FILES) &&
+           verifier.VerifyVector(files()) &&
+           verifier.VerifyVectorOfTables(files()) &&
+           VerifyOffset(verifier, VT_DIRECTORIES) &&
+           verifier.VerifyVector(directories()) &&
+           verifier.VerifyVectorOfTables(directories()) &&
            verifier.EndTable();
   }
 };
@@ -107,11 +112,14 @@ struct PathInfoBuilder {
   void add_modified(flatbuffers::Offset<flatbuffers::String> modified) {
     fbb_.AddOffset(PathInfo::VT_MODIFIED, modified);
   }
-  void add_containedFiles(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<PathInfo>>> containedFiles) {
-    fbb_.AddOffset(PathInfo::VT_CONTAINEDFILES, containedFiles);
+  void add_isFile(bool isFile) {
+    fbb_.AddElement<uint8_t>(PathInfo::VT_ISFILE, static_cast<uint8_t>(isFile), 0);
   }
-  void add_containedDirectories(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<PathInfo>>> containedDirectories) {
-    fbb_.AddOffset(PathInfo::VT_CONTAINEDDIRECTORIES, containedDirectories);
+  void add_files(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<PathInfo>>> files) {
+    fbb_.AddOffset(PathInfo::VT_FILES, files);
+  }
+  void add_directories(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<PathInfo>>> directories) {
+    fbb_.AddOffset(PathInfo::VT_DIRECTORIES, directories);
   }
   explicit PathInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -127,20 +135,22 @@ struct PathInfoBuilder {
   }
 };
 
-inline flatbuffers::Offset<PathInfo>  CreatePathInfo(
+inline flatbuffers::Offset<PathInfo> CreatePathInfo(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> path = 0,
     Permissions permissions = Permissions_None,
     uint64_t size = 0,
     flatbuffers::Offset<flatbuffers::String> modified = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<PathInfo>>> containedFiles = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<PathInfo>>> containedDirectories = 0) {
+    bool isFile = false,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<PathInfo>>> files = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<PathInfo>>> directories = 0) {
   PathInfoBuilder builder_(_fbb);
   builder_.add_size(size);
-  builder_.add_containedDirectories(containedDirectories);
-  builder_.add_containedFiles(containedFiles);
+  builder_.add_directories(directories);
+  builder_.add_files(files);
   builder_.add_modified(modified);
   builder_.add_path(path);
+  builder_.add_isFile(isFile);
   builder_.add_permissions(permissions);
   return builder_.Finish();
 }
@@ -151,20 +161,22 @@ inline flatbuffers::Offset<PathInfo> CreatePathInfoDirect(
     Permissions permissions = Permissions_None,
     uint64_t size = 0,
     const char *modified = nullptr,
-    const std::vector<flatbuffers::Offset<PathInfo>> *containedFiles = nullptr,
-    const std::vector<flatbuffers::Offset<PathInfo>> *containedDirectories = nullptr) {
+    bool isFile = false,
+    const std::vector<flatbuffers::Offset<PathInfo>> *files = nullptr,
+    const std::vector<flatbuffers::Offset<PathInfo>> *directories = nullptr) {
   auto path__ = path ? _fbb.CreateString(path) : 0;
   auto modified__ = modified ? _fbb.CreateString(modified) : 0;
-  auto containedFiles__ = containedFiles ? _fbb.CreateVector<flatbuffers::Offset<PathInfo>>(*containedFiles) : 0;
-  auto containedDirectories__ = containedDirectories ? _fbb.CreateVector<flatbuffers::Offset<PathInfo>>(*containedDirectories) : 0;
+  auto files__ = files ? _fbb.CreateVector<flatbuffers::Offset<PathInfo>>(*files) : 0;
+  auto directories__ = directories ? _fbb.CreateVector<flatbuffers::Offset<PathInfo>>(*directories) : 0;
   return executionGraphGui::serialization::CreatePathInfo(
       _fbb,
       path__,
       permissions,
       size,
       modified__,
-      containedFiles__,
-      containedDirectories__);
+      isFile,
+      files__,
+      directories__);
 }
 
 }  // namespace serialization

@@ -22,6 +22,7 @@ table PathInfo
     size: uint64 (id:2);
     modified: string (id:3, required);
 
-    containedFiles:       [PathInfo] (id:4);
-    containedDirectories: [PathInfo] (id:5);
+    isFile: bool (id:4);
+    files:       [PathInfo] (id:5);
+    directories: [PathInfo] (id:6);
 }
