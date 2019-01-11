@@ -16,7 +16,6 @@ import { flatbuffers } from 'flatbuffers';
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 import { FileBrowserService, FileInfo, DirectoryInfo, sz } from './FileBrowserService';
-import { isDefined } from '@eg/common/src';
 
 @Injectable()
 export class FileBrowserServiceBinaryHttp extends FileBrowserService {

@@ -12,16 +12,8 @@
 
 import { Injectable, Inject } from '@angular/core';
 import { VERBOSE_LOG_TOKEN } from '../tokens';
-import { flatbuffers } from 'flatbuffers';
 import { ILogger, LoggerFactory } from '@eg/logger';
-import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import * as model from '../model';
-import * as conversions from './Conversions';
 import { FileBrowserService, FileInfo, DirectoryInfo, sz, Permissions } from './FileBrowserService';
-import { pipe } from 'rxjs';
-import { parseIntAutoRadix } from '@angular/common/src/i18n/format_number';
-import { parseTimelineCommand } from '@angular/animations/browser/src/render/shared';
-import { isDefined } from '@eg/common/src';
 
 @Injectable()
 export class FileBrowserServiceDummy extends FileBrowserService {
