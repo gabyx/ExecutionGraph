@@ -23,13 +23,16 @@ export enum Permissions {
 
 export interface PathInfo {
   path: string;
+  name: string;
   permissions: Permissions;
   size: number;
   modified: string;
   isFile: boolean;
 }
 
-export interface FileInfo extends PathInfo {}
+export interface FileInfo extends PathInfo {
+
+}
 
 export interface DirectoryInfo extends PathInfo {
   files?: FileInfo[];
