@@ -28,9 +28,9 @@ namespace executionGraph
     namespace details
     {
         template<typename Type, typename Message, typename... Args>
-        void throwException(Message&& message, Args&&... args)
+        inline void throwException(Message&& message, Args&&... args) noexcept(false)
         {
-            if constexpr (sizeof...(Args) > 0)
+            if constexpr(sizeof...(Args) > 0)
             {
                 throw Type(fmt::format(message, std::forward<Args>(args)...));
             }
@@ -40,7 +40,7 @@ namespace executionGraph
             }
         }
         template<typename Type>
-        void throwException()
+        inline void throwException() noexcept(false)
         {
             throw Type{};
         }
@@ -102,8 +102,8 @@ namespace executionGraph
     };
 }  // namespace executionGraph
 
-#    ifdef __clang__
-#        pragma clang diagnostic pop
-#    endif
+#ifdef __clang__
+#    pragma clang diagnostic pop
+#endif
 
 #endif

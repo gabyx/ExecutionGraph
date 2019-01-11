@@ -49,7 +49,7 @@ defineCompileDefs(${EXEC_NAME} "memoryLib" "on")
 # Http Server
 set(EXEC_NAME ${PROJECT_NAME}GuiTest-HttpServer)
 add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_HttpServer.cpp ${SOURCE_FILES} ${INCLUDE_FILES})
-defineCompileDefs(${EXEC_NAME} "boostBeastLib", "off")
+defineCompileDefs(${EXEC_NAME} "boostBeastLib" "off")
 
 # Http Server Async
 set(EXEC_NAME ${PROJECT_NAME}GuiTest-HttpServerAsync)

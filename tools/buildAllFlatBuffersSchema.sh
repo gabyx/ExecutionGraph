@@ -52,7 +52,7 @@ python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
     --input="${folder}/cpp/*.h" \
     --includeRegex="(#include\s+"'\")'"(.*exec.*)"'(\"'".*)" \
     --includePath="${folder}/cpp"  \
-    --regex='(.*executionGraph(?:GUI)?/.*/)(.*)' --substitution='\1cpp/\2'
+    --regex='(.*executionGraph(?:Gui)?/.*/)(.*)' --substitution='\1cpp/\2'
 
 python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
     --input="${folder}/ts/*.ts" \

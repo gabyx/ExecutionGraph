@@ -15,7 +15,7 @@ include "executionGraph/serialization/schemas/GraphTypeDescription.fbs";
 namespace executionGraphGui.serialization;
 
 //! ======================================================================
-//! Message "general/getAllGraphTypeDescriptions"
+//! Message "/eg-backend/general/getAllGraphTypeDescriptions"
 //! ======================================================================
 //! Request data: 
 //!  -> no data

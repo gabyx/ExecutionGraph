@@ -99,12 +99,16 @@ inline flatbuffers::Offset<GraphTypeDescription> CreateGraphTypeDescriptionDirec
     const char *name = nullptr,
     const std::vector<flatbuffers::Offset<SocketTypeDescription>> *socketTypeDescriptions = nullptr,
     const std::vector<flatbuffers::Offset<NodeTypeDescription>> *nodeTypeDescriptions = nullptr) {
+  auto id__ = id ? _fbb.CreateString(id) : 0;
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  auto socketTypeDescriptions__ = socketTypeDescriptions ? _fbb.CreateVector<flatbuffers::Offset<SocketTypeDescription>>(*socketTypeDescriptions) : 0;
+  auto nodeTypeDescriptions__ = nodeTypeDescriptions ? _fbb.CreateVector<flatbuffers::Offset<NodeTypeDescription>>(*nodeTypeDescriptions) : 0;
   return executionGraph::serialization::CreateGraphTypeDescription(
       _fbb,
-      id ? _fbb.CreateString(id) : 0,
-      name ? _fbb.CreateString(name) : 0,
-      socketTypeDescriptions ? _fbb.CreateVector<flatbuffers::Offset<SocketTypeDescription>>(*socketTypeDescriptions) : 0,
-      nodeTypeDescriptions ? _fbb.CreateVector<flatbuffers::Offset<NodeTypeDescription>>(*nodeTypeDescriptions) : 0);
+      id__,
+      name__,
+      socketTypeDescriptions__,
+      nodeTypeDescriptions__);
 }
 
 }  // namespace serialization

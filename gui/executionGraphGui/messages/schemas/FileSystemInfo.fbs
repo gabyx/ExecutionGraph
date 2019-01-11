@@ -1,0 +1,29 @@
+// =========================================================================================
+//  ExecutionGraph
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+// 
+//  @date Sat Oct 27 2018
+//  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+// 
+//  This Source Code Form is subject to the terms of the Mozilla Public
+//  License, v. 2.0. If a copy of the MPL was not distributed with this
+//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// =========================================================================================
+
+namespace executionGraphGui.serialization;
+
+enum Permissions : byte { None = 0, OwnerRead, OwnerWrite, OwnerReadWrite }
+
+table PathInfo
+{
+    path: string (id:0, required);
+    name: string (id:1, required);
+
+    permissions: Permissions (id:2);
+    size: uint64 (id:3);
+    modified: string (id:4, required);
+
+    isFile: bool (id:5);
+    files:       [PathInfo] (id:6);
+    directories: [PathInfo] (id:7);
+}

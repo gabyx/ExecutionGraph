@@ -34,19 +34,19 @@ export class GeneralInfoServiceBinaryHttp extends GeneralInfoService {
 
   public async getAllGraphTypeDescriptions(): Promise<model.GraphTypeDescription[]> {
     const result = await this.binaryRouter.get('general/getAllGraphTypeDescriptions');
-    let buf = new flatbuffers.ByteBuffer(result);
-    let response = sz.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
+    const buf = new flatbuffers.ByteBuffer(result);
+    const response = sz.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
 
     this.logger.info(`Number of graph types: ${response.graphsTypesLength()}`);
 
-    let graphDesc: model.GraphTypeDescription[] = [];
+    const graphDesc: model.GraphTypeDescription[] = [];
 
     for (let g = 0; g < response.graphsTypesLength(); ++g) {
       graphDesc.push(conversions.toGraphTypeDescription(response.graphsTypes(g)));
     }
 
     if (this.verboseResponseLog) {
-      this.logger.debug(`GraphDescriptions: ${JSON.stringify(graphDesc)}`);
+      this.logger.debug(`GraphDescriptions: ${JSON.stringify(graphDesc, null, 4)}`);
     }
 
     return graphDesc;

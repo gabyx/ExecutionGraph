@@ -7,6 +7,8 @@ set(ExecutionGraphGUIBackend_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/BackendFactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/requestHandlers/DummyRequestHandler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/requestHandlers/DummyRequestHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/requestHandlers/FileBrowserRequestHandler.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/requestHandlers/FileBrowserRequestHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/requestHandlers/GeneralInfoRequestHandler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/requestHandlers/GeneralInfoRequestHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/requestHandlers/GraphManipulationRequestHandler.hpp

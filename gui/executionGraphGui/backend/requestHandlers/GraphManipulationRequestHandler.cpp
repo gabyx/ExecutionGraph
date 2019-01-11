@@ -24,9 +24,9 @@ namespace fl = flatbuffers;
 namespace s  = executionGraphGui::serialization;
 
 //! Init the function mapping.
-FunctionMap<GraphManipulationRequestHandler::Function> GraphManipulationRequestHandler::initFunctionMap()
+GraphManipulationRequestHandler::FuncMap GraphManipulationRequestHandler::initFunctionMap()
 {
-    using Entry = typename FunctionMap<Function>::Entry;
+    using Entry = typename FuncMap::Entry;
 
     auto r = {Entry(targetBase / "graph/addNode", Function(&GraphManipulationRequestHandler::handleAddNode)),
               Entry(targetBase / "graph/removeNode", Function(&GraphManipulationRequestHandler::handleRemoveNode)),
@@ -36,7 +36,8 @@ FunctionMap<GraphManipulationRequestHandler::Function> GraphManipulationRequestH
 }
 
 //! Static handler map: request to handler function mapping.
-const FunctionMap<GraphManipulationRequestHandler::Function> GraphManipulationRequestHandler::m_functionMap = GraphManipulationRequestHandler::initFunctionMap();
+const GraphManipulationRequestHandler::FuncMap
+    GraphManipulationRequestHandler::m_functionMap = GraphManipulationRequestHandler::initFunctionMap();
 
 //! Konstructor.
 GraphManipulationRequestHandler::GraphManipulationRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,
@@ -46,9 +47,10 @@ GraphManipulationRequestHandler::GraphManipulationRequestHandler(std::shared_ptr
 }
 
 //! Get the request types for which this handler is registered.
-const std::unordered_set<std::string>& GraphManipulationRequestHandler::getRequestTypes() const
+const std::unordered_set<GraphManipulationRequestHandler::HandlerKey>&
+GraphManipulationRequestHandler::requestTargets() const
 {
-    return m_functionMap.m_keys;
+    return m_functionMap.keys();
 }
 
 //! Handle the request.
@@ -56,13 +58,7 @@ void GraphManipulationRequestHandler::handleRequest(const Request& request,
                                                     ResponsePromise& response)
 {
     EXECGRAPHGUI_BACKENDLOG_INFO("GraphManipulationRequestHandler::handleRequest");
-
-    // Dispatch to the correct function
-    auto it = m_functionMap.m_map.find(request.getTarget().string());
-    if(it != m_functionMap.m_map.end())
-    {
-        it->second(*this, request, response);
-    }
+    m_functionMap.dispatch(request.target().native(), *this, request, response);
 }
 
 //! Handle the operation of adding a node.
@@ -70,7 +66,7 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
                                                     ResponsePromise& response)
 {
     // Request validation
-    auto& payload = request.getPayload();
+    auto& payload = request.payload();
     EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request data is null!");
 
@@ -115,7 +111,7 @@ void GraphManipulationRequestHandler::handleRemoveNode(const Request& request,
                                                        ResponsePromise& response)
 {
     // Request validation
-    auto& payload = request.getPayload();
+    auto& payload = request.payload();
     EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request data is null!");
 
@@ -136,7 +132,7 @@ void GraphManipulationRequestHandler::handleAddConnection(const Request& request
                                                           ResponsePromise& response)
 {
     // Request validation
-    auto& payload = request.getPayload();
+    auto& payload = request.payload();
     EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request data is null!");
 
@@ -168,7 +164,7 @@ void GraphManipulationRequestHandler::handleRemoveConnection(const Request& requ
                                                              ResponsePromise& response)
 {
     // Request validation
-    auto& payload = request.getPayload();
+    auto& payload = request.payload();
     EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request data is null!");
 

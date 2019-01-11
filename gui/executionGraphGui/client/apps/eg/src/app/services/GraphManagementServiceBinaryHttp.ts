@@ -34,15 +34,15 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
 
   public async addGraph(graphTypeId: Id): Promise<Graph> {
     // Build the AddGraph request
-    let builder = new flatbuffers.Builder(16);
-    let offGraphTypeId = builder.createString(graphTypeId.toString());
+    const builder = new flatbuffers.Builder(16);
+    const offGraphTypeId = builder.createString(graphTypeId.toString());
 
     sz.AddGraphRequest.startAddGraphRequest(builder);
     sz.AddGraphRequest.addGraphTypeId(builder, offGraphTypeId);
-    let off = sz.AddGraphRequest.endAddGraphRequest(builder);
+    const off = sz.AddGraphRequest.endAddGraphRequest(builder);
     builder.finish(off);
 
-    let requestPayload = builder.asUint8Array();
+    const requestPayload = builder.asUint8Array();
 
     // Send the request
     const result = await this.binaryRouter.post('general/addGraph', requestPayload);
@@ -62,15 +62,15 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
 
   public async removeGraph(graphId: Id): Promise<void> {
     // Build the RemoveGraph request
-    let builder = new flatbuffers.Builder(16);
-    let offGraphId = builder.createString(graphId.toString());
+    const builder = new flatbuffers.Builder(16);
+    const offGraphId = builder.createString(graphId.toString());
 
     sz.RemoveGraphRequest.startRemoveGraphRequest(builder);
     sz.RemoveGraphRequest.addGraphId(builder, offGraphId);
-    let off = sz.RemoveGraphRequest.endRemoveGraphRequest(builder);
+    const off = sz.RemoveGraphRequest.endRemoveGraphRequest(builder);
     builder.finish(off);
 
-    let requestPayload = builder.asUint8Array();
+    const requestPayload = builder.asUint8Array();
 
     // Send the request
     await this.binaryRouter.post('general/removeGraph', requestPayload);

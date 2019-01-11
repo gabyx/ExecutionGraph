@@ -42,6 +42,8 @@ import { storeFreeze } from 'ngrx-store-freeze';
 import { VERBOSE_LOG_TOKEN, BINARY_HTTP_ROUTER_BASE_URL } from './tokens';
 
 import { GraphModule } from '@eg/graph';
+import { CommonModule } from '@eg/common';
+
 import { SimpleConsoleLoggerFactory, LoggerFactory } from '@eg/logger';
 
 import { BinaryHttpRouterService } from './services/BinaryHttpRouterService';
@@ -62,6 +64,10 @@ import { GraphManipulationServiceDummy } from './services/GraphManipulationServi
 import { GraphManagementService } from './services/GraphManagementService';
 import { GraphManagementServiceBinaryHttp } from './services/GraphManagementServiceBinaryHttp';
 import { GraphManagementServiceDummy } from './services/GraphManagementServiceDummy';
+
+import { FileBrowserService } from './services/FileBrowserService';
+import { FileBrowserServiceDummy } from './services/FileBrowserServiceDummy';
+import { FileBrowserServiceBinaryHttp } from './services/FileBrowserServiceBinaryHttp';
 
 import { TestService } from './services/TestService';
 import { ITestBackend, TestBackend } from './services/TestBackend';
@@ -88,8 +94,6 @@ import { ConnectionLayerComponent } from './components/connection-layer/connecti
 import { MoveToolComponent } from './components/tools/move-tool/move-tool.component';
 import { DeleteToolComponent } from './components/tools/delete-tool/delete-tool.component';
 import { TypeToolTipToolComponent } from './components/tools/type-tooltip-tool/type-tooltip-tool.component';
-
-//environment.production = true;
 
 const routes: Route[] = [
   {
@@ -150,6 +154,7 @@ const routes: Route[] = [
     MatTabsModule,
     MatToolbarModule,
     GraphModule,
+    CommonModule,
     NxModule.forRoot(),
     RouterModule.forRoot(routes, { enableTracing: false }),
     StoreRouterConnectingModule.forRoot({}),
@@ -184,6 +189,10 @@ const routes: Route[] = [
     {
       provide: GraphManagementService,
       useClass: !environment.useServiceDummys ? GraphManagementServiceBinaryHttp : GraphManagementServiceDummy
+    },
+    {
+      provide: FileBrowserService,
+      useClass: !environment.useServiceDummys ? FileBrowserServiceBinaryHttp : FileBrowserServiceDummy
     },
     { provide: RouterStateSerializer, useClass: RouterStateUrlSerializer }
   ],

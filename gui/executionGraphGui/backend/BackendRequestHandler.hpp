@@ -29,7 +29,8 @@ class BackendRequestHandler : public executionGraph::IObjectID
     EXECGRAPH_NAMED_OBJECT_ID_DECLARATION
 
 public:
-    static const std::path targetBase; //!< The base targe path for all request targets.
+    static const std::path targetBase;  //!< The base targe path for all request targets.
+    using HandlerKey = std::string;
 
 public:
     BackendRequestHandler(const IdNamed& id)
@@ -39,7 +40,7 @@ public:
     BackendRequestHandler& operator=(const BackendRequestHandler&) = delete;
 
     //! Return all request types which this handler will handle.
-    virtual const std::unordered_set<std::string>& getRequestTypes() const = 0;
+    virtual const std::unordered_set<HandlerKey>& requestTargets() const = 0;
 
     //! Handle the `request` by resolving the response promise `response`.
     virtual void handleRequest(const Request& request, ResponsePromise& response) = 0;
