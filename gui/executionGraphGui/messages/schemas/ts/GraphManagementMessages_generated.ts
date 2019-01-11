@@ -64,11 +64,6 @@ static endAddGraphRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 };
 
-static createAddGraphRequest(builder:flatbuffers.Builder, graphTypeIdOffset:flatbuffers.Offset):flatbuffers.Offset {
-  AddGraphRequest.startAddGraphRequest(builder);
-  AddGraphRequest.addGraphTypeId(builder, graphTypeIdOffset);
-  return AddGraphRequest.endAddGraphRequest(builder);
-}
 }
 }
 /**
@@ -135,11 +130,6 @@ static endAddGraphResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 };
 
-static createAddGraphResponse(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset):flatbuffers.Offset {
-  AddGraphResponse.startAddGraphResponse(builder);
-  AddGraphResponse.addGraphId(builder, graphIdOffset);
-  return AddGraphResponse.endAddGraphResponse(builder);
-}
 }
 }
 /**
@@ -206,10 +196,5 @@ static endRemoveGraphRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 };
 
-static createRemoveGraphRequest(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset):flatbuffers.Offset {
-  RemoveGraphRequest.startRemoveGraphRequest(builder);
-  RemoveGraphRequest.addGraphId(builder, graphIdOffset);
-  return RemoveGraphRequest.endRemoveGraphRequest(builder);
-}
 }
 }

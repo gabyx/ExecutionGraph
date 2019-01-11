@@ -95,12 +95,10 @@ inline flatbuffers::Offset<Test> CreateTestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<Vec3> *pos = nullptr,
     const std::vector<Vec3> *pos2 = nullptr) {
-  auto pos__ = pos ? _fbb.CreateVectorOfStructs<Vec3>(*pos) : 0;
-  auto pos2__ = pos2 ? _fbb.CreateVectorOfStructs<Vec3>(*pos2) : 0;
   return test::CreateTest(
       _fbb,
-      pos__,
-      pos2__);
+      pos ? _fbb.CreateVectorOfStructs<Vec3>(*pos) : 0,
+      pos2 ? _fbb.CreateVectorOfStructs<Vec3>(*pos2) : 0);
 }
 
 inline const test::Test *GetTest(const void *buf) {

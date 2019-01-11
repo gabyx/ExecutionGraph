@@ -15,6 +15,110 @@ export enum Permissions{
  * @constructor
  */
 export namespace executionGraphGui.serialization{
+export class Date {
+  bb: flatbuffers.ByteBuffer|null = null;
+
+  bb_pos:number = 0;
+/**
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns Date
+ */
+__init(i:number, bb:flatbuffers.ByteBuffer):Date {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @returns number
+ */
+sec():number {
+  return this.bb!.readUint8(this.bb_pos);
+};
+
+/**
+ * @returns number
+ */
+min():number {
+  return this.bb!.readUint8(this.bb_pos + 1);
+};
+
+/**
+ * @returns number
+ */
+hour():number {
+  return this.bb!.readUint8(this.bb_pos + 2);
+};
+
+/**
+ * @returns number
+ */
+day():number {
+  return this.bb!.readUint8(this.bb_pos + 3);
+};
+
+/**
+ * @returns number
+ */
+month():number {
+  return this.bb!.readUint8(this.bb_pos + 4);
+};
+
+/**
+ * @returns number
+ */
+year():number {
+  return this.bb!.readUint16(this.bb_pos + 6);
+};
+
+/**
+ * @returns number
+ */
+wday():number {
+  return this.bb!.readUint8(this.bb_pos + 8);
+};
+
+/**
+ * @returns number
+ */
+yday():number {
+  return this.bb!.readUint16(this.bb_pos + 10);
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @param number sec
+ * @param number min
+ * @param number hour
+ * @param number day
+ * @param number month
+ * @param number year
+ * @param number wday
+ * @param number yday
+ * @returns flatbuffers.Offset
+ */
+static createDate(builder:flatbuffers.Builder, sec: number, min: number, hour: number, day: number, month: number, year: number, wday: number, yday: number):flatbuffers.Offset {
+  builder.prep(2, 12);
+  builder.writeInt16(yday);
+  builder.pad(1);
+  builder.writeInt8(wday);
+  builder.writeInt16(year);
+  builder.pad(1);
+  builder.writeInt8(month);
+  builder.writeInt8(day);
+  builder.writeInt8(hour);
+  builder.writeInt8(min);
+  builder.writeInt8(sec);
+  return builder.offset();
+};
+
+}
+}
+/**
+ * @constructor
+ */
+export namespace executionGraphGui.serialization{
 export class PathInfo {
   bb: flatbuffers.ByteBuffer|null = null;
 
@@ -78,14 +182,12 @@ size():flatbuffers.Long {
 };
 
 /**
- * @param flatbuffers.Encoding= optionalEncoding
- * @returns string|Uint8Array|null
+ * @param executionGraphGui.serialization.Date= obj
+ * @returns executionGraphGui.serialization.Date|null
  */
-modified():string|null
-modified(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-modified(optionalEncoding?:any):string|Uint8Array|null {
+modified(obj?:executionGraphGui.serialization.Date):executionGraphGui.serialization.Date|null {
   var offset = this.bb!.__offset(this.bb_pos, 12);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+  return offset ? (obj || new executionGraphGui.serialization.Date).__init(this.bb_pos + offset, this.bb!) : null;
 };
 
 /**
@@ -176,7 +278,7 @@ static addSize(builder:flatbuffers.Builder, size:flatbuffers.Long) {
  * @param flatbuffers.Offset modifiedOffset
  */
 static addModified(builder:flatbuffers.Builder, modifiedOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(4, modifiedOffset, 0);
+  builder.addFieldStruct(4, modifiedOffset, 0);
 };
 
 /**
@@ -257,17 +359,5 @@ static endPathInfo(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 };
 
-static createPathInfo(builder:flatbuffers.Builder, pathOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, permissions:executionGraphGui.serialization.Permissions, size:flatbuffers.Long, modifiedOffset:flatbuffers.Offset, isFile:boolean, filesOffset:flatbuffers.Offset, directoriesOffset:flatbuffers.Offset):flatbuffers.Offset {
-  PathInfo.startPathInfo(builder);
-  PathInfo.addPath(builder, pathOffset);
-  PathInfo.addName(builder, nameOffset);
-  PathInfo.addPermissions(builder, permissions);
-  PathInfo.addSize(builder, size);
-  PathInfo.addModified(builder, modifiedOffset);
-  PathInfo.addIsFile(builder, isFile);
-  PathInfo.addFiles(builder, filesOffset);
-  PathInfo.addDirectories(builder, directoriesOffset);
-  return PathInfo.endPathInfo(builder);
-}
 }
 }

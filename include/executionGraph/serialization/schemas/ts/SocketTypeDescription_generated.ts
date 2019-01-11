@@ -84,11 +84,5 @@ static endSocketTypeDescription(builder:flatbuffers.Builder):flatbuffers.Offset 
   return offset;
 };
 
-static createSocketTypeDescription(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset):flatbuffers.Offset {
-  SocketTypeDescription.startSocketTypeDescription(builder);
-  SocketTypeDescription.addType(builder, typeOffset);
-  SocketTypeDescription.addName(builder, nameOffset);
-  return SocketTypeDescription.endSocketTypeDescription(builder);
-}
 }
 }

@@ -31,13 +31,17 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
     this.logger = loggerFactory.create('FileBrowserServiceBinaryHttp');
   }
 
+  private convertDate(from: sz.Date): Date {
+    return new Date(from.year(), from.month(), from.day(), from.hour(), from.min(), from.sec(), 0);
+  }
+
   private convertFileInfo(from: sz.PathInfo): Promise<FileInfo> {
     return new Promise((resolve, reject) => {
       resolve({
         path: from.path(),
         name: from.name(),
         permissions: from.permissions(),
-        modified: from.modified(),
+        modified: this.convertDate(from.modified()),
         size: from.size().toFloat64(),
         isFile: true
       });
@@ -47,26 +51,26 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
   private convertDirectoryInfo(from: sz.PathInfo): Promise<DirectoryInfo> {
     return new Promise((resolve, reject) => {
       resolve({
-          path: from.path(),
-          name: from.name(),
-          permissions: from.permissions(),
-          modified: from.modified(),
-          size: from.size().toFloat64(),
-          isFile: false,
-          directories: [],
-          files: []
-        });
+        path: from.path(),
+        name: from.name(),
+        permissions: from.permissions(),
+        modified: this.convertDate(from.modified()),
+        size: from.size().toFloat64(),
+        isFile: false,
+        directories: [],
+        files: []
+      });
     });
   }
 
   private async convertDirectory(from: sz.PathInfo): Promise<DirectoryInfo> {
     const directory = await this.convertDirectoryInfo(from);
 
-    for (let fileIndex = 0; fileIndex < from.filesLength(); ++fileIndex) {
-      directory.files.push(await this.convertFileInfo(from.files.bind(from)(fileIndex)));
+    for (let fIdx = 0; fIdx < from.filesLength(); ++fIdx) {
+      directory.files.push(await this.convertFileInfo(from.files.bind(from)(fIdx)));
     }
-    for (let directoryIndex = 0; directoryIndex < from.directoriesLength(); ++directoryIndex) {
-      directory.directories.push(await this.convertDirectory(from.directories.bind(from)(directoryIndex)));
+    for (let dIdx = 0; dIdx < from.directoriesLength(); ++dIdx) {
+      directory.directories.push(await this.convertDirectory(from.directories.bind(from)(dIdx)));
     }
 
     return directory;
@@ -74,12 +78,8 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
 
   private convert(response: sz.BrowseResponse): Promise<DirectoryInfo | FileInfo> {
     const pathInfo = response.info();
-    return pathInfo.isFile()
-      ? this.convertFileInfo(pathInfo)
-      : this.convertDirectory(pathInfo);
+    return pathInfo.isFile() ? this.convertFileInfo(pathInfo) : this.convertDirectory(pathInfo);
   }
-
-
 
   public async browse(path: string): Promise<FileInfo | DirectoryInfo> {
     const builder = new flatbuffers.Builder(256);

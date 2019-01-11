@@ -68,10 +68,9 @@ inline flatbuffers::Offset<AddGraphRequest> CreateAddGraphRequest(
 inline flatbuffers::Offset<AddGraphRequest> CreateAddGraphRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *graphTypeId = nullptr) {
-  auto graphTypeId__ = graphTypeId ? _fbb.CreateString(graphTypeId) : 0;
   return executionGraphGui::serialization::CreateAddGraphRequest(
       _fbb,
-      graphTypeId__);
+      graphTypeId ? _fbb.CreateString(graphTypeId) : 0);
 }
 
 struct AddGraphResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -119,10 +118,9 @@ inline flatbuffers::Offset<AddGraphResponse> CreateAddGraphResponse(
 inline flatbuffers::Offset<AddGraphResponse> CreateAddGraphResponseDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *graphId = nullptr) {
-  auto graphId__ = graphId ? _fbb.CreateString(graphId) : 0;
   return executionGraphGui::serialization::CreateAddGraphResponse(
       _fbb,
-      graphId__);
+      graphId ? _fbb.CreateString(graphId) : 0);
 }
 
 struct RemoveGraphRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -170,10 +168,9 @@ inline flatbuffers::Offset<RemoveGraphRequest> CreateRemoveGraphRequest(
 inline flatbuffers::Offset<RemoveGraphRequest> CreateRemoveGraphRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *graphId = nullptr) {
-  auto graphId__ = graphId ? _fbb.CreateString(graphId) : 0;
   return executionGraphGui::serialization::CreateRemoveGraphRequest(
       _fbb,
-      graphId__);
+      graphId ? _fbb.CreateString(graphId) : 0);
 }
 
 }  // namespace serialization

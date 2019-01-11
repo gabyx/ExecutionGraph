@@ -123,19 +123,14 @@ inline flatbuffers::Offset<LogicNode> CreateLogicNodeDirect(
     const std::vector<flatbuffers::Offset<LogicSocket>> *inputSockets = nullptr,
     const std::vector<flatbuffers::Offset<LogicSocket>> *outputSockets = nullptr,
     const std::vector<uint8_t> *data = nullptr) {
-  auto type__ = type ? _fbb.CreateString(type) : 0;
-  auto name__ = name ? _fbb.CreateString(name) : 0;
-  auto inputSockets__ = inputSockets ? _fbb.CreateVector<flatbuffers::Offset<LogicSocket>>(*inputSockets) : 0;
-  auto outputSockets__ = outputSockets ? _fbb.CreateVector<flatbuffers::Offset<LogicSocket>>(*outputSockets) : 0;
-  auto data__ = data ? _fbb.CreateVector<uint8_t>(*data) : 0;
   return executionGraph::serialization::CreateLogicNode(
       _fbb,
       id,
-      type__,
-      name__,
-      inputSockets__,
-      outputSockets__,
-      data__);
+      type ? _fbb.CreateString(type) : 0,
+      name ? _fbb.CreateString(name) : 0,
+      inputSockets ? _fbb.CreateVector<flatbuffers::Offset<LogicSocket>>(*inputSockets) : 0,
+      outputSockets ? _fbb.CreateVector<flatbuffers::Offset<LogicSocket>>(*outputSockets) : 0,
+      data ? _fbb.CreateVector<uint8_t>(*data) : 0);
 }
 
 }  // namespace serialization

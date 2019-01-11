@@ -58,5 +58,6 @@ export namespace FileBrowserMessages {
   export import BrowseResponse = exec4.serialization.BrowseResponse;
 
   export import PathInfo = exec5.serialization.PathInfo;
+  export import Date = exec5.serialization.Date;
   export import Permission = exec5.serialization.Permissions;
 }
