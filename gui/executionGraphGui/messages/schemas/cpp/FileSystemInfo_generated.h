@@ -50,15 +50,19 @@ inline const char *EnumNamePermissions(Permissions e) {
 struct PathInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_PATH = 4,
-    VT_PERMISSIONS = 6,
-    VT_SIZE = 8,
-    VT_MODIFIED = 10,
-    VT_ISFILE = 12,
-    VT_FILES = 14,
-    VT_DIRECTORIES = 16
+    VT_NAME = 6,
+    VT_PERMISSIONS = 8,
+    VT_SIZE = 10,
+    VT_MODIFIED = 12,
+    VT_ISFILE = 14,
+    VT_FILES = 16,
+    VT_DIRECTORIES = 18
   };
   const flatbuffers::String *path() const {
     return GetPointer<const flatbuffers::String *>(VT_PATH);
+  }
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
   }
   Permissions permissions() const {
     return static_cast<Permissions>(GetField<int8_t>(VT_PERMISSIONS, 0));
@@ -82,6 +86,8 @@ struct PathInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_PATH) &&
            verifier.VerifyString(path()) &&
+           VerifyOffsetRequired(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
            VerifyField<int8_t>(verifier, VT_PERMISSIONS) &&
            VerifyField<uint64_t>(verifier, VT_SIZE) &&
            VerifyOffsetRequired(verifier, VT_MODIFIED) &&
@@ -102,6 +108,9 @@ struct PathInfoBuilder {
   flatbuffers::uoffset_t start_;
   void add_path(flatbuffers::Offset<flatbuffers::String> path) {
     fbb_.AddOffset(PathInfo::VT_PATH, path);
+  }
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(PathInfo::VT_NAME, name);
   }
   void add_permissions(Permissions permissions) {
     fbb_.AddElement<int8_t>(PathInfo::VT_PERMISSIONS, static_cast<int8_t>(permissions), 0);
@@ -130,6 +139,7 @@ struct PathInfoBuilder {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<PathInfo>(end);
     fbb_.Required(o, PathInfo::VT_PATH);
+    fbb_.Required(o, PathInfo::VT_NAME);
     fbb_.Required(o, PathInfo::VT_MODIFIED);
     return o;
   }
@@ -138,6 +148,7 @@ struct PathInfoBuilder {
 inline flatbuffers::Offset<PathInfo> CreatePathInfo(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> path = 0,
+    flatbuffers::Offset<flatbuffers::String> name = 0,
     Permissions permissions = Permissions_None,
     uint64_t size = 0,
     flatbuffers::Offset<flatbuffers::String> modified = 0,
@@ -149,6 +160,7 @@ inline flatbuffers::Offset<PathInfo> CreatePathInfo(
   builder_.add_directories(directories);
   builder_.add_files(files);
   builder_.add_modified(modified);
+  builder_.add_name(name);
   builder_.add_path(path);
   builder_.add_isFile(isFile);
   builder_.add_permissions(permissions);
@@ -158,6 +170,7 @@ inline flatbuffers::Offset<PathInfo> CreatePathInfo(
 inline flatbuffers::Offset<PathInfo> CreatePathInfoDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *path = nullptr,
+    const char *name = nullptr,
     Permissions permissions = Permissions_None,
     uint64_t size = 0,
     const char *modified = nullptr,
@@ -165,12 +178,14 @@ inline flatbuffers::Offset<PathInfo> CreatePathInfoDirect(
     const std::vector<flatbuffers::Offset<PathInfo>> *files = nullptr,
     const std::vector<flatbuffers::Offset<PathInfo>> *directories = nullptr) {
   auto path__ = path ? _fbb.CreateString(path) : 0;
+  auto name__ = name ? _fbb.CreateString(name) : 0;
   auto modified__ = modified ? _fbb.CreateString(modified) : 0;
   auto files__ = files ? _fbb.CreateVector<flatbuffers::Offset<PathInfo>>(*files) : 0;
   auto directories__ = directories ? _fbb.CreateVector<flatbuffers::Offset<PathInfo>>(*directories) : 0;
   return executionGraphGui::serialization::CreatePathInfo(
       _fbb,
       path__,
+      name__,
       permissions,
       size,
       modified__,

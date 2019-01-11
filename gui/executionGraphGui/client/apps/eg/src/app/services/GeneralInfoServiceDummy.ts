@@ -34,7 +34,7 @@ export class GeneralInfoServiceDummy extends GeneralInfoService {
     const graphDescs = this.backend.graphTypeDescs;
 
     if (this.verboseResponseLog) {
-      this.logger.debug(`GraphDescriptions: ${JSON.stringify(graphDescs)}`);
+      this.logger.debug(`GraphDescriptions: ${JSON.stringify(graphDescs)}`, null, 4);
     }
     return graphDescs;
   }

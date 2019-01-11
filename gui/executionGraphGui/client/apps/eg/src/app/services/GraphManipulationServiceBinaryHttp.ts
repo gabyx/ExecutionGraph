@@ -65,7 +65,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
 
     let nodeModel = conversions.toNode(node);
     if (this.verboseResponseLog) {
-      this.logger.info(`Node: '${stringify(nodeModel)}'`);
+      this.logger.info(`Node: '${stringify(nodeModel, 4)}'`);
     }
     return nodeModel;
   }

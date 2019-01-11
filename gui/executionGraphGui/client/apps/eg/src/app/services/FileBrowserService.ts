@@ -33,7 +33,7 @@ export interface FileInfo extends PathInfo {}
 
 export interface DirectoryInfo extends PathInfo {
   files?: FileInfo[];
-  directories?: PathInfo[];
+  directories?: DirectoryInfo[];
 }
 
 export function isFile(p: FileInfo | DirectoryInfo): p is FileInfo {

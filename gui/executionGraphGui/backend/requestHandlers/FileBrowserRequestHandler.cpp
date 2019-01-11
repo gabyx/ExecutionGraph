@@ -32,12 +32,15 @@ namespace
                     std::size_t maxLevel = 1)
     {
         flatbuffers::Offset<sG::PathInfo> resOff;
-        // Data strcture for depth-first traversal.
-        struct Data
+
+        // Directory structure for depth-first traversal.
+        struct Directory
         {
             std::filesystem::directory_entry entry;
             std::size_t parentIndex = 0;  //!< Index into dirInfos
-            Data* parent            = nullptr;
+            Directory* parent       = nullptr;
+
+            std::size_t size = 0;  //! Directory size.
 
             // if directory
             std::vector<flatbuffers::Offset<sG::PathInfo>> dirInfos;
@@ -67,52 +70,38 @@ namespace
             {
                 per = sG::Permissions::Permissions_OwnerWrite;
             }
-            return std::make_tuple(per, e.file_size(), offModTime);
+            return std::make_tuple(per, offModTime);
         };
 
         //! Serialize file info.
-        auto buildFileInfo = [&getStats](auto& builder, auto& e) {
+        auto buildFileInfo = [&getStats](auto& builder, const auto& e) {
+            EXECGRAPHGUI_BACKENDLOG_TRACE("Build file info: '{0}'", e.path());
             auto t = getStats(builder, e);
             return sG::CreatePathInfo(builder,
+                                      builder.CreateString(e.path().native()),
                                       builder.CreateString(e.path().filename().native()),
                                       std::get<0>(t),
-                                      std::uint64_t(std::get<1>(t)),
-                                      std::get<2>(t),
+                                      e.file_size(),
+                                      std::get<1>(t),
                                       true);
         };
 
         // Serialize directory info.
         auto buildDirectoryInfo = [&getStats](auto& builder,
-                                              auto& e,
-                                              Data* d = nullptr) {
+                                              const auto& e,
+                                              Directory* d = nullptr) {
+            EXECGRAPHGUI_BACKENDLOG_TRACE("Build dir info: '{0}'", e.path());
             auto t = getStats(builder, e);
             return sG::CreatePathInfo(builder,
+                                      builder.CreateString(e.path().native()),
                                       builder.CreateString(e.path().filename().native()),
                                       std::get<0>(t),
-                                      std::uint64_t(std::get<1>(t)),
-                                      std::get<2>(t),
+                                      0,
+                                      std::get<1>(t),
                                       false,
                                       d ? builder.CreateVector(d->fileInfos) : 0,
                                       d ? builder.CreateVector(d->dirInfos) : 0);
         };
-
-        //! Serialize directory/file.
-        auto buildInfo = [&buildFileInfo, &buildDirectoryInfo](auto& builder, auto& data) {
-            if(data.entry.is_regular_file())
-            {
-                return buildFileInfo(builder, data.entry);
-            }
-            else if(data.entry.is_directory())
-            {
-                return buildDirectoryInfo(builder,
-                                          data.entry,
-                                          &data);
-            }
-            throw executionGraph::Exception("Programming Error");
-        };
-
-        std::stack<Data> paths;
-        paths.emplace(Data{std::filesystem::directory_entry(root)});  // Depth-first travesal due to flatbuffer! (start at the bottom)
 
         //! Add all contained subdirectories and as well serialize file infos.
         auto visit = [&](auto& stack, auto& data, bool recurse) {
@@ -123,19 +112,21 @@ namespace
                 {
                     if(recurse)
                     {
-                        stack.emplace(Data{e, dirs++ /*offset index*/, &data});  // No invalidation of &data at reallocation!
+                        stack.emplace(Directory{e, dirs /*offset index*/, &data});  // No invalidation of &Directory at reallocation!
                     }
                     else
                     {
                         // build file info and store offset!
                         auto off = buildDirectoryInfo(builder, e);
-                        data.fileInfos.emplace_back(off);
+                        data.dirInfos.emplace_back(off);
                     }
+                    ++dirs;
                 }
                 else if(e.is_regular_file())
                 {
                     // build file info and store offset!
                     auto off = buildFileInfo(builder, e);
+                    data.size += e.file_size();
                     data.fileInfos.emplace_back(off);
                 }
             }
@@ -144,7 +135,15 @@ namespace
             data.visited = true;
         };
 
-        Data* current;
+        // Early return for files
+        if(std::filesystem::is_regular_file(root))
+        {
+            return buildFileInfo(builder, std::filesystem::directory_entry(root));
+        }
+
+        std::stack<Directory> paths;
+        paths.emplace(Directory{std::filesystem::directory_entry(root)});  // Depth-first travesal due to flatbuffer! (start at the bottom)
+        Directory* current;
         std::size_t currLevel = 0;
 
         while(paths.size())
@@ -156,7 +155,7 @@ namespace
             if(traverseUp)
             {
                 // Finish current path (file or directory with no more subdirs)
-                auto off = buildInfo(builder, *current);
+                auto off = buildDirectoryInfo(builder, current->entry, current);
                 // Set the offset to this info in the parent, such that it can build its structures later!
                 if(current->parent)
                 {
@@ -239,7 +238,7 @@ void FileBrowserRequestHandler::handleBrowse(const Request& request,
     // Request validation
     auto& payload = request.payload();
     EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
-                                      "Request data is null!");
+                                      "Request Directory is null!");
 
     auto browseReq = getRootOfPayloadAndVerify<sG::BrowseRequest>(*payload);
 
@@ -249,6 +248,7 @@ void FileBrowserRequestHandler::handleBrowse(const Request& request,
     {
         root = m_rootPath / root;
     }
+    root = std::filesystem::canonical(root);
 
     EXECGRAPHGUI_THROW_BAD_REQUEST_IF(!std::filesystem::exists(root),
                                       "FileBrowse path {0} does not exist!",

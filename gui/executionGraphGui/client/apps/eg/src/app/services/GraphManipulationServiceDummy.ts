@@ -44,7 +44,7 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
 
     const nodeModel = conversions.toNode(node);
     if (this.verboseResponseLog) {
-      this.logger.info(`Node: '${stringify(nodeModel)}'`);
+      this.logger.info(`Node: '${stringify(nodeModel, 4)}'`);
     }
     return nodeModel;
   }

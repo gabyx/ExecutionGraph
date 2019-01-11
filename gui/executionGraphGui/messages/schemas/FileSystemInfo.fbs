@@ -17,12 +17,13 @@ enum Permissions : byte { None = 0, OwnerRead, OwnerWrite, OwnerReadWrite }
 table PathInfo
 {
     path: string (id:0, required);
+    name: string (id:1, required);
 
-    permissions: Permissions (id:1);
-    size: uint64 (id:2);
-    modified: string (id:3, required);
+    permissions: Permissions (id:2);
+    size: uint64 (id:3);
+    modified: string (id:4, required);
 
-    isFile: bool (id:4);
-    files:       [PathInfo] (id:5);
-    directories: [PathInfo] (id:6);
+    isFile: bool (id:5);
+    files:       [PathInfo] (id:6);
+    directories: [PathInfo] (id:7);
 }

@@ -46,7 +46,7 @@ export class GeneralInfoServiceBinaryHttp extends GeneralInfoService {
     }
 
     if (this.verboseResponseLog) {
-      this.logger.debug(`GraphDescriptions: ${JSON.stringify(graphDesc)}`);
+      this.logger.debug(`GraphDescriptions: ${JSON.stringify(graphDesc, null, 4)}`);
     }
 
     return graphDesc;

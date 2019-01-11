@@ -163,16 +163,25 @@ namespace
         // Split read target into "/eg-backend/<category>/<subcategory>" and "additionalArgs"
         auto splitPath = [](std::string_view target) {
             std::size_t pos      = 0;
-            std::size_t validPos = 0;
-            for(int i = 0; i < 3 && pos != target.npos; ++i)
+            std::size_t endFirst = 0;
+            while(true)
             {
-                validPos = pos;
-                pos      = target.find("/", pos);
+                pos = target.find("/", pos);
+                if(pos == target.npos)
+                {
+                    break;
+                }
+                endFirst = pos++;
             }
-            return std::make_pair(target.substr(0, validPos), target.substr(validPos));
+            endFirst = target.find("?", endFirst);
+            return std::make_pair(target.substr(0, endFirst), endFirst != target.npos ? target.substr(endFirst) : "");
         };
 
         auto p = splitPath(req.target());
+        EXECGRAPHGUI_BACKENDLOG_DEBUG("Target: category: '{0}', subcategory: '{1}'",
+                                      p.first,
+                                      p.second);
+
         BackendRequest request(p.first,
                                std::string(p.second),
                                payLoadSize ? std::make_optional(BackendRequest::Payload{std::move(req.body()),

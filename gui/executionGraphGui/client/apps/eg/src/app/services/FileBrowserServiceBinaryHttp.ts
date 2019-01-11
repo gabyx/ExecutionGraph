@@ -15,12 +15,7 @@ import { VERBOSE_LOG_TOKEN } from '../tokens';
 import { flatbuffers } from 'flatbuffers';
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import * as model from '../model';
-import * as conversions from './Conversions';
 import { FileBrowserService, FileInfo, DirectoryInfo, sz } from './FileBrowserService';
-import { pipe } from 'rxjs';
-import { parseIntAutoRadix } from '@angular/common/src/i18n/format_number';
-import { parseTimelineCommand } from '@angular/animations/browser/src/render/shared';
 import { isDefined } from '@eg/common/src';
 
 @Injectable()
@@ -51,55 +46,51 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
     }
 
     const root: Entry = { from: response.info() };
-    const stack = new Array<Entry>(root);
+    const stack: Array<Entry> = [root];
 
-    const convertDirectory = (from: sz.PathInfo, toIn?: DirectoryInfo): DirectoryInfo => {
-      const to = Object.assign(
-        {
-          path: from.path(),
-          permissions: from.permissions(),
-          modified: from.modified(),
-          size: from.size().toFloat64(),
-          isFile: false
-        },
-        toIn === undefined ? <DirectoryInfo>{} : toIn
-      );
+    const convertFile = (from: sz.PathInfo, to?: FileInfo): FileInfo => {
+      return Object.assign(!isDefined(to) ? <FileInfo>{} : to, {
+        path: from.path(),
+        permissions: from.permissions(),
+        modified: from.modified(),
+        size: from.size().toFloat64(),
+        isFile: true
+      });
+    };
 
-      const files = from.files;
-      let l = files.length;
+    const convertDirectory = (from: sz.PathInfo, toIn: DirectoryInfo): DirectoryInfo => {
+      const to = Object.assign(!isDefined(toIn) ? <DirectoryInfo>{} : toIn, {
+        path: from.path(),
+        name: from.name(),
+        permissions: from.permissions(),
+        modified: from.modified(),
+        size: from.size().toFloat64(),
+        isFile: false
+      });
+
+      const files = from.files.bind(from);
+      let l = from.filesLength();
       if (l > 0) {
         to.files = new Array<FileInfo>();
       }
       for (let i = 0; i < l; ++i) {
-        const p = files(i);
-        to.files.push(convertFile(p));
+        to.files.push(convertFile(files(i)));
       }
 
-      const dirs = from.directories;
-      l = files.length;
+      const dirs = from.directories.bind(from);
+      l = from.directoriesLength();
+
       if (l > 0) {
-        to.directories = new Array<DirectoryInfo>(l);
+        to.directories = new Array<DirectoryInfo>();
       }
       for (let i = 0; i < l; ++i) {
-        const p = dirs(i);
         // fill into stack
-        stack.push({ from: p, to: to.directories[i] });
+        const toDir = <DirectoryInfo>{};
+        to.directories.push(toDir);
+        stack.push({ from: dirs(i), to: toDir });
       }
 
       return to;
-    };
-
-    const convertFile = (from: sz.PathInfo, to?: FileInfo): FileInfo => {
-      return Object.assign(
-        {
-          path: from.path(),
-          permissions: from.permissions(),
-          modified: from.modified(),
-          size: from.size().toFloat64(),
-          isFile: true
-        },
-        to === undefined ? <FileInfo>{} : to
-      );
     };
 
     // Traverse stack.
@@ -108,7 +99,7 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
       if (e.from.isFile()) {
         e.to = convertFile(e.from);
       } else {
-        e.to = convertDirectory(e.from);
+        e.to = convertDirectory(e.from, e.to);
       }
     }
 
@@ -132,7 +123,7 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
     const pathInfo = this.convert(response);
 
     if (this.verboseResponseLog) {
-      this.logger.debug(`Browse: ${JSON.stringify(pathInfo)}`);
+      this.logger.debug(`Browse: ${JSON.stringify(pathInfo, null, 4)}`);
     }
 
     return pathInfo;

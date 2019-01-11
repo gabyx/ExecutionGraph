@@ -65,6 +65,10 @@ import { GraphManagementService } from './services/GraphManagementService';
 import { GraphManagementServiceBinaryHttp } from './services/GraphManagementServiceBinaryHttp';
 import { GraphManagementServiceDummy } from './services/GraphManagementServiceDummy';
 
+import { FileBrowserService } from './services/FileBrowserService';
+import { FileBrowserServiceDummy } from './services/FileBrowserServiceDummy';
+import { FileBrowserServiceBinaryHttp } from './services/FileBrowserServiceBinaryHttp';
+
 import { TestService } from './services/TestService';
 import { ITestBackend, TestBackend } from './services/TestBackend';
 
@@ -185,6 +189,10 @@ const routes: Route[] = [
     {
       provide: GraphManagementService,
       useClass: !environment.useServiceDummys ? GraphManagementServiceBinaryHttp : GraphManagementServiceDummy
+    },
+    {
+      provide: FileBrowserService,
+      useClass: !environment.useServiceDummys ? FileBrowserServiceBinaryHttp : FileBrowserServiceDummy
     },
     { provide: RouterStateSerializer, useClass: RouterStateUrlSerializer }
   ],
