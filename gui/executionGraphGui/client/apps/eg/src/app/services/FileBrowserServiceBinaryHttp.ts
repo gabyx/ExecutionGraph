@@ -51,6 +51,7 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
     const convertFile = (from: sz.PathInfo, to?: FileInfo): FileInfo => {
       return Object.assign(!isDefined(to) ? <FileInfo>{} : to, {
         path: from.path(),
+        name: from.name(),
         permissions: from.permissions(),
         modified: from.modified(),
         size: from.size().toFloat64(),
