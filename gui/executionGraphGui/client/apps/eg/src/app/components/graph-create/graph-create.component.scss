@@ -37,3 +37,7 @@ h2 {
 .type:not(.last)::after {
   content: ' | ';
 }
+
+.description-button {
+  color: mat-color($app-secondary);
+}

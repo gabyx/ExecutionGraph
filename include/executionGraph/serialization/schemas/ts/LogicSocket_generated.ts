@@ -133,5 +133,14 @@ static endLogicSocket(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 };
 
+static createLogicSocket(builder:flatbuffers.Builder, typeIndex:flatbuffers.Long, typeOffset:flatbuffers.Offset, typeNameOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, index:flatbuffers.Long):flatbuffers.Offset {
+  LogicSocket.startLogicSocket(builder);
+  LogicSocket.addTypeIndex(builder, typeIndex);
+  LogicSocket.addType(builder, typeOffset);
+  LogicSocket.addTypeName(builder, typeNameOffset);
+  LogicSocket.addName(builder, nameOffset);
+  LogicSocket.addIndex(builder, index);
+  return LogicSocket.endLogicSocket(builder);
+}
 }
 }

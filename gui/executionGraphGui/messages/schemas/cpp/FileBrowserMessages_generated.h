@@ -71,9 +71,10 @@ inline flatbuffers::Offset<BrowseRequest> CreateBrowseRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *path = nullptr,
     bool recursive = false) {
+  auto path__ = path ? _fbb.CreateString(path) : 0;
   return executionGraphGui::serialization::CreateBrowseRequest(
       _fbb,
-      path ? _fbb.CreateString(path) : 0,
+      path__,
       recursive);
 }
 

@@ -38,8 +38,14 @@ namespace executionGraph
         using NodeTypeDescriptionList   = std::vector<NodeTypeDescription>;
 
     public:
-        GraphTypeDescription(const IdNamed& graphId, SocketTypeDescriptionList socketTypeDescription)
-            : m_graphId(graphId), m_socketTypeDescription(std::move(socketTypeDescription))
+        GraphTypeDescription(const IdNamed& graphId,
+                             SocketTypeDescriptionList socketTypeDescription,
+                             NodeTypeDescriptionList nodeTypeDescription = {},
+                             std::string description                     = "no description")
+            : m_graphId(graphId)
+            , m_socketTypeDescription(std::move(socketTypeDescription))
+            , m_nodeTypeDescription(std::move(nodeTypeDescription))
+            , m_description(std::move(description))
         {}
 
     public:
@@ -52,32 +58,32 @@ namespace executionGraph
             return m_socketTypeDescription[type].m_type;
         }
 
-        //! Get the graph id.
         const IdNamed& getGraphId() const { return m_graphId; }
-        //! Get the socket type descriptions.
         const SocketTypeDescriptionList& getSocketTypeDescriptions() const { return m_socketTypeDescription; }
-        //! Get the node type descriptions.
         const NodeTypeDescriptionList& getNodeTypeDescriptions() const { return m_nodeTypeDescription; }
-        NodeTypeDescriptionList& getNodeTypeDescriptions() { return m_nodeTypeDescription; }
+        const std::string& getDescription() const { return m_description; }
 
     public:
-        const IdNamed m_graphId;                                  //!< The id of this graph type.
-        const SocketTypeDescriptionList m_socketTypeDescription;  //!< Type names of the available sockets (in order with the `Config::SocketTypes`)
-        NodeTypeDescriptionList m_nodeTypeDescription;            //!< Type names of the available and creatable nodes on this graph.
+        const IdNamed m_graphId;  //!< The id of this graph type.
+        //! Type names of the available sockets (in order with the `Config::SocketTypes`)
+        const SocketTypeDescriptionList m_socketTypeDescription;
+        //! Type names of the available and creatable nodes on this graph.
+        NodeTypeDescriptionList m_nodeTypeDescription;
+        //! Some description of this graph type.
+        const std::string m_description;
     };
 
     //! Return a graph description from a graph id `graphId` and
     //! its node type descriptions `nodeTypeDescriptions`.
     template<typename Config>
     GraphTypeDescription makeGraphTypeDescription(const IdNamed& graphId,
-                                                  std::vector<NodeTypeDescription> nodeTypeDescription = {})
+                                                  const GraphTypeDescription::NodeTypeDescriptionList& nodeTypeDescription,
+                                                  const std::string& description)
     {
-        GraphTypeDescription description(graphId, getSocketDescriptions<Config>());
-
-        //! All node types
-        description.getNodeTypeDescriptions() = std::move(nodeTypeDescription);
-
-        return description;
+        return GraphTypeDescription(graphId,
+                                    getSocketDescriptions<Config>(),
+                                    nodeTypeDescription,
+                                    description);
     }
 
 }  // namespace executionGraph

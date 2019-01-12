@@ -52,7 +52,8 @@ export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescrip
     id: new Id(graphDesc.id()),
     name: graphDesc.name(),
     nodeTypeDescriptions: nodes,
-    socketTypeDescriptions: sockets
+    socketTypeDescriptions: sockets,
+    description: graphDesc.description()
   };
 }
 

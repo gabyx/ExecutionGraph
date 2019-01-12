@@ -55,7 +55,8 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
       id: new Id(response.graphId()),
       typeId: graphTypeId,
       connections: {},
-      nodes: {}
+      nodes: {},
+      name: ''
     };
     return graph;
   }

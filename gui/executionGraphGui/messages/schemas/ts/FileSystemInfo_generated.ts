@@ -359,5 +359,17 @@ static endPathInfo(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 };
 
+static createPathInfo(builder:flatbuffers.Builder, pathOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, permissions:executionGraphGui.serialization.Permissions, size:flatbuffers.Long, modifiedOffset:flatbuffers.Offset, isFile:boolean, filesOffset:flatbuffers.Offset, directoriesOffset:flatbuffers.Offset):flatbuffers.Offset {
+  PathInfo.startPathInfo(builder);
+  PathInfo.addPath(builder, pathOffset);
+  PathInfo.addName(builder, nameOffset);
+  PathInfo.addPermissions(builder, permissions);
+  PathInfo.addSize(builder, size);
+  PathInfo.addModified(builder, modifiedOffset);
+  PathInfo.addIsFile(builder, isFile);
+  PathInfo.addFiles(builder, filesOffset);
+  PathInfo.addDirectories(builder, directoriesOffset);
+  return PathInfo.endPathInfo(builder);
+}
 }
 }

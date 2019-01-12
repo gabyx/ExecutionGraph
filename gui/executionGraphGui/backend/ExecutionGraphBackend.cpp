@@ -35,7 +35,8 @@ const std::array<IdNamed, 1> ExecutionGraphBackend::m_graphTypeDescriptionIds = 
 const std::unordered_map<Id, e::GraphTypeDescription>
     ExecutionGraphBackend::m_graphTypeDescription = {std::make_pair(m_graphTypeDescriptionIds[0],
                                                                     e::makeGraphTypeDescription<DefaultGraphConfig>(m_graphTypeDescriptionIds[0],
-                                                                                                                    ExecutionGraphBackendDefs<DefaultGraphConfig>::getNodeDescriptions()))};
+                                                                                                                    ExecutionGraphBackendDefs<DefaultGraphConfig>::getNodeDescriptions(),
+                                                                                                                    ExecutionGraphBackendDefs<DefaultGraphConfig>::getDescription()))};
 
 //! Add a new graph of type `graphType` to the backend.
 Id ExecutionGraphBackend::addGraph(const Id& graphType)
