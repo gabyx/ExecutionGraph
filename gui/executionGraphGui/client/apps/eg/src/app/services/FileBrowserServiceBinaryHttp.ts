@@ -62,10 +62,10 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
     const directory = await this.convertDirectoryInfo(from);
 
     for (let fIdx = 0; fIdx < from.filesLength(); ++fIdx) {
-      directory.files.push(await this.convertFileInfo(from.files.bind(from)(fIdx)));
+      directory.files.push(await this.convertFileInfo(from.files(fIdx)));
     }
     for (let dIdx = 0; dIdx < from.directoriesLength(); ++dIdx) {
-      directory.directories.push(await this.convertDirectory(from.directories.bind(from)(dIdx)));
+      directory.directories.push(await this.convertDirectory(from.directories(dIdx)));
     }
 
     return directory;
@@ -93,8 +93,8 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
         modified: this.convertDate(from.modified()),
         size: from.size().toFloat64(),
         isFile: false,
-        directories: [],
-        files: []
+        files: [],
+        directories: []
       });
     });
   }
@@ -102,5 +102,4 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
   private convertDate(from: sz.Date): Date {
     return new Date(from.year(), from.month(), from.day(), from.hour(), from.min(), from.sec(), 0);
   }
-
 }
