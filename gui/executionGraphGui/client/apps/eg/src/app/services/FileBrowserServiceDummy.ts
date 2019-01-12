@@ -28,16 +28,16 @@ export class FileBrowserServiceDummy extends FileBrowserService {
     permissions: Permissions.OwnerReadWrite,
     files: [
       {
-        path: './FileA',
-        name: 'FileA',
+        path: './FileA.eg',
+        name: 'FileA.eg',
         size: 4,
         modified: new Date(),
         isFile: true,
         permissions: Permissions.OwnerReadWrite
       },
       {
-        path: './FileB',
-        name: 'FileB',
+        path: './FileB.tiff',
+        name: 'FileB.tiff',
         size: 4,
         modified: new Date(),
         isFile: true,
@@ -54,8 +54,8 @@ export class FileBrowserServiceDummy extends FileBrowserService {
         permissions: Permissions.OwnerReadWrite,
         files: [
           {
-            path: '/DirB/FileC',
-            name: 'FileC',
+            path: '/DirB/FileC.eg',
+            name: 'FileC.eg',
             size: 4,
             modified: new Date(),
             isFile: true,
