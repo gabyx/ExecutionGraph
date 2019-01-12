@@ -31,7 +31,9 @@ import {
   MatTabsModule,
   MatListModule,
   MatSliderModule,
-  MatProgressSpinnerModule
+  MatProgressSpinnerModule,
+  MAT_DIALOG_DEFAULT_OPTIONS,
+  MatDialogModule
 } from '@angular/material';
 import { NxModule } from '@nrwl/nx';
 import { RouterStateSerializer, StoreRouterConnectingModule } from '@ngrx/router-store';
@@ -97,6 +99,7 @@ import { MoveToolComponent } from './components/tools/move-tool/move-tool.compon
 import { DeleteToolComponent } from './components/tools/delete-tool/delete-tool.component';
 import { TypeToolTipToolComponent } from './components/tools/type-tooltip-tool/type-tooltip-tool.component';
 import { GraphOpenComponent } from './components/graph-open/graph-open.component';
+import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
 
 const routes: Route[] = [
   {
@@ -126,6 +129,7 @@ const routes: Route[] = [
 @NgModule({
   declarations: [
     AppComponent,
+    ConfirmationDialogComponent,
     ToolbarComponent,
     WorkspaceComponent,
     ConnectionStyleOptionsComponent,
@@ -143,6 +147,7 @@ const routes: Route[] = [
     ConnectionLayerComponent,
     GraphOpenComponent
   ],
+  entryComponents: [ConfirmationDialogComponent],
   imports: [
     HttpClientModule,
     BrowserModule,
@@ -164,6 +169,7 @@ const routes: Route[] = [
     MatSnackBarModule,
     MatTabsModule,
     MatToolbarModule,
+    MatDialogModule,
     GraphModule,
     CommonModule,
     NxModule.forRoot(),
@@ -179,6 +185,7 @@ const routes: Route[] = [
   providers: [
     { provide: VERBOSE_LOG_TOKEN, useValue: environment.logReponsesVerbose },
     { provide: BINARY_HTTP_ROUTER_BASE_URL, useValue: environment.backendUrl },
+    { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: false } },
     { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory },
     { provide: ITestBackend, useClass: TestBackend },
     BinaryHttpRouterService,
