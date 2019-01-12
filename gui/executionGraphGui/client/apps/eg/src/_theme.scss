@@ -13,6 +13,10 @@ $secondary: mat-color($app-secondary);
 $accent: mat-color($app-accent);
 $warn: mat-color($app-warn);
 
+$general-background: mat-palette($mat-grey, 700, 500, 900);
+$general-background-color: mat-color($general-background, 800, 1);
+$overlay-background-color: mat-color($general-background, 900, 0.95);
+
 // Fonts
 $app-typography: mat-typography-config(
   $font-family: '"Fira Sans", sans-serif;'
