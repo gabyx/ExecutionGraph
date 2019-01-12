@@ -1,42 +1,57 @@
 <eg-toolbar></eg-toolbar>
 
 <mat-drawer-container class="sidenav-container" hasBackdrop="false">
-
-  <mat-drawer mode="over" position="end" [opened]="(hasDrawerContent | async)" (closedStart)="drawerClosed()">
-
+  <mat-drawer mode="over" position="end" [opened]="hasDrawerContent | async" (closedStart)="drawerClosed()">
     <nav mat-tab-nav-bar>
-
-      <a mat-tab-link [routerLink]="[{outlets: { drawer: 'inspector'}}]"
-         routerLinkActive #inspectorActive="routerLinkActive" [active]="inspectorActive.isActive">
+      <a
+        mat-tab-link
+        [routerLink]="[{ outlets: { drawer: 'inspector' } }]"
+        routerLinkActive
+        #inspectorActive="routerLinkActive"
+        [active]="inspectorActive.isActive"
+      >
         <mat-icon>zoom_in</mat-icon>
       </a>
-      <a mat-tab-link [routerLink]="[{outlets: { drawer: 'nodes'}}]"
-          routerLinkActive #nodesActive="routerLinkActive" [active]="nodesActive.isActive">
+      <a
+        mat-tab-link
+        [routerLink]="[{ outlets: { drawer: 'nodes' } }]"
+        routerLinkActive
+        #nodesActive="routerLinkActive"
+        [active]="nodesActive.isActive"
+      >
         <mat-icon>library_add</mat-icon>
       </a>
-      <a mat-tab-link [routerLink]="[{outlets: { drawer: 'lines'}}]"
-          routerLinkActive #linesActive="routerLinkActive" [active]="linesActive.isActive">
+      <a
+        mat-tab-link
+        [routerLink]="[{ outlets: { drawer: 'lines' } }]"
+        routerLinkActive
+        #linesActive="routerLinkActive"
+        [active]="linesActive.isActive"
+      >
         <mat-icon>timeline</mat-icon>
       </a>
-      <a mat-tab-link [routerLink]="[{outlets: { drawer: 'backend-test'}}]"
-         routerLinkActive #testActive="routerLinkActive" [active]="testActive.isActive">
+      <a
+        mat-tab-link
+        [routerLink]="[{ outlets: { drawer: 'backend-test' } }]"
+        routerLinkActive
+        #testActive="routerLinkActive"
+        [active]="testActive.isActive"
+      >
         <mat-icon>bug_reportmg</mat-icon>
       </a>
-      <a mat-tab-link [routerLink]="[{outlets: { drawer: null}}]"
-         routerLinkActive #closeActive="routerLinkActive" [active]="closeActive.isActive">
+      <a
+        mat-tab-link
+        [routerLink]="[{ outlets: { drawer: null } }]"
+        routerLinkActive
+        #closeActive="routerLinkActive"
+        [active]="closeActive.isActive"
+      >
         <mat-icon>close</mat-icon>
       </a>
-
     </nav>
 
     <router-outlet name="drawer"></router-outlet>
-
   </mat-drawer>
 
-  <mat-drawer-content>
-    <router-outlet></router-outlet>
-
-  </mat-drawer-content>
-
+  <mat-drawer-content> <router-outlet name="primary"></router-outlet> </mat-drawer-content>
 </mat-drawer-container>
-

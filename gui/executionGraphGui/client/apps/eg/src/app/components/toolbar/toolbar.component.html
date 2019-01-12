@@ -1,13 +1,16 @@
 <mat-toolbar>
   <mat-toolbar-row>
     <mat-menu #fileMenu="matMenu">
-      <button mat-menu-item routerLink="/graph/new">
+      <button mat-menu-item [routerLink]="['/graph/new']">
         <mat-icon>add</mat-icon>
         <span>Create new</span>
       </button>
-      <button mat-menu-item>
+      <button mat-menu-item [routerLink]="['/graph/open']">
         <mat-icon>mode_edit</mat-icon>
         <span>Open</span>
+      </button>
+      <button mat-menu-item routerLink="/graph/:graphId/close">
+        <span>Close</span>
       </button>
       <button mat-menu-item [matMenuTriggerFor]="openRecentMenu">
         <span>Open recent</span>
@@ -34,7 +37,7 @@
     </mat-menu>
 
     <mat-menu #openRecentMenu="matMenu">
-      <button *ngFor="let graph of graphsMRU | async" mat-menu-item [routerLink]="['graph', graph.id.toString()]">{{ graph.id }}</button>
+      <button *ngFor="let graph of graphsMRU | async" mat-menu-item [routerLink]="['graph', graph.id.toString()]">{{ graph.name }} | {{ graph.id.toString()}}</button>
     </mat-menu>
 
     <mat-menu #executionMenu="matMenu">

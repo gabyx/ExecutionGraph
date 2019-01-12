@@ -18,3 +18,20 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/** Some general styles */
+a {
+  cursor: pointer;
+}
+
+h1 {
+  color: mat-color($app-primary);
+  font-family: mat-font-family($app-graph-typography);
+  font-size: mat-font-size($app-graph-typography, headline);
+}
+
+h2 {
+  color: mat-color($app-secondary);
+  font-family: mat-font-family($app-graph-typography);
+  font-size: mat-font-size($app-graph-typography, title);
+}

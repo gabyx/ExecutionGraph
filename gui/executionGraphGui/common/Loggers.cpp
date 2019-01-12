@@ -19,7 +19,7 @@ Loggers::Loggers(const std::path& logPath)
 {
     auto format  = "[%H:%M:%S,%e] [%l] [%n] [tid: %t] : %v";
     auto logFile = logPath / "AppLog.log";
-    
+
     std::filesystem::create_directories(logPath);
 
     try
@@ -31,12 +31,12 @@ Loggers::Loggers(const std::path& logPath)
 
         // Make the application log.
         m_appLog = std::make_unique<spdlog::logger>("AppLog", begin(sinks), end(sinks));
-        m_appLog->set_level(spdlog::level::debug);
+        m_appLog->set_level(spdlog::level::trace);
         m_appLog->set_pattern(format);
 
         // Make the backend log.
         m_backendLog = std::make_unique<spdlog::logger>("BackendLog", begin(sinks), end(sinks));
-        m_backendLog->set_level(spdlog::level::debug);
+        m_backendLog->set_level(spdlog::level::trace);
         m_backendLog->set_pattern(format);
     }
     catch(const spdlog::spdlog_ex& ex)

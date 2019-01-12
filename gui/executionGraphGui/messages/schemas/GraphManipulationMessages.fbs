@@ -22,7 +22,7 @@ table NodeConstructionInfo {
 }
 
 //! ======================================================================
-//! Message "graph/addNode"
+//! Message "/eg-backend/graph/addNode"
 //! ======================================================================
 //! Request data:
 table AddNodeRequest {
@@ -43,7 +43,7 @@ table AddNodeResponse {
 //! ======================================================================
 
 //! ======================================================================
-//! Message "graph/removeNode"
+//! Message "/eg-backend/graph/removeNode"
 //! ======================================================================
 //! Request data: 
 table RemoveNodeRequest {
@@ -62,7 +62,7 @@ table RemoveNodeRequest {
 
 
 //! ======================================================================
-//! Message "graph/addConnection"
+//! Message "/eg-backend/graph/addConnection"
 //! ======================================================================
 //! Request data:
 table AddConnectionRequest {
@@ -92,7 +92,7 @@ table AddConnectionResponse {
 //! ======================================================================
 
 //! ======================================================================
-//! Message "graph/removeConnection"
+//! Message "/eg-backend/graph/removeConnection"
 //! ======================================================================
 //! Request data: 
 table RemoveConnectionRequest {

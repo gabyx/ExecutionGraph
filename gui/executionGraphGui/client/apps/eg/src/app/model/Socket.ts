@@ -58,14 +58,14 @@ export abstract class Socket {
   protected _id: SocketId = new SocketId();
 
   constructor(
-    public readonly type: Long,
+    public readonly typeIndex: Long,
     public readonly name: string,
     public readonly index: SocketIndex,
-    public readonly typeName?: string,
+    public readonly type?: string,
     protected _parent?: Node
   ) {
-    if (!isDefined(typeName)) {
-      typeName = type.toString();
+    if (!isDefined(type)) {
+      type = typeIndex.toString();
     }
   }
 

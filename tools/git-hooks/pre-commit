@@ -52,6 +52,17 @@ function findExecutables(){
   fi
 }
 
+function getArgsBase64Decode(){
+  echo "test" | base64 -d > /dev/null
+  if [ $? -eq 0 ] ; then
+    echo "-d"
+  else
+    echo "-D"
+  fi
+}
+
+decodeArgs=$(getArgsBase64Decode)
+
 # get all disabled formaters
 disabledFormatters=$(git config precommit-format.disabledFormattersRegex)
 enabledFormatters=$(git config precommit-format.enabledFormattersRegex)
@@ -76,7 +87,7 @@ findExecutables | {
     [ -f "$patterns" -o -f "$magic" ] || continue
 
     # format all files
-    echo -ne "$allFiles" | base64 -D | {
+    echo -ne "$allFiles" | base64 ${decodeArgs} | {
       while IFS=; read -r -d $'\0' orig ; do
         orig="${root}/${orig}"
 

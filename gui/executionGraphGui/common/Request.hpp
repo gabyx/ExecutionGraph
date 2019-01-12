@@ -46,9 +46,11 @@ public:
 
 public:
     Request(std::path requestTarget,
+            std::string requestTargetArgs,
             std::optional<Payload> payload = std::nullopt)
         : m_id()
         , m_requestTarget(std::move(requestTarget))
+        , m_requestTargetArgs(std::move(requestTargetArgs))
         , m_payload{std::move(payload)}
     {}
 
@@ -62,20 +64,26 @@ public:
 
 public:
     //! Get the request target describing this message.
-    const std::path& getTarget() const { return m_requestTarget; }
+    const std::path& target() const { return m_requestTarget; }
+    //! Get the request target additional arguments.
+    const std::string& targetArgs() const { return m_requestTargetArgs; }
 
 public:
     //! Get the payload of this request.
-    const std::optional<Payload>& getPayload() const { return m_payload; }
+    const std::optional<Payload>& payload() const { return m_payload; }
     //! Get the payload of this request.
-    std::optional<Payload>& getPayload() { return m_payload; }
+    std::optional<Payload>& payload() { return m_payload; }
 
 private:
-    //! The request target path
-    //! e.g. "/executiongraph-backend/graph/addNode", 
-    //! e.g. "/executiongraph-backend/general/addGraph" 
-    //! etc.
+    //! The request target path in the form
+    //! "/eg-backend/<categeory>/<subcategory>":
+    //! e.g. "/eg-backend/graph/addNode",
+    //! e.g. "/eg-backend/general/addGraph"
+    //! e.g. "/eg-backend/general/files" etc.
     std::path m_requestTarget;
+
+    //! Additional request arguments (if any, normally empty).
+    std::string m_requestTargetArgs;
 
     //! The optional payload.
     std::optional<Payload> m_payload;

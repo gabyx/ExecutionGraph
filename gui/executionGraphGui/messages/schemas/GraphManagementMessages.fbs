@@ -16,7 +16,7 @@ include "executionGraph/serialization/schemas/LogicNode.fbs";
 namespace executionGraphGui.serialization;
 
 //! ======================================================================
-//! Message "general/addGraph"
+//! Message "/eg-backend/general/addGraph"
 //! ======================================================================
 //! Request data:
 table AddGraphRequest {
@@ -34,7 +34,7 @@ table AddGraphResponse {
 //! ======================================================================
 
 //! ======================================================================
-//! Message "general/removeGraph"
+//! Message "/eg-backend/general/removeGraph"
 //! ======================================================================
 //! Request data: 
 table RemoveGraphRequest {

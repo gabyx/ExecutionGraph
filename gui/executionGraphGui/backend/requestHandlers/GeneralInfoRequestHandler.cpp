@@ -24,28 +24,31 @@ namespace s  = executionGraph::serialization;
 namespace sG = executionGraphGui::serialization;
 
 //! Init the function mapping.
-FunctionMap<GeneralInfoRequestHandler::Function> GeneralInfoRequestHandler::initFunctionMap()
+GeneralInfoRequestHandler::FuncMap GeneralInfoRequestHandler::initFunctionMap()
 {
-    using Entry = typename FunctionMap<Function>::Entry;
-    auto r      = {Entry{targetBase / "general/getAllGraphTypeDescriptions",
+    using Entry = typename FuncMap::Entry;
+
+    auto r = {Entry{targetBase / "general/getAllGraphTypeDescriptions",
                     Function{&GeneralInfoRequestHandler::handleGetAllGraphTypeDescriptions}}};
     return {r};
 }
 
 //! Static handler map: request to handler function mapping.
-const FunctionMap<GeneralInfoRequestHandler::Function> GeneralInfoRequestHandler::m_functionMap = GeneralInfoRequestHandler::initFunctionMap();
+const GeneralInfoRequestHandler::FuncMap
+    GeneralInfoRequestHandler::m_functionMap = GeneralInfoRequestHandler::initFunctionMap();
 
 //! Konstructor.
 GeneralInfoRequestHandler::GeneralInfoRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,
                                                      const IdNamed& id)
-    : BackendRequestHandler(id)
+    : BackendRequestHandler(id), m_backend(backend)
 {
 }
 
 //! Get the request types for which this handler is registered.
-const std::unordered_set<std::string>& GeneralInfoRequestHandler::getRequestTypes() const
+const std::unordered_set<GeneralInfoRequestHandler::HandlerKey>&
+GeneralInfoRequestHandler::requestTargets() const
 {
-    return m_functionMap.m_keys;
+    return m_functionMap.keys();
 }
 
 //! Handle the request.
@@ -53,20 +56,14 @@ void GeneralInfoRequestHandler::handleRequest(const Request& request,
                                               ResponsePromise& response)
 {
     EXECGRAPHGUI_BACKENDLOG_INFO("GeneralInfoRequestHandler::handleRequest");
-
-    // Dispatch to the correct function
-    auto it = m_functionMap.m_map.find(request.getTarget().string());
-    if(it != m_functionMap.m_map.end())
-    {
-        it->second(*this, request, response);
-    }
+    m_functionMap.dispatch(request.target().native(), *this, request, response);
 }
 
 //! Handle the operation of getting all graph type descriptions.
 void GeneralInfoRequestHandler::handleGetAllGraphTypeDescriptions(const Request& request,
                                                                   ResponsePromise& response)
 {
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(request.getPayload() != std::nullopt,
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(request.payload() != std::nullopt,
                                       "There should not be any request payload for this request");
     using Allocator = ResponsePromise::Allocator;
 

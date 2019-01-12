@@ -160,14 +160,35 @@ namespace
             return;
         }
 
-        BackendRequest request(req.target(),
-                               payLoadSize ? std::make_optional(
-                                                 BackendRequest::Payload{
-                                                     std::move(req.body()),
-                                                     req[http::field::content_type]})
+        // Split read target into "/eg-backend/<category>/<subcategory>" and "additionalArgs"
+        auto splitPath = [](std::string_view target) {
+            std::size_t pos      = 0;
+            std::size_t endFirst = 0;
+            while(true)
+            {
+                pos = target.find("/", pos);
+                if(pos == target.npos)
+                {
+                    break;
+                }
+                endFirst = pos++;
+            }
+            endFirst = target.find("?", endFirst);
+            return std::make_pair(target.substr(0, endFirst), endFirst != target.npos ? target.substr(endFirst) : "");
+        };
+
+        auto p = splitPath(req.target());
+        EXECGRAPHGUI_BACKENDLOG_DEBUG("Target: category: '{0}', subcategory: '{1}'",
+                                      p.first,
+                                      p.second);
+
+        BackendRequest request(p.first,
+                               std::string(p.second),
+                               payLoadSize ? std::make_optional(BackendRequest::Payload{std::move(req.body()),
+                                                                                        req[http::field::content_type]})
                                            : std::nullopt);
 
-        BackendResponsePromise responsePromise{executionGraph::Id{}, allocator};
+        BackendResponsePromise responsePromise{{}, allocator};
         ResponseFuture responeFuture(responsePromise);
 
         if(!dispatcher.handleRequest(request, responsePromise))
@@ -206,7 +227,7 @@ namespace
                 send(makeServerError(req, fmt::format("Unknown Error: '{0}'", e.what())));
             }
         }
-    }
+    }  // namespace
 }  // namespace
 
 /* ---------------------------------------------------------------------------------------*/

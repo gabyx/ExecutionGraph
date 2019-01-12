@@ -9,9 +9,5 @@ import { AppState } from '../../+state/reducers/app.reducers';
 })
 export class InspectorComponent implements OnInit {
   constructor(private store: Store<AppState>) {}
-
   ngOnInit() {}
-
-  public closeInspector() {
-  }
 }

@@ -3,11 +3,13 @@
 <img src="gui/executionGraphGui/client/apps/electron/resources/icon.svg" height="150px" style="display: inline;vertical-align: middle; horizontal-align:center"/>
 
 # ExecutionGraph [![Build Status](https://travis-ci.org/gabyx/ExecutionGraph.svg?branch=master)](https://travis-ci.org/gabyx/ExecutionGraph) ![System](https://img.shields.io/badge/system-linux,osx-lightgrey.svg)
-**Fast Execution Graph consisting of Execution Nodes**
+**Fast Execution Graph consisting of Execution Nodes**    
 
-Be able to design and run such input/output graphs, such as the ones used for the work [here](http://gabyx.github.io/GRSFramework/#videos) (using this [graph](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)). A GUI is provided in from of a single-page Angular application with a backend HTTP server which allows interactive design/manipulation and execution of graphs: 
+Live Demo: [https://gabyx.github.io/ExecutionGraph/demo](https://gabyx.github.io/ExecutionGraph/demo)
 
-![Current GUI](doc/ExecutionGraphGui.png)
+Be able to design and run such input/output graphs, such as the ones used for the work [here](http://gabyx.github.io/GRSFramework/#videos) (using this [graph](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)). A generic, independent GUI is provided in from of a single-page Angular application with a backend HTTP server which allows interactive design/manipulation and execution of graphs: 
+
+![Current GUI](docs/ExecutionGraphGui.png)
 
 * [Installing and Dependencies](#installing-and-dependencies)
     * [OS X](#os-x)
@@ -96,8 +98,8 @@ This project supports [Visual Studio Code](https://code.visualstudio.com/) which
 ## General Development Setup
 If you start developing, install the pre-commit/post-commit hooks with:
 ```bash
-    npm install -g json-fmt xmllint
-    brew install plantuml
+    sudo npm install -g json-fmt xmllint prettier
+    sudo brew install plantuml # or sudo apt-get install plantuml 
     cd .git && mv hooks hooks.old && ln -s ../tools/git-hooks hooks
 ```
 
@@ -154,7 +156,7 @@ Static type dispatching avoids the use of virtual calls when using polymorphic o
 Source: `examples/libraryUsage`   
 Let us build the simple directed graph below: 
 
-![Example1](doc/Example1.svg)
+![Example1](docs/Example1.svg)
 
 This execution tree consists of 4 input nodes, e.g. Node `1a`, `1b`, `2a`, `2b`, and 1 output node `4a`.
 Each node has 2 input sockets, e.g. denoted as `i0` and `i1`, and one output socket `o0`.
@@ -294,5 +296,5 @@ Execution order for group id: 0
 ```
 
 ## Contributors
-- Gabriel Nützi (graph)
-- Simon Spörri (gui, graph)
+**Gabriel Nützi** (graph) and many thanks to **[Simon Spörri](https://github.com/simonspoerri)**
+for his nice and ellaborate take on the client gui application!

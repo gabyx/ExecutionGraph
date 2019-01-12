@@ -11,11 +11,12 @@
 // =========================================================================================
 
 import { DraggableDirective } from './draggable.directive';
+import { DragAndDropService } from '../services/drag-and-drop.service';
 import { ElementRef } from '@angular/core';
 
 describe('DraggableDirective', () => {
   it('should create an instance', () => {
-    const directive = new DraggableDirective(new ElementRef(null));
+    const directive = new DraggableDirective(new ElementRef(null), new DragAndDropService());
     expect(directive).toBeTruthy();
   });
 });

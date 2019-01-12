@@ -13,4 +13,5 @@
 export { GeneralInfoService } from './GeneralInfoService';
 export { GraphManagementService } from './GraphManagementService';
 export { GraphManipulationService } from './GraphManipulationService';
+export { FileBrowserService } from './FileBrowserService';
 export { ExecutionService } from './ExecutionService';

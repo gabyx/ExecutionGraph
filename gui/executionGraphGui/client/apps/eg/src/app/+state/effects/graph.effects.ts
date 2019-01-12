@@ -17,7 +17,7 @@ import { Connection, Node } from '../../model';
 import { GeneralInfoService, GraphManipulationService, GraphManagementService } from '../../services';
 import { GraphsState } from '../reducers';
 import { RouterStateUrl } from '../reducers/app.reducers';
-import { arraysEqual } from '@eg/common';
+import { arraysEqual, isDefined } from '@eg/common';
 
 @Injectable()
 export class GraphEffects {
@@ -58,6 +58,8 @@ export class GraphEffects {
   createGraph$ = this.actions$.ofType<fromGraph.CreateGraph>(fromGraph.CREATE_GRAPH).pipe(
     mergeMap((action, state) => from(this.graphManagementService.addGraph(action.graphType.id))),
     mergeMap(graph => [
+      //@todo gabnue->gabnue Change here the name of the graph to some default value
+      // dispatch new action fromGraph.GraphChangeProps(name: "...");
       new fromGraph.GraphAdded(graph),
       new fromNotifications.ShowNotification(`Shiny new graph created for you \u{1F6EB}`)
     ])
@@ -118,7 +120,7 @@ export class GraphEffects {
     const graphDescs = await this.generalInfoService.getAllGraphTypeDescriptions();
     const graphDesc = graphDescs[0];
     const graphTypeId = graphDesc.id;
-    const nodeType = graphDesc.nodeTypeDescritptions[0].type;
+    const nodeType = graphDesc.nodeTypeDescriptions[0].type;
 
     // Add a graph
     let graph = await this.graphManagementService.addGraph(graphTypeId);
@@ -127,19 +129,19 @@ export class GraphEffects {
     let lastNode: Node = null;
     const connections = {};
     for (let i = 0; i < 3; ++i) {
-      const node = await this.graphManipulationService.addNode(graph.id, nodeType, `${i}`);
+      const node = await this.graphManipulationService.addNode(graph.id, nodeType, `Node ${i}`);
       node.uiProps.position.x = 200 * i;
       node.uiProps.position.y = 50 + 100 * i;
       nodes[node.id.toString()] = node;
 
-      if (lastNode) {
+      if (lastNode && isDefined(node.inputs[0])) {
         const connection = Connection.create(lastNode.outputs[0], node.inputs[0]);
         connections[connection.idString] = connection;
       }
       lastNode = node;
     }
 
-    graph = { ...graph, nodes: nodes, connections: connections };
+    graph = { ...graph, nodes: nodes, connections: connections, name: 'MyDummyGraph' };
 
     return new fromGraph.GraphsLoaded([graph]);
   }

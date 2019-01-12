@@ -31,10 +31,10 @@ export class GeneralInfoServiceDummy extends GeneralInfoService {
   }
 
   public async getAllGraphTypeDescriptions(): Promise<model.GraphTypeDescription[]> {
-    let graphDescs = this.backend.graphTypeDescs;
+    const graphDescs = this.backend.graphTypeDescs;
 
     if (this.verboseResponseLog) {
-      this.logger.debug(`GraphDescriptions: ${JSON.stringify(graphDescs)}`);
+      this.logger.debug(`GraphDescriptions: ${JSON.stringify(graphDescs)}`, null, 4);
     }
     return graphDescs;
   }

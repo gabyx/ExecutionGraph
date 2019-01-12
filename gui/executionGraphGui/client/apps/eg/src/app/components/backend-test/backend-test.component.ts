@@ -7,15 +7,14 @@ import { TestService } from '../../services/TestService';
   styleUrls: ['./backend-test.component.css']
 })
 export class BackendTestComponent implements OnInit {
-
   public testResponse: any;
 
-  constructor(private readonly testService: TestService) {
-  }
+  constructor(private readonly testService: TestService) {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   public test() {
-    this.testService.testAddRemove();
+    //this.testService.testAddRemove();
+    this.testService.testFileBrowser();
   }
 }

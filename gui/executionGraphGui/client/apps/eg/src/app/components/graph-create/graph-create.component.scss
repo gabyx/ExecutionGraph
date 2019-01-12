@@ -1,0 +1,27 @@
+@import 'app/variables';
+
+.background {
+  padding: 3em;
+}
+
+.graph-type-card {
+  background: #4d4d4d;
+}
+
+.sockets,
+.nodes {
+  color: mat-color($app-secondary);
+}
+
+.socket,
+.node {
+  color: mat-color($app-secondary);
+}
+
+.type:not(.last)::after {
+  content: ' | ';
+}
+
+.description-button {
+  color: mat-color($app-secondary);
+}

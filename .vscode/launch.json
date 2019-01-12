@@ -71,7 +71,7 @@
       "program": "${workspaceFolder}/build/gui/executionGraphGui/server/ExecutionGraphServer",
       "args": [
         "--address", "127.0.0.1",
-        "--rootPath", "${workspaceFolder}/gui/executionGraphGui/client/dist/apps/eg",
+        "--rootPath", "${workspaceFolder}/tests",
         "--port", "8089",
         "--threads", "2"
       ],
