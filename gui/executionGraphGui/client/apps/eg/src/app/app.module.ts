@@ -30,7 +30,8 @@ import {
   MatSnackBarModule,
   MatTabsModule,
   MatListModule,
-  MatSliderModule
+  MatSliderModule,
+  MatProgressSpinnerModule
 } from '@angular/material';
 import { NxModule } from '@nrwl/nx';
 import { RouterStateSerializer, StoreRouterConnectingModule } from '@ngrx/router-store';
@@ -95,12 +96,14 @@ import { ConnectionLayerComponent } from './components/connection-layer/connecti
 import { MoveToolComponent } from './components/tools/move-tool/move-tool.component';
 import { DeleteToolComponent } from './components/tools/delete-tool/delete-tool.component';
 import { TypeToolTipToolComponent } from './components/tools/type-tooltip-tool/type-tooltip-tool.component';
+import { GraphOpenComponent } from './components/graph-open/graph-open.component';
 
 const routes: Route[] = [
   {
     path: 'graph',
     children: [
       { path: 'new', component: GraphCreateComponent, outlet: 'primary' },
+      { path: 'open', component: GraphOpenComponent, outlet: 'primary' },
       {
         path: ':graphId',
         component: WorkspaceComponent,
@@ -137,7 +140,8 @@ const routes: Route[] = [
     SocketConnectionToolComponent,
     TypeToolTipToolComponent,
     DeleteToolComponent,
-    ConnectionLayerComponent
+    ConnectionLayerComponent,
+    GraphOpenComponent
   ],
   imports: [
     HttpClientModule,
@@ -154,6 +158,7 @@ const routes: Route[] = [
     MatIconModule,
     MatListModule,
     MatMenuModule,
+    MatProgressSpinnerModule,
     MatSidenavModule,
     MatSliderModule,
     MatSnackBarModule,

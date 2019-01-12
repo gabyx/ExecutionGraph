@@ -12,12 +12,12 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule as ngCommonModule } from '@angular/common';
-import { FileBrowserComponent } from './components/file-browser/file-browser.component';
+import { FileInputComponent } from './components/file-input/file-input.component';
 
 @NgModule({
   imports: [ngCommonModule],
-  declarations: [FileBrowserComponent],
-  exports: [FileBrowserComponent],
+  declarations: [FileInputComponent],
+  exports: [FileInputComponent],
   providers: []
 })
 export class CommonModule {}

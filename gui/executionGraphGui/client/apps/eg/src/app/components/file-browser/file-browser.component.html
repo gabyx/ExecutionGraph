@@ -1,1 +1,28 @@
-WTF
+<ng-container *ngIf="isLoading;else fileBrowserContainer">
+    
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+
+</ng-container>
+
+<ng-template #fileBrowserContainer>
+
+    <mat-nav-list dense>
+        <mat-list-item>
+            <h4>{{ currentDirectory.path }}</h4>
+        </mat-list-item>
+
+        <a mat-list-item *ngFor="let directory of currentDirectory.directories" (click)="openDirectory(directory.path)">
+            <mat-icon matListIcon>folder</mat-icon>
+            <h4 matLine>{{ directory.name }}</h4>
+        </a>
+        
+        <mat-divider></mat-divider>
+
+        <a mat-list-item *ngFor="let file of currentDirectory.files" (click)="openFile(file)">
+            <mat-icon matListIcon>note</mat-icon>
+            <h4 matLine>{{ file.name }}</h4>
+        </a>
+    
+    </mat-nav-list>
+
+</ng-template>

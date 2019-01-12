@@ -3,15 +3,15 @@ import { of } from 'rxjs';
 import { delay, first } from 'rxjs/operators';
 
 @Component({
-  selector: 'eg-file-browser',
-  templateUrl: './file-browser.component.html'
+  selector: 'eg-input-browser',
+  templateUrl: './file-input.component.html'
 })
-export class FileBrowserComponent {
+export class FileInputComponent {
 
   /**
    * The user changed the selected file
    *
-   * @memberof FileBrowserComponent
+   * @memberof FileInputComponent
    */
   @Output() fileChanged = new EventEmitter<File>();
 
@@ -26,7 +26,7 @@ export class FileBrowserComponent {
    * to finish ongoing animations.
    *
    * @param {number} [delayT=200]
-   * @memberof FileBrowserComponent
+   * @memberof FileInputComponent
    */
   public open(delayT: number = 200) {
     of(null)
@@ -44,7 +44,7 @@ export class FileBrowserComponent {
    * i.e. another file has been selected
    *
    * @param {Event} event
-   * @memberof FileBrowserComponent
+   * @memberof FileInputComponent
    */
   public onFileChanged(event: Event) {
     if (this.fileInputElement.files.length > 0)

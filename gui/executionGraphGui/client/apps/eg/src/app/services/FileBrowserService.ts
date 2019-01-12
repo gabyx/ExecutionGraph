@@ -30,9 +30,12 @@ export interface PathInfo {
   isFile: boolean;
 }
 
-export interface FileInfo extends PathInfo {}
+export interface FileInfo extends PathInfo {
+  isFile: true;
+}
 
 export interface DirectoryInfo extends PathInfo {
+  isFile: false;
   files: FileInfo[];
   directories: DirectoryInfo[];
 }
@@ -42,5 +45,6 @@ export function isFile(p: FileInfo | DirectoryInfo): p is FileInfo {
 }
 
 export abstract class FileBrowserService {
-  public abstract async browse(path: string): Promise<PathInfo>;
+  //@todo cmonspqr -> gabyx: I'd rather have this return a Promise<DirectoryInfo>. Can we really browse to a file?
+  public abstract async browse(path: string): Promise<DirectoryInfo | FileInfo>;
 }
