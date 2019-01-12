@@ -30,18 +30,20 @@ export interface PathInfo {
   isFile: boolean;
 }
 
-export interface FileInfo extends PathInfo {
-  isFile: true;
-}
+export interface FileInfo extends PathInfo {}
 
 export interface DirectoryInfo extends PathInfo {
-  isFile: false;
   files: FileInfo[];
   directories: DirectoryInfo[];
+  explored: boolean; //! Denoting if this folder has been explored or recursion stopped here.
 }
 
 export function isFile(p: FileInfo | DirectoryInfo): p is FileInfo {
   return p.isFile;
+}
+
+export function isDirectory(p: FileInfo | DirectoryInfo): p is DirectoryInfo {
+  return !p.isFile;
 }
 
 export abstract class FileBrowserService {

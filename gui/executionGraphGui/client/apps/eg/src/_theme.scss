@@ -7,6 +7,9 @@ $app-accent: mat-palette($mat-blue-grey, A200, A100, A400);
 $app-warn: mat-palette($mat-red);
 $app-theme: mat-dark-theme($app-primary, $app-accent, $app-warn);
 
+$foreground: map-get($app-theme, foreground);
+$background: map-get($app-theme, background);
+
 // Colors
 $primary: mat-color($app-primary);
 $secondary: mat-color($app-secondary);

@@ -23,14 +23,14 @@ struct BrowseRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::String *path() const {
     return GetPointer<const flatbuffers::String *>(VT_PATH);
   }
-  bool recursive() const {
-    return GetField<uint8_t>(VT_RECURSIVE, 0) != 0;
+  uint64_t recursive() const {
+    return GetField<uint64_t>(VT_RECURSIVE, 0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_PATH) &&
            verifier.VerifyString(path()) &&
-           VerifyField<uint8_t>(verifier, VT_RECURSIVE) &&
+           VerifyField<uint64_t>(verifier, VT_RECURSIVE) &&
            verifier.EndTable();
   }
 };
@@ -41,8 +41,8 @@ struct BrowseRequestBuilder {
   void add_path(flatbuffers::Offset<flatbuffers::String> path) {
     fbb_.AddOffset(BrowseRequest::VT_PATH, path);
   }
-  void add_recursive(bool recursive) {
-    fbb_.AddElement<uint8_t>(BrowseRequest::VT_RECURSIVE, static_cast<uint8_t>(recursive), 0);
+  void add_recursive(uint64_t recursive) {
+    fbb_.AddElement<uint64_t>(BrowseRequest::VT_RECURSIVE, recursive, 0);
   }
   explicit BrowseRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -60,17 +60,17 @@ struct BrowseRequestBuilder {
 inline flatbuffers::Offset<BrowseRequest> CreateBrowseRequest(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> path = 0,
-    bool recursive = false) {
+    uint64_t recursive = 0) {
   BrowseRequestBuilder builder_(_fbb);
-  builder_.add_path(path);
   builder_.add_recursive(recursive);
+  builder_.add_path(path);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<BrowseRequest> CreateBrowseRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *path = nullptr,
-    bool recursive = false) {
+    uint64_t recursive = 0) {
   auto path__ = path ? _fbb.CreateString(path) : 0;
   return executionGraphGui::serialization::CreateBrowseRequest(
       _fbb,

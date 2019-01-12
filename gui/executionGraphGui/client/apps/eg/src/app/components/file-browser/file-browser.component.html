@@ -1,28 +1,36 @@
-<ng-container *ngIf="isLoading;else fileBrowserContainer">
-    
-    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
-
+<ng-container *ngIf="isLoading; else fileBrowserContainer">
+  <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
 </ng-container>
 
 <ng-template #fileBrowserContainer>
+  <mat-nav-list dense>
+    <mat-list-item (click)="openParentDirectory()">
+      <mat-icon aria-label="Goto parent directory." *ngIf="!atRoot">arrow_back</mat-icon>
+      <h3 class="title">{{ currentDirectory.path }}</h3>
+    </mat-list-item>
 
-    <mat-nav-list dense>
-        <mat-list-item>
-            <h4>{{ currentDirectory.path }}</h4>
-        </mat-list-item>
+    <mat-divider class="title-divider"></mat-divider>
 
-        <a mat-list-item *ngFor="let directory of currentDirectory.directories" (click)="openDirectory(directory.path)">
-            <mat-icon matListIcon>folder</mat-icon>
-            <h4 matLine>{{ directory.name }}</h4>
-        </a>
-        
-        <mat-divider></mat-divider>
+    <a mat-list-item *ngFor="let directory of currentDirectory.directories" (click)="openDirectory(directory)">
+      <mat-icon matListIcon class="folder-icon" [class.notEmpty]="notEmpty(directory)">folder</mat-icon>
+      <div matLine>
+        <div class="row">
+          <span class="folder">{{ directory.name }}</span> <span class="prop">{{ directory.size }}</span>
+          <span class="prop">{{ directory.modified.toLocaleString()  }}</span>
+        </div>
+      </div>
+    </a>
 
-        <a mat-list-item *ngFor="let file of currentDirectory.files" (click)="openFile(file)">
-            <mat-icon matListIcon>note</mat-icon>
-            <h4 matLine>{{ file.name }}</h4>
-        </a>
-    
-    </mat-nav-list>
+    <mat-divider></mat-divider>
 
+    <a mat-list-item *ngFor="let file of currentDirectory.files" (click)="openFile(file)">
+      <mat-icon matListIcon>note</mat-icon>
+      <div matLine>
+        <div class="row">
+          <span class="file">{{ file.name }}</span> <span class="prop">{{ file.size }}</span>
+          <span class="prop">{{ file.modified.toLocaleString() }}</span>
+        </div>
+      </div>
+    </a>
+  </mat-nav-list>
 </ng-template>

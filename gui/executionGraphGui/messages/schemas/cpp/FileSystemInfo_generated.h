@@ -116,7 +116,8 @@ struct PathInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_MODIFIED = 12,
     VT_ISFILE = 14,
     VT_FILES = 16,
-    VT_DIRECTORIES = 18
+    VT_DIRECTORIES = 18,
+    VT_ISEXPLORED = 20
   };
   const flatbuffers::String *path() const {
     return GetPointer<const flatbuffers::String *>(VT_PATH);
@@ -142,6 +143,9 @@ struct PathInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::Vector<flatbuffers::Offset<PathInfo>> *directories() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<PathInfo>> *>(VT_DIRECTORIES);
   }
+  bool isExplored() const {
+    return GetField<uint8_t>(VT_ISEXPLORED, 0) != 0;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_PATH) &&
@@ -158,6 +162,7 @@ struct PathInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT_DIRECTORIES) &&
            verifier.VerifyVector(directories()) &&
            verifier.VerifyVectorOfTables(directories()) &&
+           VerifyField<uint8_t>(verifier, VT_ISEXPLORED) &&
            verifier.EndTable();
   }
 };
@@ -189,6 +194,9 @@ struct PathInfoBuilder {
   void add_directories(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<PathInfo>>> directories) {
     fbb_.AddOffset(PathInfo::VT_DIRECTORIES, directories);
   }
+  void add_isExplored(bool isExplored) {
+    fbb_.AddElement<uint8_t>(PathInfo::VT_ISEXPLORED, static_cast<uint8_t>(isExplored), 0);
+  }
   explicit PathInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -213,7 +221,8 @@ inline flatbuffers::Offset<PathInfo> CreatePathInfo(
     const Date *modified = 0,
     bool isFile = false,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<PathInfo>>> files = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<PathInfo>>> directories = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<PathInfo>>> directories = 0,
+    bool isExplored = false) {
   PathInfoBuilder builder_(_fbb);
   builder_.add_size(size);
   builder_.add_directories(directories);
@@ -221,6 +230,7 @@ inline flatbuffers::Offset<PathInfo> CreatePathInfo(
   builder_.add_modified(modified);
   builder_.add_name(name);
   builder_.add_path(path);
+  builder_.add_isExplored(isExplored);
   builder_.add_isFile(isFile);
   builder_.add_permissions(permissions);
   return builder_.Finish();
@@ -235,7 +245,8 @@ inline flatbuffers::Offset<PathInfo> CreatePathInfoDirect(
     const Date *modified = 0,
     bool isFile = false,
     const std::vector<flatbuffers::Offset<PathInfo>> *files = nullptr,
-    const std::vector<flatbuffers::Offset<PathInfo>> *directories = nullptr) {
+    const std::vector<flatbuffers::Offset<PathInfo>> *directories = nullptr,
+    bool isExplored = false) {
   auto path__ = path ? _fbb.CreateString(path) : 0;
   auto name__ = name ? _fbb.CreateString(name) : 0;
   auto files__ = files ? _fbb.CreateVector<flatbuffers::Offset<PathInfo>>(*files) : 0;
@@ -249,7 +260,8 @@ inline flatbuffers::Offset<PathInfo> CreatePathInfoDirect(
       modified,
       isFile,
       files__,
-      directories__);
+      directories__,
+      isExplored);
 }
 
 }  // namespace serialization

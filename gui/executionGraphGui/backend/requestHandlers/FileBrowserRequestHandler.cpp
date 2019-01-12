@@ -29,7 +29,7 @@ namespace
     flatbuffers::Offset<sG::PathInfo>
     collectPathInfo(Builder& builder,
                     const std::path& root,
-                    std::size_t maxLevel = 1)
+                    std::size_t maxLevel = 0)
     {
         flatbuffers::Offset<sG::PathInfo> resOff;
 
@@ -55,13 +55,12 @@ namespace
             std::time_t t = decltype(fTime)::clock::to_time_t(fTime);
             std::tm tm;
             localtime_r(&t, &tm);
-
             sG::Date date(static_cast<uint8_t>(tm.tm_sec),
                           static_cast<uint8_t>(tm.tm_min),
                           static_cast<uint8_t>(tm.tm_hour),
                           static_cast<uint8_t>(tm.tm_mday),
                           static_cast<uint8_t>(tm.tm_mon),
-                          static_cast<uint16_t>(tm.tm_year),
+                          static_cast<uint16_t>(tm.tm_year + 1900),
                           static_cast<uint8_t>(tm.tm_wday),
                           static_cast<uint16_t>(tm.tm_yday));
 
@@ -110,7 +109,8 @@ namespace
                                             &std::get<1>(t),
                                             false,
                                             d ? &d->fileInfos : nullptr,
-                                            d ? &d->dirInfos : nullptr);
+                                            d ? &d->dirInfos : nullptr,
+                                            d != nullptr);
         };
 
         //! Add all contained subdirectories and as well serialize file infos.
@@ -188,10 +188,10 @@ namespace
             {
                 // Try traverse down (if possible) -> add subdirectories
                 std::size_t currSize = paths.size();
-                visit(paths, *current, currLevel < maxLevel);
+                visit(paths, *current, currLevel <= maxLevel);
                 if(currSize != paths.size())
                 {
-                    ++currSize;
+                    ++currLevel;
                 }
             }
         }
