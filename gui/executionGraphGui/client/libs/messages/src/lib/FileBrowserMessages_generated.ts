@@ -41,11 +41,11 @@ path(optionalEncoding?:any):string|Uint8Array|null {
 };
 
 /**
- * @returns boolean
+ * @returns flatbuffers.Long
  */
-recursive():boolean {
+recursive():flatbuffers.Long {
   var offset = this.bb!.__offset(this.bb_pos, 6);
-  return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
+  return offset ? this.bb!.readUint64(this.bb_pos + offset) : this.bb!.createLong(0, 0);
 };
 
 /**
@@ -65,10 +65,10 @@ static addPath(builder:flatbuffers.Builder, pathOffset:flatbuffers.Offset) {
 
 /**
  * @param flatbuffers.Builder builder
- * @param boolean recursive
+ * @param flatbuffers.Long recursive
  */
-static addRecursive(builder:flatbuffers.Builder, recursive:boolean) {
-  builder.addFieldInt8(1, +recursive, +false);
+static addRecursive(builder:flatbuffers.Builder, recursive:flatbuffers.Long) {
+  builder.addFieldInt64(1, recursive, builder.createLong(0, 0));
 };
 
 /**
@@ -81,7 +81,7 @@ static endBrowseRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 };
 
-static createBrowseRequest(builder:flatbuffers.Builder, pathOffset:flatbuffers.Offset, recursive:boolean):flatbuffers.Offset {
+static createBrowseRequest(builder:flatbuffers.Builder, pathOffset:flatbuffers.Offset, recursive:flatbuffers.Long):flatbuffers.Offset {
   BrowseRequest.startBrowseRequest(builder);
   BrowseRequest.addPath(builder, pathOffset);
   BrowseRequest.addRecursive(builder, recursive);

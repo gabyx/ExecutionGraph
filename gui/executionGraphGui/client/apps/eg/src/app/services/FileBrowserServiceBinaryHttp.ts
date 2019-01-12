@@ -16,6 +16,8 @@ import { flatbuffers } from 'flatbuffers';
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 import { FileBrowserService, FileInfo, DirectoryInfo, sz } from './FileBrowserService';
+import { toFbLong } from './Conversions';
+import * as Long from 'long';
 
 @Injectable()
 export class FileBrowserServiceBinaryHttp extends FileBrowserService {
@@ -36,6 +38,7 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
 
     sz.BrowseRequest.startBrowseRequest(builder);
     sz.BrowseRequest.addPath(builder, pathOff);
+    sz.BrowseRequest.addRecursive(builder, toFbLong(Long.fromNumber(1)));
     const off = sz.BrowseRequest.endBrowseRequest(builder);
     builder.finish(off);
     const requestPayload = builder.asUint8Array();
@@ -94,12 +97,14 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
         size: from.size().toFloat64(),
         isFile: false,
         files: [],
-        directories: []
+        directories: [],
+        explored: from.isExplored()
       });
     });
   }
 
   private convertDate(from: sz.Date): Date {
+    console.log(from.year());
     return new Date(from.year(), from.month(), from.day(), from.hour(), from.min(), from.sec(), 0);
   }
 }

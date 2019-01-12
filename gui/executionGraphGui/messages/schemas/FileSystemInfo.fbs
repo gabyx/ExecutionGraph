@@ -40,4 +40,6 @@ table PathInfo
     isFile: bool (id:5);
     files:       [PathInfo] (id:6); //! nullptr if no files.
     directories: [PathInfo] (id:7); //! nullptr if no directories.
+    
+    isExplored: bool = false (id:8); //! denoting if this folder has been explored (or if recursion has stopped here!)
 }

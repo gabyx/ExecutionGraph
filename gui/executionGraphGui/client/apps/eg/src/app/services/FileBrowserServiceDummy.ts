@@ -62,7 +62,8 @@ export class FileBrowserServiceDummy extends FileBrowserService {
             permissions: Permissions.OwnerReadWrite
           }
         ],
-        directories: []
+        directories: [],
+        explored: true
       },
       {
         path: './DirC',
@@ -72,9 +73,11 @@ export class FileBrowserServiceDummy extends FileBrowserService {
         isFile: false,
         permissions: Permissions.OwnerReadWrite,
         files: [],
-        directories: []
+        directories: [],
+        explored: true
       }
-    ]
+    ],
+    explored: true
   };
 
   constructor(loggerFactory: LoggerFactory, @Inject(VERBOSE_LOG_TOKEN) private readonly verboseResponseLog = true) {

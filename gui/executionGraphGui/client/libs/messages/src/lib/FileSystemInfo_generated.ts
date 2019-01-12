@@ -235,10 +235,18 @@ directoriesLength():number {
 };
 
 /**
+ * @returns boolean
+ */
+isExplored():boolean {
+  var offset = this.bb!.__offset(this.bb_pos, 20);
+  return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
+};
+
+/**
  * @param flatbuffers.Builder builder
  */
 static startPathInfo(builder:flatbuffers.Builder) {
-  builder.startObject(8);
+  builder.startObject(9);
 };
 
 /**
@@ -349,6 +357,14 @@ static startDirectoriesVector(builder:flatbuffers.Builder, numElems:number) {
 
 /**
  * @param flatbuffers.Builder builder
+ * @param boolean isExplored
+ */
+static addIsExplored(builder:flatbuffers.Builder, isExplored:boolean) {
+  builder.addFieldInt8(8, +isExplored, +false);
+};
+
+/**
+ * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
 static endPathInfo(builder:flatbuffers.Builder):flatbuffers.Offset {
@@ -359,7 +375,7 @@ static endPathInfo(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 };
 
-static createPathInfo(builder:flatbuffers.Builder, pathOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, permissions:executionGraphGui.serialization.Permissions, size:flatbuffers.Long, modifiedOffset:flatbuffers.Offset, isFile:boolean, filesOffset:flatbuffers.Offset, directoriesOffset:flatbuffers.Offset):flatbuffers.Offset {
+static createPathInfo(builder:flatbuffers.Builder, pathOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, permissions:executionGraphGui.serialization.Permissions, size:flatbuffers.Long, modifiedOffset:flatbuffers.Offset, isFile:boolean, filesOffset:flatbuffers.Offset, directoriesOffset:flatbuffers.Offset, isExplored:boolean):flatbuffers.Offset {
   PathInfo.startPathInfo(builder);
   PathInfo.addPath(builder, pathOffset);
   PathInfo.addName(builder, nameOffset);
@@ -369,6 +385,7 @@ static createPathInfo(builder:flatbuffers.Builder, pathOffset:flatbuffers.Offset
   PathInfo.addIsFile(builder, isFile);
   PathInfo.addFiles(builder, filesOffset);
   PathInfo.addDirectories(builder, directoriesOffset);
+  PathInfo.addIsExplored(builder, isExplored);
   return PathInfo.endPathInfo(builder);
 }
 }

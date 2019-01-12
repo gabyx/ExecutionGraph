@@ -85,7 +85,7 @@ export class FileBrowserComponent implements OnInit {
   }
 
   public notEmpty(dir: DirectoryInfo) {
-    return dir.files.length > 0 || dir.directories.length > 0;
+    return !dir.explored || (dir.files.length > 0 || dir.directories.length > 0);
   }
 
   openFile(file: FileInfo) {}

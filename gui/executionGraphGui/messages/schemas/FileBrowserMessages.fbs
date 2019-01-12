@@ -19,8 +19,8 @@ namespace executionGraphGui.serialization;
 //! ======================================================================
 //! Request data:
 table BrowseRequest {
-    path: string (id:0, required);    //!< A relative/absolute path for which information should be gathered.
-    recursive: bool = false (id:1);    //!< If the directory structure is traversed recursively.
+    path: string (id:0, required);   //!< A relative/absolute path for which information should be gathered.
+    recursive: uint64 = 0 (id:1);    //!< If the directory structure is traversed recursively.
 }
 //! Response data:
 //! Success: 
