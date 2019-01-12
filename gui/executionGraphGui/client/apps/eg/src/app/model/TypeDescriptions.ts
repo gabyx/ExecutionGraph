@@ -26,5 +26,5 @@ export class GraphTypeDescription {
   public readonly id: Id;
   public readonly name: string;
   public readonly socketTypeDescriptions: SocketTypeDescription[];
-  public readonly nodeTypeDescritptions: NodeTypeDescription[];
+  public readonly nodeTypeDescriptions: NodeTypeDescription[];
 }

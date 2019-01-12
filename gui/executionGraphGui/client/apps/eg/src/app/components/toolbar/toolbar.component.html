@@ -1,18 +1,20 @@
 <mat-toolbar>
   <mat-toolbar-row>
     <mat-menu #fileMenu="matMenu">
-      <button mat-menu-item routerLink="/graph/new">
+      <button mat-menu-item [routerLink]="['/graph/new']">
         <mat-icon>add</mat-icon>
         <span>Create new</span>
       </button>
-      <button mat-menu-item (click)="fileBrowser.open()">
+      <button mat-menu-item [routerLink]="[{ outlets: { dialog: ['file-browser'] } }]">
         <mat-icon>mode_edit</mat-icon>
         <span>Open</span>
+      </button>
+      <button mat-menu-item routerLink="/graph/:graphId/close">
+        <span>Close</span>
       </button>
       <button mat-menu-item [matMenuTriggerFor]="openRecentMenu">
         <span>Open recent</span>
       </button>
-      <eg-file-browser #fileBrowser (fileChanged)="openFile($event)"></eg-file-browser>
     </mat-menu>
 
     <mat-menu #viewMenu="matMenu">

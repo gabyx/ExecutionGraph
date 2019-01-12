@@ -15,25 +15,18 @@ import { isDefined } from '@angular/compiler/src/util';
   styleUrls: ['./add-node.component.scss']
 })
 export class AddNodeComponent implements OnInit {
-
   public nodeTypes: Observable<NodeTypeDescription[]>;
 
-  constructor(
-    graphStore: Store<GraphsState>,
-    graphDescriptionStore: Store<GraphDescriptionsState>) {
-
-      this.nodeTypes = combineLatest(
-        graphDescriptionStore.select(getGraphDescriptionEntities),
-        graphStore.select(getSelectedGraph)
-      ).pipe(
-        filter(([descriptions, graph]) => isDefined(graph)),
-        map(([descriptions, graph]) => descriptions[graph.typeId.toString()]),
-        map(graphType => graphType.nodeTypeDescritptions)
-      );
-
-    }
-
-  ngOnInit() {
+  constructor(graphStore: Store<GraphsState>, graphDescriptionStore: Store<GraphDescriptionsState>) {
+    this.nodeTypes = combineLatest(
+      graphDescriptionStore.select(getGraphDescriptionEntities),
+      graphStore.select(getSelectedGraph)
+    ).pipe(
+      filter(([descriptions, graph]) => isDefined(graph)),
+      map(([descriptions, graph]) => descriptions[graph.typeId.toString()]),
+      map(graphType => graphType.nodeTypeDescriptions)
+    );
   }
 
+  ngOnInit() {}
 }

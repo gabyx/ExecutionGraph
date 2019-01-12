@@ -1,30 +1,43 @@
-<h1>Create a new graph</h1>
+<div class="background">
+  <h1>Create a new graph</h1>
 
-<p>Every graph is based on a graph descriptions. Choose the description you want your graph to be based on here</p>
+  <h2>Every graph is based on a graph descriptions. Choose the description you want your graph to be based on.</h2>
 
-<mat-grid-list cols="2">
-
-  <mat-grid-tile *ngFor="let graphType of (graphTypes | async)">
-
-    <mat-card class="example-card">
-      <mat-card-header>
-        <div mat-card-avatar class="example-header-image"></div>
-        <mat-card-title>{{ graphType.name }}</mat-card-title>
-        <mat-card-subtitle>Dog Breed</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <p>
-          The Shiba Inu is the smallest of the six original and distinct spitz breeds of dog from Japan.
-          A small, agile dog that copes very well with mountainous terrain, the Shiba Inu was originally
-          bred for hunting.
-        </p>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-button (click)="createGraph(graphType)">Create</button>
-      </mat-card-actions>
-    </mat-card>
-
-  </mat-grid-tile>
-
-</mat-grid-list>
-
+  <mat-grid-list cols="2">
+    <mat-grid-tile *ngFor="let graphType of (graphTypes | async)">
+      <mat-card class="example-card">
+        <mat-card-header>
+          <div mat-card-avatar class="example-header-image"></div>
+          <mat-card-title>{{ graphType.name }}</mat-card-title>
+          <mat-card-subtitle>Dog Breed</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>
+            <span class="nodes"> Node Types: [ </span>
+            <span
+              class="type"
+              *ngFor="let nodeType of graphType.nodeTypeDescriptions; let last = last"
+              [ngClass]="{ last: last }"
+            >
+              {{ nodeType.name }}
+            </span>
+            <span class="nodes"> ] </span>
+          </p>
+          <p>
+            <span class="sockets"> Socket Types: [ </span>
+            <span
+              class="type"
+              *ngFor="let socketType of graphType.socketTypeDescriptions; let last = last"
+              [ngClass]="{ last: last }"
+            >
+              {{ socketType.name }}
+            </span>
+            <span class="nodes"> ] </span>
+          </p>
+        </mat-card-content>
+        <mat-card-actions> <button mat-button (click)="createGraph(graphType)">Create</button> </mat-card-actions>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
+  <div></div>
+</div>
