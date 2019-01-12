@@ -68,7 +68,7 @@
   <eg-type-tooltip-tool
     [socketEvents]="socketNameEvents"
     [nodeEvents]="nodeNameEvents"
-    [disable]="moveTool.activated"
+    [disable]="moveTool.activated | async"
   ></eg-type-tooltip-tool>
   <eg-delete-tool></eg-delete-tool>
 </ngcs-graph>

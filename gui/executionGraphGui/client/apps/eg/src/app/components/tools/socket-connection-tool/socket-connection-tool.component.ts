@@ -37,7 +37,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
   constructor(private graph: GraphComponent, private store: Store<GraphsState>, loggerFactory: LoggerFactory) {
     super();
     this.logger = loggerFactory.create('SocketConnectionToolComponent');
-    store.select(getSelectedGraph).subscribe(graph => (this.selectedGraphId = graph.id));
+    store.select(getSelectedGraph).subscribe(g => (this.selectedGraphId = g.id));
   }
 
   ngOnInit() {
@@ -51,7 +51,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       } else {
         this.tempTargetSocket = new OutputSocket(socket.typeIndex, socket.name, new SocketIndex(0));
       }
-
+      this.activate();
       this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
       this.tempConnection = Connection.create(socket, this.tempTargetSocket);
     });
@@ -66,6 +66,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       } else {
         this.abortConnection();
       }
+      this.deactivate();
     });
 
     this.socketEvents.onEnter.subscribe(e => {
