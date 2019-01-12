@@ -84,11 +84,5 @@ static endNodeTypeDescription(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 };
 
-static createNodeTypeDescription(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset):flatbuffers.Offset {
-  NodeTypeDescription.startNodeTypeDescription(builder);
-  NodeTypeDescription.addType(builder, typeOffset);
-  NodeTypeDescription.addName(builder, nameOffset);
-  return NodeTypeDescription.endNodeTypeDescription(builder);
-}
 }
 }

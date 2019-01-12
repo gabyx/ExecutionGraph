@@ -54,7 +54,7 @@ export class TestService {
     // Add a node to the first graph
     let graphDesc = graphDescs[0];
     let graphTypeId = graphDesc.id;
-    let nodeType = graphDesc.nodeTypeDescritptions[0].type;
+    let nodeType = graphDesc.nodeTypeDescriptions[0].type;
 
     // Add a graph
     let graph = await this.graphManagementService.addGraph(graphTypeId);

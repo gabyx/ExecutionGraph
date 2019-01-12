@@ -102,14 +102,11 @@ inline flatbuffers::Offset<NodeConstructionInfo> CreateNodeConstructionInfoDirec
     const char *type = nullptr,
     const char *name = nullptr,
     const std::vector<flatbuffers::Offset<ConstructorKV>> *constructorArgs = nullptr) {
-  auto type__ = type ? _fbb.CreateString(type) : 0;
-  auto name__ = name ? _fbb.CreateString(name) : 0;
-  auto constructorArgs__ = constructorArgs ? _fbb.CreateVector<flatbuffers::Offset<ConstructorKV>>(*constructorArgs) : 0;
   return executionGraphGui::serialization::CreateNodeConstructionInfo(
       _fbb,
-      type__,
-      name__,
-      constructorArgs__);
+      type ? _fbb.CreateString(type) : 0,
+      name ? _fbb.CreateString(name) : 0,
+      constructorArgs ? _fbb.CreateVector<flatbuffers::Offset<ConstructorKV>>(*constructorArgs) : 0);
 }
 
 struct AddNodeRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -170,10 +167,9 @@ inline flatbuffers::Offset<AddNodeRequest> CreateAddNodeRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *graphId = nullptr,
     flatbuffers::Offset<NodeConstructionInfo> node = 0) {
-  auto graphId__ = graphId ? _fbb.CreateString(graphId) : 0;
   return executionGraphGui::serialization::CreateAddNodeRequest(
       _fbb,
-      graphId__,
+      graphId ? _fbb.CreateString(graphId) : 0,
       node);
 }
 
@@ -275,10 +271,9 @@ inline flatbuffers::Offset<RemoveNodeRequest> CreateRemoveNodeRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *graphId = nullptr,
     uint64_t nodeId = 0) {
-  auto graphId__ = graphId ? _fbb.CreateString(graphId) : 0;
   return executionGraphGui::serialization::CreateRemoveNodeRequest(
       _fbb,
-      graphId__,
+      graphId ? _fbb.CreateString(graphId) : 0,
       nodeId);
 }
 
@@ -350,10 +345,9 @@ inline flatbuffers::Offset<AddConnectionRequest> CreateAddConnectionRequestDirec
     const char *graphId = nullptr,
     const executionGraph::serialization::SocketLinkDescription *socketLink = 0,
     bool checkForCycles = false) {
-  auto graphId__ = graphId ? _fbb.CreateString(graphId) : 0;
   return executionGraphGui::serialization::CreateAddConnectionRequest(
       _fbb,
-      graphId__,
+      graphId ? _fbb.CreateString(graphId) : 0,
       socketLink,
       checkForCycles);
 }
@@ -403,10 +397,9 @@ inline flatbuffers::Offset<AddConnectionResponse> CreateAddConnectionResponse(
 inline flatbuffers::Offset<AddConnectionResponse> CreateAddConnectionResponseDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<flatbuffers::Offset<CycleDescription>> *cycles = nullptr) {
-  auto cycles__ = cycles ? _fbb.CreateVector<flatbuffers::Offset<CycleDescription>>(*cycles) : 0;
   return executionGraphGui::serialization::CreateAddConnectionResponse(
       _fbb,
-      cycles__);
+      cycles ? _fbb.CreateVector<flatbuffers::Offset<CycleDescription>>(*cycles) : 0);
 }
 
 struct RemoveConnectionRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -466,10 +459,9 @@ inline flatbuffers::Offset<RemoveConnectionRequest> CreateRemoveConnectionReques
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *graphId = nullptr,
     const executionGraph::serialization::SocketLinkDescription *socketLink = 0) {
-  auto graphId__ = graphId ? _fbb.CreateString(graphId) : 0;
   return executionGraphGui::serialization::CreateRemoveConnectionRequest(
       _fbb,
-      graphId__,
+      graphId ? _fbb.CreateString(graphId) : 0,
       socketLink);
 }
 

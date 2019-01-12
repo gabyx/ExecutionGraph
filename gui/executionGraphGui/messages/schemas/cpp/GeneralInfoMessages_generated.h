@@ -60,10 +60,9 @@ inline flatbuffers::Offset<GetAllGraphTypeDescriptionsResponse> CreateGetAllGrap
 inline flatbuffers::Offset<GetAllGraphTypeDescriptionsResponse> CreateGetAllGraphTypeDescriptionsResponseDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<flatbuffers::Offset<executionGraph::serialization::GraphTypeDescription>> *graphsTypes = nullptr) {
-  auto graphsTypes__ = graphsTypes ? _fbb.CreateVector<flatbuffers::Offset<executionGraph::serialization::GraphTypeDescription>>(*graphsTypes) : 0;
   return executionGraphGui::serialization::CreateGetAllGraphTypeDescriptionsResponse(
       _fbb,
-      graphsTypes__);
+      graphsTypes ? _fbb.CreateVector<flatbuffers::Offset<executionGraph::serialization::GraphTypeDescription>>(*graphsTypes) : 0);
 }
 
 }  // namespace serialization

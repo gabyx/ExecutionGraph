@@ -51,9 +51,10 @@ namespace
 
         //! Get the statistics of the path entry `e`.
         auto getStats = [](auto& builder, auto& e) {
-            auto fTime      = e.last_write_time();
-            std::time_t t   = decltype(fTime)::clock::to_time_t(fTime);
-            auto offModTime = builder.CreateString(std::asctime(std::localtime(&t)));
+            auto fTime    = e.last_write_time();
+            std::time_t t = decltype(fTime)::clock::to_time_t(fTime);
+            std::tm tm;
+            std::localtime_r(&t, &tm);
 
             sG::Permissions per;
             const auto perm = e.status().permissions();
@@ -70,20 +71,20 @@ namespace
             {
                 per = sG::Permissions::Permissions_OwnerWrite;
             }
-            return std::make_tuple(per, offModTime);
+            return std::make_tuple(per, tm);
         };
 
         //! Serialize file info.
         auto buildFileInfo = [&getStats](auto& builder, const auto& e) {
             EXECGRAPHGUI_BACKENDLOG_TRACE("Build file info: '{0}'", e.path());
             auto t = getStats(builder, e);
-            return sG::CreatePathInfo(builder,
-                                      builder.CreateString(e.path().native()),
-                                      builder.CreateString(e.path().filename().native()),
-                                      std::get<0>(t),
-                                      e.file_size(),
-                                      std::get<1>(t),
-                                      true);
+            return sG::CreatePathInfoDirect(builder,
+                                            e.path().native().c_str(),
+                                            e.path().filename().native(),
+                                            std::get<0>(t),
+                                            e.file_size(),
+                                            &std::get<1>(t),
+                                            true);
         };
 
         // Serialize directory info.
@@ -92,15 +93,15 @@ namespace
                                               Directory* d = nullptr) {
             EXECGRAPHGUI_BACKENDLOG_TRACE("Build dir info: '{0}'", e.path());
             auto t = getStats(builder, e);
-            return sG::CreatePathInfo(builder,
-                                      builder.CreateString(e.path().native()),
-                                      builder.CreateString(e.path().filename().native()),
-                                      std::get<0>(t),
-                                      0,
-                                      std::get<1>(t),
-                                      false,
-                                      d ? builder.CreateVector(d->fileInfos) : 0,
-                                      d ? builder.CreateVector(d->dirInfos) : 0);
+            return sG::CreatePathInfoDirect(builder,
+                                            e.path().native(),
+                                            e.path().filename().native(),
+                                            std::get<0>(t),
+                                            0,
+                                            &std::get<1>(t),
+                                            false,
+                                            d ? d->fileInfos : nullptr,
+                                            d ? d->dirInfos : nullptr);
         };
 
         //! Add all contained subdirectories and as well serialize file infos.

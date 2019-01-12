@@ -9,6 +9,8 @@
 namespace executionGraphGui {
 namespace serialization {
 
+struct Date;
+
 struct PathInfo;
 
 enum Permissions {
@@ -47,6 +49,64 @@ inline const char *EnumNamePermissions(Permissions e) {
   return EnumNamesPermissions()[index];
 }
 
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(2) Date FLATBUFFERS_FINAL_CLASS {
+ private:
+  uint8_t sec_;
+  uint8_t min_;
+  uint8_t hour_;
+  uint8_t day_;
+  uint8_t month_;
+  int8_t padding0__;
+  uint16_t year_;
+  uint8_t wday_;
+  int8_t padding1__;
+  uint16_t yday_;
+
+ public:
+  Date() {
+    memset(this, 0, sizeof(Date));
+  }
+  Date(uint8_t _sec, uint8_t _min, uint8_t _hour, uint8_t _day, uint8_t _month, uint16_t _year, uint8_t _wday, uint16_t _yday)
+      : sec_(flatbuffers::EndianScalar(_sec)),
+        min_(flatbuffers::EndianScalar(_min)),
+        hour_(flatbuffers::EndianScalar(_hour)),
+        day_(flatbuffers::EndianScalar(_day)),
+        month_(flatbuffers::EndianScalar(_month)),
+        padding0__(0),
+        year_(flatbuffers::EndianScalar(_year)),
+        wday_(flatbuffers::EndianScalar(_wday)),
+        padding1__(0),
+        yday_(flatbuffers::EndianScalar(_yday)) {
+    (void)padding0__;
+    (void)padding1__;
+  }
+  uint8_t sec() const {
+    return flatbuffers::EndianScalar(sec_);
+  }
+  uint8_t min() const {
+    return flatbuffers::EndianScalar(min_);
+  }
+  uint8_t hour() const {
+    return flatbuffers::EndianScalar(hour_);
+  }
+  uint8_t day() const {
+    return flatbuffers::EndianScalar(day_);
+  }
+  uint8_t month() const {
+    return flatbuffers::EndianScalar(month_);
+  }
+  uint16_t year() const {
+    return flatbuffers::EndianScalar(year_);
+  }
+  uint8_t wday() const {
+    return flatbuffers::EndianScalar(wday_);
+  }
+  uint16_t yday() const {
+    return flatbuffers::EndianScalar(yday_);
+  }
+};
+FLATBUFFERS_STRUCT_END(Date, 12);
+
 struct PathInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_PATH = 4,
@@ -70,8 +130,8 @@ struct PathInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   uint64_t size() const {
     return GetField<uint64_t>(VT_SIZE, 0);
   }
-  const flatbuffers::String *modified() const {
-    return GetPointer<const flatbuffers::String *>(VT_MODIFIED);
+  const Date *modified() const {
+    return GetStruct<const Date *>(VT_MODIFIED);
   }
   bool isFile() const {
     return GetField<uint8_t>(VT_ISFILE, 0) != 0;
@@ -90,8 +150,7 @@ struct PathInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyString(name()) &&
            VerifyField<int8_t>(verifier, VT_PERMISSIONS) &&
            VerifyField<uint64_t>(verifier, VT_SIZE) &&
-           VerifyOffsetRequired(verifier, VT_MODIFIED) &&
-           verifier.VerifyString(modified()) &&
+           VerifyFieldRequired<Date>(verifier, VT_MODIFIED) &&
            VerifyField<uint8_t>(verifier, VT_ISFILE) &&
            VerifyOffset(verifier, VT_FILES) &&
            verifier.VerifyVector(files()) &&
@@ -118,8 +177,8 @@ struct PathInfoBuilder {
   void add_size(uint64_t size) {
     fbb_.AddElement<uint64_t>(PathInfo::VT_SIZE, size, 0);
   }
-  void add_modified(flatbuffers::Offset<flatbuffers::String> modified) {
-    fbb_.AddOffset(PathInfo::VT_MODIFIED, modified);
+  void add_modified(const Date *modified) {
+    fbb_.AddStruct(PathInfo::VT_MODIFIED, modified);
   }
   void add_isFile(bool isFile) {
     fbb_.AddElement<uint8_t>(PathInfo::VT_ISFILE, static_cast<uint8_t>(isFile), 0);
@@ -151,7 +210,7 @@ inline flatbuffers::Offset<PathInfo> CreatePathInfo(
     flatbuffers::Offset<flatbuffers::String> name = 0,
     Permissions permissions = Permissions_None,
     uint64_t size = 0,
-    flatbuffers::Offset<flatbuffers::String> modified = 0,
+    const Date *modified = 0,
     bool isFile = false,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<PathInfo>>> files = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<PathInfo>>> directories = 0) {
@@ -173,25 +232,20 @@ inline flatbuffers::Offset<PathInfo> CreatePathInfoDirect(
     const char *name = nullptr,
     Permissions permissions = Permissions_None,
     uint64_t size = 0,
-    const char *modified = nullptr,
+    const Date *modified = 0,
     bool isFile = false,
     const std::vector<flatbuffers::Offset<PathInfo>> *files = nullptr,
     const std::vector<flatbuffers::Offset<PathInfo>> *directories = nullptr) {
-  auto path__ = path ? _fbb.CreateString(path) : 0;
-  auto name__ = name ? _fbb.CreateString(name) : 0;
-  auto modified__ = modified ? _fbb.CreateString(modified) : 0;
-  auto files__ = files ? _fbb.CreateVector<flatbuffers::Offset<PathInfo>>(*files) : 0;
-  auto directories__ = directories ? _fbb.CreateVector<flatbuffers::Offset<PathInfo>>(*directories) : 0;
   return executionGraphGui::serialization::CreatePathInfo(
       _fbb,
-      path__,
-      name__,
+      path ? _fbb.CreateString(path) : 0,
+      name ? _fbb.CreateString(name) : 0,
       permissions,
       size,
-      modified__,
+      modified,
       isFile,
-      files__,
-      directories__);
+      files ? _fbb.CreateVector<flatbuffers::Offset<PathInfo>>(*files) : 0,
+      directories ? _fbb.CreateVector<flatbuffers::Offset<PathInfo>>(*directories) : 0);
 }
 
 }  // namespace serialization

@@ -86,6 +86,7 @@ import { effects } from './+state/effects';
 import { environment } from '../environments/environment';
 import { GraphLoadedGuard } from './guards/graphLoaded.guard';
 import { BackendTestComponent } from './components/backend-test/backend-test.component';
+import { FileBrowserComponent } from './components/file-browser/file-browser.component';
 import { AddNodeComponent } from './components/add-node/add-node.component';
 import { SelectionToolComponent } from './components/tools/selection-tool/selection-tool.component';
 import { NavigationToolComponent } from './components/tools/navigation-tool/navigation-tool.component';
@@ -99,12 +100,13 @@ const routes: Route[] = [
   {
     path: 'graph',
     children: [
-      { path: 'new', component: GraphCreateComponent },
+      { path: 'new', component: GraphCreateComponent, outlet: 'primary' },
       {
         path: ':graphId',
         component: WorkspaceComponent,
         canActivate: [GraphLoadedGuard],
-        children: []
+        children: [],
+        outlet: 'primary'
       }
     ]
   },
@@ -112,6 +114,9 @@ const routes: Route[] = [
   { path: 'lines', component: ConnectionStyleOptionsComponent, outlet: 'drawer' },
   { path: 'nodes', component: AddNodeComponent, outlet: 'drawer' },
   { path: 'backend-test', component: BackendTestComponent, outlet: 'drawer' },
+
+  // { path: 'file-browser', component: FileBrowserComponent, outlet: 'bottom-dialog' },
+
   { path: '**', redirectTo: 'graph/new' }
 ];
 
@@ -123,6 +128,7 @@ const routes: Route[] = [
     ConnectionStyleOptionsComponent,
     InspectorComponent,
     GraphCreateComponent,
+    FileBrowserComponent,
     BackendTestComponent,
     AddNodeComponent,
     SelectionToolComponent,

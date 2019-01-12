@@ -15,6 +15,110 @@ export enum Permissions{
  * @constructor
  */
 export namespace executionGraphGui.serialization{
+export class Date {
+  bb: flatbuffers.ByteBuffer|null = null;
+
+  bb_pos:number = 0;
+/**
+ * @param number i
+ * @param flatbuffers.ByteBuffer bb
+ * @returns Date
+ */
+__init(i:number, bb:flatbuffers.ByteBuffer):Date {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @returns number
+ */
+sec():number {
+  return this.bb!.readUint8(this.bb_pos);
+};
+
+/**
+ * @returns number
+ */
+min():number {
+  return this.bb!.readUint8(this.bb_pos + 1);
+};
+
+/**
+ * @returns number
+ */
+hour():number {
+  return this.bb!.readUint8(this.bb_pos + 2);
+};
+
+/**
+ * @returns number
+ */
+day():number {
+  return this.bb!.readUint8(this.bb_pos + 3);
+};
+
+/**
+ * @returns number
+ */
+month():number {
+  return this.bb!.readUint8(this.bb_pos + 4);
+};
+
+/**
+ * @returns number
+ */
+year():number {
+  return this.bb!.readUint16(this.bb_pos + 6);
+};
+
+/**
+ * @returns number
+ */
+wday():number {
+  return this.bb!.readUint8(this.bb_pos + 8);
+};
+
+/**
+ * @returns number
+ */
+yday():number {
+  return this.bb!.readUint16(this.bb_pos + 10);
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @param number sec
+ * @param number min
+ * @param number hour
+ * @param number day
+ * @param number month
+ * @param number year
+ * @param number wday
+ * @param number yday
+ * @returns flatbuffers.Offset
+ */
+static createDate(builder:flatbuffers.Builder, sec: number, min: number, hour: number, day: number, month: number, year: number, wday: number, yday: number):flatbuffers.Offset {
+  builder.prep(2, 12);
+  builder.writeInt16(yday);
+  builder.pad(1);
+  builder.writeInt8(wday);
+  builder.writeInt16(year);
+  builder.pad(1);
+  builder.writeInt8(month);
+  builder.writeInt8(day);
+  builder.writeInt8(hour);
+  builder.writeInt8(min);
+  builder.writeInt8(sec);
+  return builder.offset();
+};
+
+}
+}
+/**
+ * @constructor
+ */
+export namespace executionGraphGui.serialization{
 export class PathInfo {
   bb: flatbuffers.ByteBuffer|null = null;
 
@@ -51,10 +155,21 @@ path(optionalEncoding?:any):string|Uint8Array|null {
 };
 
 /**
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array|null
+ */
+name():string|null
+name(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+name(optionalEncoding?:any):string|Uint8Array|null {
+  var offset = this.bb!.__offset(this.bb_pos, 6);
+  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+};
+
+/**
  * @returns executionGraphGui.serialization.Permissions
  */
 permissions():executionGraphGui.serialization.Permissions {
-  var offset = this.bb!.__offset(this.bb_pos, 6);
+  var offset = this.bb!.__offset(this.bb_pos, 8);
   return offset ? /**  */ (this.bb!.readInt8(this.bb_pos + offset)) : executionGraphGui.serialization.Permissions.None;
 };
 
@@ -62,26 +177,24 @@ permissions():executionGraphGui.serialization.Permissions {
  * @returns flatbuffers.Long
  */
 size():flatbuffers.Long {
-  var offset = this.bb!.__offset(this.bb_pos, 8);
+  var offset = this.bb!.__offset(this.bb_pos, 10);
   return offset ? this.bb!.readUint64(this.bb_pos + offset) : this.bb!.createLong(0, 0);
 };
 
 /**
- * @param flatbuffers.Encoding= optionalEncoding
- * @returns string|Uint8Array|null
+ * @param executionGraphGui.serialization.Date= obj
+ * @returns executionGraphGui.serialization.Date|null
  */
-modified():string|null
-modified(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-modified(optionalEncoding?:any):string|Uint8Array|null {
-  var offset = this.bb!.__offset(this.bb_pos, 10);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+modified(obj?:executionGraphGui.serialization.Date):executionGraphGui.serialization.Date|null {
+  var offset = this.bb!.__offset(this.bb_pos, 12);
+  return offset ? (obj || new executionGraphGui.serialization.Date).__init(this.bb_pos + offset, this.bb!) : null;
 };
 
 /**
  * @returns boolean
  */
 isFile():boolean {
-  var offset = this.bb!.__offset(this.bb_pos, 12);
+  var offset = this.bb!.__offset(this.bb_pos, 14);
   return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
 };
 
@@ -91,7 +204,7 @@ isFile():boolean {
  * @returns executionGraphGui.serialization.PathInfo
  */
 files(index: number, obj?:executionGraphGui.serialization.PathInfo):executionGraphGui.serialization.PathInfo|null {
-  var offset = this.bb!.__offset(this.bb_pos, 14);
+  var offset = this.bb!.__offset(this.bb_pos, 16);
   return offset ? (obj || new executionGraphGui.serialization.PathInfo).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
 };
 
@@ -99,7 +212,7 @@ files(index: number, obj?:executionGraphGui.serialization.PathInfo):executionGra
  * @returns number
  */
 filesLength():number {
-  var offset = this.bb!.__offset(this.bb_pos, 14);
+  var offset = this.bb!.__offset(this.bb_pos, 16);
   return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
 };
 
@@ -109,7 +222,7 @@ filesLength():number {
  * @returns executionGraphGui.serialization.PathInfo
  */
 directories(index: number, obj?:executionGraphGui.serialization.PathInfo):executionGraphGui.serialization.PathInfo|null {
-  var offset = this.bb!.__offset(this.bb_pos, 16);
+  var offset = this.bb!.__offset(this.bb_pos, 18);
   return offset ? (obj || new executionGraphGui.serialization.PathInfo).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
 };
 
@@ -117,7 +230,7 @@ directories(index: number, obj?:executionGraphGui.serialization.PathInfo):execut
  * @returns number
  */
 directoriesLength():number {
-  var offset = this.bb!.__offset(this.bb_pos, 16);
+  var offset = this.bb!.__offset(this.bb_pos, 18);
   return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
 };
 
@@ -125,7 +238,7 @@ directoriesLength():number {
  * @param flatbuffers.Builder builder
  */
 static startPathInfo(builder:flatbuffers.Builder) {
-  builder.startObject(7);
+  builder.startObject(8);
 };
 
 /**
@@ -138,10 +251,18 @@ static addPath(builder:flatbuffers.Builder, pathOffset:flatbuffers.Offset) {
 
 /**
  * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset nameOffset
+ */
+static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(1, nameOffset, 0);
+};
+
+/**
+ * @param flatbuffers.Builder builder
  * @param executionGraphGui.serialization.Permissions permissions
  */
 static addPermissions(builder:flatbuffers.Builder, permissions:executionGraphGui.serialization.Permissions) {
-  builder.addFieldInt8(1, permissions, executionGraphGui.serialization.Permissions.None);
+  builder.addFieldInt8(2, permissions, executionGraphGui.serialization.Permissions.None);
 };
 
 /**
@@ -149,7 +270,7 @@ static addPermissions(builder:flatbuffers.Builder, permissions:executionGraphGui
  * @param flatbuffers.Long size
  */
 static addSize(builder:flatbuffers.Builder, size:flatbuffers.Long) {
-  builder.addFieldInt64(2, size, builder.createLong(0, 0));
+  builder.addFieldInt64(3, size, builder.createLong(0, 0));
 };
 
 /**
@@ -157,7 +278,7 @@ static addSize(builder:flatbuffers.Builder, size:flatbuffers.Long) {
  * @param flatbuffers.Offset modifiedOffset
  */
 static addModified(builder:flatbuffers.Builder, modifiedOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(3, modifiedOffset, 0);
+  builder.addFieldStruct(4, modifiedOffset, 0);
 };
 
 /**
@@ -165,7 +286,7 @@ static addModified(builder:flatbuffers.Builder, modifiedOffset:flatbuffers.Offse
  * @param boolean isFile
  */
 static addIsFile(builder:flatbuffers.Builder, isFile:boolean) {
-  builder.addFieldInt8(4, +isFile, +false);
+  builder.addFieldInt8(5, +isFile, +false);
 };
 
 /**
@@ -173,7 +294,7 @@ static addIsFile(builder:flatbuffers.Builder, isFile:boolean) {
  * @param flatbuffers.Offset filesOffset
  */
 static addFiles(builder:flatbuffers.Builder, filesOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(5, filesOffset, 0);
+  builder.addFieldOffset(6, filesOffset, 0);
 };
 
 /**
@@ -202,7 +323,7 @@ static startFilesVector(builder:flatbuffers.Builder, numElems:number) {
  * @param flatbuffers.Offset directoriesOffset
  */
 static addDirectories(builder:flatbuffers.Builder, directoriesOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(6, directoriesOffset, 0);
+  builder.addFieldOffset(7, directoriesOffset, 0);
 };
 
 /**
@@ -233,20 +354,10 @@ static startDirectoriesVector(builder:flatbuffers.Builder, numElems:number) {
 static endPathInfo(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // path
-  builder.requiredField(offset, 10); // modified
+  builder.requiredField(offset, 6); // name
+  builder.requiredField(offset, 12); // modified
   return offset;
 };
 
-static createPathInfo(builder:flatbuffers.Builder, pathOffset:flatbuffers.Offset, permissions:executionGraphGui.serialization.Permissions, size:flatbuffers.Long, modifiedOffset:flatbuffers.Offset, isFile:boolean, filesOffset:flatbuffers.Offset, directoriesOffset:flatbuffers.Offset):flatbuffers.Offset {
-  PathInfo.startPathInfo(builder);
-  PathInfo.addPath(builder, pathOffset);
-  PathInfo.addPermissions(builder, permissions);
-  PathInfo.addSize(builder, size);
-  PathInfo.addModified(builder, modifiedOffset);
-  PathInfo.addIsFile(builder, isFile);
-  PathInfo.addFiles(builder, filesOffset);
-  PathInfo.addDirectories(builder, directoriesOffset);
-  return PathInfo.endPathInfo(builder);
-}
 }
 }

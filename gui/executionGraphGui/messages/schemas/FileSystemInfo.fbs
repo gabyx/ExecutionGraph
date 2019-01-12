@@ -12,8 +12,22 @@
 
 namespace executionGraphGui.serialization;
 
+//! Date information.
+struct Date{
+    sec: ubyte;
+    min: ubyte;
+    hour: ubyte;
+    day: ubyte;
+    month: ubyte;
+    year: ushort;
+    wday: ubyte;
+    yday: ushort;
+}
+
+//! Permissions.
 enum Permissions : byte { None = 0, OwnerRead, OwnerWrite, OwnerReadWrite }
 
+//! PathInfo encoding information for directories/files.
 table PathInfo
 {
     path: string (id:0, required);
@@ -21,9 +35,9 @@ table PathInfo
 
     permissions: Permissions (id:2);
     size: uint64 (id:3);
-    modified: string (id:4, required);
+    modified: Date (id:4, required);
 
     isFile: bool (id:5);
-    files:       [PathInfo] (id:6);
-    directories: [PathInfo] (id:7);
+    files:       [PathInfo] (id:6); //! nullptr if no files.
+    directories: [PathInfo] (id:7); //! nullptr if no directories.
 }

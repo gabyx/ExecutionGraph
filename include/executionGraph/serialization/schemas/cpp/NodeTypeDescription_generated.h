@@ -69,12 +69,10 @@ inline flatbuffers::Offset<NodeTypeDescription> CreateNodeTypeDescriptionDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *type = nullptr,
     const char *name = nullptr) {
-  auto type__ = type ? _fbb.CreateString(type) : 0;
-  auto name__ = name ? _fbb.CreateString(name) : 0;
   return executionGraph::serialization::CreateNodeTypeDescription(
       _fbb,
-      type__,
-      name__);
+      type ? _fbb.CreateString(type) : 0,
+      name ? _fbb.CreateString(name) : 0);
 }
 
 }  // namespace serialization

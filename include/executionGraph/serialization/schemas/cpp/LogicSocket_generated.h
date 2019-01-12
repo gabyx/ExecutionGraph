@@ -101,15 +101,12 @@ inline flatbuffers::Offset<LogicSocket> CreateLogicSocketDirect(
     const char *typeName = nullptr,
     const char *name = nullptr,
     uint64_t index = 0) {
-  auto type__ = type ? _fbb.CreateString(type) : 0;
-  auto typeName__ = typeName ? _fbb.CreateString(typeName) : 0;
-  auto name__ = name ? _fbb.CreateString(name) : 0;
   return executionGraph::serialization::CreateLogicSocket(
       _fbb,
       typeIndex,
-      type__,
-      typeName__,
-      name__,
+      type ? _fbb.CreateString(type) : 0,
+      typeName ? _fbb.CreateString(typeName) : 0,
+      name ? _fbb.CreateString(name) : 0,
       index);
 }
 

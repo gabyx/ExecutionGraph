@@ -23,17 +23,18 @@ export enum Permissions {
 
 export interface PathInfo {
   path: string;
+  name: string;
   permissions: Permissions;
   size: number;
-  modified: string;
+  modified: Date;
   isFile: boolean;
 }
 
 export interface FileInfo extends PathInfo {}
 
 export interface DirectoryInfo extends PathInfo {
-  files?: FileInfo[];
-  directories?: DirectoryInfo[];
+  files: FileInfo[];
+  directories: DirectoryInfo[];
 }
 
 export function isFile(p: FileInfo | DirectoryInfo): p is FileInfo {

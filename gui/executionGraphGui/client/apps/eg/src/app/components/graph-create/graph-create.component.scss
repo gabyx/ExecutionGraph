@@ -1,0 +1,35 @@
+@import 'app/variables';
+
+:host() {
+  padding: 3rem;
+}
+
+.background {
+  padding: 1em;
+}
+
+h1 {
+  color: mat-color($app-primary);
+  font-family: mat-font-family($app-graph-typography);
+  font-size: mat-font-size($app-graph-typography, headline);
+}
+
+h2 {
+  color: mat-color($app-secondary);
+  font-family: mat-font-family($app-graph-typography);
+  font-size: mat-font-size($app-graph-typography, title);
+}
+
+.sockets,
+.nodes {
+  color: mat-color($app-secondary);
+}
+
+.socket,
+.node {
+  color: mat-color($app-secondary);
+}
+
+.type:not(.last)::after {
+  content: ' | ';
+}

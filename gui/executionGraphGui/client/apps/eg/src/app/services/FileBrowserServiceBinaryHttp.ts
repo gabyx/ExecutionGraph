@@ -16,7 +16,6 @@ import { flatbuffers } from 'flatbuffers';
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 import { FileBrowserService, FileInfo, DirectoryInfo, sz } from './FileBrowserService';
-import { isDefined } from '@eg/common/src';
 
 @Injectable()
 export class FileBrowserServiceBinaryHttp extends FileBrowserService {
@@ -31,79 +30,54 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
     this.logger = loggerFactory.create('FileBrowserServiceBinaryHttp');
   }
 
-  /**
-   * Traverse the path info tree and converting it.
-   *
-   * @private
-   * @param {sz.BrowseResponse} response
-   * @returns
-   * @memberof FileBrowserServiceBinaryHttp
-   */
-  private convert(response: sz.BrowseResponse) {
-    interface Entry {
-      from: sz.PathInfo;
-      to?: FileInfo | DirectoryInfo;
-    }
+  private convertDate(from: sz.Date): Date {
+    return new Date(from.year(), from.month(), from.day(), from.hour(), from.min(), from.sec(), 0);
+  }
 
-    const root: Entry = { from: response.info() };
-    const stack: Array<Entry> = [root];
-
-    const convertFile = (from: sz.PathInfo, to?: FileInfo): FileInfo => {
-      return Object.assign(!isDefined(to) ? <FileInfo>{} : to, {
-        path: from.path(),
-        permissions: from.permissions(),
-        modified: from.modified(),
-        size: from.size().toFloat64(),
-        isFile: true
-      });
-    };
-
-    const convertDirectory = (from: sz.PathInfo, toIn: DirectoryInfo): DirectoryInfo => {
-      const to = Object.assign(!isDefined(toIn) ? <DirectoryInfo>{} : toIn, {
+  private convertFileInfo(from: sz.PathInfo): Promise<FileInfo> {
+    return new Promise((resolve, reject) => {
+      resolve({
         path: from.path(),
         name: from.name(),
         permissions: from.permissions(),
-        modified: from.modified(),
+        modified: this.convertDate(from.modified()),
         size: from.size().toFloat64(),
-        isFile: false
+        isFile: true
       });
+    });
+  }
 
-      const files = from.files.bind(from);
-      let l = from.filesLength();
-      if (l > 0) {
-        to.files = new Array<FileInfo>();
-      }
-      for (let i = 0; i < l; ++i) {
-        to.files.push(convertFile(files(i)));
-      }
+  private convertDirectoryInfo(from: sz.PathInfo): Promise<DirectoryInfo> {
+    return new Promise((resolve, reject) => {
+      resolve({
+        path: from.path(),
+        name: from.name(),
+        permissions: from.permissions(),
+        modified: this.convertDate(from.modified()),
+        size: from.size().toFloat64(),
+        isFile: false,
+        directories: [],
+        files: []
+      });
+    });
+  }
 
-      const dirs = from.directories.bind(from);
-      l = from.directoriesLength();
+  private async convertDirectory(from: sz.PathInfo): Promise<DirectoryInfo> {
+    const directory = await this.convertDirectoryInfo(from);
 
-      if (l > 0) {
-        to.directories = new Array<DirectoryInfo>();
-      }
-      for (let i = 0; i < l; ++i) {
-        // fill into stack
-        const toDir = <DirectoryInfo>{};
-        to.directories.push(toDir);
-        stack.push({ from: dirs(i), to: toDir });
-      }
-
-      return to;
-    };
-
-    // Traverse stack.
-    while (stack.length) {
-      const e = stack.pop();
-      if (e.from.isFile()) {
-        e.to = convertFile(e.from);
-      } else {
-        e.to = convertDirectory(e.from, e.to);
-      }
+    for (let fIdx = 0; fIdx < from.filesLength(); ++fIdx) {
+      directory.files.push(await this.convertFileInfo(from.files.bind(from)(fIdx)));
+    }
+    for (let dIdx = 0; dIdx < from.directoriesLength(); ++dIdx) {
+      directory.directories.push(await this.convertDirectory(from.directories.bind(from)(dIdx)));
     }
 
-    return root.to;
+    return directory;
+  }
+
+  private convert(response: sz.BrowseResponse): Promise<DirectoryInfo | FileInfo> {
+    const pathInfo = response.info();
+    return pathInfo.isFile() ? this.convertFileInfo(pathInfo) : this.convertDirectory(pathInfo);
   }
 
   public async browse(path: string): Promise<FileInfo | DirectoryInfo> {
