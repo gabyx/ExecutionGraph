@@ -13,7 +13,7 @@
 import { Injectable, Inject } from '@angular/core';
 import { VERBOSE_LOG_TOKEN } from '../tokens';
 import { ILogger, LoggerFactory } from '@eg/logger';
-import { FileBrowserService, FileInfo, DirectoryInfo, Permissions, isFile } from './FileBrowserService';
+import { FileBrowserService, FileInfo, DirectoryInfo, Permissions, isDirectory } from './FileBrowserService';
 
 @Injectable()
 export class FileBrowserServiceDummy extends FileBrowserService {
@@ -93,15 +93,12 @@ export class FileBrowserServiceDummy extends FileBrowserService {
       throw 'Not in files!';
     };
 
-    const getFile = async (current: FileInfo, part: string): Promise<FileInfo> => {
-      if (current.name === part) {
-        return current;
-      }
-      throw 'Not found';
-    };
+    let wait = ms => new Promise(r => setTimeout(r, ms));
 
-    const getDir = async (parent: DirectoryInfo, part: string) => {
-      return check(parent.files, part).catch(e => check(parent.directories, part));
+    const get = async (parent: DirectoryInfo, part: string): Promise<DirectoryInfo | FileInfo> => {
+      return wait(Math.random() * 1000).then(() =>
+        check(parent.files, part).catch(e => check(parent.directories, part))
+      );
     };
 
     return new Promise<FileInfo | DirectoryInfo>(async resolve => {
@@ -113,14 +110,14 @@ export class FileBrowserServiceDummy extends FileBrowserService {
       this.logger.debug(`Browse:  [${s}] length: ${s.length}`);
 
       let r: FileInfo | DirectoryInfo = this.root;
+      let n: FileInfo | DirectoryInfo;
 
       for (let part of s) {
         this.logger.debug(`Part: ${part}`);
-        if (!isFile(r)) {
-          r = await getDir(r, part);
-        } else {
-          r = await getFile(r, part);
+        if (isDirectory(r)) {
+          n = await get(r, part);
         }
+        r = n;
       }
       resolve(r);
     }).catch(err => {
