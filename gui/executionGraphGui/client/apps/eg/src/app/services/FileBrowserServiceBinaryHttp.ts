@@ -104,7 +104,6 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
   }
 
   private convertDate(from: sz.Date): Date {
-    console.log(from.year());
     return new Date(from.year(), from.month(), from.day(), from.hour(), from.min(), from.sec(), 0);
   }
 }

@@ -55,7 +55,6 @@ namespace
             std::time_t t = decltype(fTime)::clock::to_time_t(fTime);
             std::tm tm;
             localtime_r(&t, &tm);
-            EXECGRAPHGUI_BACKENDLOG_TRACE("year: '{0}'", tm.tm_year);
             sG::Date date(static_cast<uint8_t>(tm.tm_sec),
                           static_cast<uint8_t>(tm.tm_min),
                           static_cast<uint8_t>(tm.tm_hour),
