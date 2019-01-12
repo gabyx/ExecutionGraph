@@ -1,7 +1,7 @@
 @import '~@angular/material/theming';
 
 // Palettes and Theme
-$app-primary: mat-palette($mat-pink, 700, 500, 900);
+$app-primary: mat-palette($mat-orange, 700, 500, 900);
 $app-secondary: mat-palette($mat-light-blue, 600, 400, 800);
 $app-accent: mat-palette($mat-blue-grey, A200, A100, A400);
 $app-warn: mat-palette($mat-red);
@@ -12,6 +12,10 @@ $primary: mat-color($app-primary);
 $secondary: mat-color($app-secondary);
 $accent: mat-color($app-accent);
 $warn: mat-color($app-warn);
+
+$general-background: mat-palette($mat-grey, 700, 500, 900);
+$general-background-color: mat-color($general-background, 800, 1);
+$overlay-background-color: mat-color($general-background, 900, 0.95);
 
 // Fonts
 $app-typography: mat-typography-config(

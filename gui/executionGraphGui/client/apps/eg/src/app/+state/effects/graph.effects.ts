@@ -58,6 +58,8 @@ export class GraphEffects {
   createGraph$ = this.actions$.ofType<fromGraph.CreateGraph>(fromGraph.CREATE_GRAPH).pipe(
     mergeMap((action, state) => from(this.graphManagementService.addGraph(action.graphType.id))),
     mergeMap(graph => [
+      //@todo gabnue->gabnue Change here the name of the graph to some default value
+      // dispatch new action fromGraph.GraphChangeProps(name: "...");
       new fromGraph.GraphAdded(graph),
       new fromNotifications.ShowNotification(`Shiny new graph created for you \u{1F6EB}`)
     ])
@@ -139,7 +141,7 @@ export class GraphEffects {
       lastNode = node;
     }
 
-    graph = { ...graph, nodes: nodes, connections: connections };
+    graph = { ...graph, nodes: nodes, connections: connections, name: 'MyDummyGraph' };
 
     return new fromGraph.GraphsLoaded([graph]);
   }

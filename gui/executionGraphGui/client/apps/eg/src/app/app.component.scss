@@ -18,7 +18,7 @@
 
   .mat-drawer {
     padding: 1rem;
-    background: rgba(255, 255, 255, 0.3);
+    background: mat-color($general-background, 600, 0.9);
   }
 }
 

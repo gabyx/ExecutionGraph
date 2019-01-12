@@ -5,11 +5,20 @@
 
   <mat-grid-list cols="2">
     <mat-grid-tile *ngFor="let graphType of (graphTypes | async)">
-      <mat-card class="example-card">
+      <mat-card class="graph-type-card">
         <mat-card-header>
           <div mat-card-avatar class="example-header-image"></div>
-          <mat-card-title>{{ graphType.name }}</mat-card-title>
-          <mat-card-subtitle>Dog Breed</mat-card-subtitle>
+          <mat-card-title>
+            {{ graphType.name }}
+            <button mat-icon-button class="description-button" (click)="showDescription(graphType)">
+              <mat-icon aria-label="Show description.">info</mat-icon>
+            </button>
+          </mat-card-title>
+          <img
+            mat-card-avatar
+            src="https://material.angular.io/assets/img/examples/shiba2.jpg"
+            alt="Photo of a Shiba Inu"
+          />
         </mat-card-header>
         <mat-card-content>
           <p>
@@ -39,5 +48,4 @@
       </mat-card>
     </mat-grid-tile>
   </mat-grid-list>
-  <div></div>
 </div>

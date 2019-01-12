@@ -236,16 +236,20 @@ inline flatbuffers::Offset<PathInfo> CreatePathInfoDirect(
     bool isFile = false,
     const std::vector<flatbuffers::Offset<PathInfo>> *files = nullptr,
     const std::vector<flatbuffers::Offset<PathInfo>> *directories = nullptr) {
+  auto path__ = path ? _fbb.CreateString(path) : 0;
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  auto files__ = files ? _fbb.CreateVector<flatbuffers::Offset<PathInfo>>(*files) : 0;
+  auto directories__ = directories ? _fbb.CreateVector<flatbuffers::Offset<PathInfo>>(*directories) : 0;
   return executionGraphGui::serialization::CreatePathInfo(
       _fbb,
-      path ? _fbb.CreateString(path) : 0,
-      name ? _fbb.CreateString(name) : 0,
+      path__,
+      name__,
       permissions,
       size,
       modified,
       isFile,
-      files ? _fbb.CreateVector<flatbuffers::Offset<PathInfo>>(*files) : 0,
-      directories ? _fbb.CreateVector<flatbuffers::Offset<PathInfo>>(*directories) : 0);
+      files__,
+      directories__);
 }
 
 }  // namespace serialization

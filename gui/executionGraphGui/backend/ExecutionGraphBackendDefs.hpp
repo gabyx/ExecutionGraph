@@ -71,6 +71,14 @@ public:
         return m_nodeTypeDescriptions;
     }
 
+    static const std::string& getDescription()
+    {
+        static std::string d =
+            "This is a default graph for dummy purposes."
+            "**Yes you can write markdown here 😁**!";
+        return d;
+    }
+
 private:
     static std::vector<NodeTypeDescription> initAllNodeTypeDescriptions()
     {

@@ -143,11 +143,14 @@ inline flatbuffers::Offset<ConstructorKV> CreateConstructorKVDirect(
     const char *key = nullptr,
     const std::vector<uint8_t> *value_type = nullptr,
     const std::vector<flatbuffers::Offset<void>> *value = nullptr) {
+  auto key__ = key ? _fbb.CreateString(key) : 0;
+  auto value_type__ = value_type ? _fbb.CreateVector<uint8_t>(*value_type) : 0;
+  auto value__ = value ? _fbb.CreateVector<flatbuffers::Offset<void>>(*value) : 0;
   return executionGraphGui::serialization::CreateConstructorKV(
       _fbb,
-      key ? _fbb.CreateString(key) : 0,
-      value_type ? _fbb.CreateVector<uint8_t>(*value_type) : 0,
-      value ? _fbb.CreateVector<flatbuffers::Offset<void>>(*value) : 0);
+      key__,
+      value_type__,
+      value__);
 }
 
 inline bool VerifyConstructorValue(flatbuffers::Verifier &verifier, const void *obj, ConstructorValue type) {

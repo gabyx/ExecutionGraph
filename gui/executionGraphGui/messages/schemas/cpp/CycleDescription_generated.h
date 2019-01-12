@@ -58,9 +58,10 @@ inline flatbuffers::Offset<CycleDescription> CreateCycleDescription(
 inline flatbuffers::Offset<CycleDescription> CreateCycleDescriptionDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<executionGraph::serialization::SocketLinkDescription> *cyclePath = nullptr) {
+  auto cyclePath__ = cyclePath ? _fbb.CreateVectorOfStructs<executionGraph::serialization::SocketLinkDescription>(*cyclePath) : 0;
   return executionGraphGui::serialization::CreateCycleDescription(
       _fbb,
-      cyclePath ? _fbb.CreateVectorOfStructs<executionGraph::serialization::SocketLinkDescription>(*cyclePath) : 0);
+      cyclePath__);
 }
 
 }  // namespace serialization

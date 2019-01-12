@@ -73,18 +73,24 @@ inline flatbuffers::Offset<WorkspaceVisualization> CreateWorkspaceVisualization(
 
 struct NodeVisualization FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_NODEID = 4,
-    VT_POSITION = 6
+    VT_ID = 4,
+    VT_NAME = 6,
+    VT_POSITION = 8
   };
-  uint64_t nodeId() const {
-    return GetField<uint64_t>(VT_NODEID, 0);
+  uint64_t id() const {
+    return GetField<uint64_t>(VT_ID, 0);
+  }
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
   }
   const Vector2d *position() const {
     return GetStruct<const Vector2d *>(VT_POSITION);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<uint64_t>(verifier, VT_NODEID) &&
+           VerifyField<uint64_t>(verifier, VT_ID) &&
+           VerifyOffsetRequired(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
            VerifyField<Vector2d>(verifier, VT_POSITION) &&
            verifier.EndTable();
   }
@@ -93,8 +99,11 @@ struct NodeVisualization FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct NodeVisualizationBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_nodeId(uint64_t nodeId) {
-    fbb_.AddElement<uint64_t>(NodeVisualization::VT_NODEID, nodeId, 0);
+  void add_id(uint64_t id) {
+    fbb_.AddElement<uint64_t>(NodeVisualization::VT_ID, id, 0);
+  }
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(NodeVisualization::VT_NAME, name);
   }
   void add_position(const Vector2d *position) {
     fbb_.AddStruct(NodeVisualization::VT_POSITION, position);
@@ -107,29 +116,51 @@ struct NodeVisualizationBuilder {
   flatbuffers::Offset<NodeVisualization> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<NodeVisualization>(end);
+    fbb_.Required(o, NodeVisualization::VT_NAME);
     return o;
   }
 };
 
 inline flatbuffers::Offset<NodeVisualization> CreateNodeVisualization(
     flatbuffers::FlatBufferBuilder &_fbb,
-    uint64_t nodeId = 0,
+    uint64_t id = 0,
+    flatbuffers::Offset<flatbuffers::String> name = 0,
     const Vector2d *position = 0) {
   NodeVisualizationBuilder builder_(_fbb);
-  builder_.add_nodeId(nodeId);
+  builder_.add_id(id);
   builder_.add_position(position);
+  builder_.add_name(name);
   return builder_.Finish();
+}
+
+inline flatbuffers::Offset<NodeVisualization> CreateNodeVisualizationDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint64_t id = 0,
+    const char *name = nullptr,
+    const Vector2d *position = 0) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  return executionGraph::serialization::CreateNodeVisualization(
+      _fbb,
+      id,
+      name__,
+      position);
 }
 
 struct LinkVisualization FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_SOCKET = 4
+    VT_NAME = 4,
+    VT_SOCKET = 6
   };
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
   const SocketLinkDescription *socket() const {
     return GetStruct<const SocketLinkDescription *>(VT_SOCKET);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
            VerifyFieldRequired<SocketLinkDescription>(verifier, VT_SOCKET) &&
            verifier.EndTable();
   }
@@ -138,6 +169,9 @@ struct LinkVisualization FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct LinkVisualizationBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(LinkVisualization::VT_NAME, name);
+  }
   void add_socket(const SocketLinkDescription *socket) {
     fbb_.AddStruct(LinkVisualization::VT_SOCKET, socket);
   }
@@ -156,18 +190,35 @@ struct LinkVisualizationBuilder {
 
 inline flatbuffers::Offset<LinkVisualization> CreateLinkVisualization(
     flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> name = 0,
     const SocketLinkDescription *socket = 0) {
   LinkVisualizationBuilder builder_(_fbb);
   builder_.add_socket(socket);
+  builder_.add_name(name);
   return builder_.Finish();
+}
+
+inline flatbuffers::Offset<LinkVisualization> CreateLinkVisualizationDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *name = nullptr,
+    const SocketLinkDescription *socket = 0) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  return executionGraph::serialization::CreateLinkVisualization(
+      _fbb,
+      name__,
+      socket);
 }
 
 struct GraphVisualization FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_WORKSPACEVISUALIZATION = 4,
-    VT_NODEVISUALIZATION = 6,
-    VT_LINKVISUALIZATION = 8
+    VT_NAME = 4,
+    VT_WORKSPACEVISUALIZATION = 6,
+    VT_NODEVISUALIZATION = 8,
+    VT_LINKVISUALIZATION = 10
   };
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
   const WorkspaceVisualization *workspaceVisualization() const {
     return GetPointer<const WorkspaceVisualization *>(VT_WORKSPACEVISUALIZATION);
   }
@@ -179,6 +230,8 @@ struct GraphVisualization FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
            VerifyOffset(verifier, VT_WORKSPACEVISUALIZATION) &&
            verifier.VerifyTable(workspaceVisualization()) &&
            VerifyOffset(verifier, VT_NODEVISUALIZATION) &&
@@ -194,6 +247,9 @@ struct GraphVisualization FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct GraphVisualizationBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(GraphVisualization::VT_NAME, name);
+  }
   void add_workspaceVisualization(flatbuffers::Offset<WorkspaceVisualization> workspaceVisualization) {
     fbb_.AddOffset(GraphVisualization::VT_WORKSPACEVISUALIZATION, workspaceVisualization);
   }
@@ -211,12 +267,14 @@ struct GraphVisualizationBuilder {
   flatbuffers::Offset<GraphVisualization> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<GraphVisualization>(end);
+    fbb_.Required(o, GraphVisualization::VT_NAME);
     return o;
   }
 };
 
 inline flatbuffers::Offset<GraphVisualization> CreateGraphVisualization(
     flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> name = 0,
     flatbuffers::Offset<WorkspaceVisualization> workspaceVisualization = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<NodeVisualization>>> nodeVisualization = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<LinkVisualization>>> linkVisualization = 0) {
@@ -224,19 +282,25 @@ inline flatbuffers::Offset<GraphVisualization> CreateGraphVisualization(
   builder_.add_linkVisualization(linkVisualization);
   builder_.add_nodeVisualization(nodeVisualization);
   builder_.add_workspaceVisualization(workspaceVisualization);
+  builder_.add_name(name);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<GraphVisualization> CreateGraphVisualizationDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
+    const char *name = nullptr,
     flatbuffers::Offset<WorkspaceVisualization> workspaceVisualization = 0,
     const std::vector<flatbuffers::Offset<NodeVisualization>> *nodeVisualization = nullptr,
     const std::vector<flatbuffers::Offset<LinkVisualization>> *linkVisualization = nullptr) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  auto nodeVisualization__ = nodeVisualization ? _fbb.CreateVector<flatbuffers::Offset<NodeVisualization>>(*nodeVisualization) : 0;
+  auto linkVisualization__ = linkVisualization ? _fbb.CreateVector<flatbuffers::Offset<LinkVisualization>>(*linkVisualization) : 0;
   return executionGraph::serialization::CreateGraphVisualization(
       _fbb,
+      name__,
       workspaceVisualization,
-      nodeVisualization ? _fbb.CreateVector<flatbuffers::Offset<NodeVisualization>>(*nodeVisualization) : 0,
-      linkVisualization ? _fbb.CreateVector<flatbuffers::Offset<LinkVisualization>>(*linkVisualization) : 0);
+      nodeVisualization__,
+      linkVisualization__);
 }
 
 }  // namespace serialization

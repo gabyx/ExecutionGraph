@@ -54,7 +54,16 @@ namespace
             auto fTime    = e.last_write_time();
             std::time_t t = decltype(fTime)::clock::to_time_t(fTime);
             std::tm tm;
-            std::localtime_r(&t, &tm);
+            localtime_r(&t, &tm);
+
+            sG::Date date(static_cast<uint8_t>(tm.tm_sec),
+                          static_cast<uint8_t>(tm.tm_min),
+                          static_cast<uint8_t>(tm.tm_hour),
+                          static_cast<uint8_t>(tm.tm_mday),
+                          static_cast<uint8_t>(tm.tm_mon),
+                          static_cast<uint16_t>(tm.tm_year),
+                          static_cast<uint8_t>(tm.tm_wday),
+                          static_cast<uint16_t>(tm.tm_yday));
 
             sG::Permissions per;
             const auto perm = e.status().permissions();
@@ -71,7 +80,7 @@ namespace
             {
                 per = sG::Permissions::Permissions_OwnerWrite;
             }
-            return std::make_tuple(per, tm);
+            return std::make_tuple(per, date);
         };
 
         //! Serialize file info.
@@ -80,7 +89,7 @@ namespace
             auto t = getStats(builder, e);
             return sG::CreatePathInfoDirect(builder,
                                             e.path().native().c_str(),
-                                            e.path().filename().native(),
+                                            e.path().filename().native().c_str(),
                                             std::get<0>(t),
                                             e.file_size(),
                                             &std::get<1>(t),
@@ -94,14 +103,14 @@ namespace
             EXECGRAPHGUI_BACKENDLOG_TRACE("Build dir info: '{0}'", e.path());
             auto t = getStats(builder, e);
             return sG::CreatePathInfoDirect(builder,
-                                            e.path().native(),
-                                            e.path().filename().native(),
+                                            e.path().native().c_str(),
+                                            e.path().filename().native().c_str(),
                                             std::get<0>(t),
                                             0,
                                             &std::get<1>(t),
                                             false,
-                                            d ? d->fileInfos : nullptr,
-                                            d ? d->dirInfos : nullptr);
+                                            d ? &d->fileInfos : nullptr,
+                                            d ? &d->dirInfos : nullptr);
         };
 
         //! Add all contained subdirectories and as well serialize file infos.

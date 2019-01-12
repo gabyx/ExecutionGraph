@@ -19,7 +19,8 @@ struct GraphTypeDescription FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table
     VT_ID = 4,
     VT_NAME = 6,
     VT_SOCKETTYPEDESCRIPTIONS = 8,
-    VT_NODETYPEDESCRIPTIONS = 10
+    VT_NODETYPEDESCRIPTIONS = 10,
+    VT_DESCRIPTION = 12
   };
   const flatbuffers::String *id() const {
     return GetPointer<const flatbuffers::String *>(VT_ID);
@@ -33,6 +34,9 @@ struct GraphTypeDescription FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table
   const flatbuffers::Vector<flatbuffers::Offset<NodeTypeDescription>> *nodeTypeDescriptions() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<NodeTypeDescription>> *>(VT_NODETYPEDESCRIPTIONS);
   }
+  const flatbuffers::String *description() const {
+    return GetPointer<const flatbuffers::String *>(VT_DESCRIPTION);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_ID) &&
@@ -45,6 +49,8 @@ struct GraphTypeDescription FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table
            VerifyOffset(verifier, VT_NODETYPEDESCRIPTIONS) &&
            verifier.VerifyVector(nodeTypeDescriptions()) &&
            verifier.VerifyVectorOfTables(nodeTypeDescriptions()) &&
+           VerifyOffsetRequired(verifier, VT_DESCRIPTION) &&
+           verifier.VerifyString(description()) &&
            verifier.EndTable();
   }
 };
@@ -64,6 +70,9 @@ struct GraphTypeDescriptionBuilder {
   void add_nodeTypeDescriptions(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<NodeTypeDescription>>> nodeTypeDescriptions) {
     fbb_.AddOffset(GraphTypeDescription::VT_NODETYPEDESCRIPTIONS, nodeTypeDescriptions);
   }
+  void add_description(flatbuffers::Offset<flatbuffers::String> description) {
+    fbb_.AddOffset(GraphTypeDescription::VT_DESCRIPTION, description);
+  }
   explicit GraphTypeDescriptionBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -75,6 +84,7 @@ struct GraphTypeDescriptionBuilder {
     fbb_.Required(o, GraphTypeDescription::VT_ID);
     fbb_.Required(o, GraphTypeDescription::VT_NAME);
     fbb_.Required(o, GraphTypeDescription::VT_SOCKETTYPEDESCRIPTIONS);
+    fbb_.Required(o, GraphTypeDescription::VT_DESCRIPTION);
     return o;
   }
 };
@@ -84,8 +94,10 @@ inline flatbuffers::Offset<GraphTypeDescription> CreateGraphTypeDescription(
     flatbuffers::Offset<flatbuffers::String> id = 0,
     flatbuffers::Offset<flatbuffers::String> name = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<SocketTypeDescription>>> socketTypeDescriptions = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<NodeTypeDescription>>> nodeTypeDescriptions = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<NodeTypeDescription>>> nodeTypeDescriptions = 0,
+    flatbuffers::Offset<flatbuffers::String> description = 0) {
   GraphTypeDescriptionBuilder builder_(_fbb);
+  builder_.add_description(description);
   builder_.add_nodeTypeDescriptions(nodeTypeDescriptions);
   builder_.add_socketTypeDescriptions(socketTypeDescriptions);
   builder_.add_name(name);
@@ -98,13 +110,20 @@ inline flatbuffers::Offset<GraphTypeDescription> CreateGraphTypeDescriptionDirec
     const char *id = nullptr,
     const char *name = nullptr,
     const std::vector<flatbuffers::Offset<SocketTypeDescription>> *socketTypeDescriptions = nullptr,
-    const std::vector<flatbuffers::Offset<NodeTypeDescription>> *nodeTypeDescriptions = nullptr) {
+    const std::vector<flatbuffers::Offset<NodeTypeDescription>> *nodeTypeDescriptions = nullptr,
+    const char *description = nullptr) {
+  auto id__ = id ? _fbb.CreateString(id) : 0;
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  auto socketTypeDescriptions__ = socketTypeDescriptions ? _fbb.CreateVector<flatbuffers::Offset<SocketTypeDescription>>(*socketTypeDescriptions) : 0;
+  auto nodeTypeDescriptions__ = nodeTypeDescriptions ? _fbb.CreateVector<flatbuffers::Offset<NodeTypeDescription>>(*nodeTypeDescriptions) : 0;
+  auto description__ = description ? _fbb.CreateString(description) : 0;
   return executionGraph::serialization::CreateGraphTypeDescription(
       _fbb,
-      id ? _fbb.CreateString(id) : 0,
-      name ? _fbb.CreateString(name) : 0,
-      socketTypeDescriptions ? _fbb.CreateVector<flatbuffers::Offset<SocketTypeDescription>>(*socketTypeDescriptions) : 0,
-      nodeTypeDescriptions ? _fbb.CreateVector<flatbuffers::Offset<NodeTypeDescription>>(*nodeTypeDescriptions) : 0);
+      id__,
+      name__,
+      socketTypeDescriptions__,
+      nodeTypeDescriptions__,
+      description__);
 }
 
 }  // namespace serialization

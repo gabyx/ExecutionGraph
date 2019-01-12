@@ -125,11 +125,12 @@ inline flatbuffers::Offset<ExecutionGraphNodeProperties> CreateExecutionGraphNod
     uint64_t nodeId = 0,
     NodeClassification classification = NodeClassification_NormalNode,
     const std::vector<uint64_t> *groups = nullptr) {
+  auto groups__ = groups ? _fbb.CreateVector<uint64_t>(*groups) : 0;
   return executionGraph::serialization::CreateExecutionGraphNodeProperties(
       _fbb,
       nodeId,
       classification,
-      groups ? _fbb.CreateVector<uint64_t>(*groups) : 0);
+      groups__);
 }
 
 struct ExecutionGraph FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -226,12 +227,15 @@ inline flatbuffers::Offset<ExecutionGraph> CreateExecutionGraphDirect(
     const std::vector<SocketLinkDescription> *links = nullptr,
     const std::vector<flatbuffers::Offset<ExecutionGraphNodeProperties>> *nodeProperties = nullptr,
     flatbuffers::Offset<GraphVisualization> visualization = 0) {
+  auto nodes__ = nodes ? _fbb.CreateVector<flatbuffers::Offset<LogicNode>>(*nodes) : 0;
+  auto links__ = links ? _fbb.CreateVectorOfStructs<SocketLinkDescription>(*links) : 0;
+  auto nodeProperties__ = nodeProperties ? _fbb.CreateVector<flatbuffers::Offset<ExecutionGraphNodeProperties>>(*nodeProperties) : 0;
   return executionGraph::serialization::CreateExecutionGraph(
       _fbb,
       graphDescription,
-      nodes ? _fbb.CreateVector<flatbuffers::Offset<LogicNode>>(*nodes) : 0,
-      links ? _fbb.CreateVectorOfStructs<SocketLinkDescription>(*links) : 0,
-      nodeProperties ? _fbb.CreateVector<flatbuffers::Offset<ExecutionGraphNodeProperties>>(*nodeProperties) : 0,
+      nodes__,
+      links__,
+      nodeProperties__,
       visualization);
 }
 

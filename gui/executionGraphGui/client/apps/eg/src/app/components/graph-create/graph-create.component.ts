@@ -5,6 +5,8 @@ import * as fromGraphDescriptions from '../../+state/selectors/';
 import { GraphDescriptionsState } from '../../+state/reducers/graphDescription.reducers';
 import { GraphTypeDescription } from '../../model';
 import { CreateGraph } from '../../+state/actions';
+import { ILogger, LoggerFactory } from '@eg/logger/src';
+import { RouterState, Router } from '@angular/router';
 
 @Component({
   selector: 'eg-graph-create',
@@ -13,14 +15,25 @@ import { CreateGraph } from '../../+state/actions';
 })
 export class GraphCreateComponent implements OnInit {
   graphTypes: Observable<GraphTypeDescription[]>;
+  logger: ILogger;
 
-  constructor(private store: Store<GraphDescriptionsState>) {
+  constructor(
+    private store: Store<GraphDescriptionsState>,
+    readonly loggerFactory: LoggerFactory,
+    private readonly router: Router
+  ) {
+    this.logger = loggerFactory.create('SocketConnectionToolComponent');
     this.graphTypes = this.store.select(fromGraphDescriptions.getGraphDescriptions);
   }
 
   ngOnInit() {}
 
-  createGraph(graphType: GraphTypeDescription) {
+  public createGraph(graphType: GraphTypeDescription) {
     this.store.dispatch(new CreateGraph(graphType));
+  }
+
+  public showDescription(graphType: GraphTypeDescription) {
+    this.logger.debug('Show Description');
+    //this.router.navigate(['/graph/description', graphType.id.toString()]);
   }
 }

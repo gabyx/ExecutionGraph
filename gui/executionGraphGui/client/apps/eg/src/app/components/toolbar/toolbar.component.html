@@ -37,7 +37,7 @@
     </mat-menu>
 
     <mat-menu #openRecentMenu="matMenu">
-      <button *ngFor="let graph of graphsMRU | async" mat-menu-item [routerLink]="['graph', graph.id.toString()]">{{ graph.id }}</button>
+      <button *ngFor="let graph of graphsMRU | async" mat-menu-item [routerLink]="['graph', graph.id.toString()]">{{ graph.name }} | {{ graph.id.toString()}}</button>
     </mat-menu>
 
     <mat-menu #executionMenu="matMenu">
