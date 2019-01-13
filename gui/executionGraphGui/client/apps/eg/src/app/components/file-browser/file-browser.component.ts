@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../+state/reducers/app.reducers';
 import { FileBrowserService } from '../../services';
-import { DirectoryInfo, isFile, FileInfo } from '../../services/FileBrowserService';
+import { DirectoryInfo, isFile, FileInfo, PathInfo } from '../../services/FileBrowserService';
 import { ILogger, LoggerFactory } from '@eg/logger/src';
+import { MatDialog } from '@angular/material';
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'eg-file-browser',
@@ -24,7 +26,8 @@ export class FileBrowserComponent implements OnInit {
   constructor(
     private store: Store<AppState>,
     private browser: FileBrowserService,
-    readonly loggerFactory: LoggerFactory
+    readonly loggerFactory: LoggerFactory,
+    private dialog: MatDialog
   ) {
     this.logger = loggerFactory.create('FileBrowserComponent');
   }
@@ -88,5 +91,35 @@ export class FileBrowserComponent implements OnInit {
     return !dir.explored || (dir.files.length > 0 || dir.directories.length > 0);
   }
 
-  openFile(file: FileInfo) {}
+  public openFile(file: FileInfo) {
+    this.logger.debug(`Opening file '${file.path}'`);
+  }
+
+  public deleteConfirm(path: FileInfo | DirectoryInfo) {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      minWidth: '10%',
+      data: {
+        title: 'Delete',
+        question: `Do you really want to delete the path '${path.path}' ?`
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.deleteFile(path);
+      }
+    });
+  }
+
+  public isFileOpenable(file: FileInfo) {
+    return file.name.endsWith('.eg');
+  }
+
+  private deleteFile(path: FileInfo | DirectoryInfo) {
+    if (this.isFileOpenable(path)) {
+      this.logger.debug(`Deleting path '${path.path}'`);
+    } else {
+      this.logger.error('Programming Error!');
+      throw 'Error!';
+    }
+  }
 }

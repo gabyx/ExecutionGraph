@@ -5,7 +5,8 @@
 <ng-template #fileBrowserContainer>
   <mat-nav-list dense>
     <mat-list-item (click)="openParentDirectory()">
-      <mat-icon aria-label="Goto parent directory." *ngIf="!atRoot">arrow_back</mat-icon>
+      <h3>Current Directory:</h3>
+      <mat-icon class="back-label" aria-label="Goto parent directory." *ngIf="!atRoot">arrow_back</mat-icon>
       <h3 class="title">{{ currentDirectory.path }}</h3>
     </mat-list-item>
 
@@ -16,14 +17,19 @@
       <div matLine>
         <div class="row">
           <span class="folder">{{ directory.name }}</span> <span class="prop">{{ directory.size }}</span>
-          <span class="prop">{{ directory.modified.toLocaleString()  }}</span>
+          <span class="prop">{{ directory.modified.toLocaleString() }}</span>
         </div>
       </div>
     </a>
 
     <mat-divider></mat-divider>
 
-    <a mat-list-item *ngFor="let file of currentDirectory.files" (click)="openFile(file)">
+    <a
+      mat-list-item
+      *ngFor="let file of currentDirectory.files"
+      [matMenuTriggerFor]="fileMenu"
+      [matMenuTriggerData]="{ f: file }"
+    >
       <mat-icon matListIcon>note</mat-icon>
       <div matLine>
         <div class="row">
@@ -33,4 +39,13 @@
       </div>
     </a>
   </mat-nav-list>
+
+  <mat-menu #fileMenu="matMenu">
+    <ng-template matMenuContent let-file="f">
+      <button #openButton mat-menu-item [disabled]="!isFileOpenable(file)" (click)="openFile(file)">Open</button>
+      <button #deleteButton mat-menu-item [disabled]="!isFileOpenable(file)" (click)="deleteConfirm(file)">
+        Delete
+      </button>
+    </ng-template>
+  </mat-menu>
 </ng-template>

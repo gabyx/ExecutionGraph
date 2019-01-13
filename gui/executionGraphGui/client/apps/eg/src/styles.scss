@@ -26,12 +26,25 @@ a {
 
 h1 {
   color: mat-color($app-primary);
-  font-family: mat-font-family($app-graph-typography);
   font-size: mat-font-size($app-graph-typography, headline);
 }
 
 h2 {
   color: mat-color($app-secondary);
-  font-family: mat-font-family($app-graph-typography);
   font-size: mat-font-size($app-graph-typography, title);
+}
+
+p {
+  font-size: mat-font-size($app-graph-typography, body-1);
+}
+
+a,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: mat-font-family($app-graph-typography);
 }
