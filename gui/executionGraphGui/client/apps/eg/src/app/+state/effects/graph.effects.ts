@@ -19,6 +19,7 @@ import { GraphsState } from '../reducers';
 import { RouterStateUrl } from '../reducers/app.reducers';
 import { arraysEqual, isDefined } from '@eg/common';
 import { AutoLayoutService } from '../../services/AutoLayoutService';
+import { Point } from '@eg/graph/src';
 
 @Injectable()
 export class GraphEffects {
@@ -63,7 +64,7 @@ export class GraphEffects {
       //@todo gabnue->gabnue Change here the name of the graph to some default value
       // dispatch new action fromGraph.GraphChangeProps(name: "...");
       new fromGraph.GraphAdded(graph),
-      new fromNotifications.ShowNotification(`Shiny new graph created for you \u{1F6EB}`)
+      new fromNotifications.ShowNotification(`Shiny new graph created for you 👾`)
     ])
   );
 
@@ -76,8 +77,8 @@ export class GraphEffects {
     ),
     mergeMap(({ node, action }) => [
       new fromGraph.NodeAdded(action.graphId, node),
-      new fromGraph.MoveNode(node, action.position ? action.position : { x: 0, y: 0 }),
-      new fromNotifications.ShowNotification(`Added the node '${node.name}' for you \u{1F6EB}`)
+      new fromGraph.MoveNode(node, action.position ? action.position : Point.one.copy()),
+      new fromNotifications.ShowNotification(`Added the node '${node.name}' for you 👾`)
     ])
   );
 
@@ -85,7 +86,7 @@ export class GraphEffects {
   moveNode$ = this.actions$.ofType<fromGraph.MoveNode>(fromGraph.MOVE_NODE).pipe(
     // tap(action => console.log('moving node ', action.node, action.newPosition)),
     tap(action => {
-      action.node.uiProps.position = { x: action.newPosition.x, y: action.newPosition.y };
+      action.node.uiProps.position = new Point(action.newPosition.x, action.newPosition.y);
     }),
     map((action, state) => new fromGraph.NodeUpdated(action.node))
   );

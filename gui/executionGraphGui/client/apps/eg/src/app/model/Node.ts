@@ -19,7 +19,7 @@ function isLong(value: any): value is Long {
 }
 
 export class UIProps {
-  public position: Point = { x: 0, y: 0 };
+  public position = Point.one.copy();
 }
 
 /**

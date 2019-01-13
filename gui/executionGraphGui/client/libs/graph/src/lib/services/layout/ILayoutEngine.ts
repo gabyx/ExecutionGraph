@@ -9,31 +9,30 @@
 //  License, v. 2.0. If a copy of the MPL was not distributed with this
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
-import { Point } from '../../model/Point';
 import { ILayoutStrategy, LayoutStrategys } from './ILayoutStrategy';
+import { NodeId } from 'apps/eg/src/app/model';
+import { Point, Position } from '../../model/Point';
 
-export interface Node {
-  readonly position: Point;
-}
+export type BodyMap<Body> = Map<NodeId, Body>;
 
-export interface Edge {
-  readonly from: Node;
-  readonly to: Node;
-}
+export type EngineInput<Body, Link> = { bodies: BodyMap<Body>; links: Link[] };
+export type EngineOutput = { pos: Position; id: NodeId }[];
 
-export interface Graph {
-  readonly nodes: Node[];
-  readonly edges: Edge[];
+export type BodyCreator<Body> = (id: NodeId, pos: Point) => Body;
+export type LinkCreator<Body, Link> = (b1: Body, b2: Body) => Link;
+
+export interface GraphConverter {
+  <Body, Link>(createBody: BodyCreator<Body>, createLink: LinkCreator<Body, Link>): Promise<EngineInput<Body, Link>>;
 }
 
 export abstract class ILayoutEngine {
-  public async dispatchRun(config: ILayoutStrategy, graph: Graph): Promise<void> {
+  public async dispatchRun(config: ILayoutStrategy, converter: GraphConverter): Promise<EngineOutput> {
     if (this.isStrategyValid(config.strategy)) {
-      return this.run(config, graph);
+      return this.run(config, converter);
     }
     throw `Wrong strategy '${config.strategy}' for engine!`;
   }
 
-  public abstract run(config: ILayoutStrategy, graph: Graph): Promise<void>;
+  public abstract run(config: ILayoutStrategy, converter: GraphConverter): Promise<EngineOutput>;
   public abstract isStrategyValid(strategy: LayoutStrategys): boolean;
 }

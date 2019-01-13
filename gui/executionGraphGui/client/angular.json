@@ -243,6 +243,13 @@
           }
         }
       }
+    },
+    "tsm": {
+      "root": "libs/tsm",
+      "sourceRoot": "libs/tsm/src",
+      "projectType": "library",
+      "prefix": "eg",
+      "architect": {}
     }
   },
   "defaultProject": "eg",

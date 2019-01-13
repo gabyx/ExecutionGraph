@@ -10,32 +10,13 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-export interface Point {
-  x: number;
-  y: number;
-};
+import { vec2 } from '@tlaukkan/tsm';
 
+export class Point extends vec2 {
+  constructor(x: number, y: number) {
+    super();
+    this.x = x;
+    this.y = y;
+  }
+}
 export type Position = Point;
-
-export function diff(a: Point, b: Point): Point {
-  return {
-    x: a.x - b.x,
-    y: a.y - b.y
-  };
-}
-
-export function norm2(v: Point): number {
-  return v.x * v.x + v.y * v.y;
-}
-
-export function norm(v: Point): number {
-  return Math.sqrt(norm2(v));
-}
-
-export function normalize(v: Point): Point {
-  const length = norm(v);
-  return {
-    x: v.x / length,
-    y: v.y / length
-  };
-}

@@ -13,7 +13,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { ForceDirectedGraphLayoutStrategy, ILayoutStrategy } from '@eg/graph';
+import { MassSpringLayoutStrategy } from '@eg/graph';
 import { ILogger, LoggerFactory } from '@eg/logger';
 
 import { Graph } from '../../model';
@@ -57,6 +57,6 @@ export class ConnectionStyleOptionsComponent implements OnInit {
   }
 
   autoLayoutGraph(graph: Graph) {
-    this.store.dispatch(new fromGraph.RunAutoLayout(graph, new ForceDirectedGraphLayoutStrategy()));
+    this.store.dispatch(new fromGraph.RunAutoLayout(graph, new MassSpringLayoutStrategy()));
   }
 }
