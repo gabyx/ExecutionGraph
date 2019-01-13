@@ -5,7 +5,8 @@
 <ng-template #fileBrowserContainer>
   <mat-nav-list dense>
     <mat-list-item (click)="openParentDirectory()">
-      <mat-icon aria-label="Goto parent directory." *ngIf="!atRoot">arrow_back</mat-icon>
+      <h3>Current Directory:</h3>
+      <mat-icon class="back-label" aria-label="Goto parent directory." *ngIf="!atRoot">arrow_back</mat-icon>
       <h3 class="title">{{ currentDirectory.path }}</h3>
     </mat-list-item>
 
@@ -41,19 +42,8 @@
 
   <mat-menu #fileMenu="matMenu">
     <ng-template matMenuContent let-file="f">
-      <button #openButton
-        mat-menu-item
-        [disabled]="!isFileOpenable(file)"
-        (click)="openFile(file)"
-      >
-        Open
-      </button>
-      <button
-        #deleteButton
-        mat-menu-item
-        [disabled]="!isFileOpenable(file)"
-        (click)="deleteConfirm(file)"
-      >
+      <button #openButton mat-menu-item [disabled]="!isFileOpenable(file)" (click)="openFile(file)">Open</button>
+      <button #deleteButton mat-menu-item [disabled]="!isFileOpenable(file)" (click)="deleteConfirm(file)">
         Delete
       </button>
     </ng-template>
