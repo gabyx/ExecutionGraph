@@ -1,9 +1,13 @@
 @import 'app/variables';
 
 .title {
-  margin-left: 1em;
   color: $secondary;
   font-weight: bold;
+  margin-left: 0.5em;
+}
+
+.back-label {
+  margin-left: 0.5em;
 }
 
 .title-divider {
