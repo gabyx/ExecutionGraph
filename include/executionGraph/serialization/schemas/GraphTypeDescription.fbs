@@ -18,7 +18,9 @@ namespace executionGraph.serialization;
 table GraphTypeDescription {
     id:string (id:0, required);     //!< The unique id of this graph type.
     name:string (id:1, required);   //!< The readable name of this graph type.
-    
+
     socketTypeDescriptions:[SocketTypeDescription] (id:2, required);  //!< Socket descriptions
     nodeTypeDescriptions:[NodeTypeDescription] (id:3);      //!< Node descriptions
+
+    description:string (id:4, required); //!< Some description (markdown or plain text)
 }

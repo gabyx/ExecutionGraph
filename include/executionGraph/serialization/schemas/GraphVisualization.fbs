@@ -17,28 +17,33 @@ namespace executionGraph.serialization;
 
 table WorkspaceVisualization
 {
-    workspaceId:uint64 (id:0); //!< workspace id
+    workspaceId:uint64 (id:0);  //!< workspace id
     box:Box2f (id:1, required); //!< canvas dimensions of the workspace
 }
 
 table NodeVisualization
 {
-    nodeId:uint64 (id:0);
-    position:Vector2d (id:1); //!< workspace position
+    id:uint64 (id:0);
+    name: string (id:1, required);
+    position:Vector2d (id:2); //!< workspace position
+
     // and visualization stuff
     // ...
 }
 
 table LinkVisualization
 {
-    socket:SocketLinkDescription (id:0, required);
+    socket:SocketLinkDescription (id:1, required);
+    name: string (id:0);
+
     // and more visualization stuff
     // ...
 }
 
 table GraphVisualization
 {
-    workspaceVisualization:WorkspaceVisualization (id:0);
-    nodeVisualization:[NodeVisualization] (id:1);
-    linkVisualization:[LinkVisualization] (id:2);
+    name:string (id:0, required);
+    workspaceVisualization:WorkspaceVisualization (id:1);
+    nodeVisualization:[NodeVisualization] (id:2);
+    linkVisualization:[LinkVisualization] (id:3);
 }

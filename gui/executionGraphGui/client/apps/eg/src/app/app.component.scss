@@ -1,8 +1,11 @@
+@import 'app/variables';
+
 :host {
   height: 100%;
 
   display: flex;
   flex-direction: column;
+  background: $general-background-color;
 }
 
 .mat-drawer-container {
@@ -10,12 +13,12 @@
   background: transparent;
 
   .mat-drawer-content {
-    overflow:hidden;
+    overflow: hidden;
   }
 
   .mat-drawer {
     padding: 1rem;
-    background: rgba(255,255,255,0.3);
+    background: mat-color($general-background, 600, 0.9);
   }
 }
 

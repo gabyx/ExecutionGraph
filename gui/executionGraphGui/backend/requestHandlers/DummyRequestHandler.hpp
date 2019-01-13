@@ -35,7 +35,7 @@ public:
                        ResponsePromise& response) override;
 
 public:
-    const std::unordered_set<std::string>& getRequestTypes() const override;
+    const std::unordered_set<HandlerKey>& requestTargets() const override;
 
 private:
     std::shared_ptr<ExecutionGraphBackend> m_backend;

@@ -24,9 +24,9 @@ namespace fl = flatbuffers;
 namespace s  = executionGraphGui::serialization;
 
 //! Init the function mapping.
-FunctionMap<GraphManagementRequestHandler::Function> GraphManagementRequestHandler::initFunctionMap()
+GraphManagementRequestHandler::FuncMap GraphManagementRequestHandler::initFunctionMap()
 {
-    using Entry = typename FunctionMap<Function>::Entry;
+    using Entry = typename FuncMap::Entry;
 
     auto r = {Entry(targetBase / "general/addGraph", Function(&GraphManagementRequestHandler::handleAddGraph)),
               Entry(targetBase / "general/removeGraph", Function(&GraphManagementRequestHandler::handleRemoveGraph))};
@@ -34,7 +34,8 @@ FunctionMap<GraphManagementRequestHandler::Function> GraphManagementRequestHandl
 }
 
 //! Static handler map: request to handler function mapping.
-const FunctionMap<GraphManagementRequestHandler::Function> GraphManagementRequestHandler::m_functionMap = GraphManagementRequestHandler::initFunctionMap();
+const GraphManagementRequestHandler::FuncMap
+    GraphManagementRequestHandler::m_functionMap = GraphManagementRequestHandler::initFunctionMap();
 
 //! Konstructor.
 GraphManagementRequestHandler::GraphManagementRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,
@@ -44,9 +45,10 @@ GraphManagementRequestHandler::GraphManagementRequestHandler(std::shared_ptr<Exe
 }
 
 //! Get the request types for which this handler is registered.
-const std::unordered_set<std::string>& GraphManagementRequestHandler::getRequestTypes() const
+const std::unordered_set<GraphManagementRequestHandler::HandlerKey>&
+GraphManagementRequestHandler::requestTargets() const
 {
-    return m_functionMap.m_keys;
+    return m_functionMap.keys();
 }
 
 //! Handle the operation of adding a graph.
@@ -54,13 +56,7 @@ void GraphManagementRequestHandler::handleRequest(const Request& request,
                                                   ResponsePromise& response)
 {
     EXECGRAPHGUI_BACKENDLOG_INFO("GraphManagementRequestHandler::handleRequest");
-
-    // Dispatch to the correct function
-    auto it = m_functionMap.m_map.find(request.getTarget().string());
-    if(it != m_functionMap.m_map.end())
-    {
-        it->second(*this, request, response);
-    }
+    m_functionMap.dispatch(request.target().native(), *this, request, response);
 }
 
 //! Handle the operation of adding a graph.
@@ -68,7 +64,7 @@ void GraphManagementRequestHandler::handleAddGraph(const Request& request,
                                                    ResponsePromise& response)
 {
     // Request validation
-    auto& payload = request.getPayload();
+    auto& payload = request.payload();
     EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request data is null!");
 
@@ -98,7 +94,7 @@ void GraphManagementRequestHandler::handleRemoveGraph(const Request& request,
                                                       ResponsePromise& response)
 {
     // Request validation
-    auto& payload = request.getPayload();
+    auto& payload = request.payload();
     EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request data is null!");
 

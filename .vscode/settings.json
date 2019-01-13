@@ -90,7 +90,8 @@
     "fstream": "cpp",
     "iomanip": "cpp",
     "numeric": "cpp",
-    "variant": "cpp"
+    "variant": "cpp",
+    "strstream": "cpp"
   },
   "cmake.useCMakeServer": true,
   // "C_Cpp.clang_format_fallbackStyle": "none",
@@ -175,6 +176,7 @@
     "ExecutionGraph_BUILD_LIBRARY": true,
     "ExecutionGraph_BUILD_GUI": true,
     "ExecutionGraph_EXTERNAL_BUILD_DIR": "${workspaceRoot}/buildExternal",
+    "ExecutionGraph_FORCE_MSGLOG_LEVEL" : "TRACE",
     "ExecutionGraph_USE_ADDRESS_SANITIZER": true,
     "CMAKE_EXPORT_COMPILE_COMMANDS": true
   },

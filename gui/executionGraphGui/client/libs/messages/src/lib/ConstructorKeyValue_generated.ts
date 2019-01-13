@@ -215,5 +215,12 @@ static endConstructorKV(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 };
 
+static createConstructorKV(builder:flatbuffers.Builder, keyOffset:flatbuffers.Offset, valueTypeOffset:flatbuffers.Offset, valueOffset:flatbuffers.Offset):flatbuffers.Offset {
+  ConstructorKV.startConstructorKV(builder);
+  ConstructorKV.addKey(builder, keyOffset);
+  ConstructorKV.addValueType(builder, valueTypeOffset);
+  ConstructorKV.addValue(builder, valueOffset);
+  return ConstructorKV.endConstructorKV(builder);
+}
 }
 }

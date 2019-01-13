@@ -18,11 +18,12 @@
 
 namespace
 {
-    const std::string c_debugResponse                    = "Hello from ExecutionGraphBackend!";
-    const std::unordered_set<std::string> c_requestTypes = {"general/dummyRequest"};
+    const std::string c_debugResponse                                        = "Hello from ExecutionGraphBackend!";
+    const std::unordered_set<DummyRequestHandler::HandlerKey> c_requestTypes = {"general/dummyRequest"};
 }  // namespace
 
-const std::unordered_set<std::string>& DummyRequestHandler::getRequestTypes() const
+const std::unordered_set<DummyRequestHandler::HandlerKey>&
+DummyRequestHandler::requestTargets() const
 {
     return c_requestTypes;
 }

@@ -44,6 +44,7 @@ namespace executionGraph
                                                    graphDescription.getGraphId().toString().c_str(),
                                                    graphDescription.getGraphId().getShortName().c_str(),
                                                    &sockets,
-                                                   &nodes);
+                                                   &nodes,
+                                                   graphDescription.getDescription().c_str());
     }
 }  // namespace executionGraph

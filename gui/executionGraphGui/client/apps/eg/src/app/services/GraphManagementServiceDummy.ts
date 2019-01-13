@@ -31,7 +31,8 @@ export class GraphManagementServiceDummy extends GraphManagementService {
       id: new Id(),
       typeId: graphTypeId,
       nodes: {},
-      connections: {}
+      connections: {},
+      name: 'MyDummyGraph'
     };
   }
 

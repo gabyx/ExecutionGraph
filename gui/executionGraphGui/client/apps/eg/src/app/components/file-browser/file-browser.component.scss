@@ -1,0 +1,45 @@
+@import 'app/variables';
+
+.title {
+  color: $secondary;
+  font-weight: bold;
+  margin-left: 0.5em;
+}
+
+.back-label {
+  margin-left: 0.5em;
+}
+
+.title-divider {
+  border-top-width: 2pt;
+}
+
+.file {
+  //color: $secondary;
+  font-weight: normal;
+  flex-basis: 60%;
+}
+
+.folder {
+  //color: $secondary;
+  font-weight: bold;
+  flex-basis: 60%;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.prop {
+  flex-basis: 10%;
+}
+
+.folder-icon.notEmpty {
+  color: mat-color($foreground, text);
+}
+
+.folder-icon {
+  color: mat-color($foreground, disabled-text);
+}

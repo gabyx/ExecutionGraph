@@ -106,7 +106,7 @@ export class TestBackend extends ITestBackend {
     // SocketType Description machen
     let socketDescs = [];
     for (let s of this.sockets) {
-      let offName = builder.createString(`[${s}]`);
+      let offName = builder.createString(s);
       let offType = builder.createString(s);
       szInfo.SocketTypeDescription.startSocketTypeDescription(builder);
       szInfo.SocketTypeDescription.addName(builder, offName);

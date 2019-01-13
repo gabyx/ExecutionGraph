@@ -13,7 +13,7 @@
 import { Component, OnInit, Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-
+import { RouterState, Router } from '@angular/router';
 import { Graph } from '../../model';
 import { GraphsState } from '../../+state/reducers';
 import { getGraphs } from '../../+state/selectors';
@@ -25,11 +25,14 @@ import { getGraphs } from '../../+state/selectors';
   styleUrls: ['./toolbar.component.scss']
 })
 export class ToolbarComponent implements OnInit {
-
   public graphsMRU: Observable<Graph[]>;
 
   constructor(private store: Store<GraphsState>) {
-    this.graphsMRU = store.select(getGraphs);
+    this.graphsMRU = this.store.select(getGraphs);
+  }
+
+  public closeGraph() {
+    //@todo to implement -> dispatch close
   }
 
   ngOnInit() {}

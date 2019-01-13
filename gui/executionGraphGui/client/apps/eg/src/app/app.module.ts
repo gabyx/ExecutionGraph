@@ -30,7 +30,10 @@ import {
   MatSnackBarModule,
   MatTabsModule,
   MatListModule,
-  MatSliderModule
+  MatSliderModule,
+  MatProgressSpinnerModule,
+  MAT_DIALOG_DEFAULT_OPTIONS,
+  MatDialogModule
 } from '@angular/material';
 import { NxModule } from '@nrwl/nx';
 import { RouterStateSerializer, StoreRouterConnectingModule } from '@ngrx/router-store';
@@ -42,6 +45,8 @@ import { storeFreeze } from 'ngrx-store-freeze';
 import { VERBOSE_LOG_TOKEN, BINARY_HTTP_ROUTER_BASE_URL } from './tokens';
 
 import { GraphModule } from '@eg/graph';
+import { CommonModule } from '@eg/common';
+
 import { SimpleConsoleLoggerFactory, LoggerFactory } from '@eg/logger';
 
 import { BinaryHttpRouterService } from './services/BinaryHttpRouterService';
@@ -63,6 +68,10 @@ import { GraphManagementService } from './services/GraphManagementService';
 import { GraphManagementServiceBinaryHttp } from './services/GraphManagementServiceBinaryHttp';
 import { GraphManagementServiceDummy } from './services/GraphManagementServiceDummy';
 
+import { FileBrowserService } from './services/FileBrowserService';
+import { FileBrowserServiceDummy } from './services/FileBrowserServiceDummy';
+import { FileBrowserServiceBinaryHttp } from './services/FileBrowserServiceBinaryHttp';
+
 import { TestService } from './services/TestService';
 import { ITestBackend, TestBackend } from './services/TestBackend';
 
@@ -80,6 +89,7 @@ import { effects } from './+state/effects';
 import { environment } from '../environments/environment';
 import { GraphLoadedGuard } from './guards/graphLoaded.guard';
 import { BackendTestComponent } from './components/backend-test/backend-test.component';
+import { FileBrowserComponent } from './components/file-browser/file-browser.component';
 import { AddNodeComponent } from './components/add-node/add-node.component';
 import { SelectionToolComponent } from './components/tools/selection-tool/selection-tool.component';
 import { NavigationToolComponent } from './components/tools/navigation-tool/navigation-tool.component';
@@ -88,19 +98,21 @@ import { ConnectionLayerComponent } from './components/connection-layer/connecti
 import { MoveToolComponent } from './components/tools/move-tool/move-tool.component';
 import { DeleteToolComponent } from './components/tools/delete-tool/delete-tool.component';
 import { TypeToolTipToolComponent } from './components/tools/type-tooltip-tool/type-tooltip-tool.component';
-
-//environment.production = true;
+import { GraphOpenComponent } from './components/graph-open/graph-open.component';
+import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
 
 const routes: Route[] = [
   {
     path: 'graph',
     children: [
-      { path: 'new', component: GraphCreateComponent },
+      { path: 'new', component: GraphCreateComponent, outlet: 'primary' },
+      { path: 'open', component: GraphOpenComponent, outlet: 'primary' },
       {
         path: ':graphId',
         component: WorkspaceComponent,
         canActivate: [GraphLoadedGuard],
-        children: []
+        children: [],
+        outlet: 'primary'
       }
     ]
   },
@@ -108,17 +120,22 @@ const routes: Route[] = [
   { path: 'lines', component: ConnectionStyleOptionsComponent, outlet: 'drawer' },
   { path: 'nodes', component: AddNodeComponent, outlet: 'drawer' },
   { path: 'backend-test', component: BackendTestComponent, outlet: 'drawer' },
+
+  // { path: 'file-browser', component: FileBrowserComponent, outlet: 'bottom-dialog' },
+
   { path: '**', redirectTo: 'graph/new' }
 ];
 
 @NgModule({
   declarations: [
     AppComponent,
+    ConfirmationDialogComponent,
     ToolbarComponent,
     WorkspaceComponent,
     ConnectionStyleOptionsComponent,
     InspectorComponent,
     GraphCreateComponent,
+    FileBrowserComponent,
     BackendTestComponent,
     AddNodeComponent,
     SelectionToolComponent,
@@ -127,8 +144,10 @@ const routes: Route[] = [
     SocketConnectionToolComponent,
     TypeToolTipToolComponent,
     DeleteToolComponent,
-    ConnectionLayerComponent
+    ConnectionLayerComponent,
+    GraphOpenComponent
   ],
+  entryComponents: [ConfirmationDialogComponent],
   imports: [
     HttpClientModule,
     BrowserModule,
@@ -144,12 +163,15 @@ const routes: Route[] = [
     MatIconModule,
     MatListModule,
     MatMenuModule,
+    MatProgressSpinnerModule,
     MatSidenavModule,
     MatSliderModule,
     MatSnackBarModule,
     MatTabsModule,
     MatToolbarModule,
+    MatDialogModule,
     GraphModule,
+    CommonModule,
     NxModule.forRoot(),
     RouterModule.forRoot(routes, { enableTracing: false }),
     StoreRouterConnectingModule.forRoot({}),
@@ -163,6 +185,7 @@ const routes: Route[] = [
   providers: [
     { provide: VERBOSE_LOG_TOKEN, useValue: environment.logReponsesVerbose },
     { provide: BINARY_HTTP_ROUTER_BASE_URL, useValue: environment.backendUrl },
+    { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: false } },
     { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory },
     { provide: ITestBackend, useClass: TestBackend },
     BinaryHttpRouterService,
@@ -184,6 +207,10 @@ const routes: Route[] = [
     {
       provide: GraphManagementService,
       useClass: !environment.useServiceDummys ? GraphManagementServiceBinaryHttp : GraphManagementServiceDummy
+    },
+    {
+      provide: FileBrowserService,
+      useClass: !environment.useServiceDummys ? FileBrowserServiceBinaryHttp : FileBrowserServiceDummy
     },
     { provide: RouterStateSerializer, useClass: RouterStateUrlSerializer }
   ],
