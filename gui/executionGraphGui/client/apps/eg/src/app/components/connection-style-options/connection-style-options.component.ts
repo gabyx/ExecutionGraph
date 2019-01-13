@@ -10,22 +10,16 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import {
-  ConnectionDrawStyle,
-  DirectConnectionDrawStyle,
-  ManhattenConnectionDrawStyle,
-  BezierConnectionDrawStyle
-} from '@eg/graph';
+import { ForceDirectedGraphLayoutStrategy, ILayoutStrategy } from '@eg/graph';
 import { ILogger, LoggerFactory } from '@eg/logger';
 
 import { Graph } from '../../model';
-import { UiState } from '../../+state/reducers/ui.reducers';
+import * as fromGraph from '../../+state/actions/graph.actions';
 import { SetConnectionDrawStyle } from '../../+state/actions/ui.actions';
 import { getConnectionDrawStyleName } from '../../+state/selectors/ui.selectors';
-import { AutoLayoutService } from '../../services/AutoLayoutService';
 import { AppState } from '../../+state/reducers/app.reducers';
 import { getSelectedGraph } from '../../+state/selectors';
 
@@ -43,7 +37,6 @@ export type ConnectionDrawStyleName = 'direct' | 'manhatten' | 'bezier';
   styleUrls: ['./connection-style-options.component.css']
 })
 export class ConnectionStyleOptionsComponent implements OnInit {
-
   drawStyle: Observable<ConnectionDrawStyleName>;
 
   graph: Observable<Graph>;
@@ -64,6 +57,6 @@ export class ConnectionStyleOptionsComponent implements OnInit {
   }
 
   autoLayoutGraph(graph: Graph) {
-    new AutoLayoutService(this.store).layoutGraph(graph, 300)
+    this.store.dispatch(new fromGraph.RunAutoLayout(graph, new ForceDirectedGraphLayoutStrategy()));
   }
 }

@@ -4,15 +4,13 @@ import {
   Graph,
   Node,
   Connection,
-  OutputSocket,
-  InputSocket,
   NodeId,
   ConnectionId,
   GraphTypeDescription,
   NodeTypeDescription,
   Socket
 } from '../../model';
-import { Point } from '@eg/graph';
+import { Point, ILayoutStrategy } from '@eg/graph';
 
 export const LOAD_GRAPHS = '[Graph] Load';
 export const GRAPHS_LOADED = '[Graph] Loaded';
@@ -33,6 +31,8 @@ export const ADD_CONNECTION = '[Graph] Add Connection';
 export const CONNECTION_ADDED = '[Graph] Connection Added';
 export const REMOVE_CONNECTION = '[Graph] Remove Connection';
 export const CONNECTION_REMOVED = '[Graph] Connection Removed';
+
+export const RUN_AUTO_LAYOUT = '[Graph] Run Auto Layout';
 
 export class LoadGraphs implements Action {
   readonly type = LOAD_GRAPHS;
@@ -128,6 +128,13 @@ export class ConnectionRemoved implements Action {
   constructor(public graphId: Id, public connectionId: ConnectionId) {}
 }
 
+// Actions related to AutoLayoutService
+// -------------------------------------------
+export class RunAutoLayout implements Action {
+  readonly type = RUN_AUTO_LAYOUT;
+  constructor(public graph: Graph, public config: ILayoutStrategy) {}
+}
+
 export type GraphAction =
   | LoadGraphs
   | GraphsLoaded
@@ -146,4 +153,5 @@ export type GraphAction =
   | AddConnection
   | ConnectionAdded
   | RemoveConnection
-  | ConnectionRemoved;
+  | ConnectionRemoved
+  | RunAutoLayout;

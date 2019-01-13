@@ -100,6 +100,7 @@ import { DeleteToolComponent } from './components/tools/delete-tool/delete-tool.
 import { TypeToolTipToolComponent } from './components/tools/type-tooltip-tool/type-tooltip-tool.component';
 import { GraphOpenComponent } from './components/graph-open/graph-open.component';
 import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
+import { AutoLayoutService } from './services/AutoLayoutService';
 
 const routes: Route[] = [
   {
@@ -180,7 +181,7 @@ const routes: Route[] = [
       //metaReducers : !environment.production ? [storeFreeze] : []
     }),
     EffectsModule.forRoot(effects),
-    environment.production ? [] : StoreDevtoolsModule.instrument({serialize: false})
+    environment.production ? [] : StoreDevtoolsModule.instrument({ serialize: false })
   ],
   providers: [
     { provide: VERBOSE_LOG_TOKEN, useValue: environment.logReponsesVerbose },
@@ -212,6 +213,7 @@ const routes: Route[] = [
       provide: FileBrowserService,
       useClass: !environment.useServiceDummys ? FileBrowserServiceBinaryHttp : FileBrowserServiceDummy
     },
+    { provide: AutoLayoutService, useClass: AutoLayoutService },
     { provide: RouterStateSerializer, useClass: RouterStateUrlSerializer }
   ],
   bootstrap: [AppComponent]

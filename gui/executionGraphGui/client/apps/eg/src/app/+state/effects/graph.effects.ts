@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 
-import { of, from, Observable, merge as mergeObservables } from 'rxjs';
+import { of, from, Observable, merge as mergeObservables, throwError } from 'rxjs';
 import { map, tap, catchError, filter, withLatestFrom, mergeMap } from 'rxjs/operators';
 
 import { Id } from '@eg/common';
@@ -13,11 +13,12 @@ import { LoggerFactory, ILogger } from '@eg/logger';
 import * as fromGraph from '../actions/graph.actions';
 import * as fromNotifications from '../actions/notification.actions';
 
-import { Connection, Node } from '../../model';
+import { Node } from '../../model';
 import { GeneralInfoService, GraphManipulationService, GraphManagementService } from '../../services';
 import { GraphsState } from '../reducers';
 import { RouterStateUrl } from '../reducers/app.reducers';
 import { arraysEqual, isDefined } from '@eg/common';
+import { AutoLayoutService } from '../../services/AutoLayoutService';
 
 @Injectable()
 export class GraphEffects {
@@ -30,6 +31,7 @@ export class GraphEffects {
     private readonly generalInfoService: GeneralInfoService,
     private readonly graphManipulationService: GraphManipulationService,
     private readonly graphManagementService: GraphManagementService,
+    private readonly autoLayoutService: AutoLayoutService,
     loggerFactory: LoggerFactory
   ) {
     this.log = loggerFactory.create('AppEffects');
@@ -37,7 +39,7 @@ export class GraphEffects {
 
   @Effect()
   loadGraphs$ = this.actions$.ofType<fromGraph.LoadGraphs>(fromGraph.LOAD_GRAPHS).pipe(
-    mergeMap((action, state) => this.createDummyGraph()),
+    mergeMap((action, state) => this.createScrambledGraph()),
     catchError(error => {
       this.log.error(`Failed to load graphs`, error);
       return of(new fromGraph.GraphLoadError(error));
@@ -95,7 +97,7 @@ export class GraphEffects {
     ),
     mergeMap(action => [
       new fromGraph.NodeRemoved(action.graphId, action.nodeId),
-      new fromNotifications.ShowNotification(`Removed the node for you \u{1F6EB}`)
+      new fromNotifications.ShowNotification(`Removed the node for you 👾`)
     ])
   );
 
@@ -113,6 +115,20 @@ export class GraphEffects {
       this.store.dispatch(new fromNotifications.ShowNotification(`Adding connection failed!: ${error}`, 5000));
       return caught;
     })
+  );
+
+  @Effect()
+  layoutGraph$ = this.actions$.ofType<fromGraph.RunAutoLayout>(fromGraph.RUN_AUTO_LAYOUT).pipe(
+    mergeMap(action => from(this.autoLayoutService.layoutGraph(action.graph, action.config))),
+    catchError((error, caught) => {
+      this.store.dispatch(
+        new fromNotifications.ShowNotification(
+          'Ups, auto-layouting algorithm crashed. Sorry for the remaining noddle soup. 💣'
+        )
+      );
+      return caught;
+    }),
+    map(() => new fromNotifications.ShowNotification('Did tidy up the noddle soup only for you. 🍝'))
   );
 
   private async createDummyGraph(): Promise<fromGraph.GraphsLoaded> {
@@ -135,7 +151,48 @@ export class GraphEffects {
       nodes[node.id.toString()] = node;
 
       if (lastNode && isDefined(node.inputs[0])) {
-        const connection = Connection.create(lastNode.outputs[0], node.inputs[0]);
+        const connection = await this.graphManipulationService.addConnection(
+          graph.id,
+          lastNode.outputs[0],
+          node.inputs[0],
+          false
+        );
+        connections[connection.idString] = connection;
+      }
+      lastNode = node;
+    }
+
+    graph = { ...graph, nodes: nodes, connections: connections, name: 'MyDummyGraph' };
+
+    return new fromGraph.GraphsLoaded([graph]);
+  }
+
+  private async createScrambledGraph(): Promise<fromGraph.GraphsLoaded> {
+    // Get Graph Infos
+    const graphDescs = await this.generalInfoService.getAllGraphTypeDescriptions();
+    const graphDesc = graphDescs[0];
+    const graphTypeId = graphDesc.id;
+    const nodeType = graphDesc.nodeTypeDescriptions[0].type;
+
+    // Add a graph
+    let graph = await this.graphManagementService.addGraph(graphTypeId);
+    const nodes = {};
+    // Add nodes
+    let lastNode: Node = null;
+    const connections = {};
+    for (let i = 0; i < 3; ++i) {
+      const node = await this.graphManipulationService.addNode(graph.id, nodeType, `Node ${i}`);
+      node.uiProps.position.x = 200 * i;
+      node.uiProps.position.y = 50 + 100 * i;
+      nodes[node.id.toString()] = node;
+
+      if (lastNode && isDefined(node.inputs[0])) {
+        const connection = await this.graphManipulationService.addConnection(
+          graph.id,
+          lastNode.outputs[0],
+          node.inputs[0],
+          false
+        );
         connections[connection.idString] = connection;
       }
       lastNode = node;
