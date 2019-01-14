@@ -19,7 +19,10 @@ export enum LayoutStrategys {
 
 export abstract class ILayoutStrategy {
   public readonly strategy: LayoutStrategys;
-  // @todo This function is ok to be here (imho), but would be nice to
-  // find a solution with the DI system of angular.
+
+  //! Injecting ourself into the engine such that
+  //! the user does need to know how to instanciate the engine.
+  //! @todo This function is ok to be here (imho), but would be nice to
+  //! find a solution with the DI system of angular.
   public abstract createEngine(loggerFactory: LoggerFactory): ILayoutEngine;
 }

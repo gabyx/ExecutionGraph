@@ -15,7 +15,7 @@ import { LoggerFactory, ILogger } from '@eg/logger/src';
 import { Injectable } from '@angular/core';
 import { LayoutStrategys, ILayoutStrategy } from './ILayoutStrategy';
 import { NodeId } from 'apps/eg/src/app/model';
-
+import { from, Observable, Observer } from 'rxjs';
 type Force = Point;
 
 abstract class ForceLaw {
@@ -30,7 +30,7 @@ class SpringDamper extends ForceLaw {
 }
 
 class Body {
-  constructor(public id: NodeId, public position: Position) {}
+  constructor(public readonly id: NodeId, public position: Position) {}
   public mass: number = 1.0;
   public velocity = Point.one.copy();
   public oldPosition = Point.one.copy();
@@ -51,12 +51,13 @@ export class MassSpringLayoutStrategy extends ILayoutStrategy {
 
   massRange: [number, number] = [1, 10];
   timeStep: number = 0.1;
+  maxTimeStep: number = 100;
 
   convergeRelTol: number = 1e-3;
   convergeAbsTol: number = 1e-3;
 
   public createEngine(loggerFactory: LoggerFactory): ILayoutEngine {
-    return new MassSpringLayoutEngine(loggerFactory);
+    return new MassSpringLayoutEngine(this, loggerFactory);
   }
 }
 
@@ -68,7 +69,7 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
   private links: Link[];
   private forceLaws: ForceLaw[];
 
-  constructor(private readonly loggerFactory: LoggerFactory) {
+  constructor(private readonly config: MassSpringLayoutStrategy, private readonly loggerFactory: LoggerFactory) {
     super();
     this.logger = loggerFactory.create('MassSpringLayoutEngine');
   }
@@ -77,8 +78,43 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
     return s === MassSpringLayoutStrategy.strategy_;
   }
 
-  async run(config: MassSpringLayoutStrategy, converter: GraphConverter): Promise<EngineOutput> {
-    this.logger.debug('Layout graph ...');
+  public run(converter: GraphConverter): Observable<EngineOutput> {
+    return from(this.setup(converter)).pipe();
+  }
+
+  private runAsync(): Observable<EngineOutput> {
+    let t = 0;
+    let converged = false;
+
+    const output = Array<EngineOutput>(this.bodies.size);
+    // we use the same output instance for every emitted value
+    // that should not be a problem!
+    // if this state changes during the visualization (subscription)
+    // we have incoherent times among the bodies which acceptable :-)
+    return Observable.create((observer: Observer<EngineOutput>) => {
+      while (t < this.config.maxTimeStep && !converged) {
+        const output: EngineOutput = [];
+
+        // move the bodies
+        this.bodies.forEach(body => body.position.add(Point.one.copy().scale(300)));
+
+        // update state
+        this.bodies.forEach(body => output.push({ pos: body.position, id: body.id }));
+
+        t += this.config.timeStep;
+      }
+    });
+  }
+
+  private doTimeStep(timeStep: number): Observable<EngineOutput> {
+    // move the bodies
+    this.bodies.forEach(body => body.position.add(Point.one.copy().scale(300)));
+    // update state
+    this.bodies.forEach(body => output.push({ pos: body.position, id: body.id }));
+  }
+
+  private async setup(converter: GraphConverter): Promise<void> {
+    this.logger.debug('Layout graph: setup ...');
     // Convert the graph to our internal structure (this is neat dispatching :-)
     const res = await converter(
       (id: NodeId, pos: Point) => new Body(id, pos),
@@ -89,12 +125,6 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
 
     // Setup force laws.
     this.forceLaws = await this.setupForceLaws();
-
-    // dummy output, add one!
-    const output: EngineOutput = [];
-    this.bodies.forEach(body => output.push({ id: body.id, pos: body.position.add(Point.one.copy().scale(300)) }));
-
-    return output;
   }
 
   async setupForceLaws(): Promise<ForceLaw[]> {

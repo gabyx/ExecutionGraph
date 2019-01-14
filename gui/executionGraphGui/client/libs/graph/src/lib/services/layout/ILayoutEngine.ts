@@ -26,13 +26,5 @@ export interface GraphConverter {
 }
 
 export abstract class ILayoutEngine {
-  public async dispatchRun(config: ILayoutStrategy, converter: GraphConverter): Promise<EngineOutput> {
-    if (this.isStrategyValid(config.strategy)) {
-      return this.run(config, converter);
-    }
-    throw `Wrong strategy '${config.strategy}' for engine!`;
-  }
-
-  public abstract run(config: ILayoutStrategy, converter: GraphConverter): Promise<EngineOutput>;
-  public abstract isStrategyValid(strategy: LayoutStrategys): boolean;
+  public abstract run(converter: GraphConverter): Promise<EngineOutput>;
 }

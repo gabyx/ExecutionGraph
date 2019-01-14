@@ -62,7 +62,7 @@ export class AutoLayoutService {
     // Create the engine (by the strategy) ->
     // run it and dispatch the results in the store.
     this.engineCreator(config)
-      .dispatchRun(config, converter)
+      .dispatchRun(converter)
       .catch((e: any) => {
         this.logger.error(`Error: '${e}'`);
         throw e;

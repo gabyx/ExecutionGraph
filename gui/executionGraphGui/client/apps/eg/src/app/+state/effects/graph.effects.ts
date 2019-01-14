@@ -129,7 +129,7 @@ export class GraphEffects {
       );
       return caught;
     }),
-    map(() => new fromNotifications.ShowNotification('Did tidy up the noddle soup only for you. 🍝'))
+    map(() => new fromNotifications.ShowNotification('Tidied up the noddle soup only for you. 🍝'))
   );
 
   private async createDummyGraph(): Promise<fromGraph.GraphsLoaded> {
