@@ -132,7 +132,7 @@ export class ConnectionRemoved implements Action {
 // -------------------------------------------
 export class RunAutoLayout implements Action {
   readonly type = RUN_AUTO_LAYOUT;
-  constructor(public graph: Graph, public config: ILayoutStrategy) {}
+  constructor(public graph: Graph, public config?: ILayoutStrategy) {}
 }
 
 export type GraphAction =

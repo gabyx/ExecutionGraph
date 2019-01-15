@@ -15,9 +15,9 @@ import { LoggerFactory, ILogger } from '@eg/logger/src';
 import { Injectable } from '@angular/core';
 import { LayoutStrategys, ILayoutStrategy } from './ILayoutStrategy';
 import { NodeId } from 'apps/eg/src/app/model';
-import { from, Observable, Observer, generate } from 'rxjs';
-import { ENGINE_METHOD_ALL } from 'constants';
-import { map, switchMap } from 'rxjs/operators';
+import { from, Observable, Observer, generate, throwError, asyncScheduler } from 'rxjs';
+import { map, switchMap, catchError } from 'rxjs/operators';
+
 type Force = Point;
 
 abstract class ForceLaw {
@@ -53,10 +53,9 @@ export class MassSpringLayoutStrategy extends ILayoutStrategy {
 
   massRange: [number, number] = [1, 10];
 
-  timeStep: number = 0.1;
   endTime: number = 2;
 
-  maxSteps: 100;
+  maxSteps: number = 500;
 
   convergeRelTol: number = 1e-3;
   convergeAbsTol: number = 1e-3;
@@ -88,7 +87,9 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
   }
 
   private runAsync(): Observable<EngineOutput> {
-    const output: EngineOutput = Array.from({ length: this.bodies.size }, () => createOutputState());
+    const output: EngineOutput = new Array();
+    this.bodies.forEach(body => output.push({ pos: body.position, id: body.id }));
+
     const deltaT = this.config.endTime / this.config.maxSteps;
 
     type State = { step: number; converged: boolean; time: number };
@@ -104,8 +105,16 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
         return s.time < this.config.endTime && !s.converged;
       },
       (s: State) => {
+        ++s.step;
+
+        if (s.step % (this.config.maxSteps / 10) == 0) {
+          this.logger.debug(`Computed ${(s.step / this.config.maxSteps) * 100} %`);
+        }
+
         // move the bodies
-        this.bodies.forEach(body => body.position.add(Point.zero.copy().scale(20)));
+        this.bodies.forEach(body => {
+          body.position.add(Point.one.copy().scale(1));
+        });
 
         // update state
         let i = 0;
@@ -114,12 +123,17 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
           output[i++].id = body.id;
         });
 
-        this.logger.debug(output[0].pos);
-
         s.time += deltaT;
         return s;
-      }
-    ).pipe(map(() => output));
+      },
+      asyncScheduler
+    ).pipe(
+      map(() => output),
+      catchError(err => {
+        this.logger.error(`${err}`);
+        return throwError(err);
+      })
+    );
   }
 
   private async setup(converter: GraphConverter): Promise<void> {

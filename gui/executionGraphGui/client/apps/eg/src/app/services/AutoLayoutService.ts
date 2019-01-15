@@ -16,6 +16,7 @@ import { Store } from '@ngrx/store';
 import { LoggerFactory, ILogger } from '@eg/logger/src';
 import { MoveNode } from '../+state/actions';
 import { map, catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 /**
  * This function represents the body-link-type agnostic converter
@@ -47,8 +48,10 @@ export class AutoLayoutService {
     this.engineCreator = (config: ILayoutStrategy) => config.createEngine(loggerFactory);
   }
 
-  public async layoutGraph(graph: Graph, config: ILayoutStrategy = new MassSpringLayoutStrategy()): Promise<void> {
+  public async layoutGraph(graph: Graph, config?: ILayoutStrategy): Promise<void> {
     this.logger.debug('Layouting graph...');
+
+    config = config ? config : new MassSpringLayoutStrategy();
 
     // A copy of all positions
     const positionMap = new Map<NodeId, Point>();
@@ -66,13 +69,12 @@ export class AutoLayoutService {
       .run(converter)
       .pipe(
         map((out: EngineOutput) => {
-          out.forEach(res => this.store.dispatch(new MoveNode(graph.nodes[res.id.toString()], res.pos)));
+          out.forEach(res => {
+            //this.logger.debug(`Update node position ... ${res.pos.x}, ${res.pos.y}`);
+            this.store.dispatch(new MoveNode(graph.nodes[res.id.toString()], res.pos));
+          });
         }),
-        map(() => undefined),
-        catchError((err, catched) => {
-          this.logger.error(`Error: '${err}'`);
-          return catched;
-        })
+        map(() => undefined)
       )
       .toPromise();
   }
