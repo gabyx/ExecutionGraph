@@ -55,7 +55,7 @@ export class GraphComponent {
 
   public zoomFactor: number = 1;
 
-  public pan: Position = Point.one.copy();
+  public pan: Position = Point.zero.copy();
 
   constructor(private element: ElementRef, private cdr: ChangeDetectorRef) {}
 
@@ -90,7 +90,7 @@ export class GraphComponent {
       position.y += element.offsetHeight / 2;
       return position;
     }
-    return Point.one.copy();
+    return Point.zero.copy();
   }
 
   /**
@@ -106,7 +106,7 @@ export class GraphComponent {
 
   public convertMouseToGraphPosition(mousePoint: Point, offset?: Point): Point {
     const graphPosition = this.getGraphPosition();
-    offset = offset ? offset : Point.one;
+    offset = offset ? offset : Point.zero;
     return new Point(
       (mousePoint.x - graphPosition.x - offset.x) / this.zoomFactor - this.pan.x,
       (mousePoint.y - graphPosition.y - offset.y) / this.zoomFactor - this.pan.y

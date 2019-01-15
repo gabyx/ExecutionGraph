@@ -77,7 +77,7 @@ export class GraphEffects {
     ),
     mergeMap(({ node, action }) => [
       new fromGraph.NodeAdded(action.graphId, node),
-      new fromGraph.MoveNode(node, action.position ? action.position : Point.one.copy()),
+      new fromGraph.MoveNode(node, action.position ? action.position : Point.zero.copy()),
       new fromNotifications.ShowNotification(`Added the node '${node.name}' for you 👾`)
     ])
   );

@@ -15,6 +15,7 @@ import { AppState } from '../+state/reducers/app.reducers';
 import { Store } from '@ngrx/store';
 import { LoggerFactory, ILogger } from '@eg/logger/src';
 import { MoveNode } from '../+state/actions';
+import { map, catchError } from 'rxjs/operators';
 
 /**
  * This function represents the body-link-type agnostic converter
@@ -61,14 +62,18 @@ export class AutoLayoutService {
 
     // Create the engine (by the strategy) ->
     // run it and dispatch the results in the store.
-    this.engineCreator(config)
-      .dispatchRun(converter)
-      .catch((e: any) => {
-        this.logger.error(`Error: '${e}'`);
-        throw e;
-      })
-      .then((out: EngineOutput) => {
-        out.forEach(res => this.store.dispatch(new MoveNode(graph.nodes[res.id.toString()], res.pos)));
-      });
+    return this.engineCreator(config)
+      .run(converter)
+      .pipe(
+        map((out: EngineOutput) => {
+          out.forEach(res => this.store.dispatch(new MoveNode(graph.nodes[res.id.toString()], res.pos)));
+        }),
+        map(() => undefined),
+        catchError((err, catched) => {
+          this.logger.error(`Error: '${err}'`);
+          return catched;
+        })
+      )
+      .toPromise();
   }
 }

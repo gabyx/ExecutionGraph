@@ -21,7 +21,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
 
   public tempTargetSocket: InputSocket | OutputSocket = null;
   public tempConnection: Connection = null;
-  public tempConnectionEndpoint = Point.one.copy();
+  public tempConnectionEndpoint = Point.zero.copy();
 
   public invalidity = Connection.Invalidity.Valid;
   public get invalidityMessages() {

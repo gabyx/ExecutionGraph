@@ -10,12 +10,14 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 import { Point, Position } from '../../model/Point';
-import { ILayoutEngine, GraphConverter, EngineOutput } from './ILayoutEngine';
+import { ILayoutEngine, GraphConverter, EngineOutput, EngineOutputState, createOutputState } from './ILayoutEngine';
 import { LoggerFactory, ILogger } from '@eg/logger/src';
 import { Injectable } from '@angular/core';
 import { LayoutStrategys, ILayoutStrategy } from './ILayoutStrategy';
 import { NodeId } from 'apps/eg/src/app/model';
-import { from, Observable, Observer } from 'rxjs';
+import { from, Observable, Observer, generate } from 'rxjs';
+import { ENGINE_METHOD_ALL } from 'constants';
+import { map, switchMap } from 'rxjs/operators';
 type Force = Point;
 
 abstract class ForceLaw {
@@ -32,8 +34,8 @@ class SpringDamper extends ForceLaw {
 class Body {
   constructor(public readonly id: NodeId, public position: Position) {}
   public mass: number = 1.0;
-  public velocity = Point.one.copy();
-  public oldPosition = Point.one.copy();
+  public velocity = Point.zero.copy();
+  public oldPosition = Point.zero.copy();
   public geometry: string;
   public forceLaws: ForceLaw[] = [];
 }
@@ -50,8 +52,11 @@ export class MassSpringLayoutStrategy extends ILayoutStrategy {
   public readonly strategy = MassSpringLayoutStrategy.strategy_;
 
   massRange: [number, number] = [1, 10];
+
   timeStep: number = 0.1;
-  maxTimeStep: number = 100;
+  endTime: number = 2;
+
+  maxSteps: 100;
 
   convergeRelTol: number = 1e-3;
   convergeAbsTol: number = 1e-3;
@@ -79,38 +84,42 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
   }
 
   public run(converter: GraphConverter): Observable<EngineOutput> {
-    return from(this.setup(converter)).pipe();
+    return from(this.setup(converter)).pipe(switchMap(() => this.runAsync()));
   }
 
   private runAsync(): Observable<EngineOutput> {
-    let t = 0;
-    let converged = false;
+    const output: EngineOutput = Array.from({ length: this.bodies.size }, () => createOutputState());
+    const deltaT = this.config.endTime / this.config.maxSteps;
 
-    const output = Array<EngineOutput>(this.bodies.size);
+    type State = { step: number; converged: boolean; time: number };
+    const currState = { step: 0, converged: false, time: 0 };
+
     // we use the same output instance for every emitted value
     // that should not be a problem!
     // if this state changes during the visualization (subscription)
     // we have incoherent times among the bodies which acceptable :-)
-    return Observable.create((observer: Observer<EngineOutput>) => {
-      while (t < this.config.maxTimeStep && !converged) {
-        const output: EngineOutput = [];
-
+    return generate(
+      currState,
+      (s: State) => {
+        return s.time < this.config.endTime && !s.converged;
+      },
+      (s: State) => {
         // move the bodies
-        this.bodies.forEach(body => body.position.add(Point.one.copy().scale(300)));
+        this.bodies.forEach(body => body.position.add(Point.zero.copy().scale(20)));
 
         // update state
-        this.bodies.forEach(body => output.push({ pos: body.position, id: body.id }));
+        let i = 0;
+        this.bodies.forEach((body, id) => {
+          output[i].pos = body.position;
+          output[i++].id = body.id;
+        });
 
-        t += this.config.timeStep;
+        this.logger.debug(output[0].pos);
+
+        s.time += deltaT;
+        return s;
       }
-    });
-  }
-
-  private doTimeStep(timeStep: number): Observable<EngineOutput> {
-    // move the bodies
-    this.bodies.forEach(body => body.position.add(Point.one.copy().scale(300)));
-    // update state
-    this.bodies.forEach(body => output.push({ pos: body.position, id: body.id }));
+    ).pipe(map(() => output));
   }
 
   private async setup(converter: GraphConverter): Promise<void> {
@@ -125,6 +134,7 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
 
     // Setup force laws.
     this.forceLaws = await this.setupForceLaws();
+    this.logger.debug('Layout graph: setup finished ...');
   }
 
   async setupForceLaws(): Promise<ForceLaw[]> {

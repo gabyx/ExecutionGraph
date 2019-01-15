@@ -13,7 +13,7 @@ export class NavigationToolComponent extends ToolComponent implements OnInit {
   }
 
   ngOnInit() {
-    const panStart: Point = Point.one.copy();
+    const panStart: Point = Point.zero.copy();
     this.graphEvents.onDragStart.subscribe(e => {
       if (e.button === MouseButton.Right) {
         const mousePosition = this.graph.convertMouseToGraphPosition(e.mousePosition);

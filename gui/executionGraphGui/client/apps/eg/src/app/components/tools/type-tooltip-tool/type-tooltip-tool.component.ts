@@ -19,7 +19,7 @@ export class TypeToolTipToolComponent extends ToolComponent implements OnInit, O
   private readonly logger: ILogger;
   private sub: Subscription;
   private toolTipMessages: string[] = [];
-  private toolTipPosition = Point.one.copy();
+  private toolTipPosition = Point.zero.copy();
 
   constructor(private graph: GraphComponent, private store: Store<GraphsState>, loggerFactory: LoggerFactory) {
     super();
@@ -43,7 +43,7 @@ export class TypeToolTipToolComponent extends ToolComponent implements OnInit, O
         switchMap(() => merge(leaveEvents, this.enabled.pipe(filter(e => !e)))),
         tap(() => {
           this.toolTipMessages = null;
-          this.toolTipPosition = Point.one.copy();
+          this.toolTipPosition = Point.zero.copy();
         })
       )
       .subscribe();
