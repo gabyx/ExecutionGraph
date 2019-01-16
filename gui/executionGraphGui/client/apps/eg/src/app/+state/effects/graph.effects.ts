@@ -183,7 +183,7 @@ export class GraphEffects {
     const graphDescs = await this.generalInfoService.getAllGraphTypeDescriptions();
     const graphDesc = graphDescs[0];
     const graphTypeId = graphDesc.id;
-    const nodeType = graphDesc.nodeTypeDescriptions[0].type;
+    const nodeType = graphDesc.nodeTypeDescriptions[3].type;
 
     // Add a graph
     let graph = await this.graphManagementService.addGraph(graphTypeId);

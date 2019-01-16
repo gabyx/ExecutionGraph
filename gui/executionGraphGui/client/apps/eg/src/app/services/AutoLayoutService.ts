@@ -28,14 +28,20 @@ async function convertGraph<Body, Link>(
   createBody: (id: NodeId, pos: Point, opaqueData: any) => Body,
   createLink: (b1: Body, b2: Body) => Link
 ): Promise<EngineInput<Body, Link>> {
-  const bodies = new Map<NodeId, Body>();
+  const bodies: Body[] = [];
+
+  const bodyMap = new Map<NodeId, Body>();
 
   // create bodies
-  positionMap.forEach((pos, id) => bodies.set(id, createBody(id, pos, graph.nodes[id.toString()])));
+  positionMap.forEach((pos, id) => {
+    const b = createBody(id, pos, graph.nodes[id.toString()]);
+    bodyMap.set(id, b);
+    bodies.push(b);
+  });
 
   // create links
   const links: Link[] = Object.values(graph.connections).map(connection =>
-    createLink(bodies.get(connection.inputSocket.parent.id), bodies.get(connection.outputSocket.parent.id))
+    createLink(bodyMap.get(connection.inputSocket.parent.id), bodyMap.get(connection.outputSocket.parent.id))
   );
 
   return { bodies: bodies, links: links };
@@ -78,7 +84,11 @@ export class AutoLayoutService {
           });
           this.store.dispatch(new MoveNodes(s));
         }),
-        map(() => undefined)
+        map(() => undefined),
+        catchError((e, catched) => {
+          this.logger.error(`Error: ${e}`);
+          return throwError(e);
+        })
       )
       .toPromise();
   }

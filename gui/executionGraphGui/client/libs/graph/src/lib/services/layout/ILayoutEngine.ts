@@ -16,7 +16,7 @@ import { posix } from 'path';
 
 export type BodyMap<Body> = Map<NodeId, Body>;
 
-export type EngineInput<Body, Link> = { bodies: BodyMap<Body>; links: Link[] };
+export type EngineInput<Body, Link> = { bodies: Body[]; links: Link[] };
 
 export type EngineOutputState = { pos: Position; id: NodeId; opaqueData: any };
 export type EngineOutput = EngineOutputState[];

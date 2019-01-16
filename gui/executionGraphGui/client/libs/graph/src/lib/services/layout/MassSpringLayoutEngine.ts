@@ -9,30 +9,43 @@
 //  License, v. 2.0. If a copy of the MPL was not distributed with this
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
-import { Point, Position, Vector2 } from '../../model/Point';
+import { Point, Position } from '../../model/Point';
 import { ILayoutEngine, GraphConverter, EngineOutput } from './ILayoutEngine';
 import { LoggerFactory, ILogger } from '@eg/logger/src';
 import { Injectable } from '@angular/core';
 import { LayoutStrategys, ILayoutStrategy } from './ILayoutStrategy';
 import { NodeId } from 'apps/eg/src/app/model';
 import { Observable, generate, throwError, asyncScheduler, of } from 'rxjs';
-import { map, switchMap, catchError, tap, finalize } from 'rxjs/operators';
+import { map, switchMap, catchError, tap, finalize, takeWhile } from 'rxjs/operators';
+import { Vector2 } from '@eg/common/src';
 
 type Force = Vector2;
 
-abstract class ForceLaw {
-  protected force: Force = Point.zero.copy();
-  protected temp: Force = Point.zero.copy();
+abstract class ForceLawInteraction {
+  protected force: Force = Vector2.zero.copy();
+  protected temp: Force = Vector2.zero.copy();
 
   public abstract accumulateForce(b1: Body, b2: Body): void;
 
   protected addToBody(b1: Body, b2: Body) {
     b1.extForce.add(this.force);
-    b2.extForce.add(this.force);
+    b2.extForce.add(this.force.negate());
   }
 }
 
-class SpringDamper extends ForceLaw {
+abstract class ForceLawExternal {
+  protected force: Force = Vector2.zero.copy();
+
+  public abstract accumulateForce(b1: Body): void;
+
+  protected addToBody(b1: Body) {
+    b1.extForce.add(this.force);
+  }
+}
+
+class SpringDamperInteraction extends ForceLawInteraction {
+  private sign = Vector2.one.copy();
+
   constructor(
     public readonly springConst: Vector2,
     public readonly damperConst: number,
@@ -43,13 +56,21 @@ class SpringDamper extends ForceLaw {
   public accumulateForce(b1: Body, b2: Body) {
     this.force.reset();
     // 2 Spring Forces: in X and Y seperate (for simplicity)
-    Point.difference(b2.position, b1.position, this.temp); // signed gapDistance
-    this.temp.subtract(this.relaxedLength); // gapDistance - relaxedLength
-    this.temp.multiply(this.springConst); // FSpring = [cx 0; 0 cy] * (gapDistance - relaxedLength)
+    Vector2.difference(b2.position, b1.position, this.temp); // signed gapDistance
+    this.sign.x = Math.sign(this.temp.x);
+    this.sign.y = Math.sign(this.temp.y);
+
+    this.temp
+      .abs()
+      .subtract(this.relaxedLength)
+      .multiply(this.springConst)
+      .multiply(this.sign);
+    // FSpring_x = cx * gapDistance.x/|gapDistance.x| * (|gapDistance.x| - relaxedLength.x)
+
     this.force.add(this.temp);
 
     // 2 Damper Forces: in X and Y seperate (for simplicity)
-    Point.difference(b2.velocity, b1.velocity, this.temp); // relative velocity
+    Vector2.difference(b2.velocity, b1.velocity, this.temp); // relative velocity
     this.temp.scale(this.damperConst); // FDamper = damperConst * (relative velocity)
     this.force.add(this.temp);
 
@@ -80,7 +101,7 @@ class SpringDamper extends ForceLaw {
  * @class PenetrationForce
  * @extends {ForceLaw}
  */
-class PenetrationForce extends ForceLaw {
+class PenetrationForceInteraction extends ForceLawInteraction {
   private gapDistance: number = 0;
   constructor(public readonly exponent: number) {
     super();
@@ -88,7 +109,7 @@ class PenetrationForce extends ForceLaw {
   public accumulateForce(b1: Body, b2: Body) {
     this.force.reset();
 
-    this.gapDistance = Point.difference(b2.position, b1.position, this.temp).length(); // gapDistance
+    this.gapDistance = Vector2.difference(b2.position, b1.position, this.temp).length(); // gapDistance
     this.temp.normalize().scale(1 / Math.log(Math.pow(this.gapDistance + 1, this.exponent)));
     this.force.add(this.temp);
 
@@ -96,20 +117,59 @@ class PenetrationForce extends ForceLaw {
   }
 }
 
-class Body {
-  constructor(public readonly id: NodeId, public position: Position, public readonly opaqueData: any) {}
-  public mass: number = 1.0;
-  public velocity = Point.zero.copy();
-  public oldPosition = Point.zero.copy();
-  public geometry: string;
+type ForceInteraction = { b1: Body; b2: Body; forceLaw: ForceLawInteraction };
+type ExtForce = { b: Body; forceLaw: ForceLawExternal };
 
-  public extForce: Force; // External force from all ForceLaws
-  public forceLaws: ForceLaw[] = [];
+class Body {
+  constructor(public readonly id: NodeId, position: Position, public readonly opaqueData: any) {
+    this.position = position;
+    this.positionEnd = position.copy();
+  }
+  public massInv: number = 1.0 / 1.0;
+
+  public position: Position;
+  public positionEnd: Position;
+
+  public velocity = Vector2.zero.copy();
+  public velocityEnd = Vector2.zero.copy();
+
+  public extForce: Force = Vector2.zero.copy(); // External force from all ForceLaws
+
+  public async integrateToMidPoint(deltaT: number): Promise<void> {
+    Vector2.scale(this.velocity, 0.5 * deltaT, this.temp);
+    this.position.add(this.temp);
+  }
+
+  public async computeEndVelocity(deltaT: number): Promise<void> {
+    Vector2.scale(this.extForce, deltaT * this.massInv, this.velocityEnd).add(this.velocity);
+  }
+
+  public async integrateToEndPoint(deltaT: number): Promise<void> {
+    Vector2.sum(this.velocityEnd, this.velocity, this.positionEnd)
+      .scale(0.5 * deltaT)
+      .add(this.position);
+  }
+
+  public resetForNextIteration() {
+    [this.position, this.positionEnd] = [this.positionEnd, this.position]; // Swap Positions;
+    [this.velocity, this.velocityEnd] = [this.velocityEnd, this.velocity]; // Swap Positions;
+    this.extForce.reset();
+  }
+
+  public async hasPositionConverged(relTol: number, absTol: number): Promise<boolean> {
+    Vector2.difference(this.positionEnd, this.position, this.temp).abs();
+    // Check convergence in both direction instead of taking the norm... (to expensive...)
+    return (
+      this.temp.x <= relTol * Math.abs(this.position.x) + absTol &&
+      this.temp.y <= relTol * Math.abs(this.position.y) + absTol
+    );
+  }
+
+  private temp: Position = Vector2.zero.copy();
 }
 
 class Link {
   constructor(public readonly b1: Body, public readonly b2: Body) {}
-  public forceLaws: ForceLaw[] = [];
 }
 
 type BodyMap = Map<NodeId, Body>;
@@ -120,15 +180,15 @@ export class MassSpringLayoutStrategy extends ILayoutStrategy {
 
   public readonly massRange: [number, number] = [1, 10];
 
-  public readonly endTime: number = 2;
+  public readonly endTime: number = 10;
+  public readonly maxSteps: number = 300;
 
-  public readonly maxSteps: number = 500;
+  public readonly convergeRelTol: number = 1e-4;
+  public readonly convergeAbsTol: number = 1e-4;
 
-  public readonly convergeRelTol: number = 1e-3;
-  public readonly convergeAbsTol: number = 1e-3;
-
-  public readonly springConst: Vector2 = Point.one.copy().scale(20);
-  public readonly damperConst: Vector2 = Point.one.copy().scale(2);
+  public readonly springConst = new Vector2([10, 5]);
+  public readonly damperConst = 2;
+  public readonly relaxedLength = new Vector2([300, 50]);
 
   public readonly penetractionForceExponent = 40;
 
@@ -137,21 +197,25 @@ export class MassSpringLayoutStrategy extends ILayoutStrategy {
   }
 
   public createLinkForce() {
-    return new SpringDamper(Point.one.copy().scale(2), 2, Point.one.copy().scale(300));
+    return new SpringDamperInteraction(this.springConst, this.damperConst, this.relaxedLength);
   }
 
-  public createPenetrationForce() {
-    return new PenetrationForce(this.penetractionForceExponent);
+  public createContactForce() {
+    return new PenetrationForceInteraction(this.penetractionForceExponent);
   }
 }
+
+type State = { step: number; converged: boolean; time: number };
 
 @Injectable()
 export class MassSpringLayoutEngine extends ILayoutEngine {
   private readonly logger: ILogger;
 
-  private bodies: BodyMap;
+  private bodies: Body[];
   private links: Link[];
-  private forceLaws: ForceLaw[];
+
+  private extForceInteraction: ForceInteraction[];
+  private extForce: ExtForce[];
 
   constructor(private readonly config: MassSpringLayoutStrategy, private readonly loggerFactory: LoggerFactory) {
     super();
@@ -163,9 +227,10 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
   }
 
   public run(converter: GraphConverter): Observable<EngineOutput> {
-    return of(undefined).pipe(
-      switchMap(() => this.setup(converter)),
-      switchMap(() => this.setupForceLaws()),
+    return of(0).pipe(
+      switchMap(() => {
+        return this.setup(converter);
+      }),
       switchMap(() => this.runAsync())
     );
   }
@@ -176,10 +241,7 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
     this.bodies.forEach(body => output.push({ pos: body.position, id: body.id, opaqueData: body.opaqueData }));
 
     const deltaT = this.config.endTime / this.config.maxSteps;
-
-    type State = { step: number; converged: boolean; time: number };
-    const currState = { step: 0, converged: false, time: 0 };
-
+    const state = { step: 0, converged: false, time: 0 };
     const logInterval = this.config.maxSteps / 10;
 
     // we use the same output instance for every emitted value
@@ -187,43 +249,32 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
     // if this state changes during the visualization (subscription)
     // we have incoherent times among the bodies which is acceptable :-)
     return generate(
-      currState,
-      (s: State) => {
-        return s.time < this.config.endTime && !s.converged;
-      },
+      state,
+      () => true,
       (s: State) => {
         ++s.step;
 
         if (s.step % logInterval == 0) {
           this.logger.debug(`Computed ${(s.step / this.config.maxSteps) * 100} %`);
         }
+
         s.time += deltaT;
         return s;
       },
       asyncScheduler
     ).pipe(
-      tap(s => {
-        // move the bodies
-        this.bodies.forEach(body => {
-          body.position.add(Point.one.copy().scale(1));
-        });
-      }),
-      tap(s => {
-        // update state
-        let i = 0;
-        this.bodies.forEach((body, id) => {
-          output[i].pos = body.position;
-          output[i++].id = body.id;
-        });
-      }),
-      map(() => output),
-      finalize(() => {
-        this.logger.debug(`Run timestepping: [done]`);
+      switchMap(s => this.doTimeStep(s, deltaT)),
+      takeWhile(s => {
+        return s.time < this.config.endTime && !s.converged;
       }),
       catchError(err => {
         this.logger.error(`${err}`);
         return throwError(err);
-      })
+      }),
+      finalize(() => {
+        this.logger.debug(`Run timestepping: [done] [converged: ${state.converged}]`);
+      }),
+      map(() => output)
     );
   }
 
@@ -237,24 +288,85 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
     this.bodies = res.bodies;
     this.links = res.links;
 
+    await this.setupForceLaws();
+
     this.logger.debug('Setup graph: [done].');
   }
 
-  async setupForceLaws(): Promise<ForceLaw[]> {
+  async setupForceLaws(): Promise<void> {
     this.logger.debug('Setup force laws: ...');
+    this.extForceInteraction = [];
+    this.extForce = [];
 
     // Setup for each link a link force.
-    const linkForce = this.config.createLinkForce();
+    const linkForceLaw = this.config.createLinkForce();
     this.links.forEach(l => {
-      l.b1.forceLaws.push(linkForce);
-      l.b2.forceLaws.push(linkForce);
+      this.extForceInteraction.push({ b1: l.b1, b2: l.b2, forceLaw: linkForceLaw });
     });
 
-    // This hast stupidly quadtratic run-time performance and does not scale well!
-    // us a GridAccelerator. ...(or KdTree -> :headbang: -> C++)
-    const penetrationForce = this.config.createPenetrationForce();
+    // // This hast stupidly quadtratic run-time performance and does not scale well!
+    // // us a GridAccelerator. ...(or KdTree -> :headbang: -> C++)
+    // const contactForce = this.config.createContactForce();
+    // this.bodies.forEach(b1 => {
+    //   this.bodies.forEach(b2 => {
+    //     if (b2.id.greaterThan(b1.id)) {
+    //       this.extForceInteraction.push({ b1: b1, b2: b2, forceLaw: contactForce });
+    //     }
+    //   });
+    // });
 
     this.logger.debug('Setup force laws: [done]');
-    return [];
+  }
+
+  private async doTimeStep(s: State, deltaT: number): Promise<State> {
+    await this.integrateToMidPoint(deltaT);
+    await this.computeForces();
+    await this.computeEndVelocity(deltaT);
+    await this.integrateToEndPoint(deltaT);
+    s.converged = await this.checkConvergence();
+    await this.finalizeTimeStep();
+    return s;
+  }
+
+  private async integrateToMidPoint(deltaT: number): Promise<void> {
+    for (let b of this.bodies) {
+      await b.integrateToMidPoint(deltaT);
+    }
+  }
+
+  private async computeForces(): Promise<void> {
+    for (let f of this.extForce) {
+      await f.forceLaw.accumulateForce(f.b);
+    }
+    for (let f of this.extForceInteraction) {
+      await f.forceLaw.accumulateForce(f.b1, f.b2);
+    }
+  }
+
+  private async computeEndVelocity(deltaT: number): Promise<void> {
+    for (let b of this.bodies) {
+      await b.computeEndVelocity(deltaT);
+    }
+  }
+
+  private async integrateToEndPoint(deltaT: number): Promise<void> {
+    for (let b of this.bodies) {
+      await b.integrateToEndPoint(deltaT);
+    }
+  }
+
+  private async checkConvergence(): Promise<boolean> {
+    let i = 0;
+    for (let b of this.bodies) {
+      const conv = await b.hasPositionConverged(this.config.convergeRelTol, this.config.convergeAbsTol);
+      i += conv ? 1 : 0;
+    }
+    return i === this.bodies.length;
+  }
+
+  private async finalizeTimeStep(): Promise<void> {
+    for (let b of this.bodies) {
+      b.resetForNextIteration();
+    }
   }
 }

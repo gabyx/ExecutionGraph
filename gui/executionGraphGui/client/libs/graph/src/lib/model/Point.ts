@@ -10,15 +10,11 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { vec2 } from '@tlaukkan/tsm';
+import { Vector2 } from '@eg/common';
 
-export class Point extends vec2 {
+export class Point extends Vector2 {
   constructor(x: number, y: number) {
-    super();
-    this.x = x;
-    this.y = y;
+    super([x, y]);
   }
 }
-
-export type Position = Point;
-export type Vector2 = Point;
+export class Position extends Vector2 {}
