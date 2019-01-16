@@ -1,3 +1,5 @@
+export { vec2 as Vector2, mat2 as Matrix2 } from './lib/general/VecMat';
+
 export { CommonModule } from './lib/common.module';
 
 export { Id } from './lib/general/Identifier';

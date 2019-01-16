@@ -6,7 +6,7 @@ import {
   EventSourceGateway,
   ElementMouseScrollEvent
 } from '../services/ElementInteraction';
-import { Position } from '../model/Point';
+import { Position, Point } from '../model/Point';
 import { isArray } from '@eg/common';
 import { Observable, fromEvent } from 'rxjs';
 import { switchMap, map, takeUntil, tap, first, mergeMap, concatMap } from 'rxjs/operators';
@@ -123,10 +123,7 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
 
   private get elementPosition(): Position {
     const clientRect = this.nativeElement.getBoundingClientRect();
-    return {
-      x: clientRect.left,
-      y: clientRect.top
-    };
+    return new Point(clientRect.left, clientRect.top);
   }
 
   @HostListener('mouseenter', ['$event'])
@@ -182,14 +179,8 @@ export class ElementEventSourceDirective<TElement> implements IElementEvents<TEl
     const elementPosition = this.elementPosition;
 
     return {
-      mousePosition: {
-        x: mouseEvent.clientX,
-        y: mouseEvent.clientY
-      },
-      elementOffset: {
-        x: mouseEvent.clientX - elementPosition.x,
-        y: mouseEvent.clientY - elementPosition.y
-      },
+      mousePosition: new Point(mouseEvent.clientX, mouseEvent.clientY),
+      elementOffset: new Point(mouseEvent.clientX - elementPosition.x, mouseEvent.clientY - elementPosition.y),
       element: this.element
     };
   }
