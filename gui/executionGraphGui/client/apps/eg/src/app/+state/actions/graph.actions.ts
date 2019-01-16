@@ -4,15 +4,13 @@ import {
   Graph,
   Node,
   Connection,
-  OutputSocket,
-  InputSocket,
   NodeId,
   ConnectionId,
   GraphTypeDescription,
   NodeTypeDescription,
   Socket
 } from '../../model';
-import { Point } from '@eg/graph';
+import { Point, ILayoutStrategy, Position } from '@eg/graph';
 
 export const LOAD_GRAPHS = '[Graph] Load';
 export const GRAPHS_LOADED = '[Graph] Loaded';
@@ -21,6 +19,8 @@ export const OPEN_GRAPH = '[Graph] Open';
 export const CREATE_GRAPH = '[Graph] Create';
 
 export const MOVE_NODE = '[Graph] Move Node';
+export const MOVE_NODES = '[Graph] Move Nodes';
+export const NODES_MOVED = '[Graph] Nodes Moved';
 export const NODE_UPDATED = '[Graph] Node Updated';
 export const GRAPH_ADDED = '[Graph] Graph Added';
 export const REMOVE_GRAPH = '[Graph] Remove Graph';
@@ -33,6 +33,8 @@ export const ADD_CONNECTION = '[Graph] Add Connection';
 export const CONNECTION_ADDED = '[Graph] Connection Added';
 export const REMOVE_CONNECTION = '[Graph] Remove Connection';
 export const CONNECTION_REMOVED = '[Graph] Connection Removed';
+
+export const RUN_AUTO_LAYOUT = '[Graph] Run Auto Layout';
 
 export class LoadGraphs implements Action {
   readonly type = LOAD_GRAPHS;
@@ -57,11 +59,20 @@ export class OpenGraph implements Action {
 // --------------------------------
 export class MoveNode implements Action {
   readonly type = MOVE_NODE;
-  constructor(public node: Node, public newPosition: Point) {}
+  constructor(public node: Node, public newPosition: Position) {}
 }
 export class NodeUpdated implements Action {
   readonly type = NODE_UPDATED;
   constructor(public node: Node) {}
+}
+
+export type Moves = { node: Node; pos: Position }[];
+export class MoveNodes implements Action {
+  readonly type = MOVE_NODES;
+  constructor(public moves: Moves) {}
+}
+export class NodesMoved implements Action {
+  readonly type = NODES_MOVED;
 }
 
 // Actions related to GraphManagementService
@@ -128,6 +139,13 @@ export class ConnectionRemoved implements Action {
   constructor(public graphId: Id, public connectionId: ConnectionId) {}
 }
 
+// Actions related to AutoLayoutService
+// -------------------------------------------
+export class RunAutoLayout implements Action {
+  readonly type = RUN_AUTO_LAYOUT;
+  constructor(public graph: Graph, public config?: ILayoutStrategy) {}
+}
+
 export type GraphAction =
   | LoadGraphs
   | GraphsLoaded
@@ -138,6 +156,8 @@ export type GraphAction =
   | RemoveGraph
   | GraphRemoved
   | MoveNode
+  | MoveNodes
+  | NodesMoved
   | NodeUpdated
   | AddNode
   | NodeAdded
@@ -146,4 +166,5 @@ export type GraphAction =
   | AddConnection
   | ConnectionAdded
   | RemoveConnection
-  | ConnectionRemoved;
+  | ConnectionRemoved
+  | RunAutoLayout;
