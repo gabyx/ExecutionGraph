@@ -19,4 +19,6 @@ export class Point extends vec2 {
     this.y = y;
   }
 }
+
 export type Position = Point;
+export type Vector2 = Point;
