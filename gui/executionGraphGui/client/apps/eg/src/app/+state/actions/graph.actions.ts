@@ -10,7 +10,7 @@ import {
   NodeTypeDescription,
   Socket
 } from '../../model';
-import { Point, ILayoutStrategy } from '@eg/graph';
+import { Point, ILayoutStrategy, Position } from '@eg/graph';
 
 export const LOAD_GRAPHS = '[Graph] Load';
 export const GRAPHS_LOADED = '[Graph] Loaded';
@@ -19,6 +19,8 @@ export const OPEN_GRAPH = '[Graph] Open';
 export const CREATE_GRAPH = '[Graph] Create';
 
 export const MOVE_NODE = '[Graph] Move Node';
+export const MOVE_NODES = '[Graph] Move Nodes';
+export const NODES_MOVED = '[Graph] Nodes Moved';
 export const NODE_UPDATED = '[Graph] Node Updated';
 export const GRAPH_ADDED = '[Graph] Graph Added';
 export const REMOVE_GRAPH = '[Graph] Remove Graph';
@@ -57,11 +59,20 @@ export class OpenGraph implements Action {
 // --------------------------------
 export class MoveNode implements Action {
   readonly type = MOVE_NODE;
-  constructor(public node: Node, public newPosition: Point) {}
+  constructor(public node: Node, public newPosition: Position) {}
 }
 export class NodeUpdated implements Action {
   readonly type = NODE_UPDATED;
   constructor(public node: Node) {}
+}
+
+export type Moves = { node: Node; pos: Position }[];
+export class MoveNodes implements Action {
+  readonly type = MOVE_NODES;
+  constructor(public moves: Moves) {}
+}
+export class NodesMoved implements Action {
+  readonly type = NODES_MOVED;
 }
 
 // Actions related to GraphManagementService
@@ -145,6 +156,8 @@ export type GraphAction =
   | RemoveGraph
   | GraphRemoved
   | MoveNode
+  | MoveNodes
+  | NodesMoved
   | NodeUpdated
   | AddNode
   | NodeAdded

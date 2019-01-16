@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
-import { Graph, NodeId } from '../model';
+import { Graph, NodeId, Node } from '../model';
 import {
   Point,
   ILayoutStrategy,
@@ -14,7 +14,7 @@ import {
 import { AppState } from '../+state/reducers/app.reducers';
 import { Store } from '@ngrx/store';
 import { LoggerFactory, ILogger } from '@eg/logger/src';
-import { MoveNode } from '../+state/actions';
+import { MoveNode, MoveNodes, Moves } from '../+state/actions';
 import { map, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
@@ -25,12 +25,15 @@ import { throwError } from 'rxjs';
 async function convertGraph<Body, Link>(
   graph: Graph,
   positionMap: Map<NodeId, Point>,
-  createBody: (id: NodeId, pos: Point) => Body,
+  createBody: (id: NodeId, pos: Point, opaqueData: any) => Body,
   createLink: (b1: Body, b2: Body) => Link
 ): Promise<EngineInput<Body, Link>> {
   const bodies = new Map<NodeId, Body>();
-  positionMap.forEach((pos, id) => bodies.set(id, createBody(id, pos)));
 
+  // create bodies
+  positionMap.forEach((pos, id) => bodies.set(id, createBody(id, pos, graph.nodes[id.toString()])));
+
+  // create links
   const links: Link[] = Object.values(graph.connections).map(connection =>
     createLink(bodies.get(connection.inputSocket.parent.id), bodies.get(connection.outputSocket.parent.id))
   );
@@ -53,7 +56,7 @@ export class AutoLayoutService {
 
     config = config ? config : new MassSpringLayoutStrategy();
 
-    // A copy of all positions
+    // A copy of all positions (dont change the state!)
     const positionMap = new Map<NodeId, Point>();
     Object.values(graph.nodes).map(node => {
       positionMap.set(node.id, node.uiProps.position.copy());
@@ -69,10 +72,11 @@ export class AutoLayoutService {
       .run(converter)
       .pipe(
         map((out: EngineOutput) => {
+          const s: Moves = [];
           out.forEach(res => {
-            //this.logger.debug(`Update node position ... ${res.pos.x}, ${res.pos.y}`);
-            this.store.dispatch(new MoveNode(graph.nodes[res.id.toString()], res.pos));
+            s.push({ pos: res.pos, node: <Node>res.opaqueData });
           });
+          this.store.dispatch(new MoveNodes(s));
         }),
         map(() => undefined)
       )

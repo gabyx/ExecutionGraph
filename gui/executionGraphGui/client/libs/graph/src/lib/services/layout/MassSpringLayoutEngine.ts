@@ -10,12 +10,12 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 import { Point, Position } from '../../model/Point';
-import { ILayoutEngine, GraphConverter, EngineOutput, EngineOutputState, createOutputState } from './ILayoutEngine';
+import { ILayoutEngine, GraphConverter, EngineOutput } from './ILayoutEngine';
 import { LoggerFactory, ILogger } from '@eg/logger/src';
 import { Injectable } from '@angular/core';
 import { LayoutStrategys, ILayoutStrategy } from './ILayoutStrategy';
 import { NodeId } from 'apps/eg/src/app/model';
-import { from, Observable, Observer, generate, throwError, asyncScheduler } from 'rxjs';
+import { from, Observable, Observer, generate, throwError, asyncScheduler, animationFrameScheduler } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs/operators';
 
 type Force = Point;
@@ -32,7 +32,7 @@ class SpringDamper extends ForceLaw {
 }
 
 class Body {
-  constructor(public readonly id: NodeId, public position: Position) {}
+  constructor(public readonly id: NodeId, public position: Position, public readonly opaqueData: any) {}
   public mass: number = 1.0;
   public velocity = Point.zero.copy();
   public oldPosition = Point.zero.copy();
@@ -88,17 +88,19 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
 
   private runAsync(): Observable<EngineOutput> {
     const output: EngineOutput = new Array();
-    this.bodies.forEach(body => output.push({ pos: body.position, id: body.id }));
+    this.bodies.forEach(body => output.push({ pos: body.position, id: body.id, opaqueData: body.opaqueData }));
 
     const deltaT = this.config.endTime / this.config.maxSteps;
 
     type State = { step: number; converged: boolean; time: number };
     const currState = { step: 0, converged: false, time: 0 };
 
+    const logInterval = this.config.maxSteps / 10;
+
     // we use the same output instance for every emitted value
     // that should not be a problem!
     // if this state changes during the visualization (subscription)
-    // we have incoherent times among the bodies which acceptable :-)
+    // we have incoherent times among the bodies which is acceptable :-)
     return generate(
       currState,
       (s: State) => {
@@ -107,8 +109,9 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
       (s: State) => {
         ++s.step;
 
-        if (s.step % (this.config.maxSteps / 10) == 0) {
+        if (s.step % logInterval == 0) {
           this.logger.debug(`Computed ${(s.step / this.config.maxSteps) * 100} %`);
+          this.logger.debug(Date.now());
         }
 
         // move the bodies
@@ -126,7 +129,7 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
         s.time += deltaT;
         return s;
       },
-      asyncScheduler
+      animationFrameScheduler
     ).pipe(
       map(() => output),
       catchError(err => {
@@ -140,7 +143,7 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
     this.logger.debug('Layout graph: setup ...');
     // Convert the graph to our internal structure (this is neat dispatching :-)
     const res = await converter(
-      (id: NodeId, pos: Point) => new Body(id, pos),
+      (id: NodeId, pos: Point, opaqueData: any) => new Body(id, pos, opaqueData),
       (b1: Body, b2: Body) => new Link(b1, b2)
     );
     this.bodies = res.bodies;

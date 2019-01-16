@@ -86,9 +86,19 @@ export class GraphEffects {
   moveNode$ = this.actions$.ofType<fromGraph.MoveNode>(fromGraph.MOVE_NODE).pipe(
     // tap(action => console.log('moving node ', action.node, action.newPosition)),
     tap(action => {
-      action.node.uiProps.position = new Point(action.newPosition.x, action.newPosition.y);
+      action.node.uiProps.position = action.newPosition.copy();
     }),
-    map((action, state) => new fromGraph.NodeUpdated(action.node))
+    map((action, state) => new fromGraph.NodesMoved())
+  );
+
+  @Effect()
+  moveNodes$ = this.actions$.ofType<fromGraph.MoveNodes>(fromGraph.MOVE_NODES).pipe(
+    // tap(action => console.log('moving node ', action.node, action.newPosition)),
+    tap(action => {
+      action.moves.forEach(m => (m.node.uiProps.position = m.pos.copy()));
+    }),
+    // no real action to dispatch
+    map((action, state) => new fromGraph.NodesMoved())
   );
 
   @Effect()

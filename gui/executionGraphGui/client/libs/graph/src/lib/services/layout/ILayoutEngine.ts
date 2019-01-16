@@ -18,14 +18,10 @@ export type BodyMap<Body> = Map<NodeId, Body>;
 
 export type EngineInput<Body, Link> = { bodies: BodyMap<Body>; links: Link[] };
 
-export type EngineOutputState = { pos: Position; id: NodeId };
-export function createOutputState(): EngineOutputState {
-  return { pos: Point.zero.copy(), id: undefined };
-}
-
+export type EngineOutputState = { pos: Position; id: NodeId; opaqueData: any };
 export type EngineOutput = EngineOutputState[];
 
-export type BodyCreator<Body> = (id: NodeId, pos: Point) => Body;
+export type BodyCreator<Body> = (id: NodeId, pos: Point, opaqueData: any) => Body;
 export type LinkCreator<Body, Link> = (b1: Body, b2: Body) => Link;
 
 export interface GraphConverter {

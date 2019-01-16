@@ -91,6 +91,9 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
 
 export function graphReducer(graph: Graph, action: fromActions.GraphAction): Graph {
   switch (action.type) {
+    case fromActions.NODES_MOVED: {
+      return graph;
+    }
     case fromActions.NODE_UPDATED: {
       const { node } = action;
       console.log('node updated', node);
