@@ -35,23 +35,16 @@ namespace executionGraph
     protected:
         LogicSocketBase(IndexType type,
                         SocketIndex index,
-                        NodeBaseType& parent,
-                        std::string name = "")
+                        NodeBaseType& parent)
             : m_type(type)
             , m_index(index)
             , m_parent(parent)
-            , m_name(std::move(name))
         {
-            if(m_name.empty())
-            {
-                m_name = std::string("[") + std::to_string(index) + "]";
-            }
         }
-    
+
     public:
         IndexType getType() const { return m_type; }
         SocketIndex getIndex() const { return m_index; }
-        const std::string& getName() const { return m_name; }
 
         const NodeBaseType& getParent() const { return m_parent; }
         NodeBaseType& getParent() { return m_parent; }
@@ -63,9 +56,6 @@ namespace executionGraph
         const IndexType m_type;     //!< The index in to the meta::list SocketTypes, which type this is!
         const SocketIndex m_index;  //!< The index of the slot at which this socket is installed in a LogicNode.
         NodeBaseType& m_parent;     //!< The parent node of of this socket.
-        std::string m_name;         //!< The name of the socket.
-
-        std::string getNameOfType() const;  //!< Returns the name of the current type.
     };
 
     //! The input socket base class for all input/output sockets of a node.
@@ -87,7 +77,9 @@ namespace executionGraph
 
         ~LogicSocketInputBase()
         {
-            EXECGRAPH_LOG_TRACE("Destructor: LogicSocketInputBase: index: " << this->getIndex() << " parent:" << this->getParent().getName());
+            EXECGRAPH_LOG_TRACE("Destructor: LogicSocketInputBase: index: '{0}', parent: '{1}'",
+                                this->getIndex(),
+                                fmt::ptr(&this->getParent()));
 
             // Reset Get-Link
             removeGetLink();
@@ -105,12 +97,12 @@ namespace executionGraph
         auto* castToType() const
         {
             EXECGRAPH_THROW_BADSOCKETCAST_IF(!this->template isType<T>(),
-                                             "Casting socket index '{0}' with type '{1}' into "
+                                             "Casting socket index '{0}' with type index '{1}' into type"
                                              "'{2}' of node id: '{3}' which is wrong!",
-                                             this->m_index,
-                                             this->getNameOfType(),
+                                             this->getIndex(),
+                                             this->getType(),
                                              demangle<T>(),
-                                             this->m_parent.getId());
+                                             this->getParent().getId());
 
             return static_cast<SocketInputType<T> const*>(this);
         }
@@ -203,7 +195,9 @@ namespace executionGraph
 
         ~LogicSocketOutputBase()
         {
-            EXECGRAPH_LOG_TRACE("Destructor: LogicSocketOutputBase: index: " << this->getIndex() << " parent:" << this->getParent().getName());
+            EXECGRAPH_LOG_TRACE("Destructor: LogicSocketOutputBase: index: '{0}', parent: '{1}'",
+                                this->getIndex(),
+                                fmt::ptr(&this->getParent()));
 
             removeWriteLinks();
 
@@ -221,10 +215,10 @@ namespace executionGraph
         auto* castToType() const noexcept(throwIfBadSocketCast)
         {
             EXECGRAPH_THROW_BADSOCKETCAST_IF((this->m_type != meta::find_index<SocketTypes, T>::value),
-                                             "Casting socket index '{0}' with type '{1}' into "
+                                             "Casting socket index '{0}' with type index '{1}' into "
                                              "'{2}' of node id: '{3}' which is wrong!",
                                              this->m_index,
-                                             this->getNameOfType(),
+                                             this->getType(),
                                              demangle<T>(),
                                              this->m_parent.getId());
 
@@ -325,7 +319,7 @@ namespace executionGraph
 
         //! Move allowed
         LogicSocketInput& operator=(LogicSocketInput&& other) = default;
-        LogicSocketInput(LogicSocketInput&& other) = default;
+        LogicSocketInput(LogicSocketInput&& other)            = default;
 
         //! Get the data value of the socket. (follow Get-Link).
         //! If this input socket has not been connected, this results in an access violation!
@@ -333,8 +327,8 @@ namespace executionGraph
         const DataType& getValue() const
         {
             EXECGRAPH_ASSERT(m_data,
-                             "Input socket: '{0}' of node id: '{1}' not connected",
-                             this->getName(),
+                             "Input socket index: '{0}' of node id: '{1}' not connected",
+                             this->getIndex(),
                              this->getParent().getId());
             return *static_cast<const DataType*>(m_data);
         }
@@ -387,7 +381,7 @@ namespace executionGraph
 
         //! Move allowed
         LogicSocketOutput& operator=(LogicSocketOutput&& other) = default;
-        LogicSocketOutput(LogicSocketOutput&& other) = default;
+        LogicSocketOutput(LogicSocketOutput&& other)            = default;
 
         //! Set the data value of the socket.
         template<typename T>
@@ -413,23 +407,6 @@ namespace executionGraph
 namespace executionGraph
 {
     template<typename TConfig>
-    std::string LogicSocketBase<TConfig>::getNameOfType() const
-    {
-        std::string s = "'type-not-found'";
-        IndexType i   = 0;
-        auto f        = [&](auto type) {
-            if(i == m_type)
-            {
-                s = demangle(type);
-            }
-            i++;
-        };
-
-        meta::for_each(SocketTypes{}, f);
-        return s;
-    }
-
-    template<typename TConfig>
     void LogicSocketOutputBase<TConfig>::addWriteLink(SocketInputBaseType& inputSocket)
     {
         EXECGRAPH_THROW_TYPE_IF(inputSocket.getParent().getId() == this->getParent().getId(),
@@ -439,21 +416,22 @@ namespace executionGraph
 
         EXECGRAPH_THROW_TYPE_IF(this->getType() != inputSocket.getType(),
                                 NodeConnectionException,
-                                "Output socket: '{1}' of node id: '{2}' "
-                                "has not the same type as input socket '{3}'"
+                                "Output socket index: '{1}' of node id: '{2}' "
+                                "has not the same type as input socket index '{3}'"
                                 "of node id: '{4}'",
-                                this->getName(),
+                                this->getIndex(),
                                 this->getParent().getId(),
-                                inputSocket.getName(),
+                                inputSocket.getIndex(),
                                 inputSocket.getParent().getId());
 
         EXECGRAPH_THROW_TYPE_IF(m_getterChilds.find(&inputSocket) != m_getterChilds.end(),
                                 NodeConnectionException,
-                                "Cannot add Write-Link from output socket: '{0}' of node id: '{1}' to '{2}'"
-                                "of node id: '{3}' because input already has a Get-Link to this output.",
-                                this->getName(),
+                                "Cannot add Write-Link from output socket index: '{0}' of node id: '{1}' to "
+                                "input socket index '{2} of node id: '{3}' because input "
+                                "already has a Get-Link to this output!",
+                                this->getIndex(),
                                 this->getParent().getId(),
-                                inputSocket.getName(),
+                                inputSocket.getIndex(),
                                 inputSocket.getParent().getId());
 
         if(std::find(m_writeTo.begin(), m_writeTo.end(), &inputSocket) == m_writeTo.end())
@@ -473,25 +451,26 @@ namespace executionGraph
 
         EXECGRAPH_THROW_TYPE_IF(this->getType() != outputSocket.getType(),
                                 NodeConnectionException,
-                                "Output socket: '{0}' of node id: '{1}' has not the same type as input socket: '{2}' of node id: '{3}'",
-                                outputSocket.getName(),
+                                "Output socket index: '{0}' of node id: '{1}' has not the same type as "
+                                "input socket index: '{2}' of node id: '{3}'!",
+                                outputSocket.getIndex(),
                                 outputSocket.getParent().getId(),
-                                this->getName(),
+                                this->getIndex(),
                                 this->getParent().getId());
 
         EXECGRAPH_THROW_TYPE_IF(m_writingParents.find(&outputSocket) != m_writingParents.end(),
                                 NodeConnectionException,
-                                "Cannot add Get-Link from input socket: '{0}' of node id: '{1}' to '{2}' of node id: '{3}'"
-                                "because output already has a Write-Link to this input.",
-                                this->getName(),
+                                "Cannot add Get-Link from input socket index: '{0}' of node id: '{1}' to "
+                                "output socket index '{2}' of node id: '{3}' because output already has a "
+                                "Write-Link to this input!",
+                                this->getIndex(),
                                 this->getParent().getId(),
-                                outputSocket.getName(),
+                                outputSocket.getIndex(),
                                 outputSocket.getParent().getId());
 
         // Remove Get-Link (if existing)
         removeGetLink();
 
-        // EXECGRAPH_LOG_TRACE("Add Get-Link: " << outputSocket.getParent().getId() << outputSocket.getName() << " --> " << this->getParent().getId() << this->getName());
         m_getFrom = &outputSocket;
         m_data    = outputSocket.m_data;  // Set data pointer of this input socket.
         outputSocket.m_getterChilds.emplace(this);

@@ -83,7 +83,7 @@ export function toNode(node: serialization.LogicNode): model.Node {
     }
     for (let i = 0; i < l; ++i) {
       let s = socks(i);
-      let socket = model.Socket.createSocket(kind, toULong(s.typeIndex()), s.name(), toULong(s.index()), s.typeName());
+      let socket = model.Socket.createSocket(kind, toULong(s.typeIndex()), toULong(s.index()), s.typeName());
       sockets.push(socket);
     }
   };
@@ -91,5 +91,5 @@ export function toNode(node: serialization.LogicNode): model.Node {
   extractSockets('input', sockets);
   extractSockets('output', sockets);
 
-  return new model.Node(nodeId, node.type(), node.name(), sockets);
+  return new model.Node(nodeId, node.type(), sockets);
 }

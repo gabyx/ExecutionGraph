@@ -19,6 +19,7 @@ function isLong(value: any): value is Long {
 }
 
 export class UIProps {
+  public name: string = 'NoName';
   public position = Point.zero.copy();
 }
 
@@ -63,7 +64,6 @@ export class Node {
   constructor(
     public readonly id: NodeId,
     public readonly type: string,
-    public readonly name: string,
     public sockets: Socket[] = [],
     public uiProps: UIProps = new UIProps()
   ) {

@@ -75,22 +75,15 @@ namespace executionGraph
 
     public:
         //! The basic constructor of a node.
-        LogicNode(NodeId id, std::string name = "")
-            : m_id(id), m_name(std::move(name))
+        LogicNode(NodeId id)
+            : m_id(id)
         {
-            if(m_name.empty())
-            {
-                m_name = std::to_string(id);
-            }
         }
 
         LogicNode(const LogicNode&) = default;
         LogicNode(LogicNode&&)      = default;
 
-        virtual ~LogicNode()
-        {
-            EXECGRAPH_LOG_TRACE("Destructor: LogicNode: " << m_name);
-        }
+        virtual ~LogicNode() = default;
 
         //! The reset function.
         virtual void reset() = 0;
@@ -99,7 +92,6 @@ namespace executionGraph
         virtual void compute() = 0;
 
         inline NodeId getId() const { return m_id; }
-        inline const std::string& getName() const { return m_name; }
 
         //! Get the list of input sockets.
         const SocketInputListType& getInputs() const { return m_inputs; }
@@ -236,25 +228,24 @@ namespace executionGraph
     protected:
         //! Add an input socket with default value from the default output socket `defaultOutputSocketId`.
         template<typename TData>
-        void addISock(const std::string& name = "noname")
+        void addISock()
         {
             SocketIndex id = m_inputs.size();
 
             auto p = SocketPointer<SocketInputBaseType>(
-                new SocketInputType<TData>(id, *this, name),
+                new SocketInputType<TData>(id, *this),
                 [](SocketInputBaseType* s) { delete static_cast<SocketInputType<TData>*>(s); });
             m_inputs.push_back(std::move(p));
         }
 
         //! Add an output socket with default value `defaultValue`.
         template<typename TData, typename T>
-        void addOSock(T&& defaultValue,
-                      const std::string& name = "noname")
+        void addOSock(T&& defaultValue)
         {
             SocketIndex id = m_outputs.size();
 
             auto p = SocketPointer<SocketOutputBaseType>(
-                new SocketOutputType<TData>(std::forward<T>(defaultValue), id, *this, name),
+                new SocketOutputType<TData>(std::forward<T>(defaultValue), id, *this),
                 [](SocketOutputBaseType* s) { delete static_cast<SocketOutputType<TData>*>(s); });
             m_outputs.push_back(std::move(p));
         }
@@ -288,12 +279,8 @@ namespace executionGraph
         }
         //@}
 
-    public:
-        virtual std::string getTypeName() const { return shortenTemplateBrackets(demangle(this)); }
-
     protected:
         const NodeId m_id;               //!< The unique id of the node.
-        std::string m_name;              //!< The name of the node.
         SocketInputListType m_inputs;    //!< The input sockets.
         SocketOutputListType m_outputs;  //!< The output sockets.
     };
@@ -488,9 +475,6 @@ namespace executionGraph
     static constexpr executionGraph::SocketIndex getInIdx() { return InSocketDeclList::template Get<S>::Index::value; } \
     template<OutputEnum S>                                                                                              \
     static constexpr executionGraph::SocketIndex getOutIdx() { return OutSocketDeclList::template Get<S>::Index::value; }
-
-#define EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME() \
-    virtual std::string getTypeName() const override { return executionGraph::shortenTemplateBrackets(demangle(this)); }
 
 }  // namespace executionGraph
 

@@ -40,7 +40,6 @@ public:
 
     using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, int>>;
 
-    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME()
     EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
 
     template<typename... Args>

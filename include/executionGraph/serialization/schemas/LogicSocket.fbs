@@ -16,7 +16,6 @@ table LogicSocket {
     typeIndex:uint64 (id: 0); //!< The type index of this socket in the type list `Config::SocketTypes`.
     type:string (id:1);       //!< The type rtti of this socket.
     typeName:string (id:2);   //!< The readable type name of this socket.
-
-    name:string (id: 3); //!< The name of the logic socket.
-    index:uint64 (id:4); //!< The slot index of this socket.
+    
+    index:uint64 (id:3);      //!< The slot index of this socket.
 }

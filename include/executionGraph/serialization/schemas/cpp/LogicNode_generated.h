@@ -18,19 +18,15 @@ struct LogicNode FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ID = 4,
     VT_TYPE = 6,
-    VT_NAME = 8,
-    VT_INPUTSOCKETS = 10,
-    VT_OUTPUTSOCKETS = 12,
-    VT_DATA = 14
+    VT_INPUTSOCKETS = 8,
+    VT_OUTPUTSOCKETS = 10,
+    VT_DATA = 12
   };
   uint64_t id() const {
     return GetField<uint64_t>(VT_ID, 0);
   }
   const flatbuffers::String *type() const {
     return GetPointer<const flatbuffers::String *>(VT_TYPE);
-  }
-  const flatbuffers::String *name() const {
-    return GetPointer<const flatbuffers::String *>(VT_NAME);
   }
   const flatbuffers::Vector<flatbuffers::Offset<LogicSocket>> *inputSockets() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<LogicSocket>> *>(VT_INPUTSOCKETS);
@@ -49,8 +45,6 @@ struct LogicNode FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint64_t>(verifier, VT_ID) &&
            VerifyOffsetRequired(verifier, VT_TYPE) &&
            verifier.VerifyString(type()) &&
-           VerifyOffset(verifier, VT_NAME) &&
-           verifier.VerifyString(name()) &&
            VerifyOffset(verifier, VT_INPUTSOCKETS) &&
            verifier.VerifyVector(inputSockets()) &&
            verifier.VerifyVectorOfTables(inputSockets()) &&
@@ -71,9 +65,6 @@ struct LogicNodeBuilder {
   }
   void add_type(flatbuffers::Offset<flatbuffers::String> type) {
     fbb_.AddOffset(LogicNode::VT_TYPE, type);
-  }
-  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
-    fbb_.AddOffset(LogicNode::VT_NAME, name);
   }
   void add_inputSockets(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<LogicSocket>>> inputSockets) {
     fbb_.AddOffset(LogicNode::VT_INPUTSOCKETS, inputSockets);
@@ -101,7 +92,6 @@ inline flatbuffers::Offset<LogicNode> CreateLogicNode(
     flatbuffers::FlatBufferBuilder &_fbb,
     uint64_t id = 0,
     flatbuffers::Offset<flatbuffers::String> type = 0,
-    flatbuffers::Offset<flatbuffers::String> name = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<LogicSocket>>> inputSockets = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<LogicSocket>>> outputSockets = 0,
     flatbuffers::Offset<flatbuffers::Vector<uint8_t>> data = 0) {
@@ -110,7 +100,6 @@ inline flatbuffers::Offset<LogicNode> CreateLogicNode(
   builder_.add_data(data);
   builder_.add_outputSockets(outputSockets);
   builder_.add_inputSockets(inputSockets);
-  builder_.add_name(name);
   builder_.add_type(type);
   return builder_.Finish();
 }
@@ -119,12 +108,10 @@ inline flatbuffers::Offset<LogicNode> CreateLogicNodeDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     uint64_t id = 0,
     const char *type = nullptr,
-    const char *name = nullptr,
     const std::vector<flatbuffers::Offset<LogicSocket>> *inputSockets = nullptr,
     const std::vector<flatbuffers::Offset<LogicSocket>> *outputSockets = nullptr,
     const std::vector<uint8_t> *data = nullptr) {
   auto type__ = type ? _fbb.CreateString(type) : 0;
-  auto name__ = name ? _fbb.CreateString(name) : 0;
   auto inputSockets__ = inputSockets ? _fbb.CreateVector<flatbuffers::Offset<LogicSocket>>(*inputSockets) : 0;
   auto outputSockets__ = outputSockets ? _fbb.CreateVector<flatbuffers::Offset<LogicSocket>>(*outputSockets) : 0;
   auto data__ = data ? _fbb.CreateVector<uint8_t>(*data) : 0;
@@ -132,7 +119,6 @@ inline flatbuffers::Offset<LogicNode> CreateLogicNodeDirect(
       _fbb,
       id,
       type__,
-      name__,
       inputSockets__,
       outputSockets__,
       data__);

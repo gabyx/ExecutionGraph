@@ -25,16 +25,16 @@ using Config = GeneralConfig<>;
 MY_TEST(ExecutionTree_Test, Int_Int)
 {
     using IntNode = DummyNode<Config>;
-    auto node1a   = std::make_unique<IntNode>(0, "1a");
-    auto node1b   = std::make_unique<IntNode>(1, "1b");
+    auto node1a   = std::make_unique<IntNode>(0);  // "1a"
+    auto node1b   = std::make_unique<IntNode>(1);  // "1b"
 
-    auto node2a = std::make_unique<IntNode>(2, "2a");
-    auto node2b = std::make_unique<IntNode>(3, "2b");
+    auto node2a = std::make_unique<IntNode>(2);  // "2a"
+    auto node2b = std::make_unique<IntNode>(3);  // "2b"
 
-    auto node3a = std::make_unique<IntNode>(4, "3a");
-    auto node3b = std::make_unique<IntNode>(5, "3b");
+    auto node3a = std::make_unique<IntNode>(4);  // "3a"
+    auto node3b = std::make_unique<IntNode>(5);  // "3b"
 
-    auto node4a     = std::make_unique<IntNode>(6, "4a");
+    auto node4a     = std::make_unique<IntNode>(6);  // "4a"
     auto resultNode = node4a.get();
 
     try
@@ -82,11 +82,11 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 
     execTree.setup();
 
-    EXECGRAPH_LOG_TRACE("\n" + execTree.getExecutionOrderInfo());
+    EXECGRAPH_LOG_TRACE("{0}", execTree.getExecutionOrderInfo());
 
     execTree.runExecute(0);
 
-    EXECGRAPH_LOG_TRACE("Result : " << resultNode->getOutVal<DummyNode<Config>::Result1>());
+    EXECGRAPH_LOG_TRACE("Result : '{0}'", resultNode->getOutVal<DummyNode<Config>::Result1>());
 
     ASSERT_EQ(resultNode->getOutVal<DummyNode<Config>::Result1>(), 16) << "wrong result";
 
@@ -99,8 +99,14 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     ASSERT_EQ(resultNode->getOutVal<DummyNode<Config>::Result1>(), 4) << "wrong result";
 }
 
+consexpr struct A
+{
+    const char* name;
+}
+
 MY_TEST(ExecutionTree_Test, IntBig)
 {
+    ///
     using IntNode = DummyNode<Config>;
     int nNodes    = 500;
 

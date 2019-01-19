@@ -34,7 +34,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     this.logger = loggerFactory.create('GraphManipulationServiceBinaryHttp');
   }
 
-  public async addNode(graphId: Id, type: string, name: string): Promise<Node> {
+  public async addNode(graphId: Id, type: string): Promise<Node> {
     // Build the AddNode request
     let builder = new flatbuffers.Builder(356);
     let offGraphId = builder.createString(graphId.toString());
@@ -60,7 +60,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
 
     let node = response.node();
-    this.logger.info(`Added new node [type: '${node.type()}', name: '${node.name()}', ins: ${node.inputSocketsLength()},
+    this.logger.info(`Added new node [type: '${node.type()}', ins: ${node.inputSocketsLength()},
                   outs: ${node.outputSocketsLength()}].`);
 
     let nodeModel = conversions.toNode(node);

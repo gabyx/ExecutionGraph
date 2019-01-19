@@ -198,7 +198,6 @@ private:
 template<typename ResponseCreator>
 void ExecutionGraphBackend::addNode(const Id& graphId,
                                     const std::string& type,
-                                    const std::string& nodeName,
                                     ResponseCreator&& responseCreator)
 {
     auto deferred = initRequest(graphId);
@@ -224,7 +223,7 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
 
         try
         {
-            auto n = serializer.read(type, id, nodeName);
+            auto n = serializer.read(type, id);
             node   = graphL->addNode(std::move(n));
         }
         catch(executionGraph::Exception& e)

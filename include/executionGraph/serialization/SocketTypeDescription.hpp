@@ -22,15 +22,8 @@ namespace executionGraph
     //! A simple socket descriptio, describing a LogicSocket.
     struct SocketTypeDescription
     {
-        SocketTypeDescription(const std::string& rtti)
-            : m_type(rtti), m_name(m_type)
-        {}
-        SocketTypeDescription(const std::string& rtti, const std::string& name)
-            : m_type(rtti), m_name(name)
-        {}
-
-        std::string m_type;  //!< The unique RTTI name of the socket
-        std::string m_name;  //!< The readable name of the socket
+        std::string m_type;           //!< The unique RTTI name of the socket
+        std::string m_name = m_type;  //!< The readable name of the socket
     };
 
     namespace details

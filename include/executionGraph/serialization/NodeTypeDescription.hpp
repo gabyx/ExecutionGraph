@@ -20,15 +20,11 @@ namespace executionGraph
     //! A simple node description, describing a LogicNode.
     struct NodeTypeDescription
     {
-        NodeTypeDescription(const std::string& rtti)
-            : m_type(rtti), m_name(m_type)
-        {}
-        NodeTypeDescription(const std::string& rtti, const std::string& name)
-            : m_type(rtti), m_name(name)
-        {}
+        std::string m_type;           //!< Unique RTTI name of the node
+        std::string m_name = m_type;  //!< Readable name of the node type.
 
-        std::string m_type;  //!< The unique RTTI name of the node
-        std::string m_name;  //!< The readable name of the node.
+        std::vector<std::string> inSocketNames;   //!< Default input socket names (if available).
+        std::vector<std::string> outSocketNames;  //!< Default output socket names (if available).
     };
 }  // namespace executionGraph
 #endif

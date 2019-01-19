@@ -42,6 +42,15 @@ public:
         }
     };
 
+    //! Default socket output/input names
+    static std::pair<std::vector<std::string_view>,
+                     std::vector<std::string_view>>
+    getDefaultSocketNames()
+    {
+        static const std::vector<std::string_view> inputSocketNames{"Value1", "Value2"};
+        static const std::vector<std::string_view> outputSocketNames{"Result1"};
+    }
+
 public:
     enum Ins
     {
@@ -53,13 +62,9 @@ public:
         Result1,
     };
     EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs)
-
-    using InSockets = InSocketDeclList<InSocketDecl<Value1, int>,
+    using InSockets  = InSocketDeclList<InSocketDecl<Value1, int>,
                                        InSocketDecl<Value2, int>>;
-
     using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, int>>;
-
-    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME()
     EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
 
     template<typename... Args>

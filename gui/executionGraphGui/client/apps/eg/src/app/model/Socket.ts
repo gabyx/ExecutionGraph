@@ -15,6 +15,10 @@ import { Guid } from 'guid-typescript';
 import { Node } from './Node';
 import { isDefined } from '@eg/common';
 
+export class UIProps {
+  public name: string = 'NoName';
+}
+
 /**
  * The socket index of a socket `Socket`.
  *
@@ -59,10 +63,10 @@ export abstract class Socket {
 
   constructor(
     public readonly typeIndex: Long,
-    public readonly name: string,
     public readonly index: SocketIndex,
     public readonly type?: string,
-    protected _parent?: Node
+    protected _parent?: Node,
+    public uiProps: UIProps = new UIProps()
   ) {
     if (!isDefined(type)) {
       type = typeIndex.toString();
@@ -113,16 +117,15 @@ export abstract class Socket {
   public static createSocket(
     kind: SocketType,
     type: Long,
-    name: string,
     index: SocketIndex,
     typeName: string | undefined | null,
     parent?: Node
   ) {
     switch (kind) {
       case 'input':
-        return new InputSocket(type, name, index, isDefined(typeName) ? typeName : undefined, parent);
+        return new InputSocket(type, index, isDefined(typeName) ? typeName : undefined, parent);
       case 'output':
-        return new OutputSocket(type, name, index, isDefined(typeName) ? typeName : undefined, parent);
+        return new OutputSocket(type, index, isDefined(typeName) ? typeName : undefined, parent);
     }
   }
 }
