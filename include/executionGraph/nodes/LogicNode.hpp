@@ -20,6 +20,23 @@
 #include "executionGraph/common/DemangleTypes.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 
+//! Some handy macros to redefine getters to shortcut the following ugly syntax inside a derivation of LogicNode:
+//! Accessing the value in socket Result1 : this->template getValue<typename OutSockets::template Get<Result1>>();
+#define EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(InputEnum, InSocketDeclList, OutputEnum, OutSocketDeclList)           \
+    template<InputEnum S>                                                                                               \
+    inline auto& getInVal() const { return this->template getValue<typename InSocketDeclList::template Get<S>>(); }     \
+                                                                                                                        \
+    template<OutputEnum S>                                                                                              \
+    inline auto& getOutVal() { return this->template getValue<typename OutSocketDeclList::template Get<S>>(); }         \
+                                                                                                                        \
+    template<OutputEnum S>                                                                                              \
+    inline auto& getInVal() const { return this->template getValue<typename OutSocketDeclList::template Get<S>>(); }    \
+                                                                                                                        \
+    template<InputEnum S>                                                                                               \
+    static constexpr executionGraph::SocketIndex getInIdx() { return InSocketDeclList::template Get<S>::Index::value; } \
+    template<OutputEnum S>                                                                                              \
+    static constexpr executionGraph::SocketIndex getOutIdx() { return OutSocketDeclList::template Get<S>::Index::value; }
+
 namespace executionGraph
 {
     /**
@@ -458,24 +475,6 @@ namespace executionGraph
 
         outN.getOSocket(outS).removeWriteLink(inN.getISocket(inS));
     }
-
-//! Some handy macros to redefine getters to shortcut the following ugly syntax inside a derivation of LogicNode:
-//! Accessing the value in socket Result1 : this->template getValue<typename OutSockets::template Get<Result1>>();
-#define EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(InputEnum, InSocketDeclList, OutputEnum, OutSocketDeclList)           \
-    template<InputEnum S>                                                                                               \
-    inline auto& getInVal() const { return this->template getValue<typename InSocketDeclList::template Get<S>>(); }     \
-                                                                                                                        \
-    template<OutputEnum S>                                                                                              \
-    inline auto& getOutVal() { return this->template getValue<typename OutSocketDeclList::template Get<S>>(); }         \
-                                                                                                                        \
-    template<OutputEnum S>                                                                                              \
-    inline auto& getInVal() const { return this->template getValue<typename OutSocketDeclList::template Get<S>>(); }    \
-                                                                                                                        \
-    template<InputEnum S>                                                                                               \
-    static constexpr executionGraph::SocketIndex getInIdx() { return InSocketDeclList::template Get<S>::Index::value; } \
-    template<OutputEnum S>                                                                                              \
-    static constexpr executionGraph::SocketIndex getOutIdx() { return OutSocketDeclList::template Get<S>::Index::value; }
-
 }  // namespace executionGraph
 
 #endif

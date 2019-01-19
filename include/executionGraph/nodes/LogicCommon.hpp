@@ -13,7 +13,9 @@
 #ifndef executionGraph_nodes_LogicCommon_hpp
 #define executionGraph_nodes_LogicCommon_hpp
 
+#include <array>
 #include <memory>
+#include <string>
 #include "executionGraph/common/EnumClassHelper.hpp"
 #include "executionGraph/common/SfinaeMacros.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
@@ -114,8 +116,10 @@ namespace executionGraph
         //! The actual socket declaration list, the order of the socket declarations in this list
         //! corresponds to the sequence in which they are stored in LogicNode<Config>.
         template<typename TEnum,
-                 template<typename...> class TMPSocketDeclIn,
-                 template<typename...> class TMPSocketDeclOut,
+                 template<typename...>
+                 class TMPSocketDeclIn,
+                 template<typename...>
+                 class TMPSocketDeclOut,
                  typename... TSocketDecl>
         struct SocketDeclarationList
         {
@@ -125,6 +129,11 @@ namespace executionGraph
 
             //! How many socket declaration we have
             static const auto nSockets = meta::size<meta::list<TSocketDecl...>>::value;
+
+        public:
+            SocketDeclarationList(std::array<std::string, nSockets> socketNames)
+                : m_names(std::move(socketNames))
+            {}
 
         private:
             //! Filter out all not TMPSocketDeclIn<...> and compare length to TypeList
@@ -159,7 +168,8 @@ namespace executionGraph
             using IdList = meta::transform<TypeList, meta::quote<getId>>;  //! A list with all ids: meta::list<SocketDeclaration::Id,...>
             static_assert(meta::size<meta::unique<IdList>>::value == nSockets,
                           "You have defined input (or output) enumeration with duplicated integral values"
-                          ", e.g: enum class Inputs { Value1 = 1, Value2 = 1 } (integrals should not be assigned to the enumeration!!)");
+                          ", e.g: enum class Inputs { Value1 = 1, Value2 = 1 } "
+                          "(integrals should not be assigned to the enumeration!!)");
 
         private:
             template<EnumType searchId>
@@ -173,7 +183,8 @@ namespace executionGraph
                 using result1 = meta::find_if<TypeList, meta::bind_back<meta::quote_trait<hasId>,          // return true if Id matches searchId
                                                                         meta::size_t<enumToInt(searchId)>  // searchId
                                                                         >>;
-                static_assert(!std::is_same<result1, meta::list<>>::value, "The GetSocketDecl failed because the searchId was not found!");
+                static_assert(!std::is_same<result1, meta::list<>>::value,
+                              "The GetSocketDecl failed because the searchId was not found!");
 
                 using result2 = meta::front<result1>;  //! return the first element of the result (find_if returns a meta::list)
                 using type    = result2;               //TMPSocketDeclOut<typename result2::Id, typename result2::DataType>;
@@ -183,6 +194,18 @@ namespace executionGraph
             //! Get the SocketDecleration (TMPSocketDeclOut) of socket with id `id`.
             template<EnumType id>
             using Get = typename GetSocketDeclImpl<id>::type;
+
+        public:
+            //! Get the name of the socket with id `id`.
+            const std::string& getName(EnumType id) const
+            {
+                return m_names[Get<id>::Id::value];
+            }
+
+            const auto& getNames() const { return m_names; }
+
+        private:
+            std::array<std::string, nSockets> m_names;  //!< Socket names.
         };
 
         //! The user only defines Sockets with these templates.
@@ -206,13 +229,34 @@ namespace executionGraph
         };
 
         template<typename InputEnum, typename... TSocketDecl>
-        struct InputSocketDeclarationList : SocketDeclarationList<InputEnum, InputSocketDeclarationBase, InputSocketDeclaration, TSocketDecl...>
+        struct InputSocketDeclarationList : SocketDeclarationList<InputEnum,
+                                                                  InputSocketDeclarationBase,
+                                                                  InputSocketDeclaration,
+                                                                  TSocketDecl...>
         {
+            using Base = SocketDeclarationList<InputEnum,
+                                               InputSocketDeclarationBase,
+                                               InputSocketDeclaration,
+                                               TSocketDecl...>;
+
+            InputSocketDeclarationList(std::array<std::string, Base::nSockets> socketNames)
+                : Base(std::move(socketNames))
+            {}
         };
 
         template<typename OutputEnum, typename... TSocketDecl>
-        struct OutputSocketDeclarationList : SocketDeclarationList<OutputEnum, OutputSocketDeclarationBase, OutputSocketDeclaration, TSocketDecl...>
+        struct OutputSocketDeclarationList : SocketDeclarationList<OutputEnum,
+                                                                   OutputSocketDeclarationBase,
+                                                                   OutputSocketDeclaration,
+                                                                   TSocketDecl...>
         {
+            using Base = SocketDeclarationList<OutputEnum,
+                                               OutputSocketDeclarationBase,
+                                               OutputSocketDeclaration,
+                                               TSocketDecl...>;
+            OutputSocketDeclarationList(std::array<std::string, Base::nSockets> socketNames)
+                : Base(std::move(socketNames))
+            {}
         };
 
     }  // namespace details

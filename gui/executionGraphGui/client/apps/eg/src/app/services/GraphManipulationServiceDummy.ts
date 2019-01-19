@@ -38,7 +38,7 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
     const node = response.node();
     if (this.verboseResponseLog) {
       this.logger.info(`Added new node [type: '${node.type()}']
-                    with name: '${node.name()}' [ins: ${node.inputSocketsLength()},
+                    [ins: ${node.inputSocketsLength()},
                     outs: ${node.outputSocketsLength()}`);
     }
 

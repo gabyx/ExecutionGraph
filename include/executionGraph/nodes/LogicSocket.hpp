@@ -23,6 +23,23 @@
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 
+//! Makro to statically define output/input socket decleration
+//! which provide access to the socket name.
+#define EXECGRAPH_DEFINE_STATIC_IN_SOCKET_NAMES(InSocketDeclList, ...) \
+public:                                                                \
+    static const auto& getInputNames()                                 \
+    {                                                                  \
+        const static InSocketDeclList inSockets = {{__VA_ARGS__}};     \
+        return inSockets.getNames();                                   \
+    }
+#define EXECGRAPH_DEFINE_STATIC_OUT_SOCKET_NAMES(OutSocketDeclList, ...) \
+public:                                                                  \
+    static const auto& getOutputNames()                                  \
+    {                                                                    \
+        const static OutSocketDeclList outSockets = {{__VA_ARGS__}};     \
+        return outSockets.getNames();                                    \
+    }
+
 namespace executionGraph
 {
     //! The socket base class for all input/output sockets of a node.

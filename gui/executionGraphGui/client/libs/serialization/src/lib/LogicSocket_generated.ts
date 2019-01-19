@@ -59,21 +59,10 @@ typeName(optionalEncoding?:any):string|Uint8Array|null {
 };
 
 /**
- * @param flatbuffers.Encoding= optionalEncoding
- * @returns string|Uint8Array|null
- */
-name():string|null
-name(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-name(optionalEncoding?:any):string|Uint8Array|null {
-  var offset = this.bb!.__offset(this.bb_pos, 10);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
-};
-
-/**
  * @returns flatbuffers.Long
  */
 index():flatbuffers.Long {
-  var offset = this.bb!.__offset(this.bb_pos, 12);
+  var offset = this.bb!.__offset(this.bb_pos, 10);
   return offset ? this.bb!.readUint64(this.bb_pos + offset) : this.bb!.createLong(0, 0);
 };
 
@@ -81,7 +70,7 @@ index():flatbuffers.Long {
  * @param flatbuffers.Builder builder
  */
 static startLogicSocket(builder:flatbuffers.Builder) {
-  builder.startObject(5);
+  builder.startObject(4);
 };
 
 /**
@@ -110,18 +99,10 @@ static addTypeName(builder:flatbuffers.Builder, typeNameOffset:flatbuffers.Offse
 
 /**
  * @param flatbuffers.Builder builder
- * @param flatbuffers.Offset nameOffset
- */
-static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(3, nameOffset, 0);
-};
-
-/**
- * @param flatbuffers.Builder builder
  * @param flatbuffers.Long index
  */
 static addIndex(builder:flatbuffers.Builder, index:flatbuffers.Long) {
-  builder.addFieldInt64(4, index, builder.createLong(0, 0));
+  builder.addFieldInt64(3, index, builder.createLong(0, 0));
 };
 
 /**
@@ -133,12 +114,11 @@ static endLogicSocket(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 };
 
-static createLogicSocket(builder:flatbuffers.Builder, typeIndex:flatbuffers.Long, typeOffset:flatbuffers.Offset, typeNameOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, index:flatbuffers.Long):flatbuffers.Offset {
+static createLogicSocket(builder:flatbuffers.Builder, typeIndex:flatbuffers.Long, typeOffset:flatbuffers.Offset, typeNameOffset:flatbuffers.Offset, index:flatbuffers.Long):flatbuffers.Offset {
   LogicSocket.startLogicSocket(builder);
   LogicSocket.addTypeIndex(builder, typeIndex);
   LogicSocket.addType(builder, typeOffset);
   LogicSocket.addTypeName(builder, typeNameOffset);
-  LogicSocket.addName(builder, nameOffset);
   LogicSocket.addIndex(builder, index);
   return LogicSocket.endLogicSocket(builder);
 }

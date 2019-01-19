@@ -39,13 +39,33 @@ export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescrip
   let sockets: model.SocketTypeDescription[] = [];
   for (let i = 0; i < graphDesc.socketTypeDescriptionsLength(); ++i) {
     let s = graphDesc.socketTypeDescriptions(i);
-    sockets.push({ type: s.type(), name: s.name() });
+
+    const d = s.description();
+    sockets.push({ type: s.type(), name: s.name(), description: d ? d : undefined });
   }
 
   let nodes: model.NodeTypeDescription[] = [];
   for (let i = 0; i < graphDesc.nodeTypeDescriptionsLength(); ++i) {
     let s = graphDesc.nodeTypeDescriptions(i);
-    nodes.push({ type: s.type(), name: s.name() });
+
+    let inS: string[] = [];
+    for (let j = 0; j < s.inSocketNamesLength(); ++j) {
+      inS.push(s.inSocketNames(j));
+    }
+
+    let outS: string[] = [];
+    for (let j = 0; j < s.outSocketNamesLength(); ++j) {
+      outS.push(s.outSocketNames(j));
+    }
+    const d = s.description();
+
+    nodes.push({
+      type: s.type(),
+      name: s.name(),
+      inSocketNames: inS,
+      outSocketNames: outS,
+      description: d ? d : undefined
+    });
   }
 
   return {
@@ -81,6 +101,7 @@ export function toNode(node: serialization.LogicNode): model.Node {
       l = node.inputSocketsLength();
       socks = (idx: number) => node.inputSockets(idx);
     }
+
     for (let i = 0; i < l; ++i) {
       let s = socks(i);
       let socket = model.Socket.createSocket(kind, toULong(s.typeIndex()), toULong(s.index()), s.typeName());

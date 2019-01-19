@@ -14,7 +14,10 @@
 #define executionGraphGui_backend_ExecutionGraphBackend_hpp
 
 #include <array>
+#include <atomic>
 #include <chrono>
+#include <condition_variable>
+#include <mutex>
 #include <string>
 #include <variant>
 #include <vector>
@@ -76,7 +79,6 @@ public:
     template<typename ResponseCreator>
     void addNode(const Id& graphId,
                  const std::string& type,
-                 const std::string& nodeName,
                  ResponseCreator&& responseCreator);
 
     void removeNode(const Id& graphId,
@@ -229,9 +231,8 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
         catch(executionGraph::Exception& e)
         {
             EXECGRAPHGUI_THROW_BAD_REQUEST(
-                "Construction of node '{0}' with type: '{1}' "
-                "for graph id '{2}' failed: '{3}'",
-                nodeName,
+                "Construction of node with type: '{0}' "
+                "for graph id '{1}' failed: '{2}'",
                 type,
                 graphId.toString(),
                 e.what());

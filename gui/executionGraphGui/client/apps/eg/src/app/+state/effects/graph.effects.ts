@@ -40,7 +40,7 @@ export class GraphEffects {
 
   @Effect()
   loadGraphs$ = this.actions$.ofType<fromGraph.LoadGraphs>(fromGraph.LOAD_GRAPHS).pipe(
-    mergeMap((action, state) => this.createScrambledGraph()),
+    mergeMap((action, state) => this.createDummyGraph()),
     catchError(error => {
       this.log.error(`Failed to load graphs`, error);
       return of(new fromGraph.GraphLoadError(error));
