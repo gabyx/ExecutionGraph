@@ -13,7 +13,6 @@
 include "executionGraph/serialization/schemas/GraphTypeDescription.fbs";
 include "executionGraph/serialization/schemas/LogicNode.fbs";
 include "executionGraph/serialization/schemas/SocketLinkDescription.fbs";
-include "executionGraph/serialization/schemas/GraphVisualization.fbs";
 
 namespace executionGraph.serialization;
 
@@ -36,12 +35,12 @@ table ExecutionGraph
 {
     graphDescription:GraphTypeDescription (id:0); //!< The description of this graph.
     
-    nodes:[LogicNode] (id:1); //!< All nodes.
-    links:[SocketLinkDescription] (id:2); //!< All links.
+    nodes:[LogicNode] (id:1);               //!< All nodes.
+    links:[SocketLinkDescription] (id:2);   //!< All links.
     
     nodeProperties:[ExecutionGraphNodeProperties] (id:3); //!< All node properties for the graph.
     
-    visualization:GraphVisualization (id:4); //!< Additional visualization data for this graph.
+    visualization: [uint8] (id:4, flexbuffer); //!< Additional visualization data for this graph.
 }
 
 file_identifier "EXGR";

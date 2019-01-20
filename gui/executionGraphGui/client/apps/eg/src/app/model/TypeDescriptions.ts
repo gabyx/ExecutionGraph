@@ -15,11 +15,16 @@ import { Id } from '@eg/common';
 export class SocketTypeDescription {
   public readonly type: string;
   public readonly name: string;
+  public readonly description?: string;
 }
 
 export class NodeTypeDescription {
   public readonly type: string;
   public readonly name: string;
+
+  public readonly inSocketNames: string[];
+  public readonly outSocketNames: string[];
+  public readonly description?: string;
 }
 
 export class GraphTypeDescription {

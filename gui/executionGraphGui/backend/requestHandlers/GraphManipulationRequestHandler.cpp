@@ -102,7 +102,6 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
     // Execute the request
     m_backend->addNode(graphID,
                        nodeReq->node()->type()->str(),
-                       nodeReq->node()->name()->str(),
                        responseCreator);
 }
 

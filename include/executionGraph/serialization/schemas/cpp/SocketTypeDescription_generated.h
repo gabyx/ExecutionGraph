@@ -14,7 +14,8 @@ struct SocketTypeDescription;
 struct SocketTypeDescription FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TYPE = 4,
-    VT_NAME = 6
+    VT_NAME = 6,
+    VT_DESCRIPTION = 8
   };
   const flatbuffers::String *type() const {
     return GetPointer<const flatbuffers::String *>(VT_TYPE);
@@ -22,12 +23,17 @@ struct SocketTypeDescription FLATBUFFERS_FINAL_CLASS : private flatbuffers::Tabl
   const flatbuffers::String *name() const {
     return GetPointer<const flatbuffers::String *>(VT_NAME);
   }
+  const flatbuffers::String *description() const {
+    return GetPointer<const flatbuffers::String *>(VT_DESCRIPTION);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_TYPE) &&
            verifier.VerifyString(type()) &&
            VerifyOffsetRequired(verifier, VT_NAME) &&
            verifier.VerifyString(name()) &&
+           VerifyOffset(verifier, VT_DESCRIPTION) &&
+           verifier.VerifyString(description()) &&
            verifier.EndTable();
   }
 };
@@ -40,6 +46,9 @@ struct SocketTypeDescriptionBuilder {
   }
   void add_name(flatbuffers::Offset<flatbuffers::String> name) {
     fbb_.AddOffset(SocketTypeDescription::VT_NAME, name);
+  }
+  void add_description(flatbuffers::Offset<flatbuffers::String> description) {
+    fbb_.AddOffset(SocketTypeDescription::VT_DESCRIPTION, description);
   }
   explicit SocketTypeDescriptionBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -58,8 +67,10 @@ struct SocketTypeDescriptionBuilder {
 inline flatbuffers::Offset<SocketTypeDescription> CreateSocketTypeDescription(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> type = 0,
-    flatbuffers::Offset<flatbuffers::String> name = 0) {
+    flatbuffers::Offset<flatbuffers::String> name = 0,
+    flatbuffers::Offset<flatbuffers::String> description = 0) {
   SocketTypeDescriptionBuilder builder_(_fbb);
+  builder_.add_description(description);
   builder_.add_name(name);
   builder_.add_type(type);
   return builder_.Finish();
@@ -68,13 +79,16 @@ inline flatbuffers::Offset<SocketTypeDescription> CreateSocketTypeDescription(
 inline flatbuffers::Offset<SocketTypeDescription> CreateSocketTypeDescriptionDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *type = nullptr,
-    const char *name = nullptr) {
+    const char *name = nullptr,
+    const char *description = nullptr) {
   auto type__ = type ? _fbb.CreateString(type) : 0;
   auto name__ = name ? _fbb.CreateString(name) : 0;
+  auto description__ = description ? _fbb.CreateString(description) : 0;
   return executionGraph::serialization::CreateSocketTypeDescription(
       _fbb,
       type__,
-      name__);
+      name__,
+      description__);
 }
 
 }  // namespace serialization

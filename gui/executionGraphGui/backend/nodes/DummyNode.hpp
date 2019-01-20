@@ -35,14 +35,14 @@ public:
         AutoRegisterRTTR(const std::string& rttiPostFix)
         {
             rttr::registration::class_<DummyNode>("DummyNode-" + rttiPostFix)
-                .template constructor<NodeId, const std::string&>()(
-                    rttr::policy::ctor::as_raw_ptr)
                 .template constructor<NodeId>()(
                     rttr::policy::ctor::as_raw_ptr);
         }
     };
 
 public:
+    //@{
+    // Input/Output Definitions
     enum Ins
     {
         Value1,
@@ -53,14 +53,14 @@ public:
         Result1,
     };
     EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs)
-
     using InSockets = InSocketDeclList<InSocketDecl<Value1, int>,
                                        InSocketDecl<Value2, int>>;
 
     using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, int>>;
-
-    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME()
     EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
+    EXECGRAPH_DEFINE_STATIC_IN_SOCKET_NAMES(InSockets, "Val1", "Val2")
+    EXECGRAPH_DEFINE_STATIC_OUT_SOCKET_NAMES(OutSockets, "Res")
+    //@}
 
     template<typename... Args>
     DummyNode(Args&&... args)

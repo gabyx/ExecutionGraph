@@ -23,10 +23,10 @@ export class MoveToolComponent extends ToolComponent implements OnInit {
     });
 
     this.nodeEvents.onDragContinue.subscribe(dragEvent => {
-      const nodePosition = {
-        x: dragEvent.mousePosition.x - elementOffset.x,
-        y: dragEvent.mousePosition.y - elementOffset.y
-      };
+      const nodePosition = new Point(
+        dragEvent.mousePosition.x - elementOffset.x,
+        dragEvent.mousePosition.y - elementOffset.y
+      );
       // console.log(`Mouse: ${dragEvent.mousePosition.x}:${dragEvent.mousePosition.y}, ElementOffset: ${elementOffset.x}:${elementOffset.y}`);
       const graphPosition = this.graph.convertMouseToGraphPosition(nodePosition);
       this.store.dispatch(new MoveNode(dragEvent.element, graphPosition));

@@ -15,6 +15,8 @@ set(ExecutionGraphGUIBackend_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/requestHandlers/GraphManipulationRequestHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/requestHandlers/GraphManagementRequestHandler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/requestHandlers/GraphManagementRequestHandler.cpp
+    
+    ${CMAKE_CURRENT_SOURCE_DIR}/ExecutionGraphBackendDefs.hpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/ExecutionGraphBackend.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ExecutionGraphBackend.cpp

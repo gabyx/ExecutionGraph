@@ -163,7 +163,6 @@ export class TestBackend extends ITestBackend {
     szMani.LogicNode.startLogicNode(builder);
     this.nodeId += 1;
     szMani.LogicNode.addId(builder, builder.createLong(this.nodeId, 0));
-    szMani.LogicNode.addName(builder, nameOff);
     szMani.LogicNode.addType(builder, typeOff);
     szMani.LogicNode.addInputSockets(builder, inSocksOff);
     szMani.LogicNode.addOutputSockets(builder, outSocksOff);
@@ -195,8 +194,6 @@ export class TestBackend extends ITestBackend {
       szMani.LogicSocket.addTypeIndex(builder, flatbuffers.Long.create(typeIndex, 0));
       szMani.LogicSocket.addType(builder, typeOff);
       szMani.LogicSocket.addTypeName(builder, typeOff);
-
-      szMani.LogicSocket.addName(builder, socketNameOff);
       szMani.LogicSocket.addIndex(builder, flatbuffers.Long.create(i, 0));
       let off = szMani.LogicSocket.endLogicSocket(builder);
       socketOffs.push(off);

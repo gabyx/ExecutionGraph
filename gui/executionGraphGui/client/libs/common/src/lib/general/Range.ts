@@ -1,25 +1,20 @@
 // =========================================================================================
 //  ExecutionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
-// 
-//  @date Sat Apr 28 2018
+//
+//  @date Tue Jan 15 2019
 //  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
-// 
+//
 //  This Source Code Form is subject to the terms of the Mozilla Public
 //  License, v. 2.0. If a copy of the MPL was not distributed with this
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-include "executionGraph/serialization/schemas/LogicSocket.fbs";
-
-namespace executionGraph.serialization;
-
-table LogicNode {
-    id:uint64 (id:0);                   //!< The unique node id.
-    type:string (id: 1, required);      //!< The rtti of the node.
-
-    inputSockets:[LogicSocket] (id:2);  //!< The input logic sockets.
-    outputSockets:[LogicSocket] (id:3); //!< The output logic sockets.
-
-    data:[uint8] (id: 4, flexbuffer);   //!< The additional data for this node.
+function* makeRange(start = 0, end = Infinity, step = 1) {
+  let iterationCount = 0;
+  for (let i = start; i < end; i += step) {
+    iterationCount++;
+    yield i;
+  }
+  return iterationCount;
 }

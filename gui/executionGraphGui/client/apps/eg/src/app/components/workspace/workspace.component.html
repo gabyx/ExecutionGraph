@@ -23,14 +23,14 @@
       [forwardTo]="nodeEvents"
     >
       <div class="header">
-        <span [ngcsEventSource]="node" [forwardTo]="nodeNameEvents" [cancelBubble]="false">{{ node.name }}</span>
+        <span [ngcsEventSource]="node" [forwardTo]="nodeNameEvents" [cancelBubble]="false">{{ node.uiProps.name }}</span>
       </div>
 
       <div class="sockets">
         <div class="inputs">
           <div class="socket" *ngFor="let socket of node.inputs" [ngcsEventSource]="socket" [forwardTo]="socketEvents">
             <span [ngcsEventSource]="socket" [forwardTo]="socketNameEvents" [cancelBubble]="false">{{
-              socket.name
+              socket.uiProps.name
             }}</span>
             <ngcs-port [id]="socket.idString" class="left middle"></ngcs-port>
           </div>
@@ -39,7 +39,7 @@
         <div class="outputs">
           <div class="socket" *ngFor="let socket of node.outputs" [ngcsEventSource]="socket" [forwardTo]="socketEvents">
             <span [ngcsEventSource]="socket" [forwardTo]="socketNameEvents" [cancelBubble]="false">{{
-              socket.name
+              socket.uiProps.name
             }}</span>
             <ngcs-port [id]="socket.idString" class="right middle"></ngcs-port>
           </div>

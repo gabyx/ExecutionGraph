@@ -10,19 +10,18 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
-import {
-  ConnectionDrawStyle,
-  DirectConnectionDrawStyle,
-  ManhattenConnectionDrawStyle,
-  BezierConnectionDrawStyle
-} from '@eg/graph';
-import { ILogger, LoggerFactory } from '@eg/logger';
+import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { UiState } from '../../+state/reducers/ui.reducers';
-import { SetConnectionDrawStyle } from '../../+state/actions/ui.actions';
 import { Observable } from 'rxjs';
+import { MassSpringLayoutStrategy } from '@eg/graph';
+import { ILogger, LoggerFactory } from '@eg/logger';
+
+import { Graph } from '../../model';
+import * as fromGraph from '../../+state/actions/graph.actions';
+import { SetConnectionDrawStyle } from '../../+state/actions/ui.actions';
 import { getConnectionDrawStyleName } from '../../+state/selectors/ui.selectors';
+import { AppState } from '../../+state/reducers/app.reducers';
+import { getSelectedGraph } from '../../+state/selectors';
 
 export type ConnectionDrawStyleName = 'direct' | 'manhatten' | 'bezier';
 
@@ -38,14 +37,16 @@ export type ConnectionDrawStyleName = 'direct' | 'manhatten' | 'bezier';
   styleUrls: ['./connection-style-options.component.css']
 })
 export class ConnectionStyleOptionsComponent implements OnInit {
-
   drawStyle: Observable<ConnectionDrawStyleName>;
+
+  graph: Observable<Graph>;
 
   private readonly log: ILogger;
 
-  constructor(private store: Store<UiState>, loggerFactory: LoggerFactory) {
+  constructor(private store: Store<AppState>, loggerFactory: LoggerFactory) {
     this.log = loggerFactory.create('ConnectionStyleOptionsComponent');
     this.drawStyle = store.select(getConnectionDrawStyleName);
+    this.graph = store.select(getSelectedGraph);
   }
 
   ngOnInit() {}
@@ -53,5 +54,9 @@ export class ConnectionStyleOptionsComponent implements OnInit {
   setDrawStyle(drawStyleName: ConnectionDrawStyleName) {
     this.log.info(`Draw Style changed to ${drawStyleName}`);
     this.store.dispatch(new SetConnectionDrawStyle(drawStyleName));
+  }
+
+  autoLayoutGraph(graph: Graph) {
+    this.store.dispatch(new fromGraph.RunAutoLayout(graph, new MassSpringLayoutStrategy()));
   }
 }

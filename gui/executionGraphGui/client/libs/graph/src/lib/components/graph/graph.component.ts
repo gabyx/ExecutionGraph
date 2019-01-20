@@ -10,31 +10,21 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import {
-  Component,
-  ElementRef,
-  QueryList,
-  HostListener,
-  ContentChildren,
-  ChangeDetectorRef
-} from '@angular/core';
+import { Component, ElementRef, QueryList, HostListener, ContentChildren, ChangeDetectorRef } from '@angular/core';
 import { PortComponent } from '../port/port.component';
 import { Point, Position } from '../../model/Point';
 
-export function getPositionRelativeToParent(element: HTMLElement, referenceParent?: HTMLElement) {
+export function getPositionRelativeToParent(element: HTMLElement, referenceParent?: HTMLElement): Point {
   let offsetLeft = element.offsetLeft; //+ element.offsetWidth / 2;
   let offsetTop = element.offsetTop; // + element.offsetHeight / 2;
 
   while (element.offsetParent && element.offsetParent !== referenceParent) {
-      element = element.offsetParent as HTMLElement;
-      offsetLeft += element.offsetLeft;
-      offsetTop += element.offsetTop;
+    element = element.offsetParent as HTMLElement;
+    offsetLeft += element.offsetLeft;
+    offsetTop += element.offsetTop;
   }
 
-  return {
-      x: offsetLeft,
-      y: offsetTop
-  };
+  return new Point(offsetLeft, offsetTop);
 }
 
 @Component({
@@ -61,11 +51,11 @@ export class GraphComponent {
     return `scale(${this.zoomFactor})`;
   }
 
-  private ports: {[id: string]: PortComponent} = {};
+  private ports: { [id: string]: PortComponent } = {};
 
   public zoomFactor: number = 1;
 
-  public pan: Position = { x: 0, y: 0 };
+  public pan: Position = Point.zero.copy();
 
   constructor(private element: ElementRef, private cdr: ChangeDetectorRef) {}
 
@@ -100,7 +90,7 @@ export class GraphComponent {
       position.y += element.offsetHeight / 2;
       return position;
     }
-    return { x: 0, y: 0 };
+    return Point.zero.copy();
   }
 
   /**
@@ -114,13 +104,13 @@ export class GraphComponent {
     return this.ports[id];
   }
 
-  public convertMouseToGraphPosition(mousePoint: Point, offset?: Point) {
+  public convertMouseToGraphPosition(mousePoint: Point, offset?: Point): Point {
     const graphPosition = this.getGraphPosition();
-    offset = offset ? offset : {x: 0, y: 0};
-    return {
-      x: (mousePoint.x - graphPosition.x - offset.x) / this.zoomFactor - this.pan.x,
-      y: (mousePoint.y - graphPosition.y - offset.y) / this.zoomFactor - this.pan.y
-    };
+    offset = offset ? offset : Point.zero;
+    return new Point(
+      (mousePoint.x - graphPosition.x - offset.x) / this.zoomFactor - this.pan.x,
+      (mousePoint.y - graphPosition.y - offset.y) / this.zoomFactor - this.pan.y
+    );
   }
 
   public getGraphPosition(): Point {
@@ -130,6 +120,4 @@ export class GraphComponent {
   private getRelativePosition(element: HTMLElement): Point {
     return getPositionRelativeToParent(element, this.element.nativeElement);
   }
-
-
 }

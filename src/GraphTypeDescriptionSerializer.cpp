@@ -23,12 +23,27 @@ namespace executionGraph
                                                                                        const GraphTypeDescription& graphDescription)
     {
         // Node descriptions
+
         std::vector<flatbuffers::Offset<s::NodeTypeDescription>> nodes;
         for(auto& nD : graphDescription.getNodeTypeDescriptions())
         {
+            std::vector<flatbuffers::Offset<flatbuffers::String>> inNamesOff;
+            for(auto& name : nD.inSocketNames)
+            {
+                inNamesOff.emplace_back(builder.CreateString(name));
+            }
+
+            std::vector<flatbuffers::Offset<flatbuffers::String>> outNamesOff;
+            for(auto& name : nD.outSocketNames)
+            {
+                outNamesOff.emplace_back(builder.CreateString(name));
+            }
+
             nodes.emplace_back(s::CreateNodeTypeDescriptionDirect(builder,
                                                                   nD.m_type.c_str(),
-                                                                  nD.m_name.c_str()));
+                                                                  nD.m_name.c_str(),
+                                                                  &inNamesOff,
+                                                                  &outNamesOff));
         }
 
         // Socket descriptions

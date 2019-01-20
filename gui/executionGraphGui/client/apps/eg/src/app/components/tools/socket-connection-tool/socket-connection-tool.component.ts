@@ -21,7 +21,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
 
   public tempTargetSocket: InputSocket | OutputSocket = null;
   public tempConnection: Connection = null;
-  public tempConnectionEndpoint: Point = { x: 0, y: 0 };
+  public tempConnectionEndpoint = Point.zero.copy();
 
   public invalidity = Connection.Invalidity.Valid;
   public get invalidityMessages() {
@@ -47,9 +47,9 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       this.logger.info(`Initiating new connection from ${socket.idString}`);
       this.sourceSocket = socket;
       if (Socket.isOutputSocket(this.sourceSocket)) {
-        this.tempTargetSocket = new InputSocket(socket.typeIndex, socket.name, new SocketIndex(0));
+        this.tempTargetSocket = new InputSocket(socket.typeIndex, new SocketIndex(0));
       } else {
-        this.tempTargetSocket = new OutputSocket(socket.typeIndex, socket.name, new SocketIndex(0));
+        this.tempTargetSocket = new OutputSocket(socket.typeIndex, new SocketIndex(0));
       }
       this.activate();
       this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);

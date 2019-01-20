@@ -162,7 +162,9 @@
     "**/node_modules/**": true,
     "**/build/**": true,
     "**/buildExternal/**": true,
-    "**/dist/**": true
+    "**/dist/**": true,
+    "**/docs/demo/**": true,
+    "**/client/build/**": true
   },
   "search.exclude": {
     "**/build/**": true,

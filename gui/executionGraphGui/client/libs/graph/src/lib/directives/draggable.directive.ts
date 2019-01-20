@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Directive, ElementRef, EventEmitter, Output, Input, HostListener, } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, Output, Input, HostListener } from '@angular/core';
 
 import { tap, map, switchMap, takeUntil } from 'rxjs/operators';
 
@@ -26,13 +26,13 @@ export interface DragMouseEvent {
   mouseToElementOffset?: Point;
   mousePosition: Point;
   mouseButton: MouseButton;
-};
+}
 
 export interface DragEvent {
   mousePosition: Point;
   mouseToElementOffset: Point;
   mouseButton: MouseButton;
-};
+}
 
 @Directive({
   selector: '[ngcsDraggable]'
@@ -80,7 +80,7 @@ export class DraggableDirective {
         //       dragStartEvent.mousePosition.x
         //     }:${dragStartEvent.mousePosition.y}`
         //   )
-          // ),
+        // ),
         tap(dragStartEvent => this.dragStarted.emit(this.calculateDragEvent(dragStartEvent, dragStartEvent))),
         switchMap(dragStartEvent =>
           this.mouseMoved.pipe(
@@ -103,7 +103,6 @@ export class DraggableDirective {
         )
       )
       .subscribe(() => void 0);
-
   }
 
   /**
@@ -112,7 +111,6 @@ export class DraggableDirective {
    */
   @HostListener('mousedown', ['$event'])
   onMouseDown(event: MouseEvent) {
-
     document.addEventListener('mouseup', this.onMouseUpRegistration);
     document.addEventListener('mousemove', this.onMouseMoveRegistration);
 
@@ -122,11 +120,8 @@ export class DraggableDirective {
     //const scale = clientRect.width / this.nativeElement.offsetWidth;
 
     const dragEvent = {
-      mouseToElementOffset: {
-        x: (event.clientX - clientRect.left),
-        y: (event.clientY - clientRect.top)
-      },
-      mousePosition: { x: event.clientX, y: event.clientY },
+      mouseToElementOffset: new Point(event.clientX - clientRect.left, event.clientY - clientRect.top),
+      mousePosition: new Point(event.clientX, event.clientY),
       mouseButton: event.button
     };
 
@@ -141,14 +136,13 @@ export class DraggableDirective {
    * @param event Mouse Event
    */
   onMouseUp(event: MouseEvent) {
-
     if (this.isTracking) {
       this.isTracking = false;
 
       event.preventDefault();
       event.cancelBubble = true;
       const dragEvent = {
-        mousePosition: { x: event.clientX, y: event.clientY },
+        mousePosition: new Point(event.clientX, event.clientY),
         mouseButton: event.button
       };
       this.mouseReleased.emit(dragEvent);
@@ -168,7 +162,7 @@ export class DraggableDirective {
       event.cancelBubble = true;
 
       const dragEvent = {
-        mousePosition: { x: event.clientX, y: event.clientY },
+        mousePosition: new Point(event.clientX, event.clientY),
         mouseButton: event.button
       };
       this.mouseMoved.emit(dragEvent);

@@ -260,7 +260,9 @@ namespace executionGraph
                 std::unique_ptr<NodeBaseType> logicNode = m_nodeSerializer.read(*node);
                 if(logicNode)
                 {
-                    EXECGRAPH_LOG_TRACE("Adding node with id: " << node->id() << " type: " << node->type()->str());
+                    EXECGRAPH_LOG_TRACE("Adding node with id: '{0}', type: '{0}'",
+                                        node->id(),
+                                        node->type()->str());
                     execGraph.addNode(std::move(logicNode));
                 }
                 else

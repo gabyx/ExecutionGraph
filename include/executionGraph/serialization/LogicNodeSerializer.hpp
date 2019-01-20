@@ -63,7 +63,6 @@ namespace executionGraph
         static std::unique_ptr<NodeBaseType>
         read(const std::string& type,
              NodeId nodeId,
-             const std::string& nodeName,
              const flatbuffers::Vector<flatbuffers::Offset<serialization::LogicSocket>>* inputSockets  = nullptr,
              const flatbuffers::Vector<flatbuffers::Offset<serialization::LogicSocket>>* outputSockets = nullptr,
              const flatbuffers::Vector<uint8_t>* additionalData                                        = nullptr)
@@ -74,7 +73,6 @@ namespace executionGraph
 
             auto optNode = FactoryRead::create(rttrType,
                                                nodeId,
-                                               nodeName,
                                                inputSockets,
                                                outputSockets,
                                                additionalData);
@@ -98,19 +96,11 @@ namespace executionGraph
                                    type);
 
                 rttr::variant instance;
-                if(!nodeName.empty())
-                {
-                    rttr::constructor ctor = rttrType.get_constructor({rttr::type::get<NodeId>(),
-                                                                       rttr::type::get<const std::string&>()});
-                    EXECGRAPH_THROW_IF(!ctor.is_valid(), "Ctor is invalid for type: '{0}'", type);
-                    instance = ctor.invoke(nodeId, nodeName);
-                }
-                else
-                {
-                    rttr::constructor ctor = rttrType.get_constructor({rttr::type::get<NodeId>()});
-                    EXECGRAPH_THROW_IF(!ctor.is_valid(), "Ctor is invalid for type: '{0}'", type);
-                    instance = ctor.invoke(nodeId);
-                }
+
+                rttr::constructor ctor = rttrType.get_constructor({rttr::type::get<NodeId>()});
+                EXECGRAPH_THROW_IF(!ctor.is_valid(), "Ctor is invalid for type: '{0}'", type);
+                instance = ctor.invoke(nodeId);
+
                 EXECGRAPH_THROW_IF(!instance.is_valid(), "Variant instance is not valid!");
                 EXECGRAPH_THROW_IF(!instance.get_type().is_pointer(), "Variant instance type needs to be a pointer!");
 
@@ -124,7 +114,6 @@ namespace executionGraph
         {
             return LogicNodeSerializer::read(logicNode.type()->str(),
                                              logicNode.id(),
-                                             logicNode.name() ? logicNode.name()->str() : "",
                                              logicNode.inputSockets(),
                                              logicNode.outputSockets(),
                                              logicNode.data());
@@ -141,9 +130,7 @@ namespace executionGraph
             using namespace s;
             namespace fb = flatbuffers;
 
-            NodeId id       = node.getId();
-            auto nameOffset = builder.CreateString(node.getName());
-
+            NodeId id        = node.getId();
             std::string type = rttr::type::get(node).get_name().to_string();
             auto typeOffset  = builder.CreateString(type);
 
@@ -174,7 +161,6 @@ namespace executionGraph
             LogicNodeBuilder lnBuilder(builder);
             lnBuilder.add_id(id);
             lnBuilder.add_type(typeOffset);
-            lnBuilder.add_name(nameOffset);
             lnBuilder.add_inputSockets(inputsOff);
             lnBuilder.add_outputSockets(outputsOff);
             if(!dataOffset.IsNull())
@@ -199,10 +185,9 @@ namespace executionGraph
                 std::vector<flatbuffers::Offset<LogicSocket>> socketOffs;
                 for(auto& socket : sockets)
                 {
-                    auto nameOff = builder.CreateString(socket->getName());
                     EXECGRAPH_ASSERT(socket->getType() < socketDescriptions.size(), "Socket type wrong!");
 
-                    decltype(nameOff) typeOff, typeNameOff;
+                    flatbuffers::Offset<flatbuffers::String> typeOff, typeNameOff;
                     if(fullTypeSpec)
                     {
                         typeOff     = builder.CreateString(socketDescriptions[socket->getType()].m_type);
@@ -216,7 +201,6 @@ namespace executionGraph
 
                     soBuilder.add_index(socket->getIndex());
 
-                    soBuilder.add_name(nameOff);
                     socketOffs.emplace_back(soBuilder.Finish());
                 }
                 return builder.CreateVector(socketOffs);
@@ -247,7 +231,7 @@ namespace executionGraph
                                    "socket type '{2}' at index '{3}'! "
                                    "The deserialization should have added this sockets throught the constructor! ",
                                    ((checkInput) ? "input" : "output"),
-                                   node->getName(),
+                                   node->getId(),
                                    rttr::type::get<T>().get_name().to_string(),
                                    index);
             }

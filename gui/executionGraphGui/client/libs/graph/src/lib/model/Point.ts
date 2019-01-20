@@ -10,9 +10,11 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-export interface Point {
-  x: number;
-  y: number;
-};
+import { Vector2 } from '@eg/common';
 
-export type Position = Point;
+export class Point extends Vector2 {
+  constructor(x: number, y: number) {
+    super([x, y]);
+  }
+}
+export class Position extends Vector2 {}
