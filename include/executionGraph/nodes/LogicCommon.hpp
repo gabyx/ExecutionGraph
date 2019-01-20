@@ -130,11 +130,6 @@ namespace executionGraph
             //! How many socket declaration we have
             static const auto nSockets = meta::size<meta::list<TSocketDecl...>>::value;
 
-        public:
-            SocketDeclarationList(std::array<std::string, nSockets> socketNames)
-                : m_names(std::move(socketNames))
-            {}
-
         private:
             //! Filter out all not TMPSocketDeclIn<...> and compare length to TypeList
             template<typename T>
@@ -194,18 +189,6 @@ namespace executionGraph
             //! Get the SocketDecleration (TMPSocketDeclOut) of socket with id `id`.
             template<EnumType id>
             using Get = typename GetSocketDeclImpl<id>::type;
-
-        public:
-            //! Get the name of the socket with id `id`.
-            const std::string& getName(EnumType id) const
-            {
-                return m_names[Get<id>::Id::value];
-            }
-
-            const auto& getNames() const { return m_names; }
-
-        private:
-            std::array<std::string, nSockets> m_names;  //!< Socket names.
         };
 
         //! The user only defines Sockets with these templates.
@@ -234,14 +217,6 @@ namespace executionGraph
                                                                   InputSocketDeclaration,
                                                                   TSocketDecl...>
         {
-            using Base = SocketDeclarationList<InputEnum,
-                                               InputSocketDeclarationBase,
-                                               InputSocketDeclaration,
-                                               TSocketDecl...>;
-
-            InputSocketDeclarationList(std::array<std::string, Base::nSockets> socketNames)
-                : Base(std::move(socketNames))
-            {}
         };
 
         template<typename OutputEnum, typename... TSocketDecl>
@@ -250,13 +225,6 @@ namespace executionGraph
                                                                    OutputSocketDeclaration,
                                                                    TSocketDecl...>
         {
-            using Base = SocketDeclarationList<OutputEnum,
-                                               OutputSocketDeclarationBase,
-                                               OutputSocketDeclaration,
-                                               TSocketDecl...>;
-            OutputSocketDeclarationList(std::array<std::string, Base::nSockets> socketNames)
-                : Base(std::move(socketNames))
-            {}
         };
 
     }  // namespace details

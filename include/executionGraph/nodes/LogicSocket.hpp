@@ -29,15 +29,17 @@
 public:                                                                \
     static const auto& getInputNames()                                 \
     {                                                                  \
-        const static InSocketDeclList inSockets = {{__VA_ARGS__}};     \
-        return inSockets.getNames();                                   \
+        static std::array<std::string, InSocketDeclList::nSockets>     \
+            names = {{__VA_ARGS__}};                                   \
+        return names;                                                  \
     }
 #define EXECGRAPH_DEFINE_STATIC_OUT_SOCKET_NAMES(OutSocketDeclList, ...) \
 public:                                                                  \
     static const auto& getOutputNames()                                  \
     {                                                                    \
-        const static OutSocketDeclList outSockets = {{__VA_ARGS__}};     \
-        return outSockets.getNames();                                    \
+        static std::array<std::string, OutSocketDeclList::nSockets>      \
+            names = {{__VA_ARGS__}};                                     \
+        return names;                                                    \
     }
 
 namespace executionGraph
