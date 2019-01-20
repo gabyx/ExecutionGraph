@@ -42,10 +42,10 @@
 
   <mat-menu #fileMenu="matMenu">
     <ng-template matMenuContent let-file="f">
-      <button #openButton mat-menu-item [disabled]="mode !== FileBrowserMode.OpenMode || !isFileOpenable(file)" (click)="openFile(file)">
+      <button #openButton mat-menu-item [disabled]="!allowOpen || !isFileOpenable(file)" (click)="openFile(file)">
         Open
       </button>
-      <button #openButton mat-menu-item [disabled]="!allowOpen || !isFileOpenable(file)" (click)="openFile(file)">
+      <button #openButton mat-menu-item [disabled]="!allowSave || !isFileOpenable(file)" (click)="saveFile(file)">
         Save As
       </button>
       <button
