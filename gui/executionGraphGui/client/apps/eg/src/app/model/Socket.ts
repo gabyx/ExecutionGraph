@@ -71,6 +71,12 @@ export abstract class Socket {
     if (!isDefined(type)) {
       type = typeIndex.toString();
     }
+
+    // Set a default socket name:
+    // @todo gabnue->gabnue: Move that to the designated place where we initialize UI-Properties.
+    if (this.uiProps.name) {
+      this.uiProps.name = Socket.isInputSocket(this) ? `in-${this.index}` : `out-${this.index}`;
+    }
   }
 
   public get parent(): Node {
