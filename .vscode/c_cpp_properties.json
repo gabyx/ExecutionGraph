@@ -1,32 +1,41 @@
 {
-    "configurations": [
-        {
-            "name": "Mac/Linux",
-            "includePath": [
-                "${workspaceRoot}/include",
-                "${workspaceRoot}/gui",
-                "${workspaceRoot}/gui/executionGraphGui/client",
-                "${workspaceRoot}/build/include",
-                "${workspaceRoot}/tests/include"
-            ],
-            "defines": [],
-            "browse": {
-                "path": [
-                    "${workspaceRoot}/src",
-                    "${workspaceRoot}/include",
-                    "${workspaceRoot}/gui",
-                    "${workspaceRoot}/build/include",
-                    "${workspaceRoot}/tests/include"
-                ],
-                "limitSymbolsToIncludedHeaders": true,
-                "databaseFilename": "$[workspaceRoot}/.vscode/browse.vc.db"
-            },
-            "intelliSenseMode": "clang-x64",
-            "cStandard": "c11",
-            "cppStandard": "c++17",
-            "compilerPath": "/usr/bin/clang",
-            "configurationProvider": "vector-of-bool.cmake-tools"
-        }
-    ],
-    "version": 4
+  "configurations": [
+    {
+      "name": "Mac/Linux",
+      "includePath": [
+        "${workspaceRoot}/include",
+        "${workspaceRoot}/gui",
+        "${workspaceRoot}/gui/executionGraphGui/client",
+        "${workspaceRoot}/build/include",
+        "${workspaceRoot}/tests/include",
+        "${workspaceRoot}/buildExternal/install/rttr/include",
+        "${workspaceRoot}/buildExternal/install/memory/include/foonathan_memory",
+        "${workspaceRoot}/buildExternal/meta/meta-src/include",
+        "${workspaceRoot}/buildExternal/spdlog/spdlog-src/include",
+        "${workspaceRoot}/buildExternal/install/fmt/include",
+        "${workspaceRoot}/buildExternal/install/flatbuffers/include",
+        "${workspaceRoot}/buildExternal/install/crossguid/include",
+        "${workspaceRoot}/buildExternal/install/boost/include",
+        "${workspaceRoot}/buildExternal/args/args-src/"
+      ],
+      "defines": [],
+      "browse": {
+        "path": [
+          "${workspaceRoot}/src",
+          "${workspaceRoot}/include",
+          "${workspaceRoot}/gui",
+          "${workspaceRoot}/build/include",
+          "${workspaceRoot}/tests/include"
+        ],
+        "limitSymbolsToIncludedHeaders": true,
+        "databaseFilename": "$[workspaceRoot}/.vscode/browse.vc.db"
+      },
+      "intelliSenseMode": "clang-x64",
+      "cStandard": "c11",
+      "cppStandard": "c++17",
+      "compilerPath": "/usr/bin/clang",
+      "configurationProvider": "vector-of-bool.cmake-tools"
+    }
+  ],
+  "version": 4
 }

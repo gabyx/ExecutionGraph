@@ -47,12 +47,11 @@ struct DummyNodeSerializer
 
         static std::unique_ptr<NodeBaseType>
         create(executionGraph::NodeId nodeId,
-               const std::string& name,
                const VectorOffsetSocket* inputSockets             = nullptr,
                const VectorOffsetSocket* outputSockets            = nullptr,
                const flatbuffers::Vector<uint8_t>* additionalData = nullptr)
         {
-            return std::make_unique<DummyNodeType>(nodeId, name);
+            return std::make_unique<DummyNodeType>(nodeId);
         }
     };
 };

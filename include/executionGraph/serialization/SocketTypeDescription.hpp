@@ -22,44 +22,32 @@ namespace executionGraph
     //! A simple socket descriptio, describing a LogicSocket.
     struct SocketTypeDescription
     {
-        SocketTypeDescription(const std::string& rtti)
-            : m_type(rtti), m_name(m_type)
-        {}
-        SocketTypeDescription(const std::string& rtti, const std::string& name)
-            : m_type(rtti), m_name(name)
-        {}
-
-        std::string m_type;  //!< The unique RTTI name of the socket
-        std::string m_name;  //!< The readable name of the socket
+        std::string m_type;           //!< The unique RTTI name of the socket
+        std::string m_name = m_type;  //!< The readable name of the socket
     };
-
-    namespace details
-    {
-        //! Return a set of rtti strings.
-        template<typename T>
-        struct MakeRTTIs;
-
-        //! Spezialization for `meta::list<...>`.
-        template<typename... NodeType>
-        struct MakeRTTIs<meta::list<NodeType...>>
-        {
-            template<typename T>
-            static std::vector<T> eval()
-            {
-                return {{T{rttr::type::get<NodeType>().get_name().to_string()}...}};
-            }
-        };
-    }  // namespace details
 
     //! Get all socket descriptions for this config `TConfig`.
     template<typename TConfig>
     static const std::vector<SocketTypeDescription>& getSocketDescriptions()
     {
+        using WrappedNodes = meta::transform<typename TConfig::SocketTypes, meta::quote<meta::id>>;
+
+        auto init = []() {
+            std::vector<SocketTypeDescription> desc;
+            auto create = [&desc](auto idType) {
+                using SocketType = typename decltype(idType)::type;
+                desc.emplace_back(SocketTypeDescription{rttr::type::get<SocketType>().get_name().to_string()});
+            };
+
+            meta::for_each(WrappedNodes{}, create);
+            return desc;
+        };
+
         //! The static socket description for this default configuration
-        static const std::vector<SocketTypeDescription> socketTypeDescriptions =
-            details::MakeRTTIs<typename TConfig::SocketTypes>::template eval<SocketTypeDescription>();
+        static const std::vector<SocketTypeDescription> socketTypeDescriptions = init();
 
         return socketTypeDescriptions;
     }
+
 }  // namespace executionGraph
 #endif

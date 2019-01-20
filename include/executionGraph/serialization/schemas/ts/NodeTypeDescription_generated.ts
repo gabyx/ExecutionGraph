@@ -51,10 +51,61 @@ name(optionalEncoding?:any):string|Uint8Array|null {
 };
 
 /**
+ * @param number index
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array
+ */
+inSocketNames(index: number):string
+inSocketNames(index: number,optionalEncoding:flatbuffers.Encoding):string|Uint8Array
+inSocketNames(index: number,optionalEncoding?:any):string|Uint8Array|null {
+  var offset = this.bb!.__offset(this.bb_pos, 8);
+  return offset ? this.bb!.__string(this.bb!.__vector(this.bb_pos + offset) + index * 4, optionalEncoding) : null;
+};
+
+/**
+ * @returns number
+ */
+inSocketNamesLength():number {
+  var offset = this.bb!.__offset(this.bb_pos, 8);
+  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+};
+
+/**
+ * @param number index
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array
+ */
+outSocketNames(index: number):string
+outSocketNames(index: number,optionalEncoding:flatbuffers.Encoding):string|Uint8Array
+outSocketNames(index: number,optionalEncoding?:any):string|Uint8Array|null {
+  var offset = this.bb!.__offset(this.bb_pos, 10);
+  return offset ? this.bb!.__string(this.bb!.__vector(this.bb_pos + offset) + index * 4, optionalEncoding) : null;
+};
+
+/**
+ * @returns number
+ */
+outSocketNamesLength():number {
+  var offset = this.bb!.__offset(this.bb_pos, 10);
+  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+};
+
+/**
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array|null
+ */
+description():string|null
+description(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+description(optionalEncoding?:any):string|Uint8Array|null {
+  var offset = this.bb!.__offset(this.bb_pos, 12);
+  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+};
+
+/**
  * @param flatbuffers.Builder builder
  */
 static startNodeTypeDescription(builder:flatbuffers.Builder) {
-  builder.startObject(2);
+  builder.startObject(5);
 };
 
 /**
@@ -75,6 +126,72 @@ static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
 
 /**
  * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset inSocketNamesOffset
+ */
+static addInSocketNames(builder:flatbuffers.Builder, inSocketNamesOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(2, inSocketNamesOffset, 0);
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @param Array.<flatbuffers.Offset> data
+ * @returns flatbuffers.Offset
+ */
+static createInSocketNamesVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
+  builder.startVector(4, data.length, 4);
+  for (var i = data.length - 1; i >= 0; i--) {
+    builder.addOffset(data[i]);
+  }
+  return builder.endVector();
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @param number numElems
+ */
+static startInSocketNamesVector(builder:flatbuffers.Builder, numElems:number) {
+  builder.startVector(4, numElems, 4);
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset outSocketNamesOffset
+ */
+static addOutSocketNames(builder:flatbuffers.Builder, outSocketNamesOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(3, outSocketNamesOffset, 0);
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @param Array.<flatbuffers.Offset> data
+ * @returns flatbuffers.Offset
+ */
+static createOutSocketNamesVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
+  builder.startVector(4, data.length, 4);
+  for (var i = data.length - 1; i >= 0; i--) {
+    builder.addOffset(data[i]);
+  }
+  return builder.endVector();
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @param number numElems
+ */
+static startOutSocketNamesVector(builder:flatbuffers.Builder, numElems:number) {
+  builder.startVector(4, numElems, 4);
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset descriptionOffset
+ */
+static addDescription(builder:flatbuffers.Builder, descriptionOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(4, descriptionOffset, 0);
+};
+
+/**
+ * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
 static endNodeTypeDescription(builder:flatbuffers.Builder):flatbuffers.Offset {
@@ -84,10 +201,13 @@ static endNodeTypeDescription(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 };
 
-static createNodeTypeDescription(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset):flatbuffers.Offset {
+static createNodeTypeDescription(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, inSocketNamesOffset:flatbuffers.Offset, outSocketNamesOffset:flatbuffers.Offset, descriptionOffset:flatbuffers.Offset):flatbuffers.Offset {
   NodeTypeDescription.startNodeTypeDescription(builder);
   NodeTypeDescription.addType(builder, typeOffset);
   NodeTypeDescription.addName(builder, nameOffset);
+  NodeTypeDescription.addInSocketNames(builder, inSocketNamesOffset);
+  NodeTypeDescription.addOutSocketNames(builder, outSocketNamesOffset);
+  NodeTypeDescription.addDescription(builder, descriptionOffset);
   return NodeTypeDescription.endNodeTypeDescription(builder);
 }
 }

@@ -16,8 +16,7 @@ struct LogicSocket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_TYPEINDEX = 4,
     VT_TYPE = 6,
     VT_TYPENAME = 8,
-    VT_NAME = 10,
-    VT_INDEX = 12
+    VT_INDEX = 10
   };
   uint64_t typeIndex() const {
     return GetField<uint64_t>(VT_TYPEINDEX, 0);
@@ -27,9 +26,6 @@ struct LogicSocket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const flatbuffers::String *typeName() const {
     return GetPointer<const flatbuffers::String *>(VT_TYPENAME);
-  }
-  const flatbuffers::String *name() const {
-    return GetPointer<const flatbuffers::String *>(VT_NAME);
   }
   uint64_t index() const {
     return GetField<uint64_t>(VT_INDEX, 0);
@@ -41,8 +37,6 @@ struct LogicSocket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyString(type()) &&
            VerifyOffset(verifier, VT_TYPENAME) &&
            verifier.VerifyString(typeName()) &&
-           VerifyOffset(verifier, VT_NAME) &&
-           verifier.VerifyString(name()) &&
            VerifyField<uint64_t>(verifier, VT_INDEX) &&
            verifier.EndTable();
   }
@@ -59,9 +53,6 @@ struct LogicSocketBuilder {
   }
   void add_typeName(flatbuffers::Offset<flatbuffers::String> typeName) {
     fbb_.AddOffset(LogicSocket::VT_TYPENAME, typeName);
-  }
-  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
-    fbb_.AddOffset(LogicSocket::VT_NAME, name);
   }
   void add_index(uint64_t index) {
     fbb_.AddElement<uint64_t>(LogicSocket::VT_INDEX, index, 0);
@@ -83,12 +74,10 @@ inline flatbuffers::Offset<LogicSocket> CreateLogicSocket(
     uint64_t typeIndex = 0,
     flatbuffers::Offset<flatbuffers::String> type = 0,
     flatbuffers::Offset<flatbuffers::String> typeName = 0,
-    flatbuffers::Offset<flatbuffers::String> name = 0,
     uint64_t index = 0) {
   LogicSocketBuilder builder_(_fbb);
   builder_.add_index(index);
   builder_.add_typeIndex(typeIndex);
-  builder_.add_name(name);
   builder_.add_typeName(typeName);
   builder_.add_type(type);
   return builder_.Finish();
@@ -99,17 +88,14 @@ inline flatbuffers::Offset<LogicSocket> CreateLogicSocketDirect(
     uint64_t typeIndex = 0,
     const char *type = nullptr,
     const char *typeName = nullptr,
-    const char *name = nullptr,
     uint64_t index = 0) {
   auto type__ = type ? _fbb.CreateString(type) : 0;
   auto typeName__ = typeName ? _fbb.CreateString(typeName) : 0;
-  auto name__ = name ? _fbb.CreateString(name) : 0;
   return executionGraph::serialization::CreateLogicSocket(
       _fbb,
       typeIndex,
       type__,
       typeName__,
-      name__,
       index);
 }
 

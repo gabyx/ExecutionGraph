@@ -99,12 +99,11 @@ struct DummyNodeSerializer
 
         static std::unique_ptr<NodeBaseType>
         create(executionGraph::NodeId nodeId,
-               const std::string& name,
                const flatbuffers::Vector<flatbuffers::Offset<s::LogicSocket>>* inputSockets  = nullptr,
                const flatbuffers::Vector<flatbuffers::Offset<s::LogicSocket>>* outputSockets = nullptr,
                const flatbuffers::Vector<uint8_t>* additionalData                            = nullptr)
         {
-            return std::make_unique<DummyNodeType>(nodeId, name);
+            return std::make_unique<DummyNodeType>(nodeId);
         }
     };
 };
@@ -117,11 +116,11 @@ MY_TEST(FlatBuffer, GraphSimple)
     auto makeLogicNodes = [&](auto& builder) {
         std::vector<flatbuffers::Offset<s::LogicNode>> nodes;
 
-        EXECGRAPH_LOG_TRACE("Serializing " << nNodes << " nodes!")
+        EXECGRAPH_LOG_TRACE("Serializing '{0}' nodes", nNodes);
         for(int i = 0; i < nNodes; ++i)
         {
             uint64_t id = i;
-            auto dummy = builder.CreateString(rttr::type::get<DummyNodeType>().get_name().to_string());
+            auto dummy  = builder.CreateString(rttr::type::get<DummyNodeType>().get_name().to_string());
 
             // make some sepcific flexbuffer and add it as data()
             namespace t = test;
@@ -182,9 +181,14 @@ MY_TEST(FlatBuffer, GraphSimple)
         ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(nodeSerializer);
         auto execGraph = serializer.read("myGraph.eg");
 
+        GraphTypeDescription::NodeTypeDescriptionList nodeTypeDescs = {
+            NodeTypeDescription{rttr::type::get<DummyNodeType>().get_name().to_string()}};
+
         EXECGRAPH_LOG_TRACE("Write graph by Serializer");
         serializer.write(*execGraph,
-                         makeGraphTypeDescription<Config>(IdNamed{"Graph1"}),
+                         makeGraphTypeDescription<Config>(IdNamed{"Graph1"},
+                                                          nodeTypeDescs,
+                                                          "My simple dummy graph..."),
                          "myGraph-out.eg",
                          true);
     }
@@ -203,8 +207,12 @@ MY_TEST(FlatBuffer, RandomTree)
     LogicNodeS nodeSerializer;
     ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(nodeSerializer);
     EXECGRAPH_LOG_TRACE("Write graph by Serializer");
+
+    GraphTypeDescription::NodeTypeDescriptionList nodeTypeDescs = {
+        NodeTypeDescription{rttr::type::get<DummyNodeType>().get_name().to_string()}};
+
     serializer.write(*execGraph,
-                     makeGraphTypeDescription<Config>(IdNamed{"Graph1"}),
+                     makeGraphTypeDescription<Config>(IdNamed{"Graph1"}, nodeTypeDescs, "My simple dummy graph..."),
                      "myGraph.eg",
                      true);
     auto graphRead = serializer.read("myGraph.eg");

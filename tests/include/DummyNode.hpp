@@ -33,8 +33,6 @@ public:
         AutoRegisterRTTR()
         {
             rttr::registration::class_<DummyNode>("DummyNode")
-                .template constructor<NodeId, const std::string&>()(
-                    rttr::policy::ctor::as_raw_ptr)
                 .template constructor<NodeId>()(
                     rttr::policy::ctor::as_raw_ptr);
         }
@@ -58,7 +56,6 @@ public:
 
     using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, int>>;
 
-    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME()
     EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
 
     template<typename... Args>
@@ -78,7 +75,7 @@ public:
         //        this->template getValue<typename OutSockets::template Get<Result1>>() =
         //            this->template getValue<typename InSockets::template Get<Value1>>() +
         //            this->template getValue<typename InSockets::template Get<Value2>>();
-        getOutVal<Result1>() = getInVal<Value1>() + getInVal<Value2>(); 
+        getOutVal<Result1>() = getInVal<Value1>() + getInVal<Value2>();
         /* + getInVal<Value3NotAdded>() // would be a compile error */
     }
 };

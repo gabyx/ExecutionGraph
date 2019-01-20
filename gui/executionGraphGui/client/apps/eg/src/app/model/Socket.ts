@@ -14,6 +14,11 @@ import * as Long from 'long';
 import { Guid } from 'guid-typescript';
 import { Node } from './Node';
 import { isDefined } from '@eg/common';
+import { Input } from '@angular/compiler/src/core';
+
+export class UIProps {
+  public name: string = '';
+}
 
 /**
  * The socket index of a socket `Socket`.
@@ -59,10 +64,10 @@ export abstract class Socket {
 
   constructor(
     public readonly typeIndex: Long,
-    public readonly name: string,
     public readonly index: SocketIndex,
     public readonly type?: string,
-    protected _parent?: Node
+    protected _parent?: Node,
+    public uiProps: UIProps = new UIProps()
   ) {
     if (!isDefined(type)) {
       type = typeIndex.toString();
@@ -113,16 +118,27 @@ export abstract class Socket {
   public static createSocket(
     kind: SocketType,
     type: Long,
-    name: string,
     index: SocketIndex,
     typeName: string | undefined | null,
     parent?: Node
-  ) {
+  ): InputSocket | OutputSocket {
     switch (kind) {
-      case 'input':
-        return new InputSocket(type, name, index, isDefined(typeName) ? typeName : undefined, parent);
-      case 'output':
-        return new OutputSocket(type, name, index, isDefined(typeName) ? typeName : undefined, parent);
+      case 'input': {
+        const s = new InputSocket(type, index, isDefined(typeName) ? typeName : undefined, parent);
+        // @todo gabnue->gabnue: Move that to
+        // the designated place where we initialize UI-Properties.
+        if (!s.uiProps.name) {
+          s.uiProps.name = `in-${s.index}`;
+        }
+        return s;
+      }
+      case 'output': {
+        const s = new OutputSocket(type, index, isDefined(typeName) ? typeName : undefined, parent);
+        if (!s.uiProps.name) {
+          s.uiProps.name = `out-${s.index}`;
+        }
+        return s;
+      }
     }
   }
 }

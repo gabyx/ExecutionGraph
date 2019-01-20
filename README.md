@@ -32,6 +32,7 @@ This library has these dependencies:
 - [meta](https://github.com/ericniebler/meta) (meta programming)
 - [crossguid](https://github.com/graeme-hill/crossguid) (guid implementation)
 - [rttr](https://github.com/rttrorg/rttr) (runtime type information, serialization only)
+- [fmt](https://github.com/fmtlib/fmt.git) (asserts, exception formatting)
 #### GUI Backend
 - [args](https://github.com/Taywee/args) (argument parser)
 - [memory](https://github.com/foonathan/memory.git) (memory allocators)
@@ -278,7 +279,7 @@ Finally we create the ExecutionTree `ExecutionTree`, add all nodes to it, set th
     execTree.setup();
     EXECGRAPH_LOG_INFO(execTree.getExecutionOrderInfo());
     execTree.execute(0); // execute the default execution group (=0)
-    EXECGRAPH_LOG_INFO("Result : "<< resultNode->getOutVal<IntegerNode<Config>::Result1>());
+    EXECGRAPH_LOG_INFO("Result : '{0}'", resultNode->getOutVal<IntegerNode<Config>::Result1>());
 ```
 This outputs the following execution order:
 ```c++

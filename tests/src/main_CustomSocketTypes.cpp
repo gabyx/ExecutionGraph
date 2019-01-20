@@ -67,7 +67,6 @@ public:
 
     using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, std::shared_ptr<A>>>;
 
-    EXECGRAPH_DEFINE_LOGIC_NODE_GET_TYPENAME()
     EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
 
     template<typename... Args>
@@ -149,11 +148,11 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 
     execTree.setup();
 
-    EXECGRAPH_LOG_TRACE(execTree.getExecutionOrderInfo());
+    EXECGRAPH_LOG_TRACE("{0}", execTree.getExecutionOrderInfo());
 
     execTree.runExecute(0);
 
-    EXECGRAPH_LOG_TRACE("Result : " << resultNode->getOutVal<CustomDummyNode<Config>::Result1>()->memory[1]);
+    EXECGRAPH_LOG_TRACE("Result : '{0}'", resultNode->getOutVal<CustomDummyNode<Config>::Result1>()->memory[1]);
     EXECGRAPH_THROW_IF(resultNode->getOutVal<CustomDummyNode<Config>::Result1>()->memory[1] != 30, "wrong result");
 }
 

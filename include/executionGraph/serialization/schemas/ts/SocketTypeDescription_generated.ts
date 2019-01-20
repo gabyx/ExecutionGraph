@@ -51,10 +51,21 @@ name(optionalEncoding?:any):string|Uint8Array|null {
 };
 
 /**
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array|null
+ */
+description():string|null
+description(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+description(optionalEncoding?:any):string|Uint8Array|null {
+  var offset = this.bb!.__offset(this.bb_pos, 8);
+  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+};
+
+/**
  * @param flatbuffers.Builder builder
  */
 static startSocketTypeDescription(builder:flatbuffers.Builder) {
-  builder.startObject(2);
+  builder.startObject(3);
 };
 
 /**
@@ -75,6 +86,14 @@ static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
 
 /**
  * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset descriptionOffset
+ */
+static addDescription(builder:flatbuffers.Builder, descriptionOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(2, descriptionOffset, 0);
+};
+
+/**
+ * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
 static endSocketTypeDescription(builder:flatbuffers.Builder):flatbuffers.Offset {
@@ -84,10 +103,11 @@ static endSocketTypeDescription(builder:flatbuffers.Builder):flatbuffers.Offset 
   return offset;
 };
 
-static createSocketTypeDescription(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset):flatbuffers.Offset {
+static createSocketTypeDescription(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, descriptionOffset:flatbuffers.Offset):flatbuffers.Offset {
   SocketTypeDescription.startSocketTypeDescription(builder);
   SocketTypeDescription.addType(builder, typeOffset);
   SocketTypeDescription.addName(builder, nameOffset);
+  SocketTypeDescription.addDescription(builder, descriptionOffset);
   return SocketTypeDescription.endSocketTypeDescription(builder);
 }
 }

@@ -32,13 +32,15 @@
 #endif
 
 //! Some warning macro.
-#define EXECGRAPH_WARNINGMSG(condition, message)                                            \
-    {                                                                                       \
-        if(!(condition))                                                                    \
-        {                                                                                   \
-            EXECGRAPH_LOG_WARN(#condition << " : " << std::endl                             \
-                                          << message << std::endl                           \
-                                          << " @ " << __FILE__ << " (" << __LINE__ << ")"); \
-        }                                                                                   \
+#define EXECGRAPH_WARN(condition, ...)                     \
+    {                                                      \
+        if(!(condition))                                   \
+        {                                                  \
+            EXECGRAPH_LOG_WARN("{0} : \n{1}\n@ {2} [{3}]", \
+                               #condition,                 \
+                               fmt::format(__VA_ARGS__),   \
+                               __FILE__,                   \
+                               __LINE__)                   \
+        }                                                  \
     }
 #endif

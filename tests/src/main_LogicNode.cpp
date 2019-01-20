@@ -34,7 +34,7 @@ MY_TEST(Node_Test, Int_Int)
     }
     catch(NodeConnectionException& e)
     {
-        EXECGRAPH_LOG_TRACE("Correct Exception: " << e.what());
+        EXECGRAPH_LOG_TRACE("Correct Exception: '{0}'", e.what());
         return;
     }
 

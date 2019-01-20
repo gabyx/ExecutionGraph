@@ -40,9 +40,9 @@ std::unique_ptr<GraphType> createRandomTree(std::size_t nNodes,
     for(int i = 0; i < nNodes; ++i)
     {
         vec[i] = std::make_unique<NodeType>(i);
-        EXECGRAPH_LOG_TRACE_CONT(vec[i]->getId() << ",");
+        EXECGRAPH_LOG_TRACE_CONT("{0},", vec[i]->getId());
     }
-    EXECGRAPH_LOG_TRACE_CONT(std::endl);
+    EXECGRAPH_LOG_TRACE_CONT("\n");
 
     // Links
     std::vector<int> idWithConnectionToZero;
