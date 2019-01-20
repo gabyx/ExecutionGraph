@@ -18,4 +18,7 @@ export import sz = GraphManagementMessages;
 export abstract class GraphManagementService {
   public abstract async addGraph(graphTypeId: Id): Promise<Graph>;
   public abstract async removeGraph(graphId: Id): Promise<void>;
+
+  public abstract async saveGraph(graphId: Id, path: string, overwrite: boolean): Promise<Graph>;
+  public abstract async loadGraph(path: string): Promise<Graph>;
 }

@@ -37,4 +37,11 @@ export class GraphManagementServiceDummy extends GraphManagementService {
   }
 
   public async removeGraph(graphId: Id): Promise<void> {}
+
+  public async saveGraph(graphId: Id, path: string, overwrite: boolean): Promise<Graph> {
+    throw 'Not Implemented!';
+  }
+  public async loadGraph(path: string): Promise<Graph> {
+    throw 'Not Implemented!';
+  }
 }

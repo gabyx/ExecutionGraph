@@ -56,6 +56,11 @@ private:
     void handleRemoveGraph(const Request& request,
                            ResponsePromise& response);
 
+    void handleSaveGraph(const Request& request,
+                         ResponsePromise& response);
+    void handleLoadGraph(const Request& request,
+                         ResponsePromise& response);
+
 private:
     static FuncMap initFunctionMap();
     static const FuncMap m_functionMap;

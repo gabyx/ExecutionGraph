@@ -1,10 +1,8 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { AppState } from '../../+state/reducers/app.reducers';
-import { FileBrowserService } from '../../services';
-import { DirectoryInfo, isFile, FileInfo, PathInfo } from '../../services/FileBrowserService';
-import { ILogger, LoggerFactory } from '@eg/logger/src';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material';
+import { ILogger, LoggerFactory } from '@eg/logger/src';
+import { FileBrowserService } from '../../services';
+import { DirectoryInfo, FileInfo, isFile } from '../../services/FileBrowserService';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 
 @Component({
@@ -23,14 +21,17 @@ export class FileBrowserComponent implements OnInit {
 
   private currentDirectory: DirectoryInfo = null;
 
-  constructor(
-    private store: Store<AppState>,
-    private browser: FileBrowserService,
-    readonly loggerFactory: LoggerFactory,
-    private dialog: MatDialog
-  ) {
+  constructor(private browser: FileBrowserService, readonly loggerFactory: LoggerFactory, private dialog: MatDialog) {
     this.logger = loggerFactory.create('FileBrowserComponent');
   }
+
+  @Input('allowSave') allowSave: boolean = true;
+  @Input('allowOpen') allowOpen: boolean = true;
+  @Input('allowDelete') allowDelete: boolean = true;
+
+  @Output('onSaveFile') onSaveFile: EventEmitter<string>;
+  @Output('onOpenFile') onOpenFile: EventEmitter<string>;
+  @Output('onDeleteFile') onDeleteFile: EventEmitter<string>;
 
   ngOnInit() {
     this.openRoot();
@@ -92,7 +93,13 @@ export class FileBrowserComponent implements OnInit {
   }
 
   public openFile(file: FileInfo) {
-    this.logger.debug(`Opening file '${file.path}'`);
+    if (this.allowOpen) {
+      this.logger.debug(`Opening file '${file.path}'`);
+      this.onOpenFile.emit(file.path);
+    } else {
+      this.logger.error('Programming Error!');
+      throw 'Error!';
+    }
   }
 
   public deleteConfirm(path: FileInfo | DirectoryInfo) {
@@ -115,8 +122,9 @@ export class FileBrowserComponent implements OnInit {
   }
 
   private deleteFile(path: FileInfo | DirectoryInfo) {
-    if (this.isFileOpenable(path)) {
+    if (this.allowDelete && this.isFileOpenable(path)) {
       this.logger.debug(`Deleting path '${path.path}'`);
+      this.onDeleteFile.emit(path.path);
     } else {
       this.logger.error('Programming Error!');
       throw 'Error!';
