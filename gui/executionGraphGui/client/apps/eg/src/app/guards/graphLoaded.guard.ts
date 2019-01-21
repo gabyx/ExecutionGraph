@@ -11,12 +11,12 @@ import { getSelectedGraph } from '../+state/selectors';
 
 @Injectable()
 export class GraphLoadedGuard implements CanActivate {
-    constructor(private store: Store<GraphsState>){}
+  constructor(private store: Store<GraphsState>) {}
 
-    canActivate(): Observable<boolean> {
-        return this.store.select(getSelectedGraph)
-            .pipe(map(graph => isDefined(graph)), take(1));
-    }
-
-
+  canActivate(): Observable<boolean> {
+    return this.store.select(getSelectedGraph).pipe(
+      map(graph => isDefined(graph)),
+      take(1)
+    );
+  }
 }

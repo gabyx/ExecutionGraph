@@ -1,16 +1,16 @@
-import { createSelector } from "@ngrx/store";
-import { getUiState } from "./app.selectors";
-import { BezierConnectionDrawStyle, DirectConnectionDrawStyle, ManhattenConnectionDrawStyle } from "@eg/graph";
+import { createSelector } from '@ngrx/store';
+import { getUiState } from './app.selectors';
+import { BezierConnectionDrawStyle, DirectConnectionDrawStyle, ManhattenConnectionDrawStyle } from '@eg/graph';
 
 export const getConnectionDrawStyleName = createSelector(
   getUiState,
-  (state) => state.connectionDrawStyle
+  state => state.connectionDrawStyle
 );
 
 export const getConnectionDrawStyle = createSelector(
   getConnectionDrawStyleName,
   drawStyleName => {
-    switch(drawStyleName) {
+    switch (drawStyleName) {
       case 'direct': {
         return new DirectConnectionDrawStyle();
       }
@@ -29,5 +29,5 @@ export const getConnectionDrawStyle = createSelector(
 
 export const getSelection = createSelector(
   getUiState,
-  (state) => state.selection
+  state => state.selection
 );

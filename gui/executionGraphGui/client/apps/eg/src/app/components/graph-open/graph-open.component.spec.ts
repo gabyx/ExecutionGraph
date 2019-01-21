@@ -8,9 +8,8 @@ describe('GraphOpenComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ GraphOpenComponent ]
-    })
-    .compileComponents();
+      declarations: [GraphOpenComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

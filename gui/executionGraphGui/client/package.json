@@ -1,7 +1,7 @@
 {
   "name": "eg",
   "version": "1.0.0",
-  "license": "MIT",
+  "license": "MPL 2.0",
   "author": "Gabriel Nützi, Simon Spörri",
   "description": "Write execution graphs n shit yo",
   "scripts": {
@@ -19,7 +19,7 @@
     "affected:apps": "./node_modules/.bin/nx affected:apps",
     "affected:build": "./node_modules/.bin/nx affected:build",
     "affected:e2e": "./node_modules/.bin/nx affected:e2e",
-    "format": "./node_modules/.bin/nx `ormat:write",
+    "format": "./node_modules/.bin/nx format:write",
     "format:write": "./node_modules/.bin/nx format:write",
     "format:check": "./node_modules/.bin/nx format:check",
     "update": "ng update @nrwl/schematics",
@@ -38,7 +38,8 @@
     "electron:package-test": "electron-builder --dir dist",
     "electron:package": "electron-builder",
     "native:package": "npm-run-all -s build-prod electron:build electron:package",
-    "affected": "./node_modules/.bin/nx affected"
+    "affected": "./node_modules/.bin/nx affected",
+    "pre-commit": "npm run format && npm run lint"
   },
   "private": true,
   "dependencies": {

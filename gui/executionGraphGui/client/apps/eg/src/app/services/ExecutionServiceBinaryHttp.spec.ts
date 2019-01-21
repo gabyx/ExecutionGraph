@@ -30,7 +30,8 @@ describe('ExecutionServiceBinaryHttp', () => {
       providers: [
         ExecutionServiceBinaryHttp,
         BinaryHttpRouterService,
-        { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory }]
+        { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory }
+      ]
     });
     injector = getTestBed();
 
