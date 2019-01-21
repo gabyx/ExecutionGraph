@@ -1,5 +1,4 @@
 {
   "git.ignoreLimitWarning": true,
-  "cmake.configureOnOpen": false,
-  "tslint.run": "onType"
+  "cmake.configureOnOpen": false
 }
