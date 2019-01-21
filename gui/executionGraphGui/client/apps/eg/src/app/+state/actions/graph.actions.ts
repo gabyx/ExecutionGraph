@@ -10,7 +10,7 @@ import {
   NodeTypeDescription,
   Socket
 } from '../../model';
-import { Point, ILayoutStrategy, Position } from '@eg/graph';
+import { Point, Position, MassSpringLayoutConfig } from '@eg/graph';
 
 export const LOAD_GRAPHS = '[Graph] Load';
 export const GRAPHS_LOADED = '[Graph] Loaded';
@@ -34,7 +34,7 @@ export const CONNECTION_ADDED = '[Graph] Connection Added';
 export const REMOVE_CONNECTION = '[Graph] Remove Connection';
 export const CONNECTION_REMOVED = '[Graph] Connection Removed';
 
-export const RUN_AUTO_LAYOUT = '[Graph] Run Auto Layout';
+export const RUN_AUTO_LAYOUT_SPRING_SYSTEM = '[Graph] Run Auto Layout';
 
 export class LoadGraphs implements Action {
   readonly type = LOAD_GRAPHS;
@@ -141,9 +141,9 @@ export class ConnectionRemoved implements Action {
 
 // Actions related to AutoLayoutService
 // -------------------------------------------
-export class RunAutoLayout implements Action {
-  readonly type = RUN_AUTO_LAYOUT;
-  constructor(public graph: Graph, public config?: ILayoutStrategy) {}
+export class RunAutoLayoutSpringSystem implements Action {
+  readonly type = RUN_AUTO_LAYOUT_SPRING_SYSTEM;
+  constructor(public graph: Graph, public config?: MassSpringLayoutConfig) {}
 }
 
 export type GraphAction =
@@ -167,4 +167,4 @@ export type GraphAction =
   | ConnectionAdded
   | RemoveConnection
   | ConnectionRemoved
-  | RunAutoLayout;
+  | RunAutoLayoutSpringSystem;

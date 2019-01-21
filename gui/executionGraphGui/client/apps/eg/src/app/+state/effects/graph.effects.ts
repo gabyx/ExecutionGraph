@@ -138,8 +138,8 @@ export class GraphEffects {
 
   @Effect()
   layoutGraph$ = this.actions$.pipe(
-    ofType<fromGraph.RunAutoLayout>(fromGraph.RUN_AUTO_LAYOUT),
-    mergeMap(action => from(this.autoLayoutService.layoutGraph(action.graph, action.config))),
+    ofType<fromGraph.RunAutoLayoutSpringSystem>(fromGraph.RUN_AUTO_LAYOUT_SPRING_SYSTEM),
+    mergeMap(action => from(this.autoLayoutService.layoutGraphSpringSystem(action.graph, action.config))),
     catchError((error, caught) => {
       this.store.dispatch(
         new fromNotifications.ShowNotification(
@@ -226,7 +226,8 @@ export class GraphEffects {
   private handleNavigation(path: string, callback: (a: RouterStateUrl, state: GraphsState) => Observable<any>) {
     const segments = path.split('/').map(s => s.trim());
 
-    return this.actions$.ofType<RouterNavigationAction<RouterStateUrl>>(ROUTER_NAVIGATION).pipe(
+    return this.actions$.pipe(
+      ofType<RouterNavigationAction<RouterStateUrl>>(ROUTER_NAVIGATION),
       map(r => r.payload.routerState),
       filter(r => r && arraysEqual(r.primaryRouteSegments, segments)),
       withLatestFrom(this.store),

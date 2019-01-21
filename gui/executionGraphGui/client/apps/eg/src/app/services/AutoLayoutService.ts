@@ -1,22 +1,22 @@
-import { Injectable, Inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Graph, NodeId, Node as ModelNode } from '../model';
 import {
-  Point,
-  ILayoutStrategy,
   ILayoutEngine,
   EngineInput,
-  MassSpringLayoutStrategy,
+  MassSpringLayoutConfig,
   EngineOutput,
   NodeCreator,
   EdgeCreator,
-  GraphConverter
+  GraphConverter,
+  MassSpringLayoutEngine
 } from '@eg/graph';
 import { AppState } from '../+state/reducers/app.reducers';
 import { Store } from '@ngrx/store';
 import { LoggerFactory, ILogger } from '@eg/logger';
-import { MoveNode, MoveNodes, Moves } from '../+state/actions';
+import { MoveNodes, Moves } from '../+state/actions';
 import { map, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { Vector2 } from '@eg/common';
 
 /**
  * This function represents the body-link-type agnostic converter
@@ -24,8 +24,8 @@ import { throwError } from 'rxjs';
  */
 async function convertGraph<Node, Edge>(
   graph: Graph,
-  positionMap: Map<NodeId, Point>,
-  createNode: (id: NodeId, pos: Point, opaqueData: any) => Node,
+  positionMap: Map<NodeId, Vector2>,
+  createNode: (id: NodeId, pos: Vector2, opaqueData: any) => Node,
   createEdge: (b1: Node, b2: Node) => Edge
 ): Promise<EngineInput<Node, Edge>> {
   const nodes: Node[] = [];
@@ -50,20 +50,24 @@ async function convertGraph<Node, Edge>(
 @Injectable()
 export class AutoLayoutService {
   private readonly logger: ILogger;
-  private readonly engineCreator: (config: ILayoutStrategy) => ILayoutEngine;
 
-  constructor(private store: Store<AppState>, loggerFactory: LoggerFactory) {
+  constructor(private store: Store<AppState>, private loggerFactory: LoggerFactory) {
     this.logger = loggerFactory.create('AutoLayoutService');
-    this.engineCreator = (config: ILayoutStrategy) => config.createEngine(loggerFactory);
   }
 
-  public async layoutGraph(graph: Graph, config?: ILayoutStrategy): Promise<void> {
+  public async layoutGraphSpringSystem(graph: Graph, config?: MassSpringLayoutConfig): Promise<void> {
+    if (!config) {
+      config = new MassSpringLayoutConfig();
+    }
+    const engine = new MassSpringLayoutEngine(config, this.loggerFactory);
+    return this.layoutGraph(graph, engine);
+  }
+
+  private async layoutGraph(graph: Graph, engine: ILayoutEngine): Promise<void> {
     this.logger.debug('Layouting graph...');
 
-    config = config ? config : new MassSpringLayoutStrategy();
-
     // A copy of all positions (dont change the state!)
-    const positionMap = new Map<NodeId, Point>();
+    const positionMap = new Map<NodeId, Vector2>();
     Object.values(graph.nodes).map(node => {
       positionMap.set(node.id, node.uiProps.position.copy());
     });
@@ -74,7 +78,7 @@ export class AutoLayoutService {
 
     // Create the engine (by the strategy) ->
     // run it and dispatch the results in the store.
-    return this.engineCreator(config)
+    return engine
       .run(converter)
       .pipe(
         map((out: EngineOutput) => {

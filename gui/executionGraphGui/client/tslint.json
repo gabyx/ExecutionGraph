@@ -70,9 +70,7 @@
         "depConstraints": [
           {
             "sourceTag": "app:eg",
-            "onlyDependOnLibsWithTags": [
-              "*"
-            ]
+            "onlyDependOnLibsWithTags": ["*"]
           },
           {
             "sourceTag": "lib:common",
@@ -80,24 +78,19 @@
           },
           {
             "sourceTag": "lib:logger",
-            "onlyDependOnLibsWithTags": [
-              "lib:common"
-            ]
+            "onlyDependOnLibsWithTags": ["lib:common"]
           },
           {
             "sourceTag": "lib:graph",
-            "onlyDependOnLibsWithTags": [
-              "lib:common",
-              "lib:logger"
-            ]
+            "onlyDependOnLibsWithTags": ["lib:common", "lib:logger"]
           },
           {
             "sourceTag": "lib:messages",
-            "onlyDependOnLibsWithTags": []
+            "onlyDependOnLibsWithTags": ["lib:serialization"]
           },
           {
             "sourceTag": "lib:serialization",
-            "onlyDependOnLibsWithTags": ["lib:messages"]
+            "onlyDependOnLibsWithTags": []
           }
         ]
       }

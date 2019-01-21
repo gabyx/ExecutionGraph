@@ -10,8 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 import { NodeId } from 'apps/eg/src/app/model';
-import { Point, Position } from '../../model/Point';
 import { Observable } from 'rxjs';
+import { Vector2 } from '@eg/common';
 
 export type NodeMap<Node> = Map<NodeId, Node>;
 
@@ -21,13 +21,13 @@ export interface EngineInput<Node, Edge> {
 }
 
 export interface EngineOutputState {
-  pos: Position;
+  pos: Vector2;
   id: NodeId;
   opaqueData: any;
 }
 export type EngineOutput = EngineOutputState[];
 
-export type NodeCreator<Node> = (id: NodeId, pos: Point, opaqueData: any) => Node;
+export type NodeCreator<Node> = (id: NodeId, pos: Vector2, opaqueData: any) => Node;
 export type EdgeCreator<Node, Edge> = (b1: Node, b2: Node) => Edge;
 
 export type GraphConverter = <Node, Edge>(
