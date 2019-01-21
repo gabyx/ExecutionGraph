@@ -97,7 +97,7 @@
           },
           {
             "sourceTag": "lib:serialization",
-            "onlyDependOnLibsWithTags": []
+            "onlyDependOnLibsWithTags": ["lib:messages"]
           }
         ]
       }

@@ -80,7 +80,7 @@
     "@angular/compiler-cli": "7.2.1",
     "@angular/language-service": "7.2.1",
     "@ngrx/store-devtools": "6.1.2",
-    "@nrwl/schematics": "^7.4.1",
+    "@nrwl/schematics": "7.4.1",
     "@types/flatbuffers": "^1.9.0",
     "@types/jasmine": "~2.8.6",
     "@types/jasminewd2": "~2.0.3",

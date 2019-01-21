@@ -7,6 +7,9 @@
     "eg-e2e": {
       "tags": ["app:eg"]
     },
+    "electron": {
+      "tags": ["app:electron"]
+    },
     "common": {
       "tags": ["lib:common"]
     },

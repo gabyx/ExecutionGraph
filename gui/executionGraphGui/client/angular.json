@@ -120,6 +120,11 @@
       },
       "prefix": "app"
     },
+    "electron": {
+      "root": "apps/electron",
+      "sourceRoot": "apps/electron/src",
+      "projectType": "application"
+    },
     "common": {
       "root": "libs/common",
       "sourceRoot": "libs/common/src",
