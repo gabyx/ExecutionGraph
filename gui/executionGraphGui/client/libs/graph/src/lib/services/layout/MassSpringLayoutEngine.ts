@@ -295,8 +295,8 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
       (id: NodeId, pos: Point, opaqueData: any) => new Body(id, pos, opaqueData),
       (b1: Body, b2: Body) => new Link(b1, b2)
     );
-    this.bodies = res.bodies;
-    this.links = res.links;
+    this.bodies = res.nodes;
+    this.links = res.edges;
 
     await this.setupForceLaws();
 

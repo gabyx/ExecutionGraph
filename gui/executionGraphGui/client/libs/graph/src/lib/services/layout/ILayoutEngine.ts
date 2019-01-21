@@ -13,11 +13,11 @@ import { NodeId } from 'apps/eg/src/app/model';
 import { Point, Position } from '../../model/Point';
 import { Observable } from 'rxjs';
 
-export type BodyMap<Body> = Map<NodeId, Body>;
+export type NodeMap<Node> = Map<NodeId, Node>;
 
-export interface EngineInput<Body, Link> {
-  bodies: Body[];
-  links: Link[];
+export interface EngineInput<Node, Edge> {
+  nodes: Node[];
+  edges: Edge[];
 }
 
 export interface EngineOutputState {
@@ -27,13 +27,13 @@ export interface EngineOutputState {
 }
 export type EngineOutput = EngineOutputState[];
 
-export type BodyCreator<Body> = (id: NodeId, pos: Point, opaqueData: any) => Body;
-export type LinkCreator<Body, Link> = (b1: Body, b2: Body) => Link;
+export type NodeCreator<Node> = (id: NodeId, pos: Point, opaqueData: any) => Node;
+export type EdgeCreator<Node, Edge> = (b1: Node, b2: Node) => Edge;
 
-export type GraphConverter = <Body, Link>(
-  createBody: BodyCreator<Body>,
-  createLink: LinkCreator<Body, Link>
-) => Promise<EngineInput<Body, Link>>;
+export type GraphConverter = <Node, Edge>(
+  createNode: NodeCreator<Node>,
+  createEdge: EdgeCreator<Node, Edge>
+) => Promise<EngineInput<Node, Edge>>;
 
 export abstract class ILayoutEngine {
   public abstract run(converter: GraphConverter): Observable<EngineOutput>;
