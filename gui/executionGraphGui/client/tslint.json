@@ -1,4 +1,11 @@
 {
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "typescript-tslint-plugin"
+      }
+    ]
+  },
   "rulesDirectory": ["node_modules/codelyzer", "node_modules/@nrwl/schematics/src/tslint"],
   "rules": {
     "align": [true, "parameters", "statements", "members", "arguments", "elements"],

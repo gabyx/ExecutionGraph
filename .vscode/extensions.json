@@ -10,6 +10,7 @@
         "doi.fileheadercomment",
         "gaborv.flatbuffers",
         "eamodio.gitlens",
-        "joelday.docthis"
+        "joelday.docthis",
+        "ms-vscode.vscode-typescript-tslint-plugin"
     ]
 }
