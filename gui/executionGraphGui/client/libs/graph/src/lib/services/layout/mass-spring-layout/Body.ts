@@ -1,11 +1,10 @@
 import { Vector2 } from '@eg/common';
-import { NodeId } from 'apps/eg/src/app/model';
 
 export type Force = Vector2;
 
 export class Body {
   private temp: Vector2 = Vector2.zero.copy();
-  constructor(public readonly id: NodeId, position: Vector2, public readonly opaqueData: any) {
+  constructor(position: Vector2, public readonly opaqueData: any) {
     this.position = position;
     this.positionEnd = position.copy();
   }

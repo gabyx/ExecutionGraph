@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Graph, NodeId, Node as ModelNode } from '../model';
+import { Graph, Node as ModelNode } from '../model';
 import {
   ILayoutEngine,
-  EngineInput,
   MassSpringLayoutConfig,
   EngineOutput,
   NodeCreator,
@@ -24,27 +23,32 @@ import { Vector2 } from '@eg/common';
  */
 async function convertGraph<Node, Edge>(
   graph: Graph,
-  positionMap: Map<NodeId, Vector2>,
-  createNode: (id: NodeId, pos: Vector2, opaqueData: any) => Node,
+  createNode: (s: { pos: Vector2; opaqueData: any }) => Node,
   createEdge: (b1: Node, b2: Node) => Edge
-): Promise<EngineInput<Node, Edge>> {
-  const nodes: Node[] = [];
+): Promise<void> {
+  // A copy of all positions (dont change the state!)
+  const positionMap = new Map<string, Vector2>();
+  Object.values(graph.nodes).map(node => {
+    positionMap.set(node.id.toString(), node.uiProps.position.copy());
+  });
 
-  const nodeMap = new Map<NodeId, Node>();
+  const nodes: Node[] = [];
+  const nodeMap = new Map<string, Node>();
 
   // create bodies
   positionMap.forEach((pos, id) => {
-    const b = createNode(id, pos, graph.nodes[id.toString()]);
+    const b = createNode({ pos: pos, opaqueData: graph.nodes[id] });
     nodeMap.set(id, b);
     nodes.push(b);
   });
 
   // create links
-  const edges: Edge[] = Object.values(graph.connections).map(connection =>
-    createEdge(nodeMap.get(connection.inputSocket.parent.id), nodeMap.get(connection.outputSocket.parent.id))
+  Object.values(graph.connections).map(connection =>
+    createEdge(
+      nodeMap.get(connection.inputSocket.parent.id.toString()),
+      nodeMap.get(connection.outputSocket.parent.id.toString())
+    )
   );
-
-  return { nodes: nodes, edges: edges };
 }
 
 @Injectable()
@@ -66,15 +70,9 @@ export class AutoLayoutService {
   private async layoutGraph(graph: Graph, engine: ILayoutEngine): Promise<void> {
     this.logger.debug('Layouting graph...');
 
-    // A copy of all positions (dont change the state!)
-    const positionMap = new Map<NodeId, Vector2>();
-    Object.values(graph.nodes).map(node => {
-      positionMap.set(node.id, node.uiProps.position.copy());
-    });
-
     // Create the converter for the engine
     const converter: GraphConverter = <Node, Edge>(a: NodeCreator<Node>, b: EdgeCreator<Node, Edge>) =>
-      convertGraph(graph, positionMap, a, b);
+      convertGraph(graph, a, b);
 
     // Create the engine (by the strategy) ->
     // run it and dispatch the results in the store.

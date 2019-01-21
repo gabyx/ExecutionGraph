@@ -12,7 +12,6 @@
 import { ILayoutEngine, GraphConverter, EngineOutput } from '../ILayoutEngine';
 import { LoggerFactory, ILogger } from '@eg/logger';
 import { Injectable } from '@angular/core';
-import { NodeId } from 'apps/eg/src/app/model';
 import { Observable, generate, throwError, asyncScheduler, of } from 'rxjs';
 import { map, switchMap, catchError, finalize, takeWhile } from 'rxjs/operators';
 import { Vector2 } from '@eg/common';
@@ -64,7 +63,7 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
   private runAsync(): Observable<EngineOutput> {
     this.logger.debug(`Run timestepping: ...`);
     const output: EngineOutput = new Array();
-    this.bodies.forEach(body => output.push({ pos: body.position, id: body.id, opaqueData: body.opaqueData }));
+    this.bodies.forEach(body => output.push({ pos: body.position, opaqueData: body.opaqueData }));
 
     const deltaT = this.config.endTime / this.config.maxSteps;
     const state = { step: 0, converged: false, time: 0 };
@@ -107,12 +106,21 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
   private async setup(converter: GraphConverter): Promise<void> {
     this.logger.debug('Setup graph: ...');
     // Convert the graph to our internal structure (this is neat dispatching :-)
-    const res = await converter(
-      (id: NodeId, pos: Vector2, opaqueData: any) => new Body(id, pos, opaqueData),
-      (b1: Body, b2: Body) => new Link(b1, b2)
+    this.bodies = [];
+    this.links = [];
+
+    await converter(
+      (s: { pos: Vector2; opaqueData: any }) => {
+        const b = new Body(s.pos, s.opaqueData);
+        this.bodies.push(b);
+        return b;
+      },
+      (b1: Body, b2: Body) => {
+        const l = new Link(b1, b2);
+        this.links.push(l);
+        return l;
+      }
     );
-    this.bodies = res.nodes;
-    this.links = res.edges;
 
     await this.setupForceLaws();
 
