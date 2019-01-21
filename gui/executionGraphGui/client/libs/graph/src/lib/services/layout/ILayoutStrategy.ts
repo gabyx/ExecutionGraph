@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 import { ILayoutEngine } from './ILayoutEngine';
-import { LoggerFactory } from '@eg/logger/src';
+import { LoggerFactory } from '@eg/logger';
 
 export enum LayoutStrategys {
   MassSpringSystem = 0,

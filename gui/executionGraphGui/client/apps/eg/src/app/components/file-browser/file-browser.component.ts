@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from '../../+state/reducers/app.reducers';
 import { FileBrowserService } from '../../services';
 import { DirectoryInfo, isFile, FileInfo, PathInfo } from '../../services/FileBrowserService';
-import { ILogger, LoggerFactory } from '@eg/logger/src';
+import { ILogger, LoggerFactory } from '@eg/logger';
 import { MatDialog } from '@angular/material';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 

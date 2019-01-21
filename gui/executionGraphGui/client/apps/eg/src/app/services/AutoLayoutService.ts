@@ -13,7 +13,7 @@ import {
 } from '@eg/graph';
 import { AppState } from '../+state/reducers/app.reducers';
 import { Store } from '@ngrx/store';
-import { LoggerFactory, ILogger } from '@eg/logger/src';
+import { LoggerFactory, ILogger } from '@eg/logger';
 import { MoveNode, MoveNodes, Moves } from '../+state/actions';
 import { map, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';

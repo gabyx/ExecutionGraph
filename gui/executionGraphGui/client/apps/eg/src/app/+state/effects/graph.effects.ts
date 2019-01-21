@@ -19,7 +19,7 @@ import { GraphsState } from '../reducers';
 import { RouterStateUrl } from '../reducers/app.reducers';
 import { arraysEqual, isDefined } from '@eg/common';
 import { AutoLayoutService } from '../../services/AutoLayoutService';
-import { Point } from '@eg/graph/src';
+import { Point } from '@eg/graph';
 
 @Injectable()
 export class GraphEffects {

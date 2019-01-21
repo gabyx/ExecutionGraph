@@ -5,7 +5,7 @@ import * as fromGraphDescriptions from '../../+state/selectors/';
 import { GraphDescriptionsState } from '../../+state/reducers/graphDescription.reducers';
 import { GraphTypeDescription } from '../../model';
 import { CreateGraph } from '../../+state/actions';
-import { ILogger, LoggerFactory } from '@eg/logger/src';
+import { ILogger, LoggerFactory } from '@eg/logger';
 import { RouterState, Router } from '@angular/router';
 
 @Component({

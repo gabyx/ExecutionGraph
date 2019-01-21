@@ -6,17 +6,13 @@ import { tap } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material';
 import { ShowNotification, SHOW_NOTIFICATION } from '../actions/notification.actions';
 
-
 @Injectable()
 export class NotificationEffects {
-    constructor(
-        private actions$: Actions,
-        private snackBar: MatSnackBar,
-    ) {}
+  constructor(private actions$: Actions, private snackBar: MatSnackBar) {}
 
-    @Effect({ dispatch: false })
-    showNotification$ = this.actions$.ofType<ShowNotification>(SHOW_NOTIFICATION)
-        .pipe(
-            tap(action => this.snackBar.open(action.text, '', { duration: action.showTimeMs }))
-        );
+  @Effect({ dispatch: false })
+  showNotification$ = this.actions$.pipe(
+    ofType<ShowNotification>(SHOW_NOTIFICATION),
+    tap(action => this.snackBar.open(action.text, '', { duration: action.showTimeMs }))
+  );
 }

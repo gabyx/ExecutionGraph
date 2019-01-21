@@ -25,7 +25,7 @@ export class ConnectionId {
     return new ConnectionId(`${outSocketId.string}-to-${inSocketId.string}`);
   }
 
-  constructor(public readonly idString) {}
+  constructor(public readonly idString: string) {}
 
   public equal(id: ConnectionId) {
     return this.idString === id.idString;

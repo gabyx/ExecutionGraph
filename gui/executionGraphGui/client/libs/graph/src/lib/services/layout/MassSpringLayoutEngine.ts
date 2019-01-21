@@ -11,13 +11,13 @@
 // =========================================================================================
 import { Point, Position } from '../../model/Point';
 import { ILayoutEngine, GraphConverter, EngineOutput } from './ILayoutEngine';
-import { LoggerFactory, ILogger } from '@eg/logger/src';
+import { LoggerFactory, ILogger } from '@eg/logger';
 import { Injectable } from '@angular/core';
 import { LayoutStrategys, ILayoutStrategy } from './ILayoutStrategy';
 import { NodeId } from 'apps/eg/src/app/model';
 import { Observable, generate, throwError, asyncScheduler, of } from 'rxjs';
 import { map, switchMap, catchError, tap, finalize, takeWhile } from 'rxjs/operators';
-import { Vector2 } from '@eg/common/src';
+import { Vector2 } from '@eg/common';
 
 type Force = Vector2;
 

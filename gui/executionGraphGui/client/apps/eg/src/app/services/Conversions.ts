@@ -39,7 +39,7 @@ export function toFbLong(value: Long): flatbuffers.Long {
 export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescription): model.GraphTypeDescription {
   const sockets: model.SocketTypeDescription[] = [];
   for (let i = 0; i < graphDesc.socketTypeDescriptionsLength(); ++i) {
-    let s = graphDesc.socketTypeDescriptions(i);
+    const s = graphDesc.socketTypeDescriptions(i);
 
     const d = s.description();
     sockets.push({ type: s.type(), name: s.name(), description: d ? d : undefined });
