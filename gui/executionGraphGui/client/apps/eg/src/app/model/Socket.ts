@@ -62,6 +62,7 @@ export abstract class Socket {
     // Assign a new unique id to the socket, for debugging purposes
     this._id = this.createId();
   }
+
   public get id(): string {
     return this._id;
   }
