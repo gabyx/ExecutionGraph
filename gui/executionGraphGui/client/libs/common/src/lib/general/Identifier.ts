@@ -24,14 +24,12 @@ export class Id {
     }
     this._idString = this._id.toString();
   }
-  public get name(): string {
-    return this.guid.toString();
-  }
+
   public get guid(): Guid {
     return this._id;
   }
 
-  public toString(): string {
+  public id(): string {
     return this._idString;
   }
 
@@ -46,7 +44,7 @@ export class IdNamed extends Id {
   }
 
   public get name(): string {
-    return `${this._name}-${super.toString()}`;
+    return `${this._name}-${super.id()}`;
   }
   public get shortName(): string {
     return this._name;

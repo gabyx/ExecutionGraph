@@ -25,7 +25,7 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
   switch (action.type) {
     case fromActions.GRAPHS_LOADED: {
       const entities = action.graphs.reduce(
-        (existing: GraphMap, graph: Graph) => ({ ...existing, [graph.id.toString()]: graph }),
+        (existing: GraphMap, graph: Graph) => ({ ...existing, [graph.id.id()]: graph }),
         { ...state.entities }
       );
 
@@ -46,7 +46,7 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
     }
 
     case fromActions.GRAPH_ADDED: {
-      const entities = { ...state.entities, [action.graph.id.toString()]: action.graph };
+      const entities = { ...state.entities, [action.graph.id.id()]: action.graph };
 
       return {
         ...state,
@@ -68,7 +68,7 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
       if (!isDefined(state.selectedGraphId)) {
         throw new Error(`No active graph to operate on, ${action.type} cannot be handled`);
       }
-      const graph = state.entities[state.selectedGraphId.toString()];
+      const graph = state.entities[state.selectedGraphId.id()];
       if (!isDefined(graph)) {
         throw new Error(`No graph with the id ${state.selectedGraphId} exists`);
       }
@@ -79,7 +79,7 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
         ...state,
         entities: {
           ...state.entities,
-          [state.selectedGraphId.toString()]: updatedGraph
+          [state.selectedGraphId.id()]: updatedGraph
         }
       };
     }
@@ -134,7 +134,7 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
         ...graph,
         nodes: nodes,
         connections: connections.reduce(
-          (existing: ConnectionMap, connection: Connection) => ({ ...existing, [connection.idString]: connection }),
+          (existing: ConnectionMap, connection: Connection) => ({ ...existing, [connection.id]: connection }),
           {}
         )
       };
@@ -146,14 +146,14 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
         ...graph,
         connections: {
           ...graph.connections,
-          [connection.idString]: connection
+          [connection.id]: connection
         }
       };
     }
 
     case fromActions.CONNECTION_REMOVED: {
       // Remove by destructuring to the removed and the rest
-      const { [action.connectionId.idString]: removed, ...connections } = graph.connections;
+      const { [action.connectionId]: removed, ...connections } = graph.connections;
       return {
         ...graph,
         connections: connections

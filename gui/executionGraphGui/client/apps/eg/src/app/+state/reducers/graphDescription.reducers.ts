@@ -27,7 +27,7 @@ export function reducer(
       const entities = action.graphDescriptions.reduce(
         (existing: GraphDescriptionMap, graphDescription: GraphTypeDescription) => ({
           ...existing,
-          [graphDescription.id.toString()]: graphDescription
+          [graphDescription.id.id()]: graphDescription
         }),
         { ...state.entities }
       );

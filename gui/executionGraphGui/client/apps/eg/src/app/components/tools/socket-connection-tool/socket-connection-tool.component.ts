@@ -44,7 +44,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
     this.socketEvents.onDragStart.subscribe(e => {
       const socket = e.element;
 
-      this.logger.info(`Initiating new connection from ${socket.idString}`);
+      this.logger.info(`Initiating new connection from ${socket.id}`);
       this.sourceSocket = socket;
       if (Socket.isOutputSocket(this.sourceSocket)) {
         this.tempTargetSocket = new InputSocket(socket.typeIndex, new SocketIndex(0));

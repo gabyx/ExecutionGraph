@@ -19,47 +19,15 @@ export class UIProps {
   public name: string = '';
 }
 
-/**
- * The socket index of a socket `Socket`.
- *
- * @export
- * @class SocketIndex
- * @extends {Long}
- */
 export class SocketIndex extends Long {}
-
-/**
- * Unique Identifier for a `Socket`.
- *
- * @export
- * @class SocketId
- */
-export class SocketId {
-  constructor(private readonly _idString: string = Guid.create().toString()) {}
-  /**
-   * String identifer for this NodeId.
-   *
-   * @returns {string}
-   * @memberof SocketId
-   */
-  public get string(): string {
-    return this._idString;
-  }
-
-  public equal(id: SocketId) {
-    return this._idString === id._idString;
-  }
-}
+export type SocketId = string;
 
 /**
  * Modelclass for a Socket on a node.
- *
- * @export
- * @class Socket
  */
 export abstract class Socket {
   abstract get kind(): SocketType;
-  protected _id: SocketId = new SocketId();
+  protected _id: SocketId = Guid.create().toString();
 
   /** Type guard for InputSocket */
   public static isInputSocket(socket: Socket): socket is InputSocket {
@@ -94,12 +62,10 @@ export abstract class Socket {
     // Assign a new unique id to the socket, for debugging purposes
     this._id = this.createId();
   }
-  public get id(): SocketId {
+  public get id(): string {
     return this._id;
   }
-  public get idString(): string {
-    return this._id.string;
-  }
+
   protected abstract createId(): SocketId;
 }
 
@@ -107,43 +73,26 @@ export type SocketType = 'input' | 'output';
 
 /**
  * The output socket.
- *
- * @export
- * @class InputSocket
- * @extends {Socket}
  */
 export class InputSocket extends Socket {
   public readonly kind: SocketType = 'input';
   protected createId(): SocketId {
-    return new SocketId(`n${this.parent.id.toString()}-i${this.index.toInt()}`);
+    return `n${this.parent.id.toString()}-i${this.index.toInt()}`;
   }
 }
 
 /**
  * The input socket.
- *
- * @export
- * @class OutputSocket
- * @extends {Socket}
  */
 export class OutputSocket extends Socket {
   public readonly kind: SocketType = 'output';
   protected createId(): SocketId {
-    return new SocketId(`n${this.parent.id.toString()}-o${this.index.toInt()}`);
+    return `n${this.parent.id.toString()}-o${this.index.toInt()}`;
   }
 }
 
 /**
  * Creator function for input/output sockets.
- *
- * @export
- * @param {SocketType} kind
- * @param {Long} type
- * @param {string} typeName
- * @param {string} name
- * @param {SocketIndex} index
- * @param {Node} [parent=undefined]
- * @returns
  */
 export function createSocket(
   kind: SocketType,

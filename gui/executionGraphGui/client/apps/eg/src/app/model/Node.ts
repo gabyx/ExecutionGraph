@@ -26,27 +26,19 @@ export class UIProps {
 /**
  * Unique Identifier for a `Node`.
  *
- * @export
- * @class NodeId
- * @extends {Long}
  */
 export class NodeId extends Long {
-  private readonly _idString: string;
   constructor(id: number | Long) {
     if (isLong(id)) {
       super(id.low, id.high, id.unsigned);
     } else {
       super(id, 0, true);
     }
-    this._idString = `n-${this.toInt()}`;
   }
 }
 
 /**
  *  Modelclass for a node.
- *
- * @export
- * @class Node
  */
 export class Node {
   /** Two different lists for sockets */

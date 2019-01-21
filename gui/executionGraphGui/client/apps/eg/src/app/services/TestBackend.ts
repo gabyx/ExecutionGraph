@@ -117,7 +117,7 @@ export class TestBackend extends ITestBackend {
 
     // Make GraphType Description
 
-    const offId = builder.createString(this.graphTypeId.toString());
+    const offId = builder.createString(this.graphTypeId.id());
     const offName = builder.createString('DefaultGraph');
     const offNodes = szInfo.GraphTypeDescription.createNodeTypeDescriptionsVector(builder, nodeDescs);
     const offSockets = szInfo.GraphTypeDescription.createSocketTypeDescriptionsVector(builder, socketDescs);

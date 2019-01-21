@@ -37,7 +37,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
   public async addNode(graphId: Id, type: string): Promise<Node> {
     // Build the AddNode request
     const builder = new flatbuffers.Builder(356);
-    const offGraphId = builder.createString(graphId.toString());
+    const offGraphId = builder.createString(graphId.id());
     const offType = builder.createString(type);
     const offName = builder.createString(name);
 
@@ -73,7 +73,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
   public async removeNode(graphId: Id, nodeId: NodeId): Promise<void> {
     // Build the RemoveNode request
     const builder = new flatbuffers.Builder(356);
-    const offGraphId = builder.createString(graphId.toString());
+    const offGraphId = builder.createString(graphId.id());
     sz.RemoveNodeRequest.startRemoveNodeRequest(builder);
     sz.RemoveNodeRequest.addGraphId(builder, offGraphId);
     sz.RemoveNodeRequest.addNodeId(builder, builder.createLong(nodeId.low, nodeId.high));
@@ -84,7 +84,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
 
     // Send the request
     await this.binaryRouter.post('graph/removeNode', requestPayload);
-    this.logger.debug(`Removed node [id: '${nodeId}'] from graph [id: '${graphId.toString()}']`);
+    this.logger.debug(`Removed node [id: '${nodeId}'] from graph [id: '${graphId.id()}']`);
   }
 
   public async addConnection(
@@ -96,7 +96,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     const connection = Connection.create(source, target, true);
 
     const builder = new flatbuffers.Builder(356);
-    const offGraphId = builder.createString(graphId.toString());
+    const offGraphId = builder.createString(graphId.id());
 
     sz.AddConnectionRequest.startAddConnectionRequest(builder);
     sz.AddConnectionRequest.addGraphId(builder, offGraphId);
@@ -121,9 +121,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
 
     if (!result.length) {
       // Succesfully added connection
-      this.logger.info(
-        `Added connection: ['${source.idString}' ⟶ '${target.idString}'] from graph [id: '${graphId.toString()}']`
-      );
+      this.logger.info(`Added connection: ['${source.id}' ⟶ '${target.id}'] from graph [id: '${graphId.id()}']`);
 
       return connection;
     } else {
@@ -138,7 +136,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     const connection = Connection.create(source, target, false);
 
     const builder = new flatbuffers.Builder(356);
-    const offGraphId = builder.createString(graphId.toString());
+    const offGraphId = builder.createString(graphId.id());
 
     sz.RemoveConnectionRequest.startRemoveConnectionRequest(builder);
     sz.RemoveConnectionRequest.addGraphId(builder, offGraphId);
@@ -159,8 +157,6 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     const requestPayload = builder.asUint8Array();
 
     await this.binaryRouter.post('graph/removeConnection', requestPayload);
-    this.logger.info(
-      `Removed connection: ['${source.idString}' ⟶ '${target.idString}'] from graph [id: '${graphId.toString()}']`
-    );
+    this.logger.info(`Removed connection: ['${source.id}' ⟶ '${target.id}'] from graph [id: '${graphId.id()}']`);
   }
 }

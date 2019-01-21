@@ -56,7 +56,7 @@ export class GraphEffects {
   @Effect({ dispatch: false })
   openGraph$ = this.actions$.pipe(
     ofType<fromGraph.GraphAdded>(fromGraph.GRAPH_ADDED),
-    tap(action => this.router.navigate(['graph', action.graph.id.toString()]))
+    tap(action => this.router.navigate(['graph', action.graph.id.id()]))
   );
 
   @Effect()
@@ -177,7 +177,7 @@ export class GraphEffects {
           node.inputs[0],
           false
         );
-        connections[connection.idString] = connection;
+        connections[connection.id] = connection;
       }
       lastNode = node;
     }
@@ -213,7 +213,7 @@ export class GraphEffects {
           node.inputs[0],
           false
         );
-        connections[connection.idString] = connection;
+        connections[connection.id] = connection;
       }
       lastNode = node;
     }

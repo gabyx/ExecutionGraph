@@ -1,5 +1,5 @@
 import * as fromUiActions from '../actions/ui.actions';
-import { UiState, initalState, reducer } from './ui.reducers';
+import { initalState, reducer } from './ui.reducers';
 import { NodeId, ConnectionId } from '../../model';
 
 describe('UI Reducer', () => {

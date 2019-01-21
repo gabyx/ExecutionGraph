@@ -21,8 +21,8 @@ export class ConnectionLayerComponent {
   constructor(private graph: GraphComponent, private store: Store<UiState>) {}
 
   public getPathDescription(connection: Connection) {
-    const startPoint = this.graph.getPortPosition(connection.inputSocket.idString);
-    const endPoint = this.graph.getPortPosition(connection.outputSocket.idString);
+    const startPoint = this.graph.getPortPosition(connection.inputSocket.id);
+    const endPoint = this.graph.getPortPosition(connection.outputSocket.id);
 
     let path = this.drawStyle.getPath(startPoint, endPoint);
     if (typeof path !== 'string') {

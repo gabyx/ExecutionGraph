@@ -23,7 +23,7 @@ export class AddNodeComponent implements OnInit {
       graphStore.select(getSelectedGraph)
     ).pipe(
       filter(([descriptions, graph]) => isDefined(graph)),
-      map(([descriptions, graph]) => descriptions[graph.typeId.toString()]),
+      map(([descriptions, graph]) => descriptions[graph.typeId.id()]),
       map(graphType => graphType.nodeTypeDescriptions)
     );
   }

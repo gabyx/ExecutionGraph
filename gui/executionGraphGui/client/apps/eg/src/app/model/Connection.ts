@@ -14,22 +14,14 @@ import { OutputSocket, InputSocket, SocketId, Socket } from './Socket';
 
 //tslint:disable:no-bitwise
 
+export type ConnectionId = string;
 /**
  * A class for defining a unique id for a `Connection`.
  *
  * @export
- * @class ConnectionId
  */
-export class ConnectionId {
-  public static create(outSocketId: SocketId, inSocketId: SocketId): ConnectionId {
-    return new ConnectionId(`${outSocketId.string}-to-${inSocketId.string}`);
-  }
-
-  constructor(public readonly idString: string) {}
-
-  public equal(id: ConnectionId) {
-    return this.idString === id.idString;
-  }
+export function createConnectionId(outSocketId: string, inSocketId: string): ConnectionId {
+  return `n${outSocketId}-to-n${inSocketId}`;
 }
 
 enum Invalidity {
@@ -49,7 +41,7 @@ export class UIProps {}
  */
 export class Connection {
   public static readonly Invalidity = Invalidity;
-  public readonly id: ConnectionId;
+  public readonly _id: ConnectionId;
   public uiProps: UIProps = new UIProps();
 
   /**
@@ -123,7 +115,7 @@ export class Connection {
     if (invalid) {
       throw new Error(`Cannot construct an invalid connection: ${Connection.getValidationErrors(invalid).join(',')}`);
     }
-    this.id = ConnectionId.create(outputSocket.id, inputSocket.id);
+    this._id = createConnectionId(outputSocket.id, inputSocket.id);
   }
 
   /**
@@ -132,8 +124,8 @@ export class Connection {
    * @readonly
    * @memberof Connection
    */
-  public get idString(): string {
-    return this.id.idString;
+  public get id(): string {
+    return this._id;
   }
 
   public isInvalid(): Invalidity {
