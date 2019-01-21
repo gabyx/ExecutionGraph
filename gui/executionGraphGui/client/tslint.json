@@ -62,8 +62,35 @@
         "allow": [],
         "depConstraints": [
           {
-            "sourceTag": "*",
-            "onlyDependOnLibsWithTags": ["*"]
+            "sourceTag": "app:eg",
+            "onlyDependOnLibsWithTags": [
+              "*"
+            ]
+          },
+          {
+            "sourceTag": "lib:common",
+            "onlyDependOnLibsWithTags": []
+          },
+          {
+            "sourceTag": "lib:logger",
+            "onlyDependOnLibsWithTags": [
+              "lib:common"
+            ]
+          },
+          {
+            "sourceTag": "lib:graph",
+            "onlyDependOnLibsWithTags": [
+              "lib:common",
+              "lib:logger"
+            ]
+          },
+          {
+            "sourceTag": "lib:messages",
+            "onlyDependOnLibsWithTags": []
+          },
+          {
+            "sourceTag": "lib:serialization",
+            "onlyDependOnLibsWithTags": []
           }
         ]
       }
