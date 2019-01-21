@@ -12,6 +12,8 @@
 
 import { OutputSocket, InputSocket, SocketId, Socket } from './Socket';
 
+//tslint:disable:no-bitwise
+
 /**
  * A class for defining a unique id for a `Connection`.
  *
@@ -49,6 +51,49 @@ export class Connection {
   public static readonly Invalidity = Invalidity;
   public readonly id: ConnectionId;
   public uiProps: UIProps = new UIProps();
+
+  /**
+   * Check if a connection is valid.
+   *
+   * @static
+   * @param {Socket} source
+   * @param {Socket} target
+   * @returns {Invalidity}
+   * @memberof Connection
+   */
+  public static isInvalid(source: Socket, target: Socket): Invalidity {
+    let result = Invalidity.Valid;
+    /** input,output or vice versa */
+    result |= source.kind !== target.kind ? Invalidity.Valid : Invalidity.Invalid | Invalidity.InOutMismatch;
+    /** no 1-length-cycles, more elaborate cycle-detection in the backend */
+    result |= source.parent !== target.parent ? Invalidity.Valid : Invalidity.Invalid | Invalidity.OneLengthCycle;
+    /** correct type */
+    result |= source.typeIndex.equals(target.typeIndex)
+      ? Invalidity.Valid
+      : Invalidity.Invalid | Invalidity.TypeMismatch;
+    return result;
+  }
+
+  /**
+   * Create a connection.
+   *
+   * @static
+   * @param {Socket} source
+   * @param {Socket} target
+   * @returns
+   * @memberof Connection
+   */
+  public static create(source: Socket, target: Socket, validate: boolean = true) {
+    if (Socket.isOutputSocket(source) && Socket.isInputSocket(target)) {
+      // Make a Write-Link
+      return new Connection(source, target, true, validate);
+    } else if (Socket.isInputSocket(source) && Socket.isOutputSocket(target)) {
+      // Make a Get-Link
+      return new Connection(target, source, false, validate);
+    } else {
+      throw new Error(`Programming error: Connection cannot be made! ${source} <-> ${target}`);
+    }
+  }
 
   /**
    * Get the error description for the invalidity of the connection (if any).
@@ -94,47 +139,6 @@ export class Connection {
   public isInvalid(): Invalidity {
     return Connection.isInvalid(this.outputSocket, this.inputSocket);
   }
-
-  /**
-   * Check if a connection is valid.
-   *
-   * @static
-   * @param {Socket} source
-   * @param {Socket} target
-   * @returns {Invalidity}
-   * @memberof Connection
-   */
-  public static isInvalid(source: Socket, target: Socket): Invalidity {
-    let result = Invalidity.Valid;
-    /** input,output or vice versa */
-    result |= source.kind !== target.kind ? Invalidity.Valid : Invalidity.Invalid | Invalidity.InOutMismatch;
-    /** no 1-length-cycles, more elaborate cycle-detection in the backend */
-    result |= source.parent !== target.parent ? Invalidity.Valid : Invalidity.Invalid | Invalidity.OneLengthCycle;
-    /** correct type */
-    result |= source.typeIndex.equals(target.typeIndex)
-      ? Invalidity.Valid
-      : Invalidity.Invalid | Invalidity.TypeMismatch;
-    return result;
-  }
-
-  /**
-   * Create a connection.
-   *
-   * @static
-   * @param {Socket} source
-   * @param {Socket} target
-   * @returns
-   * @memberof Connection
-   */
-  public static create(source: Socket, target: Socket, validate: boolean = true) {
-    if (Socket.isOutputSocket(source) && Socket.isInputSocket(target)) {
-      // Make a Write-Link
-      return new Connection(source, target, true, validate);
-    } else if (Socket.isInputSocket(source) && Socket.isOutputSocket(target)) {
-      // Make a Get-Link
-      return new Connection(target, source, false, validate);
-    } else {
-      throw new Error(`Programming error: Connection cannot be made! ${source} <-> ${target}`);
-    }
-  }
 }
+
+//tslint:enable:no-bitwise

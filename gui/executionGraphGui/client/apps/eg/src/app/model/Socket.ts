@@ -62,6 +62,16 @@ export abstract class Socket {
   abstract get kind(): SocketType;
   protected _id: SocketId = new SocketId();
 
+  /** Type guard for InputSocket */
+  public static isInputSocket(socket: Socket): socket is InputSocket {
+    return socket.kind === 'input';
+  }
+
+  /** Type guard for OutputSocket */
+  public static isOutputSocket(socket: Socket): socket is OutputSocket {
+    return socket.kind === 'output';
+  }
+
   constructor(
     public readonly typeIndex: Long,
     public readonly index: SocketIndex,
@@ -92,55 +102,6 @@ export abstract class Socket {
     return this._id.string;
   }
   protected abstract createId(): SocketId;
-
-  /** Type guard for InputSocket */
-  public static isInputSocket(socket: Socket): socket is InputSocket {
-    return socket.kind === 'input';
-  }
-
-  /** Type guard for OutputSocket */
-  public static isOutputSocket(socket: Socket): socket is OutputSocket {
-    return socket.kind === 'output';
-  }
-
-  /**
-   * Creator function for input/output sockets.
-   *
-   * @export
-   * @param {SocketType} kind
-   * @param {Long} type
-   * @param {string} typeName
-   * @param {string} name
-   * @param {SocketIndex} index
-   * @param {Node} [parent=undefined]
-   * @returns
-   */
-  public static createSocket(
-    kind: SocketType,
-    type: Long,
-    index: SocketIndex,
-    typeName: string | undefined | null,
-    parent?: Node
-  ): InputSocket | OutputSocket {
-    switch (kind) {
-      case 'input': {
-        const s = new InputSocket(type, index, isDefined(typeName) ? typeName : undefined, parent);
-        // @todo gabnue->gabnue: Move that to
-        // the designated place where we initialize UI-Properties.
-        if (!s.uiProps.name) {
-          s.uiProps.name = `in-${s.index}`;
-        }
-        return s;
-      }
-      case 'output': {
-        const s = new OutputSocket(type, index, isDefined(typeName) ? typeName : undefined, parent);
-        if (!s.uiProps.name) {
-          s.uiProps.name = `out-${s.index}`;
-        }
-        return s;
-      }
-    }
-  }
 }
 
 export type SocketType = 'input' | 'output';
@@ -170,5 +131,44 @@ export class OutputSocket extends Socket {
   public readonly kind: SocketType = 'output';
   protected createId(): SocketId {
     return new SocketId(`${this.parent.id.string}-o-${this.index.toInt()}`);
+  }
+}
+
+/**
+ * Creator function for input/output sockets.
+ *
+ * @export
+ * @param {SocketType} kind
+ * @param {Long} type
+ * @param {string} typeName
+ * @param {string} name
+ * @param {SocketIndex} index
+ * @param {Node} [parent=undefined]
+ * @returns
+ */
+export function createSocket(
+  kind: SocketType,
+  type: Long,
+  index: SocketIndex,
+  typeName: string | undefined | null,
+  parent?: Node
+): InputSocket | OutputSocket {
+  switch (kind) {
+    case 'input': {
+      const s = new InputSocket(type, index, isDefined(typeName) ? typeName : undefined, parent);
+      // @todo gabnue->gabnue: Move that to
+      // the designated place where we initialize UI-Properties.
+      if (!s.uiProps.name) {
+        s.uiProps.name = `in-${s.index}`;
+      }
+      return s;
+    }
+    case 'output': {
+      const s = new OutputSocket(type, index, isDefined(typeName) ? typeName : undefined, parent);
+      if (!s.uiProps.name) {
+        s.uiProps.name = `out-${s.index}`;
+      }
+      return s;
+    }
   }
 }

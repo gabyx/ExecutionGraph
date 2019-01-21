@@ -65,7 +65,7 @@ export class FileBrowserComponent implements OnInit {
     const p = this.parentPaths[this.parentPaths.length - 1];
     if (p) {
       this.loadDirectory(p).then(d => {
-        if (d.path == this.rootPath) {
+        if (d.path === this.rootPath) {
           this.atRoot = true;
         }
         this.parentPaths.pop();
@@ -82,7 +82,7 @@ export class FileBrowserComponent implements OnInit {
         this.isLoading = false;
         return pathInfo;
       } else {
-        throw `Cannot browse to a file: ${pathInfo.path}`;
+        throw new Error(`Cannot browse to a file: ${pathInfo.path}`);
       }
     });
   }
@@ -119,7 +119,7 @@ export class FileBrowserComponent implements OnInit {
       this.logger.debug(`Deleting path '${path.path}'`);
     } else {
       this.logger.error('Programming Error!');
-      throw 'Error!';
+      throw new Error('Error!');
     }
   }
 }

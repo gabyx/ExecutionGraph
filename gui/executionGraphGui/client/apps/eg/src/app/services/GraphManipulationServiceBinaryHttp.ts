@@ -36,10 +36,10 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
 
   public async addNode(graphId: Id, type: string): Promise<Node> {
     // Build the AddNode request
-    let builder = new flatbuffers.Builder(356);
-    let offGraphId = builder.createString(graphId.toString());
-    let offType = builder.createString(type);
-    let offName = builder.createString(name);
+    const builder = new flatbuffers.Builder(356);
+    const offGraphId = builder.createString(graphId.toString());
+    const offType = builder.createString(type);
+    const offName = builder.createString(name);
 
     sz.NodeConstructionInfo.startNodeConstructionInfo(builder);
     sz.NodeConstructionInfo.addName(builder, offName);
@@ -52,18 +52,18 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     off = sz.AddNodeRequest.endAddNodeRequest(builder);
     builder.finish(off);
 
-    let requestPayload = builder.asUint8Array();
+    const requestPayload = builder.asUint8Array();
 
     // Send the request
     const result = await this.binaryRouter.post('graph/addNode', requestPayload);
     const buf = new flatbuffers.ByteBuffer(result);
     const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
 
-    let node = response.node();
+    const node = response.node();
     this.logger.info(`Added new node [type: '${node.type()}', ins: ${node.inputSocketsLength()},
                   outs: ${node.outputSocketsLength()}].`);
 
-    let nodeModel = conversions.toNode(node);
+    const nodeModel = conversions.toNode(node);
     if (this.verboseResponseLog) {
       this.logger.info(`Node: '${stringify(nodeModel, 4)}'`);
     }
@@ -72,15 +72,15 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
 
   public async removeNode(graphId: Id, nodeId: NodeId): Promise<void> {
     // Build the RemoveNode request
-    let builder = new flatbuffers.Builder(356);
-    let offGraphId = builder.createString(graphId.toString());
+    const builder = new flatbuffers.Builder(356);
+    const offGraphId = builder.createString(graphId.toString());
     sz.RemoveNodeRequest.startRemoveNodeRequest(builder);
     sz.RemoveNodeRequest.addGraphId(builder, offGraphId);
     sz.RemoveNodeRequest.addNodeId(builder, builder.createLong(nodeId.low, nodeId.high));
-    let reqOff = sz.RemoveNodeRequest.endRemoveNodeRequest(builder);
+    const reqOff = sz.RemoveNodeRequest.endRemoveNodeRequest(builder);
     builder.finish(reqOff);
 
-    let requestPayload = builder.asUint8Array();
+    const requestPayload = builder.asUint8Array();
 
     // Send the request
     await this.binaryRouter.post('graph/removeNode', requestPayload);
@@ -130,7 +130,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
       // Cycle detected, read the repsonse
       const buf = new flatbuffers.ByteBuffer(result);
       const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
-      throw 'Cycle detection not yet implemented!';
+      throw new Error('Cycle detection not yet implemented!');
     }
   }
 

@@ -30,7 +30,9 @@ export class ConsoleSink implements ISink {
 
     switch (event.level) {
       case logLevels.DEBUG:
+        // tslint:disable:no-console
         console.debug(formattedMessage);
+        // tslint:enable:no-console
         break;
       case logLevels.INFO:
         console.log(formattedMessage);

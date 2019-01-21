@@ -37,7 +37,7 @@ export class DeleteToolComponent extends ToolComponent implements OnInit {
 
   @HostListener('window:keydown', ['$event'])
   onKeyDown(keyEvent: KeyboardEvent) {
-    if (keyEvent.keyCode === KEY_CODE.DELETE) {
+    if (keyEvent.key === KEY_CODE.DELETE) {
       keyEvent.preventDefault();
       this.deletePressed.emit();
     }

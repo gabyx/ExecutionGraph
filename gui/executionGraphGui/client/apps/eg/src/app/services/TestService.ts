@@ -49,15 +49,15 @@ export class TestService {
   public async testAddRemove() {
     // Get the graph infos
     this.logger.debug('Get all graph type descriptions...');
-    let graphDescs = await this.generalInfoService.getAllGraphTypeDescriptions();
+    const graphDescs = await this.generalInfoService.getAllGraphTypeDescriptions();
 
     // Add a node to the first graph
-    let graphDesc = graphDescs[0];
-    let graphTypeId = graphDesc.id;
-    let nodeType = graphDesc.nodeTypeDescriptions[0].type;
+    const graphDesc = graphDescs[0];
+    const graphTypeId = graphDesc.id;
+    const nodeType = graphDesc.nodeTypeDescriptions[0].type;
 
     // Add a graph
-    let graph = await this.graphManagementService.addGraph(graphTypeId);
+    const graph = await this.graphManagementService.addGraph(graphTypeId);
 
     // Add the node.
     await this.graphManipulationService.addNode(graph.id, nodeType, 'MySuperDuperNode');

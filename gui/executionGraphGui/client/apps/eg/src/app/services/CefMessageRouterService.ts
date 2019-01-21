@@ -12,16 +12,15 @@
 
 import { Injectable } from '@angular/core';
 
-type CefRequest = {
+interface CefRequest {
   request: string;
   persistent: boolean;
   onSuccess: (response: any) => any;
   onFailure: (errorCode: number, errorMessage: string) => void;
-};
-
-type CefWindow = {
+}
+interface CefWindow {
   cefQuery: (request: CefRequest) => void;
-};
+}
 
 /**
  * Router which sends JSON Payload (string) to the Backend by using
@@ -42,7 +41,7 @@ export class CefMessageRouterService {
     console.log(`[CefMessageRouterService] Executing '${requestURL}'`);
 
     return new Promise((resolve, reject) => {
-      var requestString = JSON.stringify({
+      const requestString = JSON.stringify({
         requestURL: requestURL,
         payload: payload
       });

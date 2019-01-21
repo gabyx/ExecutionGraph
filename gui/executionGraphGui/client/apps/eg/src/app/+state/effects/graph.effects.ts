@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRouteSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Effect, Actions } from '@ngrx/effects';
+import { Effect, Actions, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 
 import { of, from, Observable, merge as mergeObservables, throwError } from 'rxjs';
@@ -39,7 +39,8 @@ export class GraphEffects {
   }
 
   @Effect()
-  loadGraphs$ = this.actions$.ofType<fromGraph.LoadGraphs>(fromGraph.LOAD_GRAPHS).pipe(
+  loadGraphs$ = this.actions$.pipe(
+    ofType<fromGraph.LoadGraphs>(fromGraph.LOAD_GRAPHS),
     mergeMap((action, state) => this.createDummyGraph()),
     catchError(error => {
       this.log.error(`Failed to load graphs`, error);
@@ -53,12 +54,14 @@ export class GraphEffects {
   );
 
   @Effect({ dispatch: false })
-  openGraph$ = this.actions$
-    .ofType<fromGraph.GraphAdded>(fromGraph.GRAPH_ADDED)
-    .pipe(tap(action => this.router.navigate(['graph', action.graph.id.toString()])));
+  openGraph$ = this.actions$.pipe(
+    ofType<fromGraph.GraphAdded>(fromGraph.GRAPH_ADDED),
+    tap(action => this.router.navigate(['graph', action.graph.id.toString()]))
+  );
 
   @Effect()
-  createGraph$ = this.actions$.ofType<fromGraph.CreateGraph>(fromGraph.CREATE_GRAPH).pipe(
+  createGraph$ = this.actions$.pipe(
+    ofType<fromGraph.CreateGraph>(fromGraph.CREATE_GRAPH),
     mergeMap((action, state) => from(this.graphManagementService.addGraph(action.graphType.id))),
     mergeMap(graph => [
       //@todo gabnue->gabnue Change here the name of the graph to some default value
@@ -69,7 +72,8 @@ export class GraphEffects {
   );
 
   @Effect()
-  createNode$ = this.actions$.ofType<fromGraph.AddNode>(fromGraph.ADD_NODE).pipe(
+  createNode$ = this.actions$.pipe(
+    ofType<fromGraph.AddNode>(fromGraph.ADD_NODE),
     mergeMap((action, state) =>
       from(this.graphManipulationService.addNode(action.graphId, action.nodeType.type, 'Node')).pipe(
         map(node => ({ node, action }))
@@ -83,7 +87,8 @@ export class GraphEffects {
   );
 
   @Effect()
-  moveNode$ = this.actions$.ofType<fromGraph.MoveNode>(fromGraph.MOVE_NODE).pipe(
+  moveNode$ = this.actions$.pipe(
+    ofType<fromGraph.MoveNode>(fromGraph.MOVE_NODE),
     // tap(action => console.log('moving node ', action.node, action.newPosition)),
     tap(action => {
       action.node.uiProps.position = action.newPosition.copy();
@@ -92,7 +97,8 @@ export class GraphEffects {
   );
 
   @Effect()
-  moveNodes$ = this.actions$.ofType<fromGraph.MoveNodes>(fromGraph.MOVE_NODES).pipe(
+  moveNodes$ = this.actions$.pipe(
+    ofType<fromGraph.MoveNodes>(fromGraph.MOVE_NODES),
     // tap(action => console.log('moving node ', action.node, action.newPosition)),
     tap(action => {
       action.moves.forEach(m => (m.node.uiProps.position = m.pos.copy()));
@@ -102,7 +108,8 @@ export class GraphEffects {
   );
 
   @Effect()
-  removeNode$ = this.actions$.ofType<fromGraph.RemoveNode>(fromGraph.REMOVE_NODE).pipe(
+  removeNode$ = this.actions$.pipe(
+    ofType<fromGraph.RemoveNode>(fromGraph.REMOVE_NODE),
     mergeMap(action =>
       from(this.graphManipulationService.removeNode(action.graphId, action.nodeId)).pipe(map(() => action))
     ),
@@ -113,7 +120,8 @@ export class GraphEffects {
   );
 
   @Effect()
-  addConnection$ = this.actions$.ofType<fromGraph.AddConnection>(fromGraph.ADD_CONNECTION).pipe(
+  addConnection$ = this.actions$.pipe(
+    ofType<fromGraph.AddConnection>(fromGraph.ADD_CONNECTION),
     mergeMap(action =>
       from(
         this.graphManipulationService.addConnection(action.graphId, action.source, action.target, action.cycleDetection)
@@ -129,7 +137,8 @@ export class GraphEffects {
   );
 
   @Effect()
-  layoutGraph$ = this.actions$.ofType<fromGraph.RunAutoLayout>(fromGraph.RUN_AUTO_LAYOUT).pipe(
+  layoutGraph$ = this.actions$.pipe(
+    ofType<fromGraph.RunAutoLayout>(fromGraph.RUN_AUTO_LAYOUT),
     mergeMap(action => from(this.autoLayoutService.layoutGraph(action.graph, action.config))),
     catchError((error, caught) => {
       this.store.dispatch(
