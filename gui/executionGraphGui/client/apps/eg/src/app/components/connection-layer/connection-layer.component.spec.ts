@@ -8,9 +8,8 @@ describe('ConnectionLayerComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ConnectionLayerComponent ]
-    })
-    .compileComponents();
+      declarations: [ConnectionLayerComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

@@ -23,8 +23,24 @@ import { HtmlLayerComponent } from './components/html-layer/html-layer.component
 
 @NgModule({
   imports: [CommonModule],
-  declarations: [GraphComponent, PortComponent, DraggableDirective, DroppableDirective, ElementEventSourceDirective, SvgLayerComponent, HtmlLayerComponent],
-  exports: [GraphComponent, PortComponent, DraggableDirective, DroppableDirective, ElementEventSourceDirective, SvgLayerComponent, HtmlLayerComponent],
+  declarations: [
+    GraphComponent,
+    PortComponent,
+    DraggableDirective,
+    DroppableDirective,
+    ElementEventSourceDirective,
+    SvgLayerComponent,
+    HtmlLayerComponent
+  ],
+  exports: [
+    GraphComponent,
+    PortComponent,
+    DraggableDirective,
+    DroppableDirective,
+    ElementEventSourceDirective,
+    SvgLayerComponent,
+    HtmlLayerComponent
+  ],
   providers: [DragAndDropService]
 })
 export class GraphModule {}

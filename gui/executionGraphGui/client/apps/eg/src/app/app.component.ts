@@ -33,12 +33,16 @@ export class AppComponent implements OnInit {
     return this.store.select(getDrawerRequired);
   }
 
-  constructor(private graphStore: Store<GraphsState>, private store: Store<RouterState>, private router: Router, loggerFactory: LoggerFactory) {
+  constructor(
+    private graphStore: Store<GraphsState>,
+    private store: Store<RouterState>,
+    private router: Router,
+    loggerFactory: LoggerFactory
+  ) {
     this.log = loggerFactory.create('AppComponent');
   }
 
   ngOnInit() {
-
     this.graphStore.dispatch(new actions.LoadGraphDescriptions());
     this.graphStore.dispatch(new actions.LoadGraphs());
 
@@ -51,14 +55,18 @@ export class AppComponent implements OnInit {
           if (graphs.length === 0) {
             this.log.error(`Cannot select, since no graphs loaded!`);
           } else {
-            this.router.navigate([{
-              outlets: {
-                primary: ['graph', graphs[0].id.toString()],
-                drawer: ['nodes']
+            this.router.navigate([
+              {
+                outlets: {
+                  primary: ['graph', graphs[0].id.toString()],
+                  drawer: ['nodes']
+                }
               }
-            }]);
+            ]);
 
-            this.graphStore.dispatch(new actions.ShowNotification(`To help you debug I created a dummy graph for you \u{1F64C}`, 7000));
+            this.graphStore.dispatch(
+              new actions.ShowNotification(`To help you debug I created a dummy graph for you \u{1F64C}`, 7000)
+            );
           }
         }),
         take(1)
@@ -67,6 +75,6 @@ export class AppComponent implements OnInit {
   }
 
   drawerClosed() {
-    this.router.navigate([{outlets: { drawer: null}}]);
+    this.router.navigate([{ outlets: { drawer: null } }]);
   }
 }

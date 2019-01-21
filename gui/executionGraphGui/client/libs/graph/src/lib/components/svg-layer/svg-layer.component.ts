@@ -7,7 +7,6 @@ import { GraphComponent } from '@eg/graph/src/lib/components/graph/graph.compone
   styleUrls: ['./svg-layer.component.css']
 })
 export class SvgLayerComponent implements OnInit {
-
   constructor(private graph: GraphComponent) {
     console.log(`Attaching to parent graph `, graph);
   }
@@ -16,7 +15,5 @@ export class SvgLayerComponent implements OnInit {
     return this.graph.transformSvg;
   }
 
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }
