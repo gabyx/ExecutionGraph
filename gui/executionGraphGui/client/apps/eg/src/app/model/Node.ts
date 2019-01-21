@@ -40,15 +40,6 @@ export class NodeId extends Long {
     }
     this._idString = `n-${this.toInt()}`;
   }
-  /**
-   * String identifer for this NodeId.
-   *
-   * @returns {string}
-   * @memberof NodeId
-   */
-  public get string(): string {
-    return this._idString;
-  }
 }
 
 /**
@@ -82,9 +73,5 @@ export class Node {
     // Setting all parents!
     this.inputs.forEach((s: Socket) => (s.parent = this));
     this.outputs.forEach((s: Socket) => (s.parent = this));
-  }
-
-  public get idString(): string {
-    return this.id.string;
   }
 }

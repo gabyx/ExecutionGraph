@@ -14,7 +14,6 @@ import * as Long from 'long';
 import { Guid } from 'guid-typescript';
 import { Node } from './Node';
 import { isDefined } from '@eg/common';
-import { Input } from '@angular/compiler/src/core';
 
 export class UIProps {
   public name: string = '';
@@ -41,7 +40,7 @@ export class SocketId {
    * String identifer for this NodeId.
    *
    * @returns {string}
-   * @memberof NodeId
+   * @memberof SocketId
    */
   public get string(): string {
     return this._idString;
@@ -116,7 +115,7 @@ export type SocketType = 'input' | 'output';
 export class InputSocket extends Socket {
   public readonly kind: SocketType = 'input';
   protected createId(): SocketId {
-    return new SocketId(`${this.parent.id.string}-i-${this.index.toInt()}`);
+    return new SocketId(`n${this.parent.id.toString()}-i${this.index.toInt()}`);
   }
 }
 
@@ -130,7 +129,7 @@ export class InputSocket extends Socket {
 export class OutputSocket extends Socket {
   public readonly kind: SocketType = 'output';
   protected createId(): SocketId {
-    return new SocketId(`${this.parent.id.string}-o-${this.index.toInt()}`);
+    return new SocketId(`n${this.parent.id.toString()}-o${this.index.toInt()}`);
   }
 }
 
