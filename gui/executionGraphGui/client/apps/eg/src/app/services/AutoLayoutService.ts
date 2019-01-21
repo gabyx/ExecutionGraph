@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
-import { Graph, NodeId, Node } from '../model';
+import { Graph, NodeId, Node as ModelNode } from '../model';
 import {
   Point,
   ILayoutStrategy,
@@ -7,13 +7,13 @@ import {
   EngineInput,
   MassSpringLayoutStrategy,
   EngineOutput,
-  BodyCreator,
-  LinkCreator,
+  NodeCreator,
+  EdgeCreator,
   GraphConverter
 } from '@eg/graph';
 import { AppState } from '../+state/reducers/app.reducers';
 import { Store } from '@ngrx/store';
-import { LoggerFactory, ILogger } from '@eg/logger/src';
+import { LoggerFactory, ILogger } from '@eg/logger';
 import { MoveNode, MoveNodes, Moves } from '../+state/actions';
 import { map, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
@@ -22,29 +22,29 @@ import { throwError } from 'rxjs';
  * This function represents the body-link-type agnostic converter
  * which is used in the underlying Engine to convert our graph.
  */
-async function convertGraph<Body, Link>(
+async function convertGraph<Node, Edge>(
   graph: Graph,
   positionMap: Map<NodeId, Point>,
-  createBody: (id: NodeId, pos: Point, opaqueData: any) => Body,
-  createLink: (b1: Body, b2: Body) => Link
-): Promise<EngineInput<Body, Link>> {
-  const bodies: Body[] = [];
+  createNode: (id: NodeId, pos: Point, opaqueData: any) => Node,
+  createEdge: (b1: Node, b2: Node) => Edge
+): Promise<EngineInput<Node, Edge>> {
+  const nodes: Node[] = [];
 
-  const bodyMap = new Map<NodeId, Body>();
+  const nodeMap = new Map<NodeId, Node>();
 
   // create bodies
   positionMap.forEach((pos, id) => {
-    const b = createBody(id, pos, graph.nodes[id.toString()]);
-    bodyMap.set(id, b);
-    bodies.push(b);
+    const b = createNode(id, pos, graph.nodes[id.toString()]);
+    nodeMap.set(id, b);
+    nodes.push(b);
   });
 
   // create links
-  const links: Link[] = Object.values(graph.connections).map(connection =>
-    createLink(bodyMap.get(connection.inputSocket.parent.id), bodyMap.get(connection.outputSocket.parent.id))
+  const edges: Edge[] = Object.values(graph.connections).map(connection =>
+    createEdge(nodeMap.get(connection.inputSocket.parent.id), nodeMap.get(connection.outputSocket.parent.id))
   );
 
-  return { bodies: bodies, links: links };
+  return { nodes: nodes, edges: edges };
 }
 
 @Injectable()
@@ -69,7 +69,7 @@ export class AutoLayoutService {
     });
 
     // Create the converter for the engine
-    const converter: GraphConverter = <Body, Link>(a: BodyCreator<Body>, b: LinkCreator<Body, Link>) =>
+    const converter: GraphConverter = <Node, Edge>(a: NodeCreator<Node>, b: EdgeCreator<Node, Edge>) =>
       convertGraph(graph, positionMap, a, b);
 
     // Create the engine (by the strategy) ->
@@ -80,7 +80,7 @@ export class AutoLayoutService {
         map((out: EngineOutput) => {
           const s: Moves = [];
           out.forEach(res => {
-            s.push({ pos: res.pos, node: <Node>res.opaqueData });
+            s.push({ pos: res.pos, node: <ModelNode>res.opaqueData });
           });
           this.store.dispatch(new MoveNodes(s));
         }),

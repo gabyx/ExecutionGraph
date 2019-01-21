@@ -16,7 +16,7 @@ import { LogLevel, logLevels } from './LogLevel';
 import { LogEvent } from './LogEvent';
 
 function prepend(value, array) {
-  var newArray = array.slice();
+  const newArray = array.slice();
   newArray.unshift(value);
   return newArray;
 }
@@ -41,8 +41,8 @@ export class MultiSinkLogger implements ILogger {
   }
 
   private write(level: LogLevel, data: any[]) {
-    let logEvent = new LogEvent(level, prepend(`[${this.name}]`, data));
-    for (let sink of this.sinks) {
+    const logEvent = new LogEvent(level, prepend(`[${this.name}]`, data));
+    for (const sink of this.sinks) {
       sink.write(logEvent);
     }
   }

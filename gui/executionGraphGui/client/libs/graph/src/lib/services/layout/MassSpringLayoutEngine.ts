@@ -11,13 +11,13 @@
 // =========================================================================================
 import { Point, Position } from '../../model/Point';
 import { ILayoutEngine, GraphConverter, EngineOutput } from './ILayoutEngine';
-import { LoggerFactory, ILogger } from '@eg/logger/src';
+import { LoggerFactory, ILogger } from '@eg/logger';
 import { Injectable } from '@angular/core';
 import { LayoutStrategys, ILayoutStrategy } from './ILayoutStrategy';
 import { NodeId } from 'apps/eg/src/app/model';
 import { Observable, generate, throwError, asyncScheduler, of } from 'rxjs';
 import { map, switchMap, catchError, tap, finalize, takeWhile } from 'rxjs/operators';
-import { Vector2 } from '@eg/common/src';
+import { Vector2 } from '@eg/common';
 
 type Force = Vector2;
 
@@ -117,10 +117,18 @@ class PenetrationForceInteraction extends ForceLawInteraction {
   }
 }
 
-type ForceInteraction = { b1: Body; b2: Body; forceLaw: ForceLawInteraction };
-type ExtForce = { b: Body; forceLaw: ForceLawExternal };
+interface ForceInteraction {
+  b1: Body;
+  b2: Body;
+  forceLaw: ForceLawInteraction;
+}
+interface ExtForce {
+  b: Body;
+  forceLaw: ForceLawExternal;
+}
 
 class Body {
+  private temp: Position = Vector2.zero.copy();
   constructor(public readonly id: NodeId, position: Position, public readonly opaqueData: any) {
     this.position = position;
     this.positionEnd = position.copy();
@@ -164,8 +172,6 @@ class Body {
       this.temp.y <= relTol * Math.abs(this.position.y) + absTol
     );
   }
-
-  private temp: Position = Vector2.zero.copy();
 }
 
 class Link {
@@ -205,7 +211,11 @@ export class MassSpringLayoutStrategy extends ILayoutStrategy {
   }
 }
 
-type State = { step: number; converged: boolean; time: number };
+interface State {
+  step: number;
+  converged: boolean;
+  time: number;
+}
 
 @Injectable()
 export class MassSpringLayoutEngine extends ILayoutEngine {
@@ -254,7 +264,7 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
       (s: State) => {
         ++s.step;
 
-        if (s.step % logInterval == 0) {
+        if (s.step % logInterval === 0) {
           this.logger.debug(`Computed ${(s.step / this.config.maxSteps) * 100} %`);
         }
 
@@ -285,8 +295,8 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
       (id: NodeId, pos: Point, opaqueData: any) => new Body(id, pos, opaqueData),
       (b1: Body, b2: Body) => new Link(b1, b2)
     );
-    this.bodies = res.bodies;
-    this.links = res.links;
+    this.bodies = res.nodes;
+    this.links = res.edges;
 
     await this.setupForceLaws();
 
@@ -329,35 +339,35 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
   }
 
   private async integrateToMidPoint(deltaT: number): Promise<void> {
-    for (let b of this.bodies) {
+    for (const b of this.bodies) {
       await b.integrateToMidPoint(deltaT);
     }
   }
 
   private async computeForces(): Promise<void> {
-    for (let f of this.extForce) {
+    for (const f of this.extForce) {
       await f.forceLaw.accumulateForce(f.b);
     }
-    for (let f of this.extForceInteraction) {
+    for (const f of this.extForceInteraction) {
       await f.forceLaw.accumulateForce(f.b1, f.b2);
     }
   }
 
   private async computeEndVelocity(deltaT: number): Promise<void> {
-    for (let b of this.bodies) {
+    for (const b of this.bodies) {
       await b.computeEndVelocity(deltaT);
     }
   }
 
   private async integrateToEndPoint(deltaT: number): Promise<void> {
-    for (let b of this.bodies) {
+    for (const b of this.bodies) {
       await b.integrateToEndPoint(deltaT);
     }
   }
 
   private async checkConvergence(): Promise<boolean> {
     let i = 0;
-    for (let b of this.bodies) {
+    for (const b of this.bodies) {
       const conv = await b.hasPositionConverged(this.config.convergeRelTol, this.config.convergeAbsTol);
       i += conv ? 1 : 0;
     }
@@ -365,7 +375,7 @@ export class MassSpringLayoutEngine extends ILayoutEngine {
   }
 
   private async finalizeTimeStep(): Promise<void> {
-    for (let b of this.bodies) {
+    for (const b of this.bodies) {
       b.resetForNextIteration();
     }
   }

@@ -102,9 +102,10 @@
     "prettier": "1.15.2",
     "protractor": "^5.4.0",
     "ts-node": "~5.0.1",
-    "tslint": "~5.9.1",
+    "tslint": "^5.12.1",
     "typescript": "3.2.4",
-    "@ngrx/schematics": "6.1.2"
+    "@ngrx/schematics": "6.1.2",
+    "typescript-tslint-plugin": "^0.2.1"
   },
   "build": {
     "appId": "executionGraphGui",

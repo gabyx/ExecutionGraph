@@ -87,16 +87,16 @@ export class FileBrowserServiceDummy extends FileBrowserService {
 
   public async browse(path: string): Promise<FileInfo | DirectoryInfo> {
     const check = async (list: DirectoryInfo[] | FileInfo[], part: string): Promise<DirectoryInfo | FileInfo> => {
-      for (let f of list) {
+      for (const f of list) {
         this.logger.debug(`Checking: '${f.name}'`);
         if (part === f.name) {
           return f;
         }
       }
-      throw 'Not in files!';
+      throw new Error('Not in files!');
     };
 
-    let wait = ms => new Promise(r => setTimeout(r, ms));
+    const wait = ms => new Promise(r => setTimeout(r, ms));
 
     const get = async (parent: DirectoryInfo, part: string): Promise<DirectoryInfo | FileInfo> => {
       return wait(Math.random() * 1000).then(() =>
@@ -107,7 +107,7 @@ export class FileBrowserServiceDummy extends FileBrowserService {
     return new Promise<FileInfo | DirectoryInfo>(async resolve => {
       const s = path
         .split('/')
-        .filter(s => s.length > 0)
+        .filter(ss => ss.length > 0)
         .slice(1);
 
       this.logger.debug(`Browse:  [${s}] length: ${s.length}`);
@@ -115,7 +115,7 @@ export class FileBrowserServiceDummy extends FileBrowserService {
       let r: FileInfo | DirectoryInfo = this.root;
       let n: FileInfo | DirectoryInfo;
 
-      for (let part of s) {
+      for (const part of s) {
         this.logger.debug(`Part: ${part}`);
         if (isDirectory(r)) {
           n = await get(r, part);
@@ -125,7 +125,7 @@ export class FileBrowserServiceDummy extends FileBrowserService {
       resolve(r);
     }).catch(err => {
       console.log(err);
-      throw `Path '${path}' not found!`;
+      throw Error(`Path '${path}' not found!`);
     });
   }
 }

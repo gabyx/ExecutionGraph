@@ -4,12 +4,12 @@ import { Socket, Node, Graph, Connection } from '../../model';
 import { Observable, BehaviorSubject } from 'rxjs';
 
 export enum KEY_CODE {
-  BACKSPACE = 8,
-  SHIFT = 16,
-  CTRL = 17,
-  DELETE = 46,
-  ESC = 27,
-  A = 65
+  BACKSPACE = 'Backspace',
+  SHIFT = 'Space',
+  CTRL = 'Control',
+  DELETE = 'Delete',
+  ESC = 'Escape',
+  A = 'a'
 }
 
 export abstract class ToolComponent {
