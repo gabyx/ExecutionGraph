@@ -86,7 +86,7 @@ export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescrip
  */
 export function toNode(node: serialization.LogicNode): model.Node {
   // Convert to a node model
-  const nodeId = new model.NodeId(toULong(node.id()));
+  const nodeId = toULong(node.id());
 
   const allSockets: model.Socket[] = [];
 
@@ -112,5 +112,5 @@ export function toNode(node: serialization.LogicNode): model.Node {
   extractSockets('input', allSockets);
   extractSockets('output', allSockets);
 
-  return new model.Node(nodeId, node.type(), allSockets);
+  return model.fromNode.createNode(nodeId, node.type(), allSockets);
 }

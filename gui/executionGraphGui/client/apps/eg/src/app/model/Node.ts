@@ -12,56 +12,53 @@
 
 import { Point } from '@eg/graph';
 import * as Long from 'long';
-import { Socket, InputSocket, OutputSocket } from './Socket';
-import * as fromSocket from './Socket';
+import { Socket, OutputSocket, InputSocket, isOutputSocket } from './Socket';
 
-function isLong(value: any): value is Long {
-  return value instanceof Long;
+export interface UIProps {
+  readonly name: string;
+  position: Point;
+}
+function createUIProps(name: string = 'Unnamed', position: Point = Point.zero.copy()) {
+  return { name: name, position: position };
 }
 
-export class UIProps {
-  public name: string = 'Unnamed';
-  public position = Point.zero.copy();
+export type NodeId = Long;
+export type NodeType = string;
+
+export interface Node {
+  readonly id: NodeId;
+  readonly type: NodeType;
+  readonly inputs: InputSocket[];
+  readonly outputs: OutputSocket[];
+  readonly uiProps: UIProps;
 }
 
-/**
- * Unique Identifier for a `Node`.
- *
+/*
+ * Create a node.
  */
-export class NodeId extends Long {
-  constructor(id: number | Long) {
-    if (isLong(id)) {
-      super(id.low, id.high, id.unsigned);
-    } else {
-      super(id, 0, true);
-    }
-  }
-}
+export function createNode(id: NodeId, type: NodeType, sockets?: Socket[], uiProps?: UIProps): Node {
+  const inputs: InputSocket[] = [];
+  const outputs: OutputSocket[] = [];
 
-/**
- *  Modelclass for a node.
- */
-export class Node {
-  /** Two different lists for sockets */
-  public readonly inputs: InputSocket[] = [];
-  public readonly outputs: OutputSocket[] = [];
-  constructor(
-    public readonly id: NodeId,
-    public readonly type: string,
-    public sockets: Socket[] = [],
-    public uiProps: UIProps = new UIProps()
-  ) {
-    // Make
+  if (sockets) {
     sockets.forEach((s: InputSocket | OutputSocket) => {
-      if (fromSocket.isOutputSocket(s)) {
-        this.outputs.push(s);
+      if (isOutputSocket(s)) {
+        outputs.push(s);
       } else {
-        this.inputs.push(s);
+        inputs.push(s);
       }
     });
-    // Sorting input/outputs according to index.
-    const sort = (a: Socket, b: Socket) => a.index.comp(b.index);
-    this.inputs = this.inputs.sort(sort);
-    this.outputs = this.outputs.sort(sort);
   }
+
+  const sort = (a: Socket, b: Socket) => a.index.comp(b.index);
+  inputs.sort(sort);
+  outputs.sort(sort);
+
+  return {
+    id: id,
+    type: type,
+    inputs: inputs,
+    outputs: outputs,
+    uiProps: uiProps ? uiProps : createUIProps()
+  };
 }

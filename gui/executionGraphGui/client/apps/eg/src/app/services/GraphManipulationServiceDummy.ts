@@ -59,7 +59,7 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
     cycleDetection: boolean
   ): Promise<Connection> {
     this.logger.info(`Add connection: ['${source.id}' ⟶ '${target.id}'] from graph [id: '${graphId}']`);
-    return fromConnection.create(source, target, true);
+    return fromConnection.createConnection(source, target, true);
   }
 
   public async removeConnection(graphId: GraphId, source: Socket, target: Socket): Promise<void> {

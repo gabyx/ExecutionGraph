@@ -93,7 +93,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     target: Socket,
     cycleDetection: boolean
   ): Promise<Connection> {
-    const connection = fromConnection.create(source, target, true);
+    const connection = fromConnection.createConnection(source, target, true);
 
     const builder = new flatbuffers.Builder(356);
     const offGraphId = builder.createString(graphId);
@@ -133,7 +133,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
   }
 
   public async removeConnection(graphId: GraphId, source: Socket, target: Socket): Promise<void> {
-    const connection = fromConnection.create(source, target, false);
+    const connection = fromConnection.createConnection(source, target, false);
 
     const builder = new flatbuffers.Builder(356);
     const offGraphId = builder.createString(graphId);

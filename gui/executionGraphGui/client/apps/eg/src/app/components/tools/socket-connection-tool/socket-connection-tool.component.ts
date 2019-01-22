@@ -42,28 +42,46 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
 
   ngOnInit() {
     this.socketEvents.onDragStart.subscribe(e => {
-      if(e.button!==MouseButton.Left) { return; }
+      if (e.button !== MouseButton.Left) {
+        return;
+      }
       const socket = e.element;
 
       this.logger.info(`Initiating new connection from ${socket.id}`);
       this.sourceSocket = socket;
       if (fromSocket.isOutputSocket(this.sourceSocket)) {
-        this.tempTargetSocket = fromSocket.createSocket('input', socket.typeIndex, Long.fromNumber(0), Long.fromNumber(-1), 'Dummy');
+        this.tempTargetSocket = fromSocket.createSocket(
+          'input',
+          socket.typeIndex,
+          Long.fromNumber(0),
+          Long.fromNumber(-1),
+          'Dummy'
+        );
       } else {
-        this.tempTargetSocket = fromSocket.createSocket('output', socket.typeIndex, Long.fromNumber(0), Long.fromNumber(-1), 'Dummy');
+        this.tempTargetSocket = fromSocket.createSocket(
+          'output',
+          socket.typeIndex,
+          Long.fromNumber(0),
+          Long.fromNumber(-1),
+          'Dummy'
+        );
       }
       this.activate();
       this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
-      this.tempConnection = fromConnection.create(socket, this.tempTargetSocket);
+      this.tempConnection = fromConnection.createConnection(socket, this.tempTargetSocket);
     });
     this.socketEvents.onDragContinue.subscribe(e => {
-      if (e.button !== MouseButton.Left) { return; }
+      if (e.button !== MouseButton.Left) {
+        return;
+      }
       if (!this.targetSocket) {
         this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
       }
     });
     this.socketEvents.onDragStop.subscribe(e => {
-      if (e.button !== MouseButton.Left) { return; }
+      if (e.button !== MouseButton.Left) {
+        return;
+      }
       if (this.targetSocket) {
         this.addConnection(this.sourceSocket, this.targetSocket);
       } else {
@@ -81,7 +99,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
         if (!this.invalidity) {
           this.logger.info('Making preview connection');
           this.targetSocket = targetSocket;
-          this.tempConnection = fromConnection.create(this.sourceSocket, this.targetSocket, false);
+          this.tempConnection = fromConnection.createConnection(this.sourceSocket, this.targetSocket, false);
         } else {
           /** Add notifcation icon next to cursor, to make
            *  clear that this connection is impossible
@@ -96,7 +114,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       if (this.targetSocket) {
         this.logger.info('Leaving potential target Socket');
         this.targetSocket = null;
-        this.tempConnection = fromConnection.create(this.sourceSocket, this.tempTargetSocket);
+        this.tempConnection = fromConnection.createConnection(this.sourceSocket, this.tempTargetSocket);
         this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
       }
       if (this.tempConnection) {

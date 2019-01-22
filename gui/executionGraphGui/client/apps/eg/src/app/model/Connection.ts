@@ -61,7 +61,7 @@ export function isInvalid(source: Socket, target: Socket): Invalidity {
 /**
  * Create a connection.
  */
-export function create(source: Socket, target: Socket, validate: boolean = true): Connection {
+export function createConnection(source: Socket, target: Socket, validate: boolean = true): Connection {
   const invalid = validate ? isInvalid(source, target) : Invalidity.Valid /*just do it!*/;
   if (invalid) {
     throw new Error(`Cannot construct an invalid connection: ${getValidationErrors(invalid).join(',')}`);
