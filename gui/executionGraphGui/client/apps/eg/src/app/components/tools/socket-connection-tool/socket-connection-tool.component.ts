@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { Point, ConnectionDrawStyle, GraphComponent } from '@eg/graph';
+import { Point, ConnectionDrawStyle, GraphComponent, MouseButton } from '@eg/graph';
 import { ILogger, LoggerFactory } from '@eg/logger';
 
 import { ToolComponent } from '../tool-component';
@@ -42,6 +42,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
 
   ngOnInit() {
     this.socketEvents.onDragStart.subscribe(e => {
+      if(e.button!==MouseButton.Left) { return; }
       const socket = e.element;
 
       this.logger.info(`Initiating new connection from ${socket.id}`);
@@ -56,11 +57,13 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       this.tempConnection = fromConnection.create(socket, this.tempTargetSocket);
     });
     this.socketEvents.onDragContinue.subscribe(e => {
+      if (e.button !== MouseButton.Left) { return; }
       if (!this.targetSocket) {
         this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
       }
     });
     this.socketEvents.onDragStop.subscribe(e => {
+      if (e.button !== MouseButton.Left) { return; }
       if (this.targetSocket) {
         this.addConnection(this.sourceSocket, this.targetSocket);
       } else {
