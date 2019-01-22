@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import * as fromGraphDescriptions from '../../+state/selectors/';
 import { GraphDescriptionsState } from '../../+state/reducers/graphDescription.reducers';
 import { GraphTypeDescription } from '../../model';
 import { CreateGraph } from '../../+state/actions';
 import { ILogger, LoggerFactory } from '@eg/logger';
-import { RouterState, Router } from '@angular/router';
 
 @Component({
   selector: 'eg-graph-create',
@@ -19,11 +18,10 @@ export class GraphCreateComponent implements OnInit {
 
   constructor(
     private store: Store<GraphDescriptionsState>,
-    readonly loggerFactory: LoggerFactory,
-    private readonly router: Router
+    readonly loggerFactory: LoggerFactory
   ) {
-    this.logger = loggerFactory.create('SocketConnectionToolComponent');
-    this.graphTypes = this.store.select(fromGraphDescriptions.getGraphDescriptions);
+    this.logger = loggerFactory.create('GraphCreateComponent');
+    this.graphTypes = this.store.pipe(select(fromGraphDescriptions.getGraphDescriptions));
   }
 
   ngOnInit() {}
