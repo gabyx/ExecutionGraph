@@ -54,7 +54,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
         this.tempTargetSocket = fromSocket.createSocket(
           'input',
           socket.typeIndex,
-          Long.fromNumber(0),
+          0,
           Guid.create().toString(),
           'Dummy'
         );
@@ -62,7 +62,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
         this.tempTargetSocket = fromSocket.createSocket(
           'output',
           socket.typeIndex,
-          Long.fromNumber(0),
+          0,
           Guid.create().toString(),
           'Dummy'
         );

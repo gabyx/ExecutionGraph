@@ -105,9 +105,9 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
       sz.SocketLinkDescription.createSocketLinkDescription(
         builder,
         convs.toFbLong(Long.fromString(connection.outputSocket.parentId)),
-        convs.toFbLong(connection.outputSocket.index),
+        convs.toFbLong(Long.fromNumber(connection.outputSocket.index)),
         convs.toFbLong(Long.fromString(connection.inputSocket.parentId)),
-        convs.toFbLong(connection.inputSocket.index),
+        convs.toFbLong(Long.fromNumber(connection.inputSocket.index)),
         connection.isWriteLink
       )
     );
@@ -145,9 +145,9 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
       sz.SocketLinkDescription.createSocketLinkDescription(
         builder,
         convs.toFbLong(Long.fromString(connection.outputSocket.parentId)),
-        convs.toFbLong(connection.outputSocket.index),
+        convs.toFbLong(Long.fromNumber(connection.outputSocket.index)),
         convs.toFbLong(Long.fromString(connection.inputSocket.parentId)),
-        convs.toFbLong(connection.inputSocket.index),
+        convs.toFbLong(Long.fromNumber(connection.inputSocket.index)),
         connection.isWriteLink
       )
     );

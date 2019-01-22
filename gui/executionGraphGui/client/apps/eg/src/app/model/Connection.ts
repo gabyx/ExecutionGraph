@@ -54,7 +54,7 @@ export function isInvalid(source: Socket, target: Socket): Invalidity {
   /** no 1-length-cycles, more elaborate cycle-detection in the backend */
   result |= source.parentId !== target.parentId ? Invalidity.Valid : Invalidity.Invalid | Invalidity.OneLengthCycle;
   /** correct type */
-  result |= source.typeIndex.equals(target.typeIndex) ? Invalidity.Valid : Invalidity.Invalid | Invalidity.TypeMismatch;
+  result |= source.typeIndex === target.typeIndex ? Invalidity.Valid : Invalidity.Invalid | Invalidity.TypeMismatch;
   return result;
 }
 

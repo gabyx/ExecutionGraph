@@ -11,13 +11,13 @@
 // =========================================================================================
 
 import { Point } from '@eg/graph';
-import * as Long from 'long';
 import { Socket, OutputSocket, InputSocket, isOutputSocket } from './Socket';
 
 export interface UIProps {
   readonly name: string;
   position: Point;
 }
+
 function createUIProps(name: string = 'Unnamed', position: Point = Point.zero.copy()) {
   return { name: name, position: position };
 }
@@ -50,7 +50,7 @@ export function createNode(id: NodeId, type: NodeType, sockets?: Socket[], uiPro
     });
   }
 
-  const sort = (a: Socket, b: Socket) => a.index.comp(b.index);
+  const sort = (a: Socket, b: Socket) => a.index - b.index;
   inputs.sort(sort);
   outputs.sort(sort);
 
