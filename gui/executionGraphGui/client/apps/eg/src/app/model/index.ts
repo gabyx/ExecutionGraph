@@ -6,3 +6,6 @@ export { SocketTypeDescription, NodeTypeDescription, GraphTypeDescription } from
 
 import * as fromConnection from './Connection';
 export { fromConnection };
+
+import * as fromSocket from './Socket';
+export { fromSocket };

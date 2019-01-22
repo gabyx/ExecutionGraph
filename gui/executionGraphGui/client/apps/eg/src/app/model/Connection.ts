@@ -11,6 +11,7 @@
 // =========================================================================================
 
 import { InputSocket, OutputSocket, Socket } from './Socket';
+import * as fromSocket from './Socket';
 
 //tslint:disable:no-bitwise
 
@@ -69,10 +70,10 @@ export function create(source: Socket, target: Socket, validate: boolean = true)
   let isWriteLink = true;
   let inS: InputSocket;
   let outS: OutputSocket;
-  if (Socket.isOutputSocket(source) && Socket.isInputSocket(target)) {
+  if (fromSocket.isOutputSocket(source) && fromSocket.isInputSocket(target)) {
     outS = source;
     inS = target;
-  } else if (Socket.isInputSocket(source) && Socket.isOutputSocket(target)) {
+  } else if (fromSocket.isInputSocket(source) && fromSocket.isOutputSocket(target)) {
     outS = target;
     inS = source;
     // Make a Get-Link

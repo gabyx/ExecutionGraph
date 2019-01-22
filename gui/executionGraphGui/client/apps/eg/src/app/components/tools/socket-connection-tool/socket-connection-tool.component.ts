@@ -5,10 +5,11 @@ import { ILogger, LoggerFactory } from '@eg/logger';
 
 import { ToolComponent } from '../tool-component';
 import { Id } from '@eg/common';
-import { OutputSocket, InputSocket, Connection, Socket, SocketIndex, fromConnection } from '../../../model';
+import { OutputSocket, InputSocket, Connection, Socket, SocketIndex, fromConnection, fromSocket } from '../../../model';
 import { GraphsState } from '../../../+state/reducers';
 import { AddConnection } from '../../../+state/actions';
 import { getSelectedGraph } from '../../../+state/selectors';
+import * as Long from 'long';
 
 @Component({
   selector: 'eg-socket-connection-tool',
@@ -46,10 +47,10 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
 
       this.logger.info(`Initiating new connection from ${socket.id}`);
       this.sourceSocket = socket;
-      if (Socket.isOutputSocket(this.sourceSocket)) {
-        this.tempTargetSocket = new InputSocket(socket.typeIndex, new SocketIndex(0));
+      if (fromSocket.isOutputSocket(this.sourceSocket)) {
+        this.tempTargetSocket = fromSocket.createSocket('input', socket.typeIndex, Long.fromNumber(0), 'Dummy');
       } else {
-        this.tempTargetSocket = new OutputSocket(socket.typeIndex, new SocketIndex(0));
+        this.tempTargetSocket = fromSocket.createSocket('output', socket.typeIndex, Long.fromNumber(0), 'Dummy');
       }
       this.activate();
       this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);

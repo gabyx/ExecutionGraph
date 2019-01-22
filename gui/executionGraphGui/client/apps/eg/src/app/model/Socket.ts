@@ -19,105 +19,70 @@ export class UIProps {
   public name: string = '';
 }
 
-export class SocketIndex extends Long {}
+export type SocketType = 'input' | 'output';
+export type SocketIndex = Long;
+export type SocketTypeIndex = Long;
 export type SocketId = string;
 
-/**
- * Modelclass for a Socket on a node.
- */
-export abstract class Socket {
-  abstract get kind(): SocketType;
-  protected _id: SocketId = Guid.create().toString();
+export interface Socket {
+  readonly kind: SocketType;
+  readonly type?: string;
+  readonly typeIndex: SocketTypeIndex;
 
-  /** Type guard for InputSocket */
-  public static isInputSocket(socket: Socket): socket is InputSocket {
-    return socket.kind === 'input';
-  }
+  readonly index: SocketIndex;
+  parent?: Node;
 
-  /** Type guard for OutputSocket */
-  public static isOutputSocket(socket: Socket): socket is OutputSocket {
-    return socket.kind === 'output';
-  }
-
-  constructor(
-    public readonly typeIndex: Long,
-    public readonly index: SocketIndex,
-    public readonly type?: string,
-    protected _parent?: Node,
-    public uiProps: UIProps = new UIProps()
-  ) {
-    if (!isDefined(type)) {
-      type = typeIndex.toString();
-    }
-  }
-
-  public get parent(): Node {
-    return this._parent;
-  }
-  public set parent(parent: Node) {
-    if (isDefined(this.parent) || !isDefined(parent)) {
-      throw new Error('You cannot assign a new parent or undefined!');
-    }
-    this._parent = parent;
-    // Assign a new unique id to the socket, for debugging purposes
-    this._id = this.createId();
-  }
-
-  public get id(): string {
-    return this._id;
-  }
-
-  protected abstract createId(): SocketId;
+  uiProps: UIProps;
+  id: SocketId;
 }
 
-export type SocketType = 'input' | 'output';
+export type OutputSocket = Socket;
+export type InputSocket = Socket;
 
-/**
- * The output socket.
- */
-export class InputSocket extends Socket {
-  public readonly kind: SocketType = 'input';
-  protected createId(): SocketId {
-    return `n${this.parent.id.toString()}-i${this.index.toInt()}`;
-  }
+/** Type guard for InputSocket */
+export function isInputSocket(socket: Socket): socket is InputSocket {
+  return socket.kind === 'input';
 }
 
-/**
- * The input socket.
- */
-export class OutputSocket extends Socket {
-  public readonly kind: SocketType = 'output';
-  protected createId(): SocketId {
-    return `n${this.parent.id.toString()}-o${this.index.toInt()}`;
-  }
+/** Type guard for OutputSocket */
+export function isOutputSocket(socket: Socket): socket is OutputSocket {
+  return socket.kind === 'output';
 }
 
-/**
+export function createId(parent: Node | null | undefined, index: SocketIndex, kind: SocketType): SocketId {
+  return parent ? `n${parent.id.toString()}-${kind[0]}${index.toInt()}` : Guid.create().toString();
+}
+
+/*
  * Creator function for input/output sockets.
  */
 export function createSocket(
   kind: SocketType,
-  type: Long,
+  typeIndex: SocketTypeIndex,
   index: SocketIndex,
-  typeName: string | undefined | null,
+  type: string | undefined | null,
   parent?: Node
 ): InputSocket | OutputSocket {
+  let uiName: string;
+
   switch (kind) {
     case 'input': {
-      const s = new InputSocket(type, index, isDefined(typeName) ? typeName : undefined, parent);
-      // @todo gabnue->gabnue: Move that to
-      // the designated place where we initialize UI-Properties.
-      if (!s.uiProps.name) {
-        s.uiProps.name = `in-${s.index}`;
-      }
-      return s;
+      uiName = `in-${index}`;
+      break;
     }
     case 'output': {
-      const s = new OutputSocket(type, index, isDefined(typeName) ? typeName : undefined, parent);
-      if (!s.uiProps.name) {
-        s.uiProps.name = `out-${s.index}`;
-      }
-      return s;
+      uiName = `in-${index}`;
+      break;
     }
   }
+
+  return {
+    id: createId(parent, index, kind),
+    kind: kind,
+    typeIndex: typeIndex,
+    type: isDefined(type) ? type : undefined,
+    index: index,
+    parent: parent,
+    uiProps: { name: uiName }
+  };
 }
