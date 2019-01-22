@@ -12,9 +12,7 @@
 
 import * as Long from 'long';
 import { Guid } from 'guid-typescript';
-import { Node, NodeId } from './Node';
-import { isDefined } from '@eg/common';
-import { getParentInjectorIndex } from '@angular/core/src/render3/util';
+import { NodeId } from './Node';
 
 export class UIProps {
   public name: string = '';
@@ -80,7 +78,7 @@ export function createSocket(
     id: createId(),
     kind: kind,
     typeIndex: typeIndex,
-    type: isDefined(type) ? type : undefined,
+    type: type ? type : undefined,
     index: index,
     parentId: parentId,
     uiProps: { name: uiName }

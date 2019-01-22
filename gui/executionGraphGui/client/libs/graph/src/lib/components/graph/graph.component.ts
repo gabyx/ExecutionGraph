@@ -10,7 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Component, ElementRef, QueryList, HostListener, ContentChildren, ChangeDetectorRef } from '@angular/core';
+import { Component, ElementRef, HostListener, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { PortComponent } from '../port/port.component';
 import { Point, Position } from '../../model/Point';
 
@@ -32,7 +32,7 @@ export function getPositionRelativeToParent(element: HTMLElement, referenceParen
   templateUrl: './graph.component.html',
   styleUrls: ['./graph.component.scss']
 })
-export class GraphComponent {
+export class GraphComponent implements AfterViewChecked {
   // @ContentChildren(PortComponent, { descendants: true })
   // ports: QueryList<PortComponent>;
 

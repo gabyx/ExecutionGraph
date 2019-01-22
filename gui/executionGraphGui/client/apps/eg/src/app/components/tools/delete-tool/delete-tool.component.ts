@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit, EventEmitter } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { withLatestFrom } from 'rxjs/operators';
 
@@ -22,8 +22,8 @@ export class DeleteToolComponent extends ToolComponent implements OnInit {
 
   constructor(private store: Store<GraphsState>) {
     super();
-    this.selection = store.select(getSelection);
-    this.selectedGraph = store.select(getSelectedGraph);
+    this.selection = store.pipe(select(getSelection));
+    this.selectedGraph = store.pipe(select(getSelectedGraph));
   }
 
   ngOnInit() {

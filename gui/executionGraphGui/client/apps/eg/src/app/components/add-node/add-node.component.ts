@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { Observable, combineLatest } from 'rxjs';
 import { map, filter } from 'rxjs/operators';
 
@@ -19,8 +19,8 @@ export class AddNodeComponent implements OnInit {
 
   constructor(graphStore: Store<GraphsState>, graphDescriptionStore: Store<GraphDescriptionsState>) {
     this.nodeTypes = combineLatest(
-      graphDescriptionStore.select(getGraphDescriptionEntities),
-      graphStore.select(getSelectedGraph)
+      graphDescriptionStore.pipe(select(getGraphDescriptionEntities)),
+      graphStore.pipe(select(getSelectedGraph))
     ).pipe(
       filter(([descriptions, graph]) => isDefined(graph)),
       map(([descriptions, graph]) => descriptions[graph.typeId]),
