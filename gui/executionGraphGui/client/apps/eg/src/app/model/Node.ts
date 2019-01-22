@@ -63,12 +63,5 @@ export class Node {
     const sort = (a: Socket, b: Socket) => a.index.comp(b.index);
     this.inputs = this.inputs.sort(sort);
     this.outputs = this.outputs.sort(sort);
-    // Setting all parents!
-    const setter = (s: Socket) => {
-      s.parent = this;
-      s.id = fromSocket.createId(this, s.index, s.kind);
-    };
-    this.inputs.forEach(setter);
-    this.outputs.forEach(setter);
   }
 }

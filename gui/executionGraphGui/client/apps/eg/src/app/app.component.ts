@@ -12,7 +12,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { RouterState, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { filter, tap, take } from 'rxjs/operators';
 
 import { LoggerFactory, ILogger } from '@eg/logger';
@@ -47,8 +47,8 @@ export class AppComponent implements OnInit {
     this.graphStore.dispatch(new actions.LoadGraphs());
 
     this.store
-      .select(graphQueries.getGraphs)
       .pipe(
+        select(graphQueries.getGraphs),
         filter(graphs => graphs.length > 0),
         tap(graphs => {
           this.log.debug(`Loaded graphs, auto-selecting first`);

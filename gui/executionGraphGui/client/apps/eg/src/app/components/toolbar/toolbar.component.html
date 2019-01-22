@@ -5,7 +5,7 @@
         <mat-icon>add</mat-icon>
         <span>Create new</span>
       </button>
-      <button mat-menu-item [routerLink]="['/graph/open']">
+      <button mat-menu-item [routerLink]="[{ outlets: { primary: ['graph', 'open'], drawer: null }}]">
         <mat-icon>mode_edit</mat-icon>
         <span>Open</span>
       </button>
@@ -38,7 +38,7 @@
     </mat-menu>
 
     <mat-menu #openRecentMenu="matMenu">
-      <button *ngFor="let graph of graphsMRU | async" mat-menu-item [routerLink]="['graph', graph.id.toString()]">{{ graph.name }} | {{ graph.id.toString()}}</button>
+      <button *ngFor="let graph of graphsMRU | async" mat-menu-item [routerLink]="['graph', graph.id]">{{ graph.name }} | {{ graph.id}}</button>
     </mat-menu>
 
     <mat-menu #executionMenu="matMenu">

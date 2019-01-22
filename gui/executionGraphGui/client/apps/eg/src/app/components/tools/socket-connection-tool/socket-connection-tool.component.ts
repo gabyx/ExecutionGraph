@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { Point, ConnectionDrawStyle, GraphComponent } from '@eg/graph';
 import { ILogger, LoggerFactory } from '@eg/logger';
 
@@ -7,7 +7,7 @@ import { ToolComponent } from '../tool-component';
 import { OutputSocket, InputSocket, Connection, Socket, fromConnection, fromSocket, GraphId } from '../../../model';
 import { GraphsState } from '../../../+state/reducers';
 import { AddConnection } from '../../../+state/actions';
-import { getSelectedGraph } from '../../../+state/selectors';
+import { getSelectedGraph, getSelectedGraphId } from '../../../+state/selectors';
 import * as Long from 'long';
 
 @Component({
@@ -37,7 +37,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
   constructor(private graph: GraphComponent, private store: Store<GraphsState>, loggerFactory: LoggerFactory) {
     super();
     this.logger = loggerFactory.create('SocketConnectionToolComponent');
-    store.select(getSelectedGraph).subscribe(g => (this.selectedGraphId = g.id));
+    store.pipe(select(getSelectedGraphId)).subscribe(graphId => (this.selectedGraphId = graphId));
   }
 
   ngOnInit() {
@@ -47,9 +47,9 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       this.logger.info(`Initiating new connection from ${socket.id}`);
       this.sourceSocket = socket;
       if (fromSocket.isOutputSocket(this.sourceSocket)) {
-        this.tempTargetSocket = fromSocket.createSocket('input', socket.typeIndex, Long.fromNumber(0), 'Dummy');
+        this.tempTargetSocket = fromSocket.createSocket('input', socket.typeIndex, Long.fromNumber(0), Long.fromNumber(-1), 'Dummy');
       } else {
-        this.tempTargetSocket = fromSocket.createSocket('output', socket.typeIndex, Long.fromNumber(0), 'Dummy');
+        this.tempTargetSocket = fromSocket.createSocket('output', socket.typeIndex, Long.fromNumber(0), Long.fromNumber(-1), 'Dummy');
       }
       this.activate();
       this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);

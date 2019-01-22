@@ -45,8 +45,8 @@ async function convertGraph<Node, Edge>(
   // create links
   Object.values(graph.connections).map(connection =>
     createEdge(
-      nodeMap.get(connection.inputSocket.parent.id.toString()),
-      nodeMap.get(connection.outputSocket.parent.id.toString())
+      nodeMap.get(connection.inputSocket.parentId.toString()),
+      nodeMap.get(connection.outputSocket.parentId.toString())
     )
   );
 }

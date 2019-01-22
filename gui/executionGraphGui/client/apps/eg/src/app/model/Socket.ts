@@ -12,8 +12,9 @@
 
 import * as Long from 'long';
 import { Guid } from 'guid-typescript';
-import { Node } from './Node';
+import { Node, NodeId } from './Node';
 import { isDefined } from '@eg/common';
+import { getParentInjectorIndex } from '@angular/core/src/render3/util';
 
 export class UIProps {
   public name: string = '';
@@ -30,10 +31,9 @@ export interface Socket {
   readonly typeIndex: SocketTypeIndex;
 
   readonly index: SocketIndex;
-  parent?: Node;
-
-  uiProps: UIProps;
-  id: SocketId;
+  readonly parentId: NodeId;
+  readonly uiProps: UIProps;
+  readonly id: SocketId;
 }
 
 export type OutputSocket = Socket;
@@ -49,8 +49,8 @@ export function isOutputSocket(socket: Socket): socket is OutputSocket {
   return socket.kind === 'output';
 }
 
-export function createId(parent: Node | null | undefined, index: SocketIndex, kind: SocketType): SocketId {
-  return parent ? `n${parent.id.toString()}-${kind[0]}${index.toInt()}` : Guid.create().toString();
+export function createId(): SocketId {
+  return Guid.create().toString();
 }
 
 /*
@@ -60,8 +60,8 @@ export function createSocket(
   kind: SocketType,
   typeIndex: SocketTypeIndex,
   index: SocketIndex,
-  type: string | undefined | null,
-  parent?: Node
+  parentId: NodeId,
+  type: string | undefined | null
 ): InputSocket | OutputSocket {
   let uiName: string;
 
@@ -77,12 +77,12 @@ export function createSocket(
   }
 
   return {
-    id: createId(parent, index, kind),
+    id: createId(),
     kind: kind,
     typeIndex: typeIndex,
     type: isDefined(type) ? type : undefined,
     index: index,
-    parent: parent,
+    parentId: parentId,
     uiProps: { name: uiName }
   };
 }

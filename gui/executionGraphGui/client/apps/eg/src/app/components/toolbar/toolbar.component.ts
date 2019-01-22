@@ -11,12 +11,12 @@
 // =========================================================================================
 
 import { Component, OnInit, Injectable } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { RouterState, Router } from '@angular/router';
-import { Graph } from '../../model';
+import { Graph, GraphId } from '../../model';
 import { GraphsState } from '../../+state/reducers';
-import { getGraphs } from '../../+state/selectors';
+import { getGraphs, getSelectedGraphId } from '../../+state/selectors';
 
 @Injectable()
 @Component({
@@ -27,8 +27,11 @@ import { getGraphs } from '../../+state/selectors';
 export class ToolbarComponent implements OnInit {
   public graphsMRU: Observable<Graph[]>;
 
+  public currentGraphId: Observable<GraphId>;
+
   constructor(private store: Store<GraphsState>) {
-    this.graphsMRU = this.store.select(getGraphs);
+    this.graphsMRU = this.store.pipe(select(getGraphs));
+    this.currentGraphId = this.store.pipe(select(getSelectedGraphId));
   }
 
   public closeGraph() {

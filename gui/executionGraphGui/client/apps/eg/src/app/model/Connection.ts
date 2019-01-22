@@ -37,11 +37,11 @@ export class UIProps {}
  * Modelclass for a connection
  */
 export interface Connection {
-  id: ConnectionId;
-  outputSocket: OutputSocket;
-  inputSocket: InputSocket;
-  isWriteLink: boolean;
-  uiProps: UIProps;
+  readonly id: ConnectionId;
+  readonly outputSocket: OutputSocket;
+  readonly inputSocket: InputSocket;
+  readonly isWriteLink: boolean;
+  readonly uiProps: UIProps;
 }
 
 /**
@@ -52,7 +52,7 @@ export function isInvalid(source: Socket, target: Socket): Invalidity {
   /** input,output or vice versa */
   result |= source.kind !== target.kind ? Invalidity.Valid : Invalidity.Invalid | Invalidity.InOutMismatch;
   /** no 1-length-cycles, more elaborate cycle-detection in the backend */
-  result |= source.parent !== target.parent ? Invalidity.Valid : Invalidity.Invalid | Invalidity.OneLengthCycle;
+  result |= source.parentId !== target.parentId ? Invalidity.Valid : Invalidity.Invalid | Invalidity.OneLengthCycle;
   /** correct type */
   result |= source.typeIndex.equals(target.typeIndex) ? Invalidity.Valid : Invalidity.Invalid | Invalidity.TypeMismatch;
   return result;

@@ -128,8 +128,8 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
       // Anyway we deleting obsolete connections here is just a hack
       const connections = Object.keys(graph.connections)
         .map(id => graph.connections[id])
-        .filter(connection => connection.inputSocket.parent.id.toString() !== action.nodeId.toString())
-        .filter(connection => connection.outputSocket.parent.id.toString() !== action.nodeId.toString());
+        .filter(connection => connection.inputSocket.parentId.notEquals(action.nodeId))
+        .filter(connection => connection.outputSocket.parentId.notEquals(action.nodeId));
       return {
         ...graph,
         nodes: nodes,
