@@ -101,7 +101,7 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
         ...graph,
         nodes: {
           ...graph.nodes,
-          [node.id.toString()]: node
+          [node.id]: node
         }
       };
     }
@@ -112,14 +112,14 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
         ...graph,
         nodes: {
           ...graph.nodes,
-          [node.id.toString()]: node
+          [node.id]: node
         }
       };
     }
 
     case fromActions.NODE_REMOVED: {
       // Remove by destructuring to the removed and the rest
-      const { [action.nodeId.toString()]: removed, ...nodes } = graph.nodes;
+      const { [action.nodeId]: removed, ...nodes } = graph.nodes;
       //@todo cmonspqr -> gabnue:
       // Either the backend should report removed connections due to
       // removed nodes to keep the model consistent, or the backend should
@@ -128,8 +128,8 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
       // Anyway we deleting obsolete connections here is just a hack
       const connections = Object.keys(graph.connections)
         .map(id => graph.connections[id])
-        .filter(connection => connection.inputSocket.parentId.notEquals(action.nodeId))
-        .filter(connection => connection.outputSocket.parentId.notEquals(action.nodeId));
+        .filter(connection => connection.inputSocket.parentId === action.nodeId)
+        .filter(connection => connection.outputSocket.parentId === action.nodeId);
       return {
         ...graph,
         nodes: nodes,

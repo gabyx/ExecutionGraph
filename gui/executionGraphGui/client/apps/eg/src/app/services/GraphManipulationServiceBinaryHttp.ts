@@ -17,8 +17,8 @@ import { ILogger, LoggerFactory, stringify } from '@eg/logger';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 import { Node, NodeId, Socket, Connection, fromConnection } from '../model';
-import * as conversions from './Conversions';
-import { isDefined } from '@angular/compiler/src/util';
+import * as convs from './Conversions';
+import * as Long from 'long';
 import { GraphId } from '../model/Graph';
 
 @Injectable()
@@ -63,7 +63,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     this.logger.info(`Added new node [type: '${node.type()}', ins: ${node.inputSocketsLength()},
                   outs: ${node.outputSocketsLength()}].`);
 
-    const nodeModel = conversions.toNode(node);
+    const nodeModel = convs.toNode(node);
     if (this.verboseResponseLog) {
       this.logger.info(`Node: '${stringify(nodeModel, 4)}'`);
     }
@@ -76,7 +76,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     const offGraphId = builder.createString(graphId);
     sz.RemoveNodeRequest.startRemoveNodeRequest(builder);
     sz.RemoveNodeRequest.addGraphId(builder, offGraphId);
-    sz.RemoveNodeRequest.addNodeId(builder, builder.createLong(nodeId.low, nodeId.high));
+    sz.RemoveNodeRequest.addNodeId(builder, convs.toFbLong(Long.fromString(nodeId)));
     const reqOff = sz.RemoveNodeRequest.endRemoveNodeRequest(builder);
     builder.finish(reqOff);
 
@@ -104,10 +104,10 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
       builder,
       sz.SocketLinkDescription.createSocketLinkDescription(
         builder,
-        conversions.toFbLong(connection.outputSocket.parentId),
-        conversions.toFbLong(connection.outputSocket.index),
-        conversions.toFbLong(connection.inputSocket.parentId),
-        conversions.toFbLong(connection.inputSocket.index),
+        convs.toFbLong(Long.fromString(connection.outputSocket.parentId)),
+        convs.toFbLong(connection.outputSocket.index),
+        convs.toFbLong(Long.fromString(connection.inputSocket.parentId)),
+        convs.toFbLong(connection.inputSocket.index),
         connection.isWriteLink
       )
     );
@@ -144,10 +144,10 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
       builder,
       sz.SocketLinkDescription.createSocketLinkDescription(
         builder,
-        conversions.toFbLong(connection.outputSocket.parentId),
-        conversions.toFbLong(connection.outputSocket.index),
-        conversions.toFbLong(connection.inputSocket.parentId),
-        conversions.toFbLong(connection.inputSocket.index),
+        convs.toFbLong(Long.fromString(connection.outputSocket.parentId)),
+        convs.toFbLong(connection.outputSocket.index),
+        convs.toFbLong(Long.fromString(connection.inputSocket.parentId)),
+        convs.toFbLong(connection.inputSocket.index),
         connection.isWriteLink
       )
     );

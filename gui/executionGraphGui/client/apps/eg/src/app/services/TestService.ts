@@ -73,13 +73,14 @@ export class TestService {
     }
 
     // Remove first node
-    await this.graphManipulationService.removeNode(graph.id, Long.fromNumber(0));
+    await this.graphManipulationService.removeNode(graph.id, (0).toString());
 
     // Remove graph
     await this.graphManagementService.removeGraph(graph.id);
   }
 
   public async testFileBrowser() {
-    await this.fileBrowserService.browse('./');
+    const p = await this.fileBrowserService.getPathInfo('.');
+    this.logger.debug(`PathInfo:    ${JSON.stringify(p, null, 4)}`);
   }
 }

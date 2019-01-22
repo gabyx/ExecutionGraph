@@ -85,7 +85,7 @@ export class FileBrowserServiceDummy extends FileBrowserService {
     this.logger = loggerFactory.create('FileBrowserServiceDummy');
   }
 
-  public async browse(path: string): Promise<FileInfo | DirectoryInfo> {
+  public async getPathInfo(path: string): Promise<FileInfo | DirectoryInfo> {
     const check = async (list: DirectoryInfo[] | FileInfo[], part: string): Promise<DirectoryInfo | FileInfo> => {
       for (const f of list) {
         this.logger.debug(`Checking: '${f.name}'`);

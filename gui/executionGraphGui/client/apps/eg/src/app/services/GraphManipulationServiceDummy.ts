@@ -49,7 +49,7 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
   }
 
   public async removeNode(graphId: GraphId, nodeId: NodeId): Promise<void> {
-    this.logger.info(`Remove node [id: '${nodeId.toString()}'] from graph [id: '${graphId}'`);
+    this.logger.info(`Remove node [id: '${nodeId}'] from graph [id: '${graphId}'`);
   }
 
   public async addConnection(

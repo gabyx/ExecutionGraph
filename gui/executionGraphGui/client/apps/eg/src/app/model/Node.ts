@@ -22,7 +22,7 @@ function createUIProps(name: string = 'Unnamed', position: Point = Point.zero.co
   return { name: name, position: position };
 }
 
-export type NodeId = Long;
+export type NodeId = string;
 export type NodeType = string;
 
 export interface Node {

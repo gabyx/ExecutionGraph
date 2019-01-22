@@ -46,6 +46,5 @@ export function isDirectory(p: FileInfo | DirectoryInfo): p is DirectoryInfo {
 }
 
 export abstract class FileBrowserService {
-  //@todo cmonspqr -> gabyx: I'd rather have this return a Promise<DirectoryInfo>. Can we really browse to a file?
-  public abstract async browse(path: string): Promise<DirectoryInfo | FileInfo>;
+  public abstract async getPathInfo(path: string): Promise<DirectoryInfo | FileInfo>;
 }

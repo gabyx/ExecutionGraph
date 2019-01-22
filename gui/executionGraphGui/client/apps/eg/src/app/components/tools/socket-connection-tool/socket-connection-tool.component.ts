@@ -9,6 +9,7 @@ import { GraphsState } from '../../../+state/reducers';
 import { AddConnection } from '../../../+state/actions';
 import { getSelectedGraph, getSelectedGraphId } from '../../../+state/selectors';
 import * as Long from 'long';
+import { Guid } from 'guid-typescript';
 
 @Component({
   selector: 'eg-socket-connection-tool',
@@ -54,7 +55,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
           'input',
           socket.typeIndex,
           Long.fromNumber(0),
-          Long.fromNumber(-1),
+          Guid.create().toString(),
           'Dummy'
         );
       } else {
@@ -62,7 +63,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
           'output',
           socket.typeIndex,
           Long.fromNumber(0),
-          Long.fromNumber(-1),
+          Guid.create().toString(),
           'Dummy'
         );
       }

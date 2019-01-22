@@ -32,7 +32,7 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
     this.logger = loggerFactory.create('FileBrowserServiceBinaryHttp');
   }
 
-  public async browse(path: string): Promise<FileInfo | DirectoryInfo> {
+  public async getPathInfo(path: string): Promise<FileInfo | DirectoryInfo> {
     const builder = new flatbuffers.Builder(256);
     const pathOff = builder.createString(path);
 
@@ -44,7 +44,7 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
     const requestPayload = builder.asUint8Array();
 
     // Send the request
-    const r = await this.binaryRouter.post('files/browse', requestPayload);
+    const r = await this.binaryRouter.post('files/getPathInfo', requestPayload);
     const buf = new flatbuffers.ByteBuffer(r);
     const response = sz.BrowseResponse.getRootAsBrowseResponse(buf);
     const pathInfo = this.convert(response);

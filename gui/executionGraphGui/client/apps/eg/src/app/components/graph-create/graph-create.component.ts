@@ -16,10 +16,7 @@ export class GraphCreateComponent implements OnInit {
   graphTypes: Observable<GraphTypeDescription[]>;
   logger: ILogger;
 
-  constructor(
-    private store: Store<GraphDescriptionsState>,
-    readonly loggerFactory: LoggerFactory
-  ) {
+  constructor(private store: Store<GraphDescriptionsState>, readonly loggerFactory: LoggerFactory) {
     this.logger = loggerFactory.create('GraphCreateComponent');
     this.graphTypes = this.store.pipe(select(fromGraphDescriptions.getGraphDescriptions));
   }
@@ -32,6 +29,6 @@ export class GraphCreateComponent implements OnInit {
 
   public showDescription(graphType: GraphTypeDescription) {
     this.logger.debug('Show Description');
-    //this.router.navigate(['/graph/description', graphType.id.toString()]);
+    //this.router.navigate(['/graph/description', graphType.id]);
   }
 }

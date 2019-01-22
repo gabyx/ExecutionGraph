@@ -29,7 +29,7 @@ async function convertGraph<Node, Edge>(
   // A copy of all positions (dont change the state!)
   const positionMap = new Map<string, Vector2>();
   Object.values(graph.nodes).map(node => {
-    positionMap.set(node.id.toString(), node.uiProps.position.copy());
+    positionMap.set(node.id, node.uiProps.position.copy());
   });
 
   const nodes: Node[] = [];
@@ -44,10 +44,7 @@ async function convertGraph<Node, Edge>(
 
   // create links
   Object.values(graph.connections).map(connection =>
-    createEdge(
-      nodeMap.get(connection.inputSocket.parentId.toString()),
-      nodeMap.get(connection.outputSocket.parentId.toString())
-    )
+    createEdge(nodeMap.get(connection.inputSocket.parentId), nodeMap.get(connection.outputSocket.parentId))
   );
 }
 
