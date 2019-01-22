@@ -85,6 +85,9 @@
             "tsConfig": "apps/eg/tsconfig.spec.json",
             "scripts": [],
             "styles": ["apps/eg/src/styles.scss"],
+            "stylePreprocessorOptions": {
+              "includePaths": ["apps/eg/src"]
+            },
             "assets": ["apps/eg/src/assets", "apps/eg/src/favicon.ico"]
           }
         },

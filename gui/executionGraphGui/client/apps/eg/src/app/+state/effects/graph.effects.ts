@@ -7,7 +7,6 @@ import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 import { of, from, Observable, merge as mergeObservables, throwError } from 'rxjs';
 import { map, tap, catchError, filter, withLatestFrom, mergeMap } from 'rxjs/operators';
 
-import { Id } from '@eg/common';
 import { LoggerFactory, ILogger } from '@eg/logger';
 
 import * as fromGraph from '../actions/graph.actions';
@@ -49,14 +48,12 @@ export class GraphEffects {
   );
 
   @Effect()
-  openingGraph$ = this.handleNavigation('graph/:graphId', (r, state) =>
-    of(new fromGraph.OpenGraph(new Id(r.params.graphId)))
-  );
+  openingGraph$ = this.handleNavigation('graph/:graphId', (r, state) => of(new fromGraph.OpenGraph(r.params.graphId)));
 
   @Effect({ dispatch: false })
   openGraph$ = this.actions$.pipe(
     ofType<fromGraph.GraphAdded>(fromGraph.GRAPH_ADDED),
-    tap(action => this.router.navigate(['graph', action.graph.id.toString()]))
+    tap(action => this.router.navigate(['graph', action.graph.id]))
   );
 
   @Effect()
@@ -177,7 +174,7 @@ export class GraphEffects {
           node.inputs[0],
           false
         );
-        connections[connection.idString] = connection;
+        connections[connection.id] = connection;
       }
       lastNode = node;
     }
@@ -213,7 +210,7 @@ export class GraphEffects {
           node.inputs[0],
           false
         );
-        connections[connection.idString] = connection;
+        connections[connection.id] = connection;
       }
       lastNode = node;
     }

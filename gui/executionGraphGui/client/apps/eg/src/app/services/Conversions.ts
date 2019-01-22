@@ -12,7 +12,6 @@
 
 import * as Long from 'long';
 import { flatbuffers } from 'flatbuffers';
-import { Id } from '@eg/common';
 import * as model from './../model';
 import * as serialization from '@eg/serialization';
 import { createSocket } from '../model/Socket';
@@ -70,7 +69,7 @@ export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescrip
   }
 
   return {
-    id: new Id(graphDesc.id()),
+    id: graphDesc.id(),
     name: graphDesc.name(),
     nodeTypeDescriptions: nodes,
     socketTypeDescriptions: sockets,
@@ -105,7 +104,7 @@ export function toNode(node: serialization.LogicNode): model.Node {
 
     for (let i = 0; i < l; ++i) {
       const s = socks(i);
-      const socket = createSocket(kind, toULong(s.typeIndex()), toULong(s.index()), s.typeName());
+      const socket = createSocket(kind, toULong(s.typeIndex()), toULong(s.index()), nodeId, s.typeName());
       sockets.push(socket);
     }
   };

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ConnectionDrawStyle, BezierConnectionDrawStyle, GraphComponent } from '@eg/graph';
@@ -21,8 +21,8 @@ export class ConnectionLayerComponent {
   constructor(private graph: GraphComponent, private store: Store<UiState>) {}
 
   public getPathDescription(connection: Connection) {
-    const startPoint = this.graph.getPortPosition(connection.inputSocket.idString);
-    const endPoint = this.graph.getPortPosition(connection.outputSocket.idString);
+    const startPoint = this.graph.getPortPosition(connection.inputSocket.id);
+    const endPoint = this.graph.getPortPosition(connection.outputSocket.id);
 
     let path = this.drawStyle.getPath(startPoint, endPoint);
     if (typeof path !== 'string') {
@@ -36,6 +36,9 @@ export class ConnectionLayerComponent {
   }
 
   public isSelected(connection: Connection): Observable<boolean> {
-    return this.store.select(getSelection).pipe(map(selection => selection.connections.indexOf(connection.id) >= 0));
+    return this.store.pipe(
+      select(getSelection),
+      map(selection => selection.connections.indexOf(connection.id) >= 0)
+    );
   }
 }

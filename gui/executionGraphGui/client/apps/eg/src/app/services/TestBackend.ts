@@ -12,7 +12,6 @@
 
 import { Injectable } from '@angular/core';
 import { flatbuffers } from 'flatbuffers';
-import { Id } from '@eg/common';
 import * as conversions from './Conversions';
 import { sz as szInfo } from './GeneralInfoService';
 import { sz as szMani } from './GraphManipulationService';
@@ -43,7 +42,7 @@ export abstract class ITestBackend {
 @Injectable()
 export class TestBackend extends ITestBackend {
   private nodeId: number = 0;
-  private graphTypeId: Id;
+  private graphTypeId: model.GraphTypeId;
   private sockets: string[];
   private nodes: {
     [type: string]: {
@@ -59,7 +58,7 @@ export class TestBackend extends ITestBackend {
   constructor() {
     super();
 
-    this.graphTypeId = new Id('2992ebff-c950-4184-8876-5fe6ac029aa5');
+    this.graphTypeId = '2992ebff-c950-4184-8876-5fe6ac029aa5';
 
     // Internal sockets
     this.sockets = ['int', 'bool', 'double', 'Vector3', 'Matrix33', 'Scalar'];
@@ -117,7 +116,7 @@ export class TestBackend extends ITestBackend {
 
     // Make GraphType Description
 
-    const offId = builder.createString(this.graphTypeId.toString());
+    const offId = builder.createString(this.graphTypeId);
     const offName = builder.createString('DefaultGraph');
     const offNodes = szInfo.GraphTypeDescription.createNodeTypeDescriptionsVector(builder, nodeDescs);
     const offSockets = szInfo.GraphTypeDescription.createSocketTypeDescriptionsVector(builder, socketDescs);

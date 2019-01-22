@@ -10,22 +10,22 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Id } from '@eg/common';
 import { NodeId, Node, Connection, Socket } from '../model';
 import { GraphManipulationMessages } from '@eg/messages';
 
 export import sz = GraphManipulationMessages;
+import { GraphId } from '../model/Graph';
 
 export abstract class GraphManipulationService {
-  public abstract async addNode(graphId: Id, type: string, name: string): Promise<Node>;
-  public abstract async removeNode(graphId: Id, nodeId: NodeId): Promise<void>;
+  public abstract async addNode(graphId: GraphId, type: string, name: string): Promise<Node>;
+  public abstract async removeNode(graphId: GraphId, nodeId: NodeId): Promise<void>;
 
   public abstract async addConnection(
-    graphId: Id,
+    graphId: GraphId,
     source: Socket,
     target: Socket,
     cycleDetection: boolean
   ): Promise<Connection>;
 
-  public abstract async removeConnection(graphId: Id, source: Socket, target: Socket): Promise<void>;
+  public abstract async removeConnection(graphId: GraphId, source: Socket, target: Socket): Promise<void>;
 }

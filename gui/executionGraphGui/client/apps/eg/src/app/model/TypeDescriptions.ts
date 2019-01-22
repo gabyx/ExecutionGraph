@@ -1,3 +1,5 @@
+import { GraphTypeId } from './Graph';
+
 // =========================================================================================
 //  ExecutionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
@@ -9,8 +11,6 @@
 //  License, v. 2.0. If a copy of the MPL was not distributed with this
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
-
-import { Id } from '@eg/common';
 
 export class SocketTypeDescription {
   public readonly type: string;
@@ -28,7 +28,7 @@ export class NodeTypeDescription {
 }
 
 export class GraphTypeDescription {
-  public readonly id: Id;
+  public readonly id: GraphTypeId;
   public readonly name: string;
   public readonly socketTypeDescriptions: SocketTypeDescription[];
   public readonly nodeTypeDescriptions: NodeTypeDescription[];
