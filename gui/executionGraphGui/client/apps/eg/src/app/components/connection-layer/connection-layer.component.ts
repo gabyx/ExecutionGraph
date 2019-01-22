@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ConnectionDrawStyle, BezierConnectionDrawStyle, GraphComponent } from '@eg/graph';
@@ -36,6 +36,9 @@ export class ConnectionLayerComponent {
   }
 
   public isSelected(connection: Connection): Observable<boolean> {
-    return this.store.select(getSelection).pipe(map(selection => selection.connections.indexOf(connection.id) >= 0));
+    return this.store.pipe(
+      select(getSelection),
+      map(selection => selection.connections.indexOf(connection.id) >= 0)
+    );
   }
 }

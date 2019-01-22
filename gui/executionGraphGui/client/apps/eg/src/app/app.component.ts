@@ -30,7 +30,7 @@ export class AppComponent implements OnInit {
   private readonly log: ILogger;
 
   public get hasDrawerContent() {
-    return this.store.select(getDrawerRequired);
+    return this.store.pipe(select(getDrawerRequired));
   }
 
   constructor(

@@ -1,5 +1,5 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { filter, withLatestFrom } from 'rxjs/operators';
 
@@ -31,8 +31,8 @@ export class SelectionToolComponent extends ToolComponent implements OnInit {
 
   constructor(private graph: GraphComponent, private store: Store<UiState>, graphStore: Store<GraphsState>) {
     super();
-    this.selection = store.select(fromUiSelectors.getSelection);
-    graphStore.select(fromGraphSelectors.getSelectedGraph).subscribe(g => (this.selectedGraph = g));
+    this.selection = store.pipe(select(fromUiSelectors.getSelection));
+    graphStore.pipe(select(fromGraphSelectors.getSelectedGraph)).subscribe(g => (this.selectedGraph = g));
   }
 
   public get isSelecting() {

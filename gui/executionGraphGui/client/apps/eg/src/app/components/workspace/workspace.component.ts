@@ -13,7 +13,7 @@
 import { Component, OnInit, Injectable, ElementRef } from '@angular/core';
 import { Observable } from 'rxjs';
 import { filter, tap, map } from 'rxjs/operators';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 
 import { Graph, Node, Connection, NodeTypeDescription, Socket } from '../../model';
 
@@ -68,13 +68,16 @@ export class WorkspaceComponent implements OnInit {
 
   constructor(private store: Store<GraphsState>, uiStore: Store<UiState>, loggerFactory: LoggerFactory) {
     this.logger = loggerFactory.create('Workspace');
-    this.selection = uiStore.select(getSelection);
+    this.selection = uiStore.pipe(select(getSelection));
     // this.graph.subscribe(g => this.logger.debug(`Displaying graph ${g.id}`));
   }
 
   ngOnInit() {
-    this.graph = this.store.select(graphQueries.getSelectedGraph).pipe(filter(g => isDefined(g) && g != null));
-    this.connectionDrawStyle = this.store.select(getConnectionDrawStyle);
+    this.graph = this.store.pipe(
+      select(graphQueries.getSelectedGraph),
+      filter(g => isDefined(g) && g != null)
+    );
+    this.connectionDrawStyle = this.store.pipe(select(getConnectionDrawStyle));
   }
 
   public createNode(nodeType: NodeTypeDescription, graph: Graph, position?: Point) {
