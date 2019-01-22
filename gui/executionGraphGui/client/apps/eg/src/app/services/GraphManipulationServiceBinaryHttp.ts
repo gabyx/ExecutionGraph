@@ -17,7 +17,7 @@ import { ILogger, LoggerFactory, stringify } from '@eg/logger';
 import { Id } from '@eg/common';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import { Node, NodeId, Socket, Connection } from '../model';
+import { Node, NodeId, Socket, Connection, fromConnection } from '../model';
 import * as conversions from './Conversions';
 import { isDefined } from '@angular/compiler/src/util';
 
@@ -93,7 +93,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     target: Socket,
     cycleDetection: boolean
   ): Promise<Connection> {
-    const connection = Connection.create(source, target, true);
+    const connection = fromConnection.create(source, target, true);
 
     const builder = new flatbuffers.Builder(356);
     const offGraphId = builder.createString(graphId.id());
@@ -133,7 +133,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
   }
 
   public async removeConnection(graphId: Id, source: Socket, target: Socket): Promise<void> {
-    const connection = Connection.create(source, target, false);
+    const connection = fromConnection.create(source, target, false);
 
     const builder = new flatbuffers.Builder(356);
     const offGraphId = builder.createString(graphId.id());

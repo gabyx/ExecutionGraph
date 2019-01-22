@@ -5,7 +5,7 @@ import { ILogger, LoggerFactory } from '@eg/logger';
 
 import { ToolComponent } from '../tool-component';
 import { Id } from '@eg/common';
-import { OutputSocket, InputSocket, Connection, Socket, SocketIndex } from '../../../model';
+import { OutputSocket, InputSocket, Connection, Socket, SocketIndex, fromConnection } from '../../../model';
 import { GraphsState } from '../../../+state/reducers';
 import { AddConnection } from '../../../+state/actions';
 import { getSelectedGraph } from '../../../+state/selectors';
@@ -23,9 +23,9 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
   public tempConnection: Connection = null;
   public tempConnectionEndpoint = Point.zero.copy();
 
-  public invalidity = Connection.Invalidity.Valid;
+  public invalidity = fromConnection.Invalidity.Valid;
   public get invalidityMessages() {
-    return Connection.getValidationErrors(this.invalidity);
+    return fromConnection.getValidationErrors(this.invalidity);
   }
 
   private sourceSocket: Socket;
@@ -53,7 +53,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       }
       this.activate();
       this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
-      this.tempConnection = Connection.create(socket, this.tempTargetSocket);
+      this.tempConnection = fromConnection.create(socket, this.tempTargetSocket);
     });
     this.socketEvents.onDragContinue.subscribe(e => {
       if (!this.targetSocket) {
@@ -73,17 +73,17 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       this.logger.info('onEnter');
       if (this.tempConnection) {
         const targetSocket = e.element;
-        this.invalidity = Connection.isInvalid(this.sourceSocket, targetSocket);
+        this.invalidity = fromConnection.isInvalid(this.sourceSocket, targetSocket);
 
         if (!this.invalidity) {
           this.logger.info('Making preview connection');
           this.targetSocket = targetSocket;
-          this.tempConnection = Connection.create(this.sourceSocket, this.targetSocket, false);
+          this.tempConnection = fromConnection.create(this.sourceSocket, this.targetSocket, false);
         } else {
           /** Add notifcation icon next to cursor, to make
            *  clear that this connection is impossible
            */
-          this.logger.error(`Invalid connection: ${Connection.getValidationErrors(this.invalidity).join(', ')}`);
+          this.logger.error(`Invalid connection: ${fromConnection.getValidationErrors(this.invalidity).join(', ')}`);
         }
       }
     });
@@ -93,17 +93,17 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       if (this.targetSocket) {
         this.logger.info('Leaving potential target Socket');
         this.targetSocket = null;
-        this.tempConnection = Connection.create(this.sourceSocket, this.tempTargetSocket);
+        this.tempConnection = fromConnection.create(this.sourceSocket, this.tempTargetSocket);
         this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
       }
       if (this.tempConnection) {
-        this.invalidity = Connection.Invalidity.Valid;
+        this.invalidity = fromConnection.Invalidity.Valid;
       }
     });
   }
 
   private abortConnection() {
-    this.invalidity = Connection.Invalidity.Valid;
+    this.invalidity = fromConnection.Invalidity.Valid;
     this.tempConnection = null;
     this.tempTargetSocket = null;
     this.sourceSocket = null;

@@ -17,7 +17,7 @@ import { ILogger, LoggerFactory, stringify } from '@eg/logger';
 import { Id } from '@eg/common';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import * as conversions from './Conversions';
-import { Node, NodeId, Socket, Connection } from '../model';
+import { Node, NodeId, Socket, Connection, fromConnection } from '../model';
 
 @Injectable()
 export class GraphManipulationServiceDummy extends GraphManipulationService {
@@ -60,7 +60,7 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
     cycleDetection: boolean
   ): Promise<Connection> {
     this.logger.info(`Add connection: ['${source.id}' ⟶ '${target.id}'] from graph [id: '${graphId.id()}']`);
-    return Connection.create(source, target, true);
+    return fromConnection.create(source, target, true);
   }
 
   public async removeConnection(graphId: Id, source: Socket, target: Socket): Promise<void> {

@@ -53,7 +53,7 @@ export class AppComponent implements OnInit {
         tap(graphs => {
           this.log.debug(`Loaded graphs, auto-selecting first`);
           if (graphs.length === 0) {
-            this.log.error(`Cannot select, sinceidhs loaded!`);
+            this.log.error(`Cannot select, since no graphs loaded!`);
           } else {
             this.router.navigate([
               {
