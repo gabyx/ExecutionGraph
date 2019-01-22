@@ -18,7 +18,7 @@ import { GraphComponent } from './graph.component';
 import { PortComponent } from '../port/port.component';
 
 @Component({
-  selector: 'ngcs-graph>',
+  selector: 'ngcs-test',
   template: `
     <ngcs-graph>
       <ngcs-port id="s"></ngcs-port>
