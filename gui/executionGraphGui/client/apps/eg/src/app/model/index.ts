@@ -1,4 +1,4 @@
-export { Graph } from './Graph';
+export { Graph, GraphId, GraphTypeId } from './Graph';
 export { Node, NodeId } from './Node';
 export { Socket, SocketType, SocketId, SocketIndex, InputSocket, OutputSocket } from './Socket';
 export { Connection, ConnectionId } from './Connection';

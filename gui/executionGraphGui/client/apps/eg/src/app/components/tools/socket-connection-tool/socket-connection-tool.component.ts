@@ -4,8 +4,7 @@ import { Point, ConnectionDrawStyle, GraphComponent } from '@eg/graph';
 import { ILogger, LoggerFactory } from '@eg/logger';
 
 import { ToolComponent } from '../tool-component';
-import { Id } from '@eg/common';
-import { OutputSocket, InputSocket, Connection, Socket, SocketIndex, fromConnection, fromSocket } from '../../../model';
+import { OutputSocket, InputSocket, Connection, Socket, fromConnection, fromSocket, GraphId } from '../../../model';
 import { GraphsState } from '../../../+state/reducers';
 import { AddConnection } from '../../../+state/actions';
 import { getSelectedGraph } from '../../../+state/selectors';
@@ -32,7 +31,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
   private sourceSocket: Socket;
   private targetSocket: Socket;
 
-  private selectedGraphId: Id;
+  private selectedGraphId: GraphId;
   private readonly logger: ILogger;
 
   constructor(private graph: GraphComponent, private store: Store<GraphsState>, loggerFactory: LoggerFactory) {

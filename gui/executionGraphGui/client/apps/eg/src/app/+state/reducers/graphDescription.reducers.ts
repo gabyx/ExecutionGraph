@@ -1,4 +1,3 @@
-import { Id } from '@eg/common';
 import { GraphTypeDescription } from '../../model';
 import * as fromActions from '../actions/graphDescription.actions';
 
@@ -27,7 +26,7 @@ export function reducer(
       const entities = action.graphDescriptions.reduce(
         (existing: GraphDescriptionMap, graphDescription: GraphTypeDescription) => ({
           ...existing,
-          [graphDescription.id.id()]: graphDescription
+          [graphDescription.id]: graphDescription
         }),
         { ...state.entities }
       );

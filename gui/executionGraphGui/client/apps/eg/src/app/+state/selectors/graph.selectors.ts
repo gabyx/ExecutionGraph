@@ -26,7 +26,7 @@ export const getSelectedGraphId = createSelector(
 export const getSelectedGraph = createSelector(
   getSelectedGraphId,
   getGraphEntities,
-  (id, entities) => (isDefined(id) ? entities[id.id()] : null)
+  (id, entities) => (isDefined(id) ? entities[id] : null)
 );
 
 export const getGraphsLoaded = createSelector(

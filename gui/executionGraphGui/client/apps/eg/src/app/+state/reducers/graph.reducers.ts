@@ -1,8 +1,8 @@
-import { Id, isDefined } from '@eg/common';
+import { isDefined } from '@eg/common';
 
 import * as fromActions from '../actions/graph.actions';
 import { Graph, Connection } from '../../model';
-import { ConnectionMap } from '../../model/Graph';
+import { ConnectionMap, GraphId } from '../../model/Graph';
 
 export interface GraphMap {
   [id: string]: Graph;
@@ -13,7 +13,7 @@ export interface GraphsState {
 
   loaded: boolean; // Has the AppState been loaded
   error?: any; // Last none error (if any)
-  selectedGraphId?: Id; // Which Graph has been selected
+  selectedGraphId?: GraphId; // Which Graph has been selected
 }
 
 export const initialState: GraphsState = {
@@ -25,7 +25,7 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
   switch (action.type) {
     case fromActions.GRAPHS_LOADED: {
       const entities = action.graphs.reduce(
-        (existing: GraphMap, graph: Graph) => ({ ...existing, [graph.id.id()]: graph }),
+        (existing: GraphMap, graph: Graph) => ({ ...existing, [graph.id]: graph }),
         { ...state.entities }
       );
 
@@ -46,7 +46,7 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
     }
 
     case fromActions.GRAPH_ADDED: {
-      const entities = { ...state.entities, [action.graph.id.id()]: action.graph };
+      const entities = { ...state.entities, [action.graph.id]: action.graph };
 
       return {
         ...state,
@@ -68,7 +68,7 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
       if (!isDefined(state.selectedGraphId)) {
         throw new Error(`No active graph to operate on, ${action.type} cannot be handled`);
       }
-      const graph = state.entities[state.selectedGraphId.id()];
+      const graph = state.entities[state.selectedGraphId];
       if (!isDefined(graph)) {
         throw new Error(`No graph with the id ${state.selectedGraphId} exists`);
       }
@@ -79,7 +79,7 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
         ...state,
         entities: {
           ...state.entities,
-          [state.selectedGraphId.id()]: updatedGraph
+          [state.selectedGraphId]: updatedGraph
         }
       };
     }

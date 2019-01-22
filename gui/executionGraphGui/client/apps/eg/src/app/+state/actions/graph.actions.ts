@@ -1,5 +1,4 @@
 import { Action } from '@ngrx/store';
-import { Id } from '@eg/common';
 import {
   Graph,
   Node,
@@ -11,6 +10,7 @@ import {
   Socket
 } from '../../model';
 import { Point, Position, MassSpringLayoutConfig } from '@eg/graph';
+import { GraphId } from '../../model/Graph';
 
 export const LOAD_GRAPHS = '[Graph] Load';
 export const GRAPHS_LOADED = '[Graph] Loaded';
@@ -52,7 +52,7 @@ export class GraphsLoaded implements Action {
 
 export class OpenGraph implements Action {
   readonly type = OPEN_GRAPH;
-  constructor(public id: Id) {}
+  constructor(public id: GraphId) {}
 }
 
 // Actions related to the Workspace
@@ -89,54 +89,54 @@ export class GraphAdded implements Action {
 
 export class RemoveGraph implements Action {
   readonly type = REMOVE_GRAPH;
-  constructor(public id: Id) {}
+  constructor(public id: GraphId) {}
 }
 
 export class GraphRemoved implements Action {
   readonly type = GRAPH_REMOVED;
-  constructor(public id: Id) {}
+  constructor(public id: GraphId) {}
 }
 
 // Actions related to GraphManipulationService
 // -------------------------------------------
 export class AddNode implements Action {
   readonly type = ADD_NODE;
-  constructor(public graphId: Id, public nodeType: NodeTypeDescription, public position?: Point) {}
+  constructor(public graphId: GraphId, public nodeType: NodeTypeDescription, public position?: Point) {}
 }
 
 export class NodeAdded implements Action {
   readonly type = NODE_ADDED;
-  constructor(public graphId: Id, public node: Node) {}
+  constructor(public graphId: GraphId, public node: Node) {}
 }
 
 export class RemoveNode implements Action {
   readonly type = REMOVE_NODE;
-  constructor(public graphId: Id, public nodeId: NodeId) {}
+  constructor(public graphId: GraphId, public nodeId: NodeId) {}
 }
 
 export class NodeRemoved implements Action {
   readonly type = NODE_REMOVED;
-  constructor(public graphId: Id, public nodeId: NodeId) {}
+  constructor(public graphId: GraphId, public nodeId: NodeId) {}
 }
 
 export class AddConnection implements Action {
   readonly type = ADD_CONNECTION;
-  constructor(public graphId: Id, public source: Socket, public target: Socket, public cycleDetection: boolean) {}
+  constructor(public graphId: GraphId, public source: Socket, public target: Socket, public cycleDetection: boolean) {}
 }
 
 export class ConnectionAdded implements Action {
   readonly type = CONNECTION_ADDED;
-  constructor(public graphId: Id, public connection: Connection) {}
+  constructor(public graphId: GraphId, public connection: Connection) {}
 }
 
 export class RemoveConnection implements Action {
   readonly type = REMOVE_CONNECTION;
-  constructor(public graphId: Id, public connection: Connection) {}
+  constructor(public graphId: GraphId, public connection: Connection) {}
 }
 
 export class ConnectionRemoved implements Action {
   readonly type = CONNECTION_REMOVED;
-  constructor(public graphId: Id, public connectionId: ConnectionId) {}
+  constructor(public graphId: GraphId, public connectionId: ConnectionId) {}
 }
 
 // Actions related to AutoLayoutService
