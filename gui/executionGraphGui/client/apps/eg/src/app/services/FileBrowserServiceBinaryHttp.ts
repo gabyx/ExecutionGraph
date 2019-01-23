@@ -17,7 +17,6 @@ import { ILogger, LoggerFactory } from '@eg/logger';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 import { FileBrowserService, FileInfo, DirectoryInfo, sz } from './FileBrowserService';
 import { toFbLong } from './Conversions';
-import * as Long from 'long';
 
 @Injectable()
 export class FileBrowserServiceBinaryHttp extends FileBrowserService {
@@ -32,19 +31,19 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
     this.logger = loggerFactory.create('FileBrowserServiceBinaryHttp');
   }
 
-  public async browse(path: string): Promise<FileInfo | DirectoryInfo> {
+  public async getPathInfo(path: string): Promise<FileInfo | DirectoryInfo> {
     const builder = new flatbuffers.Builder(256);
     const pathOff = builder.createString(path);
 
     sz.BrowseRequest.startBrowseRequest(builder);
     sz.BrowseRequest.addPath(builder, pathOff);
-    sz.BrowseRequest.addRecursive(builder, toFbLong(Long.fromNumber(1)));
+    sz.BrowseRequest.addRecursive(builder, toFbLong(1));
     const off = sz.BrowseRequest.endBrowseRequest(builder);
     builder.finish(off);
     const requestPayload = builder.asUint8Array();
 
     // Send the request
-    const r = await this.binaryRouter.post('files/browse', requestPayload);
+    const r = await this.binaryRouter.post('files/getPathInfo', requestPayload);
     const buf = new flatbuffers.ByteBuffer(r);
     const response = sz.BrowseResponse.getRootAsBrowseResponse(buf);
     const pathInfo = this.convert(response);

@@ -8,7 +8,7 @@ import { OutputSocket, InputSocket, Connection, Socket, fromConnection, fromSock
 import { GraphsState } from '../../../+state/reducers';
 import { AddConnection } from '../../../+state/actions';
 import { getSelectedGraph, getSelectedGraphId } from '../../../+state/selectors';
-import * as Long from 'long';
+import { Guid } from 'guid-typescript';
 
 @Component({
   selector: 'eg-socket-connection-tool',
@@ -53,22 +53,22 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
         this.tempTargetSocket = fromSocket.createSocket(
           'input',
           socket.typeIndex,
-          Long.fromNumber(0),
-          Long.fromNumber(-1),
+          0,
+          Guid.create().toString(),
           'Dummy'
         );
       } else {
         this.tempTargetSocket = fromSocket.createSocket(
           'output',
           socket.typeIndex,
-          Long.fromNumber(0),
-          Long.fromNumber(-1),
+          0,
+          Guid.create().toString(),
           'Dummy'
         );
       }
       this.activate();
       this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
-      this.tempConnection = fromConnection.create(socket, this.tempTargetSocket);
+      this.tempConnection = fromConnection.createValidConnection(socket, this.tempTargetSocket);
     });
     this.socketEvents.onDragContinue.subscribe(e => {
       if (e.button !== MouseButton.Left) {
@@ -99,7 +99,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
         if (!this.invalidity) {
           this.logger.info('Making preview connection');
           this.targetSocket = targetSocket;
-          this.tempConnection = fromConnection.create(this.sourceSocket, this.targetSocket, false);
+          this.tempConnection = fromConnection.createValidConnection(this.sourceSocket, this.targetSocket);
         } else {
           /** Add notifcation icon next to cursor, to make
            *  clear that this connection is impossible
@@ -114,7 +114,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       if (this.targetSocket) {
         this.logger.info('Leaving potential target Socket');
         this.targetSocket = null;
-        this.tempConnection = fromConnection.create(this.sourceSocket, this.tempTargetSocket);
+        this.tempConnection = fromConnection.createValidConnection(this.sourceSocket, this.tempTargetSocket);
         this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
       }
       if (this.tempConnection) {

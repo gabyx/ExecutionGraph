@@ -29,6 +29,6 @@ export class GraphCreateComponent implements OnInit {
 
   public showDescription(graphType: GraphTypeDescription) {
     this.logger.debug('Show Description');
-    //this.router.navigate(['/graph/description', graphType.id.toString()]);
+    //this.router.navigate(['/graph/description', graphType.id]);
   }
 }

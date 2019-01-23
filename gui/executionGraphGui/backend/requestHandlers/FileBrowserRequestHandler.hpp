@@ -24,7 +24,7 @@ class ExecutionGraphBackend;
     Request handler for information on graphs in the backend.
 
     Handles the request URLs: 
-        - "/eg-backend/files/browse"
+        - "/eg-backend/files/getPathInfo"
 
     @date Sat Jul 07 2018
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
@@ -53,7 +53,7 @@ public:
 private:
     void handle(const Request& request, ResponsePromise& response);
 
-    void handleBrowse(const Request& request, ResponsePromise& response);
+    void handleGetPathInfo(const Request& request, ResponsePromise& response);
 
 private:
     static FuncMap initFunctionMap();

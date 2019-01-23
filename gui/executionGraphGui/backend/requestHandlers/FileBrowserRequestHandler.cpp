@@ -205,8 +205,8 @@ FileBrowserRequestHandler::FuncMap FileBrowserRequestHandler::initFunctionMap()
 {
     using Entry = typename FuncMap::Entry;
 
-    auto r = {Entry{targetBase / "files/browse",
-                    Function{&FileBrowserRequestHandler::handleBrowse}}};
+    auto r = {Entry{targetBase / "files/getPathInfo",
+                    Function{&FileBrowserRequestHandler::handleGetPathInfo}}};
     return {r};
 }
 
@@ -240,8 +240,8 @@ void FileBrowserRequestHandler::handleRequest(const Request& request,
 }
 
 //! Handle the operation of getting all path information on a path.
-void FileBrowserRequestHandler::handleBrowse(const Request& request,
-                                             ResponsePromise& response)
+void FileBrowserRequestHandler::handleGetPathInfo(const Request& request,
+                                                  ResponsePromise& response)
 {
     using Allocator = ResponsePromise::Allocator;
 

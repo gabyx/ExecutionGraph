@@ -17,9 +17,8 @@ import { ILogger, LoggerFactory, stringify } from '@eg/logger';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 import { Node, NodeId, Socket, Connection, fromConnection } from '../model';
-import * as conversions from './Conversions';
-import { isDefined } from '@angular/compiler/src/util';
 import { GraphId } from '../model/Graph';
+import { toFbLong, toNode } from './Conversions';
 
 @Injectable()
 export class GraphManipulationServiceBinaryHttp extends GraphManipulationService {
@@ -63,7 +62,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     this.logger.info(`Added new node [type: '${node.type()}', ins: ${node.inputSocketsLength()},
                   outs: ${node.outputSocketsLength()}].`);
 
-    const nodeModel = conversions.toNode(node);
+    const nodeModel = toNode(node);
     if (this.verboseResponseLog) {
       this.logger.info(`Node: '${stringify(nodeModel, 4)}'`);
     }
@@ -76,7 +75,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     const offGraphId = builder.createString(graphId);
     sz.RemoveNodeRequest.startRemoveNodeRequest(builder);
     sz.RemoveNodeRequest.addGraphId(builder, offGraphId);
-    sz.RemoveNodeRequest.addNodeId(builder, builder.createLong(nodeId.low, nodeId.high));
+    sz.RemoveNodeRequest.addNodeId(builder, toFbLong(nodeId));
     const reqOff = sz.RemoveNodeRequest.endRemoveNodeRequest(builder);
     builder.finish(reqOff);
 
@@ -93,7 +92,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     target: Socket,
     cycleDetection: boolean
   ): Promise<Connection> {
-    const connection = fromConnection.create(source, target, true);
+    const connection = fromConnection.createValidConnection(source, target);
 
     const builder = new flatbuffers.Builder(356);
     const offGraphId = builder.createString(graphId);
@@ -104,10 +103,10 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
       builder,
       sz.SocketLinkDescription.createSocketLinkDescription(
         builder,
-        conversions.toFbLong(connection.outputSocket.parentId),
-        conversions.toFbLong(connection.outputSocket.index),
-        conversions.toFbLong(connection.inputSocket.parentId),
-        conversions.toFbLong(connection.inputSocket.index),
+        toFbLong(connection.outputSocket.parentId),
+        toFbLong(connection.outputSocket.index),
+        toFbLong(connection.inputSocket.parentId),
+        toFbLong(connection.inputSocket.index),
         connection.isWriteLink
       )
     );
@@ -133,7 +132,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
   }
 
   public async removeConnection(graphId: GraphId, source: Socket, target: Socket): Promise<void> {
-    const connection = fromConnection.create(source, target, false);
+    const connection = fromConnection.createConnection(source, target);
 
     const builder = new flatbuffers.Builder(356);
     const offGraphId = builder.createString(graphId);
@@ -144,10 +143,10 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
       builder,
       sz.SocketLinkDescription.createSocketLinkDescription(
         builder,
-        conversions.toFbLong(connection.outputSocket.parentId),
-        conversions.toFbLong(connection.outputSocket.index),
-        conversions.toFbLong(connection.inputSocket.parentId),
-        conversions.toFbLong(connection.inputSocket.index),
+        toFbLong(connection.outputSocket.parentId),
+        toFbLong(connection.outputSocket.index),
+        toFbLong(connection.inputSocket.parentId),
+        toFbLong(connection.inputSocket.index),
         connection.isWriteLink
       )
     );
