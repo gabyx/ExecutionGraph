@@ -10,9 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-export function assert(condition: boolean, message?: string) {
+export function assert(condition: boolean, message: string) {
   if (!condition) {
-    message = `Assertion: ${message}` || 'Assertion failed';
-    throw new Error(message);
+    throw new Error(`Assertion: ${message}`);
   }
 }

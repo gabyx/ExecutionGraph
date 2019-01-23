@@ -15,7 +15,7 @@ import { assert } from '@eg/common/src';
 /*
  * Assert funtion which is neglected depending on env flags.
  */
-export function assertThat(condition: boolean, message?: string) {
+export function assertThat(condition: boolean, message: string) {
   if (environment.asserts) {
     assert(condition, message);
   }

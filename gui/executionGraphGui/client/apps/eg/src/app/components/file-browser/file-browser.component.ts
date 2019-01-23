@@ -105,7 +105,7 @@ export class FileBrowserComponent implements OnInit {
   }
 
   public openFile(file: FileInfo) {
-    assertThat(this.mode === FileBrowserMode.Open);
+    assertThat(this.mode === FileBrowserMode.Open, 'Programming Error!');
     this.logger.debug(`Opening file '${file.path}'`);
     this.fileActionOpen.emit(file.path);
   }
@@ -119,19 +119,19 @@ export class FileBrowserComponent implements OnInit {
   }
 
   public saveFileName(fileName: string) {
-    assertThat(this.mode === FileBrowserMode.Save && this.isFileNameCorrect(fileName));
+    assertThat(this.mode === FileBrowserMode.Save && this.isFileNameCorrect(fileName), 'Programming Error!');
     const path = (this.currentDirectory.path + '/' + fileName).replace('//', '/');
     this.saveFile(path, true);
   }
 
   private deleteFile(path: FileInfo | DirectoryInfo) {
-    assertThat(this.allowDelete && this.isFileOpenable(path));
+    assertThat(this.allowDelete && this.isFileOpenable(path), 'Programming Error!');
     this.logger.debug(`Deleting path '${path.path}'`);
     this.fileActionDelete.emit(path.path);
   }
 
   private deleteConfirm(path: FileInfo | DirectoryInfo) {
-    assertThat(this.allowDelete);
+    assertThat(this.allowDelete, 'Programming Error!');
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       minWidth: '10%',
       data: {
@@ -147,11 +147,9 @@ export class FileBrowserComponent implements OnInit {
   }
 
   private saveFile(path: string, checkOverwrite: boolean) {
-    assertThat(this.mode === FileBrowserMode.Save);
+    assertThat(this.mode === FileBrowserMode.Save, 'Programming Error!');
 
     const showOverwrite = checkOverwrite ? this.checkOverwrite(path) : false;
-
-    let save = false;
 
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       minWidth: '10%',
@@ -162,14 +160,10 @@ export class FileBrowserComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        save = true;
+        this.logger.debug(`Save file '${path}'`);
+        this.fileActionSave.emit(path);
       }
     });
-
-    if (save) {
-      this.logger.debug(`Save file '${path}'`);
-      this.fileActionSave.emit(path);
-    }
   }
 
   public isFileOpenable(file: FileInfo) {
