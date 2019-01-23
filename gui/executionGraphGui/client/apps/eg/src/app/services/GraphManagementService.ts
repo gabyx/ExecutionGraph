@@ -18,4 +18,7 @@ import { GraphTypeId, GraphId } from '../model/Graph';
 export abstract class GraphManagementService {
   public abstract async addGraph(graphTypeId: GraphTypeId): Promise<Graph>;
   public abstract async removeGraph(graphId: GraphId): Promise<void>;
+
+  public abstract async saveGraph(graphId: GraphId, path: string, overwrite: boolean): Promise<Graph>;
+  public abstract async loadGraph(path: string): Promise<Graph>;
 }

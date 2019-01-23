@@ -9,6 +9,10 @@
         <mat-icon>mode_edit</mat-icon>
         <span>Open</span>
       </button>
+      <button mat-menu-item [routerLink]="[{ outlets: { primary: ['graph', 'save'], drawer: null }}]">
+        <mat-icon>save</mat-icon>
+        <span>Save</span>
+      </button>
       <button mat-menu-item routerLink="/graph/:graphId/close">
         <mat-icon>close</mat-icon>
         <span>Close</span>

@@ -77,4 +77,11 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     await this.binaryRouter.post('general/removeGraph', requestPayload);
     this.logger.info(`Removed graph [id: '${graphId}'].`);
   }
+
+  public async saveGraph(graphId: GraphId, path: string, overwrite: boolean): Promise<Graph> {
+    throw Error('Not Implemented!');
+  }
+  public async loadGraph(path: string): Promise<Graph> {
+    throw Error('Not Implemented!');
+  }
 }

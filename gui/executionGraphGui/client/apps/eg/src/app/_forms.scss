@@ -1,0 +1,11 @@
+// All theming considering forms and stuff...
+@import 'theme';
+
+// Buttons
+@mixin app-normal-button() {
+  border: 0.5pt solid mat-color($app-secondary, 400);
+}
+
+@mixin app-accent-button() {
+  border: 1.5pt solid $secondary;
+}

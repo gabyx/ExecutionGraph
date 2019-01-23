@@ -31,7 +31,7 @@ describe('ExecutionServiceBinaryHttp', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        { provide: BINARY_HTTP_ROUTER_BASE_URL, useValue: TEST_URL},
+        { provide: BINARY_HTTP_ROUTER_BASE_URL, useValue: TEST_URL },
         ExecutionServiceBinaryHttp,
         BinaryHttpRouterService,
         { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory }

@@ -30,10 +30,7 @@ describe('UI Reducer', () => {
     it('should remove from the existing selection', () => {
       const nodeId = new NodeId(0);
 
-      const result = reducer(
-        initalState,
-        new fromUiActions.AddSelection([nodeId, new NodeId(1)], ['a'])
-      );
+      const result = reducer(initalState, new fromUiActions.AddSelection([nodeId, new NodeId(1)], ['a']));
 
       expect(result.selection.nodes.length).toBe(2);
       expect(result.selection.connections.length).toBe(1);

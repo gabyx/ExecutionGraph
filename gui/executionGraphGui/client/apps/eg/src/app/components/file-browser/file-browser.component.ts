@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, EventEmitter, Output, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../+state/reducers/app.reducers';
 import { FileBrowserService } from '../../services';
@@ -6,6 +6,12 @@ import { DirectoryInfo, isFile, FileInfo, PathInfo } from '../../services/FileBr
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { MatDialog } from '@angular/material';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import { assert } from '@eg/common';
+
+export enum FileBrowserMode {
+  Open = 'open',
+  Save = 'save'
+}
 
 @Component({
   selector: 'eg-file-browser',
@@ -31,6 +37,13 @@ export class FileBrowserComponent implements OnInit {
   ) {
     this.logger = loggerFactory.create('FileBrowserComponent');
   }
+
+  @Input('mode') mode: string = FileBrowserMode.Open;
+  @Input('allowDelete') allowDelete: boolean = true;
+
+  @Output('fileActionSave') fileActionSave: EventEmitter<string>;
+  @Output('fileActionOpen') fileActionOpen: EventEmitter<string>;
+  @Output('fileActionDelete') fileActionDelete: EventEmitter<string>;
 
   ngOnInit() {
     this.openRoot();
@@ -61,7 +74,7 @@ export class FileBrowserComponent implements OnInit {
     }
   }
 
-  public openParentDirectory() {
+  private openParentDirectory() {
     const p = this.parentPaths[this.parentPaths.length - 1];
     if (p) {
       this.loadDirectory(p).then(d => {
@@ -92,14 +105,37 @@ export class FileBrowserComponent implements OnInit {
   }
 
   public openFile(file: FileInfo) {
+    assert(this.mode === FileBrowserMode.Open, 'Programming Error!');
     this.logger.debug(`Opening file '${file.path}'`);
+    this.fileActionOpen.emit(file.path);
   }
 
-  public deleteConfirm(path: FileInfo | DirectoryInfo) {
+  private checkOverwrite(path: string) {
+    for (const p of this.currentDirectory.files) {
+      if (p.path.replace('//', '/') === path.replace('//', '/')) {
+        return true;
+      }
+    }
+  }
+
+  public saveFileName(fileName: string) {
+    assert(this.mode === FileBrowserMode.Save && this.isFileNameCorrect(fileName), 'Programming Error!');
+    const path = (this.currentDirectory.path + '/' + fileName).replace('//', '/');
+    this.saveFile(path, true);
+  }
+
+  private deleteFile(path: FileInfo | DirectoryInfo) {
+    assert(this.allowDelete && this.isFileOpenable(path), 'Programming Error!');
+    this.logger.debug(`Deleting path '${path.path}'`);
+    this.fileActionDelete.emit(path.path);
+  }
+
+  private deleteConfirm(path: FileInfo | DirectoryInfo) {
+    assert(this.allowDelete, 'Programming Error!');
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       minWidth: '10%',
       data: {
-        title: 'Delete',
+        title: 'Delete?',
         question: `Do you really want to delete the path '${path.path}' ?`
       }
     });
@@ -110,16 +146,32 @@ export class FileBrowserComponent implements OnInit {
     });
   }
 
+  private saveFile(path: string, checkOverwrite: boolean) {
+    assert(this.mode === FileBrowserMode.Save, 'Programming Error!');
+
+    const showOverwrite = checkOverwrite ? this.checkOverwrite(path) : false;
+
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      minWidth: '10%',
+      data: {
+        title: showOverwrite ? 'Overwrite?' : 'Save?',
+        question: showOverwrite ? `Do you really want to overwrite the path '${path}' ?` : `Saving to path: '${path}' ?`
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.logger.debug(`Save file '${path}'`);
+        this.fileActionSave.emit(path);
+      }
+    });
+  }
+
   public isFileOpenable(file: FileInfo) {
     return file.name.endsWith('.eg');
   }
 
-  private deleteFile(path: FileInfo | DirectoryInfo) {
-    if (this.isFileOpenable(path)) {
-      this.logger.debug(`Deleting path '${path.path}'`);
-    } else {
-      this.logger.error('Programming Error!');
-      throw new Error('Error!');
-    }
+  public isFileNameCorrect(fileName: string) {
+    // https://regex101.com/r/Owqjpb/1
+    return fileName.match(/^(?<!\.)\w([^\\/]+)\.eg$/gm).length > 0;
   }
 }

@@ -8,9 +8,7 @@ import { reducers } from '../../+state/reducers/app.reducers';
 @Component({
   selector: 'eg-test',
   template: `
-    <ngcs-graph>
-      <eg-connection-layer #testComponent></eg-connection-layer>
-    </ngcs-graph>
+    <ngcs-graph> <eg-connection-layer #testComponent></eg-connection-layer> </ngcs-graph>
   `
 })
 export class TestComponent {
@@ -23,11 +21,8 @@ describe('ConnectionLayerComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        GraphModule,
-        StoreModule.forRoot(reducers, { initialState: {} })
-      ],
-      declarations: [TestComponent, ConnectionLayerComponent],
+      imports: [GraphModule, StoreModule.forRoot(reducers, { initialState: {} })],
+      declarations: [TestComponent, ConnectionLayerComponent]
     }).compileComponents();
   }));
 

@@ -1,5 +1,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatProgressSpinnerModule, MatIconModule, MatListModule, MatMenuModule, MatDialogModule } from '@angular/material';
+import {
+  MatProgressSpinnerModule,
+  MatIconModule,
+  MatListModule,
+  MatMenuModule,
+  MatDialogModule
+} from '@angular/material';
 import { StoreModule } from '@ngrx/store';
 import { LoggerFactory, SimpleConsoleLoggerFactory } from '@eg/logger';
 
@@ -17,7 +23,11 @@ describe('GraphOpenComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
-        MatProgressSpinnerModule, MatIconModule, MatListModule, MatMenuModule, MatDialogModule,
+        MatProgressSpinnerModule,
+        MatIconModule,
+        MatListModule,
+        MatMenuModule,
+        MatDialogModule,
         StoreModule.forRoot(reducers, { initialState: {} })
       ],
       declarations: [GraphOpenComponent, FileBrowserComponent],

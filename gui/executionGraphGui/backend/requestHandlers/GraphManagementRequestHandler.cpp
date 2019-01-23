@@ -29,7 +29,9 @@ GraphManagementRequestHandler::FuncMap GraphManagementRequestHandler::initFuncti
     using Entry = typename FuncMap::Entry;
 
     auto r = {Entry(targetBase / "general/addGraph", Function(&GraphManagementRequestHandler::handleAddGraph)),
-              Entry(targetBase / "general/removeGraph", Function(&GraphManagementRequestHandler::handleRemoveGraph))};
+              Entry(targetBase / "general/removeGraph", Function(&GraphManagementRequestHandler::handleRemoveGraph)),
+              Entry(targetBase / "general/saveGraph", Function(&GraphManagementRequestHandler::handleSaveGraph)),
+              Entry(targetBase / "general/loadGraph", Function(&GraphManagementRequestHandler::handleLoadGraph))};
     return {r};
 }
 
@@ -107,4 +109,29 @@ void GraphManagementRequestHandler::handleRemoveGraph(const Request& request,
 
     // Set the response ready
     response.setReady();
+}
+
+//! Handle the operation of saving a graph to a file.
+void GraphManagementRequestHandler::handleSaveGraph(const Request& request,
+                                                    ResponsePromise& response)
+{
+    // Request validation
+    auto& payload = request.payload();
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
+                                      "Request data is null!");
+
+    //auto saveReq = getRootOfPayloadAndVerify<s::SaveGraphRequest>(*payload);
+    EXECGRAPHGUI_THROW_BAD_REQUEST("Not Implemented!");
+}
+
+//! Handle the operation of loading a graph from a file.
+void GraphManagementRequestHandler::handleLoadGraph(const Request& request,
+                                                    ResponsePromise& response)
+{
+    // Request validation
+    auto& payload = request.payload();
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
+                                      "Request data is null!");
+
+    EXECGRAPHGUI_THROW_BAD_REQUEST("Not Implemented!");
 }

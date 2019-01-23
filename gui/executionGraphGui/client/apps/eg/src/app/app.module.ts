@@ -25,6 +25,7 @@ import {
   MatCheckboxModule,
   MatButtonToggleModule,
   MatSidenavModule,
+  MatFormFieldModule,
   MatCardModule,
   MatGridListModule,
   MatSnackBarModule,
@@ -33,8 +34,11 @@ import {
   MatSliderModule,
   MatProgressSpinnerModule,
   MAT_DIALOG_DEFAULT_OPTIONS,
-  MatDialogModule
+  MatDialogModule,
+  MatInputModule
 } from '@angular/material';
+import { FormsModule } from '@angular/forms';
+
 import { NxModule } from '@nrwl/nx';
 import { RouterStateSerializer, StoreRouterConnectingModule } from '@ngrx/router-store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
@@ -101,12 +105,14 @@ import { TypeToolTipToolComponent } from './components/tools/type-tooltip-tool/t
 import { GraphOpenComponent } from './components/graph-open/graph-open.component';
 import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
 import { AutoLayoutService } from './services/AutoLayoutService';
+import { GraphSaveComponent } from './components/graph-save/graph-save.component';
 
 const routes: Route[] = [
   {
     path: 'graph',
     children: [
       { path: 'open', component: GraphOpenComponent, outlet: 'primary' },
+      { path: 'save', component: GraphSaveComponent, outlet: 'primary' },
       { path: 'new', component: GraphCreateComponent, outlet: 'primary' },
       {
         path: ':graphId',
@@ -146,7 +152,8 @@ const routes: Route[] = [
     TypeToolTipToolComponent,
     DeleteToolComponent,
     ConnectionLayerComponent,
-    GraphOpenComponent
+    GraphOpenComponent,
+    GraphSaveComponent
   ],
   entryComponents: [ConfirmationDialogComponent],
   imports: [
@@ -164,6 +171,7 @@ const routes: Route[] = [
     MatIconModule,
     MatListModule,
     MatMenuModule,
+    MatFormFieldModule,
     MatProgressSpinnerModule,
     MatSidenavModule,
     MatSliderModule,
@@ -171,6 +179,8 @@ const routes: Route[] = [
     MatTabsModule,
     MatToolbarModule,
     MatDialogModule,
+    MatInputModule,
+    FormsModule,
     GraphModule,
     CommonModule,
     NxModule.forRoot(),
