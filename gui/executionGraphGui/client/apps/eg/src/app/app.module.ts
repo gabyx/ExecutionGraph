@@ -106,8 +106,8 @@ const routes: Route[] = [
   {
     path: 'graph',
     children: [
-      { path: 'new', component: GraphCreateComponent, outlet: 'primary' },
       { path: 'open', component: GraphOpenComponent, outlet: 'primary' },
+      { path: 'new', component: GraphCreateComponent, outlet: 'primary' },
       {
         path: ':graphId',
         component: WorkspaceComponent,

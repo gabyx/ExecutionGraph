@@ -10,7 +10,6 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import * as model from '../model';
 import { FileBrowserMessages } from '@eg/messages';
 export import sz = FileBrowserMessages;
 
@@ -30,7 +29,7 @@ export interface PathInfo {
   isFile: boolean;
 }
 
-export interface FileInfo extends PathInfo {}
+export type FileInfo = PathInfo;
 
 export interface DirectoryInfo extends PathInfo {
   files: FileInfo[];

@@ -12,9 +12,9 @@
 
 import * as Long from 'long';
 import { flatbuffers } from 'flatbuffers';
-import { Id } from '@eg/common';
 import * as model from './../model';
 import * as serialization from '@eg/serialization';
+import { createSocket } from '../model/Socket';
 
 export function toLong(value: flatbuffers.Long): Long {
   return Long.fromBits(value.low, value.high, false);
@@ -36,24 +36,24 @@ export function toFbLong(value: Long): flatbuffers.Long {
  * @returns {model.GraphTypeDescription}
  */
 export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescription): model.GraphTypeDescription {
-  let sockets: model.SocketTypeDescription[] = [];
+  const sockets: model.SocketTypeDescription[] = [];
   for (let i = 0; i < graphDesc.socketTypeDescriptionsLength(); ++i) {
-    let s = graphDesc.socketTypeDescriptions(i);
+    const s = graphDesc.socketTypeDescriptions(i);
 
     const d = s.description();
     sockets.push({ type: s.type(), name: s.name(), description: d ? d : undefined });
   }
 
-  let nodes: model.NodeTypeDescription[] = [];
+  const nodes: model.NodeTypeDescription[] = [];
   for (let i = 0; i < graphDesc.nodeTypeDescriptionsLength(); ++i) {
-    let s = graphDesc.nodeTypeDescriptions(i);
+    const s = graphDesc.nodeTypeDescriptions(i);
 
-    let inS: string[] = [];
+    const inS: string[] = [];
     for (let j = 0; j < s.inSocketNamesLength(); ++j) {
       inS.push(s.inSocketNames(j));
     }
 
-    let outS: string[] = [];
+    const outS: string[] = [];
     for (let j = 0; j < s.outSocketNamesLength(); ++j) {
       outS.push(s.outSocketNames(j));
     }
@@ -69,7 +69,7 @@ export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescrip
   }
 
   return {
-    id: new Id(graphDesc.id()),
+    id: graphDesc.id(),
     name: graphDesc.name(),
     nodeTypeDescriptions: nodes,
     socketTypeDescriptions: sockets,
@@ -86,12 +86,12 @@ export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescrip
  */
 export function toNode(node: serialization.LogicNode): model.Node {
   // Convert to a node model
-  let nodeId = new model.NodeId(toULong(node.id()));
+  const nodeId = new model.NodeId(toULong(node.id()));
 
-  let sockets: model.Socket[] = [];
+  const allSockets: model.Socket[] = [];
 
   // Convert the sockets
-  let extractSockets = (kind: model.SocketType, sockets: model.Socket[]) => {
+  const extractSockets = (kind: model.SocketType, sockets: model.Socket[]) => {
     let l: number;
     let socks: (idx: number) => serialization.LogicSocket;
     if (kind === 'output') {
@@ -103,14 +103,14 @@ export function toNode(node: serialization.LogicNode): model.Node {
     }
 
     for (let i = 0; i < l; ++i) {
-      let s = socks(i);
-      let socket = model.Socket.createSocket(kind, toULong(s.typeIndex()), toULong(s.index()), s.typeName());
+      const s = socks(i);
+      const socket = createSocket(kind, toULong(s.typeIndex()), toULong(s.index()), nodeId, s.typeName());
       sockets.push(socket);
     }
   };
 
-  extractSockets('input', sockets);
-  extractSockets('output', sockets);
+  extractSockets('input', allSockets);
+  extractSockets('output', allSockets);
 
-  return new model.Node(nodeId, node.type(), sockets);
+  return new model.Node(nodeId, node.type(), allSockets);
 }

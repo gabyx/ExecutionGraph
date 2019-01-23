@@ -1,3 +1,3 @@
 export * from './ILayoutEngine';
-export * from './ILayoutStrategy';
-export * from './MassSpringLayoutEngine';
+export { MassSpringLayoutConfig } from './mass-spring-layout/MassSpringLayoutConfig';
+export { MassSpringLayoutEngine } from './mass-spring-layout/MassSpringLayoutEngine';

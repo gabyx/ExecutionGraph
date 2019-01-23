@@ -16,7 +16,6 @@
       #nodeElement
       class="node ngcs-node"
       [class.selected]="isNodeSelected(node) | async"
-      [attr.id]="node.idString"
       [style.left]="node.uiProps.position.x + 'px'"
       [style.top]="node.uiProps.position.y + 'px'"
       [ngcsEventSource]="node"
@@ -32,7 +31,7 @@
             <span [ngcsEventSource]="socket" [forwardTo]="socketNameEvents" [cancelBubble]="false">{{
               socket.uiProps.name
             }}</span>
-            <ngcs-port [id]="socket.idString" class="left middle"></ngcs-port>
+            <ngcs-port [id]="socket.id" class="left middle"></ngcs-port>
           </div>
         </div>
 
@@ -41,7 +40,7 @@
             <span [ngcsEventSource]="socket" [forwardTo]="socketNameEvents" [cancelBubble]="false">{{
               socket.uiProps.name
             }}</span>
-            <ngcs-port [id]="socket.idString" class="right middle"></ngcs-port>
+            <ngcs-port [id]="socket.id" class="right middle"></ngcs-port>
           </div>
         </div>
       </div>

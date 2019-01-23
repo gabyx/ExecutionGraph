@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GraphComponent } from '../graph/graph.component';
-import { LoggerFactory, ILogger } from '@eg/logger/src';
+import { LoggerFactory, ILogger } from '@eg/logger';
 
 @Component({
   selector: 'ngcs-html-layer',
@@ -19,7 +19,5 @@ export class HtmlLayerComponent implements OnInit {
     return this.graph.transformCss;
   }
 
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }

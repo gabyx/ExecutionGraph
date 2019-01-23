@@ -85,6 +85,9 @@
             "tsConfig": "apps/eg/tsconfig.spec.json",
             "scripts": [],
             "styles": ["apps/eg/src/styles.scss"],
+            "stylePreprocessorOptions": {
+              "includePaths": ["apps/eg/src"]
+            },
             "assets": ["apps/eg/src/assets", "apps/eg/src/favicon.ico"]
           }
         },
@@ -119,6 +122,11 @@
         }
       },
       "prefix": "app"
+    },
+    "electron": {
+      "root": "apps/electron",
+      "sourceRoot": "apps/electron/src",
+      "projectType": "application"
     },
     "common": {
       "root": "libs/common",
@@ -243,13 +251,6 @@
           }
         }
       }
-    },
-    "tsm": {
-      "root": "libs/tsm",
-      "sourceRoot": "libs/tsm/src",
-      "projectType": "library",
-      "prefix": "eg",
-      "architect": {}
     }
   },
   "defaultProject": "eg",

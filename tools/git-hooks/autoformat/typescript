@@ -15,7 +15,10 @@ function formatFile() {
 export -f formatFile
 
 function formatTS() {
-    find "$1" -regextype posix-extended  -regex "$REPO_DIR/(gui)/.*" -and -not -iname "*generated*"  | xargs -I {} bash -c 'formatFile "${@}"' _ {} "${REPO_DIR}/gui/executionGraphGui/client/.prettierrc"
+    find "$1" -regextype posix-extended  \
+              -regex "$REPO_DIR/(gui)/.*" \
+              -and -not -iname "*generated*"  | \
+              xargs -I {} bash -c 'formatFile "${@}"' _ {} "${REPO_DIR}/gui/executionGraphGui/client/.prettierrc"
 }
 
 formatTS "$1"

@@ -1,6 +1,6 @@
 export const epsilon = 0.00001;
 
-export class vec2 {
+export class Vector2 {
   get x(): number {
     return this.values[0];
   }
@@ -34,8 +34,8 @@ export class vec2 {
 
   private values = new Float32Array(2);
 
-  static readonly zero = new vec2([0, 0]);
-  static readonly one = new vec2([1, 1]);
+  static readonly zero = new Vector2([0, 0]);
+  static readonly one = new Vector2([1, 1]);
 
   at(index: number): number {
     return this.values[index];
@@ -46,9 +46,9 @@ export class vec2 {
     this.y = 0;
   }
 
-  copy(dest?: vec2): vec2 {
+  copy(dest?: Vector2): Vector2 {
     if (!dest) {
-      dest = new vec2();
+      dest = new Vector2();
     }
 
     dest.x = this.x;
@@ -57,7 +57,7 @@ export class vec2 {
     return dest;
   }
 
-  negate(dest?: vec2): vec2 {
+  negate(dest?: Vector2): Vector2 {
     if (!dest) {
       dest = this;
     }
@@ -74,7 +74,7 @@ export class vec2 {
     return this;
   }
 
-  equals(vector: vec2, threshold = epsilon): boolean {
+  equals(vector: Vector2, threshold = epsilon): boolean {
     if (Math.abs(this.x - vector.x) > threshold) {
       return false;
     }
@@ -97,42 +97,42 @@ export class vec2 {
     return x * x + y * y;
   }
 
-  add(vector: vec2): vec2 {
+  add(vector: Vector2): Vector2 {
     this.x += vector.x;
     this.y += vector.y;
 
     return this;
   }
 
-  subtract(vector: vec2): vec2 {
+  subtract(vector: Vector2): Vector2 {
     this.x -= vector.x;
     this.y -= vector.y;
 
     return this;
   }
 
-  multiply(vector: vec2): vec2 {
+  multiply(vector: Vector2): Vector2 {
     this.x *= vector.x;
     this.y *= vector.y;
 
     return this;
   }
 
-  divide(vector: vec2): vec2 {
+  divide(vector: Vector2): Vector2 {
     this.x /= vector.x;
     this.y /= vector.y;
 
     return this;
   }
 
-  scale(value: number): vec2 {
+  scale(value: number): Vector2 {
     this.x *= value;
     this.y *= value;
 
     return this;
   }
 
-  normalize(dest?: vec2): vec2 {
+  normalize(dest?: Vector2): Vector2 {
     if (!dest) {
       dest = this;
     }
@@ -158,32 +158,32 @@ export class vec2 {
     return dest;
   }
 
-  multiplyMat2(matrix: mat2, dest?: vec2): vec2 {
+  multiplyMatrix2(matrix: Matrix2, dest?: Vector2): Vector2 {
     if (!dest) {
       dest = this;
     }
 
-    return matrix.multiplyVec2(this, dest);
+    return matrix.multiplyVector2(this, dest);
   }
 
-  static dot(vector: vec2, vector2: vec2): number {
+  static dot(vector: Vector2, vector2: Vector2): number {
     return vector.x * vector2.x + vector.y * vector2.y;
   }
 
-  static distance(vector: vec2, vector2: vec2): number {
+  static distance(vector: Vector2, vector2: Vector2): number {
     return Math.sqrt(this.squaredDistance(vector, vector2));
   }
 
-  static squaredDistance(vector: vec2, vector2: vec2): number {
+  static squaredDistance(vector: Vector2, vector2: Vector2): number {
     const x = vector2.x - vector.x;
     const y = vector2.y - vector.y;
 
     return x * x + y * y;
   }
 
-  static direction(vector: vec2, vector2: vec2, dest?: vec2): vec2 {
+  static direction(vector: Vector2, vector2: Vector2, dest?: Vector2): Vector2 {
     if (!dest) {
-      dest = new vec2();
+      dest = new Vector2();
     }
 
     const x = vector.x - vector2.x;
@@ -206,9 +206,9 @@ export class vec2 {
     return dest;
   }
 
-  static mix(vector: vec2, vector2: vec2, time: number, dest?: vec2): vec2 {
+  static mix(vector: Vector2, vector2: Vector2, time: number, dest?: Vector2): Vector2 {
     if (!dest) {
-      dest = new vec2();
+      dest = new Vector2();
     }
 
     const x = vector.x;
@@ -223,9 +223,9 @@ export class vec2 {
     return dest;
   }
 
-  static sum(vector: vec2, vector2: vec2, dest?: vec2): vec2 {
+  static sum(vector: Vector2, vector2: Vector2, dest?: Vector2): Vector2 {
     if (!dest) {
-      dest = new vec2();
+      dest = new Vector2();
     }
 
     dest.x = vector.x + vector2.x;
@@ -234,9 +234,9 @@ export class vec2 {
     return dest;
   }
 
-  static difference(vector: vec2, vector2: vec2, dest?: vec2): vec2 {
+  static difference(vector: Vector2, vector2: Vector2, dest?: Vector2): Vector2 {
     if (!dest) {
-      dest = new vec2();
+      dest = new Vector2();
     }
 
     dest.x = vector.x - vector2.x;
@@ -245,9 +245,9 @@ export class vec2 {
     return dest;
   }
 
-  static product(vector: vec2, vector2: vec2, dest?: vec2): vec2 {
+  static product(vector: Vector2, vector2: Vector2, dest?: Vector2): Vector2 {
     if (!dest) {
-      dest = new vec2();
+      dest = new Vector2();
     }
 
     dest.x = vector.x * vector2.x;
@@ -256,9 +256,9 @@ export class vec2 {
     return dest;
   }
 
-  static quotient(vector: vec2, vector2: vec2, dest?: vec2): vec2 {
+  static quotient(vector: Vector2, vector2: Vector2, dest?: Vector2): Vector2 {
     if (!dest) {
-      dest = new vec2();
+      dest = new Vector2();
     }
 
     dest.x = vector.x / vector2.x;
@@ -267,9 +267,9 @@ export class vec2 {
     return dest;
   }
 
-  static scale(vector: vec2, value: number, dest?: vec2): vec2 {
+  static scale(vector: Vector2, value: number, dest?: Vector2): Vector2 {
     if (!dest) {
-      dest = new vec2();
+      dest = new Vector2();
     }
 
     dest.x = vector.x * value;
@@ -279,7 +279,7 @@ export class vec2 {
   }
 }
 
-export class mat2 {
+export class Matrix2 {
   constructor(values?: number[]) {
     if (values !== undefined) {
       this.init(values);
@@ -288,13 +288,13 @@ export class mat2 {
 
   private values = new Float32Array(4);
 
-  static readonly identity = new mat2().setIdentity();
+  static readonly identity = new Matrix2().setIdentity();
 
   at(index: number): number {
     return this.values[index];
   }
 
-  init(values: number[]): mat2 {
+  init(values: number[]): Matrix2 {
     for (let i = 0; i < 4; i++) {
       this.values[i] = values[i];
     }
@@ -308,9 +308,9 @@ export class mat2 {
     }
   }
 
-  copy(dest?: mat2): mat2 {
+  copy(dest?: Matrix2): Matrix2 {
     if (!dest) {
-      dest = new mat2();
+      dest = new Matrix2();
     }
 
     for (let i = 0; i < 4; i++) {
@@ -337,7 +337,7 @@ export class mat2 {
     return [this.values[index], this.values[index + 2]];
   }
 
-  equals(matrix: mat2, threshold = epsilon): boolean {
+  equals(matrix: Matrix2, threshold = epsilon): boolean {
     for (let i = 0; i < 4; i++) {
       if (Math.abs(this.values[i] - matrix.at(i)) > threshold) {
         return false;
@@ -351,7 +351,7 @@ export class mat2 {
     return this.values[0] * this.values[3] - this.values[2] * this.values[1];
   }
 
-  setIdentity(): mat2 {
+  setIdentity(): Matrix2 {
     this.values[0] = 1;
     this.values[1] = 0;
     this.values[2] = 0;
@@ -360,7 +360,7 @@ export class mat2 {
     return this;
   }
 
-  transpose(): mat2 {
+  transpose(): Matrix2 {
     const temp = this.values[1];
 
     this.values[1] = this.values[2];
@@ -369,7 +369,7 @@ export class mat2 {
     return this;
   }
 
-  inverse(): mat2 {
+  inverse(): Matrix2 {
     let det = this.determinant();
 
     if (!det) {
@@ -388,7 +388,7 @@ export class mat2 {
     return this;
   }
 
-  multiply(matrix: mat2): mat2 {
+  multiply(matrix: Matrix2): Matrix2 {
     const a11 = this.values[0];
     const a12 = this.values[1];
     const a21 = this.values[2];
@@ -402,7 +402,7 @@ export class mat2 {
     return this;
   }
 
-  rotate(angle: number): mat2 {
+  rotate(angle: number): Matrix2 {
     const a11 = this.values[0];
     const a12 = this.values[1];
     const a21 = this.values[2];
@@ -419,7 +419,7 @@ export class mat2 {
     return this;
   }
 
-  multiplyVec2(vector: vec2, result: vec2): vec2 {
+  multiplyVector2(vector: Vector2, result: Vector2): Vector2 {
     const x = vector.x;
     const y = vector.y;
 
@@ -428,11 +428,11 @@ export class mat2 {
 
       return result;
     } else {
-      return new vec2([x * this.values[0] + y * this.values[1], x * this.values[2] + y * this.values[3]]);
+      return new Vector2([x * this.values[0] + y * this.values[1], x * this.values[2] + y * this.values[3]]);
     }
   }
 
-  scale(vector: vec2): mat2 {
+  scale(vector: Vector2): Matrix2 {
     const a11 = this.values[0];
     const a12 = this.values[1];
     const a21 = this.values[2];
@@ -449,7 +449,7 @@ export class mat2 {
     return this;
   }
 
-  static product(m1: mat2, m2: mat2, result: mat2): mat2 {
+  static product(m1: Matrix2, m2: Matrix2, result: Matrix2): Matrix2 {
     const a11 = m1.at(0);
     const a12 = m1.at(1);
     const a21 = m1.at(2);
@@ -465,7 +465,7 @@ export class mat2 {
 
       return result;
     } else {
-      return new mat2([
+      return new Matrix2([
         a11 * m2.at(0) + a12 * m2.at(2),
         a11 * m2.at(1) + a12 * m2.at(3),
         a21 * m2.at(0) + a22 * m2.at(2),

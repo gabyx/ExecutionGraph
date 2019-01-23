@@ -12,7 +12,6 @@
 
 import { Injectable } from '@angular/core';
 import { flatbuffers } from 'flatbuffers';
-import { Id } from '@eg/common';
 import * as conversions from './Conversions';
 import { sz as szInfo } from './GeneralInfoService';
 import { sz as szMani } from './GraphManipulationService';
@@ -43,7 +42,7 @@ export abstract class ITestBackend {
 @Injectable()
 export class TestBackend extends ITestBackend {
   private nodeId: number = 0;
-  private graphTypeId: Id;
+  private graphTypeId: model.GraphTypeId;
   private sockets: string[];
   private nodes: {
     [type: string]: {
@@ -59,7 +58,7 @@ export class TestBackend extends ITestBackend {
   constructor() {
     super();
 
-    this.graphTypeId = new Id('2992ebff-c950-4184-8876-5fe6ac029aa5');
+    this.graphTypeId = '2992ebff-c950-4184-8876-5fe6ac029aa5';
 
     // Internal sockets
     this.sockets = ['int', 'bool', 'double', 'Vector3', 'Matrix33', 'Scalar'];
@@ -88,54 +87,55 @@ export class TestBackend extends ITestBackend {
 
     // Generate Descriptions
     // ---------------------
-    let builder = new flatbuffers.Builder(1024);
+    const builder = new flatbuffers.Builder(1024);
 
     // NodeType Description machen
-    let nodeDescs = [];
-    for (let type in this.nodes) {
-      let n = this.nodes[type];
-      let offName = builder.createString(n['name']);
-      let offType = builder.createString(n['type']);
+    const nodeDescs = [];
+    Object.keys(this.nodes).map(type => {
+      const n = this.nodes[type];
+      const nameOff = builder.createString(n['name']);
+      const offType = builder.createString(n['type']);
       szInfo.NodeTypeDescription.startNodeTypeDescription(builder);
-      szInfo.NodeTypeDescription.addName(builder, offName);
+      szInfo.NodeTypeDescription.addName(builder, nameOff);
       szInfo.NodeTypeDescription.addType(builder, offType);
-      let offN = szInfo.NodeTypeDescription.endNodeTypeDescription(builder);
+      const offN = szInfo.NodeTypeDescription.endNodeTypeDescription(builder);
       nodeDescs.push(offN);
-    }
+    });
 
     // SocketType Description machen
-    let socketDescs = [];
-    for (let s of this.sockets) {
-      let offName = builder.createString(s);
-      let offType = builder.createString(s);
+    const socketDescs = [];
+    for (const s of this.sockets) {
+      const offN = builder.createString(s);
+      const offType = builder.createString(s);
       szInfo.SocketTypeDescription.startSocketTypeDescription(builder);
-      szInfo.SocketTypeDescription.addName(builder, offName);
+      szInfo.SocketTypeDescription.addName(builder, offN);
       szInfo.SocketTypeDescription.addType(builder, offType);
-      let offS = szInfo.SocketTypeDescription.endSocketTypeDescription(builder);
+      const offS = szInfo.SocketTypeDescription.endSocketTypeDescription(builder);
       socketDescs.push(offS);
     }
 
     // Make GraphType Description
-    let offId = builder.createString(this.graphTypeId.toString());
-    let offName = builder.createString('DefaultGraph');
-    let offNodes = szInfo.GraphTypeDescription.createNodeTypeDescriptionsVector(builder, nodeDescs);
-    let offSockets = szInfo.GraphTypeDescription.createSocketTypeDescriptionsVector(builder, socketDescs);
+
+    const offId = builder.createString(this.graphTypeId);
+    const offName = builder.createString('DefaultGraph');
+    const offNodes = szInfo.GraphTypeDescription.createNodeTypeDescriptionsVector(builder, nodeDescs);
+    const offSockets = szInfo.GraphTypeDescription.createSocketTypeDescriptionsVector(builder, socketDescs);
     szInfo.GraphTypeDescription.startGraphTypeDescription(builder);
     szInfo.GraphTypeDescription.addId(builder, offId);
     szInfo.GraphTypeDescription.addName(builder, offName);
     szInfo.GraphTypeDescription.addNodeTypeDescriptions(builder, offNodes);
     szInfo.GraphTypeDescription.addSocketTypeDescriptions(builder, offSockets);
-    let offGT = szInfo.GraphTypeDescription.endGraphTypeDescription(builder);
+    const offGT = szInfo.GraphTypeDescription.endGraphTypeDescription(builder);
 
     // Make Response
-    let offGTs = szInfo.GetAllGraphTypeDescriptionsResponse.createGraphsTypesVector(builder, [offGT]);
+    const offGTs = szInfo.GetAllGraphTypeDescriptionsResponse.createGraphsTypesVector(builder, [offGT]);
     szInfo.GetAllGraphTypeDescriptionsResponse.startGetAllGraphTypeDescriptionsResponse(builder);
     szInfo.GetAllGraphTypeDescriptionsResponse.addGraphsTypes(builder, offGTs);
-    let offResp = szInfo.GetAllGraphTypeDescriptionsResponse.endGetAllGraphTypeDescriptionsResponse(builder);
+    const offResp = szInfo.GetAllGraphTypeDescriptionsResponse.endGetAllGraphTypeDescriptionsResponse(builder);
     builder.finish(offResp);
 
-    let buf = new flatbuffers.ByteBuffer(builder.asUint8Array());
-    let response = szInfo.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
+    const buf = new flatbuffers.ByteBuffer(builder.asUint8Array());
+    const response = szInfo.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
 
     this.graphTypeDesc = conversions.toGraphTypeDescription(response.graphsTypes(0));
 
@@ -148,17 +148,17 @@ export class TestBackend extends ITestBackend {
     // ----------------------
 
     if (!(type in this.nodes)) {
-      throw `TestBackend: No such node type: ${type}`;
+      throw new Error(`TestBackend: No such node type: ${type}`);
     }
 
-    let node = this.nodes[type];
+    const node = this.nodes[type];
 
-    let builder = new flatbuffers.Builder(1024);
-    let nameOff = builder.createString(name);
-    let typeOff = builder.createString(node.type);
+    const builder = new flatbuffers.Builder(1024);
+    const nameOff = builder.createString(name);
+    const typeOff = builder.createString(node.type);
 
-    let inSocksOff = this.createSockets(builder, node.ins, 'in', true);
-    let outSocksOff = this.createSockets(builder, node.outs, 'out', false);
+    const inSocksOff = this.createSockets(builder, node.ins, 'in', true);
+    const outSocksOff = this.createSockets(builder, node.outs, 'out', false);
 
     szMani.LogicNode.startLogicNode(builder);
     this.nodeId += 1;
@@ -166,28 +166,27 @@ export class TestBackend extends ITestBackend {
     szMani.LogicNode.addType(builder, typeOff);
     szMani.LogicNode.addInputSockets(builder, inSocksOff);
     szMani.LogicNode.addOutputSockets(builder, outSocksOff);
-    let nodeOff = szMani.LogicNode.endLogicNode(builder);
+    const nodeOff = szMani.LogicNode.endLogicNode(builder);
 
     szMani.AddNodeResponse.startAddNodeResponse(builder);
     szMani.AddNodeResponse.addNode(builder, nodeOff);
-    let respOff = szMani.AddNodeResponse.endAddNodeResponse(builder);
+    const respOff = szMani.AddNodeResponse.endAddNodeResponse(builder);
     builder.finish(respOff);
-    let result = builder.asUint8Array();
+    const result = builder.asUint8Array();
 
     const buf = new flatbuffers.ByteBuffer(result);
     return szMani.AddNodeResponse.getRootAsAddNodeResponse(buf);
   }
 
   private createSockets(builder: flatbuffers.Builder, sockets: string[], suffix: string, inputs: boolean) {
-    let socketOffs: number[] = [];
+    const socketOffs: number[] = [];
     for (let i = 0; i < sockets.length; i++) {
-      let type = sockets[i];
-      let typeIndex = this.sockets.findIndex((v, idx) => v === type);
+      const type = sockets[i];
+      const typeIndex = this.sockets.findIndex((v, idx) => v === type);
       if (typeIndex < 0) {
-        throw `TestBackend: No such socket type ${type}`;
+        throw new Error(`TestBackend: No such socket type ${type}`);
       }
-      let socketNameOff = builder.createString(`${suffix}-${i}`);
-      let typeOff = builder.createString(type);
+      const typeOff = builder.createString(type);
 
       szMani.LogicSocket.startLogicSocket(builder);
 
@@ -195,7 +194,7 @@ export class TestBackend extends ITestBackend {
       szMani.LogicSocket.addType(builder, typeOff);
       szMani.LogicSocket.addTypeName(builder, typeOff);
       szMani.LogicSocket.addIndex(builder, flatbuffers.Long.create(i, 0));
-      let off = szMani.LogicSocket.endLogicSocket(builder);
+      const off = szMani.LogicSocket.endLogicSocket(builder);
       socketOffs.push(off);
     }
     return szMani.LogicNode.createInputSocketsVector(builder, socketOffs);

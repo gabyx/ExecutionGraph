@@ -1,12 +1,13 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "importHelpers": true,
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es5",
+    "target": "es6",
     "typeRoots": ["node_modules/@types"],
     "lib": ["es2017", "dom"],
     "baseUrl": ".",
@@ -18,7 +19,8 @@
       "@eg/messages": ["libs/messages/src/index.ts"],
       "@eg/serialization": ["libs/serialization/src/index.ts"],
       "@eg/serialization/*": ["libs/serialization/src/lib/*"]
-    }
+    },
+    "module": "es2015"
   },
   "exclude": ["node_modules", "tmp"]
 }

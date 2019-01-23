@@ -14,12 +14,12 @@ import { Injectable, Inject } from '@angular/core';
 import { VERBOSE_LOG_TOKEN } from '../tokens';
 import { flatbuffers } from 'flatbuffers';
 import { ILogger, LoggerFactory, stringify } from '@eg/logger';
-import { Id } from '@eg/common';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
-import { Node, NodeId, Socket, Connection } from '../model';
+import { Node, NodeId, Socket, Connection, fromConnection } from '../model';
 import * as conversions from './Conversions';
 import { isDefined } from '@angular/compiler/src/util';
+import { GraphId } from '../model/Graph';
 
 @Injectable()
 export class GraphManipulationServiceBinaryHttp extends GraphManipulationService {
@@ -34,12 +34,12 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     this.logger = loggerFactory.create('GraphManipulationServiceBinaryHttp');
   }
 
-  public async addNode(graphId: Id, type: string): Promise<Node> {
+  public async addNode(graphId: GraphId, type: string): Promise<Node> {
     // Build the AddNode request
-    let builder = new flatbuffers.Builder(356);
-    let offGraphId = builder.createString(graphId.toString());
-    let offType = builder.createString(type);
-    let offName = builder.createString(name);
+    const builder = new flatbuffers.Builder(356);
+    const offGraphId = builder.createString(graphId);
+    const offType = builder.createString(type);
+    const offName = builder.createString(name);
 
     sz.NodeConstructionInfo.startNodeConstructionInfo(builder);
     sz.NodeConstructionInfo.addName(builder, offName);
@@ -52,51 +52,51 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     off = sz.AddNodeRequest.endAddNodeRequest(builder);
     builder.finish(off);
 
-    let requestPayload = builder.asUint8Array();
+    const requestPayload = builder.asUint8Array();
 
     // Send the request
     const result = await this.binaryRouter.post('graph/addNode', requestPayload);
     const buf = new flatbuffers.ByteBuffer(result);
     const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
 
-    let node = response.node();
+    const node = response.node();
     this.logger.info(`Added new node [type: '${node.type()}', ins: ${node.inputSocketsLength()},
                   outs: ${node.outputSocketsLength()}].`);
 
-    let nodeModel = conversions.toNode(node);
+    const nodeModel = conversions.toNode(node);
     if (this.verboseResponseLog) {
       this.logger.info(`Node: '${stringify(nodeModel, 4)}'`);
     }
     return nodeModel;
   }
 
-  public async removeNode(graphId: Id, nodeId: NodeId): Promise<void> {
+  public async removeNode(graphId: GraphId, nodeId: NodeId): Promise<void> {
     // Build the RemoveNode request
-    let builder = new flatbuffers.Builder(356);
-    let offGraphId = builder.createString(graphId.toString());
+    const builder = new flatbuffers.Builder(356);
+    const offGraphId = builder.createString(graphId);
     sz.RemoveNodeRequest.startRemoveNodeRequest(builder);
     sz.RemoveNodeRequest.addGraphId(builder, offGraphId);
     sz.RemoveNodeRequest.addNodeId(builder, builder.createLong(nodeId.low, nodeId.high));
-    let reqOff = sz.RemoveNodeRequest.endRemoveNodeRequest(builder);
+    const reqOff = sz.RemoveNodeRequest.endRemoveNodeRequest(builder);
     builder.finish(reqOff);
 
-    let requestPayload = builder.asUint8Array();
+    const requestPayload = builder.asUint8Array();
 
     // Send the request
     await this.binaryRouter.post('graph/removeNode', requestPayload);
-    this.logger.debug(`Removed node [id: '${nodeId}'] from graph [id: '${graphId.toString()}']`);
+    this.logger.debug(`Removed node [id: '${nodeId}'] from graph [id: '${graphId}']`);
   }
 
   public async addConnection(
-    graphId: Id,
+    graphId: GraphId,
     source: Socket,
     target: Socket,
     cycleDetection: boolean
   ): Promise<Connection> {
-    const connection = Connection.create(source, target, true);
+    const connection = fromConnection.create(source, target, true);
 
     const builder = new flatbuffers.Builder(356);
-    const offGraphId = builder.createString(graphId.toString());
+    const offGraphId = builder.createString(graphId);
 
     sz.AddConnectionRequest.startAddConnectionRequest(builder);
     sz.AddConnectionRequest.addGraphId(builder, offGraphId);
@@ -104,9 +104,9 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
       builder,
       sz.SocketLinkDescription.createSocketLinkDescription(
         builder,
-        conversions.toFbLong(connection.outputSocket.parent.id),
+        conversions.toFbLong(connection.outputSocket.parentId),
         conversions.toFbLong(connection.outputSocket.index),
-        conversions.toFbLong(connection.inputSocket.parent.id),
+        conversions.toFbLong(connection.inputSocket.parentId),
         conversions.toFbLong(connection.inputSocket.index),
         connection.isWriteLink
       )
@@ -121,24 +121,22 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
 
     if (!result.length) {
       // Succesfully added connection
-      this.logger.info(
-        `Added connection: ['${source.idString}' ⟶ '${target.idString}'] from graph [id: '${graphId.toString()}']`
-      );
+      this.logger.info(`Added connection: ['${source.id}' ⟶ '${target.id}'] from graph [id: '${graphId}']`);
 
       return connection;
     } else {
       // Cycle detected, read the repsonse
       const buf = new flatbuffers.ByteBuffer(result);
       const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
-      throw 'Cycle detection not yet implemented!';
+      throw new Error('Cycle detection not yet implemented!');
     }
   }
 
-  public async removeConnection(graphId: Id, source: Socket, target: Socket): Promise<void> {
-    const connection = Connection.create(source, target, false);
+  public async removeConnection(graphId: GraphId, source: Socket, target: Socket): Promise<void> {
+    const connection = fromConnection.create(source, target, false);
 
     const builder = new flatbuffers.Builder(356);
-    const offGraphId = builder.createString(graphId.toString());
+    const offGraphId = builder.createString(graphId);
 
     sz.RemoveConnectionRequest.startRemoveConnectionRequest(builder);
     sz.RemoveConnectionRequest.addGraphId(builder, offGraphId);
@@ -146,9 +144,9 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
       builder,
       sz.SocketLinkDescription.createSocketLinkDescription(
         builder,
-        conversions.toFbLong(connection.outputSocket.parent.id),
+        conversions.toFbLong(connection.outputSocket.parentId),
         conversions.toFbLong(connection.outputSocket.index),
-        conversions.toFbLong(connection.inputSocket.parent.id),
+        conversions.toFbLong(connection.inputSocket.parentId),
         conversions.toFbLong(connection.inputSocket.index),
         connection.isWriteLink
       )
@@ -159,8 +157,6 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     const requestPayload = builder.asUint8Array();
 
     await this.binaryRouter.post('graph/removeConnection', requestPayload);
-    this.logger.info(
-      `Removed connection: ['${source.idString}' ⟶ '${target.idString}'] from graph [id: '${graphId.toString()}']`
-    );
+    this.logger.info(`Removed connection: ['${source.id}' ⟶ '${target.id}'] from graph [id: '${graphId}']`);
   }
 }

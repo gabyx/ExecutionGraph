@@ -13,6 +13,7 @@
 import { Point } from '@eg/graph';
 import * as Long from 'long';
 import { Socket, InputSocket, OutputSocket } from './Socket';
+import * as fromSocket from './Socket';
 
 function isLong(value: any): value is Long {
   return value instanceof Long;
@@ -26,36 +27,19 @@ export class UIProps {
 /**
  * Unique Identifier for a `Node`.
  *
- * @export
- * @class NodeId
- * @extends {Long}
  */
 export class NodeId extends Long {
-  private readonly _idString: string;
   constructor(id: number | Long) {
     if (isLong(id)) {
       super(id.low, id.high, id.unsigned);
     } else {
       super(id, 0, true);
     }
-    this._idString = `n-${this.toInt()}`;
-  }
-  /**
-   * String identifer for this NodeId.
-   *
-   * @returns {string}
-   * @memberof NodeId
-   */
-  public get string(): string {
-    return this._idString;
   }
 }
 
 /**
  *  Modelclass for a node.
- *
- * @export
- * @class Node
  */
 export class Node {
   /** Two different lists for sockets */
@@ -69,7 +53,7 @@ export class Node {
   ) {
     // Make
     sockets.forEach((s: InputSocket | OutputSocket) => {
-      if (Socket.isOutputSocket(s)) {
+      if (fromSocket.isOutputSocket(s)) {
         this.outputs.push(s);
       } else {
         this.inputs.push(s);
@@ -79,12 +63,5 @@ export class Node {
     const sort = (a: Socket, b: Socket) => a.index.comp(b.index);
     this.inputs = this.inputs.sort(sort);
     this.outputs = this.outputs.sort(sort);
-    // Setting all parents!
-    this.inputs.forEach((s: Socket) => (s.parent = this));
-    this.outputs.forEach((s: Socket) => (s.parent = this));
-  }
-
-  public get idString(): string {
-    return this.id.string;
   }
 }

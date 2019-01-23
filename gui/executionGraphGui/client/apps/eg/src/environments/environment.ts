@@ -15,5 +15,5 @@ export const environment = {
   logReponsesVerbose: true,
 
   useServiceDummys: true,
-  backendUrl: "this url is not needed since we use service dummies!"
+  backendUrl: 'this url is not needed since we use service dummies!'
 };

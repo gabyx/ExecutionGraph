@@ -8,9 +8,8 @@ describe('SvgLayerComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SvgLayerComponent ]
-    })
-    .compileComponents();
+      declarations: [SvgLayerComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
