@@ -8,7 +8,6 @@ import { OutputSocket, InputSocket, Connection, Socket, fromConnection, fromSock
 import { GraphsState } from '../../../+state/reducers';
 import { AddConnection } from '../../../+state/actions';
 import { getSelectedGraph, getSelectedGraphId } from '../../../+state/selectors';
-import * as Long from 'long';
 import { Guid } from 'guid-typescript';
 
 @Component({
@@ -69,7 +68,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       }
       this.activate();
       this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
-      this.tempConnection = fromConnection.createConnection(socket, this.tempTargetSocket);
+      this.tempConnection = fromConnection.createValidConnection(socket, this.tempTargetSocket);
     });
     this.socketEvents.onDragContinue.subscribe(e => {
       if (e.button !== MouseButton.Left) {
@@ -100,7 +99,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
         if (!this.invalidity) {
           this.logger.info('Making preview connection');
           this.targetSocket = targetSocket;
-          this.tempConnection = fromConnection.createConnection(this.sourceSocket, this.targetSocket, false);
+          this.tempConnection = fromConnection.createValidConnection(this.sourceSocket, this.targetSocket);
         } else {
           /** Add notifcation icon next to cursor, to make
            *  clear that this connection is impossible
@@ -115,7 +114,7 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       if (this.targetSocket) {
         this.logger.info('Leaving potential target Socket');
         this.targetSocket = null;
-        this.tempConnection = fromConnection.createConnection(this.sourceSocket, this.tempTargetSocket);
+        this.tempConnection = fromConnection.createValidConnection(this.sourceSocket, this.tempTargetSocket);
         this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
       }
       if (this.tempConnection) {

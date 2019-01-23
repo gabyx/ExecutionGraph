@@ -10,22 +10,17 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import * as Long from 'long';
 import { flatbuffers } from 'flatbuffers';
 import * as model from './../model';
 import * as serialization from '@eg/serialization';
 import { createSocket } from '../model/Socket';
 
-export function toLong(value: flatbuffers.Long): Long {
-  return Long.fromBits(value.low, value.high, false);
-}
-
-export function toULong(value: flatbuffers.Long): Long {
-  return Long.fromBits(value.low, value.high, true);
-}
-
-export function toFbLong(value: Long): flatbuffers.Long {
-  return flatbuffers.Long.create(value.low, value.high);
+export function toFbLong(value: number | string): flatbuffers.Long {
+  if (typeof value === 'number') {
+    return flatbuffers.Long.create(value, 0);
+  } else {
+    return flatbuffers.Long.create(parseInt(value, 10), 0);
+  }
 }
 
 /**
@@ -86,7 +81,7 @@ export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescrip
  */
 export function toNode(node: serialization.LogicNode): model.Node {
   // Convert to a node model
-  const nodeId = toULong(node.id()).toString();
+  const nodeId = node.id().toFloat64();
 
   const allSockets: model.Socket[] = [];
 

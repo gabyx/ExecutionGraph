@@ -16,7 +16,6 @@ import { GeneralInfoService } from './GeneralInfoService';
 import { GraphManipulationService } from './GraphManipulationService';
 import { GraphManagementService } from './GraphManagementService';
 import { FileBrowserService } from './FileBrowserService';
-import * as Long from 'long';
 
 /**
  * Stupid TestService class which can be quickly injected

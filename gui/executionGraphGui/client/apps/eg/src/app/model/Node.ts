@@ -15,6 +15,12 @@ import { Socket, OutputSocket, InputSocket, isOutputSocket } from './Socket';
 
 export interface UIProps {
   readonly name: string;
+
+  /* @todo cmonspqr->cmonspqr:
+   * We're too lazy now because the property is set in the effect directly on the node
+   * instead of passing it on to the reducer... If that is too slow we should
+   * consider an alternative position attribute per node during movements / animations
+   */
   position: Point;
 }
 
