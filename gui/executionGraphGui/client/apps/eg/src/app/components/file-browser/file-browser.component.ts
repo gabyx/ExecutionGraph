@@ -6,7 +6,7 @@ import { DirectoryInfo, isFile, FileInfo, PathInfo } from '../../services/FileBr
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { MatDialog } from '@angular/material';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
-import { assertThat } from '../../general/Assert';
+import { assert } from '@eg/common';
 
 export enum FileBrowserMode {
   Open = 'open',
@@ -105,7 +105,7 @@ export class FileBrowserComponent implements OnInit {
   }
 
   public openFile(file: FileInfo) {
-    assertThat(this.mode === FileBrowserMode.Open, 'Programming Error!');
+    assert(this.mode === FileBrowserMode.Open, 'Programming Error!');
     this.logger.debug(`Opening file '${file.path}'`);
     this.fileActionOpen.emit(file.path);
   }
@@ -119,19 +119,19 @@ export class FileBrowserComponent implements OnInit {
   }
 
   public saveFileName(fileName: string) {
-    assertThat(this.mode === FileBrowserMode.Save && this.isFileNameCorrect(fileName), 'Programming Error!');
+    assert(this.mode === FileBrowserMode.Save && this.isFileNameCorrect(fileName), 'Programming Error!');
     const path = (this.currentDirectory.path + '/' + fileName).replace('//', '/');
     this.saveFile(path, true);
   }
 
   private deleteFile(path: FileInfo | DirectoryInfo) {
-    assertThat(this.allowDelete && this.isFileOpenable(path), 'Programming Error!');
+    assert(this.allowDelete && this.isFileOpenable(path), 'Programming Error!');
     this.logger.debug(`Deleting path '${path.path}'`);
     this.fileActionDelete.emit(path.path);
   }
 
   private deleteConfirm(path: FileInfo | DirectoryInfo) {
-    assertThat(this.allowDelete, 'Programming Error!');
+    assert(this.allowDelete, 'Programming Error!');
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       minWidth: '10%',
       data: {
@@ -147,7 +147,7 @@ export class FileBrowserComponent implements OnInit {
   }
 
   private saveFile(path: string, checkOverwrite: boolean) {
-    assertThat(this.mode === FileBrowserMode.Save, 'Programming Error!');
+    assert(this.mode === FileBrowserMode.Save, 'Programming Error!');
 
     const showOverwrite = checkOverwrite ? this.checkOverwrite(path) : false;
 
