@@ -54,7 +54,7 @@ export class FileBrowserServiceDummy extends FileBrowserService {
         permissions: Permissions.OwnerReadWrite,
         files: [
           {
-            path: '/DirB/FileC.eg',
+            path: './DirB/FileC.eg',
             name: 'FileC.eg',
             size: 4,
             modified: new Date(),

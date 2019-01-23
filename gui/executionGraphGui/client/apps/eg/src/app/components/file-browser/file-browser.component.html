@@ -3,6 +3,19 @@
 </ng-container>
 
 <ng-template #fileBrowserContainer>
+  <ng-container *ngIf="mode === 'save'">
+    <form class="filename-form">
+      <mat-form-field class="filename-input">
+        <input #fileNameInput matInput placeholder="File name" value="MyGraph.eg" autocomplete="off"/>
+      </mat-form-field>
+      <div class="save-button">
+        <button mat-button [disabled]="!isFileNameCorrect(fileNameInput.value)" (click)="saveFileName(fileNameInput.value)">
+          Save ...
+        </button>
+      </div>
+    </form>
+  </ng-container>
+
   <mat-nav-list dense>
     <mat-list-item (click)="openParentDirectory()">
       <h3>Current Directory:</h3>
@@ -42,11 +55,16 @@
 
   <mat-menu #fileMenu="matMenu">
     <ng-template matMenuContent let-file="f">
-      <button #openButton mat-menu-item [disabled]="!allowOpen || !isFileOpenable(file)" (click)="openFile(file)">
+      <button #openButton mat-menu-item *ngIf="mode === 'open' && isFileOpenable(file)" (click)="openFile(file)">
         Open
       </button>
-      <button #openButton mat-menu-item [disabled]="!allowSave || !isFileOpenable(file)" (click)="saveFile(file)">
-        Save As
+      <button
+        #openButton
+        mat-menu-item
+        *ngIf="mode === 'save' && isFileOpenable(file)"
+        (click)="saveFile(file.path, true)"
+      >
+        Save ...
       </button>
       <button
         #deleteButton

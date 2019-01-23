@@ -14,5 +14,6 @@ export const environment = {
   production: false,
   logReponsesVerbose: true,
   useServiceDummys: false,
-  backendUrl: '/eg-backend'
+  backendUrl: '/eg-backend',
+  asserts: true
 };

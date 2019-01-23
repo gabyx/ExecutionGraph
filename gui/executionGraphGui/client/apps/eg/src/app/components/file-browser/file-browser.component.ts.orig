@@ -1,17 +1,18 @@
-import { Component, OnInit, ViewChild, ElementRef, EventEmitter, Output, Input } from '@angular/core';
+<<<<<<< HEAD
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+=======
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../+state/reducers/app.reducers';
 import { FileBrowserService } from '../../services';
 import { DirectoryInfo, isFile, FileInfo, PathInfo } from '../../services/FileBrowserService';
 import { ILogger, LoggerFactory } from '@eg/logger';
+>>>>>>> dev
 import { MatDialog } from '@angular/material';
+import { ILogger, LoggerFactory } from '@eg/logger/src';
+import { FileBrowserService } from '../../services';
+import { DirectoryInfo, FileInfo, isFile } from '../../services/FileBrowserService';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
-import { assertThat } from '../../general/Assert';
-
-export enum FileBrowserMode {
-  Open = 'open',
-  Save = 'save'
-}
 
 @Component({
   selector: 'eg-file-browser',
@@ -29,21 +30,17 @@ export class FileBrowserComponent implements OnInit {
 
   private currentDirectory: DirectoryInfo = null;
 
-  constructor(
-    private store: Store<AppState>,
-    private browser: FileBrowserService,
-    readonly loggerFactory: LoggerFactory,
-    private dialog: MatDialog
-  ) {
+  constructor(private browser: FileBrowserService, readonly loggerFactory: LoggerFactory, private dialog: MatDialog) {
     this.logger = loggerFactory.create('FileBrowserComponent');
   }
 
-  @Input('mode') mode: string = FileBrowserMode.Open;
+  @Input('allowSave') allowSave: boolean = true;
+  @Input('allowOpen') allowOpen: boolean = true;
   @Input('allowDelete') allowDelete: boolean = true;
 
-  @Output('fileActionSave') fileActionSave: EventEmitter<string>;
-  @Output('fileActionOpen') fileActionOpen: EventEmitter<string>;
-  @Output('fileActionDelete') fileActionDelete: EventEmitter<string>;
+  @Output('onSaveFile') onSaveFile: EventEmitter<string>;
+  @Output('onOpenFile') onOpenFile: EventEmitter<string>;
+  @Output('onDeleteFile') onDeleteFile: EventEmitter<string>;
 
   ngOnInit() {
     this.openRoot();
@@ -74,7 +71,7 @@ export class FileBrowserComponent implements OnInit {
     }
   }
 
-  private openParentDirectory() {
+  public openParentDirectory() {
     const p = this.parentPaths[this.parentPaths.length - 1];
     if (p) {
       this.loadDirectory(p).then(d => {
@@ -105,37 +102,20 @@ export class FileBrowserComponent implements OnInit {
   }
 
   public openFile(file: FileInfo) {
-    assertThat(this.mode === FileBrowserMode.Open);
-    this.logger.debug(`Opening file '${file.path}'`);
-    this.fileActionOpen.emit(file.path);
-  }
-
-  private checkOverwrite(path: string) {
-    for (const p of this.currentDirectory.files) {
-      if (p.path.replace('//', '/') === path.replace('//', '/')) {
-        return true;
-      }
+    if (this.allowOpen) {
+      this.logger.debug(`Opening file '${file.path}'`);
+      this.onOpenFile.emit(file.path);
+    } else {
+      this.logger.error('Programming Error!');
+      throw 'Error!';
     }
   }
 
-  public saveFileName(fileName: string) {
-    assertThat(this.mode === FileBrowserMode.Save && this.isFileNameCorrect(fileName));
-    const path = (this.currentDirectory.path + '/' + fileName).replace('//', '/');
-    this.saveFile(path, true);
-  }
-
-  private deleteFile(path: FileInfo | DirectoryInfo) {
-    assertThat(this.allowDelete && this.isFileOpenable(path));
-    this.logger.debug(`Deleting path '${path.path}'`);
-    this.fileActionDelete.emit(path.path);
-  }
-
-  private deleteConfirm(path: FileInfo | DirectoryInfo) {
-    assertThat(this.allowDelete);
+  public deleteConfirm(path: FileInfo | DirectoryInfo) {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       minWidth: '10%',
       data: {
-        title: 'Delete?',
+        title: 'Delete',
         question: `Do you really want to delete the path '${path.path}' ?`
       }
     });
@@ -146,38 +126,17 @@ export class FileBrowserComponent implements OnInit {
     });
   }
 
-  private saveFile(path: string, checkOverwrite: boolean) {
-    assertThat(this.mode === FileBrowserMode.Save);
-
-    const showOverwrite = checkOverwrite ? this.checkOverwrite(path) : false;
-
-    let save = false;
-
-    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      minWidth: '10%',
-      data: {
-        title: showOverwrite ? 'Overwrite?' : 'Save?',
-        question: showOverwrite ? `Do you really want to overwrite the path '${path}' ?` : `Saving to path: '${path}' ?`
-      }
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        save = true;
-      }
-    });
-
-    if (save) {
-      this.logger.debug(`Save file '${path}'`);
-      this.fileActionSave.emit(path);
-    }
-  }
-
   public isFileOpenable(file: FileInfo) {
     return file.name.endsWith('.eg');
   }
 
-  public isFileNameCorrect(fileName: string) {
-    // https://regex101.com/r/Owqjpb/1
-    return fileName.match(/^(?<!\.)\w([^\\/]+)\.eg$/gm).length > 0;
+  private deleteFile(path: FileInfo | DirectoryInfo) {
+    if (this.allowDelete && this.isFileOpenable(path)) {
+      this.logger.debug(`Deleting path '${path.path}'`);
+      this.onDeleteFile.emit(path.path);
+    } else {
+      this.logger.error('Programming Error!');
+      throw new Error('Error!');
+    }
   }
 }

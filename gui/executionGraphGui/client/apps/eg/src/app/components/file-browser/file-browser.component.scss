@@ -43,3 +43,30 @@
 .folder-icon {
   color: mat-color($foreground, disabled-text);
 }
+
+.filename-form {
+  margin-top: 2em;
+  margin-bottom: 1em;
+  min-width: 150px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.save-button {
+  display: flex;
+  flex-direction: column;
+  margin-left: 1em;
+}
+
+.save-button > button {
+  flex-direction: row;
+  min-height: 100%;
+  border: 1pt solid;
+  border-color: $secondary;
+}
+
+.filename-input {
+  flex-basis: 80%;
+}
