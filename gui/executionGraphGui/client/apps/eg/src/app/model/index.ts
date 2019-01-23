@@ -9,3 +9,6 @@ export { fromConnection };
 
 import * as fromSocket from './Socket';
 export { fromSocket };
+
+import * as fromNode from './Node';
+export { fromNode };

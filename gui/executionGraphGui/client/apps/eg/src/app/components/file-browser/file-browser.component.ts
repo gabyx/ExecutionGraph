@@ -77,7 +77,7 @@ export class FileBrowserComponent implements OnInit {
   private async loadDirectory(path: string): Promise<DirectoryInfo> {
     this.isLoading = true;
     this.logger.debug(`loadDirectory: '${path}'`);
-    return this.browser.browse(path).then(pathInfo => {
+    return this.browser.getPathInfo(path).then(pathInfo => {
       if (!isFile(pathInfo)) {
         this.isLoading = false;
         return pathInfo;

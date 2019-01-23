@@ -10,7 +10,6 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import * as Long from 'long';
 import { Guid } from 'guid-typescript';
 import { NodeId } from './Node';
 
@@ -19,8 +18,8 @@ export class UIProps {
 }
 
 export type SocketType = 'input' | 'output';
-export type SocketIndex = Long;
-export type SocketTypeIndex = Long;
+export type SocketIndex = number;
+export type SocketTypeIndex = number;
 export type SocketId = string;
 
 export interface Socket {

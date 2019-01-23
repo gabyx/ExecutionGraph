@@ -49,7 +49,7 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
   }
 
   public async removeNode(graphId: GraphId, nodeId: NodeId): Promise<void> {
-    this.logger.info(`Remove node [id: '${nodeId.toString()}'] from graph [id: '${graphId}'`);
+    this.logger.info(`Remove node [id: '${nodeId}'] from graph [id: '${graphId}'`);
   }
 
   public async addConnection(
@@ -59,7 +59,7 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
     cycleDetection: boolean
   ): Promise<Connection> {
     this.logger.info(`Add connection: ['${source.id}' ⟶ '${target.id}'] from graph [id: '${graphId}']`);
-    return fromConnection.create(source, target, true);
+    return fromConnection.createValidConnection(source, target);
   }
 
   public async removeConnection(graphId: GraphId, source: Socket, target: Socket): Promise<void> {

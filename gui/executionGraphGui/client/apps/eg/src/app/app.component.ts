@@ -58,7 +58,7 @@ export class AppComponent implements OnInit {
             this.router.navigate([
               {
                 outlets: {
-                  primary: ['graph', graphs[0].id.toString()],
+                  primary: ['graph', graphs[0].id],
                   drawer: ['nodes']
                 }
               }

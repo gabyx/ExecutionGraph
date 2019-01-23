@@ -11,13 +11,11 @@
 // =========================================================================================
 
 import { Injectable } from '@angular/core';
-import { flatbuffers } from 'flatbuffers';
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { GeneralInfoService } from './GeneralInfoService';
 import { GraphManipulationService } from './GraphManipulationService';
 import { GraphManagementService } from './GraphManagementService';
 import { FileBrowserService } from './FileBrowserService';
-import { NodeId } from './../model';
 
 /**
  * Stupid TestService class which can be quickly injected
@@ -74,13 +72,14 @@ export class TestService {
     }
 
     // Remove first node
-    await this.graphManipulationService.removeNode(graph.id, new NodeId(0));
+    await this.graphManipulationService.removeNode(graph.id, (0).toString());
 
     // Remove graph
     await this.graphManagementService.removeGraph(graph.id);
   }
 
   public async testFileBrowser() {
-    await this.fileBrowserService.browse('./');
+    const p = await this.fileBrowserService.getPathInfo('.');
+    this.logger.debug(`PathInfo:    ${JSON.stringify(p, null, 4)}`);
   }
 }

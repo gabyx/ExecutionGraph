@@ -12,6 +12,7 @@
 
 import { InputSocket, OutputSocket, Socket } from './Socket';
 import * as fromSocket from './Socket';
+import { create } from 'domain';
 
 //tslint:disable:no-bitwise
 
@@ -54,19 +55,25 @@ export function isInvalid(source: Socket, target: Socket): Invalidity {
   /** no 1-length-cycles, more elaborate cycle-detection in the backend */
   result |= source.parentId !== target.parentId ? Invalidity.Valid : Invalidity.Invalid | Invalidity.OneLengthCycle;
   /** correct type */
-  result |= source.typeIndex.equals(target.typeIndex) ? Invalidity.Valid : Invalidity.Invalid | Invalidity.TypeMismatch;
+  result |= source.typeIndex === target.typeIndex ? Invalidity.Valid : Invalidity.Invalid | Invalidity.TypeMismatch;
   return result;
 }
 
 /**
- * Create a connection.
+ * Create a valid connection.
  */
-export function create(source: Socket, target: Socket, validate: boolean = true): Connection {
-  const invalid = validate ? isInvalid(source, target) : Invalidity.Valid /*just do it!*/;
+export function createValidConnection(source: Socket, target: Socket): Connection {
+  const invalid = isInvalid(source, target);
   if (invalid) {
     throw new Error(`Cannot construct an invalid connection: ${getValidationErrors(invalid).join(',')}`);
   }
+  return createConnection(source, target);
+}
 
+/**
+ * Create a connection (unchecked: especially for dummy connections in the gui).
+ */
+export function createConnection(source: Socket, target: Socket): Connection {
   let isWriteLink = true;
   let inS: InputSocket;
   let outS: OutputSocket;

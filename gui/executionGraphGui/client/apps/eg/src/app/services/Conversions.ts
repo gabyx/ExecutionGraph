@@ -10,22 +10,17 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import * as Long from 'long';
 import { flatbuffers } from 'flatbuffers';
 import * as model from './../model';
 import * as serialization from '@eg/serialization';
 import { createSocket } from '../model/Socket';
 
-export function toLong(value: flatbuffers.Long): Long {
-  return Long.fromBits(value.low, value.high, false);
-}
-
-export function toULong(value: flatbuffers.Long): Long {
-  return Long.fromBits(value.low, value.high, true);
-}
-
-export function toFbLong(value: Long): flatbuffers.Long {
-  return flatbuffers.Long.create(value.low, value.high);
+export function toFbLong(value: number | string): flatbuffers.Long {
+  if (typeof value === 'number') {
+    return flatbuffers.Long.create(value, 0);
+  } else {
+    return flatbuffers.Long.create(parseInt(value, 10), 0);
+  }
 }
 
 /**
@@ -86,7 +81,10 @@ export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescrip
  */
 export function toNode(node: serialization.LogicNode): model.Node {
   // Convert to a node model
-  const nodeId = new model.NodeId(toULong(node.id()));
+  const nodeId = node
+    .id()
+    .toFloat64()
+    .toString();
 
   const allSockets: model.Socket[] = [];
 
@@ -104,7 +102,7 @@ export function toNode(node: serialization.LogicNode): model.Node {
 
     for (let i = 0; i < l; ++i) {
       const s = socks(i);
-      const socket = createSocket(kind, toULong(s.typeIndex()), toULong(s.index()), nodeId, s.typeName());
+      const socket = createSocket(kind, s.typeIndex().toFloat64(), s.index().toFloat64(), nodeId, s.typeName());
       sockets.push(socket);
     }
   };
@@ -112,5 +110,5 @@ export function toNode(node: serialization.LogicNode): model.Node {
   extractSockets('input', allSockets);
   extractSockets('output', allSockets);
 
-  return new model.Node(nodeId, node.type(), allSockets);
+  return model.fromNode.createNode(nodeId, node.type(), allSockets);
 }

@@ -165,7 +165,7 @@ export class GraphEffects {
       const node = await this.graphManipulationService.addNode(graph.id, nodeType, `Node ${i}`);
       node.uiProps.position.x = 200 * i;
       node.uiProps.position.y = 50 + 100 * i;
-      nodes[node.id.toString()] = node;
+      nodes[node.id] = node;
 
       if (lastNode && isDefined(node.inputs[0])) {
         const connection = await this.graphManipulationService.addConnection(
@@ -201,7 +201,7 @@ export class GraphEffects {
       const node = await this.graphManipulationService.addNode(graph.id, nodeType, `Node ${i}`);
       node.uiProps.position.x = 200 * i;
       node.uiProps.position.y = 50 + 100 * i;
-      nodes[node.id.toString()] = node;
+      nodes[node.id] = node;
 
       if (lastNode && isDefined(node.inputs[0])) {
         const connection = await this.graphManipulationService.addConnection(
