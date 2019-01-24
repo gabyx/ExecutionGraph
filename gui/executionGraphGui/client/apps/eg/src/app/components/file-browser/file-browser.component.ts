@@ -50,7 +50,7 @@ export class FileBrowserComponent implements OnInit {
   }
   ngOnInit() {
     this.fileNameForm = new FormGroup({
-      fileName: new FormControl('MyGraph.eg', [Validators.required, Validators.pattern(/^(?<!\.)\w([^\\/]+)\.eg$/gm)])
+      fileName: new FormControl('MyGraph.eg', [Validators.required, Validators.pattern(/^\w([^\\/])+\.eg/)])
     });
     this.openRoot();
   }

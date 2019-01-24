@@ -14,11 +14,9 @@
           A file name is <strong>required</strong>
         </mat-error>
       </mat-form-field>
-      <div class="save-button">
-        <button mat-raised-button [disabled]="!fileNameForm.valid" type="submit">
-          Save
-        </button>
-      </div>
+      <button mat-raised-button color="accent" [disabled]="!fileNameForm.valid" type="submit">
+        Save
+      </button>
     </form>
   </ng-container>
 

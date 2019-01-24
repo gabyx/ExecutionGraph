@@ -44,7 +44,7 @@
   color: mat-color($foreground, disabled-text);
 }
 
-.filename-form {
+form {
   margin-top: 2em;
   margin-bottom: 1em;
   min-width: 5em;
@@ -52,26 +52,16 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-}
+  align-items: center;
 
-.save-button {
-  display: flex;
-  flex-direction: column;
-  margin-left: 1em;
-}
+  .filename-input {
+    flex-basis: 80%;
+  }
 
-.save-button > button {
-  @include app-accent-button();
-  flex-direction: row;
-  min-height: 100%;
-}
 
-.filename-input {
-  flex-basis: 80%;
-}
-
-mat-form-field {
-  .ng-invalid {
-    color: $stroke-color-invalid;
+  mat-form-field {
+    .ng-invalid {
+      color: $stroke-color-invalid;
+    }
   }
 }
