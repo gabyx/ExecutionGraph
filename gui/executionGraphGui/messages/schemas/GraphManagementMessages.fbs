@@ -74,8 +74,9 @@ table LoadGraphResponse {
 //! ======================================================================
 //! Request data: 
 table SaveGraphRequest {
-    filePath:string (id:0, required);  //!< The graph file.
-    overwrite: bool = false (id:1); //!< If we have the permission to overwrite the file.
+    graphId: string (id:0, required);
+    filePath: string (id:1, required);   //!< The graph file.
+    overwrite: bool = false (id:2);     //!< If we have the permission to overwrite the file.
 }
 //! Response data: none
 //! Success: 

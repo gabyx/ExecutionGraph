@@ -27,6 +27,7 @@
 #include <executionGraph/graphs/CycleDescription.hpp>
 #include <executionGraph/graphs/ExecutionTree.hpp>
 #include <executionGraph/serialization/GraphTypeDescription.hpp>
+#include "executionGraph/common/FileSystem.hpp"
 #include "executionGraphGui/backend/Backend.hpp"
 #include "executionGraphGui/backend/ExecutionGraphBackendDefs.hpp"
 #include "executionGraphGui/common/RequestError.hpp"
@@ -61,10 +62,13 @@ public:
 
 public:
     ExecutionGraphBackend()
-        : Backend(IdNamed("ExecutionGraphBackend"))
-    {
-    }
+        : Backend(IdNamed("ExecutionGraphBackend")) {}
     ~ExecutionGraphBackend() override = default;
+
+    //! Load/Save graphs.
+    //@{
+    void saveGraph(const Id& graphId, const std::path& filePath, bool overwrite) const;
+    //@}
 
     //! Adding/removing graphs.
     //@{
@@ -76,12 +80,9 @@ public:
     //! Adding/removing nodes.
     //@{
     template<typename ResponseCreator>
-    void addNode(const Id& graphId,
-                 const std::string& type,
-                 ResponseCreator&& responseCreator);
+    void addNode(const Id& graphId, std::string_view type, ResponseCreator&& responseCreator);
 
-    void removeNode(const Id& graphId,
-                    NodeId id);
+    void removeNode(const Id& graphId, NodeId id);
     //@}
 
     //! Adding/removing connections.
@@ -108,12 +109,17 @@ public:
     //@{
 public:
 private:
-    static const std::array<IdNamed, 1> m_graphTypeDescriptionIds;                     //!< All IDs used for the graph description.
-    static const std::unordered_map<Id, GraphTypeDescription> m_graphTypeDescription;  //!< All graph descriptions.
+    static const std::array<IdNamed, 1>
+        m_graphTypeDescriptionIds;  //!< All IDs used for the graph description.
+    static const std::unordered_map<Id, GraphTypeDescription>
+        m_graphTypeDescription;  //!< All graph descriptions.
 
 public:
     //! Get all graph descriptions identified by its id.
-    const std::unordered_map<Id, GraphTypeDescription>& getGraphTypeDescriptions() const { return m_graphTypeDescription; }
+    const std::unordered_map<Id, GraphTypeDescription>& getGraphTypeDescriptions() const
+    {
+        return m_graphTypeDescription;
+    }
     //@}
 
 private:
@@ -162,7 +168,8 @@ private:
 
             if(singleRequest)
             {
-                m_onlySingleRequest.notify_all();  // Notify all waiting threads, that this graph has one single request
+                m_onlySingleRequest.notify_all();  // Notify all waiting threads, that this graph
+                                                   // has one single request
             }
         };
 
@@ -170,20 +177,20 @@ private:
         //! @param Return the lock, such that no one can change the request count and
         //! the bool indicating if the request count is zero!
         template<typename Duration = std::chrono::seconds>
-        std::pair<std::unique_lock<Mutex>, bool>
-        waitUntilOtherRequestsFinished(Duration timeout = std::chrono::seconds(10))
+        std::pair<std::unique_lock<Mutex>, bool> waitUntilOtherRequestsFinished(
+            Duration timeout = std::chrono::seconds(10))
         {
             std::unique_lock<Mutex> lock(m_requestCountMutex);
-            bool singleRequest = m_onlySingleRequest.wait_for(lock,
-                                                              timeout,
-                                                              [&]() { return m_requestCount == 1; });
+            bool singleRequest =
+                m_onlySingleRequest.wait_for(lock, timeout, [&]() { return m_requestCount == 1; });
             return std::make_pair(std::move(lock), singleRequest);
         }
 
     private:
-        ConditionVariable m_onlySingleRequest;  //!< Condition variable indicating: request count == 1
-        mutable Mutex m_requestCountMutex;      //!< The mutex for the request count
-        std::size_t m_requestCount = 0;         //!< The number of simultanously handling requests.
+        ConditionVariable
+            m_onlySingleRequest;            //!< Condition variable indicating: request count == 1
+        mutable Mutex m_requestCountMutex;  //!< The mutex for the request count
+        std::size_t m_requestCount = 0;     //!< The number of simultanously handling requests.
     };
 
     using GraphVariant = std::variant<std::shared_ptr<Synchronized<DefaultGraph>>>;
@@ -192,13 +199,14 @@ private:
 private:
     SyncedUMap<Id, GraphVariant> m_graphs;                  //! Graphs identified by its id.
     SyncedUMap<Id, std::shared_ptr<GraphStatus>> m_status;  //! Graph status for each graph id.
-    //SyncedUMap<Id, std::shared_ptr<IGraphIExecutor> > m_executor; //!< Graph executors for each graph id.
+    // SyncedUMap<Id, std::shared_ptr<IGraphIExecutor> > m_executor; //!< Graph executors for each
+    // graph id.
 };
 
 //! Add a node with type `type` to the graph with id `graphId`.
 template<typename ResponseCreator>
 void ExecutionGraphBackend::addNode(const Id& graphId,
-                                    const std::string& type,
+                                    std::string_view type,
                                     ResponseCreator&& responseCreator)
 {
     auto deferred = initRequest(graphId);
@@ -210,7 +218,8 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
 
     // Make a visitor to dispatch the "add" over the variant...
     auto add = [&](auto& graph) {
-        using GraphType    = typename std::remove_cv_t<std::remove_reference_t<decltype(*graph)>>::DataType;
+        using GraphType =
+            typename std::remove_cv_t<std::remove_reference_t<decltype(*graph)>>::DataType;
         using Config       = typename GraphType::Config;
         using NodeBaseType = typename Config::NodeBaseType;
 
@@ -268,7 +277,8 @@ void ExecutionGraphBackend::addConnection(const Id& graphId,
 
     // Make a visitor to dispatch the "add" over the variant...
     auto add = [&](auto& graph) {
-        using GraphType = typename std::remove_cv_t<std::remove_reference_t<decltype(*graph)>>::DataType;
+        using GraphType =
+            typename std::remove_cv_t<std::remove_reference_t<decltype(*graph)>>::DataType;
 
         // Potential cycles data structure
         std::vector<executionGraph::CycleDescription> cycles;
@@ -277,21 +287,16 @@ void ExecutionGraphBackend::addConnection(const Id& graphId,
         auto graphL = graph->wlock();
         try
         {
-            EXECGRAPHGUI_THROW_BAD_REQUEST_IF(checkForCycles, "Checking cycles not yet implemented!");
+            EXECGRAPHGUI_THROW_BAD_REQUEST_IF(checkForCycles,
+                                              "Checking cycles not yet implemented!");
 
             if(isWriteLink)
             {
-                graphL->addWriteLink(outNodeId,
-                                     outSocketIdx,
-                                     inNodeId,
-                                     inSocketIdx);
+                graphL->addWriteLink(outNodeId, outSocketIdx, inNodeId, inSocketIdx);
             }
             else
             {
-                graphL->setGetLink(outNodeId,
-                                   outSocketIdx,
-                                   inNodeId,
-                                   inSocketIdx);
+                graphL->setGetLink(outNodeId, outSocketIdx, inNodeId, inSocketIdx);
             }
         }
         catch(executionGraph::Exception& e)

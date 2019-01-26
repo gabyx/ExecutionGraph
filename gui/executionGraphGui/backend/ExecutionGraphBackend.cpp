@@ -38,6 +38,13 @@ const std::unordered_map<Id, e::GraphTypeDescription>
                                                                                                                     ExecutionGraphBackendDefs<DefaultGraphConfig>::getNodeDescriptions(),
                                                                                                                     ExecutionGraphBackendDefs<DefaultGraphConfig>::getDescription()))};
 
+//! Save a graph to a file.
+void ExecutionGraphBackend::saveGraph(const Id& graphId,
+                                      const std::path& filePath,
+                                      bool overwrite) const
+{
+}
+
 //! Add a new graph of type `graphType` to the backend.
 Id ExecutionGraphBackend::addGraph(const Id& graphType)
 {

@@ -60,7 +60,7 @@ namespace executionGraph
         //! It first tries to construct it by the factory
         //! and uses RTTR construction as a fallback.
         static std::unique_ptr<NodeBaseType>
-        read(const std::string& type,
+        read(std::string_view type,
              NodeId nodeId,
              const flatbuffers::Vector<flatbuffers::Offset<serialization::LogicSocket>>* inputSockets  = nullptr,
              const flatbuffers::Vector<flatbuffers::Offset<serialization::LogicSocket>>* outputSockets = nullptr,

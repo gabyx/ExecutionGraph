@@ -22,7 +22,7 @@ class ExecutionGraphBackend;
 /*!
     Request handler for information on graphs in the backend.
 
-    Handles the request URLs: 
+    Handles the request URLs:
         - "/eg-backend/files/getPathInfo"
 
     @date Sat Jul 07 2018
@@ -36,9 +36,8 @@ class FileBrowserRequestHandler final : public BackendRequestHandler
 
 public:
     using IdNamed  = BackendRequestHandler::IdNamed;
-    using Function = std::function<void(FileBrowserRequestHandler&,
-                                        const Request& request,
-                                        ResponsePromise& response)>;
+    using Function = std::function<void(
+        FileBrowserRequestHandler&, const Request& request, ResponsePromise& response)>;
     using FuncMap  = FunctionMap<Function, HandlerKey>;
 
 public:
