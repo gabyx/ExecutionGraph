@@ -37,7 +37,7 @@ import {
   MatDialogModule,
   MatInputModule
 } from '@angular/material';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { NxModule } from '@nrwl/nx';
 import { RouterStateSerializer, StoreRouterConnectingModule } from '@ngrx/router-store';
@@ -181,6 +181,7 @@ const routes: Route[] = [
     MatDialogModule,
     MatInputModule,
     FormsModule,
+    ReactiveFormsModule,
     GraphModule,
     CommonModule,
     NxModule.forRoot(),

@@ -4,15 +4,19 @@
 <!-- @todo gabnue -> gabnue, cmonspqr : make  a form validation! -->
 <ng-template #fileBrowserContainer>
   <ng-container *ngIf="mode === 'save'">
-    <form class="filename-form">
+    <form [formGroup]="fileNameForm" class="filename-form" novalidate (submit)="saveNewFile()">
       <mat-form-field class="filename-input">
-        <input #fileNameInput matInput placeholder="File name" value="MyGraph.eg" autocomplete="off"/>
+        <input formControlName="fileName" matInput placeholder="File name" autocomplete="off"/>
+        <mat-error *ngIf="fileNameForm.get('fileName').hasError('pattern') && !fileNameForm.get('fileName').hasError('required')">
+          The file name is not valid (use the ending '.eg')
+        </mat-error>
+        <mat-error *ngIf="fileNameForm.get('fileName').hasError('required')">
+          A file name is <strong>required</strong>
+        </mat-error>
       </mat-form-field>
-      <div class="save-button">
-        <button mat-button [disabled]="!isFileNameCorrect(fileNameInput.value)" (click)="saveFileName(fileNameInput.value)">
-          Save ...
-        </button>
-      </div>
+      <button mat-raised-button color="accent" [disabled]="!fileNameForm.valid" type="submit">
+        Save
+      </button>
     </form>
   </ng-container>
 
