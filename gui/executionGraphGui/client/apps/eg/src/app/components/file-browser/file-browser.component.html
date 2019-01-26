@@ -1,17 +1,17 @@
 <ng-container *ngIf="isLoading; else fileBrowserContainer">
   <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
 </ng-container>
-<!-- @todo gabnue -> gabnue, cmonspqr : make  a form validation! -->
+
 <ng-template #fileBrowserContainer>
   <ng-container *ngIf="mode === 'save'">
     <form [formGroup]="fileNameForm" class="filename-form" novalidate (submit)="saveNewFile()">
       <mat-form-field class="filename-input">
         <input formControlName="fileName" matInput placeholder="File name" autocomplete="off"/>
         <mat-error *ngIf="fileNameForm.get('fileName').hasError('pattern') && !fileNameForm.get('fileName').hasError('required')">
-          The file name is not valid (use the ending '.eg')
+          The file name is not valid (use the ending '.eg', no white space and no '\', '/') !
         </mat-error>
         <mat-error *ngIf="fileNameForm.get('fileName').hasError('required')">
-          A file name is <strong>required</strong>
+          A file name is <strong>required!</strong>
         </mat-error>
       </mat-form-field>
       <button mat-raised-button color="accent" [disabled]="!fileNameForm.valid" type="submit">

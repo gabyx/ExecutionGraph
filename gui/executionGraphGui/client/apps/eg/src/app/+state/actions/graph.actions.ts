@@ -18,6 +18,9 @@ export const GRAPHS_LOAD_ERROR = '[Graph] Load Error';
 export const OPEN_GRAPH = '[Graph] Open';
 export const CREATE_GRAPH = '[Graph] Create';
 
+export const SAVE_GRAPH = '[Graph] Save';
+export const GRAPH_SAVED = '[Graph] Saved';
+
 export const MOVE_NODE = '[Graph] Move Node';
 export const MOVE_NODES = '[Graph] Move Nodes';
 export const NODES_MOVED = '[Graph] Nodes Moved';
@@ -97,6 +100,16 @@ export class GraphRemoved implements Action {
   constructor(public id: GraphId) {}
 }
 
+export class SaveGraph implements Action {
+  readonly type = SAVE_GRAPH;
+  constructor(public id: GraphId, public path: string, public overwrite: boolean) {}
+}
+
+export class GraphSaved implements Action {
+  readonly type = GRAPH_SAVED;
+  constructor(public id: GraphId) {}
+}
+
 // Actions related to GraphManipulationService
 // -------------------------------------------
 export class AddNode implements Action {
@@ -155,6 +168,8 @@ export type GraphAction =
   | GraphAdded
   | RemoveGraph
   | GraphRemoved
+  | SaveGraph
+  | GraphSaved
   | MoveNode
   | MoveNodes
   | NodesMoved

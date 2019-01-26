@@ -15,17 +15,21 @@ export enum FileBrowserMode {
   Save = 'save'
 }
 
+export interface SaveAction {
+  filePath: string;
+  overwrite: boolean;
+}
+
 @Component({
   selector: 'eg-file-browser',
   templateUrl: './file-browser.component.html',
   styleUrls: ['./file-browser.component.scss']
 })
 export class FileBrowserComponent implements OnInit {
-
   @Input() mode: string = FileBrowserMode.Open;
   @Input() allowDelete: boolean = true;
 
-  @Output() fileActionSave = new EventEmitter<string>();
+  @Output() fileActionSave = new EventEmitter<SaveAction>();
   @Output() fileActionOpen = new EventEmitter<string>();
   @Output() fileActionDelete = new EventEmitter<string>();
 
@@ -39,6 +43,7 @@ export class FileBrowserComponent implements OnInit {
   private rootPath: string;
   private parentPaths: string[] = [];
 
+  private readonly fileNameRegex = /^\w([^\\/ ])+\.eg$/m;
 
   constructor(
     private store: Store<AppState>,
@@ -50,7 +55,7 @@ export class FileBrowserComponent implements OnInit {
   }
   ngOnInit() {
     this.fileNameForm = new FormGroup({
-      fileName: new FormControl('MyGraph.eg', [Validators.required, Validators.pattern(/^\w([^\\/])+\.eg/)])
+      fileName: new FormControl('MyGraph.eg', [Validators.required, Validators.pattern(this.fileNameRegex)])
     });
     this.openRoot();
   }
@@ -143,7 +148,8 @@ export class FileBrowserComponent implements OnInit {
   }
 
   public isFileOpenable(file: FileInfo) {
-    return file.name.endsWith('.eg');
+    assert(file.isFile, 'Programming Error!');
+    return file.name.match(this.fileNameRegex) !== null;
   }
 
   private checkOverwrite(path: string) {
@@ -176,7 +182,7 @@ export class FileBrowserComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.logger.debug(`Save file '${path}'`);
-        this.fileActionSave.emit(path);
+        this.fileActionSave.emit({ filePath: path, overwrite: showOverwrite });
       }
     });
   }

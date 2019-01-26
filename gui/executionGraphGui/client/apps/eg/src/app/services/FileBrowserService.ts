@@ -47,4 +47,5 @@ export function isDirectory(p: FileInfo | DirectoryInfo): p is DirectoryInfo {
 
 export abstract class FileBrowserService {
   public abstract async getPathInfo(path: string): Promise<DirectoryInfo | FileInfo>;
+  public abstract async getPathInfo(path: string): Promise<DirectoryInfo | FileInfo>;
 }

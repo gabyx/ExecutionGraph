@@ -64,7 +64,21 @@ export class GraphEffects {
       //@todo gabnue->gabnue Change here the name of the graph to some default value
       // dispatch new action fromGraph.GraphChangeProps(name: "...");
       new fromGraph.GraphAdded(graph),
-      new fromNotifications.ShowNotification(`Shiny new graph created for you 👾`)
+      new fromNotifications.ShowNotification(`Shiny new graph created for you 👾`, 2000)
+    ])
+  );
+
+  @Effect()
+  saveGraph$ = this.actions$.pipe(
+    ofType<fromGraph.SaveGraph>(fromGraph.SAVE_GRAPH),
+    mergeMap((action, state) =>
+      from(this.graphManagementService.saveGraph(action.id, action.path, action.overwrite)).pipe(
+        map(() => [action.id, action.path])
+      )
+    ),
+    mergeMap(([id, path]) => [
+      new fromGraph.GraphSaved(id),
+      new fromNotifications.ShowNotification(`Graph id: ${id} saved to '${path}' 🌻`, 4000)
     ])
   );
 
