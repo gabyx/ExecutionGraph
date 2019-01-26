@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_cefapp_RenderApp_h
-#define executionGraphGui_cefapp_RenderApp_h
+#pragma once
 
 #include <cef_app.h>
 
@@ -62,5 +61,3 @@ private:
 private:
     IMPLEMENT_REFCOUNTING(RendererApp)
 };
-
-#endif

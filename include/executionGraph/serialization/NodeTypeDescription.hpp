@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraph_serialization_NodeTypeDescription_hpp
-#define executionGraph_serialization_NodeTypeDescription_hpp
+#pragma once
 
 #include <string>
 
@@ -27,4 +26,3 @@ namespace executionGraph
         std::vector<std::string> outSocketNames;  //!< Default output socket names (if available).
     };
 }  // namespace executionGraph
-#endif

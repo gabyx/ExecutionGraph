@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_graphs_ExecutionTree_hpp
-#define executionGraph_graphs_ExecutionTree_hpp
+#pragma once
 
 #include <algorithm>
 #include <deque>
@@ -1181,4 +1180,4 @@ namespace executionGraph
 }  // namespace executionGraph
 
 #undef EXECGRAPH_EXECTREE_SOLVER_LOG
-#endif  // ExecutionTree_hpp
+// ExecutionTree_hpp

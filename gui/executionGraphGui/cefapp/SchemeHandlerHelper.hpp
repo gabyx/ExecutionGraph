@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_cefapp_SchemeHandlerHelper_hpp
-#define executionGraphGui_cefapp_SchemeHandlerHelper_hpp
+#pragma once
 
 #include <cef_scheme.h>
 #include <optional>
@@ -29,5 +28,3 @@ namespace schemeHandlerHelper
     void registerCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar);
 
 }  // namespace schemeHandlerHelper
-
-#endif

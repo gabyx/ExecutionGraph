@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_backend_BackendRequestHandler_hpp
-#define executionGraphGui_backend_BackendRequestHandler_hpp
+#pragma once
 
 #include <memory>
 #include <unordered_set>
@@ -45,5 +44,3 @@ public:
     //! Handle the `request` by resolving the response promise `response`.
     virtual void handleRequest(const Request& request, ResponsePromise& response) = 0;
 };
-
-#endif

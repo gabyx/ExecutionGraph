@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_server_HttpFieldAllocator_hpp
-#define executionGraphGui_server_HttpFieldAllocator_hpp
+#pragma once
 
 #include <cstdlib>
 #include <memory>
@@ -169,5 +168,3 @@ public:
         return !(lhs == rhs);
     }
 };
-
-#endif

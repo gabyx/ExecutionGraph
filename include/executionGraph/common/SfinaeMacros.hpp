@@ -8,8 +8,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // ========================================================================================
 
-#ifndef executionGraph_Common_SfinaeMacros_hpp
-#define executionGraph_Common_SfinaeMacros_hpp
+#pragma once
 
 #include <type_traits>
 
@@ -51,5 +50,3 @@
 #define EXECGRAPH_SFINAE_ENABLE_IF(__meta__) EXECGRAPH_SFINAE_ENABLE_IF_IMPL(__meta__) = nullptr
 
 #define EXECGRAPH_SFINAE_ENABLE_IF_CLASS(__meta__) typename std::enable_if<(__meta__)>::type
-
-#endif

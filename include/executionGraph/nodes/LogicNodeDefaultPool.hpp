@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_nodes_LogicNodeDefaultPool_hpp
-#define executionGraph_nodes_LogicNodeDefaultPool_hpp
+#pragma once
 
 #include <type_traits>
 #include "executionGraph/common/Exception.hpp"
@@ -82,5 +81,3 @@ namespace executionGraph
         void compute() {}
     };
 };  // namespace executionGraph
-
-#endif

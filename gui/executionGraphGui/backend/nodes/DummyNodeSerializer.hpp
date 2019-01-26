@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_backend_nodes_DummyNodeSerializer_hpp
-#define executionGraphGui_backend_nodes_DummyNodeSerializer_hpp
+#pragma once
 
 #include <flatbuffers/flatbuffers.h>
 #include <executionGraph/nodes/LogicCommon.hpp>
@@ -55,5 +54,3 @@ struct DummyNodeSerializer
         }
     };
 };
-
-#endif

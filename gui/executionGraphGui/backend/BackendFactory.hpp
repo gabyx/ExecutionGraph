@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_backend_BackendFactory_hpp
-#define executionGraphGui_backend_BackendFactory_hpp
+#pragma once
 
 #include <memory>
 #include <rttr/type>
@@ -60,5 +59,3 @@ public:
         return Factory::create(type, std::forward<Args>(args)...);
     }
 };
-
-#endif

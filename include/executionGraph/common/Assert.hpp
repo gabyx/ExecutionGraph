@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_common_Asserts_hpp
-#define executionGraph_common_Asserts_hpp
+#pragma once
 
 #include "executionGraph/common/Exception.hpp"
 #include "executionGraph/common/Log.hpp"
@@ -43,4 +42,3 @@
                                __LINE__)                   \
         }                                                  \
     }
-#endif

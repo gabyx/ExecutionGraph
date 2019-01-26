@@ -10,15 +10,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_server_HttpCommon_hpp
-#define executionGraphGui_server_HttpCommon_hpp
+#pragma once
 
 #include <string>
 #include "executionGraphGui/server/HttpFailure.hpp"
 #include "executionGraphGui/server/MimeType.hpp"
 
 std::string getServerVersion();
-
-
-
-#endif

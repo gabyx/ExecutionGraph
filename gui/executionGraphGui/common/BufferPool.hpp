@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_common_BufferPool_hpp
-#define executionGraphGui_common_BufferPool_hpp
+#pragma once
 
 #include <foonathan/memory/heap_allocator.hpp>
 #include <foonathan/memory/threading.hpp>
@@ -37,5 +36,3 @@ public:
     BufferPool()          = default;
     virtual ~BufferPool() = default;
 };
-
-#endif

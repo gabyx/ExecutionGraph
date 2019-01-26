@@ -10,13 +10,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_common_DevFlags_hpp
-#define executionGraphGui_common_DevFlags_hpp
+#pragma once
 
 namespace devFlags
 {
     static constexpr bool showDevTools                = true;  //!< If the DeveloperTools are shown on start up of the browser.
     static constexpr bool verifyAllFlatbufferMessages = true;  //!< If all Flatbuffer messages are verified.
 }  // namespace devFlags
-
-#endif

@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_common_RequestError_hpp
-#define executionGraphGui_common_RequestError_hpp
+#pragma once
 
 #include "executionGraphGui/common/Exception.hpp"
 
@@ -30,7 +29,5 @@ public:
         : executionGraph::Exception(s) {}
 };
 
-#    define EXECGRAPHGUI_THROW_BAD_REQUEST_IF(condition, ...) EXECGRAPHGUI_THROW_TYPE_IF(condition, BadRequestError, __VA_ARGS__)
-#    define EXECGRAPHGUI_THROW_BAD_REQUEST(...) EXECGRAPHGUI_THROW_TYPE(BadRequestError, __VA_ARGS__)
-
-#endif
+#define EXECGRAPHGUI_THROW_BAD_REQUEST_IF(condition, ...) EXECGRAPHGUI_THROW_TYPE_IF(condition, BadRequestError, __VA_ARGS__)
+#define EXECGRAPHGUI_THROW_BAD_REQUEST(...) EXECGRAPHGUI_THROW_TYPE(BadRequestError, __VA_ARGS__)

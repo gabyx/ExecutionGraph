@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraph_serializer_LogicNodeSerializer_hpp
-#define executionGraph_serializer_LogicNodeSerializer_hpp
+#pragma once
 
 #include <type_traits>
 #include <meta/meta.hpp>
@@ -293,4 +292,3 @@ namespace executionGraph
         using FactoryRead      = StaticFactory<CreatorListRead>;
     };
 }  // namespace executionGraph
-#endif

@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_common_TypeDefs_hpp
-#define executionGraph_common_TypeDefs_hpp
+#pragma once
 
 // #include "executionGraph/common/MyContainerTypeDefs.hpp"
 // #include "executionGraph/common/MyMatrixTypeDefs.hpp"
@@ -30,4 +29,3 @@ namespace executionGraph
     /* EXECGRAPH_DEFINE_MATRIX_TYPES_OF(PREC)  */     \
     /* EXECGRAPH_DEFINE_CONTAINER_TYPES */
 }  // namespace executionGraph
-#endif

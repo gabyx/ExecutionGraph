@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_common_Identifier_hpp
-#define executionGraph_common_Identifier_hpp
+#pragma once
 
 #include <functional>
 #include <string>
@@ -121,5 +120,3 @@ namespace std
     };
 
 }  // namespace std
-
-#endif

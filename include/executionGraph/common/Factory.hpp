@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_common_Factory_hpp
-#define executionGraph_common_Factory_hpp
+#pragma once
 
 #include <optional>
 #include <type_traits>
@@ -156,8 +155,6 @@ namespace executionGraph
 
 }  // namespace executionGraph
 
-#    ifdef __clang__
-#        pragma clang diagnostic pop
-#    endif
-
+#ifdef __clang__
+#    pragma clang diagnostic pop
 #endif

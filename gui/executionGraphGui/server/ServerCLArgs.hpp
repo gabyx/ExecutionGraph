@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_server_ServerCLArgs_hpp
-#define executionGraphGui_server_ServerCLArgs_hpp
+#pragma once
 
 #include <executionGraph/common/FileSystem.hpp>
 #include <executionGraph/common/Singleton.hpp>
@@ -47,5 +46,3 @@ private:
     args::ValueFlag<std::size_t> m_threads;  //!< Number of threads used for async. operations.
     args::ValueFlag<std::string> m_logPath;  //!< Server log path.
 };
-
-#endif

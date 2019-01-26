@@ -10,12 +10,9 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_server_BackendResponse_hpp
-#define executionGraphGui_server_BackendResponse_hpp
+#pragma once
 
 #include "executionGraphGui/common/Response.hpp"
 
 using BackendResponsePromise = ResponsePromise;
 using BackendResponseFuture  = ResponseFuture;
-
-#endif

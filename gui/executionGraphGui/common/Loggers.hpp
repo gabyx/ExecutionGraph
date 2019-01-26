@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_common_Logger_hpp
-#define executionGraphGui_common_Logger_hpp
+#pragma once
 
 #include <spdlog/spdlog.h>
 #include <executionGraph/common/FileSystem.hpp>
@@ -116,5 +115,3 @@ private:
     std::unique_ptr<spdlog::logger> m_backendLog;  //! Log for the backend (mutli-threaded)
     std::unique_ptr<spdlog::logger> m_appLog;      //! Log for the app (multi-threaded)
 };
-
-#endif

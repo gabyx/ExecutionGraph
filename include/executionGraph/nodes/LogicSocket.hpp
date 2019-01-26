@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_nodes_LogicSocket_hpp
-#define executionGraph_nodes_LogicSocket_hpp
+#pragma once
 
 #include <unordered_set>
 #include <vector>
@@ -496,4 +495,3 @@ namespace executionGraph
     }
 
 }  // namespace executionGraph
-#endif

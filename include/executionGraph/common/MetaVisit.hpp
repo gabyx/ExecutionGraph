@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraph_common_MetaVisit_hpp
-#define executionGraph_common_MetaVisit_hpp
+#pragma once
 
 #include <meta/meta.hpp>
 #include "executionGraph/common/Exception.hpp"
@@ -45,5 +44,3 @@ namespace meta
         (f.*map[index])(std::forward<Args>(args)...);
     }
 }  // namespace meta
-
-#endif

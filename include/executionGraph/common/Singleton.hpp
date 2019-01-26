@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_common_Singelton_hpp
-#define executionGraph_common_Singelton_hpp
+#pragma once
 
 #include <memory>
 #include "executionGraph/common/Assert.hpp"
@@ -73,11 +72,9 @@ namespace executionGraph
 
 }  // namespace executionGraph
 
-    //! Instanciate a singelton `name` with type `type` and ctor arguments `ctor_args`.
-#    define EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(type, name, ctor_args) \
-        auto name = std::unique_ptr<type>(new type ctor_args);
+//! Instanciate a singelton `name` with type `type` and ctor arguments `ctor_args`.
+#define EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(type, name, ctor_args) \
+    auto name = std::unique_ptr<type>(new type ctor_args);
 
-    //! Instanciate a singelton `name` with type `type`.
-#    define EXECGRAPH_INSTANCIATE_SINGLETON(type, name) INSTANCIATE_UNIQUE_SINGELTON_CTOR(type, name, ())
-
-#endif
+//! Instanciate a singelton `name` with type `type`.
+#define EXECGRAPH_INSTANCIATE_SINGLETON(type, name) INSTANCIATE_UNIQUE_SINGELTON_CTOR(type, name, ())

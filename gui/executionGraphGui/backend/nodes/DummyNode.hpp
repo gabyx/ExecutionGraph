@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_backend_nodes_DummyNode_hpp
-#define executionGraphGui_backend_nodes_DummyNode_hpp
+#pragma once
 
 #include <rttr/registration>
 #include <rttr/type>
@@ -78,5 +77,3 @@ public:
         getOutVal<Result1>() = getInVal<Value1>() + getInVal<Value2>();
     }
 };
-
-#endif

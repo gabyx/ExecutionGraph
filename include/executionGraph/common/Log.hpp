@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_common_Log_hpp
-#define executionGraph_common_Log_hpp
+#pragma once
 
 #include <iostream>
 #include <fmt/format.h>
@@ -95,5 +94,3 @@
 
 #undef CONCAT1
 #undef CONCAT2
-
-#endif

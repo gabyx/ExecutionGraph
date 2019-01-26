@@ -7,8 +7,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // ========================================================================================
 
-#ifndef executionGraph_Common_Exception_hpp
-#define executionGraph_Common_Exception_hpp
+#pragma once
 
 #include <exception>
 #include <sstream>
@@ -104,6 +103,4 @@ namespace executionGraph
 
 #ifdef __clang__
 #    pragma clang diagnostic pop
-#endif
-
 #endif

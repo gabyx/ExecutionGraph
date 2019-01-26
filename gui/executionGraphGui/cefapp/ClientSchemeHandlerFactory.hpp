@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_cefapp_ClientSchemeHandlerFactory_hpp
-#define executionGraphGui_cefapp_ClientSchemeHandlerFactory_hpp
+#pragma once
 
 #include <cef_scheme.h>
 #include <string>
@@ -46,5 +45,3 @@ private:
     const std::path m_folderPath;  //!< Where the files this handler serves are located.
     const std::path m_pathPrefix;  //!< Prefix of the URL Path part.
 };
-
-#endif

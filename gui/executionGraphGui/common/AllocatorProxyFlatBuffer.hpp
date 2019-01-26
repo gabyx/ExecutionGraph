@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_common_AllocatorProxyFlatBuffer
-#define executionGraphGui_common_AllocatorProxyFlatBuffer
+#pragma once
 
 #include <memory>
 #include <flatbuffers/flatbuffers.h>
@@ -83,5 +82,3 @@ BinaryBuffer<RawAllocator> releaseIntoBinaryBuffer(AllocatorProxyFlatBuffer<RawA
                             data,
                             size);
 }
-
-#endif

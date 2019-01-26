@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_backend_Backend_hpp
-#define executionGraphGui_backend_Backend_hpp
+#pragma once
 
 #include <rttr/type>
 #include <executionGraph/common/IObjectID.hpp>
@@ -26,5 +25,3 @@ protected:
         : m_id(id) {}
     virtual ~Backend() override = default;
 };
-
-#endif

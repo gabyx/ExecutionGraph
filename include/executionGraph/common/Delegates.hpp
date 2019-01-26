@@ -8,8 +8,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // ========================================================================================
 
-#ifndef executionGraph_Common_Delegates_HPP
-#define executionGraph_Common_Delegates_HPP
+#pragma once
 
 #include <cassert>
 #include <memory>
@@ -313,4 +312,3 @@ namespace std
         }
     };
 }  // namespace std
-#endif
