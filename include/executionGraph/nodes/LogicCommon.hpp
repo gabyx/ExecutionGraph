@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_nodes_LogicCommon_hpp
-#define executionGraph_nodes_LogicCommon_hpp
+#pragma once
 
 #include <array>
 #include <memory>
@@ -230,5 +229,3 @@ namespace executionGraph
     }  // namespace details
 
 }  // namespace executionGraph
-
-#endif

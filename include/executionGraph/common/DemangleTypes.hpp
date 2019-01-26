@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_common_DemangleTypes_hpp
-#define executionGraph_common_DemangleTypes_hpp
+#pragma once
 
 #include <string>
 #include <typeinfo>
@@ -38,5 +37,3 @@ namespace executionGraph
 
     EXECGRAPH_EXPORT std::string shortenTemplateBrackets(std::string s, unsigned int fromLevel = 1);
 }  // namespace executionGraph
-
-#endif

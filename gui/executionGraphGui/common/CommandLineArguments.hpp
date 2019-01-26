@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_common_CommandLineArguments_hpp
-#define executionGraphGui_common_CommandLineArguments_hpp
+#pragma once
 
 #include <args.hxx>
 #include "executionGraph/common/FileSystem.hpp"
@@ -53,5 +52,3 @@ private:
     std::path m_applicationPath;  //!< Absolute application path from argv[0].
     std::path m_initialPath;      //!< Absolute initial path.
 };
-
-#endif

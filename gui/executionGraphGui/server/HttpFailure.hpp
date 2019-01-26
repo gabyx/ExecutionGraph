@@ -10,12 +10,11 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_server_HttpFailure_hpp
-#define executionGraphGui_server_HttpFailure_hpp
+#pragma once
 
 #include <boost/system/error_code.hpp>
-#include "executionGraphGui/common/Loggers.hpp"
 #include "executionGraphGui/common/Exception.hpp"
+#include "executionGraphGui/common/Loggers.hpp"
 
 //! Report a failure.
 template<bool doThrow = false, typename ErrorCode, typename T>
@@ -30,5 +29,3 @@ void fail(const ErrorCode& ec, const T& what)
         EXECGRAPHGUI_BACKENDLOG_ERROR("Failure: {0} : {1}", what, ec.message());
     }
 }
-
-#endif

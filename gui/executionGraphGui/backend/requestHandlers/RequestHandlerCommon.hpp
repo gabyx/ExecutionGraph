@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_backend_requestHandlers_RequestHandlerCommon_hpp
-#define executionGraphGui_backend_requestHandlers_RequestHandlerCommon_hpp
+#pragma once
 
 #include <flatbuffers/flatbuffers.h>
 #include "executionGraphGui/common/BinaryPayload.hpp"
@@ -31,4 +30,3 @@ auto getRootOfPayloadAndVerify(const BinaryPayload& payload)
     }
     return flatbuffers::GetRoot<MessageType>(buffer.data());
 }
-#endif

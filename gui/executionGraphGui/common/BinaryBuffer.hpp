@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_common_BinaryBuffer_hpp
-#define executionGraphGui_common_BinaryBuffer_hpp
+#pragma once
 
 #include <cstdint>
 #include <memory>
@@ -64,13 +63,13 @@ public:
     BinaryBuffer(const BinaryBuffer&) = delete;
     BinaryBuffer& operator=(const BinaryBuffer&) = delete;
 
-    //! Move-construct the buffer. 
+    //! Move-construct the buffer.
     //! Buffer `o` stays valid and can be reused again.
     BinaryBuffer(BinaryBuffer&& o)
     {
         *this = std::move(o);
     };
-    //! Move-assign to the buffer. 
+    //! Move-assign to the buffer.
     //! Buffer `o` stays valid and can be reused again.
     BinaryBuffer& operator=(BinaryBuffer&& o)
     {
@@ -172,5 +171,3 @@ BinaryBuffer<RawAllocator> makeBinaryBuffer(const std::shared_ptr<RawAllocator>&
 {
     return BinaryBuffer<RawAllocator>{allocator, std::forward<Args>(args)...};
 }
-
-#endif

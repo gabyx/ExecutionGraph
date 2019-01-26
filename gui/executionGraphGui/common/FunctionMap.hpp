@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_common_FunctionMap_hpp
-#define executionGraphGui_common_FunctionMap_hpp
+#pragma once
 
 #include <functional>
 #include <string>
@@ -64,4 +63,3 @@ private:
     Map m_map;                        //! Key to function mapping.
     std::unordered_set<TKey> m_keys;  //! All keys.
 };
-#endif

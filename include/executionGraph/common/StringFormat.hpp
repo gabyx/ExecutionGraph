@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_common_StringFormat_hpp
-#define executionGraph_common_StringFormat_hpp
+#pragma once
 
 #include <cstdio>
 #include <memory>
@@ -54,5 +53,3 @@ namespace executionGraph
 #pragma clang diagnostic pop
     }
 }  // namespace executionGraph
-
-#endif

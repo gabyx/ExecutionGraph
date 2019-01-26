@@ -99,11 +99,6 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     ASSERT_EQ(resultNode->getOutVal<DummyNode<Config>::Result1>(), 4) << "wrong result";
 }
 
-consexpr struct A
-{
-    const char* name;
-}
-
 MY_TEST(ExecutionTree_Test, IntBig)
 {
     ///

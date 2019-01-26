@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_cefapp_AppHandler_hpp
-#define executionGraphGui_cefapp_AppHandler_hpp
+#pragma once
 
 #include <cef_client.h>
 #include <memory>
@@ -97,5 +96,3 @@ public:
 private:
     bool m_isClosing;
 };
-
-#endif

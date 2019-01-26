@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_common_Request_hpp
-#define executionGraphGui_common_Request_hpp
+#pragma once
 
 #include <optional>
 #include <string>
@@ -88,5 +87,3 @@ private:
     //! The optional payload.
     std::optional<Payload> m_payload;
 };
-
-#endif

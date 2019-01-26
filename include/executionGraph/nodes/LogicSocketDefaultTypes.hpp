@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_nodes_LogicTypes_hpp
-#define executionGraph_nodes_LogicTypes_hpp
+#pragma once
 
 #include <string>
 #include <meta/meta.hpp>
@@ -73,4 +72,4 @@ namespace executionGraph
     }
 }  // namespace executionGraph
 
-#endif  // LogicTypes_hpp
+// LogicTypes_hpp

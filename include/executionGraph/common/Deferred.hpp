@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraph_common_Deferred_hpp
-#define executionGraph_common_Deferred_hpp
+#pragma once
 
 #include <functional>
 
@@ -53,5 +52,3 @@ namespace executionGraph
     Deferred makeDeferred(T&& function) { return {function}; }
 
 }  // namespace executionGraph
-
-#endif

@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_nodes_LogicNode_hpp
-#define executionGraph_nodes_LogicNode_hpp
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -476,5 +475,3 @@ namespace executionGraph
         outN.getOSocket(outS).removeWriteLink(inN.getISocket(inS));
     }
 }  // namespace executionGraph
-
-#endif

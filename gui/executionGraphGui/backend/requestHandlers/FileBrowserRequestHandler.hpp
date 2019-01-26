@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_backend_requestHandlers_FileBrowserRequestHandler_hpp
-#define executionGraphGui_backend_requestHandlers_FileBrowserRequestHandler_hpp
+#pragma once
 
 #include "executionGraph/common/FileSystem.hpp"
 #include "executionGraphGui/backend/BackendRequestHandler.hpp"
@@ -62,5 +61,3 @@ private:
     std::shared_ptr<ExecutionGraphBackend> m_backend;
     std::path m_rootPath;
 };
-
-#endif

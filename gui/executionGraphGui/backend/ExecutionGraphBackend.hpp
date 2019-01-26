@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_backend_ExecutionGraphBackend_hpp
-#define executionGraphGui_backend_ExecutionGraphBackend_hpp
+#pragma once
 
 #include <array>
 #include <atomic>
@@ -315,5 +314,3 @@ void ExecutionGraphBackend::addConnection(const Id& graphId,
 
     std::visit(add, graphVar);
 }
-
-#endif

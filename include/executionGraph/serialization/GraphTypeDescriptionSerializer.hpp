@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraph_serializer_GraphTypeDescriptionSerializer_hpp
-#define executionGraph_serializer_GraphTypeDescriptionSerializer_hpp
+#pragma once
 
 #include <flatbuffers/flatbuffers.h>
 #include "executionGraph/common/Platform.hpp"
@@ -27,5 +26,3 @@ namespace executionGraph
                                                                               const GraphTypeDescription& graphDescription);
     };
 }  // namespace executionGraph
-
-#endif

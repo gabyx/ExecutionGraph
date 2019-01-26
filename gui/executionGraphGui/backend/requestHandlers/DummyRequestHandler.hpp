@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_backend_requestHandlers_DummyRequestHandler_hpp
-#define executionGraphGui_backend_requestHandlers_DummyRequestHandler_hpp
+#pragma once
 
 #include "executionGraphGui/backend/BackendRequestHandler.hpp"
 #include "executionGraphGui/backend/ExecutionGraphBackend.hpp"
@@ -40,5 +39,3 @@ public:
 private:
     std::shared_ptr<ExecutionGraphBackend> m_backend;
 };
-
-#endif

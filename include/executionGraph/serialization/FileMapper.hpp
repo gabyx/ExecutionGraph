@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraph_serialization_FileMapper_h
-#define executionGraph_serialization_FileMapper_h
+#pragma once
 
 #include <stdint.h>
 #include "executionGraph/common/FileSystem.hpp"
@@ -43,7 +42,7 @@ namespace executionGraph
 
         //! Get the mapped address and size of the file.
         std::pair<const uint8_t*, std::size_t> data() { return {static_cast<const uint8_t*>(m_mappedAddress),
-                                                                   m_mappedBytes}; }
+                                                                m_mappedBytes}; }
 
     private:
         void load(const std::path& filePath) noexcept(false);
@@ -58,5 +57,3 @@ namespace executionGraph
     };
 
 }  // namespace executionGraph
-
-#endif

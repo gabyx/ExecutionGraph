@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_common_ObjectID_hpp
-#define executionGraph_common_ObjectID_hpp
+#pragma once
 
 #include <rttr/type>
 #include "executionGraph/common/Identifier.hpp"
@@ -67,5 +66,3 @@ public:                                                                         
     EXECGRAPH_NAMED_OBJECT_ID_DECLARATION_IMPL()
 
 // clang-format on
-
-#endif

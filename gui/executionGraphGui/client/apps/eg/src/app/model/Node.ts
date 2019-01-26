@@ -12,6 +12,7 @@
 
 import { Point } from '@eg/graph';
 import { Socket, OutputSocket, InputSocket, isOutputSocket } from './Socket';
+import { Guid } from 'guid-typescript';
 
 export interface UIProps {
   readonly name: string;
@@ -37,6 +38,13 @@ export interface Node {
   readonly inputs: InputSocket[];
   readonly outputs: OutputSocket[];
   readonly uiProps: UIProps;
+}
+
+/* Create a node id.
+ * If no number given -> create a GUID!
+ */
+export function createNodeId(id?: number) {
+  return id ? Math.floor(id).toString() : Guid.create().toString();
 }
 
 /*

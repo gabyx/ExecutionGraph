@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraph_serialization_ExecutionGraphSerializer_hpp
-#define executionGraph_serialization_ExecutionGraphSerializer_hpp
+#pragma once
 
 #include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/Exception.hpp"
@@ -300,5 +299,3 @@ namespace executionGraph
         LogicNodeSerializer& m_nodeSerializer;  //!< The node serializer which provides load/store operations for LogicNodes.
     };
 }  // namespace executionGraph
-
-#endif

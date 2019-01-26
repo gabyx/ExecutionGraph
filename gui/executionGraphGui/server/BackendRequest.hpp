@@ -10,11 +10,8 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_server_BackendRequest_hpp
-#define executionGraphGui_server_BackendRequest_hpp
+#pragma once
 
 #include "executionGraphGui/common/Request.hpp"
 
 using BackendRequest = Request;
-
-#endif

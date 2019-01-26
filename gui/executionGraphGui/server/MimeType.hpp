@@ -10,13 +10,10 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_server_MimeType_hpp
-#define executionGraphGui_server_MimeType_hpp
+#pragma once
 
 #include <string_view>
 #include <executionGraph/common/FileSystem.hpp>
 
 // Return a reasonable mime type based on the extension of a file.
 std::string_view getMimeType(const std::path& path);
-
-#endif

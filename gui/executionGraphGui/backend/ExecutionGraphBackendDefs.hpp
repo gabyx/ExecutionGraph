@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_backend_ExecutionGraphBackendDefs_hpp
-#define executionGraphGui_backend_ExecutionGraphBackendDefs_hpp
+#pragma once
 
 #include <meta/meta.hpp>
 #include <rttr/type>
@@ -113,5 +112,3 @@ private:
         return description;
     }
 };
-
-#endif

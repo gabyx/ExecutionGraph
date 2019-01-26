@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_server_HttpWorker_hpp
-#define executionGraphGui_server_HttpWorker_hpp
+#pragma once
 
 #include <memory>
 #include <optional>
@@ -95,5 +94,3 @@ private:
     const std::path m_rootPath;  //!< The path to the root of the document directory.
     const std::string m_name;    //! The name of this worker.
 };
-
-#endif

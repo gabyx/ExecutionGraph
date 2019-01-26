@@ -4,11 +4,19 @@ import { Point, ConnectionDrawStyle, GraphComponent, MouseButton } from '@eg/gra
 import { ILogger, LoggerFactory } from '@eg/logger';
 
 import { ToolComponent } from '../tool-component';
-import { OutputSocket, InputSocket, Connection, Socket, fromConnection, fromSocket, GraphId } from '../../../model';
+import {
+  OutputSocket,
+  InputSocket,
+  Connection,
+  Socket,
+  fromConnection,
+  fromSocket,
+  GraphId,
+  fromNode
+} from '../../../model';
 import { GraphsState } from '../../../+state/reducers';
 import { AddConnection } from '../../../+state/actions';
-import { getSelectedGraph, getSelectedGraphId } from '../../../+state/selectors';
-import { Guid } from 'guid-typescript';
+import { getSelectedGraphId } from '../../../+state/selectors';
 
 @Component({
   selector: 'eg-socket-connection-tool',
@@ -50,19 +58,13 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       this.logger.info(`Initiating new connection from ${socket.id}`);
       this.sourceSocket = socket;
       if (fromSocket.isOutputSocket(this.sourceSocket)) {
-        this.tempTargetSocket = fromSocket.createSocket(
-          'input',
-          socket.typeIndex,
-          0,
-          Guid.create().toString(),
-          'Dummy'
-        );
+        this.tempTargetSocket = fromSocket.createSocket('input', socket.typeIndex, 0, fromNode.createNodeId(), 'Dummy');
       } else {
         this.tempTargetSocket = fromSocket.createSocket(
           'output',
           socket.typeIndex,
           0,
-          Guid.create().toString(),
+          fromNode.createNodeId(),
           'Dummy'
         );
       }

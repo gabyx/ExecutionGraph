@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraph_serialization_GraphTypeDescription_hpp
-#define executionGraph_serialization_GraphTypeDescription_hpp
+#pragma once
 
 #include <string>
 #include <vector>
@@ -87,4 +86,3 @@ namespace executionGraph
     }
 
 }  // namespace executionGraph
-#endif

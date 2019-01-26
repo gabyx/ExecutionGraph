@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_cefapp_BackendSchemeHandlerFactory_hpp
-#define executionGraphGui_cefapp_BackendSchemeHandlerFactory_hpp
+#pragma once
 
 #include <cef_scheme.h>
 #include <queue>
@@ -53,5 +52,3 @@ private:
     std::shared_ptr<BufferPool> m_bufferPool;        //! Binary buffers for the messages.
     foonathan::memory::memory_pool<> m_handlerPool;  //! Simple request handler pool.
 };
-
-#endif

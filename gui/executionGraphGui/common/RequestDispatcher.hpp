@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_common_RequestDispatcher_hpp
-#define executionGraphGui_common_RequestDispatcher_hpp
+#pragma once
 
 #include <memory>
 #include <unordered_set>
@@ -258,5 +257,3 @@ private:
                            NoPool>;
     Pool m_pool{1};  //! One seperate thread will handle all messages for this dispatcher.
 };
-
-#endif

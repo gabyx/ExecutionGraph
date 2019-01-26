@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_common_BinaryPayload_hpp
-#define executionGraphGui_common_BinaryPayload_hpp
+#pragma once
 
 #include <string_view>
 #include "executionGraphGui/common/BinaryBuffer.hpp"
@@ -37,7 +36,7 @@ public:
         : m_buffer(std::forward<TBuffer>(buffer)), m_mimeType(mimeType)
     {
     }
-    
+
     //! No copy
     BinaryPayload(const BinaryPayload&) = delete;
     BinaryPayload& operator=(const BinaryPayload&) = delete;
@@ -55,5 +54,3 @@ private:
     Buffer m_buffer;         //!< The binary buffer.
     std::string m_mimeType;  //!< The MIME type of the binary buffer.
 };
-
-#endif
