@@ -1,25 +1,25 @@
-<ng-container *ngIf="isLoading; else fileBrowserContainer">
+<ng-container *ngIf="mode === 'save'">
+  <form [formGroup]="fileNameForm" class="filename-form" novalidate (submit)="saveNewFile()">
+    <mat-form-field class="filename-input">
+      <input formControlName="fileName" matInput placeholder="File name" autocomplete="off" />
+      <mat-error
+        *ngIf="fileNameForm.get('fileName').hasError('pattern') && !fileNameForm.get('fileName').hasError('required')"
+      >
+        The file name is not valid (use the ending '.eg', no white space and no '\', '/') !
+      </mat-error>
+      <mat-error *ngIf="fileNameForm.get('fileName').hasError('required')">
+        A file name is <strong>required!</strong>
+      </mat-error>
+    </mat-form-field>
+    <button mat-raised-button color="accent" [disabled]="!fileNameForm.valid" type="submit">Save</button>
+  </form>
+</ng-container>
+
+<ng-container *ngIf="isLoading; else folderList">
   <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
 </ng-container>
 
-<ng-template #fileBrowserContainer>
-  <ng-container *ngIf="mode === 'save'">
-    <form [formGroup]="fileNameForm" class="filename-form" novalidate (submit)="saveNewFile()">
-      <mat-form-field class="filename-input">
-        <input formControlName="fileName" matInput placeholder="File name" autocomplete="off"/>
-        <mat-error *ngIf="fileNameForm.get('fileName').hasError('pattern') && !fileNameForm.get('fileName').hasError('required')">
-          The file name is not valid (use the ending '.eg', no white space and no '\', '/') !
-        </mat-error>
-        <mat-error *ngIf="fileNameForm.get('fileName').hasError('required')">
-          A file name is <strong>required!</strong>
-        </mat-error>
-      </mat-form-field>
-      <button mat-raised-button color="accent" [disabled]="!fileNameForm.valid" type="submit">
-        Save
-      </button>
-    </form>
-  </ng-container>
-
+<ng-template #folderList>
   <mat-nav-list dense>
     <mat-list-item (click)="openParentDirectory()">
       <h3>Current Directory:</h3>
