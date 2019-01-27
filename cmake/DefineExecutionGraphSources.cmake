@@ -28,6 +28,7 @@ function(include_all_source_ExecutionGraph
 
         # Serialization
         ${ExecutionGraph_ROOT_DIR}/src/GraphTypeDescriptionSerializer.cpp
+        ${ExecutionGraph_ROOT_DIR}/src/Conversions.cpp
 
         PARENT_SCOPE
     )

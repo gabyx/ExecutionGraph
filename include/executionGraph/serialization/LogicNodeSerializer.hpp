@@ -16,6 +16,7 @@
 #include <meta/meta.hpp>
 #include "executionGraph/common/Factory.hpp"
 #include "executionGraph/common/MetaVisit.hpp"
+#include "executionGraph/serialization/Conversions.hpp"
 #include "executionGraph/serialization/SocketTypeDescription.hpp"
 #include "executionGraph/serialization/schemas/cpp/LogicNode_generated.h"
 
@@ -68,7 +69,7 @@ namespace executionGraph
         {
             // Dispatch to the correct serialization read function
             // the factory reads and returns the node
-            auto rttrType = rttr::type::get_by_name(type);
+            auto rttrType = rttr::type::get_by_name(rttr::toRttr(type));
 
             auto optNode = FactoryRead::create(rttrType,
                                                nodeId,
