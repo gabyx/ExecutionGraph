@@ -95,7 +95,7 @@ namespace executionGraph
         //! Get the short name of this identifier.
         const std::string& getShortName() const { return m_name; }
 
-    public:
+    private:
         std::string m_name;  //!< The short name of this identifier.
     };
 

@@ -20,6 +20,7 @@
 #include <string>
 #include <variant>
 #include <vector>
+#include <meta/meta.hpp>
 #include <rttr/type>
 #include <executionGraph/common/Deferred.hpp>
 #include <executionGraph/common/Identifier.hpp>
@@ -45,7 +46,26 @@ class ExecutionGraphBackend final : public Backend
     RTTR_ENABLE()
 
 public:
-    using DefaultGraph = executionGraph::ExecutionTree<executionGraph::GeneralConfig<>>;
+    //! All supported graphs.
+    using GraphConfigs                       = meta::list<executionGraph::GeneralConfig<>>;
+    static constexpr std::size_t nGraphTypes = meta::size<GraphConfigs>::value;
+
+    //! Traits details.
+    struct details
+    {
+        // Get the graph from the backend.
+        template<typename Config>
+        using getGraph = typename ExecutionGraphBackendDefs<Config>::Graph;
+
+        // List of graphs types.
+        using Graphs = meta::transform<GraphConfigs, meta::quote<details::getGraph>>;
+
+        // The underlying variant.
+        template<typename Graph>
+        using toPointer    = std::shared_ptr<Synchronized<Graph>>;
+        using GraphVariant = meta::apply<meta::quote<std::variant>,
+                                         meta::transform<Graphs, meta::quote<toPointer>>>;
+    };
 
     using Id                   = executionGraph::Id;
     using IdNamed              = executionGraph::IdNamed;
@@ -53,12 +73,17 @@ public:
     using NodeId               = executionGraph::NodeId;
     using SocketIndex          = executionGraph::SocketIndex;
     using Deferred             = executionGraph::Deferred;
+    using GraphVariant         = details::GraphVariant;
+    using Graphs               = details::Graphs;
 
     template<typename... Args>
     using Synchronized = executionGraph::Synchronized<Args...>;
 
     template<typename K, typename T>
     using SyncedUMap = Synchronized<std::unordered_map<K, T>>;
+
+private:
+    class GraphStatus;
 
 public:
     ExecutionGraphBackend()
@@ -67,7 +92,7 @@ public:
 
     //! Load/Save graphs.
     //@{
-    void saveGraph(const Id& graphId, const std::path& filePath, bool overwrite) const;
+    void saveGraph(const Id& graphId, const std::path& filePath, bool overwrite);
     //@}
 
     //! Adding/removing graphs.
@@ -108,18 +133,8 @@ public:
     //! Information about graphs.
     //@{
 public:
-private:
-    static const std::array<IdNamed, 1>
-        m_graphTypeDescriptionIds;  //!< All IDs used for the graph description.
-    static const std::unordered_map<Id, GraphTypeDescription>
-        m_graphTypeDescription;  //!< All graph descriptions.
-
-public:
     //! Get all graph descriptions identified by its id.
-    const std::unordered_map<Id, GraphTypeDescription>& getGraphTypeDescriptions() const
-    {
-        return m_graphTypeDescription;
-    }
+    const std::unordered_map<Id, GraphTypeDescription>& getGraphTypeDescriptions() const;
     //@}
 
 private:
@@ -127,73 +142,6 @@ private:
     void clearGraphData(Id graphId);
 
 private:
-    class GraphStatus
-    {
-    private:
-        using Mutex             = std::mutex;
-        using Lock              = std::scoped_lock<Mutex>;
-        using ConditionVariable = std::condition_variable;
-
-    public:
-        bool isRequestHandlingEnabled() const { return m_requestHandlingEnabled; }
-        void setRequestHandlingEnabled(bool enabled) { m_requestHandlingEnabled = enabled; }
-
-    private:
-        std::atomic<bool> m_requestHandlingEnabled = true;
-
-    public:
-        std::size_t getRequestCount() const
-        {
-            Lock lock(m_requestCountMutex);
-            return m_requestCount;
-        }
-
-        void incrementRequestCount()
-        {
-            Lock lock(m_requestCountMutex);
-            ++m_requestCount;
-        };
-
-        void decrementRequestCount()
-        {
-            bool singleRequest = false;
-            {  // Locking start
-                Lock lock(m_requestCountMutex);
-                if(m_requestCount)
-                {
-                    --m_requestCount;
-                }
-                singleRequest = m_requestCount == 1;
-            }  // Locking end
-
-            if(singleRequest)
-            {
-                m_onlySingleRequest.notify_all();  // Notify all waiting threads, that this graph
-                                                   // has one single request
-            }
-        };
-
-        //! Wait until the request count is zero, or timeout.
-        //! @param Return the lock, such that no one can change the request count and
-        //! the bool indicating if the request count is zero!
-        template<typename Duration = std::chrono::seconds>
-        std::pair<std::unique_lock<Mutex>, bool> waitUntilOtherRequestsFinished(
-            Duration timeout = std::chrono::seconds(10))
-        {
-            std::unique_lock<Mutex> lock(m_requestCountMutex);
-            bool singleRequest =
-                m_onlySingleRequest.wait_for(lock, timeout, [&]() { return m_requestCount == 1; });
-            return std::make_pair(std::move(lock), singleRequest);
-        }
-
-    private:
-        ConditionVariable
-            m_onlySingleRequest;            //!< Condition variable indicating: request count == 1
-        mutable Mutex m_requestCountMutex;  //!< The mutex for the request count
-        std::size_t m_requestCount = 0;     //!< The number of simultanously handling requests.
-    };
-
-    using GraphVariant = std::variant<std::shared_ptr<Synchronized<DefaultGraph>>>;
     GraphVariant getGraph(const Id& graphId);
 
 private:

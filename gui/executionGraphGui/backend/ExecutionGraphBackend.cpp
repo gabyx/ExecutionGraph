@@ -19,46 +19,200 @@
 using Id                   = ExecutionGraphBackend::Id;
 using IdNamed              = ExecutionGraphBackend::IdNamed;
 using GraphTypeDescription = ExecutionGraphBackend::GraphTypeDescription;
-using DefaultGraph         = ExecutionGraphBackend::DefaultGraph;
-using DefaultGraphConfig   = typename DefaultGraph::Config;
 using NodeId               = ExecutionGraphBackend::NodeId;
 using Deferred             = ExecutionGraphBackend::Deferred;
 
 namespace e = executionGraph;
 
-//! Define all description Ids for the different graphs.
-//! Default graph type has always this unique id!
-const std::array<IdNamed, 1> ExecutionGraphBackend::m_graphTypeDescriptionIds = {IdNamed{"DefaultGraph",
-                                                                                         std::string("2992ebff-c950-4184-8876-5fe6ac029aa5")}};
-//! Define all graph types in this Backend
-//! Currently only the DefaultGraphConfig is added.
-const std::unordered_map<Id, e::GraphTypeDescription>
-    ExecutionGraphBackend::m_graphTypeDescription = {std::make_pair(m_graphTypeDescriptionIds[0],
-                                                                    e::makeGraphTypeDescription<DefaultGraphConfig>(m_graphTypeDescriptionIds[0],
-                                                                                                                    ExecutionGraphBackendDefs<DefaultGraphConfig>::getNodeDescriptions(),
-                                                                                                                    ExecutionGraphBackendDefs<DefaultGraphConfig>::getDescription()))};
+namespace
+{
+    using GraphConfigs = ExecutionGraphBackend::GraphConfigs;
+
+    template<typename F>
+    bool forEachConfig(F&& func)
+    {
+        std::size_t idx = 0;
+        bool loop       = true;
+        meta::for_each(GraphConfigs,
+                       [](auto graphConfig) {
+                           loop = loop ? func(graphConfig, idx) : false;
+                       });
+        return loop;
+    }
+
+    //! Define all description Ids for the different graphs.
+    //! Default graph type has always this unique id!
+    const auto& getGraphTypeDescriptionsIds()
+    {
+        // Build all ids.
+        auto init = []() {
+            std::array<IdNamed, ExecutionGraphBackend::nGraphTypes> ids;
+
+            forEachConfig([&](auto graphConfig, auto idx) {
+                using Config = decltype(graphConfig);
+                ids[idx]     = ExecutionGraphBackend<Config>::getId();
+                return true;
+            });
+
+            return ids;
+        };
+
+        static auto ids = init();
+        return ids;
+    }
+
+    //! Define all graph types in this Backend
+    //! Currently only the DefaultGraphConfig is added.
+    const auto& getGraphTypeDescriptions()
+    {
+        auto init = []() {
+            auto& ids = getGraphTypeDescriptionsIds();
+            std::unordered_map<Id, GraphTypeDescription> m;
+            std::size_t idx = 0;
+
+            // Build the map.
+            forEachConfig([&](auto graphConfig, auto idx) {
+                using Config = decltype(graphConfig);
+                m.emplace(ids[idx],
+                          e::makeGraphTypeDescription<Config>(
+                              ids[idx],
+                              ExecutionGraphBackendDefs<Config>::getNodeDescriptions(),
+                              ExecutionGraphBackendDefs<Config>::getDescription()));
+                return true;
+            });
+
+            return m;
+        };
+
+        // All graph descriptions.
+        static auto graphTypeDescription = init();
+        return graphTypeDescription;
+    }
+
+}  // namespace
+
+class ExecutionGraphBackend::GraphStatus
+{
+private:
+    using Mutex             = std::mutex;
+    using Lock              = std::scoped_lock<Mutex>;
+    using ConditionVariable = std::condition_variable;
+
+public:
+    bool isRequestHandlingEnabled() const { return m_requestHandlingEnabled; }
+    void setRequestHandlingEnabled(bool enabled) { m_requestHandlingEnabled = enabled; }
+
+private:
+    std::atomic<bool> m_requestHandlingEnabled = true;
+
+public:
+    std::size_t getRequestCount() const
+    {
+        Lock lock(m_requestCountMutex);
+        return m_requestCount;
+    }
+
+    void incrementRequestCount()
+    {
+        Lock lock(m_requestCountMutex);
+        ++m_requestCount;
+    };
+
+    void decrementRequestCount()
+    {
+        bool singleRequest = false;
+        {  // Locking start
+            Lock lock(m_requestCountMutex);
+            if(m_requestCount)
+            {
+                --m_requestCount;
+            }
+            singleRequest = m_requestCount == 1;
+        }  // Locking end
+
+        if(singleRequest)
+        {
+            m_onlySingleRequest.notify_all();  // Notify all waiting threads, that this graph
+                                               // has one single request
+        }
+    };
+
+    //! Wait until the request count is zero, or timeout.
+    //! @param Return the lock, such that no one can change the request count and
+    //! the bool indicating if the request count is zero!
+    template<typename Duration = std::chrono::seconds>
+    std::pair<std::unique_lock<Mutex>, bool> waitUntilOtherRequestsFinished(
+        Duration timeout = std::chrono::seconds(10))
+    {
+        std::unique_lock<Mutex> lock(m_requestCountMutex);
+        bool singleRequest =
+            m_onlySingleRequest.wait_for(lock, timeout, [&]() { return m_requestCount == 1; });
+        return std::make_pair(std::move(lock), singleRequest);
+    }
+
+private:
+    ConditionVariable
+        m_onlySingleRequest;            //!< Condition variable indicating: request count == 1
+    mutable Mutex m_requestCountMutex;  //!< The mutex for the request count
+    std::size_t m_requestCount = 0;     //!< The number of simultanously handling requests.
+};
+
+//! Get all graph description of supported graphs.
+const std::unordered_map<Id, GraphTypeDescription>&
+ExecutionGraphBackend::getGraphTypeDescriptions() const
+{
+    return ::getGraphTypeDescriptions();
+}
 
 //! Save a graph to a file.
 void ExecutionGraphBackend::saveGraph(const Id& graphId,
                                       const std::path& filePath,
-                                      bool overwrite) const
+                                      bool overwrite)
 {
+    auto deferred = initRequest(graphId);
+
+    GraphVariant graphVar = getGraph(graphId);
+    auto& ids             = getGraphTypeDescriptionsIds();
+    auto& id              = ids[graphVar.index()];
+
+    auto save = [&](auto graph) {
+        using GraphType    = typename std::decay_t<decltype(*graph)>::DataType;
+        using Config       = typename GraphType::Config;
+        using NodeBaseType = typename Config::NodeBaseType;
+
+        ExecutionGraphBackendDefs<Config>::NodeSerializer nodeS;
+        ExecutionGraphBackendDefs<Config>::GraphSerializer graphS(nodeS);
+
+        graphS.write(graph,
+                     getGraphTypeDescriptions()[id],
+                     filePath,
+                     bOverwrite)
+    };
+
+    std::visit(graphVar, save);
 }
 
 //! Add a new graph of type `graphType` to the backend.
 Id ExecutionGraphBackend::addGraph(const Id& graphType)
 {
-    static_assert(m_graphTypeDescriptionIds.size() == 1, "You need to expand this functionality here!");
     Id newId;  // Generate new id
+    const auto& ids = getGraphTypeDescriptionsIds();
 
-    if(graphType == m_graphTypeDescriptionIds[0])
-    {
-        auto graph       = std::make_shared<Synchronized<DefaultGraph>>();
-        auto graphStatus = std::make_shared<GraphStatus>();
-        m_graphs.wlock()->emplace(std::make_pair(newId, graph));
-        m_status.wlock()->emplace(std::make_pair(newId, graphStatus));
-    }
-    else
+    bool endReached = forEachConfig([](auto graphConfig, auto idx) {
+        using Config = decltype(graphConfig);
+        using Graph  = ExecutionGraphBackend<Config>;
+        if(graphType == ids[idx])
+        {
+            auto graph       = std::make_shared<Synchronized<Graph>>();
+            auto graphStatus = std::make_shared<GraphStatus>();
+            m_graphs.wlock()->emplace(std::make_pair(newId, graph));
+            m_status.wlock()->emplace(std::make_pair(newId, graphStatus));
+            return false;
+        }
+        return true;
+    });
+
+    if(endReached)
     {
         EXECGRAPHGUI_THROW_BAD_REQUEST("Graph type: '{0}' not known!",
                                        graphType.toString());
@@ -72,7 +226,7 @@ void ExecutionGraphBackend::removeGraph(const Id& graphId)
     auto s = initRequest(graphId);
 
     //! @todo:
-    //! - terminate any execution thread working on the graph
+    //! - terminate any execution thread working on the graphGraphTypeDescription
 
     // Holding a shared_ptr to the graphStatus is ok, since we are the only
     // function which is gona delete this!
@@ -124,12 +278,7 @@ void ExecutionGraphBackend::removeNode(const Id& graphId,
 {
     auto s = initRequest(graphId);
 
-    GraphVariant graphVar;
-    m_graphs.withRLock([&](auto& graphs) {
-        auto graphIt = graphs.find(graphId);
-        EXECGRAPHGUI_ASSERT(graphIt != graphs.cend(), "Programming Error!");
-        graphVar = graphIt->second;
-    });
+    GraphVariant graphVar = getGraph(graphId);
 
     // Make a visitor to dispatch the "remove" over the variant...
     auto remove = [&](auto& graph) {
@@ -161,7 +310,7 @@ void ExecutionGraphBackend::removeConnection(const Id& graphId,
 
     // Make a visitor to dispatch the "remove" over the variant...
     auto remove = [&](auto& graph) {
-        using GraphType    = typename std::remove_cv_t<std::remove_reference_t<decltype(*graph)>>::DataType;
+        using GraphType    = typename std::decay_t<decltype(*graph)>::DataType;
         using Config       = typename GraphType::Config;
         using NodeBaseType = typename Config::NodeBaseType;
 

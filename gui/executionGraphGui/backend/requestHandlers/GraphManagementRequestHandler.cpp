@@ -120,7 +120,9 @@ void GraphManagementRequestHandler::handleSaveGraph(const Request& request,
 
     auto saveReq = getRootOfPayloadAndVerify<s::SaveGraphRequest>(*payload);
 
-    m_backend->saveGraph(Id{saveReq->graphId()->c_str()}, saveReq->filePath()->c_str(), saveReq->overwrite());
+    m_backend->saveGraph(Id{saveReq->graphId()->c_str()},
+                         saveReq->filePath()->c_str(),
+                         saveReq->overwrite());
 
     EXECGRAPHGUI_THROW_BAD_REQUEST("Not Implemented!");
 }
