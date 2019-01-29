@@ -88,14 +88,14 @@ namespace executionGraph
         void write(const GraphType& execGraph,
                    const GraphTypeDescription& graphDescription,
                    const std::path& filePath,
-                   bool bOverwrite = false) noexcept(false)
+                   bool overwrite = false) noexcept(false)
         {
             flatbuffers::FlatBufferBuilder builder;
             auto graphOffset = writeGraph(builder, execGraph, graphDescription);
             FinishExecutionGraphBuffer(builder, graphOffset);
 
             std::ofstream file;
-            EXECGRAPH_THROW_IF(!bOverwrite && std::filesystem::exists(filePath),
+            EXECGRAPH_THROW_IF(!overwrite && std::filesystem::exists(filePath),
                                "File '{0}' already exists!",
                                filePath);
 
@@ -196,9 +196,8 @@ namespace executionGraph
         auto writeLinks(flatbuffers::FlatBufferBuilder& builder, const GraphType& execGraph) const
         {
             namespace s = serialization;
-            using namespace s;
 
-            std::vector<SocketLinkDescription> socketLinks;
+            std::vector<s::SocketLinkDescription> socketLinks;
 
             auto& nonConstantNodes = execGraph.getNodes().first;
             // Iterate over all non-constant nodes.
@@ -211,21 +210,21 @@ namespace executionGraph
                     // Serialize all Write-Links
                     for(auto& writeSocket : inputSocket->getWritingSockets())
                     {
-                        socketLinks.emplace_back(SocketLinkDescription{writeSocket->getParent().getId(),
-                                                                       writeSocket->getIndex(),
-                                                                       node->getId(),
-                                                                       inputSocket->getIndex(),
-                                                                       true});
+                        socketLinks.emplace_back(s::SocketLinkDescription{writeSocket->getParent().getId(),
+                                                                          writeSocket->getIndex(),
+                                                                          node->getId(),
+                                                                          inputSocket->getIndex(),
+                                                                          true});
                     }
                     // Serialize Get-Link
                     if(inputSocket->hasGetLink())
                     {
                         SocketOutputBaseType* outSocket = inputSocket->followGetLink();
-                        socketLinks.emplace_back(SocketLinkDescription{outSocket->getParent().getId(),
-                                                                       outSocket->getIndex(),
-                                                                       node->getId(),
-                                                                       inputSocket->getIndex(),
-                                                                       false});
+                        socketLinks.emplace_back(s::SocketLinkDescription{outSocket->getParent().getId(),
+                                                                          outSocket->getIndex(),
+                                                                          node->getId(),
+                                                                          inputSocket->getIndex(),
+                                                                          false});
                     }
                 }
             }

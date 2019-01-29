@@ -54,7 +54,7 @@ public:
     // Get the unique id of this graph type.
     static executionGraph::IdNamed getId()
     {
-        return IdNamed{"DefaultGraph", std::string("2992ebff-c950-4184-8876-5fe6ac029aa5")};
+        return executionGraph::IdNamed{"DefaultGraph", std::string("2992ebff-c950-4184-8876-5fe6ac029aa5")};
     }
 
     //! The configuration traits.
@@ -73,7 +73,7 @@ public:
     using NodeSerializer  = executionGraph::LogicNodeSerializer<Config, NodeSerializers>;
 
     //! Graph serializer.
-    using GraphSerializer = executionGraph::ExecutionGraphSerializer<Graph, NodeSerializers>;
+    using GraphSerializer = executionGraph::ExecutionGraphSerializer<Graph, NodeSerializer>;
 
     //! The node descriptions for this default configuration.
     static const std::vector<NodeTypeDescription>& getNodeDescriptions()

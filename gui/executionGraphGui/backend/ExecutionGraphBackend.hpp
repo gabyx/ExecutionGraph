@@ -46,6 +46,19 @@ class ExecutionGraphBackend final : public Backend
     RTTR_ENABLE()
 
 public:
+    using Id                   = executionGraph::Id;
+    using IdNamed              = executionGraph::IdNamed;
+    using GraphTypeDescription = executionGraph::GraphTypeDescription;
+    using NodeId               = executionGraph::NodeId;
+    using SocketIndex          = executionGraph::SocketIndex;
+    using Deferred             = executionGraph::Deferred;
+
+    template<typename... Args>
+    using Synchronized = executionGraph::Synchronized<Args...>;
+
+    template<typename K, typename T>
+    using SyncedUMap = Synchronized<std::unordered_map<K, T>>;
+
     //! All supported graphs.
     using GraphConfigs                       = meta::list<executionGraph::GeneralConfig<>>;
     static constexpr std::size_t nGraphTypes = meta::size<GraphConfigs>::value;
@@ -67,32 +80,21 @@ public:
                                          meta::transform<Graphs, meta::quote<toPointer>>>;
     };
 
-    using Id                   = executionGraph::Id;
-    using IdNamed              = executionGraph::IdNamed;
-    using GraphTypeDescription = executionGraph::GraphTypeDescription;
-    using NodeId               = executionGraph::NodeId;
-    using SocketIndex          = executionGraph::SocketIndex;
-    using Deferred             = executionGraph::Deferred;
-    using GraphVariant         = details::GraphVariant;
-    using Graphs               = details::Graphs;
-
-    template<typename... Args>
-    using Synchronized = executionGraph::Synchronized<Args...>;
-
-    template<typename K, typename T>
-    using SyncedUMap = Synchronized<std::unordered_map<K, T>>;
+    using GraphVariant = details::GraphVariant;
+    using Graphs       = details::Graphs;
 
 private:
     class GraphStatus;
 
 public:
-    ExecutionGraphBackend()
-        : Backend(IdNamed("ExecutionGraphBackend")) {}
+    ExecutionGraphBackend(std::path rootPath)
+        : Backend(IdNamed("ExecutionGraphBackend"))
+        , m_rootPath(rootPath) {}
     ~ExecutionGraphBackend() override = default;
 
     //! Load/Save graphs.
     //@{
-    void saveGraph(const Id& graphId, const std::path& filePath, bool overwrite);
+    void saveGraph(const Id& graphId, std::path filePath, bool overwrite);
     //@}
 
     //! Adding/removing graphs.
@@ -140,8 +142,6 @@ public:
 private:
     [[nodiscard]] executionGraph::Deferred initRequest(Id graphId);
     void clearGraphData(Id graphId);
-
-private:
     GraphVariant getGraph(const Id& graphId);
 
 private:
@@ -149,6 +149,8 @@ private:
     SyncedUMap<Id, std::shared_ptr<GraphStatus>> m_status;  //! Graph status for each graph id.
     // SyncedUMap<Id, std::shared_ptr<IGraphIExecutor> > m_executor; //!< Graph executors for each
     // graph id.
+
+    const std::path m_rootPath;  //!< Root path where relative file paths are based on (save/load).
 };
 
 //! Add a node with type `type` to the graph with id `graphId`.

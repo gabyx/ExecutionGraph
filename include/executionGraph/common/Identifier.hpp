@@ -84,6 +84,9 @@ namespace executionGraph
         MixinNamedIdentifier(const MixinNamedIdentifier&) = default;
         MixinNamedIdentifier(MixinNamedIdentifier&&)      = default;
 
+        MixinNamedIdentifier& operator=(const MixinNamedIdentifier&) = default;
+        MixinNamedIdentifier& operator=(MixinNamedIdentifier&&) = default;
+
         template<typename T, typename... Args>
         explicit MixinNamedIdentifier(const T& name, Args&&... args)
             : TIdentifier(std::forward<Args>(args)...), m_name(name)

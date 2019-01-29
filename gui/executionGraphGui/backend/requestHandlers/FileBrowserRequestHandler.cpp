@@ -29,6 +29,7 @@ namespace
     flatbuffers::Offset<sG::PathInfo>
     collectPathInfo(Builder& builder,
                     const std::path& root,
+                    const std::path& basePath,
                     std::size_t maxLevel = 0)
     {
         flatbuffers::Offset<sG::PathInfo> resOff;
@@ -87,7 +88,7 @@ namespace
             EXECGRAPHGUI_BACKENDLOG_TRACE("Build file info: '{0}'", e.path());
             auto t = getStats(builder, e);
             return sG::CreatePathInfoDirect(builder,
-                                            e.path().native().c_str(),
+                                            std::filesystem::relative(e.path(), basePath).native().c_str(),
                                             e.path().filename().native().c_str(),
                                             std::get<0>(t),
                                             e.file_size(),
@@ -96,13 +97,13 @@ namespace
         };
 
         // Serialize directory info.
-        auto buildDirectoryInfo = [&getStats](auto& builder,
-                                              const auto& e,
-                                              Directory* d = nullptr) {
+        auto buildDirectoryInfo = [&getStats, &basePath](auto& builder,
+                                                         const auto& e,
+                                                         Directory* d = nullptr) {
             EXECGRAPHGUI_BACKENDLOG_TRACE("Build dir info: '{0}'", e.path());
             auto t = getStats(builder, e);
             return sG::CreatePathInfoDirect(builder,
-                                            e.path().native().c_str(),
+                                            std::filesystem::relative(e.path(), basePath).native().c_str(),
                                             e.path().filename().native().c_str(),
                                             std::get<0>(t),
                                             0,
@@ -260,6 +261,9 @@ void FileBrowserRequestHandler::handleGetPathInfo(const Request& request,
     }
     root = std::filesystem::canonical(root);
 
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(root.native().find(m_rootPath.native()) != 0,
+                                      "Not allowed to browse before root path: '{0}'!",
+                                      root);
     EXECGRAPHGUI_THROW_BAD_REQUEST_IF(!std::filesystem::exists(root),
                                       "FileBrowse path {0} does not exist!",
                                       root);
@@ -268,7 +272,10 @@ void FileBrowserRequestHandler::handleGetPathInfo(const Request& request,
     flatbuffers::FlatBufferBuilder builder(1024, &allocator);
 
     auto off = sG::CreateBrowseResponse(builder,
-                                        collectPathInfo(builder, root, browseReq->recursive()));
+                                        collectPathInfo(builder,
+                                                        root,
+                                                        m_rootPath,
+                                                        browseReq->recursive()));
     builder.Finish(off);
 
     // Set the response.

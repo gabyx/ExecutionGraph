@@ -33,8 +33,8 @@ namespace
     {
         std::size_t idx = 0;
         bool loop       = true;
-        meta::for_each(GraphConfigs,
-                       [](auto graphConfig) {
+        meta::for_each(GraphConfigs{},
+                       [&](auto graphConfig) {
                            loop = loop ? func(graphConfig, idx) : false;
                        });
         return loop;
@@ -50,7 +50,7 @@ namespace
 
             forEachConfig([&](auto graphConfig, auto idx) {
                 using Config = decltype(graphConfig);
-                ids[idx]     = ExecutionGraphBackend<Config>::getId();
+                ids[idx]     = ExecutionGraphBackendDefs<Config>::getId();
                 return true;
             });
 
@@ -68,7 +68,6 @@ namespace
         auto init = []() {
             auto& ids = getGraphTypeDescriptionsIds();
             std::unordered_map<Id, GraphTypeDescription> m;
-            std::size_t idx = 0;
 
             // Build the map.
             forEachConfig([&](auto graphConfig, auto idx) {
@@ -166,30 +165,40 @@ ExecutionGraphBackend::getGraphTypeDescriptions() const
 
 //! Save a graph to a file.
 void ExecutionGraphBackend::saveGraph(const Id& graphId,
-                                      const std::path& filePath,
+                                      std::path filePath,
                                       bool overwrite)
 {
     auto deferred = initRequest(graphId);
 
+    if(filePath.is_relative())
+    {
+        filePath = m_rootPath / filePath;
+    }
+
     GraphVariant graphVar = getGraph(graphId);
-    auto& ids             = getGraphTypeDescriptionsIds();
-    auto& id              = ids[graphVar.index()];
+    auto& id              = getGraphTypeDescriptionsIds()[graphVar.index()];
+    auto& descs           = getGraphTypeDescriptions();
 
     auto save = [&](auto graph) {
         using GraphType    = typename std::decay_t<decltype(*graph)>::DataType;
         using Config       = typename GraphType::Config;
         using NodeBaseType = typename Config::NodeBaseType;
 
-        ExecutionGraphBackendDefs<Config>::NodeSerializer nodeS;
-        ExecutionGraphBackendDefs<Config>::GraphSerializer graphS(nodeS);
+        typename ExecutionGraphBackendDefs<Config>::NodeSerializer nodeS;
+        typename ExecutionGraphBackendDefs<Config>::GraphSerializer graphS(nodeS);
 
-        graphS.write(graph,
-                     getGraphTypeDescriptions()[id],
-                     filePath,
-                     bOverwrite)
+        auto descIt = descs.find(id);
+        EXECGRAPHGUI_ASSERT(descIt != descs.end(), "Implementation Error!");
+
+        graph->withRLock([&](auto& graph) {
+            graphS.write(graph,
+                         descIt->second,
+                         filePath,
+                         overwrite);
+        });
     };
 
-    std::visit(graphVar, save);
+    std::visit(save, graphVar);
 }
 
 //! Add a new graph of type `graphType` to the backend.
@@ -198,9 +207,9 @@ Id ExecutionGraphBackend::addGraph(const Id& graphType)
     Id newId;  // Generate new id
     const auto& ids = getGraphTypeDescriptionsIds();
 
-    bool endReached = forEachConfig([](auto graphConfig, auto idx) {
+    bool endReached = forEachConfig([&](auto graphConfig, auto idx) {
         using Config = decltype(graphConfig);
-        using Graph  = ExecutionGraphBackend<Config>;
+        using Graph  = typename ExecutionGraphBackendDefs<Config>::Graph;
         if(graphType == ids[idx])
         {
             auto graph       = std::make_shared<Synchronized<Graph>>();
@@ -233,7 +242,7 @@ void ExecutionGraphBackend::removeGraph(const Id& graphId)
     std::shared_ptr<GraphStatus> graphStatus;
     m_status.withWLock([&graphId, &graphStatus](auto& status) {
         auto it = status.find(graphId);
-        EXECGRAPHGUI_ASSERT(it != status.cend(), "Programming error!");
+        EXECGRAPHGUI_ASSERT(it != status.cend(), "Implementation Error!");
         graphStatus = it->second;
     });
 

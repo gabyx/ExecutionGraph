@@ -258,7 +258,7 @@ namespace executionGraph
         }
 
         //! Remove an node with id `nodeId` from the graph.
-        //! A programming error is fatal ==> UB.
+        //! A Implementation Error is fatal ==> UB.
         NodePointer removeNode(NodeId nodeId)
         {
             auto nodeIt = m_nodes.find(nodeId);
@@ -271,7 +271,7 @@ namespace executionGraph
 
             // Erase from the classifications.
             EXECGRAPH_VERIFY(m_nodeClassifications[nodeDataBase->m_class].erase(nodeDataBase->m_node.get()),
-                             "Programming error!");
+                             "Implementation Error!");
 
             // Move the node out!
             NodePointer node = std::move(nodeDataBase->m_node);
@@ -279,7 +279,7 @@ namespace executionGraph
             if(nodeDataBase->m_class == NodeClassification::ConstantNode)
             {
                 // Remove from constant nodes.
-                EXECGRAPH_VERIFY(m_constNodes.erase(nodeId), "Programming error!");
+                EXECGRAPH_VERIFY(m_constNodes.erase(nodeId), "Implementation Error!");
             }
             else
             {
@@ -289,12 +289,12 @@ namespace executionGraph
                 for(auto groupId : nodeData->m_groups)
                 {
                     auto groupIt = m_nodeGroups.find(groupId);
-                    EXECGRAPH_ASSERT(groupIt != m_nodeGroups.end(), "Programming error!");
-                    EXECGRAPH_VERIFY(groupIt->second.erase(nodeData), "Programming error!");
+                    EXECGRAPH_ASSERT(groupIt != m_nodeGroups.end(), "Implementation Error!");
+                    EXECGRAPH_VERIFY(groupIt->second.erase(nodeData), "Implementation Error!");
                 }
 
                 // Remove from non-constant nodes.
-                EXECGRAPH_VERIFY(m_nonConstNodes.erase(nodeId), "Programming error!");
+                EXECGRAPH_VERIFY(m_nonConstNodes.erase(nodeId), "Implementation Error!");
             }
             // Erase from nodes.
             m_nodes.erase(nodeIt);

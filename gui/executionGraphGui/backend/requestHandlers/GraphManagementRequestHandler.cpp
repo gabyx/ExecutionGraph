@@ -124,7 +124,7 @@ void GraphManagementRequestHandler::handleSaveGraph(const Request& request,
                          saveReq->filePath()->c_str(),
                          saveReq->overwrite());
 
-    EXECGRAPHGUI_THROW_BAD_REQUEST("Not Implemented!");
+    response.setReady();
 }
 
 //! Handle the operation of loading a graph from a file.

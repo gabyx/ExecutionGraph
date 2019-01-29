@@ -22,7 +22,7 @@ BackendFactory::BackendData
 BackendFactory::CreatorExecutionGraphBackend::create(const std::path& rootPath)
 {
     // Create the executionGraph backend
-    auto backend = std::make_shared<ExecutionGraphBackend>();
+    auto backend = std::make_shared<ExecutionGraphBackend>(rootPath);
 
     // Create a general info handler
     auto generalInfoHandler = std::make_shared<GeneralInfoRequestHandler>(backend);
