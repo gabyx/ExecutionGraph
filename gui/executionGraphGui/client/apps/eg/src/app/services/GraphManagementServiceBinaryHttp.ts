@@ -78,8 +78,24 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     this.logger.info(`Removed graph [id: '${graphId}'].`);
   }
 
-  public async saveGraph(graphId: GraphId, path: string, overwrite: boolean): Promise<void> {
-    this.logger.debug(`Saving graph id: '${graphId}' to file: '${path}'`);
+  public async saveGraph(graphId: GraphId, filePath: string, overwrite: boolean): Promise<void> {
+    // Build the RemoveGraph request
+    const builder = new flatbuffers.Builder(16);
+    const offGraphId = builder.createString(graphId);
+    const offFilePath = builder.createString(filePath);
+
+    sz.SaveGraphRequest.startSaveGraphRequest(builder);
+    sz.SaveGraphRequest.addGraphId(builder, offGraphId);
+    sz.SaveGraphRequest.addFilePath(builder, offFilePath);
+    sz.SaveGraphRequest.addOverwrite(builder, overwrite);
+    const off = sz.SaveGraphRequest.endSaveGraphRequest(builder);
+    builder.finish(off);
+
+    const requestPayload = builder.asUint8Array();
+
+    // Send the request
+    await this.binaryRouter.post('general/saveGraph', requestPayload);
+    this.logger.debug(`Saved graph id: '${graphId}' to file: '${filePath}'`);
   }
   public async loadGraph(path: string): Promise<Graph> {
     throw Error('Not Implemented!');

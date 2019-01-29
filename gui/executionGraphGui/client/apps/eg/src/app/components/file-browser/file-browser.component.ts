@@ -116,7 +116,7 @@ export class FileBrowserComponent implements OnInit {
   }
 
   public openFile(file: FileInfo) {
-    assert(this.mode === FileBrowserMode.Open, 'Programming Error!');
+    assert(this.mode === FileBrowserMode.Open, 'Implementation Error!');
     this.logger.debug(`Opening file '${file.path}'`);
     this.fileActionOpen.emit(file.path);
   }
@@ -127,12 +127,11 @@ export class FileBrowserComponent implements OnInit {
     assert(!isNullOrUndefined(this.currentDirectory), 'Directory must be known when saving a file');
 
     const fileName = this.fileNameForm.get('fileName').value;
-    const path = `${this.currentDirectory.path}/${fileName}`.replace('//', '/');
-    this.saveFile(path, true);
+    this.saveFile(fileName, true);
   }
 
   public deleteConfirm(path: FileInfo | DirectoryInfo) {
-    assert(this.allowDelete, 'Programming Error!');
+    assert(this.allowDelete, 'Implementation Error!');
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       minWidth: '10%',
       data: {
@@ -148,16 +147,17 @@ export class FileBrowserComponent implements OnInit {
   }
 
   public isFileOpenable(file: FileInfo) {
-    assert(file.isFile, 'Programming Error!');
+    assert(file.isFile, 'Implementation Error!');
     return file.name.match(this.fileNameRegex) !== null;
   }
 
-  private checkOverwrite(path: string) {
+  private checkOverwrite(fileName: string): boolean {
     for (const p of this.currentDirectory.files) {
-      if (p.path.replace('//', '/') === path.replace('//', '/')) {
+      if (p.name === fileName) {
         return true;
       }
     }
+    return false;
   }
 
   private deleteFile(path: FileInfo | DirectoryInfo) {
@@ -167,10 +167,12 @@ export class FileBrowserComponent implements OnInit {
     this.fileActionDelete.emit(path.path);
   }
 
-  private saveFile(path: string, checkOverwrite: boolean) {
-    assert(this.mode === FileBrowserMode.Save, 'Programming Error!');
+  private saveFile(fileName: string, checkOverwrite: boolean) {
+    assert(this.mode === FileBrowserMode.Save, 'Implementation Error!');
 
-    const showOverwrite = checkOverwrite ? this.checkOverwrite(path) : false;
+    const showOverwrite = checkOverwrite ? this.checkOverwrite(fileName) : false;
+
+    const path = `${this.currentDirectory.path}/${fileName}`.replace('//', '/');
 
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       minWidth: '10%',

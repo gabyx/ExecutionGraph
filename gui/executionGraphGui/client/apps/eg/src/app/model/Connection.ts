@@ -86,7 +86,7 @@ export function createConnection(source: Socket, target: Socket): Connection {
     // Make a Get-Link
     isWriteLink = false;
   } else {
-    throw new Error(`Programming error: Connection cannot be made! ${source} <-> ${target}`);
+    throw new Error(`Implementation Error: Connection cannot be made! ${source} <-> ${target}`);
   }
 
   const id = createId(source.id, target.id);

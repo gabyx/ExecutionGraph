@@ -19,6 +19,6 @@ export abstract class GraphManagementService {
   public abstract async addGraph(graphTypeId: GraphTypeId): Promise<Graph>;
   public abstract async removeGraph(graphId: GraphId): Promise<void>;
 
-  public abstract async saveGraph(graphId: GraphId, path: string, overwrite: boolean): Promise<void>;
-  public abstract async loadGraph(path: string): Promise<Graph>;
+  public abstract async saveGraph(graphId: GraphId, filePath: string, overwrite: boolean): Promise<void>;
+  public abstract async loadGraph(filePath: string): Promise<Graph>;
 }

@@ -38,10 +38,10 @@ export class GraphManagementServiceDummy extends GraphManagementService {
 
   public async removeGraph(graphId: GraphId): Promise<void> {}
 
-  public async saveGraph(graphId: GraphId, path: string, overwrite: boolean): Promise<void> {
-    this.logger.debug(`Saving graph id: '${graphId}' to file: '${path}'`);
+  public async saveGraph(graphId: GraphId, filePath: string, overwrite: boolean): Promise<void> {
+    this.logger.debug(`Saving graph id: '${graphId}' to file: '${filePath}'`);
   }
-  public async loadGraph(path: string): Promise<Graph> {
+  public async loadGraph(filePath: string): Promise<Graph> {
     throw new Error('Not Implemented!');
   }
 }

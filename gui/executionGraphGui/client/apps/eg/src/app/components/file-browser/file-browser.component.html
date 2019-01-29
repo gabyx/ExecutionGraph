@@ -66,7 +66,7 @@
         #openButton
         mat-menu-item
         *ngIf="mode === 'save' && isFileOpenable(file)"
-        (click)="saveFile(file.path, true)"
+        (click)="saveFile(file.name, true)"
       >
         Save ...
       </button>

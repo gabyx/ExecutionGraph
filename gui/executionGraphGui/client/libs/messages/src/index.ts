@@ -48,6 +48,11 @@ export namespace GraphManagementMessages {
   export import AddGraphResponse = exec3.serialization.AddGraphResponse;
 
   export import RemoveGraphRequest = exec3.serialization.RemoveGraphRequest;
+
+  export import LoadGraphRequest = exec3.serialization.LoadGraphRequest;
+  export import LoadGraphResponse = exec3.serialization.LoadGraphResponse;
+
+  export import SaveGraphRequest = exec3.serialization.SaveGraphRequest;
 }
 
 // Export everything which is needed for FileBrowserMessages (into a namespace!)
