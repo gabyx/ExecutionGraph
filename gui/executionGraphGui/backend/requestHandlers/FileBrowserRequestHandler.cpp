@@ -84,7 +84,7 @@ namespace
         };
 
         //! Serialize file info.
-        auto buildFileInfo = [&getStats](auto& builder, const auto& e) {
+        auto buildFileInfo = [&getStats, &basePath](auto& builder, const auto& e) {
             EXECGRAPHGUI_BACKENDLOG_TRACE("Build file info: '{0}'", e.path());
             auto t = getStats(builder, e);
             return sG::CreatePathInfoDirect(builder,

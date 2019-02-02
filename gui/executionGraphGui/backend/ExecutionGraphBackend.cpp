@@ -11,6 +11,7 @@
 //! ========================================================================================
 
 #include "executionGraphGui/backend/ExecutionGraphBackend.hpp"
+#include "executionGraph/common/MetaVisit.hpp"
 #include "executionGraphGui/backend/ExecutionGraphBackendDefs.hpp"
 #include "executionGraphGui/common/Assert.hpp"
 #include "executionGraphGui/common/Exception.hpp"
@@ -29,15 +30,13 @@ namespace
     using GraphConfigs = ExecutionGraphBackend::GraphConfigs;
 
     template<typename F>
-    bool forEachConfig(F&& func)
+    void forEachConfig(F&& func)
     {
         std::size_t idx = 0;
-        bool loop       = true;
         meta::for_each(GraphConfigs{},
                        [&](auto graphConfig) {
-                           loop = loop ? func(graphConfig, idx) : false;
+                           func(graphConfig, ++idx);
                        });
-        return loop;
     }
 
     //! Define all description Ids for the different graphs.
@@ -51,7 +50,6 @@ namespace
             forEachConfig([&](auto graphConfig, auto idx) {
                 using Config = decltype(graphConfig);
                 ids[idx]     = ExecutionGraphBackendDefs<Config>::getId();
-                return true;
             });
 
             return ids;
@@ -59,6 +57,22 @@ namespace
 
         static auto ids = init();
         return ids;
+    }
+
+    //! Define all description Ids to the index in the `GraphConfigs`.
+    const auto& getGraphTypeDescriptionsToIndex()
+    {
+        auto init = []() {
+            std::unordered_map<Id, std::size_t> map;
+            std::size_t i = 0;
+            for(auto& id : getGraphTypeDescriptionsIds())
+            {
+                map.emplace(id, i);
+            }
+            return map;
+        };
+        static auto m = init();
+        return m;
     }
 
     //! Define all graph types in this Backend
@@ -77,7 +91,6 @@ namespace
                               ids[idx],
                               ExecutionGraphBackendDefs<Config>::getNodeDescriptions(),
                               ExecutionGraphBackendDefs<Config>::getDescription()));
-                return true;
             });
 
             return m;
@@ -204,29 +217,25 @@ void ExecutionGraphBackend::saveGraph(const Id& graphId,
 //! Add a new graph of type `graphType` to the backend.
 Id ExecutionGraphBackend::addGraph(const Id& graphType)
 {
-    Id newId;  // Generate new id
-    const auto& ids = getGraphTypeDescriptionsIds();
+    const auto& idToIdx = getGraphTypeDescriptionsToIndex();
+    auto it             = idToIdx.find(graphType);
 
-    bool endReached = forEachConfig([&](auto graphConfig, auto idx) {
-        using Config = decltype(graphConfig);
-        using Graph  = typename ExecutionGraphBackendDefs<Config>::Graph;
-        if(graphType == ids[idx])
-        {
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(it == idToIdx.end(),
+                                      "Graph type: '{0}' not known!",
+                                      graphType.toString());
+
+    return meta::visit<GraphConfigs>(
+        it->second,
+        [&](auto graphConfig) {
+            using Config = decltype(graphConfig);
+            using Graph  = typename ExecutionGraphBackendDefs<Config>::Graph;
+            Id newId;  // Generate new id
             auto graph       = std::make_shared<Synchronized<Graph>>();
             auto graphStatus = std::make_shared<GraphStatus>();
             m_graphs.wlock()->emplace(std::make_pair(newId, graph));
             m_status.wlock()->emplace(std::make_pair(newId, graphStatus));
-            return false;
-        }
-        return true;
-    });
-
-    if(endReached)
-    {
-        EXECGRAPHGUI_THROW_BAD_REQUEST("Graph type: '{0}' not known!",
-                                       graphType.toString());
-    }
-    return newId;
+            return newId;
+        });
 }
 
 //! Remove a graph with id `graphId` from the backend.

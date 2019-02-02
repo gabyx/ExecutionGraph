@@ -12,6 +12,7 @@
 
 #include <array>
 #include <exception>
+#include <limits>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -20,49 +21,34 @@
 
 #include <executionGraph/common/MetaVisit.hpp>
 
-struct Functor
-{
-    template<typename T>
-    void invoke(int b)
-    {
-        if constexpr(std::is_same<T, char>{})
-        {
-            std::cout << "char" << b << std::endl;
-        }
-        else if constexpr(std::is_same<T, double>{})
-        {
-            throw std::runtime_error("this should not be thrown!");
-        }
-        else
-        {
-            throw std::runtime_error("this should not be thrown!");
-        }
-    }
-};
-
 MY_TEST(MetaProgramming, Test1)
 {
-    using List = meta::list<int, double, char>;
-    Functor func;
-    meta::visit<List>(func, 2, 3);
+    using List = meta::list<int, double, short>;
+    int r      = meta::visit<List>(2,
+                              [&](auto type) {
+                                  using T = decltype(type);
+                                  if constexpr(std::is_same<T, short>{})
+                                  {
+                                      return 2;
+                                  }
+                                  return -1;
+                              });
+    ASSERT_EQ(r, 2) << "Meta Visit failed!";
+}
 
-    try
-    {
-        meta::visit<List>(func, 1, 3);
-        throw std::runtime_error("no exception thrown!");
-    }
-    catch(...)
-    {
-    }
+MY_TEST(MetaProgramming, Test2)
+{
+    using List = meta::list<int, double, short>;
+    auto f     = [&](auto type) {
+        using T = decltype(type);
+        if constexpr(std::is_same<T, short>{})
+        {
+            return 2;
+        }
+        return -1;
+    };
 
-    try
-    {
-        meta::visit<List>(func, 3, 3);
-        throw std::runtime_error("no exception thrown!");
-    }
-    catch(...)
-    {
-    }
+    ASSERT_EQ(meta::visit<List>(2, f), 2) << "Meta Visit failed!";
 }
 
 int main(int argc, char** argv)

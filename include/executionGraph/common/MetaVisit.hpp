@@ -19,28 +19,45 @@ namespace meta
 {
     namespace details
     {
-        template<typename Func, typename List>
-        struct visitTraits;
-
-        template<typename Func, typename... Args>
-        struct visitTraits<Func, meta::list<Args...>>
+        template<typename Func, typename Type>
+        struct Wrapper
         {
-            using MemberPtr = decltype(&Func::template invoke<void>);
-
-            static constexpr std::array<MemberPtr, sizeof...(Args)> makeMap()
+            static_assert(!std::is_same<Type, void>{}, "void type will not work!");
+            static auto invoke(Func f)
             {
-                return {&Func::template invoke<Args>...};  // Build member function pointers.
+                return f(Type{});
             }
         };
+
+        template<typename List, typename Func>
+        struct visit;
+
+        template<typename Func, typename... Types>
+        struct visit<meta::list<Types...>, Func>
+        {
+            using L = meta::list<Types...>;
+            static_assert(meta::size<L>::value != 0, "Cannot visit empty list!");
+
+            static constexpr auto makeMap()
+            {
+                using FuncPtr = decltype(&Wrapper<Func, meta::front<L>>::invoke);
+                using Array   = std::array<FuncPtr, sizeof...(Types)>;
+                // Build member function pointers.
+                return Array{&Wrapper<Func, Types>::invoke...};
+            }
+        };
+
     }  // namespace details
 
-    //! Dispatch to the function `f.invoke<T>(args...)` where `T` is the type at index `index`.
-    //! Throw exception if index is out of range!
-    template<typename List, typename Func, typename... Args>
-    void visit(Func&& f, std::size_t index, Args&&... args)
+    //! Apply the function `Func` with the type
+    //! in the `List` at position `index`.
+    template<typename List, typename Func>
+    auto visit(std::size_t index, Func&& f)
     {
-        constexpr auto map = details::visitTraits<std::decay_t<Func>, List>::makeMap();
-        EXECGRAPH_THROW_IF(index >= map.size(), "Index {0} >= {1} out of range!", index, map.size());
-        (f.*map[index])(std::forward<Args>(args)...);
+        using F            = decltype(std::forward<Func>(f));  // Define either an lvalue, or rvalue;
+        constexpr auto map = details::visit<List, F>::makeMap();
+        EXECGRAPH_THROW_IF(index >= map.size(), "Index {0} >= {1} : out of range!", index, map.size());
+        return map[index](std::forward<Func>(f));
     }
+
 }  // namespace meta
