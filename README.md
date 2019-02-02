@@ -3,9 +3,10 @@
 <img src="gui/executionGraphGui/client/apps/electron/resources/icon.svg" height="150px" style="display: inline;vertical-align: middle; horizontal-align:center"/>
 
 # ExecutionGraph 
-
 [![Build Status](https://travis-ci.org/gabyx/ExecutionGraph.svg?branch=master)](https://travis-ci.org/gabyx/ExecutionGraph) not yet setup ...      
-![System](https://img.shields.io/badge/system-linux,osx-lightgrey.svg)      
+![System](https://img.shields.io/badge/system-linux,osx-lightgrey.svg)     
+[![Gitter chat](https://badges.gitter.im/ExecutionGraph/gitter.png)](https://gitter.im/ExecutionGraph/community)
+
 
 **Fast Execution Graph consisting of Execution Nodes**    
 
