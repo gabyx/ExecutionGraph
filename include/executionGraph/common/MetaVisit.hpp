@@ -15,6 +15,16 @@
 #include <meta/meta.hpp>
 #include "executionGraph/common/Exception.hpp"
 
+//! Making a overloaded functor inherited from several lambdas to use in std::visit, or meta::visit.
+template<class... Ts>
+struct overloaded : Ts...
+{
+    using Ts::operator()...;
+};
+//! Deduction guide, taking several lambdas.
+template<class... Ts>
+overloaded(Ts...)->overloaded<Ts...>;
+
 namespace meta
 {
     namespace details

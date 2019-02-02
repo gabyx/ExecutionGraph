@@ -50,6 +50,16 @@ MY_TEST(MetaProgramming, Test2)
 
     ASSERT_EQ(meta::visit<List>(2, f), 2) << "Meta Visit failed!";
 }
+MY_TEST(MetaProgramming, Overloaded)
+{
+    using List = meta::list<int, double, short>;
+    auto f     = overloaded{
+        [](int type) { return 0; },
+        [](double type) { return 1; },
+        [](short type) { return 2; }};
+
+    ASSERT_EQ(meta::visit<List>(2, f), 2) << "Meta Visit failed!";
+}
 
 int main(int argc, char** argv)
 {
