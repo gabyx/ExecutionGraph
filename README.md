@@ -4,7 +4,7 @@
 
 # ExecutionGraph 
 
-[![Build Status](https://travis-ci.org/gabyx/ExecutionGraph.svg?branch=master)](https://travis-ci.org/gabyx/ExecutionGraph) not yet setup ...      
+[![Build Status](https://travis-ci.org/gabyx/ExecutionGraph.svg?branch=master)](https://travis-ci.org/gabyx/ExecutionGraph) [![Join the chat at https://gitter.im/ExecutionGraph/community](https://badges.gitter.im/ExecutionGraph/community.svg)](https://gitter.im/ExecutionGraph/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) not yet setup ...      
 ![System](https://img.shields.io/badge/system-linux,osx-lightgrey.svg)      
 
 **Fast Execution Graph consisting of Execution Nodes**    
