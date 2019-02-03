@@ -139,7 +139,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):PathInfo {
  * @param PathInfo= obj
  * @returns PathInfo
  */
-static getRootAsPathInfo(bb:flatbuffers.ByteBuffer, obj?:PathInfo):PathInfo {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:PathInfo):PathInfo {
   return (obj || new PathInfo).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 

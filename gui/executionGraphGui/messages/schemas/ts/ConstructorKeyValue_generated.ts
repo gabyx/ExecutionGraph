@@ -72,7 +72,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):ConstructorKV {
  * @param ConstructorKV= obj
  * @returns ConstructorKV
  */
-static getRootAsConstructorKV(bb:flatbuffers.ByteBuffer, obj?:ConstructorKV):ConstructorKV {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:ConstructorKV):ConstructorKV {
   return (obj || new ConstructorKV).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 

@@ -24,7 +24,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):LogicSocket {
  * @param LogicSocket= obj
  * @returns LogicSocket
  */
-static getRootAsLogicSocket(bb:flatbuffers.ByteBuffer, obj?:LogicSocket):LogicSocket {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:LogicSocket):LogicSocket {
   return (obj || new LogicSocket).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 

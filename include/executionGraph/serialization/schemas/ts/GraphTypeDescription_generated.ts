@@ -26,7 +26,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):GraphTypeDescription {
  * @param GraphTypeDescription= obj
  * @returns GraphTypeDescription
  */
-static getRootAsGraphTypeDescription(bb:flatbuffers.ByteBuffer, obj?:GraphTypeDescription):GraphTypeDescription {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:GraphTypeDescription):GraphTypeDescription {
   return (obj || new GraphTypeDescription).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 

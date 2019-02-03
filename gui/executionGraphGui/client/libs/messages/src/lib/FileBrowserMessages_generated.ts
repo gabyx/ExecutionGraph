@@ -25,7 +25,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):BrowseRequest {
  * @param BrowseRequest= obj
  * @returns BrowseRequest
  */
-static getRootAsBrowseRequest(bb:flatbuffers.ByteBuffer, obj?:BrowseRequest):BrowseRequest {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:BrowseRequest):BrowseRequest {
   return (obj || new BrowseRequest).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -113,7 +113,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):BrowseResponse {
  * @param BrowseResponse= obj
  * @returns BrowseResponse
  */
-static getRootAsBrowseResponse(bb:flatbuffers.ByteBuffer, obj?:BrowseResponse):BrowseResponse {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:BrowseResponse):BrowseResponse {
   return (obj || new BrowseResponse).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 

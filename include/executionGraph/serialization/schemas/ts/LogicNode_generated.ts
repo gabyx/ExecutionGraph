@@ -25,7 +25,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):LogicNode {
  * @param LogicNode= obj
  * @returns LogicNode
  */
-static getRootAsLogicNode(bb:flatbuffers.ByteBuffer, obj?:LogicNode):LogicNode {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:LogicNode):LogicNode {
   return (obj || new LogicNode).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 

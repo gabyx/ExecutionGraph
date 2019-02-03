@@ -45,7 +45,7 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
     // Send the request
     const r = await this.binaryRouter.post('files/getPathInfo', requestPayload);
     const buf = new flatbuffers.ByteBuffer(r);
-    const response = sz.BrowseResponse.getRootAsBrowseResponse(buf);
+    const response = sz.BrowseResponse.getRoot(buf);
     const pathInfo = this.convert(response);
 
     if (this.verboseResponseLog) {

@@ -24,7 +24,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):AddGraphRequest {
  * @param AddGraphRequest= obj
  * @returns AddGraphRequest
  */
-static getRootAsAddGraphRequest(bb:flatbuffers.ByteBuffer, obj?:AddGraphRequest):AddGraphRequest {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:AddGraphRequest):AddGraphRequest {
   return (obj || new AddGraphRequest).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -90,7 +90,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):AddGraphResponse {
  * @param AddGraphResponse= obj
  * @returns AddGraphResponse
  */
-static getRootAsAddGraphResponse(bb:flatbuffers.ByteBuffer, obj?:AddGraphResponse):AddGraphResponse {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:AddGraphResponse):AddGraphResponse {
   return (obj || new AddGraphResponse).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -156,7 +156,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):RemoveGraphRequest {
  * @param RemoveGraphRequest= obj
  * @returns RemoveGraphRequest
  */
-static getRootAsRemoveGraphRequest(bb:flatbuffers.ByteBuffer, obj?:RemoveGraphRequest):RemoveGraphRequest {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:RemoveGraphRequest):RemoveGraphRequest {
   return (obj || new RemoveGraphRequest).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 

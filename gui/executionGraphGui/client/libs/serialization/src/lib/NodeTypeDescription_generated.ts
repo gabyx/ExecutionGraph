@@ -24,7 +24,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):NodeTypeDescription {
  * @param NodeTypeDescription= obj
  * @returns NodeTypeDescription
  */
-static getRootAsNodeTypeDescription(bb:flatbuffers.ByteBuffer, obj?:NodeTypeDescription):NodeTypeDescription {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:NodeTypeDescription):NodeTypeDescription {
   return (obj || new NodeTypeDescription).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 

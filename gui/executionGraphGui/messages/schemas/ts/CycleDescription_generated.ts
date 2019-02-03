@@ -25,7 +25,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):CycleDescription {
  * @param CycleDescription= obj
  * @returns CycleDescription
  */
-static getRootAsCycleDescription(bb:flatbuffers.ByteBuffer, obj?:CycleDescription):CycleDescription {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:CycleDescription):CycleDescription {
   return (obj || new CycleDescription).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 

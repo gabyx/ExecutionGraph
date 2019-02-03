@@ -25,7 +25,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):GetAllGraphTypeDescriptionsResponse 
  * @param GetAllGraphTypeDescriptionsResponse= obj
  * @returns GetAllGraphTypeDescriptionsResponse
  */
-static getRootAsGetAllGraphTypeDescriptionsResponse(bb:flatbuffers.ByteBuffer, obj?:GetAllGraphTypeDescriptionsResponse):GetAllGraphTypeDescriptionsResponse {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:GetAllGraphTypeDescriptionsResponse):GetAllGraphTypeDescriptionsResponse {
   return (obj || new GetAllGraphTypeDescriptionsResponse).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 

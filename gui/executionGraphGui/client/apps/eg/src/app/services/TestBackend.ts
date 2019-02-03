@@ -135,7 +135,7 @@ export class TestBackend extends ITestBackend {
     builder.finish(offResp);
 
     const buf = new flatbuffers.ByteBuffer(builder.asUint8Array());
-    const response = szInfo.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
+    const response = szInfo.GetAllGraphTypeDescriptionsResponse.getRoot(buf);
 
     this.graphTypeDesc = conversions.toGraphTypeDescription(response.graphsTypes(0));
 
@@ -175,7 +175,7 @@ export class TestBackend extends ITestBackend {
     const result = builder.asUint8Array();
 
     const buf = new flatbuffers.ByteBuffer(result);
-    return szMani.AddNodeResponse.getRootAsAddNodeResponse(buf);
+    return szMani.AddNodeResponse.getRoot(buf);
   }
 
   private createSockets(builder: flatbuffers.Builder, sockets: string[], suffix: string, inputs: boolean) {

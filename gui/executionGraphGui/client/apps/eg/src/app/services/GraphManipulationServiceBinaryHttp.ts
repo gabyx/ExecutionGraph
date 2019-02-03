@@ -56,7 +56,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     // Send the request
     const result = await this.binaryRouter.post('graph/addNode', requestPayload);
     const buf = new flatbuffers.ByteBuffer(result);
-    const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
+    const response = sz.AddNodeResponse.getRoot(buf);
 
     const node = response.node();
     this.logger.info(`Added new node [type: '${node.type()}', ins: ${node.inputSocketsLength()},
@@ -126,7 +126,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     } else {
       // Cycle detected, read the repsonse
       const buf = new flatbuffers.ByteBuffer(result);
-      const response = sz.AddNodeResponse.getRootAsAddNodeResponse(buf);
+      const response = sz.AddNodeResponse.getRoot(buf);
       throw new Error('Cycle detection not yet implemented!');
     }
   }

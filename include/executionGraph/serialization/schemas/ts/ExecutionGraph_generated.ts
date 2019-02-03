@@ -38,7 +38,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):ExecutionGraphNodeProperties {
  * @param ExecutionGraphNodeProperties= obj
  * @returns ExecutionGraphNodeProperties
  */
-static getRootAsExecutionGraphNodeProperties(bb:flatbuffers.ByteBuffer, obj?:ExecutionGraphNodeProperties):ExecutionGraphNodeProperties {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:ExecutionGraphNodeProperties):ExecutionGraphNodeProperties {
   return (obj || new ExecutionGraphNodeProperties).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -169,7 +169,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):ExecutionGraph {
  * @param ExecutionGraph= obj
  * @returns ExecutionGraph
  */
-static getRootAsExecutionGraph(bb:flatbuffers.ByteBuffer, obj?:ExecutionGraph):ExecutionGraph {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:ExecutionGraph):ExecutionGraph {
   return (obj || new ExecutionGraph).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 

@@ -47,7 +47,7 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     // Send the request
     const result = await this.binaryRouter.post('general/addGraph', requestPayload);
     const buf = new flatbuffers.ByteBuffer(result);
-    const response = sz.AddGraphResponse.getRootAsAddGraphResponse(buf);
+    const response = sz.AddGraphResponse.getRoot(buf);
 
     this.logger.info(`Added new graph [id: '${response.graphId()}', type: '${graphTypeId}'].`);
 
@@ -79,6 +79,8 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
   }
 
   public async saveGraph(graphId: GraphId, filePath: string, overwrite: boolean): Promise<void> {
+    this.logger.debug(`Saving graph from '${filePath}'`);
+
     // Build the RemoveGraph request
     const builder = new flatbuffers.Builder(16);
     const offGraphId = builder.createString(graphId);
@@ -95,9 +97,28 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
 
     // Send the request
     await this.binaryRouter.post('general/saveGraph', requestPayload);
-    this.logger.debug(`Saved graph id: '${graphId}' to file: '${filePath}'`);
   }
-  public async loadGraph(path: string): Promise<Graph> {
-    throw Error('Not Implemented!');
+  public async loadGraph(filePath: string): Promise<Graph> {
+    this.logger.debug(`Loading graph from '${filePath}'`);
+
+    // Build the RemoveGraph request
+    const builder = new flatbuffers.Builder(16);
+    const offFilePath = builder.createString(filePath);
+
+    sz.LoadGraphRequest.start(builder);
+    sz.LoadGraphRequest.addFilePath(builder, offFilePath);
+    const off = sz.SaveGraphRequest.end(builder);
+    builder.finish(off);
+
+    const requestPayload = builder.asUint8Array();
+
+    // Send the request
+    const result = await this.binaryRouter.post('general/loadGraph', requestPayload);
+
+    // Load graph.
+    const buf = new flatbuffers.ByteBuffer(result);
+    const response = sz.LoadGraphResponse.getRoot(buf);
+
+    const graph = response.graph();
   }
 }

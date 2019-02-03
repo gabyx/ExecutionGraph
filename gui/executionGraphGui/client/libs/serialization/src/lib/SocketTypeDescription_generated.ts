@@ -24,7 +24,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):SocketTypeDescription {
  * @param SocketTypeDescription= obj
  * @returns SocketTypeDescription
  */
-static getRootAsSocketTypeDescription(bb:flatbuffers.ByteBuffer, obj?:SocketTypeDescription):SocketTypeDescription {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:SocketTypeDescription):SocketTypeDescription {
   return (obj || new SocketTypeDescription).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 

@@ -28,7 +28,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):NodeConstructionInfo {
  * @param NodeConstructionInfo= obj
  * @returns NodeConstructionInfo
  */
-static getRootAsNodeConstructionInfo(bb:flatbuffers.ByteBuffer, obj?:NodeConstructionInfo):NodeConstructionInfo {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:NodeConstructionInfo):NodeConstructionInfo {
   return (obj || new NodeConstructionInfo).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -168,7 +168,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):AddNodeRequest {
  * @param AddNodeRequest= obj
  * @returns AddNodeRequest
  */
-static getRootAsAddNodeRequest(bb:flatbuffers.ByteBuffer, obj?:AddNodeRequest):AddNodeRequest {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:AddNodeRequest):AddNodeRequest {
   return (obj || new AddNodeRequest).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -258,7 +258,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):AddNodeResponse {
  * @param AddNodeResponse= obj
  * @returns AddNodeResponse
  */
-static getRootAsAddNodeResponse(bb:flatbuffers.ByteBuffer, obj?:AddNodeResponse):AddNodeResponse {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:AddNodeResponse):AddNodeResponse {
   return (obj || new AddNodeResponse).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -327,7 +327,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):RemoveNodeRequest {
  * @param RemoveNodeRequest= obj
  * @returns RemoveNodeRequest
  */
-static getRootAsRemoveNodeRequest(bb:flatbuffers.ByteBuffer, obj?:RemoveNodeRequest):RemoveNodeRequest {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:RemoveNodeRequest):RemoveNodeRequest {
   return (obj || new RemoveNodeRequest).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -415,7 +415,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):AddConnectionRequest {
  * @param AddConnectionRequest= obj
  * @returns AddConnectionRequest
  */
-static getRootAsAddConnectionRequest(bb:flatbuffers.ByteBuffer, obj?:AddConnectionRequest):AddConnectionRequest {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:AddConnectionRequest):AddConnectionRequest {
   return (obj || new AddConnectionRequest).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -522,7 +522,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):AddConnectionResponse {
  * @param AddConnectionResponse= obj
  * @returns AddConnectionResponse
  */
-static getRootAsAddConnectionResponse(bb:flatbuffers.ByteBuffer, obj?:AddConnectionResponse):AddConnectionResponse {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:AddConnectionResponse):AddConnectionResponse {
   return (obj || new AddConnectionResponse).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -620,7 +620,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):RemoveConnectionRequest {
  * @param RemoveConnectionRequest= obj
  * @returns RemoveConnectionRequest
  */
-static getRootAsRemoveConnectionRequest(bb:flatbuffers.ByteBuffer, obj?:RemoveConnectionRequest):RemoveConnectionRequest {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:RemoveConnectionRequest):RemoveConnectionRequest {
   return (obj || new RemoveConnectionRequest).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
