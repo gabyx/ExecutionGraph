@@ -75,7 +75,7 @@ constructorArgsLength():number {
 /**
  * @param flatbuffers.Builder builder
  */
-static startNodeConstructionInfo(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(3);
 };
 
@@ -128,19 +128,19 @@ static startConstructorArgsVector(builder:flatbuffers.Builder, numElems:number) 
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endNodeConstructionInfo(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // type
   builder.requiredField(offset, 6); // name
   return offset;
 };
 
-static createNodeConstructionInfo(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, constructorArgsOffset:flatbuffers.Offset):flatbuffers.Offset {
-  NodeConstructionInfo.startNodeConstructionInfo(builder);
+static create(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, constructorArgsOffset:flatbuffers.Offset):flatbuffers.Offset {
+  NodeConstructionInfo.start(builder);
   NodeConstructionInfo.addType(builder, typeOffset);
   NodeConstructionInfo.addName(builder, nameOffset);
   NodeConstructionInfo.addConstructorArgs(builder, constructorArgsOffset);
-  return NodeConstructionInfo.endNodeConstructionInfo(builder);
+  return NodeConstructionInfo.end(builder);
 }
 }
 }
@@ -195,7 +195,7 @@ node(obj?:executionGraphGui.serialization.NodeConstructionInfo):executionGraphGu
 /**
  * @param flatbuffers.Builder builder
  */
-static startAddNodeRequest(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(2);
 };
 
@@ -219,18 +219,18 @@ static addNode(builder:flatbuffers.Builder, nodeOffset:flatbuffers.Offset) {
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endAddNodeRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // graphId
   builder.requiredField(offset, 6); // node
   return offset;
 };
 
-static createAddNodeRequest(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset, nodeOffset:flatbuffers.Offset):flatbuffers.Offset {
-  AddNodeRequest.startAddNodeRequest(builder);
+static create(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset, nodeOffset:flatbuffers.Offset):flatbuffers.Offset {
+  AddNodeRequest.start(builder);
   AddNodeRequest.addGraphId(builder, graphIdOffset);
   AddNodeRequest.addNode(builder, nodeOffset);
-  return AddNodeRequest.endAddNodeRequest(builder);
+  return AddNodeRequest.end(builder);
 }
 }
 }
@@ -274,7 +274,7 @@ node(obj?:NS151393392049638678.executionGraph.serialization.LogicNode):NS1513933
 /**
  * @param flatbuffers.Builder builder
  */
-static startAddNodeResponse(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
@@ -290,16 +290,16 @@ static addNode(builder:flatbuffers.Builder, nodeOffset:flatbuffers.Offset) {
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endAddNodeResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // node
   return offset;
 };
 
-static createAddNodeResponse(builder:flatbuffers.Builder, nodeOffset:flatbuffers.Offset):flatbuffers.Offset {
-  AddNodeResponse.startAddNodeResponse(builder);
+static create(builder:flatbuffers.Builder, nodeOffset:flatbuffers.Offset):flatbuffers.Offset {
+  AddNodeResponse.start(builder);
   AddNodeResponse.addNode(builder, nodeOffset);
-  return AddNodeResponse.endAddNodeResponse(builder);
+  return AddNodeResponse.end(builder);
 }
 }
 }
@@ -353,7 +353,7 @@ nodeId():flatbuffers.Long {
 /**
  * @param flatbuffers.Builder builder
  */
-static startRemoveNodeRequest(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(2);
 };
 
@@ -377,17 +377,17 @@ static addNodeId(builder:flatbuffers.Builder, nodeId:flatbuffers.Long) {
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endRemoveNodeRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // graphId
   return offset;
 };
 
-static createRemoveNodeRequest(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset, nodeId:flatbuffers.Long):flatbuffers.Offset {
-  RemoveNodeRequest.startRemoveNodeRequest(builder);
+static create(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset, nodeId:flatbuffers.Long):flatbuffers.Offset {
+  RemoveNodeRequest.start(builder);
   RemoveNodeRequest.addGraphId(builder, graphIdOffset);
   RemoveNodeRequest.addNodeId(builder, nodeId);
-  return RemoveNodeRequest.endRemoveNodeRequest(builder);
+  return RemoveNodeRequest.end(builder);
 }
 }
 }
@@ -450,7 +450,7 @@ checkForCycles():boolean {
 /**
  * @param flatbuffers.Builder builder
  */
-static startAddConnectionRequest(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(3);
 };
 
@@ -482,19 +482,19 @@ static addCheckForCycles(builder:flatbuffers.Builder, checkForCycles:boolean) {
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endAddConnectionRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // graphId
   builder.requiredField(offset, 6); // socketLink
   return offset;
 };
 
-static createAddConnectionRequest(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset, socketLinkOffset:flatbuffers.Offset, checkForCycles:boolean):flatbuffers.Offset {
-  AddConnectionRequest.startAddConnectionRequest(builder);
+static create(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset, socketLinkOffset:flatbuffers.Offset, checkForCycles:boolean):flatbuffers.Offset {
+  AddConnectionRequest.start(builder);
   AddConnectionRequest.addGraphId(builder, graphIdOffset);
   AddConnectionRequest.addSocketLink(builder, socketLinkOffset);
   AddConnectionRequest.addCheckForCycles(builder, checkForCycles);
-  return AddConnectionRequest.endAddConnectionRequest(builder);
+  return AddConnectionRequest.end(builder);
 }
 }
 }
@@ -547,7 +547,7 @@ cyclesLength():number {
 /**
  * @param flatbuffers.Builder builder
  */
-static startAddConnectionResponse(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
@@ -584,15 +584,15 @@ static startCyclesVector(builder:flatbuffers.Builder, numElems:number) {
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endAddConnectionResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   return offset;
 };
 
-static createAddConnectionResponse(builder:flatbuffers.Builder, cyclesOffset:flatbuffers.Offset):flatbuffers.Offset {
-  AddConnectionResponse.startAddConnectionResponse(builder);
+static create(builder:flatbuffers.Builder, cyclesOffset:flatbuffers.Offset):flatbuffers.Offset {
+  AddConnectionResponse.start(builder);
   AddConnectionResponse.addCycles(builder, cyclesOffset);
-  return AddConnectionResponse.endAddConnectionResponse(builder);
+  return AddConnectionResponse.end(builder);
 }
 }
 }
@@ -647,7 +647,7 @@ socketLink(obj?:NS11220090238097262337.executionGraph.serialization.SocketLinkDe
 /**
  * @param flatbuffers.Builder builder
  */
-static startRemoveConnectionRequest(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(2);
 };
 
@@ -671,18 +671,18 @@ static addSocketLink(builder:flatbuffers.Builder, socketLinkOffset:flatbuffers.O
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endRemoveConnectionRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // graphId
   builder.requiredField(offset, 6); // socketLink
   return offset;
 };
 
-static createRemoveConnectionRequest(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset, socketLinkOffset:flatbuffers.Offset):flatbuffers.Offset {
-  RemoveConnectionRequest.startRemoveConnectionRequest(builder);
+static create(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset, socketLinkOffset:flatbuffers.Offset):flatbuffers.Offset {
+  RemoveConnectionRequest.start(builder);
   RemoveConnectionRequest.addGraphId(builder, graphIdOffset);
   RemoveConnectionRequest.addSocketLink(builder, socketLinkOffset);
-  return RemoveConnectionRequest.endRemoveConnectionRequest(builder);
+  return RemoveConnectionRequest.end(builder);
 }
 }
 }

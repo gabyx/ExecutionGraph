@@ -40,7 +40,7 @@ value():boolean {
  * @param boolean value
  * @returns flatbuffers.Offset
  */
-static createBool(builder:flatbuffers.Builder, value: boolean):flatbuffers.Offset {
+static create(builder:flatbuffers.Builder, value: boolean):flatbuffers.Offset {
   builder.prep(1, 1);
   builder.writeInt8(+value);
   return builder.offset();
@@ -133,7 +133,7 @@ valueLength():number {
 /**
  * @param flatbuffers.Builder builder
  */
-static startConstructorKV(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(3);
 };
 
@@ -207,7 +207,7 @@ static startValueVector(builder:flatbuffers.Builder, numElems:number) {
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endConstructorKV(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // key
   builder.requiredField(offset, 6); // value_type
@@ -215,12 +215,12 @@ static endConstructorKV(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 };
 
-static createConstructorKV(builder:flatbuffers.Builder, keyOffset:flatbuffers.Offset, valueTypeOffset:flatbuffers.Offset, valueOffset:flatbuffers.Offset):flatbuffers.Offset {
-  ConstructorKV.startConstructorKV(builder);
+static create(builder:flatbuffers.Builder, keyOffset:flatbuffers.Offset, valueTypeOffset:flatbuffers.Offset, valueOffset:flatbuffers.Offset):flatbuffers.Offset {
+  ConstructorKV.start(builder);
   ConstructorKV.addKey(builder, keyOffset);
   ConstructorKV.addValueType(builder, valueTypeOffset);
   ConstructorKV.addValue(builder, valueOffset);
-  return ConstructorKV.endConstructorKV(builder);
+  return ConstructorKV.end(builder);
 }
 }
 }

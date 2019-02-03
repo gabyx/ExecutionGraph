@@ -98,7 +98,7 @@ yday():number {
  * @param number yday
  * @returns flatbuffers.Offset
  */
-static createDate(builder:flatbuffers.Builder, sec: number, min: number, hour: number, day: number, month: number, year: number, wday: number, yday: number):flatbuffers.Offset {
+static create(builder:flatbuffers.Builder, sec: number, min: number, hour: number, day: number, month: number, year: number, wday: number, yday: number):flatbuffers.Offset {
   builder.prep(2, 12);
   builder.writeInt16(yday);
   builder.pad(1);
@@ -245,7 +245,7 @@ isExplored():boolean {
 /**
  * @param flatbuffers.Builder builder
  */
-static startPathInfo(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(9);
 };
 
@@ -367,7 +367,7 @@ static addIsExplored(builder:flatbuffers.Builder, isExplored:boolean) {
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endPathInfo(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // path
   builder.requiredField(offset, 6); // name
@@ -375,8 +375,8 @@ static endPathInfo(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 };
 
-static createPathInfo(builder:flatbuffers.Builder, pathOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, permissions:executionGraphGui.serialization.Permissions, size:flatbuffers.Long, modifiedOffset:flatbuffers.Offset, isFile:boolean, filesOffset:flatbuffers.Offset, directoriesOffset:flatbuffers.Offset, isExplored:boolean):flatbuffers.Offset {
-  PathInfo.startPathInfo(builder);
+static create(builder:flatbuffers.Builder, pathOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, permissions:executionGraphGui.serialization.Permissions, size:flatbuffers.Long, modifiedOffset:flatbuffers.Offset, isFile:boolean, filesOffset:flatbuffers.Offset, directoriesOffset:flatbuffers.Offset, isExplored:boolean):flatbuffers.Offset {
+  PathInfo.start(builder);
   PathInfo.addPath(builder, pathOffset);
   PathInfo.addName(builder, nameOffset);
   PathInfo.addPermissions(builder, permissions);
@@ -386,7 +386,7 @@ static createPathInfo(builder:flatbuffers.Builder, pathOffset:flatbuffers.Offset
   PathInfo.addFiles(builder, filesOffset);
   PathInfo.addDirectories(builder, directoriesOffset);
   PathInfo.addIsExplored(builder, isExplored);
-  return PathInfo.endPathInfo(builder);
+  return PathInfo.end(builder);
 }
 }
 }

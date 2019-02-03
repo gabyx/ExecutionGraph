@@ -104,7 +104,7 @@ description(optionalEncoding?:any):string|Uint8Array|null {
 /**
  * @param flatbuffers.Builder builder
  */
-static startNodeTypeDescription(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(5);
 };
 
@@ -194,21 +194,21 @@ static addDescription(builder:flatbuffers.Builder, descriptionOffset:flatbuffers
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endNodeTypeDescription(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // type
   builder.requiredField(offset, 6); // name
   return offset;
 };
 
-static createNodeTypeDescription(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, inSocketNamesOffset:flatbuffers.Offset, outSocketNamesOffset:flatbuffers.Offset, descriptionOffset:flatbuffers.Offset):flatbuffers.Offset {
-  NodeTypeDescription.startNodeTypeDescription(builder);
+static create(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, inSocketNamesOffset:flatbuffers.Offset, outSocketNamesOffset:flatbuffers.Offset, descriptionOffset:flatbuffers.Offset):flatbuffers.Offset {
+  NodeTypeDescription.start(builder);
   NodeTypeDescription.addType(builder, typeOffset);
   NodeTypeDescription.addName(builder, nameOffset);
   NodeTypeDescription.addInSocketNames(builder, inSocketNamesOffset);
   NodeTypeDescription.addOutSocketNames(builder, outSocketNamesOffset);
   NodeTypeDescription.addDescription(builder, descriptionOffset);
-  return NodeTypeDescription.endNodeTypeDescription(builder);
+  return NodeTypeDescription.end(builder);
 }
 }
 }

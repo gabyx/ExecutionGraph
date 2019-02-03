@@ -51,7 +51,7 @@ recursive():flatbuffers.Long {
 /**
  * @param flatbuffers.Builder builder
  */
-static startBrowseRequest(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(2);
 };
 
@@ -75,17 +75,17 @@ static addRecursive(builder:flatbuffers.Builder, recursive:flatbuffers.Long) {
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endBrowseRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // path
   return offset;
 };
 
-static createBrowseRequest(builder:flatbuffers.Builder, pathOffset:flatbuffers.Offset, recursive:flatbuffers.Long):flatbuffers.Offset {
-  BrowseRequest.startBrowseRequest(builder);
+static create(builder:flatbuffers.Builder, pathOffset:flatbuffers.Offset, recursive:flatbuffers.Long):flatbuffers.Offset {
+  BrowseRequest.start(builder);
   BrowseRequest.addPath(builder, pathOffset);
   BrowseRequest.addRecursive(builder, recursive);
-  return BrowseRequest.endBrowseRequest(builder);
+  return BrowseRequest.end(builder);
 }
 }
 }
@@ -129,7 +129,7 @@ info(obj?:NS8358872326649077371.executionGraphGui.serialization.PathInfo):NS8358
 /**
  * @param flatbuffers.Builder builder
  */
-static startBrowseResponse(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
@@ -145,16 +145,16 @@ static addInfo(builder:flatbuffers.Builder, infoOffset:flatbuffers.Offset) {
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endBrowseResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // info
   return offset;
 };
 
-static createBrowseResponse(builder:flatbuffers.Builder, infoOffset:flatbuffers.Offset):flatbuffers.Offset {
-  BrowseResponse.startBrowseResponse(builder);
+static create(builder:flatbuffers.Builder, infoOffset:flatbuffers.Offset):flatbuffers.Offset {
+  BrowseResponse.start(builder);
   BrowseResponse.addInfo(builder, infoOffset);
-  return BrowseResponse.endBrowseResponse(builder);
+  return BrowseResponse.end(builder);
 }
 }
 }

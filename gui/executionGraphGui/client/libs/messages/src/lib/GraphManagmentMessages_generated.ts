@@ -42,7 +42,7 @@ graphTypeId(optionalEncoding?:any):string|Uint8Array|null {
 /**
  * @param flatbuffers.Builder builder
  */
-static startAddGraphRequest(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
@@ -58,7 +58,7 @@ static addGraphTypeId(builder:flatbuffers.Builder, graphTypeIdOffset:flatbuffers
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endAddGraphRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // graphTypeId
   return offset;
@@ -108,7 +108,7 @@ graphId(optionalEncoding?:any):string|Uint8Array|null {
 /**
  * @param flatbuffers.Builder builder
  */
-static startAddGraphResponse(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
@@ -124,7 +124,7 @@ static addGraphId(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset)
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endAddGraphResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // graphId
   return offset;
@@ -174,7 +174,7 @@ graphId(optionalEncoding?:any):string|Uint8Array|null {
 /**
  * @param flatbuffers.Builder builder
  */
-static startRemoveGraphRequest(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
@@ -190,7 +190,7 @@ static addGraphId(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset)
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endRemoveGraphRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // graphId
   return offset;

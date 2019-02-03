@@ -43,7 +43,7 @@ graphTypeId(optionalEncoding?:any):string|Uint8Array|null {
 /**
  * @param flatbuffers.Builder builder
  */
-static startAddGraphRequest(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
@@ -59,16 +59,16 @@ static addGraphTypeId(builder:flatbuffers.Builder, graphTypeIdOffset:flatbuffers
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endAddGraphRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // graphTypeId
   return offset;
 };
 
-static createAddGraphRequest(builder:flatbuffers.Builder, graphTypeIdOffset:flatbuffers.Offset):flatbuffers.Offset {
-  AddGraphRequest.startAddGraphRequest(builder);
+static create(builder:flatbuffers.Builder, graphTypeIdOffset:flatbuffers.Offset):flatbuffers.Offset {
+  AddGraphRequest.start(builder);
   AddGraphRequest.addGraphTypeId(builder, graphTypeIdOffset);
-  return AddGraphRequest.endAddGraphRequest(builder);
+  return AddGraphRequest.end(builder);
 }
 }
 }
@@ -114,7 +114,7 @@ graphId(optionalEncoding?:any):string|Uint8Array|null {
 /**
  * @param flatbuffers.Builder builder
  */
-static startAddGraphResponse(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
@@ -130,16 +130,16 @@ static addGraphId(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset)
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endAddGraphResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // graphId
   return offset;
 };
 
-static createAddGraphResponse(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset):flatbuffers.Offset {
-  AddGraphResponse.startAddGraphResponse(builder);
+static create(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset):flatbuffers.Offset {
+  AddGraphResponse.start(builder);
   AddGraphResponse.addGraphId(builder, graphIdOffset);
-  return AddGraphResponse.endAddGraphResponse(builder);
+  return AddGraphResponse.end(builder);
 }
 }
 }
@@ -185,7 +185,7 @@ graphId(optionalEncoding?:any):string|Uint8Array|null {
 /**
  * @param flatbuffers.Builder builder
  */
-static startRemoveGraphRequest(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
@@ -201,16 +201,16 @@ static addGraphId(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset)
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endRemoveGraphRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // graphId
   return offset;
 };
 
-static createRemoveGraphRequest(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset):flatbuffers.Offset {
-  RemoveGraphRequest.startRemoveGraphRequest(builder);
+static create(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset):flatbuffers.Offset {
+  RemoveGraphRequest.start(builder);
   RemoveGraphRequest.addGraphId(builder, graphIdOffset);
-  return RemoveGraphRequest.endRemoveGraphRequest(builder);
+  return RemoveGraphRequest.end(builder);
 }
 }
 }
@@ -256,7 +256,7 @@ filePath(optionalEncoding?:any):string|Uint8Array|null {
 /**
  * @param flatbuffers.Builder builder
  */
-static startLoadGraphRequest(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
@@ -272,16 +272,16 @@ static addFilePath(builder:flatbuffers.Builder, filePathOffset:flatbuffers.Offse
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endLoadGraphRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // filePath
   return offset;
 };
 
-static createLoadGraphRequest(builder:flatbuffers.Builder, filePathOffset:flatbuffers.Offset):flatbuffers.Offset {
-  LoadGraphRequest.startLoadGraphRequest(builder);
+static create(builder:flatbuffers.Builder, filePathOffset:flatbuffers.Offset):flatbuffers.Offset {
+  LoadGraphRequest.start(builder);
   LoadGraphRequest.addFilePath(builder, filePathOffset);
-  return LoadGraphRequest.endLoadGraphRequest(builder);
+  return LoadGraphRequest.end(builder);
 }
 }
 }
@@ -314,27 +314,18 @@ static getRootAsLoadGraphResponse(bb:flatbuffers.ByteBuffer, obj?:LoadGraphRespo
 };
 
 /**
- * @param number index
  * @param executionGraph.serialization.ExecutionGraph= obj
- * @returns executionGraph.serialization.ExecutionGraph
+ * @returns executionGraph.serialization.ExecutionGraph|null
  */
-graph(index: number, obj?:NS12623504695714931604.executionGraph.serialization.ExecutionGraph):NS12623504695714931604.executionGraph.serialization.ExecutionGraph|null {
+graph(obj?:NS12623504695714931604.executionGraph.serialization.ExecutionGraph):NS12623504695714931604.executionGraph.serialization.ExecutionGraph|null {
   var offset = this.bb!.__offset(this.bb_pos, 4);
-  return offset ? (obj || new NS12623504695714931604.executionGraph.serialization.ExecutionGraph).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
-};
-
-/**
- * @returns number
- */
-graphLength():number {
-  var offset = this.bb!.__offset(this.bb_pos, 4);
-  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+  return offset ? (obj || new NS12623504695714931604.executionGraph.serialization.ExecutionGraph).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 };
 
 /**
  * @param flatbuffers.Builder builder
  */
-static startLoadGraphResponse(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
@@ -348,39 +339,18 @@ static addGraph(builder:flatbuffers.Builder, graphOffset:flatbuffers.Offset) {
 
 /**
  * @param flatbuffers.Builder builder
- * @param Array.<flatbuffers.Offset> data
  * @returns flatbuffers.Offset
  */
-static createGraphVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
-  builder.startVector(4, data.length, 4);
-  for (var i = data.length - 1; i >= 0; i--) {
-    builder.addOffset(data[i]);
-  }
-  return builder.endVector();
-};
-
-/**
- * @param flatbuffers.Builder builder
- * @param number numElems
- */
-static startGraphVector(builder:flatbuffers.Builder, numElems:number) {
-  builder.startVector(4, numElems, 4);
-};
-
-/**
- * @param flatbuffers.Builder builder
- * @returns flatbuffers.Offset
- */
-static endLoadGraphResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // graph
   return offset;
 };
 
-static createLoadGraphResponse(builder:flatbuffers.Builder, graphOffset:flatbuffers.Offset):flatbuffers.Offset {
-  LoadGraphResponse.startLoadGraphResponse(builder);
+static create(builder:flatbuffers.Builder, graphOffset:flatbuffers.Offset):flatbuffers.Offset {
+  LoadGraphResponse.start(builder);
   LoadGraphResponse.addGraph(builder, graphOffset);
-  return LoadGraphResponse.endLoadGraphResponse(builder);
+  return LoadGraphResponse.end(builder);
 }
 }
 }
@@ -443,10 +413,35 @@ overwrite():boolean {
 };
 
 /**
+ * @param number index
+ * @returns number
+ */
+visualization(index: number):number|null {
+  var offset = this.bb!.__offset(this.bb_pos, 10);
+  return offset ? this.bb!.readUint8(this.bb!.__vector(this.bb_pos + offset) + index) : 0;
+};
+
+/**
+ * @returns number
+ */
+visualizationLength():number {
+  var offset = this.bb!.__offset(this.bb_pos, 10);
+  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+};
+
+/**
+ * @returns Uint8Array
+ */
+visualizationArray():Uint8Array|null {
+  var offset = this.bb!.__offset(this.bb_pos, 10);
+  return offset ? new Uint8Array(this.bb!.bytes().buffer, this.bb!.bytes().byteOffset + this.bb!.__vector(this.bb_pos + offset), this.bb!.__vector_len(this.bb_pos + offset)) : null;
+};
+
+/**
  * @param flatbuffers.Builder builder
  */
-static startSaveGraphRequest(builder:flatbuffers.Builder) {
-  builder.startObject(3);
+static start(builder:flatbuffers.Builder) {
+  builder.startObject(4);
 };
 
 /**
@@ -475,21 +470,51 @@ static addOverwrite(builder:flatbuffers.Builder, overwrite:boolean) {
 
 /**
  * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset visualizationOffset
+ */
+static addVisualization(builder:flatbuffers.Builder, visualizationOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(3, visualizationOffset, 0);
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @param Array.<number> data
  * @returns flatbuffers.Offset
  */
-static endSaveGraphRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
+static createVisualizationVector(builder:flatbuffers.Builder, data:number[] | Uint8Array):flatbuffers.Offset {
+  builder.startVector(1, data.length, 1);
+  for (var i = data.length - 1; i >= 0; i--) {
+    builder.addInt8(data[i]);
+  }
+  return builder.endVector();
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @param number numElems
+ */
+static startVisualizationVector(builder:flatbuffers.Builder, numElems:number) {
+  builder.startVector(1, numElems, 1);
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @returns flatbuffers.Offset
+ */
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // graphId
   builder.requiredField(offset, 6); // filePath
   return offset;
 };
 
-static createSaveGraphRequest(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset, filePathOffset:flatbuffers.Offset, overwrite:boolean):flatbuffers.Offset {
-  SaveGraphRequest.startSaveGraphRequest(builder);
+static create(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset, filePathOffset:flatbuffers.Offset, overwrite:boolean, visualizationOffset:flatbuffers.Offset):flatbuffers.Offset {
+  SaveGraphRequest.start(builder);
   SaveGraphRequest.addGraphId(builder, graphIdOffset);
   SaveGraphRequest.addFilePath(builder, filePathOffset);
   SaveGraphRequest.addOverwrite(builder, overwrite);
-  return SaveGraphRequest.endSaveGraphRequest(builder);
+  SaveGraphRequest.addVisualization(builder, visualizationOffset);
+  return SaveGraphRequest.end(builder);
 }
 }
 }

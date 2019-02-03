@@ -63,7 +63,7 @@ isWriteLink():boolean {
  * @param boolean isWriteLink
  * @returns flatbuffers.Offset
  */
-static createSocketLinkDescription(builder:flatbuffers.Builder, outNodeId: flatbuffers.Long, outSocketIdx: flatbuffers.Long, inNodeId: flatbuffers.Long, inSocketIdx: flatbuffers.Long, isWriteLink: boolean):flatbuffers.Offset {
+static create(builder:flatbuffers.Builder, outNodeId: flatbuffers.Long, outSocketIdx: flatbuffers.Long, inNodeId: flatbuffers.Long, inSocketIdx: flatbuffers.Long, isWriteLink: boolean):flatbuffers.Offset {
   builder.prep(8, 40);
   builder.pad(7);
   builder.writeInt8(+isWriteLink);
