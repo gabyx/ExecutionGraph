@@ -150,6 +150,7 @@ private:
     [[nodiscard]] executionGraph::Deferred initRequest(Id graphId);
     void clearGraphData(Id graphId);
     GraphVariant getGraph(const Id& graphId);
+    const std::unordered_map<Id, std::size_t>& getGraphTypeDescriptionsToIndex() const;
 
 private:
     SyncedUMap<Id, GraphVariant> m_graphs;                  //! Graphs identified by its id.
@@ -280,39 +281,35 @@ void ExecutionGraphBackend::loadGraph(const std::path& filePath,
     using namespace executionGraph;
 
     FileMapper mapper(filePath);
-    auto graph = getGraphSerialization(BinaryBufferView{mapper.data(),
-                                                        mapper.size()});
+    auto graphS = getGraphSerialization(BinaryBufferView{mapper.data(),
+                                                         mapper.size()});
 
-    Id graphTypeId{graph->graphDescription()->id()->c_str()};
-    EXECGRAPHGUI_BACKENDLOG_TRACE("{0}", graphTypeId.toString());
-    // Load corresponding graph description id
-    // Get the config type with meta::visit
+    Id graphTypeId{graphS->graphDescription()->id()->c_str()};
+    auto& idsToIdx = getGraphTypeDescriptionsToIndex();
+
+    auto it = idsToIdx.find(graphTypeId);
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(it == idsToIdx.end(),
+                                      "Graph type id: '{0}' is not supported in the backend",
+                                      graphTypeId.toString());
+
     // Load the graph
+    auto load = [&](auto graphConfig) {
+        using Config = decltype(graphConfig);
+        using Graph  = typename ExecutionGraphBackendDefs<Config>::Graph;
 
-    // using GraphType = typename std::decay_t<decltype(*graph)>::DataType;
-    // using Config    = typename GraphType::Config;
+        typename ExecutionGraphBackendDefs<Config>::NodeSerializer nodeSerializer;
+        typename ExecutionGraphBackendDefs<Config>::GraphSerializer graphSerializer(nodeSerializer);
 
-    // typename ExecutionGraphBackendDefs<Config>::NodeSerializer nodeS;
-    // typename ExecutionGraphBackendDefs<Config>::GraphSerializer graphS(nodeS);
+        // Load a new graph.
+        auto graph = std::make_shared<Synchronized<Graph>>();
+        graph->withWLock([&](auto& graph) { graphSerializer.read(graphS, graph); });
 
-    // // Load a new graph.
-    // auto graph = std::make_shared<Synchronized<Graph>>();
-    // graph->withWLock([&](auto& graph) { graphS.read(filePath, graph); });
+        // Graph loaded -> add it with a new id.
+        Id newId;
+        m_graphs.wlock()->emplace(std::make_pair(newId, graph));
+        auto graphStatus = std::make_shared<GraphStatus>();
+        m_status.wlock()->emplace(std::make_pair(newId, graphStatus));
+    };
 
-    // // Graph loaded -> add it with a new id.
-    // Id newId;
-    // m_graphs.wlock()->emplace(std::make_pair(newId, graph));
-    // auto graphStatus = std::make_shared<GraphStatus>();
-    // m_status.wlock()->emplace(std::make_pair(newId, graphStatus));
-
-    // // Graph loaded -> add it with a new id.
-    // Id newId;
-    // m_graphs.wlock()->emplace(std::make_pair(newId, graph));
-    // auto graphStatus = std::make_shared<GraphStatus>();
-    // // Graph loaded -> add it with a new id.
-    // Id newId;
-    // m_graphs.wlock()->emplace(std::make_pair(newId, graph));
-    // auto graphStatus = std::make_shared<GraphStatus>();
-    // m_status.wlock()->emplace(std::make_pair(newId, graphStatus));
-    // // Graph loaded -> add it with a new id.
+    meta::visit<GraphConfigs>(it->second, load);
 }

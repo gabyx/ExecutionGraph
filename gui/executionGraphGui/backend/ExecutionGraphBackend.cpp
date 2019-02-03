@@ -168,6 +168,12 @@ const std::unordered_map<Id, GraphTypeDescription>& ExecutionGraphBackend::getGr
     return ::getGraphTypeDescriptions();
 }
 
+//! Get all graph description of supported graphs.
+const std::unordered_map<Id, std::size_t>& ExecutionGraphBackend::getGraphTypeDescriptionsToIndex() const
+{
+    return ::getGraphTypeDescriptionsToIndex();
+}
+
 //! Save a graph to a file.
 void ExecutionGraphBackend::saveGraph(const Id& graphId,
                                       std::path filePath,
@@ -211,7 +217,9 @@ Id ExecutionGraphBackend::addGraph(const Id& graphType)
     const auto& idToIdx = getGraphTypeDescriptionsToIndex();
     auto it             = idToIdx.find(graphType);
 
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(it == idToIdx.end(), "Graph type: '{0}' not known!", graphType.toString());
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(it == idToIdx.end(),
+                                      "Graph type id: '{0}' not supported in backend!",
+                                      graphType.toString());
 
     return meta::visit<GraphConfigs>(it->second, [&](auto graphConfig) {
         using Config = decltype(graphConfig);
