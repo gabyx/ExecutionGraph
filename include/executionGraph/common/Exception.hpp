@@ -16,12 +16,6 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
-#ifdef __clang__
-#    pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
-#    pragma clang diagnostic push
-#    pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
-
 namespace executionGraph
 {
     namespace details
@@ -65,8 +59,6 @@ namespace executionGraph
     public:
         ExceptionFatal(const std::string& s)
             : std::runtime_error(s) {}
-        // we dont need a virtual dtor, the std destroys the exception correctly.
-        // https://stackoverflow.com/questions/28353708/exception-with-non-virtual-destructor-c
     };
 
     //! Base class for all exceptions.
@@ -75,8 +67,6 @@ namespace executionGraph
     public:
         Exception(const std::string& s)
             : std::runtime_error(s) {}
-        // we dont need a virtual dtor, the std destroys the exception correctly.
-        // https://stackoverflow.com/questions/28353708/exception-with-non-virtual-destructor-c
     };
 
     class NodeConnectionException final : public Exception
@@ -100,7 +90,3 @@ namespace executionGraph
             : Exception(s) {}
     };
 }  // namespace executionGraph
-
-#ifdef __clang__
-#    pragma clang diagnostic pop
-#endif

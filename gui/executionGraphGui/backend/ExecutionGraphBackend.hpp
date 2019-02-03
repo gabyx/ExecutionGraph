@@ -383,12 +383,11 @@ void ExecutionGraphBackend::loadGraph(const std::path& filePath,
         auto graphStatus = std::make_shared<GraphStatus>();
         m_status.wlock()->emplace(std::make_pair(newId, graphStatus));
 
-        auto vis = graphS->visualization();
-
         // Create the response.
         // Here we serialize the graph again.
         // @todo maybe use the stuff from graphS -> wont work if we do postprocessing
         // after the load here.
+        auto vis = graphS->visualization();
         responseCreator(*graphL,
                         graphDesc,
                         BinaryBufferView{vis->data(), vis->size()});
