@@ -37,9 +37,9 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     const builder = new flatbuffers.Builder(16);
     const offGraphTypeId = builder.createString(graphTypeId);
 
-    sz.AddGraphRequest.startAddGraphRequest(builder);
+    sz.AddGraphRequest.start(builder);
     sz.AddGraphRequest.addGraphTypeId(builder, offGraphTypeId);
-    const off = sz.AddGraphRequest.endAddGraphRequest(builder);
+    const off = sz.AddGraphRequest.end(builder);
     builder.finish(off);
 
     const requestPayload = builder.asUint8Array();
@@ -66,9 +66,9 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     const builder = new flatbuffers.Builder(16);
     const offGraphId = builder.createString(graphId);
 
-    sz.RemoveGraphRequest.startRemoveGraphRequest(builder);
+    sz.RemoveGraphRequest.start(builder);
     sz.RemoveGraphRequest.addGraphId(builder, offGraphId);
-    const off = sz.RemoveGraphRequest.endRemoveGraphRequest(builder);
+    const off = sz.RemoveGraphRequest.end(builder);
     builder.finish(off);
 
     const requestPayload = builder.asUint8Array();
@@ -84,11 +84,11 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     const offGraphId = builder.createString(graphId);
     const offFilePath = builder.createString(filePath);
 
-    sz.SaveGraphRequest.startSaveGraphRequest(builder);
+    sz.SaveGraphRequest.start(builder);
     sz.SaveGraphRequest.addGraphId(builder, offGraphId);
     sz.SaveGraphRequest.addFilePath(builder, offFilePath);
     sz.SaveGraphRequest.addOverwrite(builder, overwrite);
-    const off = sz.SaveGraphRequest.endSaveGraphRequest(builder);
+    const off = sz.SaveGraphRequest.end(builder);
     builder.finish(off);
 
     const requestPayload = builder.asUint8Array();

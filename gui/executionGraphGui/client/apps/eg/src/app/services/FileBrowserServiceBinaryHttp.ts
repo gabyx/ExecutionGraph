@@ -35,10 +35,10 @@ export class FileBrowserServiceBinaryHttp extends FileBrowserService {
     const builder = new flatbuffers.Builder(256);
     const pathOff = builder.createString(path);
 
-    sz.BrowseRequest.startBrowseRequest(builder);
+    sz.BrowseRequest.start(builder);
     sz.BrowseRequest.addPath(builder, pathOff);
     sz.BrowseRequest.addRecursive(builder, toFbLong(1));
-    const off = sz.BrowseRequest.endBrowseRequest(builder);
+    const off = sz.BrowseRequest.end(builder);
     builder.finish(off);
     const requestPayload = builder.asUint8Array();
 

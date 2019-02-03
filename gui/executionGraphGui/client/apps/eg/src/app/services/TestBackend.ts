@@ -95,10 +95,10 @@ export class TestBackend extends ITestBackend {
       const n = this.nodes[type];
       const nameOff = builder.createString(n['name']);
       const offType = builder.createString(n['type']);
-      szInfo.NodeTypeDescription.startNodeTypeDescription(builder);
+      szInfo.NodeTypeDescription.start(builder);
       szInfo.NodeTypeDescription.addName(builder, nameOff);
       szInfo.NodeTypeDescription.addType(builder, offType);
-      const offN = szInfo.NodeTypeDescription.endNodeTypeDescription(builder);
+      const offN = szInfo.NodeTypeDescription.end(builder);
       nodeDescs.push(offN);
     });
 
@@ -107,10 +107,10 @@ export class TestBackend extends ITestBackend {
     for (const s of this.sockets) {
       const offN = builder.createString(s);
       const offType = builder.createString(s);
-      szInfo.SocketTypeDescription.startSocketTypeDescription(builder);
+      szInfo.SocketTypeDescription.start(builder);
       szInfo.SocketTypeDescription.addName(builder, offN);
       szInfo.SocketTypeDescription.addType(builder, offType);
-      const offS = szInfo.SocketTypeDescription.endSocketTypeDescription(builder);
+      const offS = szInfo.SocketTypeDescription.end(builder);
       socketDescs.push(offS);
     }
 
@@ -120,18 +120,18 @@ export class TestBackend extends ITestBackend {
     const offName = builder.createString('DefaultGraph');
     const offNodes = szInfo.GraphTypeDescription.createNodeTypeDescriptionsVector(builder, nodeDescs);
     const offSockets = szInfo.GraphTypeDescription.createSocketTypeDescriptionsVector(builder, socketDescs);
-    szInfo.GraphTypeDescription.startGraphTypeDescription(builder);
+    szInfo.GraphTypeDescription.start(builder);
     szInfo.GraphTypeDescription.addId(builder, offId);
     szInfo.GraphTypeDescription.addName(builder, offName);
     szInfo.GraphTypeDescription.addNodeTypeDescriptions(builder, offNodes);
     szInfo.GraphTypeDescription.addSocketTypeDescriptions(builder, offSockets);
-    const offGT = szInfo.GraphTypeDescription.endGraphTypeDescription(builder);
+    const offGT = szInfo.GraphTypeDescription.end(builder);
 
     // Make Response
     const offGTs = szInfo.GetAllGraphTypeDescriptionsResponse.createGraphsTypesVector(builder, [offGT]);
-    szInfo.GetAllGraphTypeDescriptionsResponse.startGetAllGraphTypeDescriptionsResponse(builder);
+    szInfo.GetAllGraphTypeDescriptionsResponse.start(builder);
     szInfo.GetAllGraphTypeDescriptionsResponse.addGraphsTypes(builder, offGTs);
-    const offResp = szInfo.GetAllGraphTypeDescriptionsResponse.endGetAllGraphTypeDescriptionsResponse(builder);
+    const offResp = szInfo.GetAllGraphTypeDescriptionsResponse.end(builder);
     builder.finish(offResp);
 
     const buf = new flatbuffers.ByteBuffer(builder.asUint8Array());
@@ -160,17 +160,17 @@ export class TestBackend extends ITestBackend {
     const inSocksOff = this.createSockets(builder, node.ins, 'in', true);
     const outSocksOff = this.createSockets(builder, node.outs, 'out', false);
 
-    szMani.LogicNode.startLogicNode(builder);
+    szMani.LogicNode.start(builder);
     this.nodeId += 1;
     szMani.LogicNode.addId(builder, builder.createLong(this.nodeId, 0));
     szMani.LogicNode.addType(builder, typeOff);
     szMani.LogicNode.addInputSockets(builder, inSocksOff);
     szMani.LogicNode.addOutputSockets(builder, outSocksOff);
-    const nodeOff = szMani.LogicNode.endLogicNode(builder);
+    const nodeOff = szMani.LogicNode.end(builder);
 
-    szMani.AddNodeResponse.startAddNodeResponse(builder);
+    szMani.AddNodeResponse.start(builder);
     szMani.AddNodeResponse.addNode(builder, nodeOff);
-    const respOff = szMani.AddNodeResponse.endAddNodeResponse(builder);
+    const respOff = szMani.AddNodeResponse.end(builder);
     builder.finish(respOff);
     const result = builder.asUint8Array();
 
@@ -188,13 +188,13 @@ export class TestBackend extends ITestBackend {
       }
       const typeOff = builder.createString(type);
 
-      szMani.LogicSocket.startLogicSocket(builder);
+      szMani.LogicSocket.start(builder);
 
       szMani.LogicSocket.addTypeIndex(builder, flatbuffers.Long.create(typeIndex, 0));
       szMani.LogicSocket.addType(builder, typeOff);
       szMani.LogicSocket.addTypeName(builder, typeOff);
       szMani.LogicSocket.addIndex(builder, flatbuffers.Long.create(i, 0));
-      const off = szMani.LogicSocket.endLogicSocket(builder);
+      const off = szMani.LogicSocket.end(builder);
       socketOffs.push(off);
     }
     return szMani.LogicNode.createInputSocketsVector(builder, socketOffs);

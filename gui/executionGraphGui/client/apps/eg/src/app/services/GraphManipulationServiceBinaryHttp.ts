@@ -40,15 +40,15 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     const offType = builder.createString(type);
     const offName = builder.createString(name);
 
-    sz.NodeConstructionInfo.startNodeConstructionInfo(builder);
+    sz.NodeConstructionInfo.start(builder);
     sz.NodeConstructionInfo.addName(builder, offName);
     sz.NodeConstructionInfo.addType(builder, offType);
-    let off = sz.NodeConstructionInfo.endNodeConstructionInfo(builder);
+    let off = sz.NodeConstructionInfo.end(builder);
 
-    sz.AddNodeRequest.startAddNodeRequest(builder);
+    sz.AddNodeRequest.start(builder);
     sz.AddNodeRequest.addGraphId(builder, offGraphId);
     sz.AddNodeRequest.addNode(builder, off);
-    off = sz.AddNodeRequest.endAddNodeRequest(builder);
+    off = sz.AddNodeRequest.end(builder);
     builder.finish(off);
 
     const requestPayload = builder.asUint8Array();
@@ -73,10 +73,10 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     // Build the RemoveNode request
     const builder = new flatbuffers.Builder(356);
     const offGraphId = builder.createString(graphId);
-    sz.RemoveNodeRequest.startRemoveNodeRequest(builder);
+    sz.RemoveNodeRequest.start(builder);
     sz.RemoveNodeRequest.addGraphId(builder, offGraphId);
     sz.RemoveNodeRequest.addNodeId(builder, toFbLong(nodeId));
-    const reqOff = sz.RemoveNodeRequest.endRemoveNodeRequest(builder);
+    const reqOff = sz.RemoveNodeRequest.end(builder);
     builder.finish(reqOff);
 
     const requestPayload = builder.asUint8Array();
@@ -97,11 +97,11 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     const builder = new flatbuffers.Builder(356);
     const offGraphId = builder.createString(graphId);
 
-    sz.AddConnectionRequest.startAddConnectionRequest(builder);
+    sz.AddConnectionRequest.start(builder);
     sz.AddConnectionRequest.addGraphId(builder, offGraphId);
     sz.AddConnectionRequest.addSocketLink(
       builder,
-      sz.SocketLinkDescription.createSocketLinkDescription(
+      sz.SocketLinkDescription.create(
         builder,
         toFbLong(connection.outputSocket.parentId),
         toFbLong(connection.outputSocket.index),
@@ -111,7 +111,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
       )
     );
     sz.AddConnectionRequest.addCheckForCycles(builder, cycleDetection);
-    const off = sz.AddConnectionRequest.endAddConnectionRequest(builder);
+    const off = sz.AddConnectionRequest.end(builder);
     builder.finish(off);
 
     const requestPayload = builder.asUint8Array();
@@ -137,11 +137,11 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     const builder = new flatbuffers.Builder(356);
     const offGraphId = builder.createString(graphId);
 
-    sz.RemoveConnectionRequest.startRemoveConnectionRequest(builder);
+    sz.RemoveConnectionRequest.start(builder);
     sz.RemoveConnectionRequest.addGraphId(builder, offGraphId);
     sz.RemoveConnectionRequest.addSocketLink(
       builder,
-      sz.SocketLinkDescription.createSocketLinkDescription(
+      sz.SocketLinkDescription.create(
         builder,
         toFbLong(connection.outputSocket.parentId),
         toFbLong(connection.outputSocket.index),
@@ -150,7 +150,7 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
         connection.isWriteLink
       )
     );
-    const off = sz.RemoveConnectionRequest.endRemoveConnectionRequest(builder);
+    const off = sz.RemoveConnectionRequest.end(builder);
     builder.finish(off);
 
     const requestPayload = builder.asUint8Array();
