@@ -77,6 +77,8 @@ table SaveGraphRequest {
     graphId: string (id:0, required);
     filePath: string (id:1, required);   //!< The graph file.
     overwrite: bool = false (id:2);     //!< If we have the permission to overwrite the file.
+
+    visualization: [uint8] (id:3, flexbuffer); //!< Additional visualization data for this graph.
 }
 //! Response data: none
 //! Success: 

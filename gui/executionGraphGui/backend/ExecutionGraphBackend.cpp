@@ -29,14 +29,10 @@ namespace
 {
     using GraphConfigs = ExecutionGraphBackend::GraphConfigs;
 
-    template<typename F>
-    void forEachConfig(F&& func)
+    template<typename F> void forEachConfig(F&& func)
     {
         std::size_t idx = 0;
-        meta::for_each(GraphConfigs{},
-                       [&](auto graphConfig) {
-                           func(graphConfig, ++idx);
-                       });
+        meta::for_each(GraphConfigs{}, [&](auto graphConfig) { func(graphConfig, ++idx); });
     }
 
     //! Define all description Ids for the different graphs.
@@ -87,10 +83,9 @@ namespace
             forEachConfig([&](auto graphConfig, auto idx) {
                 using Config = decltype(graphConfig);
                 m.emplace(ids[idx],
-                          e::makeGraphTypeDescription<Config>(
-                              ids[idx],
-                              ExecutionGraphBackendDefs<Config>::getNodeDescriptions(),
-                              ExecutionGraphBackendDefs<Config>::getDescription()));
+                          e::makeGraphTypeDescription<Config>(ids[idx],
+                                                              ExecutionGraphBackendDefs<Config>::getNodeDescriptions(),
+                                                              ExecutionGraphBackendDefs<Config>::getDescription()));
             });
 
             return m;
@@ -153,25 +148,21 @@ public:
     //! @param Return the lock, such that no one can change the request count and
     //! the bool indicating if the request count is zero!
     template<typename Duration = std::chrono::seconds>
-    std::pair<std::unique_lock<Mutex>, bool> waitUntilOtherRequestsFinished(
-        Duration timeout = std::chrono::seconds(10))
+    std::pair<std::unique_lock<Mutex>, bool> waitUntilOtherRequestsFinished(Duration timeout = std::chrono::seconds(10))
     {
         std::unique_lock<Mutex> lock(m_requestCountMutex);
-        bool singleRequest =
-            m_onlySingleRequest.wait_for(lock, timeout, [&]() { return m_requestCount == 1; });
+        bool singleRequest = m_onlySingleRequest.wait_for(lock, timeout, [&]() { return m_requestCount == 1; });
         return std::make_pair(std::move(lock), singleRequest);
     }
 
 private:
-    ConditionVariable
-        m_onlySingleRequest;            //!< Condition variable indicating: request count == 1
-    mutable Mutex m_requestCountMutex;  //!< The mutex for the request count
-    std::size_t m_requestCount = 0;     //!< The number of simultanously handling requests.
+    ConditionVariable m_onlySingleRequest;  //!< Condition variable indicating: request count == 1
+    mutable Mutex m_requestCountMutex;      //!< The mutex for the request count
+    std::size_t m_requestCount = 0;         //!< The number of simultanously handling requests.
 };
 
 //! Get all graph description of supported graphs.
-const std::unordered_map<Id, GraphTypeDescription>&
-ExecutionGraphBackend::getGraphTypeDescriptions() const
+const std::unordered_map<Id, GraphTypeDescription>& ExecutionGraphBackend::getGraphTypeDescriptions() const
 {
     return ::getGraphTypeDescriptions();
 }
@@ -179,7 +170,8 @@ ExecutionGraphBackend::getGraphTypeDescriptions() const
 //! Save a graph to a file.
 void ExecutionGraphBackend::saveGraph(const Id& graphId,
                                       std::path filePath,
-                                      bool overwrite)
+                                      bool overwrite,
+                                      BinaryBufferView visualization)
 {
     auto deferred = initRequest(graphId);
 
@@ -203,12 +195,7 @@ void ExecutionGraphBackend::saveGraph(const Id& graphId,
         auto descIt = descs.find(id);
         EXECGRAPHGUI_ASSERT(descIt != descs.end(), "Implementation Error!");
 
-        graph->withRLock([&](auto& graph) {
-            graphS.write(graph,
-                         descIt->second,
-                         filePath,
-                         overwrite);
-        });
+        graph->withRLock([&](auto& graph) { graphS.write(graph, descIt->second, filePath, overwrite, visualization); });
     };
 
     std::visit(save, graphVar);
@@ -220,22 +207,18 @@ Id ExecutionGraphBackend::addGraph(const Id& graphType)
     const auto& idToIdx = getGraphTypeDescriptionsToIndex();
     auto it             = idToIdx.find(graphType);
 
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(it == idToIdx.end(),
-                                      "Graph type: '{0}' not known!",
-                                      graphType.toString());
+    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(it == idToIdx.end(), "Graph type: '{0}' not known!", graphType.toString());
 
-    return meta::visit<GraphConfigs>(
-        it->second,
-        [&](auto graphConfig) {
-            using Config = decltype(graphConfig);
-            using Graph  = typename ExecutionGraphBackendDefs<Config>::Graph;
-            Id newId;  // Generate new id
-            auto graph       = std::make_shared<Synchronized<Graph>>();
-            auto graphStatus = std::make_shared<GraphStatus>();
-            m_graphs.wlock()->emplace(std::make_pair(newId, graph));
-            m_status.wlock()->emplace(std::make_pair(newId, graphStatus));
-            return newId;
-        });
+    return meta::visit<GraphConfigs>(it->second, [&](auto graphConfig) {
+        using Config = decltype(graphConfig);
+        using Graph  = typename ExecutionGraphBackendDefs<Config>::Graph;
+        Id newId;  // Generate new id
+        auto graph       = std::make_shared<Synchronized<Graph>>();
+        auto graphStatus = std::make_shared<GraphStatus>();
+        m_graphs.wlock()->emplace(std::make_pair(newId, graph));
+        m_status.wlock()->emplace(std::make_pair(newId, graphStatus));
+        return newId;
+    });
 }
 
 //! Remove a graph with id `graphId` from the backend.
@@ -291,8 +274,7 @@ void ExecutionGraphBackend::removeGraphs()
 }
 
 //! Remove a node with type `type` from the graph with id `graphId`.
-void ExecutionGraphBackend::removeNode(const Id& graphId,
-                                       NodeId nodeId)
+void ExecutionGraphBackend::removeNode(const Id& graphId, NodeId nodeId)
 {
     auto s = initRequest(graphId);
 
@@ -302,10 +284,8 @@ void ExecutionGraphBackend::removeNode(const Id& graphId,
     auto remove = [&](auto& graph) {
         // Remove the node (gets destroyed right here after this scope!)
         auto node = graph->wlock()->removeNode(nodeId);
-        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(node == nullptr,
-                                          "Node with id '{0}' does not exist in graph with id '{1}'",
-                                          nodeId,
-                                          graphId.toString());
+        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(
+            node == nullptr, "Node with id '{0}' does not exist in graph with id '{1}'", nodeId, graphId.toString());
     };
 
     std::visit(remove, graphVar);
@@ -337,25 +317,18 @@ void ExecutionGraphBackend::removeConnection(const Id& graphId,
             auto graphL = graph->wlock();
             if(isWriteLink)
             {
-                graphL->removeWriteLink(outNodeId,
-                                        outSocketIdx,
-                                        inNodeId,
-                                        inSocketIdx);
+                graphL->removeWriteLink(outNodeId, outSocketIdx, inNodeId, inSocketIdx);
             }
             else
             {
-                graphL->removeGetLink(inNodeId,
-                                      inSocketIdx,
-                                      &outNodeId,
-                                      &outSocketIdx);
+                graphL->removeGetLink(inNodeId, inSocketIdx, &outNodeId, &outSocketIdx);
             }
         }  // Locking end
         catch(executionGraph::Exception& e)
         {
             EXECGRAPHGUI_THROW_BAD_REQUEST(
                 std::string("Removing connection from output node id '{0}' [socket idx: '{1}'] ") +
-                    (isWriteLink ? "<-- " : "--> ") +
-                    "input node id '{2}' [socket idx: '{3}' not successful!",
+                    (isWriteLink ? "<-- " : "--> ") + "input node id '{2}' [socket idx: '{3}' not successful!",
                 outNodeId,
                 outSocketIdx,
                 inNodeId,
@@ -374,9 +347,8 @@ Deferred ExecutionGraphBackend::initRequest(Id graphId)
     m_status.withWLock([&graphId](auto& stati) {
         auto it = stati.find(graphId);
 
-        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(it == stati.end(),
-                                          "No status for graph id: '{0}', Graph doesn't exist!",
-                                          graphId.toString());
+        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(
+            it == stati.end(), "No status for graph id: '{0}', Graph doesn't exist!", graphId.toString());
 
         auto& status = it->second;
         EXECGRAPHGUI_THROW_BAD_REQUEST_IF(!status->isRequestHandlingEnabled(),
@@ -406,14 +378,10 @@ Deferred ExecutionGraphBackend::initRequest(Id graphId)
 void ExecutionGraphBackend::clearGraphData(Id graphId)
 {
     auto nErased = m_graphs.wlock()->erase(graphId);
-    EXECGRAPH_ASSERT(nErased != 0,
-                     "No such graph with id: '{0}' removed!",
-                     graphId.toString());
+    EXECGRAPH_ASSERT(nErased != 0, "No such graph with id: '{0}' removed!", graphId.toString());
 
     nErased = m_status.wlock()->erase(graphId);
-    EXECGRAPH_ASSERT(nErased != 0,
-                     "No such graph status with id: '{0}' removed!",
-                     graphId.toString());
+    EXECGRAPH_ASSERT(nErased != 0, "No such graph status with id: '{0}' removed!", graphId.toString());
 
     // nErased = m_executor.wlock()->erase(graphId);
     // EXECGRAPH_ASSERT(nErased == 0,
@@ -422,14 +390,12 @@ void ExecutionGraphBackend::clearGraphData(Id graphId)
 }
 
 //! Get the graph corresponding to `graphId`.
-ExecutionGraphBackend::GraphVariant
-ExecutionGraphBackend::getGraph(const Id& graphId)
+ExecutionGraphBackend::GraphVariant ExecutionGraphBackend::getGraph(const Id& graphId)
 {
     return m_graphs.withRLock([&](auto& graphs) {
         auto graphIt = graphs.find(graphId);
-        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(graphIt == graphs.cend(),
-                                          "Graph id: '{0}' does not exist!",
-                                          graphId.toString());
+        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(
+            graphIt == graphs.cend(), "Graph id: '{0}' does not exist!", graphId.toString());
         return graphIt->second;
     });
 }

@@ -28,14 +28,10 @@ GraphManagementRequestHandler::FuncMap GraphManagementRequestHandler::initFuncti
 {
     using Entry = typename FuncMap::Entry;
 
-    auto r = {Entry(targetBase / "general/addGraph",
-                    Function(&GraphManagementRequestHandler::handleAddGraph)),
-              Entry(targetBase / "general/removeGraph",
-                    Function(&GraphManagementRequestHandler::handleRemoveGraph)),
-              Entry(targetBase / "general/saveGraph",
-                    Function(&GraphManagementRequestHandler::handleSaveGraph)),
-              Entry(targetBase / "general/loadGraph",
-                    Function(&GraphManagementRequestHandler::handleLoadGraph))};
+    auto r = {Entry(targetBase / "general/addGraph", Function(&GraphManagementRequestHandler::handleAddGraph)),
+              Entry(targetBase / "general/removeGraph", Function(&GraphManagementRequestHandler::handleRemoveGraph)),
+              Entry(targetBase / "general/saveGraph", Function(&GraphManagementRequestHandler::handleSaveGraph)),
+              Entry(targetBase / "general/loadGraph", Function(&GraphManagementRequestHandler::handleLoadGraph))};
     return {r};
 }
 
@@ -44,14 +40,14 @@ const GraphManagementRequestHandler::FuncMap GraphManagementRequestHandler::m_fu
     GraphManagementRequestHandler::initFunctionMap();
 
 //! Konstructor.
-GraphManagementRequestHandler::GraphManagementRequestHandler(
-    std::shared_ptr<ExecutionGraphBackend> backend, const IdNamed& id)
+GraphManagementRequestHandler::GraphManagementRequestHandler(std::shared_ptr<ExecutionGraphBackend> backend,
+                                                             const IdNamed& id)
     : BackendRequestHandler(id), m_backend(backend)
 {}
 
 //! Get the request types for which this handler is registered.
-const std::unordered_set<GraphManagementRequestHandler::HandlerKey>&
-GraphManagementRequestHandler::requestTargets() const
+const std::unordered_set<GraphManagementRequestHandler::HandlerKey>& GraphManagementRequestHandler::requestTargets()
+    const
 {
     return m_functionMap.keys();
 }
@@ -64,8 +60,7 @@ void GraphManagementRequestHandler::handleRequest(const Request& request, Respon
 }
 
 //! Handle the operation of adding a graph.
-void GraphManagementRequestHandler::handleAddGraph(const Request& request,
-                                                   ResponsePromise& response)
+void GraphManagementRequestHandler::handleAddGraph(const Request& request, ResponsePromise& response)
 {
     // Request validation
     auto& payload = request.payload();
@@ -87,13 +82,12 @@ void GraphManagementRequestHandler::handleAddGraph(const Request& request,
     builder.Finish(responseOff);
 
     // Set the response ready
-    response.setReady(ResponsePromise::Payload{
-        releaseIntoBinaryBuffer(std::move(allocator), builder), "application/octet-stream"});
+    response.setReady(
+        ResponsePromise::Payload{releaseIntoBinaryBuffer(std::move(allocator), builder), "application/octet-stream"});
 }
 
 //! Handle the operation of removing a graph.
-void GraphManagementRequestHandler::handleRemoveGraph(const Request& request,
-                                                      ResponsePromise& response)
+void GraphManagementRequestHandler::handleRemoveGraph(const Request& request, ResponsePromise& response)
 {
     // Request validation
     auto& payload = request.payload();
@@ -111,8 +105,7 @@ void GraphManagementRequestHandler::handleRemoveGraph(const Request& request,
 }
 
 //! Handle the operation of saving a graph to a file.
-void GraphManagementRequestHandler::handleSaveGraph(const Request& request,
-                                                    ResponsePromise& response)
+void GraphManagementRequestHandler::handleSaveGraph(const Request& request, ResponsePromise& response)
 {
     // Request validation
     auto& payload = request.payload();
@@ -120,16 +113,16 @@ void GraphManagementRequestHandler::handleSaveGraph(const Request& request,
 
     auto saveReq = getRootOfPayloadAndVerify<s::SaveGraphRequest>(*payload);
 
-    m_backend->saveGraph(Id{saveReq->graphId()->c_str()},
-                         saveReq->filePath()->c_str(),
-                         saveReq->overwrite());
+    auto vis     = saveReq.visualization();
+    auto visView = BinaryBufferView(vis.data(), vis.size());
+
+    m_backend->saveGraph(Id{saveReq->graphId()->c_str()}, saveReq->filePath()->c_str(), saveReq->overwrite(), visView);
 
     response.setReady();
 }
 
 //! Handle the operation of loading a graph from a file.
-void GraphManagementRequestHandler::handleLoadGraph(const Request& request,
-                                                    ResponsePromise& response)
+void GraphManagementRequestHandler::handleLoadGraph(const Request& request, ResponsePromise& response)
 {
     // Request validation
     auto& payload = request.payload();

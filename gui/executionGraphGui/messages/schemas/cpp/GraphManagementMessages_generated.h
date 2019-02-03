@@ -293,7 +293,8 @@ struct SaveGraphRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_GRAPHID = 4,
     VT_FILEPATH = 6,
-    VT_OVERWRITE = 8
+    VT_OVERWRITE = 8,
+    VT_VISUALIZATION = 10
   };
   const flatbuffers::String *graphId() const {
     return GetPointer<const flatbuffers::String *>(VT_GRAPHID);
@@ -304,6 +305,12 @@ struct SaveGraphRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool overwrite() const {
     return GetField<uint8_t>(VT_OVERWRITE, 0) != 0;
   }
+  const flatbuffers::Vector<uint8_t> *visualization() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_VISUALIZATION);
+  }
+  flexbuffers::Reference visualization_flexbuffer_root() const {
+    return flexbuffers::GetRoot(visualization()->Data(), visualization()->size());
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_GRAPHID) &&
@@ -311,6 +318,8 @@ struct SaveGraphRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffsetRequired(verifier, VT_FILEPATH) &&
            verifier.VerifyString(filePath()) &&
            VerifyField<uint8_t>(verifier, VT_OVERWRITE) &&
+           VerifyOffset(verifier, VT_VISUALIZATION) &&
+           verifier.VerifyVector(visualization()) &&
            verifier.EndTable();
   }
 };
@@ -326,6 +335,9 @@ struct SaveGraphRequestBuilder {
   }
   void add_overwrite(bool overwrite) {
     fbb_.AddElement<uint8_t>(SaveGraphRequest::VT_OVERWRITE, static_cast<uint8_t>(overwrite), 0);
+  }
+  void add_visualization(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> visualization) {
+    fbb_.AddOffset(SaveGraphRequest::VT_VISUALIZATION, visualization);
   }
   explicit SaveGraphRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -345,8 +357,10 @@ inline flatbuffers::Offset<SaveGraphRequest> CreateSaveGraphRequest(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> graphId = 0,
     flatbuffers::Offset<flatbuffers::String> filePath = 0,
-    bool overwrite = false) {
+    bool overwrite = false,
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> visualization = 0) {
   SaveGraphRequestBuilder builder_(_fbb);
+  builder_.add_visualization(visualization);
   builder_.add_filePath(filePath);
   builder_.add_graphId(graphId);
   builder_.add_overwrite(overwrite);
@@ -357,14 +371,17 @@ inline flatbuffers::Offset<SaveGraphRequest> CreateSaveGraphRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *graphId = nullptr,
     const char *filePath = nullptr,
-    bool overwrite = false) {
+    bool overwrite = false,
+    const std::vector<uint8_t> *visualization = nullptr) {
   auto graphId__ = graphId ? _fbb.CreateString(graphId) : 0;
   auto filePath__ = filePath ? _fbb.CreateString(filePath) : 0;
+  auto visualization__ = visualization ? _fbb.CreateVector<uint8_t>(*visualization) : 0;
   return executionGraphGui::serialization::CreateSaveGraphRequest(
       _fbb,
       graphId__,
       filePath__,
-      overwrite);
+      overwrite,
+      visualization__);
 }
 
 }  // namespace serialization

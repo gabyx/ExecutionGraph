@@ -443,10 +443,35 @@ overwrite():boolean {
 };
 
 /**
+ * @param number index
+ * @returns number
+ */
+visualization(index: number):number|null {
+  var offset = this.bb!.__offset(this.bb_pos, 10);
+  return offset ? this.bb!.readUint8(this.bb!.__vector(this.bb_pos + offset) + index) : 0;
+};
+
+/**
+ * @returns number
+ */
+visualizationLength():number {
+  var offset = this.bb!.__offset(this.bb_pos, 10);
+  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+};
+
+/**
+ * @returns Uint8Array
+ */
+visualizationArray():Uint8Array|null {
+  var offset = this.bb!.__offset(this.bb_pos, 10);
+  return offset ? new Uint8Array(this.bb!.bytes().buffer, this.bb!.bytes().byteOffset + this.bb!.__vector(this.bb_pos + offset), this.bb!.__vector_len(this.bb_pos + offset)) : null;
+};
+
+/**
  * @param flatbuffers.Builder builder
  */
 static startSaveGraphRequest(builder:flatbuffers.Builder) {
-  builder.startObject(3);
+  builder.startObject(4);
 };
 
 /**
@@ -475,6 +500,35 @@ static addOverwrite(builder:flatbuffers.Builder, overwrite:boolean) {
 
 /**
  * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset visualizationOffset
+ */
+static addVisualization(builder:flatbuffers.Builder, visualizationOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(3, visualizationOffset, 0);
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @param Array.<number> data
+ * @returns flatbuffers.Offset
+ */
+static createVisualizationVector(builder:flatbuffers.Builder, data:number[] | Uint8Array):flatbuffers.Offset {
+  builder.startVector(1, data.length, 1);
+  for (var i = data.length - 1; i >= 0; i--) {
+    builder.addInt8(data[i]);
+  }
+  return builder.endVector();
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @param number numElems
+ */
+static startVisualizationVector(builder:flatbuffers.Builder, numElems:number) {
+  builder.startVector(1, numElems, 1);
+};
+
+/**
+ * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
 static endSaveGraphRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
@@ -484,11 +538,12 @@ static endSaveGraphRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 };
 
-static createSaveGraphRequest(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset, filePathOffset:flatbuffers.Offset, overwrite:boolean):flatbuffers.Offset {
+static createSaveGraphRequest(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset, filePathOffset:flatbuffers.Offset, overwrite:boolean, visualizationOffset:flatbuffers.Offset):flatbuffers.Offset {
   SaveGraphRequest.startSaveGraphRequest(builder);
   SaveGraphRequest.addGraphId(builder, graphIdOffset);
   SaveGraphRequest.addFilePath(builder, filePathOffset);
   SaveGraphRequest.addOverwrite(builder, overwrite);
+  SaveGraphRequest.addVisualization(builder, visualizationOffset);
   return SaveGraphRequest.endSaveGraphRequest(builder);
 }
 }

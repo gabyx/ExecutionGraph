@@ -31,6 +31,7 @@
 #include "executionGraph/common/FileSystem.hpp"
 #include "executionGraphGui/backend/Backend.hpp"
 #include "executionGraphGui/backend/ExecutionGraphBackendDefs.hpp"
+#include "executionGraphGui/common/BinaryBufferView.hpp"
 #include "executionGraphGui/common/RequestError.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
@@ -53,11 +54,9 @@ public:
     using SocketIndex          = executionGraph::SocketIndex;
     using Deferred             = executionGraph::Deferred;
 
-    template<typename... Args>
-    using Synchronized = executionGraph::Synchronized<Args...>;
+    template<typename... Args> using Synchronized = executionGraph::Synchronized<Args...>;
 
-    template<typename K, typename T>
-    using SyncedUMap = Synchronized<std::unordered_map<K, T>>;
+    template<typename K, typename T> using SyncedUMap = Synchronized<std::unordered_map<K, T>>;
 
     //! All supported graphs.
     using GraphConfigs                       = meta::list<executionGraph::GeneralConfig<>>;
@@ -67,17 +66,14 @@ public:
     struct details
     {
         // Get the graph from the backend.
-        template<typename Config>
-        using getGraph = typename ExecutionGraphBackendDefs<Config>::Graph;
+        template<typename Config> using getGraph = typename ExecutionGraphBackendDefs<Config>::Graph;
 
         // List of graphs types.
         using Graphs = meta::transform<GraphConfigs, meta::quote<details::getGraph>>;
 
         // The underlying variant.
-        template<typename Graph>
-        using toPointer    = std::shared_ptr<Synchronized<Graph>>;
-        using GraphVariant = meta::apply<meta::quote<std::variant>,
-                                         meta::transform<Graphs, meta::quote<toPointer>>>;
+        template<typename Graph> using toPointer = std::shared_ptr<Synchronized<Graph>>;
+        using GraphVariant = meta::apply<meta::quote<std::variant>, meta::transform<Graphs, meta::quote<toPointer>>>;
     };
 
     using GraphVariant = details::GraphVariant;
@@ -87,14 +83,12 @@ private:
     class GraphStatus;
 
 public:
-    ExecutionGraphBackend(std::path rootPath)
-        : Backend(IdNamed("ExecutionGraphBackend"))
-        , m_rootPath(rootPath) {}
+    ExecutionGraphBackend(std::path rootPath) : Backend(IdNamed("ExecutionGraphBackend")), m_rootPath(rootPath) {}
     ~ExecutionGraphBackend() override = default;
 
     //! Load/Save graphs.
     //@{
-    void saveGraph(const Id& graphId, std::path filePath, bool overwrite);
+    void saveGraph(const Id& graphId, ::path filePath, bool overwrite, BinaryBufferView visualization = {});
     //@}
 
     //! Adding/removing graphs.
@@ -155,9 +149,7 @@ private:
 
 //! Add a node with type `type` to the graph with id `graphId`.
 template<typename ResponseCreator>
-void ExecutionGraphBackend::addNode(const Id& graphId,
-                                    std::string_view type,
-                                    ResponseCreator&& responseCreator)
+void ExecutionGraphBackend::addNode(const Id& graphId, std::string_view type, ResponseCreator&& responseCreator)
 {
     auto deferred = initRequest(graphId);
 
@@ -168,8 +160,7 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
 
     // Make a visitor to dispatch the "add" over the variant...
     auto add = [&](auto& graph) {
-        using GraphType =
-            typename std::remove_cv_t<std::remove_reference_t<decltype(*graph)>>::DataType;
+        using GraphType    = typename std::remove_cv_t<std::remove_reference_t<decltype(*graph)>>::DataType;
         using Config       = typename GraphType::Config;
         using NodeBaseType = typename Config::NodeBaseType;
 
@@ -227,8 +218,7 @@ void ExecutionGraphBackend::addConnection(const Id& graphId,
 
     // Make a visitor to dispatch the "add" over the variant...
     auto add = [&](auto& graph) {
-        using GraphType =
-            typename std::remove_cv_t<std::remove_reference_t<decltype(*graph)>>::DataType;
+        using GraphType = typename std::remove_cv_t<std::remove_reference_t<decltype(*graph)>>::DataType;
 
         // Potential cycles data structure
         std::vector<executionGraph::CycleDescription> cycles;
@@ -237,8 +227,7 @@ void ExecutionGraphBackend::addConnection(const Id& graphId,
         auto graphL = graph->wlock();
         try
         {
-            EXECGRAPHGUI_THROW_BAD_REQUEST_IF(checkForCycles,
-                                              "Checking cycles not yet implemented!");
+            EXECGRAPHGUI_THROW_BAD_REQUEST_IF(checkForCycles, "Checking cycles not yet implemented!");
 
             if(isWriteLink)
             {
@@ -253,8 +242,7 @@ void ExecutionGraphBackend::addConnection(const Id& graphId,
         {
             EXECGRAPHGUI_THROW_BAD_REQUEST(
                 std::string("Adding connection from output node id '{0}' [socket idx: '{1}'] ") +
-                    (isWriteLink ? "<-- " : "--> ") +
-                    "input node id '{2}' [socket idx: '{3}' not successful!",
+                    (isWriteLink ? "<-- " : "--> ") + "input node id '{2}' [socket idx: '{3}' not successful!",
                 outNodeId,
                 outSocketIdx,
                 inNodeId,
