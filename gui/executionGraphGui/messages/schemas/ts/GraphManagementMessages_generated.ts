@@ -314,21 +314,12 @@ static getRootAsLoadGraphResponse(bb:flatbuffers.ByteBuffer, obj?:LoadGraphRespo
 };
 
 /**
- * @param number index
  * @param executionGraph.serialization.ExecutionGraph= obj
- * @returns executionGraph.serialization.ExecutionGraph
+ * @returns executionGraph.serialization.ExecutionGraph|null
  */
-graph(index: number, obj?:NS12623504695714931604.executionGraph.serialization.ExecutionGraph):NS12623504695714931604.executionGraph.serialization.ExecutionGraph|null {
+graph(obj?:NS12623504695714931604.executionGraph.serialization.ExecutionGraph):NS12623504695714931604.executionGraph.serialization.ExecutionGraph|null {
   var offset = this.bb!.__offset(this.bb_pos, 4);
-  return offset ? (obj || new NS12623504695714931604.executionGraph.serialization.ExecutionGraph).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
-};
-
-/**
- * @returns number
- */
-graphLength():number {
-  var offset = this.bb!.__offset(this.bb_pos, 4);
-  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+  return offset ? (obj || new NS12623504695714931604.executionGraph.serialization.ExecutionGraph).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 };
 
 /**
@@ -344,27 +335,6 @@ static startLoadGraphResponse(builder:flatbuffers.Builder) {
  */
 static addGraph(builder:flatbuffers.Builder, graphOffset:flatbuffers.Offset) {
   builder.addFieldOffset(0, graphOffset, 0);
-};
-
-/**
- * @param flatbuffers.Builder builder
- * @param Array.<flatbuffers.Offset> data
- * @returns flatbuffers.Offset
- */
-static createGraphVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
-  builder.startVector(4, data.length, 4);
-  for (var i = data.length - 1; i >= 0; i--) {
-    builder.addOffset(data[i]);
-  }
-  return builder.endVector();
-};
-
-/**
- * @param flatbuffers.Builder builder
- * @param number numElems
- */
-static startGraphVector(builder:flatbuffers.Builder, numElems:number) {
-  builder.startVector(4, numElems, 4);
 };
 
 /**

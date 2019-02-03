@@ -99,77 +99,16 @@ namespace
 
 }  // namespace
 
-class ExecutionGraphBackend::GraphStatus
-{
-private:
-    using Mutex             = std::mutex;
-    using Lock              = std::scoped_lock<Mutex>;
-    using ConditionVariable = std::condition_variable;
-
-public:
-    bool isRequestHandlingEnabled() const { return m_requestHandlingEnabled; }
-    void setRequestHandlingEnabled(bool enabled) { m_requestHandlingEnabled = enabled; }
-
-private:
-    std::atomic<bool> m_requestHandlingEnabled = true;
-
-public:
-    std::size_t getRequestCount() const
-    {
-        Lock lock(m_requestCountMutex);
-        return m_requestCount;
-    }
-
-    void incrementRequestCount()
-    {
-        Lock lock(m_requestCountMutex);
-        ++m_requestCount;
-    };
-
-    void decrementRequestCount()
-    {
-        bool singleRequest = false;
-        {  // Locking start
-            Lock lock(m_requestCountMutex);
-            if(m_requestCount)
-            {
-                --m_requestCount;
-            }
-            singleRequest = m_requestCount == 1;
-        }  // Locking end
-
-        if(singleRequest)
-        {
-            m_onlySingleRequest.notify_all();  // Notify all waiting threads, that this graph
-                                               // has one single request
-        }
-    };
-
-    //! Wait until the request count is zero, or timeout.
-    //! @param Return the lock, such that no one can change the request count and
-    //! the bool indicating if the request count is zero!
-    template<typename Duration = std::chrono::seconds>
-    std::pair<std::unique_lock<Mutex>, bool> waitUntilOtherRequestsFinished(Duration timeout = std::chrono::seconds(10))
-    {
-        std::unique_lock<Mutex> lock(m_requestCountMutex);
-        bool singleRequest = m_onlySingleRequest.wait_for(lock, timeout, [&]() { return m_requestCount == 1; });
-        return std::make_pair(std::move(lock), singleRequest);
-    }
-
-private:
-    ConditionVariable m_onlySingleRequest;  //!< Condition variable indicating: request count == 1
-    mutable Mutex m_requestCountMutex;      //!< The mutex for the request count
-    std::size_t m_requestCount = 0;         //!< The number of simultanously handling requests.
-};
-
 //! Get all graph description of supported graphs.
-const std::unordered_map<Id, GraphTypeDescription>& ExecutionGraphBackend::getGraphTypeDescriptions() const
+const std::unordered_map<Id, GraphTypeDescription>&
+ExecutionGraphBackend::getGraphTypeDescriptions() const
 {
     return ::getGraphTypeDescriptions();
 }
 
 //! Get all graph description of supported graphs.
-const std::unordered_map<Id, std::size_t>& ExecutionGraphBackend::getGraphTypeDescriptionsToIndex() const
+const std::unordered_map<Id, std::size_t>&
+ExecutionGraphBackend::getGraphTypeDescriptionsToIndex() const
 {
     return ::getGraphTypeDescriptionsToIndex();
 }
@@ -199,7 +138,7 @@ void ExecutionGraphBackend::saveGraph(const Id& graphId,
         typename ExecutionGraphBackendDefs<Config>::GraphSerializer graphS(nodeS);
 
         auto descIt = descs.find(id);
-        EXECGRAPHGUI_ASSERT(descIt != descs.end(), "Implementation Error!");
+        EXECGRAPHGUI_ASSERT(descIt != descs.end(), "Graph Description not mapped (?)");
 
         graph->withRLock([&](auto& graph) { graphS.write(graph,
                                                          descIt->second,
@@ -246,7 +185,9 @@ void ExecutionGraphBackend::removeGraph(const Id& graphId)
     std::shared_ptr<GraphStatus> graphStatus;
     m_status.withWLock([&graphId, &graphStatus](auto& status) {
         auto it = status.find(graphId);
-        EXECGRAPHGUI_ASSERT(it != status.cend(), "Implementation Error!");
+        EXECGRAPHGUI_ASSERT(it != status.cend(),
+                            "No status for graph id '{0}'",
+                            graphId.toString());
         graphStatus = it->second;
     });
 

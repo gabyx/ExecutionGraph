@@ -80,7 +80,7 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
         AllocatorProxyFlatBuffer<Allocator> allocator(response.getAllocator());
         flatbuffers::FlatBufferBuilder builder(512, &allocator);
 
-        using GraphType      = typename std::remove_cv_t<std::remove_reference_t<decltype(graph)>>;
+        using GraphType      = std::decay_t<decltype(graph)>;
         using Config         = typename GraphType::Config;
         using NodeSerializer = typename ExecutionGraphBackendDefs<Config>::NodeSerializer;
 

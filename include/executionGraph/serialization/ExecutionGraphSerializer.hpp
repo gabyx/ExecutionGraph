@@ -27,17 +27,18 @@ namespace executionGraph
     template<typename BufferView = BinaryBufferView>
     const executionGraph::serialization::ExecutionGraph* getGraphSerialization(BufferView buffer)
     {
+        namespace s = serialization;
         EXECGRAPH_ASSERT(buffer.data() != nullptr, "Buffer is nullptr!");
 
         // Deserialize
-        EXECGRAPH_THROW_IF(!ExecutionGraphBufferHasIdentifier(buffer.data()),
+        EXECGRAPH_THROW_IF(!s::ExecutionGraphBufferHasIdentifier(buffer.data()),
                            "File identifier not found!");
 
         flatbuffers::Verifier verifier(buffer.data(), buffer.size(), 64, 1000000000);
-        EXECGRAPH_THROW_IF(!serialization::VerifyExecutionGraphBuffer(verifier),
+        EXECGRAPH_THROW_IF(!s::VerifyExecutionGraphBuffer(verifier),
                            "Buffer could not be verified!");
 
-        auto graph = serialization::GetExecutionGraph(buffer);
+        auto graph = s::GetExecutionGraph(buffer.data());
         EXECGRAPH_THROW_IF(graph == nullptr,
                            "Deserialization is invalid!");
         return graph;
@@ -64,14 +65,15 @@ namespace executionGraph
             : m_nodeSerializer(nodeSerializer) {}
         ~ExecutionGraphSerializer() = default;
 
-        //! Default no-op checker for reading.
+    private:
+        //! Default no-op functor for reading.
         struct NoOp
         {
             void operator()(const serialization::ExecutionGraph& graph) {}
         };
 
     public:
-        //! Read an execution graph from a file `filePath`.
+        //! Read a graph from a file `filePath`.
         template<typename PreLoad  = NoOp,
                  typename PostLoad = NoOp>
         void read(const std::path& filePath,
@@ -96,14 +98,14 @@ namespace executionGraph
             }
         }
 
-        //! Read an execution graph from a loaded serialization `graph`.
+        //! Read a graph from a loaded serialization `graph`.
         void read(const serialization::ExecutionGraph& graph,
                   GraphType& execGraph) const
         {
             readGraph(execGraph, graph);
         }
 
-        //! Write an execution graph to the file `filePath`.
+        //! Write a graph to the file `filePath`.
         void write(const GraphType& execGraph,
                    const GraphTypeDescription& graphDescription,
                    const std::path& filePath,
@@ -125,14 +127,13 @@ namespace executionGraph
             file.close();
         }
 
-    private:
+    public:
         //! Serialize a graph `graph` and return the offset.
-        template<typename BufferView>
-        flatbuffers::Offset<serialization::ExecutionGraph> writeGraph(
-            flatbuffers::FlatBufferBuilder& builder,
-            const GraphType& execGraph,
-            const GraphTypeDescription& graphDescription,
-            BufferView visualization = std::basic_string_view<uint8_t>{}) const
+        flatbuffers::Offset<serialization::ExecutionGraph>
+        writeGraph(flatbuffers::FlatBufferBuilder& builder,
+                   const GraphType& execGraph,
+                   const GraphTypeDescription& graphDescription,
+                   BinaryBufferView visualization = {}) const
         {
             namespace s = serialization;
             using namespace s;
@@ -160,6 +161,7 @@ namespace executionGraph
             return graphBuilder.Finish();
         }
 
+    private:
         //! Serialize all nodes of the graph `execGraph` and return the offsets.
         auto writeNodes(flatbuffers::FlatBufferBuilder& builder, const GraphType& execGraph) const
         {

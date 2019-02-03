@@ -116,7 +116,7 @@ export class FileBrowserComponent implements OnInit {
   }
 
   public openFile(file: FileInfo) {
-    assert(this.mode === FileBrowserMode.Open, 'Implementation Error!');
+    assert(this.mode === FileBrowserMode.Open, 'Wrong mode!');
     this.logger.debug(`Opening file '${file.path}'`);
     this.fileActionOpen.emit(file.path);
   }
@@ -131,7 +131,7 @@ export class FileBrowserComponent implements OnInit {
   }
 
   public deleteConfirm(path: FileInfo | DirectoryInfo) {
-    assert(this.allowDelete, 'Implementation Error!');
+    assert(this.allowDelete, 'Delete needs to be allowed!');
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       minWidth: '10%',
       data: {
@@ -147,7 +147,7 @@ export class FileBrowserComponent implements OnInit {
   }
 
   public isFileOpenable(file: FileInfo) {
-    assert(file.isFile, 'Implementation Error!');
+    assert(file.isFile, 'Datastructure is corrupt!');
     return file.name.match(this.fileNameRegex) !== null;
   }
 
@@ -168,7 +168,7 @@ export class FileBrowserComponent implements OnInit {
   }
 
   private saveFile(fileName: string, checkOverwrite: boolean) {
-    assert(this.mode === FileBrowserMode.Save, 'Implementation Error!');
+    assert(this.mode === FileBrowserMode.Save, 'Wrong mode!');
 
     const showOverwrite = checkOverwrite ? this.checkOverwrite(fileName) : false;
 

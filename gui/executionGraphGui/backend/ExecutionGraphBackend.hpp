@@ -114,7 +114,9 @@ public:
     //! Adding/removing nodes.
     //@{
     template<typename ResponseCreator>
-    void addNode(const Id& graphId, std::string_view type, ResponseCreator&& responseCreator);
+    void addNode(const Id& graphId,
+                 std::string_view type,
+                 ResponseCreator&& responseCreator);
 
     void removeNode(const Id& graphId, NodeId id);
     //@}
@@ -159,6 +161,69 @@ private:
     // graph id.
 
     const std::path m_rootPath;  //!< Root path where relative file paths are based on (save/load).
+};
+
+class ExecutionGraphBackend::GraphStatus
+{
+private:
+    using Mutex             = std::mutex;
+    using Lock              = std::scoped_lock<Mutex>;
+    using ConditionVariable = std::condition_variable;
+
+public:
+    bool isRequestHandlingEnabled() const { return m_requestHandlingEnabled; }
+    void setRequestHandlingEnabled(bool enabled) { m_requestHandlingEnabled = enabled; }
+
+private:
+    std::atomic<bool> m_requestHandlingEnabled = true;
+
+public:
+    std::size_t getRequestCount() const
+    {
+        Lock lock(m_requestCountMutex);
+        return m_requestCount;
+    }
+
+    void incrementRequestCount()
+    {
+        Lock lock(m_requestCountMutex);
+        ++m_requestCount;
+    };
+
+    void decrementRequestCount()
+    {
+        bool singleRequest = false;
+        {  // Locking start
+            Lock lock(m_requestCountMutex);
+            if(m_requestCount)
+            {
+                --m_requestCount;
+            }
+            singleRequest = m_requestCount == 1;
+        }  // Locking end
+
+        if(singleRequest)
+        {
+            m_onlySingleRequest.notify_all();  // Notify all waiting threads, that this graph
+                                               // has one single request
+        }
+    };
+
+    //! Wait until the request count is zero, or timeout.
+    //! @param Return the lock, such that no one can change the request count and
+    //! the bool indicating if the request count is zero!
+    template<typename Duration = std::chrono::seconds>
+    std::pair<std::unique_lock<Mutex>, bool> waitUntilOtherRequestsFinished(Duration timeout = std::chrono::seconds(10))
+    {
+        std::unique_lock<Mutex> lock(m_requestCountMutex);
+        bool singleRequest = m_onlySingleRequest.wait_for(lock, timeout, [&]() { return m_requestCount == 1; });
+        return std::make_pair(std::move(lock), singleRequest);
+    }
+
+private:
+    ConditionVariable m_onlySingleRequest;  //!< Condition variable indicating: request count == 1
+    mutable Mutex m_requestCountMutex;      //!< The mutex for the request count
+    std::size_t m_requestCount = 0;         //!< The number of simultanously handling requests.
 };
 
 //! Add a node with type `type` to the graph with id `graphId`.
@@ -284,13 +349,20 @@ void ExecutionGraphBackend::loadGraph(const std::path& filePath,
     auto graphS = getGraphSerialization(BinaryBufferView{mapper.data(),
                                                          mapper.size()});
 
-    Id graphTypeId{graphS->graphDescription()->id()->c_str()};
-    auto& idsToIdx = getGraphTypeDescriptionsToIndex();
+    // We dont do anything (validation/checking) with the graph description
+    // we return the matched on in the backend.
+    Id graphDescId{graphS->graphDescription()->id()->c_str()};
 
-    auto it = idsToIdx.find(graphTypeId);
+    auto& idsToIdx = getGraphTypeDescriptionsToIndex();
+    auto it        = idsToIdx.find(graphDescId);
     EXECGRAPHGUI_THROW_BAD_REQUEST_IF(it == idsToIdx.end(),
                                       "Graph type id: '{0}' is not supported in the backend",
-                                      graphTypeId.toString());
+                                      graphDescId.toString());
+
+    auto itDesc = getGraphTypeDescriptions().find(graphDescId);
+    EXECGRAPH_ASSERT(itDesc != getGraphTypeDescriptions().end(),
+                     "Graph Description not mapped (?)");
+    auto& graphDesc = itDesc->second;
 
     // Load the graph
     auto load = [&](auto graphConfig) {
@@ -301,14 +373,25 @@ void ExecutionGraphBackend::loadGraph(const std::path& filePath,
         typename ExecutionGraphBackendDefs<Config>::GraphSerializer graphSerializer(nodeSerializer);
 
         // Load a new graph.
-        auto graph = std::make_shared<Synchronized<Graph>>();
-        graph->withWLock([&](auto& graph) { graphSerializer.read(graphS, graph); });
+        auto graph  = std::make_shared<Synchronized<Graph>>();
+        auto graphL = graph->wlock();
+        graphSerializer.read(*graphS, *graphL);
 
         // Graph loaded -> add it with a new id.
         Id newId;
         m_graphs.wlock()->emplace(std::make_pair(newId, graph));
         auto graphStatus = std::make_shared<GraphStatus>();
         m_status.wlock()->emplace(std::make_pair(newId, graphStatus));
+
+        auto vis = graphS->visualization();
+
+        // Create the response.
+        // Here we serialize the graph again.
+        // @todo maybe use the stuff from graphS -> wont work if we do postprocessing
+        // after the load here.
+        responseCreator(*graphL,
+                        graphDesc,
+                        BinaryBufferView{vis->data(), vis->size()});
     };
 
     meta::visit<GraphConfigs>(it->second, load);

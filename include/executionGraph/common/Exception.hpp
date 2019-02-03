@@ -59,7 +59,7 @@ namespace executionGraph
 
 namespace executionGraph
 {
-    //! Special exception to denote a fatal Implementation Error.
+    //! Special exception to denote a fatal error.
     class ExceptionFatal : public std::runtime_error
     {
     public:
