@@ -29,7 +29,8 @@ namespace
 {
     using GraphConfigs = ExecutionGraphBackend::GraphConfigs;
 
-    template<typename F> void forEachConfig(F&& func)
+    template<typename F>
+    void forEachConfig(F&& func)
     {
         std::size_t idx = 0;
         meta::for_each(GraphConfigs{}, [&](auto graphConfig) { func(graphConfig, ++idx); });
@@ -185,9 +186,8 @@ void ExecutionGraphBackend::saveGraph(const Id& graphId,
     auto& descs           = getGraphTypeDescriptions();
 
     auto save = [&](auto graph) {
-        using GraphType    = typename std::decay_t<decltype(*graph)>::DataType;
-        using Config       = typename GraphType::Config;
-        using NodeBaseType = typename Config::NodeBaseType;
+        using GraphType = typename std::decay_t<decltype(*graph)>::DataType;
+        using Config    = typename GraphType::Config;
 
         typename ExecutionGraphBackendDefs<Config>::NodeSerializer nodeS;
         typename ExecutionGraphBackendDefs<Config>::GraphSerializer graphS(nodeS);
@@ -195,7 +195,11 @@ void ExecutionGraphBackend::saveGraph(const Id& graphId,
         auto descIt = descs.find(id);
         EXECGRAPHGUI_ASSERT(descIt != descs.end(), "Implementation Error!");
 
-        graph->withRLock([&](auto& graph) { graphS.write(graph, descIt->second, filePath, overwrite, visualization); });
+        graph->withRLock([&](auto& graph) { graphS.write(graph,
+                                                         descIt->second,
+                                                         filePath,
+                                                         overwrite,
+                                                         visualization); });
     };
 
     std::visit(save, graphVar);
@@ -308,9 +312,8 @@ void ExecutionGraphBackend::removeConnection(const Id& graphId,
 
     // Make a visitor to dispatch the "remove" over the variant...
     auto remove = [&](auto& graph) {
-        using GraphType    = typename std::decay_t<decltype(*graph)>::DataType;
-        using Config       = typename GraphType::Config;
-        using NodeBaseType = typename Config::NodeBaseType;
+        using GraphType = typename std::decay_t<decltype(*graph)>::DataType;
+        using Config    = typename GraphType::Config;
 
         try
         {  // Locking start

@@ -31,7 +31,8 @@ namespace executionGraph
         */
     /* ---------------------------------------------------------------------------------------*/
 
-    template<typename TGraphType, typename TLogicNodeSerializer> class ExecutionGraphSerializer
+    template<typename TGraphType, typename TLogicNodeSerializer>
+    class ExecutionGraphSerializer
     {
     public:
         using GraphType = TGraphType;
@@ -39,12 +40,13 @@ namespace executionGraph
         EXECGRAPH_DEFINE_CONFIG(TConfig);
         using LogicNodeSerializer = TLogicNodeSerializer;
 
-        ExecutionGraphSerializer(LogicNodeSerializer& nodeSerializer) : m_nodeSerializer(nodeSerializer) {}
+        ExecutionGraphSerializer(LogicNodeSerializer& nodeSerializer)
+            : m_nodeSerializer(nodeSerializer) {}
         ~ExecutionGraphSerializer() = default;
 
     public:
         //! Read an execution graph from a file `filePath`.
-        std::unique_ptr<GraphType> read(const std::path& filePath) noexcept(false)
+        void read(const std::path& filePath, GraphType& execGraph) noexcept(false)
         {
             namespace s = serialization;
             using namespace s;
@@ -69,18 +71,16 @@ namespace executionGraph
 
             EXECGRAPH_THROW_IF(graph == nullptr, "Deserialization from '{0}' is invalid!", filePath);
 
-            auto execGraph = std::make_unique<GraphType>();
-            readGraph(*execGraph, *graph);
-            return std::move(execGraph);
+            readGraph(execGraph, *graph);
         }
 
         //! Write an execution graph to the file `filePath`.
-        template<typename BufferView>
+        template<typename BufferView = std::basic_string_view<uint8_t>>
         void write(const GraphType& execGraph,
                    const GraphTypeDescription& graphDescription,
                    const std::path& filePath,
                    bool overwrite           = false,
-                   BufferView visualization = std::basic_string_view<uint8_t>{}) noexcept(false)
+                   BufferView visualization = {}) noexcept(false)
         {
             flatbuffers::FlatBufferBuilder builder;
             auto graphOffset = writeGraph(builder, execGraph, graphDescription, visualization);
@@ -249,7 +249,8 @@ namespace executionGraph
         }
 
         //! Deserialize all nodes of a graph `graph` into the internal graph.
-        template<typename Nodes> void readNodes(GraphType& execGraph, Nodes& nodes)
+        template<typename Nodes>
+        void readNodes(GraphType& execGraph, Nodes& nodes)
         {
             for(auto node : nodes)
             {
@@ -267,7 +268,8 @@ namespace executionGraph
         }
 
         //! Deserialize all links of a graph `graph` into the internal graph.
-        template<typename Links> void readLinks(GraphType& execGraph, Links& links)
+        template<typename Links>
+        void readLinks(GraphType& execGraph, Links& links)
         {
             for(auto link : links)
             {

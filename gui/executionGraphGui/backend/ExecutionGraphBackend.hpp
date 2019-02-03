@@ -54,9 +54,11 @@ public:
     using SocketIndex          = executionGraph::SocketIndex;
     using Deferred             = executionGraph::Deferred;
 
-    template<typename... Args> using Synchronized = executionGraph::Synchronized<Args...>;
+    template<typename... Args>
+    using Synchronized = executionGraph::Synchronized<Args...>;
 
-    template<typename K, typename T> using SyncedUMap = Synchronized<std::unordered_map<K, T>>;
+    template<typename K, typename T>
+    using SyncedUMap = Synchronized<std::unordered_map<K, T>>;
 
     //! All supported graphs.
     using GraphConfigs                       = meta::list<executionGraph::GeneralConfig<>>;
@@ -66,13 +68,15 @@ public:
     struct details
     {
         // Get the graph from the backend.
-        template<typename Config> using getGraph = typename ExecutionGraphBackendDefs<Config>::Graph;
+        template<typename Config>
+        using getGraph = typename ExecutionGraphBackendDefs<Config>::Graph;
 
         // List of graphs types.
         using Graphs = meta::transform<GraphConfigs, meta::quote<details::getGraph>>;
 
         // The underlying variant.
-        template<typename Graph> using toPointer = std::shared_ptr<Synchronized<Graph>>;
+        template<typename Graph>
+        using toPointer    = std::shared_ptr<Synchronized<Graph>>;
         using GraphVariant = meta::apply<meta::quote<std::variant>, meta::transform<Graphs, meta::quote<toPointer>>>;
     };
 
@@ -83,12 +87,20 @@ private:
     class GraphStatus;
 
 public:
-    ExecutionGraphBackend(std::path rootPath) : Backend(IdNamed("ExecutionGraphBackend")), m_rootPath(rootPath) {}
+    ExecutionGraphBackend(std::path rootPath)
+        : Backend(IdNamed("ExecutionGraphBackend")), m_rootPath(rootPath) {}
     ~ExecutionGraphBackend() override = default;
 
     //! Load/Save graphs.
     //@{
-    void saveGraph(const Id& graphId, ::path filePath, bool overwrite, BinaryBufferView visualization = {});
+    void saveGraph(const Id& graphId,
+                   std::path filePath,
+                   bool overwrite,
+                   BinaryBufferView visualization = {});
+
+    template<typename ResponseCreator>
+    void loadGraph(const std::path& filePath,
+                   ResponseCreator&& responseCreator);
     //@}
 
     //! Adding/removing graphs.
@@ -149,7 +161,9 @@ private:
 
 //! Add a node with type `type` to the graph with id `graphId`.
 template<typename ResponseCreator>
-void ExecutionGraphBackend::addNode(const Id& graphId, std::string_view type, ResponseCreator&& responseCreator)
+void ExecutionGraphBackend::addNode(const Id& graphId,
+                                    std::string_view type,
+                                    ResponseCreator&& responseCreator)
 {
     auto deferred = initRequest(graphId);
 
@@ -256,4 +270,29 @@ void ExecutionGraphBackend::addConnection(const Id& graphId,
     };
 
     std::visit(add, graphVar);
+}
+
+template<typename ResponseCreator>
+void loadGraph(const std::path& filePath,
+               ResponseCreator&& responseCreator)
+{
+    GraphVariant graphVar = getGraph(graphId);
+
+    auto load = [&](auto graph) {
+        using GraphType = typename std::decay_t<decltype(*graph)>::DataType;
+        using Config    = typename GraphType::Config;
+
+        typename ExecutionGraphBackendDefs<Config>::NodeSerializer nodeS;
+        typename ExecutionGraphBackendDefs<Config>::GraphSerializer graphS(nodeS);
+
+        auto graphgraphS.read(filePath);
+
+        graph->withRLock([&](auto& graph) { graphS.write(graph,
+                                                         descIt->second,
+                                                         filePath,
+                                                         overwrite,
+                                                         visualization); });
+    };
+
+    std::visit(remove, graphVar);
 }

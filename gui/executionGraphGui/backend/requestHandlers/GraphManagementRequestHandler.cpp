@@ -113,10 +113,13 @@ void GraphManagementRequestHandler::handleSaveGraph(const Request& request, Resp
 
     auto saveReq = getRootOfPayloadAndVerify<s::SaveGraphRequest>(*payload);
 
-    auto vis     = saveReq.visualization();
-    auto visView = BinaryBufferView(vis.data(), vis.size());
+    auto vis     = saveReq->visualization();
+    auto visView = BinaryBufferView(vis->data(), vis->size());
 
-    m_backend->saveGraph(Id{saveReq->graphId()->c_str()}, saveReq->filePath()->c_str(), saveReq->overwrite(), visView);
+    m_backend->saveGraph(Id{saveReq->graphId()->c_str()},
+                         saveReq->filePath()->c_str(),
+                         saveReq->overwrite(),
+                         visView);
 
     response.setReady();
 }
