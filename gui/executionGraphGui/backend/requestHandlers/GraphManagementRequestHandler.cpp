@@ -134,8 +134,9 @@ void GraphManagementRequestHandler::handleLoadGraph(const Request& request, Resp
     auto loadReq = getRootOfPayloadAndVerify<s::LoadGraphRequest>(*payload);
 
     // Callback to create the response
-    auto responseCreator = [&response](auto& graph,
-                                       auto& graphDescription,
+    auto responseCreator = [&response](const auto& graphId,
+                                       const auto& graph,
+                                       const auto& graphDescription,
                                        BinaryBufferView visualization) {
         using Allocator = ResponsePromise::Allocator;
         AllocatorProxyFlatBuffer<Allocator> allocator(response.getAllocator());
@@ -154,7 +155,10 @@ void GraphManagementRequestHandler::handleLoadGraph(const Request& request, Resp
                                                       graphDescription,
                                                       visualization);
 
+        auto graphIdOff = builder.CreateString(graphId.toString());
+
         s::LoadGraphResponseBuilder loadResponse(builder);
+        loadResponse.add_graphId(graphIdOff);
         loadResponse.add_graph(graphOffset);
         auto resOff = loadResponse.Finish();
         builder.Finish(resOff);

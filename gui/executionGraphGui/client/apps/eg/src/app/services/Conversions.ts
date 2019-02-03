@@ -25,10 +25,6 @@ export function toFbLong(value: number | string): flatbuffers.Long {
 
 /**
  * Convert a `serialized`-instance of a graph type description to a `model`-instance.
- *
- * @export
- * @param {serialization.GraphTypeDescription} graphDesc
- * @returns {model.GraphTypeDescription}
  */
 export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescription): model.GraphTypeDescription {
   const sockets: model.SocketTypeDescription[] = [];
@@ -74,10 +70,6 @@ export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescrip
 
 /**
  *  Convert a `serialized`-instance of a node to a `model`-instance.
- *
- * @export
- * @param {serialization.LogicNode} node
- * @returns {Node}
  */
 export function toNode(node: serialization.LogicNode): model.Node {
   // Convert to a node model
@@ -111,4 +103,17 @@ export function toNode(node: serialization.LogicNode): model.Node {
   extractSockets('output', allSockets);
 
   return model.fromNode.createNode(nodeId, node.type(), allSockets);
+}
+
+/**
+ *  Convert a `serialized`-instance of a graph to a `model`-instance.
+ */
+export function toGraph(graphId: string, graph: serialization.ExecutionGraph): model.Graph {
+  return {
+    id: graphId,
+    name: 'Unnamed',
+    connections: {},
+    nodes: {},
+    typeId: graph.graphDescription().id()
+  };
 }

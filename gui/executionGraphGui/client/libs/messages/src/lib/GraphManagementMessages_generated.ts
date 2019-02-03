@@ -314,11 +314,22 @@ static getRoot(bb:flatbuffers.ByteBuffer, obj?:LoadGraphResponse):LoadGraphRespo
 };
 
 /**
+ * @param flatbuffers.Encoding= optionalEncoding
+ * @returns string|Uint8Array|null
+ */
+graphId():string|null
+graphId(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+graphId(optionalEncoding?:any):string|Uint8Array|null {
+  var offset = this.bb!.__offset(this.bb_pos, 4);
+  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+};
+
+/**
  * @param executionGraph.serialization.ExecutionGraph= obj
  * @returns executionGraph.serialization.ExecutionGraph|null
  */
 graph(obj?:NS12623504695714931604.executionGraph.serialization.ExecutionGraph):NS12623504695714931604.executionGraph.serialization.ExecutionGraph|null {
-  var offset = this.bb!.__offset(this.bb_pos, 4);
+  var offset = this.bb!.__offset(this.bb_pos, 6);
   return offset ? (obj || new NS12623504695714931604.executionGraph.serialization.ExecutionGraph).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 };
 
@@ -326,7 +337,15 @@ graph(obj?:NS12623504695714931604.executionGraph.serialization.ExecutionGraph):N
  * @param flatbuffers.Builder builder
  */
 static start(builder:flatbuffers.Builder) {
-  builder.startObject(1);
+  builder.startObject(2);
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset graphIdOffset
+ */
+static addGraphId(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(0, graphIdOffset, 0);
 };
 
 /**
@@ -334,7 +353,7 @@ static start(builder:flatbuffers.Builder) {
  * @param flatbuffers.Offset graphOffset
  */
 static addGraph(builder:flatbuffers.Builder, graphOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(0, graphOffset, 0);
+  builder.addFieldOffset(1, graphOffset, 0);
 };
 
 /**
@@ -343,12 +362,14 @@ static addGraph(builder:flatbuffers.Builder, graphOffset:flatbuffers.Offset) {
  */
 static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
-  builder.requiredField(offset, 4); // graph
+  builder.requiredField(offset, 4); // graphId
+  builder.requiredField(offset, 6); // graph
   return offset;
 };
 
-static create(builder:flatbuffers.Builder, graphOffset:flatbuffers.Offset):flatbuffers.Offset {
+static create(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset, graphOffset:flatbuffers.Offset):flatbuffers.Offset {
   LoadGraphResponse.start(builder);
+  LoadGraphResponse.addGraphId(builder, graphIdOffset);
   LoadGraphResponse.addGraph(builder, graphOffset);
   return LoadGraphResponse.end(builder);
 }

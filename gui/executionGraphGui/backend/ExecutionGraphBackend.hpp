@@ -388,7 +388,8 @@ void ExecutionGraphBackend::loadGraph(const std::path& filePath,
         // @todo maybe use the stuff from graphS -> wont work if we do postprocessing
         // after the load here.
         auto vis = graphS->visualization();
-        responseCreator(*graphL,
+        responseCreator(newId,
+                        *graphL,
                         graphDesc,
                         BinaryBufferView{vis->data(), vis->size()});
     };

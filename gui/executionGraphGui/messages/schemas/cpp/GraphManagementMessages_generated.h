@@ -239,13 +239,19 @@ inline flatbuffers::Offset<LoadGraphRequest> CreateLoadGraphRequestDirect(
 
 struct LoadGraphResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_GRAPH = 4
+    VT_GRAPHID = 4,
+    VT_GRAPH = 6
   };
+  const flatbuffers::String *graphId() const {
+    return GetPointer<const flatbuffers::String *>(VT_GRAPHID);
+  }
   const executionGraph::serialization::ExecutionGraph *graph() const {
     return GetPointer<const executionGraph::serialization::ExecutionGraph *>(VT_GRAPH);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_GRAPHID) &&
+           verifier.VerifyString(graphId()) &&
            VerifyOffsetRequired(verifier, VT_GRAPH) &&
            verifier.VerifyTable(graph()) &&
            verifier.EndTable();
@@ -255,6 +261,9 @@ struct LoadGraphResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct LoadGraphResponseBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_graphId(flatbuffers::Offset<flatbuffers::String> graphId) {
+    fbb_.AddOffset(LoadGraphResponse::VT_GRAPHID, graphId);
+  }
   void add_graph(flatbuffers::Offset<executionGraph::serialization::ExecutionGraph> graph) {
     fbb_.AddOffset(LoadGraphResponse::VT_GRAPH, graph);
   }
@@ -266,6 +275,7 @@ struct LoadGraphResponseBuilder {
   flatbuffers::Offset<LoadGraphResponse> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<LoadGraphResponse>(end);
+    fbb_.Required(o, LoadGraphResponse::VT_GRAPHID);
     fbb_.Required(o, LoadGraphResponse::VT_GRAPH);
     return o;
   }
@@ -273,10 +283,23 @@ struct LoadGraphResponseBuilder {
 
 inline flatbuffers::Offset<LoadGraphResponse> CreateLoadGraphResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> graphId = 0,
     flatbuffers::Offset<executionGraph::serialization::ExecutionGraph> graph = 0) {
   LoadGraphResponseBuilder builder_(_fbb);
   builder_.add_graph(graph);
+  builder_.add_graphId(graphId);
   return builder_.Finish();
+}
+
+inline flatbuffers::Offset<LoadGraphResponse> CreateLoadGraphResponseDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *graphId = nullptr,
+    flatbuffers::Offset<executionGraph::serialization::ExecutionGraph> graph = 0) {
+  auto graphId__ = graphId ? _fbb.CreateString(graphId) : 0;
+  return executionGraphGui::serialization::CreateLoadGraphResponse(
+      _fbb,
+      graphId__,
+      graph);
 }
 
 struct SaveGraphRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {

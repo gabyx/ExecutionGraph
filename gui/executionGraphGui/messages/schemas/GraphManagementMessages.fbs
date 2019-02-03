@@ -59,7 +59,8 @@ table LoadGraphRequest {
 
 //! Response data: 
 table LoadGraphResponse {
-    graph: executionGraph.serialization.ExecutionGraph (id:0, required);
+    graphId: string (id:0, required);
+    graph: executionGraph.serialization.ExecutionGraph (id:1, required);
 }
 //! Success: 
 //    - status code: 200 (OK)

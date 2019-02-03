@@ -18,6 +18,7 @@ import { GraphManagementService, sz } from './GraphManagementService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 import { VERBOSE_LOG_TOKEN } from '../tokens';
 import { GraphTypeId, GraphId } from '../model/Graph';
+import { toGraph } from './Conversions';
 
 @Injectable()
 export class GraphManagementServiceBinaryHttp extends GraphManagementService {
@@ -119,6 +120,6 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     const buf = new flatbuffers.ByteBuffer(result);
     const response = sz.LoadGraphResponse.getRoot(buf);
 
-    const graph = response.graph();
+    return toGraph(response.graphId(), response.graph());
   }
 }
