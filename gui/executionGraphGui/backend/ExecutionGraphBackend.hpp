@@ -28,10 +28,11 @@
 #include <executionGraph/graphs/CycleDescription.hpp>
 #include <executionGraph/graphs/ExecutionTree.hpp>
 #include <executionGraph/serialization/GraphTypeDescription.hpp>
+#include "executionGraph/common/BinaryBufferView.hpp"
 #include "executionGraph/common/FileSystem.hpp"
 #include "executionGraphGui/backend/Backend.hpp"
 #include "executionGraphGui/backend/ExecutionGraphBackendDefs.hpp"
-#include "executionGraphGui/common/BinaryBufferView.hpp"
+#include "executionGraphGui/common/Loggers.hpp"
 #include "executionGraphGui/common/RequestError.hpp"
 
 /* ---------------------------------------------------------------------------------------*/
@@ -273,26 +274,45 @@ void ExecutionGraphBackend::addConnection(const Id& graphId,
 }
 
 template<typename ResponseCreator>
-void loadGraph(const std::path& filePath,
-               ResponseCreator&& responseCreator)
+void ExecutionGraphBackend::loadGraph(const std::path& filePath,
+                                      ResponseCreator&& responseCreator)
 {
-    GraphVariant graphVar = getGraph(graphId);
+    using namespace executionGraph;
 
-    auto load = [&](auto graph) {
-        using GraphType = typename std::decay_t<decltype(*graph)>::DataType;
-        using Config    = typename GraphType::Config;
+    FileMapper mapper(filePath);
+    auto graph = getGraphSerialization(BinaryBufferView{mapper.data(),
+                                                        mapper.size()});
 
-        typename ExecutionGraphBackendDefs<Config>::NodeSerializer nodeS;
-        typename ExecutionGraphBackendDefs<Config>::GraphSerializer graphS(nodeS);
+    Id graphTypeId{graph->graphDescription()->id()->c_str()};
+    EXECGRAPHGUI_BACKENDLOG_TRACE("{0}", graphTypeId.toString());
+    // Load corresponding graph description id
+    // Get the config type with meta::visit
+    // Load the graph
 
-        auto graphgraphS.read(filePath);
+    // using GraphType = typename std::decay_t<decltype(*graph)>::DataType;
+    // using Config    = typename GraphType::Config;
 
-        graph->withRLock([&](auto& graph) { graphS.write(graph,
-                                                         descIt->second,
-                                                         filePath,
-                                                         overwrite,
-                                                         visualization); });
-    };
+    // typename ExecutionGraphBackendDefs<Config>::NodeSerializer nodeS;
+    // typename ExecutionGraphBackendDefs<Config>::GraphSerializer graphS(nodeS);
 
-    std::visit(remove, graphVar);
+    // // Load a new graph.
+    // auto graph = std::make_shared<Synchronized<Graph>>();
+    // graph->withWLock([&](auto& graph) { graphS.read(filePath, graph); });
+
+    // // Graph loaded -> add it with a new id.
+    // Id newId;
+    // m_graphs.wlock()->emplace(std::make_pair(newId, graph));
+    // auto graphStatus = std::make_shared<GraphStatus>();
+    // m_status.wlock()->emplace(std::make_pair(newId, graphStatus));
+
+    // // Graph loaded -> add it with a new id.
+    // Id newId;
+    // m_graphs.wlock()->emplace(std::make_pair(newId, graph));
+    // auto graphStatus = std::make_shared<GraphStatus>();
+    // // Graph loaded -> add it with a new id.
+    // Id newId;
+    // m_graphs.wlock()->emplace(std::make_pair(newId, graph));
+    // auto graphStatus = std::make_shared<GraphStatus>();
+    // m_status.wlock()->emplace(std::make_pair(newId, graphStatus));
+    // // Graph loaded -> add it with a new id.
 }

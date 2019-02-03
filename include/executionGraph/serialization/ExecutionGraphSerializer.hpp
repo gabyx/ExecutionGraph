@@ -13,6 +13,7 @@
 #pragma once
 
 #include "executionGraph/common/Assert.hpp"
+#include "executionGraph/common/BinaryBufferView.hpp"
 #include "executionGraph/common/Exception.hpp"
 #include "executionGraph/common/Log.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
@@ -22,6 +23,26 @@
 
 namespace executionGraph
 {
+    //! Get the serialization from the `buffer`.
+    template<typename BufferView = BinaryBufferView>
+    const executionGraph::serialization::ExecutionGraph* getGraphSerialization(BufferView buffer)
+    {
+        EXECGRAPH_ASSERT(buffer.data() != nullptr, "Buffer is nullptr!");
+
+        // Deserialize
+        EXECGRAPH_THROW_IF(!ExecutionGraphBufferHasIdentifier(buffer.data()),
+                           "File identifier not found!");
+
+        flatbuffers::Verifier verifier(buffer.data(), buffer.size(), 64, 1000000000);
+        EXECGRAPH_THROW_IF(!serialization::VerifyExecutionGraphBuffer(verifier),
+                           "Buffer could not be verified!");
+
+        auto graph = serialization::GetExecutionGraph(buffer);
+        EXECGRAPH_THROW_IF(graph == nullptr,
+                           "Deserialization is invalid!");
+        return graph;
+    }
+
     /* ---------------------------------------------------------------------------------------*/
     /*!
         Serializer to store and read an execution graph.
@@ -30,7 +51,6 @@ namespace executionGraph
         @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
         */
     /* ---------------------------------------------------------------------------------------*/
-
     template<typename TGraphType, typename TLogicNodeSerializer>
     class ExecutionGraphSerializer
     {
@@ -44,52 +64,63 @@ namespace executionGraph
             : m_nodeSerializer(nodeSerializer) {}
         ~ExecutionGraphSerializer() = default;
 
+        //! Default no-op checker for reading.
+        struct NoOp
+        {
+            void operator()(const serialization::ExecutionGraph& graph) {}
+        };
+
     public:
         //! Read an execution graph from a file `filePath`.
-        void read(const std::path& filePath, GraphType& execGraph) noexcept(false)
+        template<typename PreLoad  = NoOp,
+                 typename PostLoad = NoOp>
+        void read(const std::path& filePath,
+                  GraphType& execGraph,
+                  PreLoad&& preLoad   = {},
+                  PostLoad&& postLoad = {}) const
         {
-            namespace s = serialization;
-            using namespace s;
+            FileMapper mapper(filePath);
+            try
+            {
+                auto graph = getGraphSerialization(BinaryBufferView{mapper.data(),
+                                                                    mapper.size()});
+                preLoad(*graph);
+                read(*graph, execGraph);
+                postLoad(*graph);
+            }
+            catch(const Exception& e)
+            {
+                EXECGRAPH_THROW("Loading of file '{0}' failed: '{1}",
+                                filePath,
+                                e.what());
+            }
+        }
 
-            m_filePath = filePath;
-            // Memory mapping the file
-            FileMapper mapper(m_filePath);
-            const uint8_t* buffer = nullptr;
-            std::size_t size;
-            std::tie(buffer, size) = mapper.data();
-            EXECGRAPH_ASSERT(buffer != nullptr, "FileMapper returned nullptr for file '{0}'", m_filePath);
-
-            // Deserialize
-            EXECGRAPH_THROW_IF(
-                !ExecutionGraphBufferHasIdentifier(buffer), "File identifier in '{0}' not found!", filePath);
-
-            flatbuffers::Verifier verifier(buffer, size, 64, 1000000000);
-            EXECGRAPH_THROW_IF(
-                !VerifyExecutionGraphBuffer(verifier), "Buffer in '{0}' could not be verified!", filePath);
-
-            auto graph = GetExecutionGraph(buffer);
-
-            EXECGRAPH_THROW_IF(graph == nullptr, "Deserialization from '{0}' is invalid!", filePath);
-
-            readGraph(execGraph, *graph);
+        //! Read an execution graph from a loaded serialization `graph`.
+        void read(const serialization::ExecutionGraph& graph,
+                  GraphType& execGraph) const
+        {
+            readGraph(execGraph, graph);
         }
 
         //! Write an execution graph to the file `filePath`.
-        template<typename BufferView = std::basic_string_view<uint8_t>>
         void write(const GraphType& execGraph,
                    const GraphTypeDescription& graphDescription,
                    const std::path& filePath,
-                   bool overwrite           = false,
-                   BufferView visualization = {}) noexcept(false)
+                   bool overwrite                 = false,
+                   BinaryBufferView visualization = {}) const
         {
             flatbuffers::FlatBufferBuilder builder;
             auto graphOffset = writeGraph(builder, execGraph, graphDescription, visualization);
             FinishExecutionGraphBuffer(builder, graphOffset);
 
             std::ofstream file;
-            EXECGRAPH_THROW_IF(!overwrite && std::filesystem::exists(filePath), "File '{0}' already exists!", filePath);
+            EXECGRAPH_THROW_IF(!overwrite && std::filesystem::exists(filePath),
+                               "File '{0}' already exists!",
+                               filePath);
 
-            file.open(filePath.string(), std::ios_base::trunc | std::ios_base::binary | std::ios_base::in);
+            file.open(filePath.string(),
+                      std::ios_base::trunc | std::ios_base::binary | std::ios_base::in);
             file.write(reinterpret_cast<const char*>(builder.GetBufferPointer()), builder.GetSize());
             file.close();
         }
@@ -233,7 +264,7 @@ namespace executionGraph
 
     private:
         //! Deserialize a graph `graph` into the internal graph.
-        void readGraph(GraphType& execGraph, const serialization::ExecutionGraph& graph)
+        void readGraph(GraphType& execGraph, const serialization::ExecutionGraph& graph) const
         {
             auto nodes = graph.nodes();
             if(nodes)
@@ -250,7 +281,7 @@ namespace executionGraph
 
         //! Deserialize all nodes of a graph `graph` into the internal graph.
         template<typename Nodes>
-        void readNodes(GraphType& execGraph, Nodes& nodes)
+        void readNodes(GraphType& execGraph, Nodes& nodes) const
         {
             for(auto node : nodes)
             {
@@ -269,7 +300,7 @@ namespace executionGraph
 
         //! Deserialize all links of a graph `graph` into the internal graph.
         template<typename Links>
-        void readLinks(GraphType& execGraph, Links& links)
+        void readLinks(GraphType& execGraph, Links& links) const
         {
             for(auto link : links)
             {
@@ -287,8 +318,6 @@ namespace executionGraph
         }
 
     private:
-        std::path m_filePath;  //!< The temporary file path.
-        LogicNodeSerializer&
-            m_nodeSerializer;  //!< The node serializer which provides load/store operations for LogicNodes.
+        LogicNodeSerializer& m_nodeSerializer;  //!< The node serializer which provides load/store operations for LogicNodes.
     };
 }  // namespace executionGraph
