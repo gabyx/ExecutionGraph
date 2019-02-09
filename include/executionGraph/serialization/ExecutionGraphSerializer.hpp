@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <fstream>
 #include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/BinaryBufferView.hpp"
 #include "executionGraph/common/Exception.hpp"

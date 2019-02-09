@@ -240,7 +240,8 @@ inline flatbuffers::Offset<LoadGraphRequest> CreateLoadGraphRequestDirect(
 struct LoadGraphResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_GRAPHID = 4,
-    VT_GRAPH = 6
+    VT_GRAPH = 6,
+    VT_VISUALIZATION = 8
   };
   const flatbuffers::String *graphId() const {
     return GetPointer<const flatbuffers::String *>(VT_GRAPHID);
@@ -248,12 +249,20 @@ struct LoadGraphResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const executionGraph::serialization::ExecutionGraph *graph() const {
     return GetPointer<const executionGraph::serialization::ExecutionGraph *>(VT_GRAPH);
   }
+  const flatbuffers::Vector<uint8_t> *visualization() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_VISUALIZATION);
+  }
+  flexbuffers::Reference visualization_flexbuffer_root() const {
+    return flexbuffers::GetRoot(visualization()->Data(), visualization()->size());
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_GRAPHID) &&
            verifier.VerifyString(graphId()) &&
            VerifyOffsetRequired(verifier, VT_GRAPH) &&
            verifier.VerifyTable(graph()) &&
+           VerifyOffset(verifier, VT_VISUALIZATION) &&
+           verifier.VerifyVector(visualization()) &&
            verifier.EndTable();
   }
 };
@@ -266,6 +275,9 @@ struct LoadGraphResponseBuilder {
   }
   void add_graph(flatbuffers::Offset<executionGraph::serialization::ExecutionGraph> graph) {
     fbb_.AddOffset(LoadGraphResponse::VT_GRAPH, graph);
+  }
+  void add_visualization(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> visualization) {
+    fbb_.AddOffset(LoadGraphResponse::VT_VISUALIZATION, visualization);
   }
   explicit LoadGraphResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -284,8 +296,10 @@ struct LoadGraphResponseBuilder {
 inline flatbuffers::Offset<LoadGraphResponse> CreateLoadGraphResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> graphId = 0,
-    flatbuffers::Offset<executionGraph::serialization::ExecutionGraph> graph = 0) {
+    flatbuffers::Offset<executionGraph::serialization::ExecutionGraph> graph = 0,
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> visualization = 0) {
   LoadGraphResponseBuilder builder_(_fbb);
+  builder_.add_visualization(visualization);
   builder_.add_graph(graph);
   builder_.add_graphId(graphId);
   return builder_.Finish();
@@ -294,12 +308,15 @@ inline flatbuffers::Offset<LoadGraphResponse> CreateLoadGraphResponse(
 inline flatbuffers::Offset<LoadGraphResponse> CreateLoadGraphResponseDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *graphId = nullptr,
-    flatbuffers::Offset<executionGraph::serialization::ExecutionGraph> graph = 0) {
+    flatbuffers::Offset<executionGraph::serialization::ExecutionGraph> graph = 0,
+    const std::vector<uint8_t> *visualization = nullptr) {
   auto graphId__ = graphId ? _fbb.CreateString(graphId) : 0;
+  auto visualization__ = visualization ? _fbb.CreateVector<uint8_t>(*visualization) : 0;
   return executionGraphGui::serialization::CreateLoadGraphResponse(
       _fbb,
       graphId__,
-      graph);
+      graph,
+      visualization__);
 }
 
 struct SaveGraphRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {

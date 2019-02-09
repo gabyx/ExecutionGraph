@@ -13,15 +13,15 @@
 import { Injectable } from '@angular/core';
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { GraphManagementService } from './GraphManagementService';
-import { ITestBackend } from './TestBackend';
 import { Graph, GraphTypeId, GraphId } from '../model';
 import { Guid } from 'guid-typescript';
+import { ITestBackend } from './TestBackend';
 
 @Injectable()
 export class GraphManagementServiceDummy extends GraphManagementService {
   private logger: ILogger;
 
-  constructor(loggerFactory: LoggerFactory, private backend: ITestBackend) {
+  constructor(loggerFactory: LoggerFactory, private readonly backend: ITestBackend) {
     super();
     this.logger = loggerFactory.create('GraphManagementServiceDummy');
   }
@@ -42,6 +42,13 @@ export class GraphManagementServiceDummy extends GraphManagementService {
     this.logger.debug(`Saving graph id: '${graphId}' to file: '${filePath}'`);
   }
   public async loadGraph(filePath: string): Promise<Graph> {
-    throw new Error('Not Implemented!');
+    this.logger.debug(`Loading graph from file: '${filePath}'`);
+    return {
+      id: Guid.create().toString(),
+      name: 'Unnamed',
+      connections: {},
+      nodes: {},
+      typeId: this.backend.graphTypeDescs[0].id
+    };
   }
 }

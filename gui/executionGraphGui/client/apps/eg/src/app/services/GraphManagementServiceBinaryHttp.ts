@@ -120,6 +120,10 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     const buf = new flatbuffers.ByteBuffer(result);
     const response = sz.LoadGraphResponse.getRoot(buf);
 
+    // @todo gabnue->gabnue,simspoe
+    // Parse in the visualization flatbuffer -> return the UI Props for the
+    // graph and setup all stuff in the effect/reducer ...
+
     return toGraph(response.graphId(), response.graph());
   }
 }

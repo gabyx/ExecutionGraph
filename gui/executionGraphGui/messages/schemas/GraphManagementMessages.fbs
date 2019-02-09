@@ -61,6 +61,8 @@ table LoadGraphRequest {
 table LoadGraphResponse {
     graphId: string (id:0, required);
     graph: executionGraph.serialization.ExecutionGraph (id:1, required);
+
+    visualization: [uint8] (id:2, flexbuffer); //!< Additional visualization data for this graph.
 }
 //! Success: 
 //    - status code: 200 (OK)

@@ -20,6 +20,9 @@ export interface SaveAction {
   overwrite: boolean;
 }
 
+export type OpenAction = string;
+export type DeleteAction = string;
+
 @Component({
   selector: 'eg-file-browser',
   templateUrl: './file-browser.component.html',

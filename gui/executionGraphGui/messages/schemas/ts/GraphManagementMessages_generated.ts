@@ -334,10 +334,35 @@ graph(obj?:NS12623504695714931604.executionGraph.serialization.ExecutionGraph):N
 };
 
 /**
+ * @param number index
+ * @returns number
+ */
+visualization(index: number):number|null {
+  var offset = this.bb!.__offset(this.bb_pos, 8);
+  return offset ? this.bb!.readUint8(this.bb!.__vector(this.bb_pos + offset) + index) : 0;
+};
+
+/**
+ * @returns number
+ */
+visualizationLength():number {
+  var offset = this.bb!.__offset(this.bb_pos, 8);
+  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+};
+
+/**
+ * @returns Uint8Array
+ */
+visualizationArray():Uint8Array|null {
+  var offset = this.bb!.__offset(this.bb_pos, 8);
+  return offset ? new Uint8Array(this.bb!.bytes().buffer, this.bb!.bytes().byteOffset + this.bb!.__vector(this.bb_pos + offset), this.bb!.__vector_len(this.bb_pos + offset)) : null;
+};
+
+/**
  * @param flatbuffers.Builder builder
  */
 static start(builder:flatbuffers.Builder) {
-  builder.startObject(2);
+  builder.startObject(3);
 };
 
 /**
@@ -358,6 +383,35 @@ static addGraph(builder:flatbuffers.Builder, graphOffset:flatbuffers.Offset) {
 
 /**
  * @param flatbuffers.Builder builder
+ * @param flatbuffers.Offset visualizationOffset
+ */
+static addVisualization(builder:flatbuffers.Builder, visualizationOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(2, visualizationOffset, 0);
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @param Array.<number> data
+ * @returns flatbuffers.Offset
+ */
+static createVisualizationVector(builder:flatbuffers.Builder, data:number[] | Uint8Array):flatbuffers.Offset {
+  builder.startVector(1, data.length, 1);
+  for (var i = data.length - 1; i >= 0; i--) {
+    builder.addInt8(data[i]);
+  }
+  return builder.endVector();
+};
+
+/**
+ * @param flatbuffers.Builder builder
+ * @param number numElems
+ */
+static startVisualizationVector(builder:flatbuffers.Builder, numElems:number) {
+  builder.startVector(1, numElems, 1);
+};
+
+/**
+ * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
 static end(builder:flatbuffers.Builder):flatbuffers.Offset {
@@ -367,10 +421,11 @@ static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 };
 
-static create(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset, graphOffset:flatbuffers.Offset):flatbuffers.Offset {
+static create(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset, graphOffset:flatbuffers.Offset, visualizationOffset:flatbuffers.Offset):flatbuffers.Offset {
   LoadGraphResponse.start(builder);
   LoadGraphResponse.addGraphId(builder, graphIdOffset);
   LoadGraphResponse.addGraph(builder, graphOffset);
+  LoadGraphResponse.addVisualization(builder, visualizationOffset);
   return LoadGraphResponse.end(builder);
 }
 }

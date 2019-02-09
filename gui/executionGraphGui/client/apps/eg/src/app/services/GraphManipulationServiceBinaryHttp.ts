@@ -121,12 +121,11 @@ export class GraphManipulationServiceBinaryHttp extends GraphManipulationService
     if (!result.length) {
       // Succesfully added connection
       this.logger.info(`Added connection: ['${source.id}' ⟶ '${target.id}'] from graph [id: '${graphId}']`);
-
       return connection;
     } else {
       // Cycle detected, read the repsonse
       const buf = new flatbuffers.ByteBuffer(result);
-      const response = sz.AddNodeResponse.getRoot(buf);
+      const response = sz.AddConnectionResponse.getRoot(buf);
       throw new Error('Cycle detection not yet implemented!');
     }
   }
