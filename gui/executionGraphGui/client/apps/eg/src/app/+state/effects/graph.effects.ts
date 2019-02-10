@@ -78,7 +78,6 @@ export class GraphEffects {
     mergeMap(l => [
       new fromGraph.GraphLoaded(l.graph),
       new fromNotifications.ShowNotification(`Graph id: '${l.graph.id}' loaded from '${l.filePath}' 🌻`, 4000)
-      //new fromGraph.OpenGraph(l.graph.id)
     ])
   );
 

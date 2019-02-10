@@ -120,6 +120,7 @@ export function toConnection(nodes: NodeMap, link: serialization.SocketLinkDescr
     .inNodeId()
     .toFloat64()
     .toString();
+
   const outSocketIdx = link.outSocketIdx().toFloat64();
   const inSocketIdx = link.inSocketIdx().toFloat64();
 
@@ -131,7 +132,7 @@ export function toConnection(nodes: NodeMap, link: serialization.SocketLinkDescr
   const outSocket = outNode.outputs[outSocketIdx];
   const inSocket = inNode.inputs[inSocketIdx];
 
-  return createConnection(outSocket, inSocket);
+  return link.isWriteLink() ? createConnection(outSocket, inSocket) : createConnection(inSocket, outSocket);
 }
 
 /**
