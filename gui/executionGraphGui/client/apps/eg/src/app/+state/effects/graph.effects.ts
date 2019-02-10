@@ -32,7 +32,7 @@ export class GraphEffects {
     private readonly graphManipulationService: GraphManipulationService,
     private readonly graphManagementService: GraphManagementService,
     private readonly autoLayoutService: AutoLayoutService,
-    //! @ŧodo gabnue->gabnue,simspoe This needs to be removed once the
+    //! @todo gabnue->gabnue,simspoe This needs to be removed once the
     //! testing is finished.
     private readonly testService: TestService,
     loggerFactory: LoggerFactory
