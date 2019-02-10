@@ -12,22 +12,22 @@ import {
 import { Point, Position, MassSpringLayoutConfig } from '@eg/graph';
 import { GraphId } from '../../model/Graph';
 
-export const LOAD_GRAPHS = '[Graphs] Load';
-export const GRAPHS_LOADED = '[Graphs] Loaded';
-export const GRAPHS_LOAD_ERROR = '[Graphs] Load Error';
-export const OPEN_GRAPH = '[Graph] Open';
+export const LOAD_GRAPHS = '[Graphs] Load Graphs';
+export const GRAPHS_LOADED = '[Graphs] Loaded Graphs';
+export const GRAPHS_LOAD_ERROR = '[Graphs] Load Graphs Error';
+export const OPEN_GRAPH = '[Graph] Open Graph';
 
-export const SAVE_GRAPH = '[Graph] Save';
-export const GRAPH_SAVED = '[Graph] Saved';
-export const LOAD_GRAPH = '[Graph] Load';
-export const GRAPH_LOADED = '[Graph] Loaded';
+export const SAVE_GRAPH = '[Graph] Save Graph';
+export const GRAPH_SAVED = '[Graph] Saved Graph';
+export const LOAD_GRAPH = '[Graph] Load Graph';
+export const GRAPH_LOADED = '[Graph] Loaded Graph';
 
 export const MOVE_NODE = '[Graph] Move Node';
 export const MOVE_NODES = '[Graph] Move Nodes';
 export const NODES_MOVED = '[Graph] Nodes Moved';
 export const NODE_UPDATED = '[Graph] Node Updated';
 
-export const ADD_GRAPH = '[Graph] Add';
+export const ADD_GRAPH = '[Graph] Add Graph';
 export const GRAPH_ADDED = '[Graph] Graph Added';
 export const REMOVE_GRAPH = '[Graph] Remove Graph';
 export const GRAPH_REMOVED = '[Graph] Graph Removed';
