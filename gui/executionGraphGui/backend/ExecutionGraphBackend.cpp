@@ -33,7 +33,7 @@ namespace
     void forEachConfig(F&& func)
     {
         std::size_t idx = 0;
-        meta::for_each(GraphConfigs{}, [&](auto graphConfig) { func(graphConfig, ++idx); });
+        meta::for_each(GraphConfigs{}, [&](auto graphConfig) { func(graphConfig, idx++); });
     }
 
     //! Define all description Ids for the different graphs.
