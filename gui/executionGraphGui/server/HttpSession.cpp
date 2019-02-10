@@ -216,15 +216,21 @@ namespace
             }
             catch(const BadRequestError& e)
             {
-                send(makeBadResponse(req, fmt::format("BadRequest: '{0}'", e.what())));
+                auto m = fmt::format("BadRequest: '{0}'", e.what());
+                EXECGRAPHGUI_BACKENDLOG_ERROR(m);
+                send(makeBadResponse(req, m));
             }
             catch(const InternalBackendError& e)
             {
-                send(makeServerError(req, fmt::format("InternalBackendError: '{0}'", e.what())));
+                auto m = fmt::format("InternalBackendError: '{0}'", e.what());
+                EXECGRAPHGUI_BACKENDLOG_ERROR(m);
+                send(makeServerError(req, m));
             }
             catch(const std::exception& e)
             {
-                send(makeServerError(req, fmt::format("Unknown Error: '{0}'", e.what())));
+                auto m = fmt::format("Unknown Error: '{0}'", e.what());
+                EXECGRAPHGUI_BACKENDLOG_ERROR(m);
+                send(makeServerError(req, m));
             }
         }
     }  // namespace

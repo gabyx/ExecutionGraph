@@ -65,7 +65,7 @@ namespace details
         void onTaskException(std::exception_ptr e)
         {
             EXECGRAPHGUI_BACKENDLOG_WARN(
-                "RequestDispatcher: Cancel request id: '{0}' [url: '{1}']",
+                "RequestDispatcher: Exception in handler! -> Cancel request id: '{0}' [url: '{1}']",
                 m_request.getId().toString(),
                 m_request.target());
             m_response.setCanceled(e);

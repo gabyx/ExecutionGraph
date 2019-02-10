@@ -100,7 +100,7 @@ public:
                    BinaryBufferView visualization = {});
 
     template<typename ResponseCreator>
-    void loadGraph(const std::path& filePath,
+    void loadGraph(std::path filePath,
                    ResponseCreator&& responseCreator);
     //@}
 
@@ -340,10 +340,15 @@ void ExecutionGraphBackend::addConnection(const Id& graphId,
 }
 
 template<typename ResponseCreator>
-void ExecutionGraphBackend::loadGraph(const std::path& filePath,
+void ExecutionGraphBackend::loadGraph(std::path filePath,
                                       ResponseCreator&& responseCreator)
 {
     using namespace executionGraph;
+
+    if(filePath.is_relative())
+    {
+        filePath = m_rootPath / filePath;
+    }
 
     FileMapper mapper(filePath);
     auto graphS = getGraphSerialization(BinaryBufferView{mapper.data(),
@@ -391,7 +396,7 @@ void ExecutionGraphBackend::loadGraph(const std::path& filePath,
         responseCreator(newId,
                         *graphL,
                         graphDesc,
-                        BinaryBufferView{vis->data(), vis->size()});
+                        vis ? BinaryBufferView{vis->data(), vis->size()} : BinaryBufferView{});
     };
 
     meta::visit<GraphConfigs>(it->second, load);
