@@ -5,4 +5,4 @@ add_subdirectory(backend)
 add_subdirectory(server)
 
 # Configure the client application
-# add_subdirectory(client)
+add_subdirectory(client)
