@@ -114,7 +114,7 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
         if(responseLength)
         {
             response->SetMimeType(m_payload.mimeType());  // set the mime type
-            m_buffer = m_payload.buffer().data();      // set the buffer pointer (can be nullptr!)
+            m_buffer = m_payload.buffer().data();         // set the buffer pointer (can be nullptr!)
         }
         response->SetStatusText("handled");
         response->SetStatus(200);  // http status code: 200 := The request has been handled! (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
@@ -169,7 +169,7 @@ bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
     // over to the message dispatcher.
     ////////////////////////////////////////////////////
     // Make a RequestCef (move the payload into it)
-    auto requestCef = std::make_unique<RequestCef>(m_requestTarget, std::move(payload));
+    auto requestCef = std::make_unique<RequestCef>(m_target, std::move(payload));
     // Make a ResponseCef
     auto responseCef = std::make_unique<ResponsePromiseCef>(cbResponseHeaderReady, requestCef->getId(), m_allocator, true);
     // Get the future out
@@ -225,10 +225,10 @@ bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
     }
 
     // Exctract requestId
-    // e.g. m_requestTarget := "catergory/subcategory/command"
-    m_requestTarget = executionGraph::splitLeadingSlashes(CefString(urlParts.path.str).ToString());
+    // e.g. m_target := "catergory/subcategory/command"
+    m_target = executionGraph::splitLeadingSlashes(CefString(urlParts.path.str).ToString());
 
-    if(m_requestTarget.empty())
+    if(m_target.empty())
     {
         EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler '{0}' : url '{1}': requestId extract failed!",
                                   getName(),
@@ -264,7 +264,7 @@ bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
 //! Finish handling the request: Reset everything and signal callback.
 void BackendResourceHandler::reset()
 {
-    m_requestTarget.clear();
+    m_target.clear();
     m_query.clear();
     m_mimeType.clear();
     m_buffer     = nullptr;

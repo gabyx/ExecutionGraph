@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import * as fromGraphDescriptions from '../../+state/selectors/';
 import { GraphDescriptionsState } from '../../+state/reducers/graphDescription.reducers';
 import { GraphTypeDescription } from '../../model';
-import { CreateGraph } from '../../+state/actions';
+import { AddGraph } from '../../+state/actions';
 import { ILogger, LoggerFactory } from '@eg/logger';
 
 @Component({
@@ -24,7 +24,7 @@ export class GraphCreateComponent implements OnInit {
   ngOnInit() {}
 
   public createGraph(graphType: GraphTypeDescription) {
-    this.store.dispatch(new CreateGraph(graphType));
+    this.store.dispatch(new AddGraph(graphType));
   }
 
   public showDescription(graphType: GraphTypeDescription) {

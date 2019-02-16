@@ -71,9 +71,9 @@ public:
     //@}
 
 private:
-    std::path m_requestTarget;  //!< The request type "<category/subcategory>" (e.g. "graphManip/addNode" ).
-    std::string m_query;        //!< The additional query (everything after "?").
-    std::string m_mimeType;     //!< MIME type of the post data.
+    std::path m_target;      //!< The request type "<category/subcategory>" (e.g. "graphManip/addNode" ).
+    std::string m_query;     //!< The additional query (everything after "?").
+    std::string m_mimeType;  //!< MIME type of the post data.
     bool initRequest(CefRefPtr<CefRequest> request);
 
 private:

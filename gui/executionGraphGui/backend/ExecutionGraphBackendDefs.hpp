@@ -15,7 +15,10 @@
 #include <meta/meta.hpp>
 #include <rttr/type>
 #include <executionGraph/nodes/LogicCommon.hpp>
+#include <executionGraph/serialization/ExecutionGraphSerializer.hpp>
 #include <executionGraph/serialization/LogicNodeSerializer.hpp>
+#include "executionGraph/common/Identifier.hpp"
+#include "executionGraph/graphs/ExecutionTree.hpp"
 #include "executionGraph/serialization/NodeTypeDescription.hpp"
 #include "executionGraph/serialization/SocketTypeDescription.hpp"
 #include "executionGraphGui/backend/nodes/DummyNode.hpp"
@@ -48,12 +51,19 @@ template<>
 class ExecutionGraphBackendDefs<executionGraph::GeneralConfig<>>
 {
 public:
+    // Get the unique id of this graph type.
+    static executionGraph::IdNamed getId()
+    {
+        return executionGraph::IdNamed{"DefaultGraph", std::string("2992ebff-c950-4184-8876-5fe6ac029aa5")};
+    }
+
     //! The configuration traits.
     using Config = executionGraph::GeneralConfig<>;
+    using Graph  = executionGraph::ExecutionTree<Config>;
 
     //! List of all nodes available in this graph.
-    using Nodes                         = meta::list<DummyNode<Config>>;
-    static const std::size_t nNodeTypes = meta::size<Nodes>::value;
+    using Nodes                             = meta::list<DummyNode<Config>>;
+    static constexpr std::size_t nNodeTypes = meta::size<Nodes>::value;
 
     using NodeTypeDescription   = executionGraph::NodeTypeDescription;
     using SocketTypeDescription = executionGraph::SocketTypeDescription;
@@ -61,6 +71,9 @@ public:
     //! Node serializer for this graph.
     using NodeSerializers = meta::list<DummyNodeSerializer<Config>>;
     using NodeSerializer  = executionGraph::LogicNodeSerializer<Config, NodeSerializers>;
+
+    //! Graph serializer.
+    using GraphSerializer = executionGraph::ExecutionGraphSerializer<Graph, NodeSerializer>;
 
     //! The node descriptions for this default configuration.
     static const std::vector<NodeTypeDescription>& getNodeDescriptions()

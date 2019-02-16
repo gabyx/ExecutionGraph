@@ -258,7 +258,7 @@ namespace executionGraph
         }
 
         //! Remove an node with id `nodeId` from the graph.
-        //! A programming error is fatal ==> UB.
+        //! Any error is fatal ==> UB.
         NodePointer removeNode(NodeId nodeId)
         {
             auto nodeIt = m_nodes.find(nodeId);
@@ -271,7 +271,8 @@ namespace executionGraph
 
             // Erase from the classifications.
             EXECGRAPH_VERIFY(m_nodeClassifications[nodeDataBase->m_class].erase(nodeDataBase->m_node.get()),
-                             "Programming error!");
+                             "Error while erasing node id '{0}'",
+                             nodeId);
 
             // Move the node out!
             NodePointer node = std::move(nodeDataBase->m_node);
@@ -279,7 +280,8 @@ namespace executionGraph
             if(nodeDataBase->m_class == NodeClassification::ConstantNode)
             {
                 // Remove from constant nodes.
-                EXECGRAPH_VERIFY(m_constNodes.erase(nodeId), "Programming error!");
+                EXECGRAPH_VERIFY(m_constNodes.erase(nodeId),
+                                 "Removing node id '{0}' from const nodes failed!");
             }
             else
             {
@@ -289,12 +291,19 @@ namespace executionGraph
                 for(auto groupId : nodeData->m_groups)
                 {
                     auto groupIt = m_nodeGroups.find(groupId);
-                    EXECGRAPH_ASSERT(groupIt != m_nodeGroups.end(), "Programming error!");
-                    EXECGRAPH_VERIFY(groupIt->second.erase(nodeData), "Programming error!");
+                    EXECGRAPH_ASSERT(groupIt != m_nodeGroups.end(),
+                                     "No such group id '{0}' found!",
+                                     groupId);
+                    EXECGRAPH_VERIFY(groupIt->second.erase(nodeData),
+                                     "Removing node id '{0}' from groud id '{0}' failed!",
+                                     nodeId,
+                                     groupId);
                 }
 
                 // Remove from non-constant nodes.
-                EXECGRAPH_VERIFY(m_nonConstNodes.erase(nodeId), "Programming error!");
+                EXECGRAPH_VERIFY(m_nonConstNodes.erase(nodeId),
+                                 "Removing node id '{0}' from non-const nodes failed!",
+                                 nodeId);
             }
             // Erase from nodes.
             m_nodes.erase(nodeIt);

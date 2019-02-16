@@ -13,15 +13,15 @@
 import { Injectable } from '@angular/core';
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { GraphManagementService } from './GraphManagementService';
-import { ITestBackend } from './TestBackend';
 import { Graph, GraphTypeId, GraphId } from '../model';
 import { Guid } from 'guid-typescript';
+import { ITestBackend } from './TestBackend';
 
 @Injectable()
 export class GraphManagementServiceDummy extends GraphManagementService {
   private logger: ILogger;
 
-  constructor(loggerFactory: LoggerFactory, private backend: ITestBackend) {
+  constructor(loggerFactory: LoggerFactory, private readonly backend: ITestBackend) {
     super();
     this.logger = loggerFactory.create('GraphManagementServiceDummy');
   }
@@ -37,11 +37,4 @@ export class GraphManagementServiceDummy extends GraphManagementService {
   }
 
   public async removeGraph(graphId: GraphId): Promise<void> {}
-
-  public async saveGraph(graphId: GraphId, path: string, overwrite: boolean): Promise<Graph> {
-    throw new Error('Not Implemented!');
-  }
-  public async loadGraph(path: string): Promise<Graph> {
-    throw new Error('Not Implemented!');
-  }
 }

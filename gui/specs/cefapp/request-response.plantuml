@@ -19,7 +19,7 @@ namespace common {
         + getURL()
         + payload() {abstract}
         - m_id
-        - m_requestURL
+        - m_target
     }
     class ResponsePromise #ff6600 {
         + setCancel(what)

@@ -48,39 +48,3 @@ table RemoveGraphRequest {
 //!   - status code: 400 (Bad Request)
 //!     - graph id is not found
 //! ======================================================================
-
-//! ======================================================================
-//! Message "/eg-backend/general/loadGraph"
-//! ======================================================================
-//! Request data: 
-table LoadGraphRequest {
-    filePath:string (id:0, required);  //!< The graph file.
-}
-
-//! Response data: 
-table LoadGraphResponse {
-    graph:[executionGraph.serialization.ExecutionGraph] (id:0, required);
-}
-//! Success: 
-//    - status code: 200 (OK)
-//! Valid Errors:
-//!   - status code: 400 (Bad Request)
-//!     - graph could not be loaded.
-//! ======================================================================
-
-
-//! ======================================================================
-//! Message "/eg-backend/general/saveGraph"
-//! ======================================================================
-//! Request data: 
-table SaveGraphRequest {
-    filePath:string (id:0, required);  //!< The graph file.
-    overwrite: bool = false (id:1); //!< If we have the permission to overwrite the file.
-}
-//! Response data: none
-//! Success: 
-//    - status code: 200 (OK)
-//! Valid Errors:
-//!   - status code: 400 (Bad Request)
-//!     - graph could not be saved.
-//! ======================================================================

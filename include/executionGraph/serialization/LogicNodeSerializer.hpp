@@ -16,6 +16,7 @@
 #include <meta/meta.hpp>
 #include "executionGraph/common/Factory.hpp"
 #include "executionGraph/common/MetaVisit.hpp"
+#include "executionGraph/serialization/Conversions.hpp"
 #include "executionGraph/serialization/SocketTypeDescription.hpp"
 #include "executionGraph/serialization/schemas/cpp/LogicNode_generated.h"
 
@@ -60,7 +61,7 @@ namespace executionGraph
         //! It first tries to construct it by the factory
         //! and uses RTTR construction as a fallback.
         static std::unique_ptr<NodeBaseType>
-        read(const std::string& type,
+        read(std::string_view type,
              NodeId nodeId,
              const flatbuffers::Vector<flatbuffers::Offset<serialization::LogicSocket>>* inputSockets  = nullptr,
              const flatbuffers::Vector<flatbuffers::Offset<serialization::LogicSocket>>* outputSockets = nullptr,
@@ -68,7 +69,7 @@ namespace executionGraph
         {
             // Dispatch to the correct serialization read function
             // the factory reads and returns the node
-            auto rttrType = rttr::type::get_by_name(type);
+            auto rttrType = rttr::type::get_by_name(rttr::toRttr(type));
 
             auto optNode = FactoryRead::create(rttrType,
                                                nodeId,

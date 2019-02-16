@@ -12,23 +12,31 @@ import {
 import { Point, Position, MassSpringLayoutConfig } from '@eg/graph';
 import { GraphId } from '../../model/Graph';
 
-export const LOAD_GRAPHS = '[Graph] Load';
-export const GRAPHS_LOADED = '[Graph] Loaded';
-export const GRAPHS_LOAD_ERROR = '[Graph] Load Error';
-export const OPEN_GRAPH = '[Graph] Open';
-export const CREATE_GRAPH = '[Graph] Create';
+export const LOAD_GRAPHS = '[Graphs] Load Graphs';
+export const GRAPHS_LOADED = '[Graphs] Loaded Graphs';
+export const GRAPHS_LOAD_ERROR = '[Graphs] Load Graphs Error';
+export const OPEN_GRAPH = '[Graph] Open Graph';
+
+export const SAVE_GRAPH = '[Graph] Save Graph';
+export const GRAPH_SAVED = '[Graph] Saved Graph';
+export const LOAD_GRAPH = '[Graph] Load Graph';
+export const GRAPH_LOADED = '[Graph] Loaded Graph';
 
 export const MOVE_NODE = '[Graph] Move Node';
 export const MOVE_NODES = '[Graph] Move Nodes';
 export const NODES_MOVED = '[Graph] Nodes Moved';
 export const NODE_UPDATED = '[Graph] Node Updated';
+
+export const ADD_GRAPH = '[Graph] Add Graph';
 export const GRAPH_ADDED = '[Graph] Graph Added';
 export const REMOVE_GRAPH = '[Graph] Remove Graph';
 export const GRAPH_REMOVED = '[Graph] Graph Removed';
+
 export const ADD_NODE = '[Graph] Add Node';
 export const NODE_ADDED = '[Graph] Node Added';
 export const REMOVE_NODE = '[Graph] Remove Node';
 export const NODE_REMOVED = '[Graph] Node Removed';
+
 export const ADD_CONNECTION = '[Graph] Add Connection';
 export const CONNECTION_ADDED = '[Graph] Connection Added';
 export const REMOVE_CONNECTION = '[Graph] Remove Connection';
@@ -77,8 +85,28 @@ export class NodesMoved implements Action {
 
 // Actions related to GraphManagementService
 // -----------------------------------------
-export class CreateGraph implements Action {
-  readonly type = CREATE_GRAPH;
+export class SaveGraph implements Action {
+  readonly type = SAVE_GRAPH;
+  constructor(public id: GraphId, public filePath: string, public overwrite: boolean) {}
+}
+
+export class GraphSaved implements Action {
+  readonly type = GRAPH_SAVED;
+  constructor(public id: GraphId) {}
+}
+
+export class LoadGraph implements Action {
+  readonly type = LOAD_GRAPH;
+  constructor(public filePath: string, public openAfterLoad: boolean) {}
+}
+
+export class GraphLoaded implements Action {
+  readonly type = GRAPH_LOADED;
+  constructor(public graph: Graph) {}
+}
+
+export class AddGraph implements Action {
+  readonly type = ADD_GRAPH;
   constructor(public graphType: GraphTypeDescription) {}
 }
 
@@ -151,7 +179,11 @@ export type GraphAction =
   | GraphsLoaded
   | GraphLoadError
   | OpenGraph
-  | CreateGraph
+  | LoadGraph
+  | GraphLoaded
+  | SaveGraph
+  | GraphSaved
+  | AddGraph
   | GraphAdded
   | RemoveGraph
   | GraphRemoved

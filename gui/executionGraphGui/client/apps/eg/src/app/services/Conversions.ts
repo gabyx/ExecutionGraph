@@ -14,6 +14,9 @@ import { flatbuffers } from 'flatbuffers';
 import * as model from './../model';
 import * as serialization from '@eg/serialization';
 import { createSocket } from '../model/Socket';
+import { NodeMap, ConnectionMap } from '../model/Graph';
+import { assert } from '@eg/common';
+import { createConnection } from '../model/Connection';
 
 export function toFbLong(value: number | string): flatbuffers.Long {
   if (typeof value === 'number') {
@@ -25,10 +28,6 @@ export function toFbLong(value: number | string): flatbuffers.Long {
 
 /**
  * Convert a `serialized`-instance of a graph type description to a `model`-instance.
- *
- * @export
- * @param {serialization.GraphTypeDescription} graphDesc
- * @returns {model.GraphTypeDescription}
  */
 export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescription): model.GraphTypeDescription {
   const sockets: model.SocketTypeDescription[] = [];
@@ -74,10 +73,6 @@ export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescrip
 
 /**
  *  Convert a `serialized`-instance of a node to a `model`-instance.
- *
- * @export
- * @param {serialization.LogicNode} node
- * @returns {Node}
  */
 export function toNode(node: serialization.LogicNode): model.Node {
   // Convert to a node model
@@ -111,4 +106,58 @@ export function toNode(node: serialization.LogicNode): model.Node {
   extractSockets('output', allSockets);
 
   return model.fromNode.createNode(nodeId, node.type(), allSockets);
+}
+
+/**
+ *  Convert a `serialized`-instance of a connection to a `model`-instance.
+ */
+export function toConnection(nodes: NodeMap, link: serialization.SocketLinkDescription): model.Connection {
+  const outNodeId = link
+    .outNodeId()
+    .toFloat64()
+    .toString();
+  const inNodeId = link
+    .inNodeId()
+    .toFloat64()
+    .toString();
+
+  const outSocketIdx = link.outSocketIdx().toFloat64();
+  const inSocketIdx = link.inSocketIdx().toFloat64();
+
+  assert(inNodeId in nodes && outNodeId in nodes, 'In/Out node index not in map!');
+  const inNode = nodes[inNodeId];
+  const outNode = nodes[outNodeId];
+
+  assert(outSocketIdx < outNode.outputs.length && inSocketIdx < inNode.inputs.length, 'Sockets indices wrong!');
+  const outSocket = outNode.outputs[outSocketIdx];
+  const inSocket = inNode.inputs[inSocketIdx];
+
+  return link.isWriteLink() ? createConnection(outSocket, inSocket) : createConnection(inSocket, outSocket);
+}
+
+/**
+ *  Convert a `serialized`-instance of a graph to a `model`-instance.
+ */
+export function toGraph(graphId: string, graph: serialization.ExecutionGraph): model.Graph {
+  const nodes: NodeMap = {};
+  let l = graph.nodesLength();
+  for (let i = 0; i < l; ++i) {
+    const node = toNode(graph.nodes(i));
+    nodes[node.id.toString()] = node;
+  }
+
+  const connections: ConnectionMap = {};
+  l = graph.linksLength();
+  for (let i = 0; i < l; ++i) {
+    const con = toConnection(nodes, graph.links(i));
+    connections[con.id.toString()] = con;
+  }
+
+  return {
+    id: graphId,
+    name: 'Unnamed',
+    connections: connections,
+    nodes: nodes,
+    typeId: graph.graphDescription().id()
+  };
 }

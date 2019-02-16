@@ -38,6 +38,7 @@
     "electron:package-test": "electron-builder --dir dist",
     "electron:package": "electron-builder",
     "native:package": "npm-run-all -s build-prod electron:build electron:package",
+    "native:package-to": "npm-run-all -s \"build-prod -- --output-path {1}/apps/eg\" \"electron:build -- --outDir {1}\" --",
     "affected": "./node_modules/.bin/nx affected",
     "pre-commit": "npm run format && npm run lint"
   },
@@ -130,7 +131,7 @@
     "files": [
       "dist"
     ],
-    "extraFiles": [
+    "extraResources": [
       "apps/electron/resources/icon.png"
     ]
   },

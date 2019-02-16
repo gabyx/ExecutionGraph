@@ -35,7 +35,7 @@ export class GeneralInfoServiceBinaryHttp extends GeneralInfoService {
   public async getAllGraphTypeDescriptions(): Promise<model.GraphTypeDescription[]> {
     const result = await this.binaryRouter.get('general/getAllGraphTypeDescriptions');
     const buf = new flatbuffers.ByteBuffer(result);
-    const response = sz.GetAllGraphTypeDescriptionsResponse.getRootAsGetAllGraphTypeDescriptionsResponse(buf);
+    const response = sz.GetAllGraphTypeDescriptionsResponse.getRoot(buf);
 
     this.logger.info(`Number of graph types: ${response.graphsTypesLength()}`);
 

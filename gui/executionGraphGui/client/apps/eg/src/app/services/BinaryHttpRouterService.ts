@@ -35,10 +35,10 @@ export class BinaryHttpRouterService {
 
   /**
    * Get the response payload as a Uint8Array.
-   * @param requestUrl The request url.
+   * @param target The request url.
    */
-  public get(requestUrl: string): Promise<Uint8Array> {
-    const url = `${this.baseUrl}/${requestUrl}`;
+  public get(target: string): Promise<Uint8Array> {
+    const url = `${this.baseUrl}/${target}`;
 
     this.logger.debug(`Get from '${url})`);
 
@@ -66,14 +66,14 @@ export class BinaryHttpRouterService {
 
   /**
    * Post the binary request, and get a the response payload as a Uint8Array.
-   * @param requestUrl The request url.
+   * @param target The request url.
    * @param payload The request payload.
    */
-  public post(requestUrl: string, payload: Uint8Array): Promise<Uint8Array> {
+  public post(target: string, payload: Uint8Array): Promise<Uint8Array> {
     // @todo: This .slice is horribly inefficient, how to convert a payload with byteOffset != 0
     // to a ArrayBuffer -> its stupidly impossible...
     const data = (payload.byteOffset > 0 ? payload.slice().buffer : payload.buffer) as ArrayBuffer;
-    const url = `${this.baseUrl}/${requestUrl}`;
+    const url = `${this.baseUrl}/${target}`;
 
     this.logger.debug(`Post to '${url}': (Bytes: '${data.byteLength}')`);
 

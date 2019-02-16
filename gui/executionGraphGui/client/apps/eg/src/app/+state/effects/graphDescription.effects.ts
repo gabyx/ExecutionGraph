@@ -22,7 +22,7 @@ export class GraphDescriptionEffects {
   }
 
   @Effect()
-  loadGraphs$ = this.actions$.pipe(
+  loadGraphDescriptions$ = this.actions$.pipe(
     ofType<fromGraphDescription.LoadGraphDescriptions>(fromGraphDescription.LOAD_GRAPH_DESCRIPTIONS),
     switchMap((action, state) => from(this.generalInfoService.getAllGraphTypeDescriptions())),
     tap(graphDescriptions => this.log.info(`Loaded ${graphDescriptions.length} graph descriptions`)),

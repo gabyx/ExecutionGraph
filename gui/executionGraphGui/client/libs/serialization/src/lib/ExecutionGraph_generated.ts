@@ -38,7 +38,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):ExecutionGraphNodeProperties {
  * @param ExecutionGraphNodeProperties= obj
  * @returns ExecutionGraphNodeProperties
  */
-static getRootAsExecutionGraphNodeProperties(bb:flatbuffers.ByteBuffer, obj?:ExecutionGraphNodeProperties):ExecutionGraphNodeProperties {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:ExecutionGraphNodeProperties):ExecutionGraphNodeProperties {
   return (obj || new ExecutionGraphNodeProperties).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -78,7 +78,7 @@ groupsLength():number {
 /**
  * @param flatbuffers.Builder builder
  */
-static startExecutionGraphNodeProperties(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(3);
 };
 
@@ -131,17 +131,17 @@ static startGroupsVector(builder:flatbuffers.Builder, numElems:number) {
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endExecutionGraphNodeProperties(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   return offset;
 };
 
-static createExecutionGraphNodeProperties(builder:flatbuffers.Builder, nodeId:flatbuffers.Long, classification:executionGraph.serialization.NodeClassification, groupsOffset:flatbuffers.Offset):flatbuffers.Offset {
-  ExecutionGraphNodeProperties.startExecutionGraphNodeProperties(builder);
+static create(builder:flatbuffers.Builder, nodeId:flatbuffers.Long, classification:executionGraph.serialization.NodeClassification, groupsOffset:flatbuffers.Offset):flatbuffers.Offset {
+  ExecutionGraphNodeProperties.start(builder);
   ExecutionGraphNodeProperties.addNodeId(builder, nodeId);
   ExecutionGraphNodeProperties.addClassification(builder, classification);
   ExecutionGraphNodeProperties.addGroups(builder, groupsOffset);
-  return ExecutionGraphNodeProperties.endExecutionGraphNodeProperties(builder);
+  return ExecutionGraphNodeProperties.end(builder);
 }
 }
 }
@@ -169,7 +169,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):ExecutionGraph {
  * @param ExecutionGraph= obj
  * @returns ExecutionGraph
  */
-static getRootAsExecutionGraph(bb:flatbuffers.ByteBuffer, obj?:ExecutionGraph):ExecutionGraph {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:ExecutionGraph):ExecutionGraph {
   return (obj || new ExecutionGraph).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -272,7 +272,7 @@ visualizationArray():Uint8Array|null {
 /**
  * @param flatbuffers.Builder builder
  */
-static startExecutionGraph(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(5);
 };
 
@@ -391,7 +391,7 @@ static startVisualizationVector(builder:flatbuffers.Builder, numElems:number) {
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endExecutionGraph(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   return offset;
 };
@@ -400,18 +400,18 @@ static endExecutionGraph(builder:flatbuffers.Builder):flatbuffers.Offset {
  * @param flatbuffers.Builder builder
  * @param flatbuffers.Offset offset
  */
-static finishExecutionGraphBuffer(builder:flatbuffers.Builder, offset:flatbuffers.Offset) {
+static finishBuffer(builder:flatbuffers.Builder, offset:flatbuffers.Offset) {
   builder.finish(offset, 'EXGR');
 };
 
-static createExecutionGraph(builder:flatbuffers.Builder, graphDescriptionOffset:flatbuffers.Offset, nodesOffset:flatbuffers.Offset, linksOffset:flatbuffers.Offset, nodePropertiesOffset:flatbuffers.Offset, visualizationOffset:flatbuffers.Offset):flatbuffers.Offset {
-  ExecutionGraph.startExecutionGraph(builder);
+static create(builder:flatbuffers.Builder, graphDescriptionOffset:flatbuffers.Offset, nodesOffset:flatbuffers.Offset, linksOffset:flatbuffers.Offset, nodePropertiesOffset:flatbuffers.Offset, visualizationOffset:flatbuffers.Offset):flatbuffers.Offset {
+  ExecutionGraph.start(builder);
   ExecutionGraph.addGraphDescription(builder, graphDescriptionOffset);
   ExecutionGraph.addNodes(builder, nodesOffset);
   ExecutionGraph.addLinks(builder, linksOffset);
   ExecutionGraph.addNodeProperties(builder, nodePropertiesOffset);
   ExecutionGraph.addVisualization(builder, visualizationOffset);
-  return ExecutionGraph.endExecutionGraph(builder);
+  return ExecutionGraph.end(builder);
 }
 }
 }

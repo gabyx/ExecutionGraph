@@ -27,7 +27,7 @@ folder="${REPO_DIR}/include/executionGraph/serialization/schemas"
 echo "Building schemas in ${folder} ..."
 cd "$folder"
 "$flatcCompiler" -I "${REPO_DIR}/include/" -o "cpp"  --keep-prefix --cpp *.fbs 
-"$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" --keep-prefix -o "ts" --ts --no-fb-import *.fbs
+"$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" --keep-prefix -o "ts" --ts --short-names --no-fb-import *.fbs
 
 python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
     --input="${folder}/cpp/*.h" \
@@ -46,7 +46,7 @@ folder="${REPO_DIR}/gui/executionGraphGui/messages/schemas"
 echo "Building schemas in ${folder} ..."
 cd "$folder"
 "$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" --keep-prefix -o "cpp"  --cpp *.fbs
-"$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" --keep-prefix -o "ts" --ts --no-fb-import *.fbs
+"$flatcCompiler" -I "${REPO_DIR}/include/" -I "${REPO_DIR}/gui/" --keep-prefix -o "ts" --ts --short-names --no-fb-import *.fbs
 
 python3 "$REPO_DIR/tools/correctFlatBufferSchemaIncludes.py" \
     --input="${folder}/cpp/*.h" \

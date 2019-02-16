@@ -24,7 +24,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):LogicSocket {
  * @param LogicSocket= obj
  * @returns LogicSocket
  */
-static getRootAsLogicSocket(bb:flatbuffers.ByteBuffer, obj?:LogicSocket):LogicSocket {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:LogicSocket):LogicSocket {
   return (obj || new LogicSocket).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -69,7 +69,7 @@ index():flatbuffers.Long {
 /**
  * @param flatbuffers.Builder builder
  */
-static startLogicSocket(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(4);
 };
 
@@ -109,18 +109,18 @@ static addIndex(builder:flatbuffers.Builder, index:flatbuffers.Long) {
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endLogicSocket(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   return offset;
 };
 
-static createLogicSocket(builder:flatbuffers.Builder, typeIndex:flatbuffers.Long, typeOffset:flatbuffers.Offset, typeNameOffset:flatbuffers.Offset, index:flatbuffers.Long):flatbuffers.Offset {
-  LogicSocket.startLogicSocket(builder);
+static create(builder:flatbuffers.Builder, typeIndex:flatbuffers.Long, typeOffset:flatbuffers.Offset, typeNameOffset:flatbuffers.Offset, index:flatbuffers.Long):flatbuffers.Offset {
+  LogicSocket.start(builder);
   LogicSocket.addTypeIndex(builder, typeIndex);
   LogicSocket.addType(builder, typeOffset);
   LogicSocket.addTypeName(builder, typeNameOffset);
   LogicSocket.addIndex(builder, index);
-  return LogicSocket.endLogicSocket(builder);
+  return LogicSocket.end(builder);
 }
 }
 }

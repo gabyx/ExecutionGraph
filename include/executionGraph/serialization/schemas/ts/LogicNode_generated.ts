@@ -25,7 +25,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):LogicNode {
  * @param LogicNode= obj
  * @returns LogicNode
  */
-static getRootAsLogicNode(bb:flatbuffers.ByteBuffer, obj?:LogicNode):LogicNode {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:LogicNode):LogicNode {
   return (obj || new LogicNode).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -112,7 +112,7 @@ dataArray():Uint8Array|null {
 /**
  * @param flatbuffers.Builder builder
  */
-static startLogicNode(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(5);
 };
 
@@ -223,20 +223,20 @@ static startDataVector(builder:flatbuffers.Builder, numElems:number) {
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endLogicNode(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 6); // type
   return offset;
 };
 
-static createLogicNode(builder:flatbuffers.Builder, id:flatbuffers.Long, typeOffset:flatbuffers.Offset, inputSocketsOffset:flatbuffers.Offset, outputSocketsOffset:flatbuffers.Offset, dataOffset:flatbuffers.Offset):flatbuffers.Offset {
-  LogicNode.startLogicNode(builder);
+static create(builder:flatbuffers.Builder, id:flatbuffers.Long, typeOffset:flatbuffers.Offset, inputSocketsOffset:flatbuffers.Offset, outputSocketsOffset:flatbuffers.Offset, dataOffset:flatbuffers.Offset):flatbuffers.Offset {
+  LogicNode.start(builder);
   LogicNode.addId(builder, id);
   LogicNode.addType(builder, typeOffset);
   LogicNode.addInputSockets(builder, inputSocketsOffset);
   LogicNode.addOutputSockets(builder, outputSocketsOffset);
   LogicNode.addData(builder, dataOffset);
-  return LogicNode.endLogicNode(builder);
+  return LogicNode.end(builder);
 }
 }
 }

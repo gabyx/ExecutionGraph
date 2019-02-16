@@ -62,7 +62,7 @@ function createWindow() {
   const serverExec = path.join(__dirname, 'ExecutionGraphServer');
   if (fs.existsSync(serverExec)) {
     console.log(`Starting up server: '${serverExec}'`);
-    execFile(serverExec, (err, data) => {
+    execFile(serverExec, ['--address', '127.0.0.1', '--port', '8089', '--threads', '2'], (err, data) => {
       if (err) {
         console.error(err);
         return;

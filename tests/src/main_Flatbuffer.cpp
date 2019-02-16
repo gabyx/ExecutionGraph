@@ -179,13 +179,14 @@ MY_TEST(FlatBuffer, GraphSimple)
                                                meta::list<DummyNodeSerializer>>;
         LogicNodeS nodeSerializer;
         ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(nodeSerializer);
-        auto execGraph = serializer.read("myGraph.eg");
+        GraphType execGraph;
+        serializer.read("myGraph.eg", execGraph);
 
         GraphTypeDescription::NodeTypeDescriptionList nodeTypeDescs = {
             NodeTypeDescription{rttr::type::get<DummyNodeType>().get_name().to_string()}};
 
         EXECGRAPH_LOG_TRACE("Write graph by Serializer");
-        serializer.write(*execGraph,
+        serializer.write(execGraph,
                          makeGraphTypeDescription<Config>(IdNamed{"Graph1"},
                                                           nodeTypeDescs,
                                                           "My simple dummy graph..."),
@@ -212,10 +213,14 @@ MY_TEST(FlatBuffer, RandomTree)
         NodeTypeDescription{rttr::type::get<DummyNodeType>().get_name().to_string()}};
 
     serializer.write(*execGraph,
-                     makeGraphTypeDescription<Config>(IdNamed{"Graph1"}, nodeTypeDescs, "My simple dummy graph..."),
+                     makeGraphTypeDescription<Config>(IdNamed{"Graph1"},
+                                                      nodeTypeDescs,
+                                                      "My simple dummy graph..."),
                      "myGraph.eg",
                      true);
-    auto graphRead = serializer.read("myGraph.eg");
+
+    GraphType graphR;
+    serializer.read("myGraph.eg", graphR);
 
     std::filesystem::remove("myGraph.eg");
 }

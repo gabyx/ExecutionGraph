@@ -7,11 +7,21 @@ import { ILogger, LoggerFactory } from '@eg/logger';
 import { MatDialog } from '@angular/material';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { assert } from '@eg/common';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { isNullOrUndefined } from 'util';
 
 export enum FileBrowserMode {
   Open = 'open',
   Save = 'save'
 }
+
+export interface SaveAction {
+  filePath: string;
+  overwrite: boolean;
+}
+
+export type OpenAction = string;
+export type DeleteAction = string;
 
 @Component({
   selector: 'eg-file-browser',
@@ -19,15 +29,24 @@ export enum FileBrowserMode {
   styleUrls: ['./file-browser.component.scss']
 })
 export class FileBrowserComponent implements OnInit {
-  private logger: ILogger;
-  private initPath = '.';
+  @Input() mode: string = FileBrowserMode.Open;
+  @Input() allowDelete: boolean = true;
+
+  @Output() fileActionSave = new EventEmitter<SaveAction>();
+  @Output() fileActionOpen = new EventEmitter<string>();
+  @Output() fileActionDelete = new EventEmitter<string>();
+
+  fileNameForm: FormGroup;
+  currentDirectory: DirectoryInfo = null;
+  isLoading = false;
+  atRoot: boolean;
+
+  private readonly logger: ILogger;
 
   private rootPath: string;
-  private atRoot: boolean;
-  private isLoading = false;
   private parentPaths: string[] = [];
 
-  private currentDirectory: DirectoryInfo = null;
+  private readonly fileNameRegex = /^\w([^\\/ ])+\.eg$/m;
 
   constructor(
     private store: Store<AppState>,
@@ -37,21 +56,16 @@ export class FileBrowserComponent implements OnInit {
   ) {
     this.logger = loggerFactory.create('FileBrowserComponent');
   }
-
-  @Input('mode') mode: string = FileBrowserMode.Open;
-  @Input('allowDelete') allowDelete: boolean = true;
-
-  @Output('fileActionSave') fileActionSave: EventEmitter<string>;
-  @Output('fileActionOpen') fileActionOpen: EventEmitter<string>;
-  @Output('fileActionDelete') fileActionDelete: EventEmitter<string>;
-
   ngOnInit() {
+    this.fileNameForm = new FormGroup({
+      fileName: new FormControl('MyGraph.eg', [Validators.required, Validators.pattern(this.fileNameRegex)])
+    });
     this.openRoot();
   }
 
   private openRoot() {
     this.reset();
-    this.loadDirectory(this.initPath).then(d => {
+    this.loadDirectory('.').then(d => {
       this.rootPath = d.path;
       this.atRoot = true;
       this.currentDirectory = d;
@@ -74,7 +88,7 @@ export class FileBrowserComponent implements OnInit {
     }
   }
 
-  private openParentDirectory() {
+  public openParentDirectory() {
     const p = this.parentPaths[this.parentPaths.length - 1];
     if (p) {
       this.loadDirectory(p).then(d => {
@@ -105,33 +119,22 @@ export class FileBrowserComponent implements OnInit {
   }
 
   public openFile(file: FileInfo) {
-    assert(this.mode === FileBrowserMode.Open, 'Programming Error!');
+    assert(this.mode === FileBrowserMode.Open, 'Wrong mode!');
     this.logger.debug(`Opening file '${file.path}'`);
     this.fileActionOpen.emit(file.path);
   }
 
-  private checkOverwrite(path: string) {
-    for (const p of this.currentDirectory.files) {
-      if (p.path.replace('//', '/') === path.replace('//', '/')) {
-        return true;
-      }
-    }
+  public saveNewFile() {
+    assert(this.mode === FileBrowserMode.Save, 'Ensure saving is only available in save Mode!');
+    assert(this.fileNameForm.valid, 'Ensure valid file names in the UI!');
+    assert(!isNullOrUndefined(this.currentDirectory), 'Directory must be known when saving a file');
+
+    const fileName = this.fileNameForm.get('fileName').value;
+    this.saveFile(fileName, true);
   }
 
-  public saveFileName(fileName: string) {
-    assert(this.mode === FileBrowserMode.Save && this.isFileNameCorrect(fileName), 'Programming Error!');
-    const path = (this.currentDirectory.path + '/' + fileName).replace('//', '/');
-    this.saveFile(path, true);
-  }
-
-  private deleteFile(path: FileInfo | DirectoryInfo) {
-    assert(this.allowDelete && this.isFileOpenable(path), 'Programming Error!');
-    this.logger.debug(`Deleting path '${path.path}'`);
-    this.fileActionDelete.emit(path.path);
-  }
-
-  private deleteConfirm(path: FileInfo | DirectoryInfo) {
-    assert(this.allowDelete, 'Programming Error!');
+  public deleteConfirm(path: FileInfo | DirectoryInfo) {
+    assert(this.allowDelete, 'Delete needs to be allowed!');
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       minWidth: '10%',
       data: {
@@ -146,10 +149,33 @@ export class FileBrowserComponent implements OnInit {
     });
   }
 
-  private saveFile(path: string, checkOverwrite: boolean) {
-    assert(this.mode === FileBrowserMode.Save, 'Programming Error!');
+  public isFileOpenable(file: FileInfo) {
+    assert(file.isFile, 'Datastructure is corrupt!');
+    return file.name.match(this.fileNameRegex) !== null;
+  }
 
-    const showOverwrite = checkOverwrite ? this.checkOverwrite(path) : false;
+  private checkOverwrite(fileName: string): boolean {
+    for (const p of this.currentDirectory.files) {
+      if (p.name === fileName) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private deleteFile(path: FileInfo | DirectoryInfo) {
+    assert(this.allowDelete, 'Ensure deleting is only available when deleting is allowed');
+    assert(this.isFileOpenable(path), 'Only openable files should be deletable!');
+    this.logger.debug(`Deleting path '${path.path}'`);
+    this.fileActionDelete.emit(path.path);
+  }
+
+  private saveFile(fileName: string, checkOverwrite: boolean) {
+    assert(this.mode === FileBrowserMode.Save, 'Wrong mode!');
+
+    const showOverwrite = checkOverwrite ? this.checkOverwrite(fileName) : false;
+
+    const path = `${this.currentDirectory.path}/${fileName}`.replace('//', '/');
 
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       minWidth: '10%',
@@ -161,17 +187,8 @@ export class FileBrowserComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.logger.debug(`Save file '${path}'`);
-        this.fileActionSave.emit(path);
+        this.fileActionSave.emit({ filePath: path, overwrite: showOverwrite });
       }
     });
-  }
-
-  public isFileOpenable(file: FileInfo) {
-    return file.name.endsWith('.eg');
-  }
-
-  public isFileNameCorrect(fileName: string) {
-    // https://regex101.com/r/Owqjpb/1
-    return fileName.match(/^(?<!\.)\w([^\\/]+)\.eg$/gm).length > 0;
   }
 }

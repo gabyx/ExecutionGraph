@@ -18,7 +18,7 @@ import { GraphsState } from '../../../+state/reducers';
 export class TypeToolTipToolComponent extends ToolComponent implements OnInit, OnDestroy {
   private readonly logger: ILogger;
   private sub: Subscription;
-  private toolTipMessages: string[] = [];
+  public toolTipMessages: string[] = [];
   private toolTipPosition = Point.zero.copy();
 
   constructor(private graph: GraphComponent, private store: Store<GraphsState>, loggerFactory: LoggerFactory) {

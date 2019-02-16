@@ -38,7 +38,7 @@ y():number {
  * @param number y
  * @returns flatbuffers.Offset
  */
-static createVector2f(builder:flatbuffers.Builder, x: number, y: number):flatbuffers.Offset {
+static create(builder:flatbuffers.Builder, x: number, y: number):flatbuffers.Offset {
   builder.prep(4, 8);
   builder.writeFloat32(y);
   builder.writeFloat32(x);
@@ -84,7 +84,7 @@ y():number {
  * @param number y
  * @returns flatbuffers.Offset
  */
-static createVector2d(builder:flatbuffers.Builder, x: number, y: number):flatbuffers.Offset {
+static create(builder:flatbuffers.Builder, x: number, y: number):flatbuffers.Offset {
   builder.prep(8, 16);
   builder.writeFloat64(y);
   builder.writeFloat64(x);
@@ -138,7 +138,7 @@ z():number {
  * @param number z
  * @returns flatbuffers.Offset
  */
-static createVector3d(builder:flatbuffers.Builder, x: number, y: number, z: number):flatbuffers.Offset {
+static create(builder:flatbuffers.Builder, x: number, y: number, z: number):flatbuffers.Offset {
   builder.prep(8, 24);
   builder.writeFloat64(z);
   builder.writeFloat64(y);
@@ -189,7 +189,7 @@ positionMax(obj?:Vector2f):Vector2f|null {
  * @param number positionMax_y
  * @returns flatbuffers.Offset
  */
-static createBox2f(builder:flatbuffers.Builder, positionMin_x: number, positionMin_y: number, positionMax_x: number, positionMax_y: number):flatbuffers.Offset {
+static create(builder:flatbuffers.Builder, positionMin_x: number, positionMin_y: number, positionMax_x: number, positionMax_y: number):flatbuffers.Offset {
   builder.prep(4, 16);
   builder.prep(4, 8);
   builder.writeFloat32(positionMax_y);

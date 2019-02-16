@@ -25,7 +25,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):CycleDescription {
  * @param CycleDescription= obj
  * @returns CycleDescription
  */
-static getRootAsCycleDescription(bb:flatbuffers.ByteBuffer, obj?:CycleDescription):CycleDescription {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:CycleDescription):CycleDescription {
   return (obj || new CycleDescription).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -50,7 +50,7 @@ cyclePathLength():number {
 /**
  * @param flatbuffers.Builder builder
  */
-static startCycleDescription(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
@@ -74,16 +74,16 @@ static startCyclePathVector(builder:flatbuffers.Builder, numElems:number) {
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endCycleDescription(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // cyclePath
   return offset;
 };
 
-static createCycleDescription(builder:flatbuffers.Builder, cyclePathOffset:flatbuffers.Offset):flatbuffers.Offset {
-  CycleDescription.startCycleDescription(builder);
+static create(builder:flatbuffers.Builder, cyclePathOffset:flatbuffers.Offset):flatbuffers.Offset {
+  CycleDescription.start(builder);
   CycleDescription.addCyclePath(builder, cyclePathOffset);
-  return CycleDescription.endCycleDescription(builder);
+  return CycleDescription.end(builder);
 }
 }
 }

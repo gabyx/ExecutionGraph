@@ -45,19 +45,20 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
       };
     }
 
+    case fromActions.OPEN_GRAPH: {
+      return {
+        ...state,
+        selectedGraphId: action.id
+      };
+    }
+
+    case fromActions.GRAPH_LOADED:
     case fromActions.GRAPH_ADDED: {
       const entities = { ...state.entities, [action.graph.id]: action.graph };
 
       return {
         ...state,
         entities
-      };
-    }
-
-    case fromActions.OPEN_GRAPH: {
-      return {
-        ...state,
-        selectedGraphId: action.id
       };
     }
 
