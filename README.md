@@ -55,7 +55,7 @@ Install the latest `clang` with [homebrew](https://brew.sh) by **updateing your 
 installing a [code-sign certificate](https://llvm.org/svn/llvm-project/lldb/trunk/docs/code-signing.txt)
 for lldb and then running:
 ```bash
-    brew install --HEAD llvm --with-toolchain --with-lldb
+brew install --HEAD llvm --with-toolchain --with-lldb
 ```
 or manually install
 ```bash
@@ -72,23 +72,23 @@ Now you should be ready to configure with cmake:
 Source the `tools/.enable-compiler.sh` and use `enableCompiler "clang"` which uses the `tools/.clang-flags-llvm-latest.cfg` to setup the compiler before you configure with: 
 
 ```bash
-    cd <pathToRepo>
-    mkdir build
-    cd build
-    # configuring the superbuild (-DUSE_SUPERBUILD=ON is default)
-    cmake .. -DUSE_SUPERBUILD=ON \
-         -DExecutionGraph_BUILD_TESTS=true \
-         -DExecutionGraph_BUILD_LIBRARY=true \
-         -DExecutionGraph_BUILD_GUI=true \
-         -DExecutionGraph_EXTERNAL_BUILD_DIR="$(pwd)/external" \
-         -DExecutionGraph_USE_ADDRESS_SANITIZER=true \
-         -DCMAKE_EXPORT_COMPILE_COMMANDS=true
-    # building the superbuild configuration 
-    make -j all
-    # configuring the actual build
-    cmake ..
-    # building the library/gui
-    make -j <targetName>
+cd <pathToRepo>
+mkdir build
+cd build
+# configuring the superbuild (-DUSE_SUPERBUILD=ON is default)
+cmake .. -DUSE_SUPERBUILD=ON \
+        -DExecutionGraph_BUILD_TESTS=true \
+        -DExecutionGraph_BUILD_LIBRARY=true \
+        -DExecutionGraph_BUILD_GUI=true \
+        -DExecutionGraph_EXTERNAL_BUILD_DIR="$(pwd)/external" \
+        -DExecutionGraph_USE_ADDRESS_SANITIZER=true \
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=true
+# building the superbuild configuration 
+make -j all
+# configuring the actual build
+cmake ..
+# building the library/gui
+make -j <targetName>
 ```
 We use a super build setup. The first cmake configure and build by using `-DUSE_SUPERBUILD=ON` (automatically set at first run) will download every dependency and build the ones which need installing.
  See the cmake variable `ExecutionGraph_EXTERNAL_BUILD_DIR` which is used for building all external dependencies to be able to quickly delete certain dependencies without deleting the normal build folder `build`). 
@@ -103,19 +103,19 @@ This project supports [Visual Studio Code](https://code.visualstudio.com/) which
 ## General Development Setup
 If you start developing, install the pre-commit/post-commit hooks with:
 ```bash
-    sudo npm install -g json-fmt xmllint prettier
-    sudo apt-get install plantuml # or sudo brew install plantuml
-    cd .git && mv hooks hooks.old && ln -s ../tools/git-hooks hooks
+sudo npm install -g json-fmt xmllint prettier
+sudo apt-get install plantuml # or sudo brew install plantuml
+cd .git && mv hooks hooks.old && ln -s ../tools/git-hooks hooks
 ```
 
 ### Codeformatting
 You can run the same pre-commit hook by doing
 ``` 
-    tools/formatAll.sh
+tools/formatAll.sh
 ```
 which will format all files for which formatting styles have been defined in the repository.
 
-## GUI Development Setup
+### GUI
 The UI is made up of an [Angular](https://angular.io) application that uses the [Angular CLI](https://cli.angular.io) to create the web assets that are ultimately displayed in an [electron app](https://electronjs.org/) browser.
 The client backend consists of a http server which provides the executiong graph.
 Please visit the Angular CLI website for its prerequisites (node.js and npm respectively, also a globally installed Angular CLI aka `ng`).
