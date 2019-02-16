@@ -1,0 +1,49 @@
+
+@startuml
+set namespaceSeparator ::
+skinparam shadowing false
+
+namespace common {
+    class BinaryBuffer<BufferPool> {
+        + resize()
+        + reserve()
+        + clear()
+        + data()
+        + isEmpty()
+        + allocatedSize()
+    }
+    class BinaryPayload {
+        + buffer()
+        + mimeType()
+    }
+
+    class Request #33cc33 {
+        + target()
+        + payload()
+    }
+    class ResponsePromise #ff6600 {
+        + setCancel(what)
+        + setReady(payload)
+    }
+    class ResponseFuture #00ccff {
+        + isValid()
+        + waitForPayload()
+    }
+}
+
+namespace std {
+    class promise<BinaryPayload>
+    class future<BinaryPayload>
+}
+
+common::ResponsePromise "1" *-- std::promise
+common::ResponseFuture "1" *-- std::future
+common::ResponseFuture .right.> common::ResponsePromise : uses
+
+common::ResponseFuture .down.> common::BinaryPayload : uses
+common::ResponsePromise .right.> common::BinaryPayload : uses
+
+
+common::Request "1" *--  common::BinaryPayload
+common::BinaryPayload "1" *-right- common::BinaryBuffer
+@enduml
