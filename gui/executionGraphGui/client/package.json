@@ -12,7 +12,7 @@
     "build": "ng build --project=eg",
     "build-dev": "npm run build -- --configuration=dev",
     "build-prod": "npm run build -- --prod",
-    "build:publish": "npm run build -- --output-path='../../../docs/demo' --optimization",
+    "build:publish": "ng build --project=eg --base-href './' --output-path='../../../docs/demo' --optimization",
     "test": "ng test",
     "lint": "./node_modules/.bin/nx lint && ng lint",
     "e2e": "ng e2e",
