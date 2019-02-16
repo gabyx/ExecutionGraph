@@ -10,8 +10,6 @@
 
 **Fast Execution Graph consisting of Execution Nodes**    
 
-Live Demo: 
-
 Be able to design and run such input/output dataflow graphs, such as the ones used for the work [here](http://gabyx.github.io/GRSFramework/#videos) (using this [graph](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)). A generic, independent GUI is provided in from of a single-page Angular application with a backend HTTP server which allows interactive design/manipulation and execution of graphs: 
 
 ![Current GUI](docs/ExecutionGraphGui.png)
