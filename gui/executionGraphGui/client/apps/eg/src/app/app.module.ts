@@ -67,6 +67,10 @@ import { GraphManipulationService } from './services/GraphManipulationService';
 import { GraphManipulationServiceBinaryHttp } from './services/GraphManipulationServiceBinaryHttp';
 import { GraphManipulationServiceDummy } from './services/GraphManipulationServiceDummy';
 
+import { GraphSerializationService } from './services/GraphSerializationService';
+import { GraphSerializationServiceBinaryHttp } from './services/GraphSerializationServiceBinaryHttp';
+import { GraphSerializationServiceDummy } from './services/GraphSerializationServiceDummy';
+
 import { GraphManagementService } from './services/GraphManagementService';
 import { GraphManagementServiceBinaryHttp } from './services/GraphManagementServiceBinaryHttp';
 import { GraphManagementServiceDummy } from './services/GraphManagementServiceDummy';
@@ -217,6 +221,10 @@ const routes: Route[] = [
     {
       provide: GraphManagementService,
       useClass: !environment.useServiceDummys ? GraphManagementServiceBinaryHttp : GraphManagementServiceDummy
+    },
+    {
+      provide: GraphSerializationService,
+      useClass: !environment.useServiceDummys ? GraphSerializationServiceBinaryHttp : GraphSerializationServiceDummy
     },
     {
       provide: FileBrowserService,

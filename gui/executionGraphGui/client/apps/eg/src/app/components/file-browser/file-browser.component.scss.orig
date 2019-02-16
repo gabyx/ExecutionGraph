@@ -1,0 +1,74 @@
+@import 'app/variables';
+
+.title {
+  color: $secondary;
+  font-weight: bold;
+  margin-left: 0.5em;
+}
+
+.back-label {
+  margin-left: 0.5em;
+}
+
+.title-divider {
+  border-top-width: 2pt;
+}
+
+.file {
+  //color: $secondary;
+  font-weight: normal;
+  flex-basis: 60%;
+}
+
+.folder {
+  //color: $secondary;
+  font-weight: bold;
+  flex-basis: 60%;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.prop {
+  flex-basis: 10%;
+}
+
+.folder-icon.notEmpty {
+  color: mat-color($foreground, text);
+}
+
+.folder-icon {
+  color: mat-color($foreground, disabled-text);
+}
+
+form {
+  margin-top: 2em;
+  margin-bottom: 1em;
+  min-width: 5em;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  .filename-input {
+    flex-basis: 80%;
+  }
+
+<<<<<<< HEAD
+
+=======
+>>>>>>> master
+  mat-form-field {
+    .ng-invalid {
+      color: $stroke-color-invalid;
+    }
+  }
+<<<<<<< HEAD
+}
+=======
+}
+>>>>>>> master
