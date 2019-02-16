@@ -17,16 +17,27 @@ Be able to design and run such input/output dataflow graphs, such as the ones us
 
 ![Current GUI](docs/ExecutionGraphGui.png)
 
-* [Installing and Dependencies](#installing-and-dependencies)
-    * [OS X](#os-x)
-* [Buidling](#buidling)
-* [General Development Setup](#general-development-setup)
-    * [Codeformatting](#codeformatting)
-    * [On OS X](#on-os-x)
-* [GUI Development Setup](#gui-development-setup)
-* [Introduction](#introduction)
-* [Example 1:](#example-1)
-* [Contributors](#contributors)
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+* [ExecutionGraph](#executiongraph)
+	* [Installing and Dependencies](#installing-and-dependencies)
+			* [Library](#library)
+			* [GUI Backend](#gui-backend)
+			* [GUI Client](#gui-client)
+			* [Testing](#testing)
+		* [OS X](#os-x)
+	* [Buidling](#buidling)
+* [Contributing](#contributing)
+	* [General Development Setup](#general-development-setup)
+		* [Codeformatting](#codeformatting)
+		* [GUI](#gui)
+	* [Introduction](#introduction)
+		* [Example 1:](#example-1)
+	* [Contributors](#contributors)
+
+<!-- /code_chunk_output -->
 
 ## Installing and Dependencies
 To build the library, the tests and the example you need the build tool [cmake](
