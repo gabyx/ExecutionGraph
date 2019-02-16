@@ -13,7 +13,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { Route, RouterModule } from '@angular/router';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   MatIconModule,
@@ -54,7 +54,6 @@ import { CommonModule } from '@eg/common';
 import { SimpleConsoleLoggerFactory, LoggerFactory } from '@eg/logger';
 
 import { BinaryHttpRouterService } from './services/BinaryHttpRouterService';
-import { CefMessageRouterService } from './services/CefMessageRouterService';
 
 import { ExecutionService } from './services/ExecutionService';
 import { ExecutionServiceBinaryHttp } from './services/ExecutionServiceBinaryHttp';
@@ -201,7 +200,6 @@ const routes: Route[] = [
     { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory },
     { provide: ITestBackend, useClass: TestBackend },
     BinaryHttpRouterService,
-    CefMessageRouterService,
     TestService,
     GraphLoadedGuard,
     {

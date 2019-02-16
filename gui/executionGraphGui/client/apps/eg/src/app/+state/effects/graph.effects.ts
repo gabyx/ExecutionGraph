@@ -20,6 +20,7 @@ import { AutoLayoutService } from '../../services/AutoLayoutService';
 import { Point } from '@eg/graph';
 import { TestService } from '../../services/TestService';
 import { Graph } from '../../model';
+import { GraphSerializationService } from '../../services/GraphSerializationService';
 
 @Injectable()
 export class GraphEffects {
@@ -31,6 +32,7 @@ export class GraphEffects {
     private readonly store: Store<GraphsState>,
     private readonly graphManipulationService: GraphManipulationService,
     private readonly graphManagementService: GraphManagementService,
+    private readonly graphSerializationService: GraphSerializationService,
     private readonly autoLayoutService: AutoLayoutService,
     //! @todo gabnue->gabnue,simspoe This needs to be removed once the
     //! testing is finished.
@@ -71,7 +73,7 @@ export class GraphEffects {
   loadGraph$ = this.actions$.pipe(
     ofType<fromGraph.LoadGraph>(fromGraph.LOAD_GRAPH),
     mergeMap((action, state) =>
-      from(this.graphManagementService.loadGraph(action.filePath)).pipe(
+      from(this.graphSerializationService.loadGraph(action.filePath)).pipe(
         map(graph => <{ graph: Graph; filePath: string }>{ graph: graph, filePath: action.filePath })
       )
     ),
@@ -85,7 +87,7 @@ export class GraphEffects {
   saveGraph$ = this.actions$.pipe(
     ofType<fromGraph.SaveGraph>(fromGraph.SAVE_GRAPH),
     mergeMap((action, state) =>
-      from(this.graphManagementService.saveGraph(action.id, action.filePath, action.overwrite)).pipe(
+      from(this.graphSerializationService.saveGraph(action.id, action.filePath, action.overwrite)).pipe(
         map(() => [action.id, action.filePath])
       )
     ),

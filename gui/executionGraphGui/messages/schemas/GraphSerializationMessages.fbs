@@ -16,35 +16,43 @@ include "executionGraph/serialization/schemas/ExecutionGraph.fbs";
 namespace executionGraphGui.serialization;
 
 //! ======================================================================
-//! Message "/eg-backend/general/addGraph"
+//! Message "/eg-backend/general/loadGraph"
 //! ======================================================================
-//! Request data:
-table AddGraphRequest {
-    graphTypeId:string (id:0, required); //!< The graph type guid.
+//! Request data: 
+table LoadGraphRequest {
+    filePath:string (id:0, required);  //!< The graph file.
 }
-//! Response data:
+
+//! Response data: 
+table LoadGraphResponse {
+    graphId: string (id:0, required);
+    graph: executionGraph.serialization.ExecutionGraph (id:1, required);
+
+    visualization: [uint8] (id:2, flexbuffer); //!< Additional visualization data for this graph.
+}
 //! Success: 
 //    - status code: 200 (OK)
 //! Valid Errors:
 //!   - status code: 400 (Bad Request)
-//!     - graph type id is not found
-table AddGraphResponse {
-    graphId:string (id:0, required); //!< The graph guid.
-}
+//!     - graph could not be loaded.
 //! ======================================================================
 
+
 //! ======================================================================
-//! Message "/eg-backend/general/removeGraph"
+//! Message "/eg-backend/general/saveGraph"
 //! ======================================================================
 //! Request data: 
-table RemoveGraphRequest {
-    graphId:string (id:0, required);  //!< The graph guid.
-}
+table SaveGraphRequest {
+    graphId: string (id:0, required);
+    filePath: string (id:1, required);   //!< The graph file.
+    overwrite: bool = false (id:2);     //!< If we have the permission to overwrite the file.
 
+    visualization: [uint8] (id:3, flexbuffer); //!< Additional visualization data for this graph.
+}
 //! Response data: none
 //! Success: 
 //    - status code: 200 (OK)
 //! Valid Errors:
 //!   - status code: 400 (Bad Request)
-//!     - graph id is not found
+//!     - graph could not be saved.
 //! ======================================================================

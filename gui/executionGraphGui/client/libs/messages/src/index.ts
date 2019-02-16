@@ -48,11 +48,6 @@ export namespace GraphManagementMessages {
   export import AddGraphResponse = exec3.serialization.AddGraphResponse;
 
   export import RemoveGraphRequest = exec3.serialization.RemoveGraphRequest;
-
-  export import LoadGraphRequest = exec3.serialization.LoadGraphRequest;
-  export import LoadGraphResponse = exec3.serialization.LoadGraphResponse;
-
-  export import SaveGraphRequest = exec3.serialization.SaveGraphRequest;
 }
 
 // Export everything which is needed for FileBrowserMessages (into a namespace!)
@@ -65,4 +60,13 @@ export namespace FileBrowserMessages {
   export import PathInfo = exec5.serialization.PathInfo;
   export import Date = exec5.serialization.Date;
   export import Permission = exec5.serialization.Permissions;
+}
+
+// Export everything which is needed for GraphManagementMessages (into a namespace!)
+import { executionGraphGui as exec6 } from './lib/GraphSerializationMessages_generated';
+export namespace GraphSerializationMessages {
+  export import LoadGraphRequest = exec6.serialization.LoadGraphRequest;
+  export import LoadGraphResponse = exec6.serialization.LoadGraphResponse;
+
+  export import SaveGraphRequest = exec6.serialization.SaveGraphRequest;
 }

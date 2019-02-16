@@ -184,7 +184,6 @@
   },
   "cmake.configureArgs": ["--parallel"],
   "plantuml.exportFormat": "svg",
-  "plantuml.exportSubFolder": false,
   "markdown-preview-enhanced.previewTheme": "github-dark.css",
   "C_Cpp.clang_format_fallbackStyle": "none",
   "C_Cpp.loggingLevel": "Debug",
@@ -201,5 +200,7 @@
   "gitlens.mode.active": "zen",
   "python.formatting.provider": "yapf",
   "gitlens.views.fileHistory.enabled": false,
-  "gitlens.views.lineHistory.enabled": false
+  "gitlens.views.lineHistory.enabled": false,
+  "plantuml.exportOutDir": "",
+  "plantuml.exportSubFolder": false
 }

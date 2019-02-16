@@ -28,10 +28,9 @@ GraphManagementRequestHandler::FuncMap GraphManagementRequestHandler::initFuncti
 {
     using Entry = typename FuncMap::Entry;
 
-    auto r = {Entry(targetBase / "general/addGraph", Function(&GraphManagementRequestHandler::handleAddGraph)),
-              Entry(targetBase / "general/removeGraph", Function(&GraphManagementRequestHandler::handleRemoveGraph)),
-              Entry(targetBase / "general/saveGraph", Function(&GraphManagementRequestHandler::handleSaveGraph)),
-              Entry(targetBase / "general/loadGraph", Function(&GraphManagementRequestHandler::handleLoadGraph))};
+    auto r = {
+        Entry(targetBase / "general/addGraph", Function(&GraphManagementRequestHandler::handleAddGraph)),
+        Entry(targetBase / "general/removeGraph", Function(&GraphManagementRequestHandler::handleRemoveGraph))};
     return {r};
 }
 
@@ -102,73 +101,4 @@ void GraphManagementRequestHandler::handleRemoveGraph(const Request& request, Re
 
     // Set the response ready
     response.setReady();
-}
-
-//! Handle the operation of saving a graph to a file.
-void GraphManagementRequestHandler::handleSaveGraph(const Request& request, ResponsePromise& response)
-{
-    // Request validation
-    auto& payload = request.payload();
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt, "Request data is null!");
-
-    auto saveReq = getRootOfPayloadAndVerify<s::SaveGraphRequest>(*payload);
-
-    auto vis     = saveReq->visualization();
-    auto visView = vis ? BinaryBufferView(vis->data(), vis->size()) : BinaryBufferView{};
-
-    m_backend->saveGraph(Id{saveReq->graphId()->c_str()},
-                         saveReq->filePath()->c_str(),
-                         saveReq->overwrite(),
-                         visView);
-
-    response.setReady();
-}
-
-//! Handle the operation of loading a graph from a file.
-void GraphManagementRequestHandler::handleLoadGraph(const Request& request, ResponsePromise& response)
-{
-    // Request validation
-    auto& payload = request.payload();
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt, "Request data is null!");
-
-    auto loadReq = getRootOfPayloadAndVerify<s::LoadGraphRequest>(*payload);
-
-    // Callback to create the response
-    auto responseCreator = [&response](const auto& graphId,
-                                       const auto& graph,
-                                       const auto& graphDescription,
-                                       BinaryBufferView visualization) {
-        using Allocator = ResponsePromise::Allocator;
-        AllocatorProxyFlatBuffer<Allocator> allocator(response.getAllocator());
-        flatbuffers::FlatBufferBuilder builder(10 * (1 << 20), &allocator);
-
-        using GraphType       = std::decay_t<decltype(graph)>;
-        using Config          = typename GraphType::Config;
-        using NodeSerializer  = typename ExecutionGraphBackendDefs<Config>::NodeSerializer;
-        using GraphSerializer = typename ExecutionGraphBackendDefs<Config>::GraphSerializer;
-
-        // Serialize the graph.
-        NodeSerializer nodeSerializer;
-        GraphSerializer graphSerializer(nodeSerializer);
-        auto graphOffset = graphSerializer.writeGraph(builder,
-                                                      graph,
-                                                      graphDescription,
-                                                      visualization);
-
-        auto graphIdOff = builder.CreateString(graphId.toString());
-
-        s::LoadGraphResponseBuilder loadResponse(builder);
-        loadResponse.add_graphId(graphIdOff);
-        loadResponse.add_graph(graphOffset);
-        auto resOff = loadResponse.Finish();
-        builder.Finish(resOff);
-
-        // Set the response.
-        response.setReady(ResponsePromise::Payload{releaseIntoBinaryBuffer(std::move(allocator),
-                                                                           builder),
-                                                   "application/octet-stream"});
-    };
-
-    m_backend->loadGraph(loadReq->filePath()->c_str(),
-                         responseCreator);
 }

@@ -12,29 +12,31 @@
 
 import { Injectable } from '@angular/core';
 import { ILogger, LoggerFactory } from '@eg/logger';
-import { GraphManagementService } from './GraphManagementService';
+import { GraphSerializationService } from './GraphSerializationService';
 import { Graph, GraphTypeId, GraphId } from '../model';
 import { Guid } from 'guid-typescript';
 import { ITestBackend } from './TestBackend';
 
 @Injectable()
-export class GraphManagementServiceDummy extends GraphManagementService {
+export class GraphSerializationServiceDummy extends GraphSerializationService {
   private logger: ILogger;
 
   constructor(loggerFactory: LoggerFactory, private readonly backend: ITestBackend) {
     super();
-    this.logger = loggerFactory.create('GraphManagementServiceDummy');
+    this.logger = loggerFactory.create('GraphSerializationServiceDummy');
   }
 
-  public async addGraph(graphTypeId: GraphTypeId): Promise<Graph> {
+  public async saveGraph(graphId: GraphId, filePath: string, overwrite: boolean): Promise<void> {
+    this.logger.debug(`Saving graph id: '${graphId}' to file: '${filePath}'`);
+  }
+  public async loadGraph(filePath: string): Promise<Graph> {
+    this.logger.debug(`Loading graph from file: '${filePath}'`);
     return {
       id: Guid.create().toString(),
-      typeId: graphTypeId,
-      nodes: {},
+      name: 'Unnamed',
       connections: {},
-      name: 'MyDummyGraph'
+      nodes: {},
+      typeId: this.backend.graphTypeDescs[0].id
     };
   }
-
-  public async removeGraph(graphId: GraphId): Promise<void> {}
 }

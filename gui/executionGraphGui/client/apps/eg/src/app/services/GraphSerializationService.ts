@@ -10,12 +10,12 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { GraphManagementMessages } from '@eg/messages';
+import { GraphSerializationMessages } from '@eg/messages';
 import { Graph } from '../model';
-export import sz = GraphManagementMessages;
+export import sz = GraphSerializationMessages;
 import { GraphTypeId, GraphId } from '../model/Graph';
 
-export abstract class GraphManagementService {
-  public abstract async addGraph(graphTypeId: GraphTypeId): Promise<Graph>;
-  public abstract async removeGraph(graphId: GraphId): Promise<void>;
+export abstract class GraphSerializationService {
+  public abstract async saveGraph(graphId: GraphId, filePath: string, overwrite: boolean): Promise<void>;
+  public abstract async loadGraph(filePath: string): Promise<Graph>;
 }
