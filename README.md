@@ -23,10 +23,10 @@ Be able to design and run such input/output dataflow graphs, such as the ones us
 
 * [ExecutionGraph](#executiongraph)
 	* [Installing and Dependencies](#installing-and-dependencies)
-			* [Library](#library)
-			* [GUI Backend](#gui-backend)
-			* [GUI Client](#gui-client)
-			* [Testing](#testing)
+		* [Library](#library)
+		* [GUI Backend](#gui-backend)
+		* [GUI Client](#gui-client)
+		* [Testing](#testing)
 		* [OS X](#os-x)
 	* [Buidling](#buidling)
 * [Contributing](#contributing)
@@ -44,18 +44,18 @@ To build the library, the tests and the example you need the build tool [cmake](
 http://www.cmake.org).
 This library has these dependencies:
 
-#### Library
+### Library
 - [meta](https://github.com/ericniebler/meta) (meta programming)
 - [crossguid](https://github.com/graeme-hill/crossguid) (guid implementation)
 - [rttr](https://github.com/rttrorg/rttr) (runtime type information, serialization only)
 - [fmt](https://github.com/fmtlib/fmt.git) (asserts, exception formatting)
-#### GUI Backend
+### GUI Backend
 - [args](https://github.com/Taywee/args) (argument parser)
 - [memory](https://github.com/foonathan/memory.git) (memory allocators)
 - [spdlog](https://github.com/gabime/spdlog) (logs)
-#### GUI Client
+### GUI Client
 - [node](https://nodejs.org/) (client build)
-#### Testing
+### Testing
 - [googletest](https://github.com/google/googletest) (for tests)
 - [benchmark](https://github.com/google/benchmark) (for benchmarks)
 
