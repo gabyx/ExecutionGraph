@@ -7,11 +7,11 @@
 ![system](https://img.shields.io/badge/system-linux,osx-blue.svg)
 ![std](https://img.shields.io/badge/std-c++17-green.svg)   
 [![Gitter chat](https://badges.gitter.im/ExecutionGraph/gitter.png)](https://gitter.im/ExecutionGraph/community)
-
+[![Live](https://img.shields.io/badge/demo-live-blue.svg)](https://gabyx.github.io/ExecutionGraph/demo)
 
 **Fast Execution Graph consisting of Execution Nodes**    
 
-Live Demo: [https://gabyx.github.io/ExecutionGraph/demo](https://gabyx.github.io/ExecutionGraph/demo)
+Live Demo: 
 
 Be able to design and run such input/output dataflow graphs, such as the ones used for the work [here](http://gabyx.github.io/GRSFramework/#videos) (using this [graph](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)). A generic, independent GUI is provided in from of a single-page Angular application with a backend HTTP server which allows interactive design/manipulation and execution of graphs: 
 
