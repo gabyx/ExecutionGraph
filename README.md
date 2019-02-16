@@ -35,7 +35,7 @@ Be able to design and run such input/output dataflow graphs, such as the ones us
 		* [GUI](#gui)
 	* [Introduction](#introduction)
 		* [Example 1:](#example-1)
-	* [Contributors](#contributors)
+* [Contributors](#contributors)
 
 <!-- /code_chunk_output -->
 
@@ -310,7 +310,7 @@ Execution order for group id: 0
     ------  |  --------  |  --------  
 ```
 
-## Contributors
+# Contributors
 **Gabriel Nützi** and many thanks to:
 - **[Simon Spörri](https://github.com/simonspoerri)**
 for his nice and ellaborate take on the client gui application!
