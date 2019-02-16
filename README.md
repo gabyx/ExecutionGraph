@@ -3,8 +3,9 @@
 <img src="gui/executionGraphGui/client/apps/electron/resources/icon.svg" height="150px" style="display: inline;vertical-align: middle; horizontal-align:center"/>
 
 # ExecutionGraph 
-[![Build Status](https://travis-ci.org/gabyx/ExecutionGraph.svg?branch=master)](https://travis-ci.org/gabyx/ExecutionGraph) not yet setup ...      
-![System](https://img.shields.io/badge/system-linux,osx-lightgrey.svg)     
+[![Build Status](https://travis-ci.org/gabyx/ExecutionGraph.svg?branch=master)](https://travis-ci.org/gabyx/ExecutionGraph)      
+![system](https://img.shields.io/badge/system-linux,osx-blue.svg)
+![std](https://img.shields.io/badge/std-c++17-green.svg)   
 [![Gitter chat](https://badges.gitter.im/ExecutionGraph/gitter.png)](https://gitter.im/ExecutionGraph/community)
 
 
@@ -27,7 +28,6 @@ Be able to design and run such input/output dataflow graphs, such as the ones us
 * [Example 1:](#example-1)
 * [Contributors](#contributors)
 
-
 ## Installing and Dependencies
 To build the library, the tests and the example you need the build tool [cmake](
 http://www.cmake.org).
@@ -48,10 +48,10 @@ This library has these dependencies:
 - [googletest](https://github.com/google/googletest) (for tests)
 - [benchmark](https://github.com/google/benchmark) (for benchmarks)
 
-For easy building, all dependencies are searched, downloaded and build if not found, during the first super build run.
+For easy building, all dependencies are searched, downloaded and built if not found, during the first super build run.
 
 ### OS X
-Install `clang` with [homebrew](https://brew.sh) by **updateing your xcode installation**, 
+Install the latest `clang` with [homebrew](https://brew.sh) by **updateing your xcode installation**, 
 installing a [code-sign certificate](https://llvm.org/svn/llvm-project/lldb/trunk/docs/code-signing.txt)
 for lldb and then running:
 ```bash
@@ -61,16 +61,16 @@ or manually install
 ```bash
 git clone https://github.com/llvm-project/llvm-project-20170507 llvm-project
 mkdir llvm-build && cd llvm-build
-cmake ../llvm-project/llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS="clang;libcxx;libcxxabi;lldb;compiler-rt;lld;polly" -DCMAKE_INSTALL_PREFIX="/usr/local/opt/llvm-7.0"
+cmake ../llvm-project/llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS="clang;libcxx;libcxxabi;lldb;compiler-rt;lld;polly" -DCMAKE_INSTALL_PREFIX="/usr/local/opt/llvm-latest"
 make -j install
 ```
-We install the latest llvm build, since clang5.0.1 has problems showing `std::string` correctly while using `-fsanitize=address`.
-With Clang 7.0 no problems have been detected.
 
-Set the `CXX` and `CC` variables in your `~/.bash_profile` or similar to `tools/.compiler_profile`.
+
 Now you should be ready to configure with cmake:
 
 ## Buidling
+Source the `tools/.enable-compiler.sh` and use `enableCompiler "clang"` which uses the `tools/.clang-flags-llvm-latest.cfg` to setup the compiler before you configure with: 
+
 ```bash
     cd <pathToRepo>
     mkdir build
@@ -100,17 +100,16 @@ This project supports [Visual Studio Code](https://code.visualstudio.com/) which
 
 **Note:** Dont use the [multi-root workspaces](https://code.visualstudio.com/docs/editor/multi-root-workspaces) feature in VS Code since the C++ Extension does not yet support this and code completion won't work properly.
 
-
 ## General Development Setup
 If you start developing, install the pre-commit/post-commit hooks with:
 ```bash
     sudo npm install -g json-fmt xmllint prettier
-    sudo brew install plantuml # or sudo apt-get install plantuml 
+    sudo apt-get install plantuml # or sudo brew install plantuml
     cd .git && mv hooks hooks.old && ln -s ../tools/git-hooks hooks
 ```
 
 ### Codeformatting
-You can run the same pre-commit hook by doing 
+You can run the same pre-commit hook by doing
 ``` 
     tools/formatAll.sh
 ```
@@ -120,7 +119,7 @@ which will format all files for which formatting styles have been defined in the
 The UI is made up of an [Angular](https://angular.io) application that uses the [Angular CLI](https://cli.angular.io) to create the web assets that are ultimately displayed in an [electron app](https://electronjs.org/) browser.
 The client backend consists of a http server which provides the executiong graph.
 Please visit the Angular CLI website for its prerequisites (node.js and npm respectively, also a globally installed Angular CLI aka `ng`).
-Once you installed the prerequisites build the client application by navigating to the client directory and starting the build process.
+Once you installed the prerequisites build with
 
 ```bash
 cd gui/executionGraphGui/client
@@ -131,7 +130,6 @@ npm run serve
 For more information about the development of the client application please refer to the dedicated [client documentation](gui/client/README.md)
 
 ## Introduction
-
 The execution graph implemented in `ExecutionTree` is a directed acyclic graph consisting of several connected nodes derived from `LogicNode` which define a simple input/output control flow.
 Each node in the execution graph contains several input/output sockets (`LogicSocket`) with a certain type out of the predefined types defined in `LogicSocketTypes`. 
 
@@ -302,5 +300,6 @@ Execution order for group id: 0
 ```
 
 ## Contributors
-**Gabriel Nützi** (graph) and many thanks to **[Simon Spörri](https://github.com/simonspoerri)**
+**Gabriel Nützi** and many thanks to:
+- **[Simon Spörri](https://github.com/simonspoerri)**
 for his nice and ellaborate take on the client gui application!
