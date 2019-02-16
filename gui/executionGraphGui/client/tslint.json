@@ -1,4 +1,11 @@
 {
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "typescript-tslint-plugin"
+      }
+    ]
+  },
   "rulesDirectory": ["node_modules/codelyzer", "node_modules/@nrwl/schematics/src/tslint"],
   "rules": {
     "align": [true, "parameters", "statements", "members", "arguments", "elements"],
@@ -62,8 +69,28 @@
         "allow": [],
         "depConstraints": [
           {
-            "sourceTag": "*",
+            "sourceTag": "app:eg",
             "onlyDependOnLibsWithTags": ["*"]
+          },
+          {
+            "sourceTag": "lib:common",
+            "onlyDependOnLibsWithTags": []
+          },
+          {
+            "sourceTag": "lib:logger",
+            "onlyDependOnLibsWithTags": ["lib:common"]
+          },
+          {
+            "sourceTag": "lib:graph",
+            "onlyDependOnLibsWithTags": ["lib:common", "lib:logger"]
+          },
+          {
+            "sourceTag": "lib:messages",
+            "onlyDependOnLibsWithTags": ["lib:serialization"]
+          },
+          {
+            "sourceTag": "lib:serialization",
+            "onlyDependOnLibsWithTags": []
           }
         ]
       }

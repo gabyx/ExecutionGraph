@@ -11,7 +11,7 @@
 // =========================================================================================
 
 include "executionGraphGui/messages/schemas/DataTypes.fbs";
-include "executionGraph/serialization/schemas/LogicNode.fbs";
+include "executionGraph/serialization/schemas/ExecutionGraph.fbs";
 
 namespace executionGraphGui.serialization;
 

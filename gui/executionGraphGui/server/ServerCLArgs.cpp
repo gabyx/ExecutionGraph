@@ -20,9 +20,9 @@
 
 ServerCLArgs::ServerCLArgs(int argc, const char* argv[])
     : CommandLineArguments(argc,
-                                           argv,
-                                           "ExecutionGraphServer Application",
-                                           "No detailed description")
+                           argv,
+                           "ExecutionGraphServer Application",
+                           "No detailed description")
     , m_rootPath(m_parser,
                  "root",
                  "Root path of the server application.",
@@ -71,13 +71,17 @@ ServerCLArgs::ServerCLArgs(int argc, const char* argv[])
         {
             m_rootPath.Get() = this->initialPath() / m_rootPath.Get();
         }
+
+        EXECGRAPHGUI_THROW_TYPE_IF(!std::filesystem::exists(m_rootPath.Get()),
+                                   args::ParseError,
+                                   "Root path does not exist!");
     }
     catch(args::Help)
     {
         std::cerr << m_parser;
         std::exit(EXIT_SUCCESS);
     }
-    catch(args::ParseError e)
+    catch(args::ParseError& e)
     {
         std::cerr << fmt::format("Parser Error: '{0}'\n{1}",
                                  e.what(),

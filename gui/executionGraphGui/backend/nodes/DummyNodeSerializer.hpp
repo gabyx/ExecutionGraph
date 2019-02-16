@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_backend_nodes_DummyNodeSerializer_hpp
-#define executionGraphGui_backend_nodes_DummyNodeSerializer_hpp
+#pragma once
 
 #include <flatbuffers/flatbuffers.h>
 #include <executionGraph/nodes/LogicCommon.hpp>
@@ -47,14 +46,11 @@ struct DummyNodeSerializer
 
         static std::unique_ptr<NodeBaseType>
         create(executionGraph::NodeId nodeId,
-               const std::string& name,
                const VectorOffsetSocket* inputSockets             = nullptr,
                const VectorOffsetSocket* outputSockets            = nullptr,
                const flatbuffers::Vector<uint8_t>* additionalData = nullptr)
         {
-            return std::make_unique<DummyNodeType>(nodeId, name);
+            return std::make_unique<DummyNodeType>(nodeId);
         }
     };
 };
-
-#endif

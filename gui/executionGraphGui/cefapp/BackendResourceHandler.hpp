@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_cefapp_BackendResourceHandler_h
-#define executionGraphGui_cefapp_BackendResourceHandler_h
+#pragma once
 
 #include <cef_base.h>
 #include <cef_resource_handler.h>
@@ -72,7 +71,7 @@ public:
     //@}
 
 private:
-    std::path m_requestTarget;  //!< The request type "<category/subcategory>" (e.g. "graphManip/addNode" ).
+    std::path m_target;      //!< The request type "<category/subcategory>" (e.g. "graphManip/addNode" ).
     std::string m_query;     //!< The additional query (everything after "?").
     std::string m_mimeType;  //!< MIME type of the post data.
     bool initRequest(CefRefPtr<CefRequest> request);
@@ -102,5 +101,3 @@ private:
     CefRefCount m_refCount;
     //@}
 };
-
-#endif

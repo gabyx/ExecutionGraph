@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_common_Assert_hpp
-#define executionGraphGui_common_Assert_hpp
+#pragma once
 
 #include "executionGraphGui/common/Loggers.hpp"
 
@@ -39,6 +38,4 @@
             }                                           \
         }
 #    define EXECGRAPHGUI_VERIFY(condition, ...) EXECGRAPHGUI_ASSERT(condition, __VA_ARGS__)
-#endif
-
 #endif

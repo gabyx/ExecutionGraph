@@ -10,13 +10,13 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraph_serializer_LogicNodeSerializer_hpp
-#define executionGraph_serializer_LogicNodeSerializer_hpp
+#pragma once
 
 #include <type_traits>
 #include <meta/meta.hpp>
 #include "executionGraph/common/Factory.hpp"
 #include "executionGraph/common/MetaVisit.hpp"
+#include "executionGraph/serialization/Conversions.hpp"
 #include "executionGraph/serialization/SocketTypeDescription.hpp"
 #include "executionGraph/serialization/schemas/cpp/LogicNode_generated.h"
 
@@ -61,20 +61,18 @@ namespace executionGraph
         //! It first tries to construct it by the factory
         //! and uses RTTR construction as a fallback.
         static std::unique_ptr<NodeBaseType>
-        read(const std::string& type,
+        read(std::string_view type,
              NodeId nodeId,
-             const std::string& nodeName,
              const flatbuffers::Vector<flatbuffers::Offset<serialization::LogicSocket>>* inputSockets  = nullptr,
              const flatbuffers::Vector<flatbuffers::Offset<serialization::LogicSocket>>* outputSockets = nullptr,
              const flatbuffers::Vector<uint8_t>* additionalData                                        = nullptr)
         {
             // Dispatch to the correct serialization read function
             // the factory reads and returns the node
-            auto rttrType = rttr::type::get_by_name(type);
+            auto rttrType = rttr::type::get_by_name(rttr::toRttr(type));
 
             auto optNode = FactoryRead::create(rttrType,
                                                nodeId,
-                                               nodeName,
                                                inputSockets,
                                                outputSockets,
                                                additionalData);
@@ -98,19 +96,11 @@ namespace executionGraph
                                    type);
 
                 rttr::variant instance;
-                if(!nodeName.empty())
-                {
-                    rttr::constructor ctor = rttrType.get_constructor({rttr::type::get<NodeId>(),
-                                                                       rttr::type::get<const std::string&>()});
-                    EXECGRAPH_THROW_IF(!ctor.is_valid(), "Ctor is invalid for type: '{0}'", type);
-                    instance = ctor.invoke(nodeId, nodeName);
-                }
-                else
-                {
-                    rttr::constructor ctor = rttrType.get_constructor({rttr::type::get<NodeId>()});
-                    EXECGRAPH_THROW_IF(!ctor.is_valid(), "Ctor is invalid for type: '{0}'", type);
-                    instance = ctor.invoke(nodeId);
-                }
+
+                rttr::constructor ctor = rttrType.get_constructor({rttr::type::get<NodeId>()});
+                EXECGRAPH_THROW_IF(!ctor.is_valid(), "Ctor is invalid for type: '{0}'", type);
+                instance = ctor.invoke(nodeId);
+
                 EXECGRAPH_THROW_IF(!instance.is_valid(), "Variant instance is not valid!");
                 EXECGRAPH_THROW_IF(!instance.get_type().is_pointer(), "Variant instance type needs to be a pointer!");
 
@@ -124,7 +114,6 @@ namespace executionGraph
         {
             return LogicNodeSerializer::read(logicNode.type()->str(),
                                              logicNode.id(),
-                                             logicNode.name() ? logicNode.name()->str() : "",
                                              logicNode.inputSockets(),
                                              logicNode.outputSockets(),
                                              logicNode.data());
@@ -141,9 +130,7 @@ namespace executionGraph
             using namespace s;
             namespace fb = flatbuffers;
 
-            NodeId id       = node.getId();
-            auto nameOffset = builder.CreateString(node.getName());
-
+            NodeId id        = node.getId();
             std::string type = rttr::type::get(node).get_name().to_string();
             auto typeOffset  = builder.CreateString(type);
 
@@ -174,7 +161,6 @@ namespace executionGraph
             LogicNodeBuilder lnBuilder(builder);
             lnBuilder.add_id(id);
             lnBuilder.add_type(typeOffset);
-            lnBuilder.add_name(nameOffset);
             lnBuilder.add_inputSockets(inputsOff);
             lnBuilder.add_outputSockets(outputsOff);
             if(!dataOffset.IsNull())
@@ -199,10 +185,9 @@ namespace executionGraph
                 std::vector<flatbuffers::Offset<LogicSocket>> socketOffs;
                 for(auto& socket : sockets)
                 {
-                    auto nameOff = builder.CreateString(socket->getName());
                     EXECGRAPH_ASSERT(socket->getType() < socketDescriptions.size(), "Socket type wrong!");
 
-                    decltype(nameOff) typeOff, typeNameOff;
+                    flatbuffers::Offset<flatbuffers::String> typeOff, typeNameOff;
                     if(fullTypeSpec)
                     {
                         typeOff     = builder.CreateString(socketDescriptions[socket->getType()].m_type);
@@ -216,7 +201,6 @@ namespace executionGraph
 
                     soBuilder.add_index(socket->getIndex());
 
-                    soBuilder.add_name(nameOff);
                     socketOffs.emplace_back(soBuilder.Finish());
                 }
                 return builder.CreateVector(socketOffs);
@@ -247,7 +231,7 @@ namespace executionGraph
                                    "socket type '{2}' at index '{3}'! "
                                    "The deserialization should have added this sockets throught the constructor! ",
                                    ((checkInput) ? "input" : "output"),
-                                   node->getName(),
+                                   node->getId(),
                                    rttr::type::get<T>().get_name().to_string(),
                                    index);
             }
@@ -309,4 +293,3 @@ namespace executionGraph
         using FactoryRead      = StaticFactory<CreatorListRead>;
     };
 }  // namespace executionGraph
-#endif

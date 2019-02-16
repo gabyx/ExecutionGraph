@@ -7,7 +7,6 @@ import { delay, first } from 'rxjs/operators';
   templateUrl: './file-input.component.html'
 })
 export class FileInputComponent {
-
   /**
    * The user changed the selected file
    *
@@ -17,7 +16,7 @@ export class FileInputComponent {
 
   @ViewChild('inputElement') private input: ElementRef;
 
-  private get fileInputElement() : HTMLInputElement {
+  private get fileInputElement(): HTMLInputElement {
     return this.input.nativeElement;
   }
 
@@ -47,8 +46,7 @@ export class FileInputComponent {
    * @memberof FileInputComponent
    */
   public onFileChanged(event: Event) {
-    if (this.fileInputElement.files.length > 0)
-    {
+    if (this.fileInputElement.files.length > 0) {
       // @todo cmonspqr -> gabyx: Is multi-selection allowed? if so, emit multiple files
       this.fileChanged.emit(this.fileInputElement.files[0]);
     }

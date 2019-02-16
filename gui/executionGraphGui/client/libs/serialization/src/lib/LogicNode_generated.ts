@@ -25,7 +25,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):LogicNode {
  * @param LogicNode= obj
  * @returns LogicNode
  */
-static getRootAsLogicNode(bb:flatbuffers.ByteBuffer, obj?:LogicNode):LogicNode {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:LogicNode):LogicNode {
   return (obj || new LogicNode).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -49,23 +49,12 @@ type(optionalEncoding?:any):string|Uint8Array|null {
 };
 
 /**
- * @param flatbuffers.Encoding= optionalEncoding
- * @returns string|Uint8Array|null
- */
-name():string|null
-name(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-name(optionalEncoding?:any):string|Uint8Array|null {
-  var offset = this.bb!.__offset(this.bb_pos, 8);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
-};
-
-/**
  * @param number index
  * @param executionGraph.serialization.LogicSocket= obj
  * @returns executionGraph.serialization.LogicSocket
  */
 inputSockets(index: number, obj?:NS15865320443877550707.executionGraph.serialization.LogicSocket):NS15865320443877550707.executionGraph.serialization.LogicSocket|null {
-  var offset = this.bb!.__offset(this.bb_pos, 10);
+  var offset = this.bb!.__offset(this.bb_pos, 8);
   return offset ? (obj || new NS15865320443877550707.executionGraph.serialization.LogicSocket).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
 };
 
@@ -73,7 +62,7 @@ inputSockets(index: number, obj?:NS15865320443877550707.executionGraph.serializa
  * @returns number
  */
 inputSocketsLength():number {
-  var offset = this.bb!.__offset(this.bb_pos, 10);
+  var offset = this.bb!.__offset(this.bb_pos, 8);
   return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
 };
 
@@ -83,7 +72,7 @@ inputSocketsLength():number {
  * @returns executionGraph.serialization.LogicSocket
  */
 outputSockets(index: number, obj?:NS15865320443877550707.executionGraph.serialization.LogicSocket):NS15865320443877550707.executionGraph.serialization.LogicSocket|null {
-  var offset = this.bb!.__offset(this.bb_pos, 12);
+  var offset = this.bb!.__offset(this.bb_pos, 10);
   return offset ? (obj || new NS15865320443877550707.executionGraph.serialization.LogicSocket).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
 };
 
@@ -91,7 +80,7 @@ outputSockets(index: number, obj?:NS15865320443877550707.executionGraph.serializ
  * @returns number
  */
 outputSocketsLength():number {
-  var offset = this.bb!.__offset(this.bb_pos, 12);
+  var offset = this.bb!.__offset(this.bb_pos, 10);
   return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
 };
 
@@ -100,7 +89,7 @@ outputSocketsLength():number {
  * @returns number
  */
 data(index: number):number|null {
-  var offset = this.bb!.__offset(this.bb_pos, 14);
+  var offset = this.bb!.__offset(this.bb_pos, 12);
   return offset ? this.bb!.readUint8(this.bb!.__vector(this.bb_pos + offset) + index) : 0;
 };
 
@@ -108,7 +97,7 @@ data(index: number):number|null {
  * @returns number
  */
 dataLength():number {
-  var offset = this.bb!.__offset(this.bb_pos, 14);
+  var offset = this.bb!.__offset(this.bb_pos, 12);
   return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
 };
 
@@ -116,15 +105,15 @@ dataLength():number {
  * @returns Uint8Array
  */
 dataArray():Uint8Array|null {
-  var offset = this.bb!.__offset(this.bb_pos, 14);
+  var offset = this.bb!.__offset(this.bb_pos, 12);
   return offset ? new Uint8Array(this.bb!.bytes().buffer, this.bb!.bytes().byteOffset + this.bb!.__vector(this.bb_pos + offset), this.bb!.__vector_len(this.bb_pos + offset)) : null;
 };
 
 /**
  * @param flatbuffers.Builder builder
  */
-static startLogicNode(builder:flatbuffers.Builder) {
-  builder.startObject(6);
+static start(builder:flatbuffers.Builder) {
+  builder.startObject(5);
 };
 
 /**
@@ -145,18 +134,10 @@ static addType(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset) {
 
 /**
  * @param flatbuffers.Builder builder
- * @param flatbuffers.Offset nameOffset
- */
-static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(2, nameOffset, 0);
-};
-
-/**
- * @param flatbuffers.Builder builder
  * @param flatbuffers.Offset inputSocketsOffset
  */
 static addInputSockets(builder:flatbuffers.Builder, inputSocketsOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(3, inputSocketsOffset, 0);
+  builder.addFieldOffset(2, inputSocketsOffset, 0);
 };
 
 /**
@@ -185,7 +166,7 @@ static startInputSocketsVector(builder:flatbuffers.Builder, numElems:number) {
  * @param flatbuffers.Offset outputSocketsOffset
  */
 static addOutputSockets(builder:flatbuffers.Builder, outputSocketsOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(4, outputSocketsOffset, 0);
+  builder.addFieldOffset(3, outputSocketsOffset, 0);
 };
 
 /**
@@ -214,7 +195,7 @@ static startOutputSocketsVector(builder:flatbuffers.Builder, numElems:number) {
  * @param flatbuffers.Offset dataOffset
  */
 static addData(builder:flatbuffers.Builder, dataOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(5, dataOffset, 0);
+  builder.addFieldOffset(4, dataOffset, 0);
 };
 
 /**
@@ -242,21 +223,20 @@ static startDataVector(builder:flatbuffers.Builder, numElems:number) {
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endLogicNode(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 6); // type
   return offset;
 };
 
-static createLogicNode(builder:flatbuffers.Builder, id:flatbuffers.Long, typeOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, inputSocketsOffset:flatbuffers.Offset, outputSocketsOffset:flatbuffers.Offset, dataOffset:flatbuffers.Offset):flatbuffers.Offset {
-  LogicNode.startLogicNode(builder);
+static create(builder:flatbuffers.Builder, id:flatbuffers.Long, typeOffset:flatbuffers.Offset, inputSocketsOffset:flatbuffers.Offset, outputSocketsOffset:flatbuffers.Offset, dataOffset:flatbuffers.Offset):flatbuffers.Offset {
+  LogicNode.start(builder);
   LogicNode.addId(builder, id);
   LogicNode.addType(builder, typeOffset);
-  LogicNode.addName(builder, nameOffset);
   LogicNode.addInputSockets(builder, inputSocketsOffset);
   LogicNode.addOutputSockets(builder, outputSocketsOffset);
   LogicNode.addData(builder, dataOffset);
-  return LogicNode.endLogicNode(builder);
+  return LogicNode.end(builder);
 }
 }
 }

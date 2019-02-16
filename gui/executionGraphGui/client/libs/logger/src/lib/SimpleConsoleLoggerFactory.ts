@@ -20,7 +20,7 @@ import { ILogger } from './ILogger';
  */
 export class SimpleConsoleLoggerFactory extends LoggerFactory {
   create(name: string): ILogger {
-    let formatter = new SimpleFormatter();
+    const formatter = new SimpleFormatter();
     return new MultiSinkLogger(name, [
       new ConsoleSink(formatter)
       // @todo: here could we introduce another appender which sends to the backend (other factory of course)

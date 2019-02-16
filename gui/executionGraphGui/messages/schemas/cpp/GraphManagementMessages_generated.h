@@ -10,9 +10,13 @@
 #include "executionGraphGui/messages/schemas/cpp/ConstructorKeyValue_generated.h"
 #include "executionGraphGui/messages/schemas/cpp/CycleDescription_generated.h"
 #include "executionGraphGui/messages/schemas/cpp/DataTypes_generated.h"
+#include "executionGraph/serialization/schemas/cpp/ExecutionGraph_generated.h"
+#include "executionGraph/serialization/schemas/cpp/GraphTypeDescription_generated.h"
 #include "executionGraph/serialization/schemas/cpp/LogicNode_generated.h"
 #include "executionGraph/serialization/schemas/cpp/LogicSocket_generated.h"
+#include "executionGraph/serialization/schemas/cpp/NodeTypeDescription_generated.h"
 #include "executionGraph/serialization/schemas/cpp/SocketLinkDescription_generated.h"
+#include "executionGraph/serialization/schemas/cpp/SocketTypeDescription_generated.h"
 
 namespace executionGraphGui {
 namespace serialization {

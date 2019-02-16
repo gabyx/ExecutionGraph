@@ -43,3 +43,24 @@
 .folder-icon {
   color: mat-color($foreground, disabled-text);
 }
+
+form {
+  margin-top: 2em;
+  margin-bottom: 1em;
+  min-width: 5em;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  .filename-input {
+    flex-basis: 80%;
+  }
+
+  mat-form-field {
+    .ng-invalid {
+      color: $stroke-color-invalid;
+    }
+  }
+}

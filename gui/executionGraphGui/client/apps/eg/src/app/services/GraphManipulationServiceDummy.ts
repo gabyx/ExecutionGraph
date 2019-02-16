@@ -14,10 +14,9 @@ import { Injectable, Inject } from '@angular/core';
 import { VERBOSE_LOG_TOKEN } from '../tokens';
 import { ITestBackend } from './TestBackend';
 import { ILogger, LoggerFactory, stringify } from '@eg/logger';
-import { Id } from '@eg/common';
 import { GraphManipulationService, sz } from './GraphManipulationService';
 import * as conversions from './Conversions';
-import { Node, NodeId, Socket, Connection } from '../model';
+import { Node, NodeId, Socket, Connection, fromConnection, GraphId } from '../model';
 
 @Injectable()
 export class GraphManipulationServiceDummy extends GraphManipulationService {
@@ -32,13 +31,13 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
     this.logger = loggerFactory.create('GraphManipulationServiceDummy');
   }
 
-  public async addNode(graphId: Id, type: string, name: string): Promise<Node> {
+  public async addNode(graphId: GraphId, type: string, name: string): Promise<Node> {
     const response = this.backend.createAddNodeResponse(type, name);
 
     const node = response.node();
     if (this.verboseResponseLog) {
       this.logger.info(`Added new node [type: '${node.type()}']
-                    with name: '${node.name()}' [ins: ${node.inputSocketsLength()},
+                    [ins: ${node.inputSocketsLength()},
                     outs: ${node.outputSocketsLength()}`);
     }
 
@@ -49,25 +48,21 @@ export class GraphManipulationServiceDummy extends GraphManipulationService {
     return nodeModel;
   }
 
-  public async removeNode(graphId: Id, nodeId: NodeId): Promise<void> {
-    this.logger.info(`Remove node [id: '${nodeId.toString()}'] from graph [id: '${graphId.toString()}'`);
+  public async removeNode(graphId: GraphId, nodeId: NodeId): Promise<void> {
+    this.logger.info(`Remove node [id: '${nodeId}'] from graph [id: '${graphId}'`);
   }
 
   public async addConnection(
-    graphId: Id,
+    graphId: GraphId,
     source: Socket,
     target: Socket,
     cycleDetection: boolean
   ): Promise<Connection> {
-    this.logger.info(
-      `Add connection: ['${source.idString}' ⟶ '${target.idString}'] from graph [id: '${graphId.toString()}']`
-    );
-    return Connection.create(source, target, true);
+    this.logger.info(`Add connection: ['${source.id}' ⟶ '${target.id}'] from graph [id: '${graphId}']`);
+    return fromConnection.createValidConnection(source, target);
   }
 
-  public async removeConnection(graphId: Id, source: Socket, target: Socket): Promise<void> {
-    this.logger.info(
-      `Remove connection: ['${source.idString}' ⟶ '${target.idString}'] from graph [id: '${graphId.toString()}']`
-    );
+  public async removeConnection(graphId: GraphId, source: Socket, target: Socket): Promise<void> {
+    this.logger.info(`Remove connection: ['${source.id}' ⟶ '${target.id}'] from graph [id: '${graphId}']`);
   }
 }

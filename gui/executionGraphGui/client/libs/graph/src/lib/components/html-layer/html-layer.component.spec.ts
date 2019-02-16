@@ -8,9 +8,8 @@ describe('HtmlLayerComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ HtmlLayerComponent ]
-    })
-    .compileComponents();
+      declarations: [HtmlLayerComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

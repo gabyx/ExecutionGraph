@@ -1,19 +1,19 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TypeToolTipToolComponent } from './type-tooltip-tool.component';
+import { GraphSaveComponent } from './graph-save.component';
 
-describe('TypeToolTipToolComponent', () => {
-  let component: TypeToolTipToolComponent;
-  let fixture: ComponentFixture<TypeToolTipToolComponent>;
+describe('GraphSaveComponent', () => {
+  let component: GraphSaveComponent;
+  let fixture: ComponentFixture<GraphSaveComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [TypeToolTipToolComponent]
+      declarations: [GraphSaveComponent]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TypeToolTipToolComponent);
+    fixture = TestBed.createComponent(GraphSaveComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

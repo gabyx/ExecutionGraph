@@ -7,9 +7,7 @@
 #include "flatbuffers/flatbuffers.h"
 #include "flatbuffers/flexbuffers.h"
 
-#include "executionGraph/serialization/schemas/cpp/DataTypes_generated.h"
 #include "executionGraph/serialization/schemas/cpp/GraphTypeDescription_generated.h"
-#include "executionGraph/serialization/schemas/cpp/GraphVisualization_generated.h"
 #include "executionGraph/serialization/schemas/cpp/LogicNode_generated.h"
 #include "executionGraph/serialization/schemas/cpp/LogicSocket_generated.h"
 #include "executionGraph/serialization/schemas/cpp/NodeTypeDescription_generated.h"
@@ -153,8 +151,11 @@ struct ExecutionGraph FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::Vector<flatbuffers::Offset<ExecutionGraphNodeProperties>> *nodeProperties() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<ExecutionGraphNodeProperties>> *>(VT_NODEPROPERTIES);
   }
-  const GraphVisualization *visualization() const {
-    return GetPointer<const GraphVisualization *>(VT_VISUALIZATION);
+  const flatbuffers::Vector<uint8_t> *visualization() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_VISUALIZATION);
+  }
+  flexbuffers::Reference visualization_flexbuffer_root() const {
+    return flexbuffers::GetRoot(visualization()->Data(), visualization()->size());
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -169,7 +170,7 @@ struct ExecutionGraph FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVector(nodeProperties()) &&
            verifier.VerifyVectorOfTables(nodeProperties()) &&
            VerifyOffset(verifier, VT_VISUALIZATION) &&
-           verifier.VerifyTable(visualization()) &&
+           verifier.VerifyVector(visualization()) &&
            verifier.EndTable();
   }
 };
@@ -189,7 +190,7 @@ struct ExecutionGraphBuilder {
   void add_nodeProperties(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<ExecutionGraphNodeProperties>>> nodeProperties) {
     fbb_.AddOffset(ExecutionGraph::VT_NODEPROPERTIES, nodeProperties);
   }
-  void add_visualization(flatbuffers::Offset<GraphVisualization> visualization) {
+  void add_visualization(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> visualization) {
     fbb_.AddOffset(ExecutionGraph::VT_VISUALIZATION, visualization);
   }
   explicit ExecutionGraphBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -210,7 +211,7 @@ inline flatbuffers::Offset<ExecutionGraph> CreateExecutionGraph(
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<LogicNode>>> nodes = 0,
     flatbuffers::Offset<flatbuffers::Vector<const SocketLinkDescription *>> links = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<ExecutionGraphNodeProperties>>> nodeProperties = 0,
-    flatbuffers::Offset<GraphVisualization> visualization = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> visualization = 0) {
   ExecutionGraphBuilder builder_(_fbb);
   builder_.add_visualization(visualization);
   builder_.add_nodeProperties(nodeProperties);
@@ -226,17 +227,18 @@ inline flatbuffers::Offset<ExecutionGraph> CreateExecutionGraphDirect(
     const std::vector<flatbuffers::Offset<LogicNode>> *nodes = nullptr,
     const std::vector<SocketLinkDescription> *links = nullptr,
     const std::vector<flatbuffers::Offset<ExecutionGraphNodeProperties>> *nodeProperties = nullptr,
-    flatbuffers::Offset<GraphVisualization> visualization = 0) {
+    const std::vector<uint8_t> *visualization = nullptr) {
   auto nodes__ = nodes ? _fbb.CreateVector<flatbuffers::Offset<LogicNode>>(*nodes) : 0;
   auto links__ = links ? _fbb.CreateVectorOfStructs<SocketLinkDescription>(*links) : 0;
   auto nodeProperties__ = nodeProperties ? _fbb.CreateVector<flatbuffers::Offset<ExecutionGraphNodeProperties>>(*nodeProperties) : 0;
+  auto visualization__ = visualization ? _fbb.CreateVector<uint8_t>(*visualization) : 0;
   return executionGraph::serialization::CreateExecutionGraph(
       _fbb,
       graphDescription,
       nodes__,
       links__,
       nodeProperties__,
-      visualization);
+      visualization__);
 }
 
 inline const executionGraph::serialization::ExecutionGraph *GetExecutionGraph(const void *buf) {

@@ -16,4 +16,6 @@ namespace executionGraph.serialization;
 table SocketTypeDescription {
     type:string (id:0, required); //!< The unqiue RTTI name of the socket type.
     name:string (id:1, required); //!< The readable name of the socket type.
+
+    description:string (id:2); //!< Some description (markdown or plain text)
 }

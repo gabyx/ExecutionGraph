@@ -1,14 +1,22 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { Point, ConnectionDrawStyle, GraphComponent } from '@eg/graph';
+import { Store, select } from '@ngrx/store';
+import { Point, ConnectionDrawStyle, GraphComponent, MouseButton } from '@eg/graph';
 import { ILogger, LoggerFactory } from '@eg/logger';
 
 import { ToolComponent } from '../tool-component';
-import { Id } from '@eg/common';
-import { OutputSocket, InputSocket, Connection, Socket, SocketIndex } from '../../../model';
+import {
+  OutputSocket,
+  InputSocket,
+  Connection,
+  Socket,
+  fromConnection,
+  fromSocket,
+  GraphId,
+  fromNode
+} from '../../../model';
 import { GraphsState } from '../../../+state/reducers';
 import { AddConnection } from '../../../+state/actions';
-import { getSelectedGraph } from '../../../+state/selectors';
+import { getSelectedGraphId } from '../../../+state/selectors';
 
 @Component({
   selector: 'eg-socket-connection-tool',
@@ -23,44 +31,59 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
   public tempConnection: Connection = null;
   public tempConnectionEndpoint = Point.zero.copy();
 
-  public invalidity = Connection.Invalidity.Valid;
+  public invalidity = fromConnection.Invalidity.Valid;
   public get invalidityMessages() {
-    return Connection.getValidationErrors(this.invalidity);
+    return fromConnection.getValidationErrors(this.invalidity);
   }
 
   private sourceSocket: Socket;
   private targetSocket: Socket;
 
-  private selectedGraphId: Id;
+  private selectedGraphId: GraphId;
   private readonly logger: ILogger;
 
   constructor(private graph: GraphComponent, private store: Store<GraphsState>, loggerFactory: LoggerFactory) {
     super();
     this.logger = loggerFactory.create('SocketConnectionToolComponent');
-    store.select(getSelectedGraph).subscribe(g => (this.selectedGraphId = g.id));
+    store.pipe(select(getSelectedGraphId)).subscribe(graphId => (this.selectedGraphId = graphId));
   }
 
   ngOnInit() {
     this.socketEvents.onDragStart.subscribe(e => {
+      if (e.button !== MouseButton.Left) {
+        return;
+      }
       const socket = e.element;
 
-      this.logger.info(`Initiating new connection from ${socket.idString}`);
+      this.logger.info(`Initiating new connection from ${socket.id}`);
       this.sourceSocket = socket;
-      if (Socket.isOutputSocket(this.sourceSocket)) {
-        this.tempTargetSocket = new InputSocket(socket.typeIndex, socket.name, new SocketIndex(0));
+      if (fromSocket.isOutputSocket(this.sourceSocket)) {
+        this.tempTargetSocket = fromSocket.createSocket('input', socket.typeIndex, 0, fromNode.createNodeId(), 'Dummy');
       } else {
-        this.tempTargetSocket = new OutputSocket(socket.typeIndex, socket.name, new SocketIndex(0));
+        this.tempTargetSocket = fromSocket.createSocket(
+          'output',
+          socket.typeIndex,
+          0,
+          fromNode.createNodeId(),
+          'Dummy'
+        );
       }
       this.activate();
       this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
-      this.tempConnection = Connection.create(socket, this.tempTargetSocket);
+      this.tempConnection = fromConnection.createValidConnection(socket, this.tempTargetSocket);
     });
     this.socketEvents.onDragContinue.subscribe(e => {
+      if (e.button !== MouseButton.Left) {
+        return;
+      }
       if (!this.targetSocket) {
         this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
       }
     });
     this.socketEvents.onDragStop.subscribe(e => {
+      if (e.button !== MouseButton.Left) {
+        return;
+      }
       if (this.targetSocket) {
         this.addConnection(this.sourceSocket, this.targetSocket);
       } else {
@@ -73,17 +96,17 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       this.logger.info('onEnter');
       if (this.tempConnection) {
         const targetSocket = e.element;
-        this.invalidity = Connection.isInvalid(this.sourceSocket, targetSocket);
+        this.invalidity = fromConnection.isInvalid(this.sourceSocket, targetSocket);
 
         if (!this.invalidity) {
           this.logger.info('Making preview connection');
           this.targetSocket = targetSocket;
-          this.tempConnection = Connection.create(this.sourceSocket, this.targetSocket, false);
+          this.tempConnection = fromConnection.createValidConnection(this.sourceSocket, this.targetSocket);
         } else {
           /** Add notifcation icon next to cursor, to make
            *  clear that this connection is impossible
            */
-          this.logger.error(`Invalid connection: ${Connection.getValidationErrors(this.invalidity).join(', ')}`);
+          this.logger.error(`Invalid connection: ${fromConnection.getValidationErrors(this.invalidity).join(', ')}`);
         }
       }
     });
@@ -93,17 +116,17 @@ export class SocketConnectionToolComponent extends ToolComponent implements OnIn
       if (this.targetSocket) {
         this.logger.info('Leaving potential target Socket');
         this.targetSocket = null;
-        this.tempConnection = Connection.create(this.sourceSocket, this.tempTargetSocket);
+        this.tempConnection = fromConnection.createValidConnection(this.sourceSocket, this.tempTargetSocket);
         this.tempConnectionEndpoint = this.graph.convertMouseToGraphPosition(e.mousePosition);
       }
       if (this.tempConnection) {
-        this.invalidity = Connection.Invalidity.Valid;
+        this.invalidity = fromConnection.Invalidity.Valid;
       }
     });
   }
 
   private abortConnection() {
-    this.invalidity = Connection.Invalidity.Valid;
+    this.invalidity = fromConnection.Invalidity.Valid;
     this.tempConnection = null;
     this.tempTargetSocket = null;
     this.sourceSocket = null;

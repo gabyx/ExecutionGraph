@@ -10,14 +10,14 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_graphs_ExecutionTree_hpp
-#define executionGraph_graphs_ExecutionTree_hpp
+#pragma once
 
 #include <algorithm>
 #include <deque>
 #include <set>
 #include <unordered_set>
 #include <fmt/printf.h>
+#include <rttr/type>
 #include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/DemangleTypes.hpp"
 #include "executionGraph/common/StringFormat.hpp"
@@ -26,7 +26,7 @@
 #include "executionGraph/nodes/LogicNodeDefaultPool.hpp"
 #include "executionGraph/nodes/LogicSocket.hpp"
 
-#define EXECGRAPH_EXECTREE_SOLVER_LOG(message) EXECGRAPH_DEBUG_ONLY(EXECGRAPH_LOG_TRACE(message));
+#define EXECGRAPH_EXECTREE_SOLVER_LOG(...) EXECGRAPH_DEBUG_ONLY(EXECGRAPH_LOG_TRACE(__VA_ARGS__));
 
 namespace executionGraph
 {
@@ -258,7 +258,7 @@ namespace executionGraph
         }
 
         //! Remove an node with id `nodeId` from the graph.
-        //! A programming error is fatal ==> UB.
+        //! Any error is fatal ==> UB.
         NodePointer removeNode(NodeId nodeId)
         {
             auto nodeIt = m_nodes.find(nodeId);
@@ -271,7 +271,8 @@ namespace executionGraph
 
             // Erase from the classifications.
             EXECGRAPH_VERIFY(m_nodeClassifications[nodeDataBase->m_class].erase(nodeDataBase->m_node.get()),
-                             "Programming error!");
+                             "Error while erasing node id '{0}'",
+                             nodeId);
 
             // Move the node out!
             NodePointer node = std::move(nodeDataBase->m_node);
@@ -279,7 +280,8 @@ namespace executionGraph
             if(nodeDataBase->m_class == NodeClassification::ConstantNode)
             {
                 // Remove from constant nodes.
-                EXECGRAPH_VERIFY(m_constNodes.erase(nodeId), "Programming error!");
+                EXECGRAPH_VERIFY(m_constNodes.erase(nodeId),
+                                 "Removing node id '{0}' from const nodes failed!");
             }
             else
             {
@@ -289,12 +291,19 @@ namespace executionGraph
                 for(auto groupId : nodeData->m_groups)
                 {
                     auto groupIt = m_nodeGroups.find(groupId);
-                    EXECGRAPH_ASSERT(groupIt != m_nodeGroups.end(), "Programming error!");
-                    EXECGRAPH_VERIFY(groupIt->second.erase(nodeData), "Programming error!");
+                    EXECGRAPH_ASSERT(groupIt != m_nodeGroups.end(),
+                                     "No such group id '{0}' found!",
+                                     groupId);
+                    EXECGRAPH_VERIFY(groupIt->second.erase(nodeData),
+                                     "Removing node id '{0}' from groud id '{0}' failed!",
+                                     nodeId,
+                                     groupId);
                 }
 
                 // Remove from non-constant nodes.
-                EXECGRAPH_VERIFY(m_nonConstNodes.erase(nodeId), "Programming error!");
+                EXECGRAPH_VERIFY(m_nonConstNodes.erase(nodeId),
+                                 "Removing node id '{0}' from non-const nodes failed!",
+                                 nodeId);
             }
             // Erase from nodes.
             m_nodes.erase(nodeIt);
@@ -477,7 +486,9 @@ namespace executionGraph
                         break;
                     }
                 }
-                EXECGRAPH_WARNINGMSG(outputReachedInput, "WARNING: Output id: " << outNode->getId() << " did not reach any input!")
+                EXECGRAPH_WARN(outputReachedInput,
+                               "Output node id: '{0}' did not reach any input!",
+                               outNode->getId());
             }
 
             m_executionOrderUpToDate = true;
@@ -488,20 +499,20 @@ namespace executionGraph
         {
             // Print execution order
             std::stringstream s;
-            std::string fmtH = "%-15s  |  %-6s  | %-8s   |  %-20s\n";
-            std::string fmt  = "%-15s  |  %-6i  | %-8i   |  %-20s\n";
+            std::string fmtH = "  %-6s  | %-8s   |  %-20s\n";
+            std::string fmt  = "  %-6i  | %-8i   |  %-20s\n";
             for(auto& g : m_groupExecList)
             {
                 s << "Execution order for group id: " << g.first << std::endl;
-                s << suffix << fmt::printf(fmtH, "Name", "NodeId", "Priority", "NodeType") << std::endl;
-                s << suffix << fmt::printf(fmtH, "---------------", "------", "--------", "--------") << std::endl;
+                s << suffix << fmt::printf(fmtH, "NodeId", "Priority", "NodeType") << std::endl;
+                s << suffix << fmt::printf(fmtH, "------", "--------", "--------") << std::endl;
                 for(auto& p : g.second)
                 {
                     for(NodeData* nodeData : p.second)
                     {
                         auto* n = nodeData->m_node.get();
                         s << suffix
-                          << fmt::printf(fmt, n->getName().c_str(), n->getId(), nodeData->m_priority, n->getTypeName().c_str())
+                          << fmt::printf(fmt, n->getId(), nodeData->m_priority, rttr::type::get(*n).get_name())
                           << std::endl;
                     }
                 }
@@ -516,7 +527,7 @@ namespace executionGraph
         {
             auto id = std::numeric_limits<NodeId>::max();
             // Make a default pool of output sockets.
-            auto p                  = std::make_unique<LogicNodeDefaultOutputs>(id, "DefaultOutputPool");
+            auto p                  = std::make_unique<LogicNodeDefaultOutputs>(id);
             m_nodeDefaultOutputPool = p.get();
             addNode(std::move(p), NodeClassification::ConstantNode);
             auto it = m_constNodes.find(id);
@@ -690,13 +701,13 @@ namespace executionGraph
                     // we know that the prioriteis below it are correct, so skip this one
                     if(nodeData->isFlagSet(NodeData::Visited))
                     {
-                        EXECGRAPH_EXECTREE_SOLVER_LOG("DFS Start: Node id: " << nodeData->m_node->getId()
-                                                                             << " already visited -> skip it."
-                                                                             << std::endl);
+                        EXECGRAPH_EXECTREE_SOLVER_LOG("DFS Start: Node id: '{0}'  already visited -> skip it.",
+                                                      nodeData->m_node->getId());
                         continue;
                     }
 
-                    EXECGRAPH_EXECTREE_SOLVER_LOG("DFS Start: Node id: " << nodeData->m_node->getId());
+                    EXECGRAPH_EXECTREE_SOLVER_LOG("DFS Start: Node id: '{0}'",
+                                                  nodeData->m_node->getId());
 
                     // Start a depth-first recursion from this node (exploring its subtree)
                     m_dfrStack.clear();
@@ -709,7 +720,7 @@ namespace executionGraph
 
                     while(!m_dfrStack.empty())
                     {
-                        EXECGRAPH_EXECTREE_SOLVER_LOG("DFS Stack:" << getStackInfo() << std::endl);
+                        EXECGRAPH_EXECTREE_SOLVER_LOG("DFS Stack: {0}", getStackInfo());
 
                         currentNode = m_dfrStack.back();
                         currentSize = m_dfrStack.size();
@@ -795,7 +806,7 @@ namespace executionGraph
              */
             void visit(NodeData& nodeData)
             {
-                EXECGRAPH_EXECTREE_SOLVER_LOG("visit: " << nodeData.m_node->getId());
+                EXECGRAPH_EXECTREE_SOLVER_LOG("visit: '{0}'", nodeData.m_node->getId());
 
                 auto addParentsToStack = [&](auto* socket) {
                     // Get NodeData of parentNode
@@ -911,7 +922,7 @@ namespace executionGraph
                 {
                     NodeData* nodeData = &keyValue.second;
 
-                    EXECGRAPH_EXECTREE_SOLVER_LOG("DFS Start: Node id: " << nodeData->m_node->getId());
+                    EXECGRAPH_EXECTREE_SOLVER_LOG("DFS Start: Node id: '{0}'", nodeData->m_node->getId());
                     // Skip visited nodes.
                     if(nodeData->isFlagSet(NodeData::Visited))
                     {
@@ -928,7 +939,7 @@ namespace executionGraph
 
                     while(!m_dfrStack.empty())
                     {
-                        EXECGRAPH_EXECTREE_SOLVER_LOG("DFS Stack:" << getStackInfo() << std::endl);
+                        EXECGRAPH_EXECTREE_SOLVER_LOG("DFS Stack: {0}", getStackInfo());
 
                         currentNode = m_dfrStack.back();
 
@@ -1019,7 +1030,7 @@ namespace executionGraph
              */
             void visit(NodeData& nodeData)
             {
-                EXECGRAPH_EXECTREE_SOLVER_LOG("visit: " << nodeData.m_node->getId());
+                EXECGRAPH_EXECTREE_SOLVER_LOG("visit: '{0}'", nodeData.m_node->getId());
 
                 auto addParentsToStack = [&](auto* socket) {
                     // Get NodeData of parentNode
@@ -1178,4 +1189,4 @@ namespace executionGraph
 }  // namespace executionGraph
 
 #undef EXECGRAPH_EXECTREE_SOLVER_LOG
-#endif  // ExecutionTree_hpp
+// ExecutionTree_hpp

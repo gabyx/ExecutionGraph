@@ -1,86 +1,85 @@
-import { Injectable, Inject } from '@angular/core';
-import { Graph, NodeId, Node } from '../model';
+import { Injectable } from '@angular/core';
+import { Graph, Node as ModelNode } from '../model';
 import {
-  Point,
-  ILayoutStrategy,
   ILayoutEngine,
-  EngineInput,
-  MassSpringLayoutStrategy,
+  MassSpringLayoutConfig,
   EngineOutput,
-  BodyCreator,
-  LinkCreator,
-  GraphConverter
+  NodeCreator,
+  EdgeCreator,
+  GraphConverter,
+  MassSpringLayoutEngine
 } from '@eg/graph';
 import { AppState } from '../+state/reducers/app.reducers';
 import { Store } from '@ngrx/store';
-import { LoggerFactory, ILogger } from '@eg/logger/src';
-import { MoveNode, MoveNodes, Moves } from '../+state/actions';
+import { LoggerFactory, ILogger } from '@eg/logger';
+import { MoveNodes, Moves } from '../+state/actions';
 import { map, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { Vector2 } from '@eg/common';
 
 /**
  * This function represents the body-link-type agnostic converter
  * which is used in the underlying Engine to convert our graph.
  */
-async function convertGraph<Body, Link>(
+async function convertGraph<Node, Edge>(
   graph: Graph,
-  positionMap: Map<NodeId, Point>,
-  createBody: (id: NodeId, pos: Point, opaqueData: any) => Body,
-  createLink: (b1: Body, b2: Body) => Link
-): Promise<EngineInput<Body, Link>> {
-  const bodies: Body[] = [];
+  createNode: (s: { pos: Vector2; opaqueData: any }) => Node,
+  createEdge: (b1: Node, b2: Node) => Edge
+): Promise<void> {
+  // A copy of all positions (dont change the state!)
+  const positionMap = new Map<string, Vector2>();
+  Object.values(graph.nodes).map(node => {
+    positionMap.set(node.id, node.uiProps.position.copy());
+  });
 
-  const bodyMap = new Map<NodeId, Body>();
+  const nodes: Node[] = [];
+  const nodeMap = new Map<string, Node>();
 
   // create bodies
   positionMap.forEach((pos, id) => {
-    const b = createBody(id, pos, graph.nodes[id.toString()]);
-    bodyMap.set(id, b);
-    bodies.push(b);
+    const b = createNode({ pos: pos, opaqueData: graph.nodes[id] });
+    nodeMap.set(id, b);
+    nodes.push(b);
   });
 
   // create links
-  const links: Link[] = Object.values(graph.connections).map(connection =>
-    createLink(bodyMap.get(connection.inputSocket.parent.id), bodyMap.get(connection.outputSocket.parent.id))
+  Object.values(graph.connections).map(connection =>
+    createEdge(nodeMap.get(connection.inputSocket.parentId), nodeMap.get(connection.outputSocket.parentId))
   );
-
-  return { bodies: bodies, links: links };
 }
 
 @Injectable()
 export class AutoLayoutService {
   private readonly logger: ILogger;
-  private readonly engineCreator: (config: ILayoutStrategy) => ILayoutEngine;
 
-  constructor(private store: Store<AppState>, loggerFactory: LoggerFactory) {
+  constructor(private store: Store<AppState>, private loggerFactory: LoggerFactory) {
     this.logger = loggerFactory.create('AutoLayoutService');
-    this.engineCreator = (config: ILayoutStrategy) => config.createEngine(loggerFactory);
   }
 
-  public async layoutGraph(graph: Graph, config?: ILayoutStrategy): Promise<void> {
+  public async layoutGraphSpringSystem(graph: Graph, config?: MassSpringLayoutConfig): Promise<void> {
+    if (!config) {
+      config = new MassSpringLayoutConfig();
+    }
+    const engine = new MassSpringLayoutEngine(config, this.loggerFactory);
+    return this.layoutGraph(graph, engine);
+  }
+
+  private async layoutGraph(graph: Graph, engine: ILayoutEngine): Promise<void> {
     this.logger.debug('Layouting graph...');
 
-    config = config ? config : new MassSpringLayoutStrategy();
-
-    // A copy of all positions (dont change the state!)
-    const positionMap = new Map<NodeId, Point>();
-    Object.values(graph.nodes).map(node => {
-      positionMap.set(node.id, node.uiProps.position.copy());
-    });
-
     // Create the converter for the engine
-    const converter: GraphConverter = <Body, Link>(a: BodyCreator<Body>, b: LinkCreator<Body, Link>) =>
-      convertGraph(graph, positionMap, a, b);
+    const converter: GraphConverter = <Node, Edge>(a: NodeCreator<Node>, b: EdgeCreator<Node, Edge>) =>
+      convertGraph(graph, a, b);
 
     // Create the engine (by the strategy) ->
     // run it and dispatch the results in the store.
-    return this.engineCreator(config)
+    return engine
       .run(converter)
       .pipe(
         map((out: EngineOutput) => {
           const s: Moves = [];
           out.forEach(res => {
-            s.push({ pos: res.pos, node: <Node>res.opaqueData });
+            s.push({ pos: res.pos, node: <ModelNode>res.opaqueData });
           });
           this.store.dispatch(new MoveNodes(s));
         }),

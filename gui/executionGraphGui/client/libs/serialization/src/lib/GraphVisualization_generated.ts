@@ -26,7 +26,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):WorkspaceVisualization {
  * @param WorkspaceVisualization= obj
  * @returns WorkspaceVisualization
  */
-static getRootAsWorkspaceVisualization(bb:flatbuffers.ByteBuffer, obj?:WorkspaceVisualization):WorkspaceVisualization {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:WorkspaceVisualization):WorkspaceVisualization {
   return (obj || new WorkspaceVisualization).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -112,7 +112,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):NodeVisualization {
  * @param NodeVisualization= obj
  * @returns NodeVisualization
  */
-static getRootAsNodeVisualization(bb:flatbuffers.ByteBuffer, obj?:NodeVisualization):NodeVisualization {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:NodeVisualization):NodeVisualization {
   return (obj || new NodeVisualization).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -218,7 +218,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):LinkVisualization {
  * @param LinkVisualization= obj
  * @returns LinkVisualization
  */
-static getRootAsLinkVisualization(bb:flatbuffers.ByteBuffer, obj?:LinkVisualization):LinkVisualization {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:LinkVisualization):LinkVisualization {
   return (obj || new LinkVisualization).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -307,7 +307,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):GraphVisualization {
  * @param GraphVisualization= obj
  * @returns GraphVisualization
  */
-static getRootAsGraphVisualization(bb:flatbuffers.ByteBuffer, obj?:GraphVisualization):GraphVisualization {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:GraphVisualization):GraphVisualization {
   return (obj || new GraphVisualization).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 

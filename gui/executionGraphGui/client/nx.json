@@ -2,25 +2,28 @@
   "npmScope": "eg",
   "projects": {
     "eg": {
-      "tags": []
+      "tags": ["app:eg"]
     },
     "eg-e2e": {
-      "tags": []
+      "tags": ["app:eg"]
+    },
+    "electron": {
+      "tags": ["app:electron"]
     },
     "common": {
-      "tags": []
+      "tags": ["lib:common"]
     },
     "graph": {
-      "tags": []
+      "tags": ["lib:graph"]
     },
     "logger": {
-      "tags": []
+      "tags": ["lib:logger"]
     },
     "messages": {
-      "tags": []
+      "tags": ["lib:messages"]
     },
     "serialization": {
-      "tags": []
+      "tags": ["lib:serialization"]
     }
   },
   "implicitDependencies": {

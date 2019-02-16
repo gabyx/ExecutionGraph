@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraphGui_backend_requestHandlers_FileBrowserRequestHandler_hpp
-#define executionGraphGui_backend_requestHandlers_FileBrowserRequestHandler_hpp
+#pragma once
 
 #include "executionGraph/common/FileSystem.hpp"
 #include "executionGraphGui/backend/BackendRequestHandler.hpp"
@@ -23,8 +22,8 @@ class ExecutionGraphBackend;
 /*!
     Request handler for information on graphs in the backend.
 
-    Handles the request URLs: 
-        - "/eg-backend/files/browse"
+    Handles the request URLs:
+        - "/eg-backend/files/getPathInfo"
 
     @date Sat Jul 07 2018
     @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
@@ -37,9 +36,8 @@ class FileBrowserRequestHandler final : public BackendRequestHandler
 
 public:
     using IdNamed  = BackendRequestHandler::IdNamed;
-    using Function = std::function<void(FileBrowserRequestHandler&,
-                                        const Request& request,
-                                        ResponsePromise& response)>;
+    using Function = std::function<void(
+        FileBrowserRequestHandler&, const Request& request, ResponsePromise& response)>;
     using FuncMap  = FunctionMap<Function, HandlerKey>;
 
 public:
@@ -53,7 +51,7 @@ public:
 private:
     void handle(const Request& request, ResponsePromise& response);
 
-    void handleBrowse(const Request& request, ResponsePromise& response);
+    void handleGetPathInfo(const Request& request, ResponsePromise& response);
 
 private:
     static FuncMap initFunctionMap();
@@ -62,5 +60,3 @@ private:
     std::shared_ptr<ExecutionGraphBackend> m_backend;
     std::path m_rootPath;
 };
-
-#endif

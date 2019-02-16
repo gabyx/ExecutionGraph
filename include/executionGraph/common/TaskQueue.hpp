@@ -10,14 +10,13 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_common_TaskQueue_hpp
-#define executionGraph_common_TaskQueue_hpp
+#pragma once
 
 #include <chrono>
+#include <condition_variable>
 #include <mutex>
 #include <optional>
 #include <queue>
-#include <condition_variable>
 
 namespace executionGraph
 {
@@ -38,7 +37,7 @@ namespace executionGraph
     {
         //! No move/copy allowed!
         EXECGRAPH_DISALLOW_COPY_AND_MOVE(TaskQueue)
-        
+
     public:
         using Task = TTask;
         static_assert(std::is_move_constructible_v<Task>);
@@ -82,5 +81,3 @@ namespace executionGraph
         std::condition_variable m_cond;  //!< Worker wait on this condition variable.
     };
 }  // namespace executionGraph
-
-#endif

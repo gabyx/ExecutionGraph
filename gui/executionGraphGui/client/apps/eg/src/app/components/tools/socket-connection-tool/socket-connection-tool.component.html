@@ -8,7 +8,7 @@
         <div *ngIf="!targetSocket" style="position: absolute" [style.left]="tempConnectionEndpoint.x+'px'"
             [style.top]="tempConnectionEndpoint.y+'px'">
 
-            <ngcs-port [id]="tempTargetSocket.idString" class="right middle"></ngcs-port>
+            <ngcs-port [id]="tempTargetSocket.id" class="right middle"></ngcs-port>
 
         </div>
         <div *ngIf="invalidity" class="invalidity-tooltip"

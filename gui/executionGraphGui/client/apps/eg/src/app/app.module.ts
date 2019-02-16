@@ -13,7 +13,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { Route, RouterModule } from '@angular/router';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   MatIconModule,
@@ -25,6 +25,7 @@ import {
   MatCheckboxModule,
   MatButtonToggleModule,
   MatSidenavModule,
+  MatFormFieldModule,
   MatCardModule,
   MatGridListModule,
   MatSnackBarModule,
@@ -33,8 +34,11 @@ import {
   MatSliderModule,
   MatProgressSpinnerModule,
   MAT_DIALOG_DEFAULT_OPTIONS,
-  MatDialogModule
+  MatDialogModule,
+  MatInputModule
 } from '@angular/material';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import { NxModule } from '@nrwl/nx';
 import { RouterStateSerializer, StoreRouterConnectingModule } from '@ngrx/router-store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
@@ -50,7 +54,6 @@ import { CommonModule } from '@eg/common';
 import { SimpleConsoleLoggerFactory, LoggerFactory } from '@eg/logger';
 
 import { BinaryHttpRouterService } from './services/BinaryHttpRouterService';
-import { CefMessageRouterService } from './services/CefMessageRouterService';
 
 import { ExecutionService } from './services/ExecutionService';
 import { ExecutionServiceBinaryHttp } from './services/ExecutionServiceBinaryHttp';
@@ -101,13 +104,15 @@ import { TypeToolTipToolComponent } from './components/tools/type-tooltip-tool/t
 import { GraphOpenComponent } from './components/graph-open/graph-open.component';
 import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
 import { AutoLayoutService } from './services/AutoLayoutService';
+import { GraphSaveComponent } from './components/graph-save/graph-save.component';
 
 const routes: Route[] = [
   {
     path: 'graph',
     children: [
-      { path: 'new', component: GraphCreateComponent, outlet: 'primary' },
       { path: 'open', component: GraphOpenComponent, outlet: 'primary' },
+      { path: 'save', component: GraphSaveComponent, outlet: 'primary' },
+      { path: 'new', component: GraphCreateComponent, outlet: 'primary' },
       {
         path: ':graphId',
         component: WorkspaceComponent,
@@ -146,7 +151,8 @@ const routes: Route[] = [
     TypeToolTipToolComponent,
     DeleteToolComponent,
     ConnectionLayerComponent,
-    GraphOpenComponent
+    GraphOpenComponent,
+    GraphSaveComponent
   ],
   entryComponents: [ConfirmationDialogComponent],
   imports: [
@@ -164,6 +170,7 @@ const routes: Route[] = [
     MatIconModule,
     MatListModule,
     MatMenuModule,
+    MatFormFieldModule,
     MatProgressSpinnerModule,
     MatSidenavModule,
     MatSliderModule,
@@ -171,6 +178,9 @@ const routes: Route[] = [
     MatTabsModule,
     MatToolbarModule,
     MatDialogModule,
+    MatInputModule,
+    FormsModule,
+    ReactiveFormsModule,
     GraphModule,
     CommonModule,
     NxModule.forRoot(),
@@ -190,7 +200,6 @@ const routes: Route[] = [
     { provide: LoggerFactory, useClass: SimpleConsoleLoggerFactory },
     { provide: ITestBackend, useClass: TestBackend },
     BinaryHttpRouterService,
-    CefMessageRouterService,
     TestService,
     GraphLoadedGuard,
     {

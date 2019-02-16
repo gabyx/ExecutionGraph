@@ -26,7 +26,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):GraphTypeDescription {
  * @param GraphTypeDescription= obj
  * @returns GraphTypeDescription
  */
-static getRootAsGraphTypeDescription(bb:flatbuffers.ByteBuffer, obj?:GraphTypeDescription):GraphTypeDescription {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:GraphTypeDescription):GraphTypeDescription {
   return (obj || new GraphTypeDescription).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -102,7 +102,7 @@ description(optionalEncoding?:any):string|Uint8Array|null {
 /**
  * @param flatbuffers.Builder builder
  */
-static startGraphTypeDescription(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(5);
 };
 
@@ -192,7 +192,7 @@ static addDescription(builder:flatbuffers.Builder, descriptionOffset:flatbuffers
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endGraphTypeDescription(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // id
   builder.requiredField(offset, 6); // name
@@ -201,14 +201,14 @@ static endGraphTypeDescription(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 };
 
-static createGraphTypeDescription(builder:flatbuffers.Builder, idOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, socketTypeDescriptionsOffset:flatbuffers.Offset, nodeTypeDescriptionsOffset:flatbuffers.Offset, descriptionOffset:flatbuffers.Offset):flatbuffers.Offset {
-  GraphTypeDescription.startGraphTypeDescription(builder);
+static create(builder:flatbuffers.Builder, idOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, socketTypeDescriptionsOffset:flatbuffers.Offset, nodeTypeDescriptionsOffset:flatbuffers.Offset, descriptionOffset:flatbuffers.Offset):flatbuffers.Offset {
+  GraphTypeDescription.start(builder);
   GraphTypeDescription.addId(builder, idOffset);
   GraphTypeDescription.addName(builder, nameOffset);
   GraphTypeDescription.addSocketTypeDescriptions(builder, socketTypeDescriptionsOffset);
   GraphTypeDescription.addNodeTypeDescriptions(builder, nodeTypeDescriptionsOffset);
   GraphTypeDescription.addDescription(builder, descriptionOffset);
-  return GraphTypeDescription.endGraphTypeDescription(builder);
+  return GraphTypeDescription.end(builder);
 }
 }
 }

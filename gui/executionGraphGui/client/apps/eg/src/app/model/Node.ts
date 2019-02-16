@@ -11,80 +11,68 @@
 // =========================================================================================
 
 import { Point } from '@eg/graph';
-import * as Long from 'long';
-import { Socket, InputSocket, OutputSocket } from './Socket';
+import { Socket, OutputSocket, InputSocket, isOutputSocket } from './Socket';
+import { Guid } from 'guid-typescript';
 
-function isLong(value: any): value is Long {
-  return value instanceof Long;
-}
+export interface UIProps {
+  readonly name: string;
 
-export class UIProps {
-  public position = Point.zero.copy();
-}
-
-/**
- * Unique Identifier for a `Node`.
- *
- * @export
- * @class NodeId
- * @extends {Long}
- */
-export class NodeId extends Long {
-  private readonly _idString: string;
-  constructor(id: number | Long) {
-    if (isLong(id)) {
-      super(id.low, id.high, id.unsigned);
-    } else {
-      super(id, 0, true);
-    }
-    this._idString = `n-${this.toInt()}`;
-  }
-  /**
-   * String identifer for this NodeId.
-   *
-   * @returns {string}
-   * @memberof NodeId
+  /* @todo cmonspqr->cmonspqr:
+   * We're too lazy now because the property is set in the effect directly on the node
+   * instead of passing it on to the reducer... If that is too slow we should
+   * consider an alternative position attribute per node during movements / animations
    */
-  public get string(): string {
-    return this._idString;
-  }
+  position: Point;
 }
 
-/**
- *  Modelclass for a node.
- *
- * @export
- * @class Node
+function createUIProps(name: string = 'Unnamed', position: Point = Point.zero.copy()) {
+  return { name: name, position: position };
+}
+
+export type NodeId = string;
+export type NodeType = string;
+
+export interface Node {
+  readonly id: NodeId;
+  readonly type: NodeType;
+  readonly inputs: InputSocket[];
+  readonly outputs: OutputSocket[];
+  readonly uiProps: UIProps;
+}
+
+/* Create a node id.
+ * If no number given -> create a GUID!
  */
-export class Node {
-  /** Two different lists for sockets */
-  public readonly inputs: InputSocket[] = [];
-  public readonly outputs: OutputSocket[] = [];
-  constructor(
-    public readonly id: NodeId,
-    public readonly type: string,
-    public readonly name: string,
-    public sockets: Socket[] = [],
-    public uiProps: UIProps = new UIProps()
-  ) {
-    // Make
+export function createNodeId(id?: number) {
+  return id ? Math.floor(id).toString() : Guid.create().toString();
+}
+
+/*
+ * Create a node.
+ */
+export function createNode(id: NodeId, type: NodeType, sockets?: Socket[], uiProps?: UIProps): Node {
+  const inputs: InputSocket[] = [];
+  const outputs: OutputSocket[] = [];
+
+  if (sockets) {
     sockets.forEach((s: InputSocket | OutputSocket) => {
-      if (Socket.isOutputSocket(s)) {
-        this.outputs.push(s);
+      if (isOutputSocket(s)) {
+        outputs.push(s);
       } else {
-        this.inputs.push(s);
+        inputs.push(s);
       }
     });
-    // Sorting input/outputs according to index.
-    const sort = (a: Socket, b: Socket) => a.index.comp(b.index);
-    this.inputs = this.inputs.sort(sort);
-    this.outputs = this.outputs.sort(sort);
-    // Setting all parents!
-    this.inputs.forEach((s: Socket) => (s.parent = this));
-    this.outputs.forEach((s: Socket) => (s.parent = this));
   }
 
-  public get idString(): string {
-    return this.id.string;
-  }
+  const sort = (a: Socket, b: Socket) => a.index - b.index;
+  inputs.sort(sort);
+  outputs.sort(sort);
+
+  return {
+    id: id,
+    type: type,
+    inputs: inputs,
+    outputs: outputs,
+    uiProps: uiProps ? uiProps : createUIProps()
+  };
 }

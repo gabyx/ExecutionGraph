@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraph_common_ITask_hpp
-#define executionGraph_common_ITask_hpp
+#pragma once
 
 using executionGraph
 {
@@ -52,4 +51,3 @@ using executionGraph
         virtual void onTaskException(const std::string& what) = 0;
     };
 }
-#endif

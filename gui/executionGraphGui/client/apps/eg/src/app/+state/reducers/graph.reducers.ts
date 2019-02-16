@@ -1,8 +1,8 @@
-import { Id, isDefined } from '@eg/common';
+import { isDefined } from '@eg/common';
 
 import * as fromActions from '../actions/graph.actions';
 import { Graph, Connection } from '../../model';
-import { ConnectionMap } from '../../model/Graph';
+import { ConnectionMap, GraphId } from '../../model/Graph';
 
 export interface GraphMap {
   [id: string]: Graph;
@@ -13,7 +13,7 @@ export interface GraphsState {
 
   loaded: boolean; // Has the AppState been loaded
   error?: any; // Last none error (if any)
-  selectedGraphId?: Id; // Which Graph has been selected
+  selectedGraphId?: GraphId; // Which Graph has been selected
 }
 
 export const initialState: GraphsState = {
@@ -25,7 +25,7 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
   switch (action.type) {
     case fromActions.GRAPHS_LOADED: {
       const entities = action.graphs.reduce(
-        (existing: GraphMap, graph: Graph) => ({ ...existing, [graph.id.toString()]: graph }),
+        (existing: GraphMap, graph: Graph) => ({ ...existing, [graph.id]: graph }),
         { ...state.entities }
       );
 
@@ -45,19 +45,20 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
       };
     }
 
-    case fromActions.GRAPH_ADDED: {
-      const entities = { ...state.entities, [action.graph.id.toString()]: action.graph };
-
-      return {
-        ...state,
-        entities
-      };
-    }
-
     case fromActions.OPEN_GRAPH: {
       return {
         ...state,
         selectedGraphId: action.id
+      };
+    }
+
+    case fromActions.GRAPH_LOADED:
+    case fromActions.GRAPH_ADDED: {
+      const entities = { ...state.entities, [action.graph.id]: action.graph };
+
+      return {
+        ...state,
+        entities
       };
     }
 
@@ -68,7 +69,7 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
       if (!isDefined(state.selectedGraphId)) {
         throw new Error(`No active graph to operate on, ${action.type} cannot be handled`);
       }
-      const graph = state.entities[state.selectedGraphId.toString()];
+      const graph = state.entities[state.selectedGraphId];
       if (!isDefined(graph)) {
         throw new Error(`No graph with the id ${state.selectedGraphId} exists`);
       }
@@ -79,7 +80,7 @@ export function reducer(state: GraphsState = initialState, action: fromActions.G
         ...state,
         entities: {
           ...state.entities,
-          [state.selectedGraphId.toString()]: updatedGraph
+          [state.selectedGraphId]: updatedGraph
         }
       };
     }
@@ -101,7 +102,7 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
         ...graph,
         nodes: {
           ...graph.nodes,
-          [node.id.toString()]: node
+          [node.id]: node
         }
       };
     }
@@ -112,14 +113,14 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
         ...graph,
         nodes: {
           ...graph.nodes,
-          [node.id.toString()]: node
+          [node.id]: node
         }
       };
     }
 
     case fromActions.NODE_REMOVED: {
       // Remove by destructuring to the removed and the rest
-      const { [action.nodeId.toString()]: removed, ...nodes } = graph.nodes;
+      const { [action.nodeId]: removed, ...nodes } = graph.nodes;
       //@todo cmonspqr -> gabnue:
       // Either the backend should report removed connections due to
       // removed nodes to keep the model consistent, or the backend should
@@ -128,13 +129,13 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
       // Anyway we deleting obsolete connections here is just a hack
       const connections = Object.keys(graph.connections)
         .map(id => graph.connections[id])
-        .filter(connection => connection.inputSocket.parent.id.toString() !== action.nodeId.toString())
-        .filter(connection => connection.outputSocket.parent.id.toString() !== action.nodeId.toString());
+        .filter(connection => connection.inputSocket.parentId === action.nodeId)
+        .filter(connection => connection.outputSocket.parentId === action.nodeId);
       return {
         ...graph,
         nodes: nodes,
         connections: connections.reduce(
-          (existing: ConnectionMap, connection: Connection) => ({ ...existing, [connection.idString]: connection }),
+          (existing: ConnectionMap, connection: Connection) => ({ ...existing, [connection.id]: connection }),
           {}
         )
       };
@@ -146,14 +147,14 @@ export function graphReducer(graph: Graph, action: fromActions.GraphAction): Gra
         ...graph,
         connections: {
           ...graph.connections,
-          [connection.idString]: connection
+          [connection.id]: connection
         }
       };
     }
 
     case fromActions.CONNECTION_REMOVED: {
       // Remove by destructuring to the removed and the rest
-      const { [action.connectionId.idString]: removed, ...connections } = graph.connections;
+      const { [action.connectionId]: removed, ...connections } = graph.connections;
       return {
         ...graph,
         connections: connections

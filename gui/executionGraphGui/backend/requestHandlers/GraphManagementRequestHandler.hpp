@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_backend_requestHandlers_GraphManagementRequestHandler_hpp
-#define executionGraphGui_backend_requestHandlers_GraphManagementRequestHandler_hpp
+#pragma once
 
 #include "executionGraph/common/FileSystem.hpp"
 #include "executionGraphGui/backend/BackendRequestHandler.hpp"
@@ -56,11 +55,14 @@ private:
     void handleRemoveGraph(const Request& request,
                            ResponsePromise& response);
 
+    void handleSaveGraph(const Request& request,
+                         ResponsePromise& response);
+    void handleLoadGraph(const Request& request,
+                         ResponsePromise& response);
+
 private:
     static FuncMap initFunctionMap();
     static const FuncMap m_functionMap;
 
     std::shared_ptr<ExecutionGraphBackend> m_backend;
 };
-
-#endif

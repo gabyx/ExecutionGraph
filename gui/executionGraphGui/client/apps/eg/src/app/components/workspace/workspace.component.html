@@ -16,32 +16,31 @@
       #nodeElement
       class="node ngcs-node"
       [class.selected]="isNodeSelected(node) | async"
-      [attr.id]="node.idString"
       [style.left]="node.uiProps.position.x + 'px'"
       [style.top]="node.uiProps.position.y + 'px'"
       [ngcsEventSource]="node"
       [forwardTo]="nodeEvents"
     >
       <div class="header">
-        <span [ngcsEventSource]="node" [forwardTo]="nodeNameEvents" [cancelBubble]="false">{{ node.name }}</span>
+        <span [ngcsEventSource]="node" [forwardTo]="nodeNameEvents" [cancelBubble]="false">{{ node.uiProps.name }}</span>
       </div>
 
       <div class="sockets">
         <div class="inputs">
           <div class="socket" *ngFor="let socket of node.inputs" [ngcsEventSource]="socket" [forwardTo]="socketEvents">
             <span [ngcsEventSource]="socket" [forwardTo]="socketNameEvents" [cancelBubble]="false">{{
-              socket.name
+              socket.uiProps.name
             }}</span>
-            <ngcs-port [id]="socket.idString" class="left middle"></ngcs-port>
+            <ngcs-port [id]="socket.id" class="left middle"></ngcs-port>
           </div>
         </div>
 
         <div class="outputs">
           <div class="socket" *ngFor="let socket of node.outputs" [ngcsEventSource]="socket" [forwardTo]="socketEvents">
             <span [ngcsEventSource]="socket" [forwardTo]="socketNameEvents" [cancelBubble]="false">{{
-              socket.name
+              socket.uiProps.name
             }}</span>
-            <ngcs-port [id]="socket.idString" class="right middle"></ngcs-port>
+            <ngcs-port [id]="socket.id" class="right middle"></ngcs-port>
           </div>
         </div>
       </div>

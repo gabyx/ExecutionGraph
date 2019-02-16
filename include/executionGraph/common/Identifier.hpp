@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_common_Identifier_hpp
-#define executionGraph_common_Identifier_hpp
+#pragma once
 
 #include <functional>
 #include <string>
@@ -85,6 +84,9 @@ namespace executionGraph
         MixinNamedIdentifier(const MixinNamedIdentifier&) = default;
         MixinNamedIdentifier(MixinNamedIdentifier&&)      = default;
 
+        MixinNamedIdentifier& operator=(const MixinNamedIdentifier&) = default;
+        MixinNamedIdentifier& operator=(MixinNamedIdentifier&&) = default;
+
         template<typename T, typename... Args>
         explicit MixinNamedIdentifier(const T& name, Args&&... args)
             : TIdentifier(std::forward<Args>(args)...), m_name(name)
@@ -96,7 +98,7 @@ namespace executionGraph
         //! Get the short name of this identifier.
         const std::string& getShortName() const { return m_name; }
 
-    public:
+    private:
         std::string m_name;  //!< The short name of this identifier.
     };
 
@@ -121,5 +123,3 @@ namespace std
     };
 
 }  // namespace std
-
-#endif

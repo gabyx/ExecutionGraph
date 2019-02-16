@@ -1,5 +1,5 @@
 <div class="background">
   <h1>Open a graph.</h1>
   <h2>Select or upload a graph from the backend file system.</h2>
-  <eg-file-browser></eg-file-browser>
+  <eg-file-browser [mode]="'open'" [allowDelete]="true" (fileActionOpen)="openGraph($event)"></eg-file-browser>
 </div>

@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_server_BackendRequestDispatcher_hpp
-#define executionGraphGui_server_BackendRequestDispatcher_hpp
+#pragma once
 
 #include "executionGraphGui/backend/BackendRequestHandler.hpp"
 #include "executionGraphGui/common/RequestDispatcher.hpp"
@@ -46,5 +45,3 @@ public:
 
     virtual ~BackendRequestDispatcher() = default;
 };
-
-#endif

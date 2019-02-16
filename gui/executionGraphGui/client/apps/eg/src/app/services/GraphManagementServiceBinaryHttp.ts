@@ -13,11 +13,12 @@
 import { Inject, Injectable } from '@angular/core';
 import { flatbuffers } from 'flatbuffers';
 import { Graph } from '../model';
-import { Id } from '@eg/common';
 import { ILogger, LoggerFactory } from '@eg/logger';
 import { GraphManagementService, sz } from './GraphManagementService';
 import { BinaryHttpRouterService } from './BinaryHttpRouterService';
 import { VERBOSE_LOG_TOKEN } from '../tokens';
+import { GraphTypeId, GraphId } from '../model/Graph';
+import { toGraph } from './Conversions';
 
 @Injectable()
 export class GraphManagementServiceBinaryHttp extends GraphManagementService {
@@ -32,14 +33,14 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     this.logger = loggerFactory.create('GraphManagementServiceBinaryHttp');
   }
 
-  public async addGraph(graphTypeId: Id): Promise<Graph> {
+  public async addGraph(graphTypeId: GraphTypeId): Promise<Graph> {
     // Build the AddGraph request
     const builder = new flatbuffers.Builder(16);
-    const offGraphTypeId = builder.createString(graphTypeId.toString());
+    const offGraphTypeId = builder.createString(graphTypeId);
 
-    sz.AddGraphRequest.startAddGraphRequest(builder);
+    sz.AddGraphRequest.start(builder);
     sz.AddGraphRequest.addGraphTypeId(builder, offGraphTypeId);
-    const off = sz.AddGraphRequest.endAddGraphRequest(builder);
+    const off = sz.AddGraphRequest.end(builder);
     builder.finish(off);
 
     const requestPayload = builder.asUint8Array();
@@ -47,12 +48,12 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     // Send the request
     const result = await this.binaryRouter.post('general/addGraph', requestPayload);
     const buf = new flatbuffers.ByteBuffer(result);
-    const response = sz.AddGraphResponse.getRootAsAddGraphResponse(buf);
+    const response = sz.AddGraphResponse.getRoot(buf);
 
     this.logger.info(`Added new graph [id: '${response.graphId()}', type: '${graphTypeId}'].`);
 
     const graph: Graph = {
-      id: new Id(response.graphId()),
+      id: response.graphId(),
       typeId: graphTypeId,
       connections: {},
       nodes: {},
@@ -61,14 +62,14 @@ export class GraphManagementServiceBinaryHttp extends GraphManagementService {
     return graph;
   }
 
-  public async removeGraph(graphId: Id): Promise<void> {
+  public async removeGraph(graphId: GraphId): Promise<void> {
     // Build the RemoveGraph request
     const builder = new flatbuffers.Builder(16);
-    const offGraphId = builder.createString(graphId.toString());
+    const offGraphId = builder.createString(graphId);
 
-    sz.RemoveGraphRequest.startRemoveGraphRequest(builder);
+    sz.RemoveGraphRequest.start(builder);
     sz.RemoveGraphRequest.addGraphId(builder, offGraphId);
-    const off = sz.RemoveGraphRequest.endRemoveGraphRequest(builder);
+    const off = sz.RemoveGraphRequest.end(builder);
     builder.finish(off);
 
     const requestPayload = builder.asUint8Array();

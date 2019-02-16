@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_common_ThreadPool_hpp
-#define executionGraph_common_ThreadPool_hpp
+#pragma once
 
 #include <mutex>
 #include "executionGraph/common/TaskConsumer.hpp"
@@ -82,5 +81,3 @@ namespace executionGraph
         std::mutex m_access;                                 //!< Access mutex for this pool.
     };
 }  // namespace executionGraph
-
-#endif

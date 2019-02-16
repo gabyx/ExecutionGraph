@@ -12,7 +12,7 @@
 
 Live Demo: [https://gabyx.github.io/ExecutionGraph/demo](https://gabyx.github.io/ExecutionGraph/demo)
 
-Be able to design and run such input/output graphs, such as the ones used for the work [here](http://gabyx.github.io/GRSFramework/#videos) (using this [graph](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)). A generic, independent GUI is provided in from of a single-page Angular application with a backend HTTP server which allows interactive design/manipulation and execution of graphs: 
+Be able to design and run such input/output dataflow graphs, such as the ones used for the work [here](http://gabyx.github.io/GRSFramework/#videos) (using this [graph](https://cdn.rawgit.com/gabyx/GRSFramework/b1414aa0/simulations/examples/jobs/simulationStudies/avalanche1M-Tree-SimStudy/analyzeStartJob/analyzerLogic/FindStart.svg)). A generic, independent GUI is provided in from of a single-page Angular application with a backend HTTP server which allows interactive design/manipulation and execution of graphs: 
 
 ![Current GUI](docs/ExecutionGraphGui.png)
 
@@ -37,6 +37,7 @@ This library has these dependencies:
 - [meta](https://github.com/ericniebler/meta) (meta programming)
 - [crossguid](https://github.com/graeme-hill/crossguid) (guid implementation)
 - [rttr](https://github.com/rttrorg/rttr) (runtime type information, serialization only)
+- [fmt](https://github.com/fmtlib/fmt.git) (asserts, exception formatting)
 #### GUI Backend
 - [args](https://github.com/Taywee/args) (argument parser)
 - [memory](https://github.com/foonathan/memory.git) (memory allocators)
@@ -283,7 +284,7 @@ Finally we create the ExecutionTree `ExecutionTree`, add all nodes to it, set th
     execTree.setup();
     EXECGRAPH_LOG_INFO(execTree.getExecutionOrderInfo());
     execTree.execute(0); // execute the default execution group (=0)
-    EXECGRAPH_LOG_INFO("Result : "<< resultNode->getOutVal<IntegerNode<Config>::Result1>());
+    EXECGRAPH_LOG_INFO("Result : '{0}'", resultNode->getOutVal<IntegerNode<Config>::Result1>());
 ```
 This outputs the following execution order:
 ```c++

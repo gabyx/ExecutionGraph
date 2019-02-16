@@ -1,0 +1,58 @@
+// =========================================================================================
+//  ExecutionGraph
+//  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
+// 
+//  @date Tue Aug 14 2018
+//  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+// 
+//  This Source Code Form is subject to the terms of the Mozilla Public
+//  License, v. 2.0. If a copy of the MPL was not distributed with this
+//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// =========================================================================================
+
+include "executionGraphGui/messages/schemas/DataTypes.fbs";
+include "executionGraph/serialization/schemas/ExecutionGraph.fbs";
+
+namespace executionGraphGui.serialization;
+
+//! ======================================================================
+//! Message "/eg-backend/general/loadGraph"
+//! ======================================================================
+//! Request data: 
+table LoadGraphRequest {
+    filePath:string (id:0, required);  //!< The graph file.
+}
+
+//! Response data: 
+table LoadGraphResponse {
+    graphId: string (id:0, required);
+    graph: executionGraph.serialization.ExecutionGraph (id:1, required);
+
+    visualization: [uint8] (id:2, flexbuffer); //!< Additional visualization data for this graph.
+}
+//! Success: 
+//    - status code: 200 (OK)
+//! Valid Errors:
+//!   - status code: 400 (Bad Request)
+//!     - graph could not be loaded.
+//! ======================================================================
+
+
+//! ======================================================================
+//! Message "/eg-backend/general/saveGraph"
+//! ======================================================================
+//! Request data: 
+table SaveGraphRequest {
+    graphId: string (id:0, required);
+    filePath: string (id:1, required);   //!< The graph file.
+    overwrite: bool = false (id:2);     //!< If we have the permission to overwrite the file.
+
+    visualization: [uint8] (id:3, flexbuffer); //!< Additional visualization data for this graph.
+}
+//! Response data: none
+//! Success: 
+//    - status code: 200 (OK)
+//! Valid Errors:
+//!   - status code: 400 (Bad Request)
+//!     - graph could not be saved.
+//! ======================================================================

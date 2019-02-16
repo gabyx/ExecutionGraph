@@ -10,46 +10,60 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import * as Long from 'long';
 import { flatbuffers } from 'flatbuffers';
-import { Id } from '@eg/common';
 import * as model from './../model';
 import * as serialization from '@eg/serialization';
+import { createSocket } from '../model/Socket';
+import { NodeMap, ConnectionMap } from '../model/Graph';
+import { assert } from '@eg/common';
+import { createConnection } from '../model/Connection';
 
-export function toLong(value: flatbuffers.Long): Long {
-  return Long.fromBits(value.low, value.high, false);
-}
-
-export function toULong(value: flatbuffers.Long): Long {
-  return Long.fromBits(value.low, value.high, true);
-}
-
-export function toFbLong(value: Long): flatbuffers.Long {
-  return flatbuffers.Long.create(value.low, value.high);
+export function toFbLong(value: number | string): flatbuffers.Long {
+  if (typeof value === 'number') {
+    return flatbuffers.Long.create(value, 0);
+  } else {
+    return flatbuffers.Long.create(parseInt(value, 10), 0);
+  }
 }
 
 /**
  * Convert a `serialized`-instance of a graph type description to a `model`-instance.
- *
- * @export
- * @param {serialization.GraphTypeDescription} graphDesc
- * @returns {model.GraphTypeDescription}
  */
 export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescription): model.GraphTypeDescription {
-  let sockets: model.SocketTypeDescription[] = [];
+  const sockets: model.SocketTypeDescription[] = [];
   for (let i = 0; i < graphDesc.socketTypeDescriptionsLength(); ++i) {
-    let s = graphDesc.socketTypeDescriptions(i);
-    sockets.push({ type: s.type(), name: s.name() });
+    const s = graphDesc.socketTypeDescriptions(i);
+
+    const d = s.description();
+    sockets.push({ type: s.type(), name: s.name(), description: d ? d : undefined });
   }
 
-  let nodes: model.NodeTypeDescription[] = [];
+  const nodes: model.NodeTypeDescription[] = [];
   for (let i = 0; i < graphDesc.nodeTypeDescriptionsLength(); ++i) {
-    let s = graphDesc.nodeTypeDescriptions(i);
-    nodes.push({ type: s.type(), name: s.name() });
+    const s = graphDesc.nodeTypeDescriptions(i);
+
+    const inS: string[] = [];
+    for (let j = 0; j < s.inSocketNamesLength(); ++j) {
+      inS.push(s.inSocketNames(j));
+    }
+
+    const outS: string[] = [];
+    for (let j = 0; j < s.outSocketNamesLength(); ++j) {
+      outS.push(s.outSocketNames(j));
+    }
+    const d = s.description();
+
+    nodes.push({
+      type: s.type(),
+      name: s.name(),
+      inSocketNames: inS,
+      outSocketNames: outS,
+      description: d ? d : undefined
+    });
   }
 
   return {
-    id: new Id(graphDesc.id()),
+    id: graphDesc.id(),
     name: graphDesc.name(),
     nodeTypeDescriptions: nodes,
     socketTypeDescriptions: sockets,
@@ -59,19 +73,18 @@ export function toGraphTypeDescription(graphDesc: serialization.GraphTypeDescrip
 
 /**
  *  Convert a `serialized`-instance of a node to a `model`-instance.
- *
- * @export
- * @param {serialization.LogicNode} node
- * @returns {Node}
  */
 export function toNode(node: serialization.LogicNode): model.Node {
   // Convert to a node model
-  let nodeId = new model.NodeId(toULong(node.id()));
+  const nodeId = node
+    .id()
+    .toFloat64()
+    .toString();
 
-  let sockets: model.Socket[] = [];
+  const allSockets: model.Socket[] = [];
 
   // Convert the sockets
-  let extractSockets = (kind: model.SocketType, sockets: model.Socket[]) => {
+  const extractSockets = (kind: model.SocketType, sockets: model.Socket[]) => {
     let l: number;
     let socks: (idx: number) => serialization.LogicSocket;
     if (kind === 'output') {
@@ -81,15 +94,70 @@ export function toNode(node: serialization.LogicNode): model.Node {
       l = node.inputSocketsLength();
       socks = (idx: number) => node.inputSockets(idx);
     }
+
     for (let i = 0; i < l; ++i) {
-      let s = socks(i);
-      let socket = model.Socket.createSocket(kind, toULong(s.typeIndex()), s.name(), toULong(s.index()), s.typeName());
+      const s = socks(i);
+      const socket = createSocket(kind, s.typeIndex().toFloat64(), s.index().toFloat64(), nodeId, s.typeName());
       sockets.push(socket);
     }
   };
 
-  extractSockets('input', sockets);
-  extractSockets('output', sockets);
+  extractSockets('input', allSockets);
+  extractSockets('output', allSockets);
 
-  return new model.Node(nodeId, node.type(), node.name(), sockets);
+  return model.fromNode.createNode(nodeId, node.type(), allSockets);
+}
+
+/**
+ *  Convert a `serialized`-instance of a connection to a `model`-instance.
+ */
+export function toConnection(nodes: NodeMap, link: serialization.SocketLinkDescription): model.Connection {
+  const outNodeId = link
+    .outNodeId()
+    .toFloat64()
+    .toString();
+  const inNodeId = link
+    .inNodeId()
+    .toFloat64()
+    .toString();
+
+  const outSocketIdx = link.outSocketIdx().toFloat64();
+  const inSocketIdx = link.inSocketIdx().toFloat64();
+
+  assert(inNodeId in nodes && outNodeId in nodes, 'In/Out node index not in map!');
+  const inNode = nodes[inNodeId];
+  const outNode = nodes[outNodeId];
+
+  assert(outSocketIdx < outNode.outputs.length && inSocketIdx < inNode.inputs.length, 'Sockets indices wrong!');
+  const outSocket = outNode.outputs[outSocketIdx];
+  const inSocket = inNode.inputs[inSocketIdx];
+
+  return link.isWriteLink() ? createConnection(outSocket, inSocket) : createConnection(inSocket, outSocket);
+}
+
+/**
+ *  Convert a `serialized`-instance of a graph to a `model`-instance.
+ */
+export function toGraph(graphId: string, graph: serialization.ExecutionGraph): model.Graph {
+  const nodes: NodeMap = {};
+  let l = graph.nodesLength();
+  for (let i = 0; i < l; ++i) {
+    const node = toNode(graph.nodes(i));
+    nodes[node.id.toString()] = node;
+  }
+
+  const connections: ConnectionMap = {};
+  l = graph.linksLength();
+  for (let i = 0; i < l; ++i) {
+    const con = toConnection(nodes, graph.links(i));
+    connections[con.id.toString()] = con;
+  }
+
+  return {
+    id: graphId,
+    name: 'Unnamed',
+    connections: connections,
+    nodes: nodes,
+    typeId: graph.graphDescription().id()
+  };
 }

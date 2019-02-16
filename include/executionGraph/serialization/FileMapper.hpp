@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraph_serialization_FileMapper_h
-#define executionGraph_serialization_FileMapper_h
+#pragma once
 
 #include <stdint.h>
 #include "executionGraph/common/FileSystem.hpp"
@@ -21,10 +20,10 @@ namespace executionGraph
 {
     /* ---------------------------------------------------------------------------------------*/
     /*!
-    FileMapper to quickly map a file into memory.
+        FileMapper to quickly map a file into memory.
 
-    @date Sat Apr 28 2018
-    @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+        @date Sat Apr 28 2018
+        @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
     */
     /* ---------------------------------------------------------------------------------------*/
     class EXECGRAPH_EXPORT FileMapper final
@@ -42,8 +41,9 @@ namespace executionGraph
         FileMapper& operator=(const FileMapper&&) = delete;
 
         //! Get the mapped address and size of the file.
-        std::pair<const uint8_t*, std::size_t> data() { return {static_cast<const uint8_t*>(m_mappedAddress),
-                                                                   m_mappedBytes}; }
+        const uint8_t* data() const { return static_cast<const uint8_t*>(m_mappedAddress); }
+        //! Get the size of the mapped file.
+        std::size_t size() const { return m_mappedBytes; }
 
     private:
         void load(const std::path& filePath) noexcept(false);
@@ -58,5 +58,3 @@ namespace executionGraph
     };
 
 }  // namespace executionGraph
-
-#endif

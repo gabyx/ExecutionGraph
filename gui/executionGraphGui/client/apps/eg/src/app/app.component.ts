@@ -12,7 +12,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { RouterState, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { filter, tap, take } from 'rxjs/operators';
 
 import { LoggerFactory, ILogger } from '@eg/logger';
@@ -30,35 +30,43 @@ export class AppComponent implements OnInit {
   private readonly log: ILogger;
 
   public get hasDrawerContent() {
-    return this.store.select(getDrawerRequired);
+    return this.store.pipe(select(getDrawerRequired));
   }
 
-  constructor(private graphStore: Store<GraphsState>, private store: Store<RouterState>, private router: Router, loggerFactory: LoggerFactory) {
+  constructor(
+    private graphStore: Store<GraphsState>,
+    private store: Store<RouterState>,
+    private router: Router,
+    loggerFactory: LoggerFactory
+  ) {
     this.log = loggerFactory.create('AppComponent');
   }
 
   ngOnInit() {
-
     this.graphStore.dispatch(new actions.LoadGraphDescriptions());
     this.graphStore.dispatch(new actions.LoadGraphs());
 
     this.store
-      .select(graphQueries.getGraphs)
       .pipe(
+        select(graphQueries.getGraphs),
         filter(graphs => graphs.length > 0),
         tap(graphs => {
           this.log.debug(`Loaded graphs, auto-selecting first`);
           if (graphs.length === 0) {
             this.log.error(`Cannot select, since no graphs loaded!`);
           } else {
-            this.router.navigate([{
-              outlets: {
-                primary: ['graph', graphs[0].id.toString()],
-                drawer: ['nodes']
+            this.router.navigate([
+              {
+                outlets: {
+                  primary: ['graph', graphs[0].id],
+                  drawer: ['nodes']
+                }
               }
-            }]);
+            ]);
 
-            this.graphStore.dispatch(new actions.ShowNotification(`To help you debug I created a dummy graph for you \u{1F64C}`, 7000));
+            this.graphStore.dispatch(
+              new actions.ShowNotification(`To help you debug I created a dummy graph for you \u{1F64C}`, 7000)
+            );
           }
         }),
         take(1)
@@ -67,6 +75,6 @@ export class AppComponent implements OnInit {
   }
 
   drawerClosed() {
-    this.router.navigate([{outlets: { drawer: null}}]);
+    this.router.navigate([{ outlets: { drawer: null } }]);
   }
 }

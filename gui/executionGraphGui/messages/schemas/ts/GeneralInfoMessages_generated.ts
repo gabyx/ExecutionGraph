@@ -25,7 +25,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):GetAllGraphTypeDescriptionsResponse 
  * @param GetAllGraphTypeDescriptionsResponse= obj
  * @returns GetAllGraphTypeDescriptionsResponse
  */
-static getRootAsGetAllGraphTypeDescriptionsResponse(bb:flatbuffers.ByteBuffer, obj?:GetAllGraphTypeDescriptionsResponse):GetAllGraphTypeDescriptionsResponse {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:GetAllGraphTypeDescriptionsResponse):GetAllGraphTypeDescriptionsResponse {
   return (obj || new GetAllGraphTypeDescriptionsResponse).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -50,7 +50,7 @@ graphsTypesLength():number {
 /**
  * @param flatbuffers.Builder builder
  */
-static startGetAllGraphTypeDescriptionsResponse(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
@@ -87,15 +87,15 @@ static startGraphsTypesVector(builder:flatbuffers.Builder, numElems:number) {
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endGetAllGraphTypeDescriptionsResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   return offset;
 };
 
-static createGetAllGraphTypeDescriptionsResponse(builder:flatbuffers.Builder, graphsTypesOffset:flatbuffers.Offset):flatbuffers.Offset {
-  GetAllGraphTypeDescriptionsResponse.startGetAllGraphTypeDescriptionsResponse(builder);
+static create(builder:flatbuffers.Builder, graphsTypesOffset:flatbuffers.Offset):flatbuffers.Offset {
+  GetAllGraphTypeDescriptionsResponse.start(builder);
   GetAllGraphTypeDescriptionsResponse.addGraphsTypes(builder, graphsTypesOffset);
-  return GetAllGraphTypeDescriptionsResponse.endGetAllGraphTypeDescriptionsResponse(builder);
+  return GetAllGraphTypeDescriptionsResponse.end(builder);
 }
 }
 }

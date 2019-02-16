@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_common_EnumClassHelper_hpp
-#define executionGraph_common_EnumClassHelper_hpp
+#pragma once
 
 #include <type_traits>
 
@@ -31,4 +30,4 @@ namespace executionGraph
     }
 }  // namespace executionGraph
 
-#endif  // EnumClassHelper_hpp
+// EnumClassHelper_hpp

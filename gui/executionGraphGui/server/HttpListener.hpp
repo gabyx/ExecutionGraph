@@ -9,8 +9,7 @@
 //  License, v. 2.0. If a copy of the MPL was not distributed with this
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
-#ifndef executionGraphGui_server_HttpListener_hpp
-#define executionGraphGui_server_HttpListener_hpp
+#pragma once
 
 #include <memory>
 #include <string>
@@ -47,5 +46,3 @@ private:
 };
 
 #include "executionGraphGui/server/HttpListener.cpp"
-
-#endif

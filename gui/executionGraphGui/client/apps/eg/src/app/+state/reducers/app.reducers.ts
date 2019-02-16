@@ -24,7 +24,7 @@ export class RouterStateUrlSerializer implements RouterStateSerializer<RouterSta
     const primaryRouteSegments = [];
     const drawerRouteSegments = [];
     const primaryLeaf = this.traverseOutletRoutesToLeaf(state, 'primary', routeState => {
-      if(routeState.routeConfig) {
+      if (routeState.routeConfig) {
         primaryRouteSegments.push(routeState.routeConfig.path);
       }
     });
@@ -36,36 +36,38 @@ export class RouterStateUrlSerializer implements RouterStateSerializer<RouterSta
 
     const { params } = primaryLeaf;
 
-    return { url, queryParams, params, primaryRouteSegments, drawerRouteSegments};
+    return { url, queryParams, params, primaryRouteSegments, drawerRouteSegments };
   }
 
-  private traverseOutletRoutesToLeaf(routeState: ActivatedRouteSnapshot, outletName: string = 'primary', callback: (route: ActivatedRouteSnapshot) => any): ActivatedRouteSnapshot {
+  private traverseOutletRoutesToLeaf(
+    routeState: ActivatedRouteSnapshot,
+    outletName: string = 'primary',
+    callback: (route: ActivatedRouteSnapshot) => any
+  ): ActivatedRouteSnapshot {
     if (routeState.outlet === outletName) {
       callback(routeState);
     }
-    if(routeState.children.length > 0) {
+    if (routeState.children.length > 0) {
       for (const childState of routeState.children) {
         const leafRoute = this.traverseOutletRoutesToLeaf(childState, outletName, callback);
-        if(leafRoute !== null) {
+        if (leafRoute !== null) {
           return leafRoute;
         }
       }
       return null;
-    } else if(routeState.outlet === outletName) {
+    } else if (routeState.outlet === outletName) {
       return routeState;
-    }
-    else {
+    } else {
       return null;
     }
   }
-
 }
 
 export interface AppState {
-  routerReducer: fromRouter.RouterReducerState<RouterStateUrl>,
-  graphs: GraphsState,
-  graphDescriptions: GraphDescriptionsState,
-  ui: UiState
+  routerReducer: fromRouter.RouterReducerState<RouterStateUrl>;
+  graphs: GraphsState;
+  graphDescriptions: GraphDescriptionsState;
+  ui: UiState;
 }
 
 export const reducers: ActionReducerMap<AppState> = {
@@ -73,4 +75,4 @@ export const reducers: ActionReducerMap<AppState> = {
   graphs: graphsReducer,
   graphDescriptions: graphDescriptionsReducer,
   ui: uiReducer
-}
+};

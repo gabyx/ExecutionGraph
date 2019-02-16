@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_common_Asserts_hpp
-#define executionGraph_common_Asserts_hpp
+#pragma once
 
 #include "executionGraph/common/Exception.hpp"
 #include "executionGraph/common/Log.hpp"
@@ -32,13 +31,14 @@
 #endif
 
 //! Some warning macro.
-#define EXECGRAPH_WARNINGMSG(condition, message)                                            \
-    {                                                                                       \
-        if(!(condition))                                                                    \
-        {                                                                                   \
-            EXECGRAPH_LOG_WARN(#condition << " : " << std::endl                             \
-                                          << message << std::endl                           \
-                                          << " @ " << __FILE__ << " (" << __LINE__ << ")"); \
-        }                                                                                   \
+#define EXECGRAPH_WARN(condition, ...)                     \
+    {                                                      \
+        if(!(condition))                                   \
+        {                                                  \
+            EXECGRAPH_LOG_WARN("{0} : \n{1}\n@ {2} [{3}]", \
+                               #condition,                 \
+                               fmt::format(__VA_ARGS__),   \
+                               __FILE__,                   \
+                               __LINE__)                   \
+        }                                                  \
     }
-#endif

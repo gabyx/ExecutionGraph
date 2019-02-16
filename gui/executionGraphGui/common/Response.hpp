@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_common_Response_hpp
-#define executionGraphGui_common_Response_hpp
+#pragma once
 
 #include <future>
 #include <memory>
@@ -192,5 +191,3 @@ private:
     Id m_requestId;                        //!< The id of the corresponding request.
     std::future<Payload> m_payloadFuture;  //!< The future object refering to the payload promise (possibly in another thread).
 };
-
-#endif

@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraph_serialization_GraphTypeDescription_hpp
-#define executionGraph_serialization_GraphTypeDescription_hpp
+#pragma once
 
 #include <string>
 #include <vector>
@@ -75,16 +74,15 @@ namespace executionGraph
 
     //! Return a graph description from a graph id `graphId` and
     //! its node type descriptions `nodeTypeDescriptions`.
-    template<typename Config>
+    template<typename Config, typename T>
     GraphTypeDescription makeGraphTypeDescription(const IdNamed& graphId,
                                                   const GraphTypeDescription::NodeTypeDescriptionList& nodeTypeDescription,
-                                                  const std::string& description)
+                                                  T&& description)
     {
         return GraphTypeDescription(graphId,
                                     getSocketDescriptions<Config>(),
                                     nodeTypeDescription,
-                                    description);
+                                    std::forward<T>(description));
     }
 
 }  // namespace executionGraph
-#endif

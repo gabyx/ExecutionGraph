@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_cefapp_ResponseCef_h
-#define executionGraphGui_cefapp_ResponseCef_h
+#pragma once
 
 #include <cef_base.h>
 #include <cef_request.h>
@@ -70,5 +69,3 @@ private:
 
 //! The response future corresponding to `ResponsePromiseCef`.
 using ResponseFutureCef = ResponseFuture;
-
-#endif

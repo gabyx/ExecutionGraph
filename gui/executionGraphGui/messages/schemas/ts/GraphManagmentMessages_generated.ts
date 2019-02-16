@@ -24,7 +24,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):AddGraphRequest {
  * @param AddGraphRequest= obj
  * @returns AddGraphRequest
  */
-static getRootAsAddGraphRequest(bb:flatbuffers.ByteBuffer, obj?:AddGraphRequest):AddGraphRequest {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:AddGraphRequest):AddGraphRequest {
   return (obj || new AddGraphRequest).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -42,7 +42,7 @@ graphTypeId(optionalEncoding?:any):string|Uint8Array|null {
 /**
  * @param flatbuffers.Builder builder
  */
-static startAddGraphRequest(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
@@ -58,7 +58,7 @@ static addGraphTypeId(builder:flatbuffers.Builder, graphTypeIdOffset:flatbuffers
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endAddGraphRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // graphTypeId
   return offset;
@@ -90,7 +90,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):AddGraphResponse {
  * @param AddGraphResponse= obj
  * @returns AddGraphResponse
  */
-static getRootAsAddGraphResponse(bb:flatbuffers.ByteBuffer, obj?:AddGraphResponse):AddGraphResponse {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:AddGraphResponse):AddGraphResponse {
   return (obj || new AddGraphResponse).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -108,7 +108,7 @@ graphId(optionalEncoding?:any):string|Uint8Array|null {
 /**
  * @param flatbuffers.Builder builder
  */
-static startAddGraphResponse(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
@@ -124,7 +124,7 @@ static addGraphId(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset)
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endAddGraphResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // graphId
   return offset;
@@ -156,7 +156,7 @@ __init(i:number, bb:flatbuffers.ByteBuffer):RemoveGraphRequest {
  * @param RemoveGraphRequest= obj
  * @returns RemoveGraphRequest
  */
-static getRootAsRemoveGraphRequest(bb:flatbuffers.ByteBuffer, obj?:RemoveGraphRequest):RemoveGraphRequest {
+static getRoot(bb:flatbuffers.ByteBuffer, obj?:RemoveGraphRequest):RemoveGraphRequest {
   return (obj || new RemoveGraphRequest).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
@@ -174,7 +174,7 @@ graphId(optionalEncoding?:any):string|Uint8Array|null {
 /**
  * @param flatbuffers.Builder builder
  */
-static startRemoveGraphRequest(builder:flatbuffers.Builder) {
+static start(builder:flatbuffers.Builder) {
   builder.startObject(1);
 };
 
@@ -190,7 +190,7 @@ static addGraphId(builder:flatbuffers.Builder, graphIdOffset:flatbuffers.Offset)
  * @param flatbuffers.Builder builder
  * @returns flatbuffers.Offset
  */
-static endRemoveGraphRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
+static end(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   builder.requiredField(offset, 4); // graphId
   return offset;

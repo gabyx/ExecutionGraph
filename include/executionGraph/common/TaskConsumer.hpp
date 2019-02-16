@@ -10,8 +10,7 @@
 //!  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //! ========================================================================================
 
-#ifndef executionGraph_common_TaskConsumer_hpp
-#define executionGraph_common_TaskConsumer_hpp
+#pragma once
 
 #include <atomic>
 #include <memory>
@@ -47,7 +46,7 @@ namespace executionGraph
 
     private:
         template<typename TIn, typename T = std::decay_t<TIn>>
-        using IsPointerType = meta::or_<meta::is<T, std::shared_ptr>, 
+        using IsPointerType = meta::or_<meta::is<T, std::shared_ptr>,
                                         meta::is<T, std::unique_ptr>>;
 
     public:
@@ -146,5 +145,3 @@ namespace executionGraph
     };
 
 }  // namespace executionGraph
-
-#endif

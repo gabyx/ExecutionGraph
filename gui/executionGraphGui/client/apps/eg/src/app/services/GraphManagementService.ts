@@ -10,12 +10,12 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-import { Id } from '@eg/common';
 import { GraphManagementMessages } from '@eg/messages';
 import { Graph } from '../model';
 export import sz = GraphManagementMessages;
+import { GraphTypeId, GraphId } from '../model/Graph';
 
 export abstract class GraphManagementService {
-  public abstract async addGraph(graphTypeId: Id): Promise<Graph>;
-  public abstract async removeGraph(graphId: Id): Promise<void>;
+  public abstract async addGraph(graphTypeId: GraphTypeId): Promise<Graph>;
+  public abstract async removeGraph(graphId: GraphId): Promise<void>;
 }

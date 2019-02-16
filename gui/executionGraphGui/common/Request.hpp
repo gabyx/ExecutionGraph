@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraphGui_common_Request_hpp
-#define executionGraphGui_common_Request_hpp
+#pragma once
 
 #include <optional>
 #include <string>
@@ -26,7 +25,7 @@
 
     A `BackendRequestHandler` is handling such a request. It can be registered in
     the message dispatcher for handling one or several request targets 
-    (see `m_requestTarget`).
+    (see `m_target`).
     The request target is a normal absolute path.
 
     The serializer which decodes the payload is kept outside of this class 
@@ -49,8 +48,8 @@ public:
             std::string requestTargetArgs,
             std::optional<Payload> payload = std::nullopt)
         : m_id()
-        , m_requestTarget(std::move(requestTarget))
-        , m_requestTargetArgs(std::move(requestTargetArgs))
+        , m_target(std::move(requestTarget))
+        , m_targetArgs(std::move(requestTargetArgs))
         , m_payload{std::move(payload)}
     {}
 
@@ -64,9 +63,9 @@ public:
 
 public:
     //! Get the request target describing this message.
-    const std::path& target() const { return m_requestTarget; }
+    const std::path& target() const { return m_target; }
     //! Get the request target additional arguments.
-    const std::string& targetArgs() const { return m_requestTargetArgs; }
+    const std::string& targetArgs() const { return m_targetArgs; }
 
 public:
     //! Get the payload of this request.
@@ -80,13 +79,11 @@ private:
     //! e.g. "/eg-backend/graph/addNode",
     //! e.g. "/eg-backend/general/addGraph"
     //! e.g. "/eg-backend/general/files" etc.
-    std::path m_requestTarget;
+    std::path m_target;
 
     //! Additional request arguments (if any, normally empty).
-    std::string m_requestTargetArgs;
+    std::string m_targetArgs;
 
     //! The optional payload.
     std::optional<Payload> m_payload;
 };
-
-#endif

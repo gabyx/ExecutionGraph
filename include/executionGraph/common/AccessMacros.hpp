@@ -10,8 +10,7 @@
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // =========================================================================================
 
-#ifndef executionGraph_common_AccessMacros_hpp
-#define executionGraph_common_AccessMacros_hpp
+#pragma once
 
 #define EXECGRAPH_DISALLOW_COPY(Class) \
 public:                                \
@@ -26,5 +25,3 @@ public:                                \
 #define EXECGRAPH_DISALLOW_COPY_AND_MOVE(Class) \
     EXECGRAPH_DISALLOW_COPY(Class)              \
     EXECGRAPH_DISALLOW_MOVE(Class)
-
-#endif
