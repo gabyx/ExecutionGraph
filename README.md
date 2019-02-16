@@ -4,10 +4,9 @@
 
 # ExecutionGraph 
 [![Build Status](https://travis-ci.org/gabyx/ExecutionGraph.svg?branch=master)](https://travis-ci.org/gabyx/ExecutionGraph)      
-![system](https://img.shields.io/badge/system-linux,osx-blue.svg)
-![std](https://img.shields.io/badge/std-c++17-green.svg)   
-[![Gitter chat](https://badges.gitter.im/ExecutionGraph/gitter.png)](https://gitter.im/ExecutionGraph/community)
-[![Live](https://img.shields.io/badge/demo-live-blue.svg)](https://gabyx.github.io/ExecutionGraph/demo)
+![system](https://img.shields.io/badge/system-linux,osx-blue.svg) ![std](https://img.shields.io/badge/std-c++17-green.svg)   
+[![Gitter chat](https://badges.gitter.im/ExecutionGraph/gitter.png)](https://gitter.im/ExecutionGraph/community)      
+[![Live](https://img.shields.io/badge/live-demo-blue.svg)](https://gabyx.github.io/ExecutionGraph/demo)      
 
 **Fast Execution Graph consisting of Execution Nodes**    
 
