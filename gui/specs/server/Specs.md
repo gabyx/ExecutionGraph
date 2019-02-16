@@ -100,5 +100,3 @@ The base template url of the backend is `http://<server-ip>/eg-backend/${target}
 - **Graph Execution Functionalities:**
     * Run graph:
     * Stop graph:
-
-```
