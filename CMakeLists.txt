@@ -43,6 +43,9 @@ set(ExecutionGraph_BUILD_BENCHMARKS OFF CACHE BOOL "Build the benchmarks")
 mark_as_advanced(ExecutionGraph_BUILD_EXAMPLE)
 set(ExecutionGraph_BUILD_EXAMPLE OFF CACHE BOOL "Build the example, the library is automatically built if this is true")
 
+mark_as_advanced(ExecutionGraph_BUILD_SERIALIZATION)
+set(ExecutionGraph_BUILD_SERIALIZATION OFF CACHE BOOL "Build the serialization part into the library.")
+
 mark_as_advanced(ExecutionGraph_BUILD_GUI)
 set(ExecutionGraph_BUILD_GUI ON CACHE BOOL "Build Graphical User Interface for the Execution Graph")
 set(ExecutionGraph_USE_CEF_DSYM_FILE ON CACHE BOOL "Use the CEF Debug Symbols")
@@ -55,6 +58,18 @@ set(ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS ON CACHE BOOL "Force an exception i
 
 #mark_as_advanced( ExecutionGraph_USE_OPENMP)
 #set(ExecutionGraph_USE_OPENMP ON CACHE BOOL "Try to use OpenMp for parallel speedup")
+
+if( ${ExecutionGraph_BUILD_EXAMPLE} OR 
+    ${ExecutionGraph_BUILD_TESTS} OR 
+    ${ExecutionGraph_BUILD_GUI} OR 
+    ${ExecutionGraph_BUILD_BENCHMARKS} OR 
+    ${ExecutionGraph_BUILD_SERIALIZATION})
+  set(ExecutionGraph_BUILD_LIBRARY On CACHE BOOL "Build a shared library" FORCE)
+endif()
+
+if(${ExecutionGraph_BUILD_GUI})
+    set(ExecutionGraph_BUILD_SERIALIZATION ON)
+endif()
 
 set(ExecutionGraph_EXTERNAL_BUILD_DIR "${CMAKE_BINARY_DIR}/external" CACHE STRING "Folder where all external shit is build!")
 set(ExecutionGraph_EXTERNAL_INSTALL_DIR "${ExecutionGraph_EXTERNAL_BUILD_DIR}/install")
@@ -133,8 +148,8 @@ if(CCACHE_FOUND)
     set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
 endif(CCACHE_FOUND)
 
-message("Default Compiler Flags: '${CMAKE_CXX_FLAGS}' | '${CMAKE_CXX_FLAGS_DEBUG}' | '${CMAKE_CXX_FLAGS_RELEASE}'")
-message("Default Linker Flags: '${CMAKE_EXE_LINKER_FLAGS}' | '${CMAKE_SHARED_LINKER_FLAGS}' | '${CMAKE_STATIC_LINKER_FLAGS}'")
+message(STATUS "Default Compiler Flags: '${CMAKE_CXX_FLAGS}' | '${CMAKE_CXX_FLAGS_DEBUG}' | '${CMAKE_CXX_FLAGS_RELEASE}'")
+message(STATUS "Default Linker Flags: '${CMAKE_EXE_LINKER_FLAGS}' | '${CMAKE_SHARED_LINKER_FLAGS}' | '${CMAKE_STATIC_LINKER_FLAGS}'")
 
 # Dependencies =========================================================
 add_library(ExecutionGraph::Core-Dependencies INTERFACE IMPORTED)
@@ -149,15 +164,18 @@ list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "metaLib")
 find_package(FmtLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "fmtLib")
 
-# Try to find the RTTR library 
-find_package(RTTRLib REQUIRED)
-list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "rttrLib")
-# Try to find flatbuffer library
-find_package(FlatBuffersLib REQUIRED)
-list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "flatbuffersLib")
 # Try to find the crossguid library
 find_package(CrossGUIDLib REQUIRED)
  list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "crossguidLib")
+
+if(${ExecutionGraph_BUILD_SERIALIZATION})
+    # Try to find the RTTR library 
+    find_package(RTTRLib REQUIRED)
+    list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "rttrLib")
+    # Try to find flatbuffer library
+    find_package(FlatBuffersLib REQUIRED)
+    list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "flatbuffersLib")
+endif()
 
 set_target_properties(ExecutionGraph::Core-Dependencies PROPERTIES INTERFACE_LINK_LIBRARIES "${ExecutionGraph_LINK_TARGETS_CORE_DEP}")
 
@@ -220,15 +238,15 @@ set(ExecutionGraph_EXTERNAL_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/external/")
 include_all_source_ExecutionGraph(ExecutionGraph_SRC
                                   ExecutionGraph_INC
                                   ExecutionGraph_INC_DIRS
-                                  ExecutionGraph_DEPENDING_TARGETS
                                   ${PROJECT_SOURCE_DIR} ${ExecutionGraph_BINARY_DIR} )
+
+include_all_source_ExecutionGraphSerialization(ExecutionGraph_SER_SRC
+                                               ExecutionGraph_SER_INC
+                                               ExecutionGraph_SER_INC_DIRS
+                                               ${PROJECT_SOURCE_DIR} ${ExecutionGraph_BINARY_DIR} )
 
 set(ExecutionGraph_LICENSE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set(ExecutionGraph_README_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
-
-if( ${ExecutionGraph_BUILD_EXAMPLE} OR ${ExecutionGraph_BUILD_TESTS} OR ${ExecutionGraph_BUILD_GUI} OR ${ExecutionGraph_BUILD_BENCHMARKS})
-  set(ExecutionGraph_BUILD_LIBRARY On CACHE BOOL "Build a shared library" FORCE)
-endif()
 
 if(ExecutionGraph_BUILD_LIBRARY)
     add_subdirectory(lib)

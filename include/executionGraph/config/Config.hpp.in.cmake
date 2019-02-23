@@ -54,6 +54,21 @@ namespace executionGraph{
         static const bool throwIfBadSocketCast = false;
         #define EXECGRAPH_THROW_BADSOCKETCAST_IF(cond, mess, ...) EXECGRAPH_ASSERT_TYPE(cond, BadSocketCastException, mess, __VA_ARGS__)
     #endif
+
+    #cmakedefine ExecutionGraph_HAS_RTTR
+    #ifdef ExecutionGraph_HAS_RTTR
+        #define EXECGRAPH_HAS_RTTR
+    #else
+        #undef EXECGRAPH_HAS_RTTR
+    #endif
+
+    #cmakedefine ExecutionGraph_HAS_FLATBUFFERS
+    #ifdef ExecutionGraph_HAS_FLATBUFFERS
+        #define EXECGRAPH_HAS_FLATBUFFERS
+    #else
+        #undef EXECGRAPH_HAS_FLATBUFFERS
+    #endif
+
 }
 
 

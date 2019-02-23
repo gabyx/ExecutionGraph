@@ -13,6 +13,7 @@
 #pragma once
 
 #include <fstream>
+#include <flatbuffers/flatbuffers.h>
 #include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/BinaryBufferView.hpp"
 #include "executionGraph/common/Exception.hpp"

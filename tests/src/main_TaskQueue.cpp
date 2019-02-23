@@ -13,7 +13,6 @@
 #include <array>
 #include "TestFunctions.hpp"
 #include "executionGraph/common/Exception.hpp"
-#include "executionGraph/common/IObjectID.hpp"
 #include "executionGraph/common/TaskConsumer.hpp"
 #include "executionGraph/common/TaskQueue.hpp"
 #include "executionGraph/common/ThreadPool.hpp"
@@ -60,8 +59,6 @@ void doRandomStuff(std::thread::id threadId, int i, const std::string& name, boo
 
 struct Task
 {
-    EXECGRAPH_OBJECT_ID_NON_VIRTUAL_DECLARATION
-
 public:
     Task(int i)
         : m_i(i) {}

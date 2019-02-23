@@ -91,7 +91,8 @@
     "iomanip": "cpp",
     "numeric": "cpp",
     "variant": "cpp",
-    "strstream": "cpp"
+    "strstream": "cpp",
+    "type": "cpp"
   },
   "cmake.useCMakeServer": true,
   // "C_Cpp.clang_format_fallbackStyle": "none",

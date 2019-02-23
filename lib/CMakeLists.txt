@@ -6,27 +6,39 @@ set(ExecutionGraph_BUILD_LIBRARY_STATIC OFF CACHE BOOL "Build a static library")
 # Make Target: Library 
 ################################
 
-macro(add_ExecutionGraph_lib STATICorSHARED TARGETNAME EXPORTNAME DOINSTALL)
+macro(add_ExecutionGraph_lib STATICorSHARED 
+                             TARGETNAME 
+                             EXPORTNAME 
+                             DOINSTALL
+                             SRC
+                             INC
+                             INC_DIRS)
     # Add the real library
-    add_library(${TARGETNAME} ${STATICorSHARED} ${ExecutionGraph_SRC} ${ExecutionGraph_INC})
-    setTargetCompileOptionsExecutionGraph(${TARGETNAME} ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
+    add_library(${TARGETNAME} ${STATICorSHARED} ${${SRC}} ${${INC}})
+    setTargetCompileOptionsExecutionGraph(${TARGETNAME} 
+                                          ${ExecutionGraph_USE_ADDRESS_SANITIZER} 
+                                          ${ExecutionGraph_USE_LEAK_SANITIZER})
 
-    target_include_directories(${TARGETNAME} PUBLIC ${ExecutionGraph_INC_DIRS} $<INSTALL_INTERFACE:include>)
+    target_include_directories(${TARGETNAME} PUBLIC 
+                               $<BUILD_INTERFACE:${${INC_DIRS}}>
+                               $<INSTALL_INTERFACE:include>)
     target_link_libraries(${TARGETNAME} PUBLIC ExecutionGraph::Core-Dependencies)
     add_library("ExecutionGraph::${EXPORTNAME}" ALIAS ${TARGETNAME})
 
     # Add library for headers only
     add_library("${TARGETNAME}-Headers" INTERFACE)
     add_library("ExecutionGraph::${EXPORTNAME}-Headers" ALIAS "${TARGETNAME}-Headers")
-    target_include_directories("${TARGETNAME}-Headers" INTERFACE ${ExecutionGraph_INC_DIRS} $<INSTALL_INTERFACE:include>)
+    target_include_directories("${TARGETNAME}-Headers"
+                                INTERFACE ${${INC_DIRS}}
+                                $<INSTALL_INTERFACE:include>)
 
 
     set_target_properties(${TARGETNAME} 
-        PROPERTIES
-        VERSION ${ExecutionGraph_VERSION_STRING} SOVERSION ${ExecutionGraph_VERSION_STRING}
-        DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
-        EXPORT_NAME ${EXPORTNAME})
-
+                          PROPERTIES
+                          VERSION ${ExecutionGraph_VERSION_STRING} 
+                          SOVERSION ${ExecutionGraph_VERSION_STRING}
+                          DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
+                          EXPORT_NAME ${EXPORTNAME})
 
     # set build flag, for import/export specifiers in platform.hpp
     # Building a library means we only export the symbols which have ExecutionGraph_EXPORT set in the Platform.hpp file
@@ -34,12 +46,13 @@ macro(add_ExecutionGraph_lib STATICorSHARED TARGETNAME EXPORTNAME DOINSTALL)
     if( ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR 
         ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR 
         ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
-        target_compile_options(${TARGETNAME} PRIVATE -DExecutionGraph_BUILD_LIBRARY -fvisibility=hidden -fPIC)
+        target_compile_options(${TARGETNAME} PRIVATE -fvisibility=hidden -fPIC)
     elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
-        target_compile_options(${TARGETNAME} PRIVATE /DExecutionGraph_BUILD_LIBRARY)
     else()
         message(FATAL_ERROR "Could not set compile options for compiler id: '${CMAKE_CXX_COMPILER_ID}'")
     endif()
+
+    target_compile_definitions(${TARGETNAME} PRIVATE ExecutionGraph_BUILD_LIBRARY)
 
     if(${DOINSTALL})
         install(TARGETS ${TARGETNAME} EXPORT ExecutionGraphTargets
@@ -53,41 +66,52 @@ endmacro()
 
 message(STATUS "====================================================")
 message(STATUS "Configuring target: ExecutionGraph::Core")
-add_ExecutionGraph_lib("SHARED" "ExecutionGraph-Core" "Core" ON)
+add_ExecutionGraph_lib("SHARED" "ExecutionGraph-Core" "Core" ON 
+                       ExecutionGraph_SRC 
+                       ExecutionGraph_INC 
+                       ExecutionGraph_INC_DIRS)
 print_target_properties(ExecutionGraph::Core)
-
 if(ExecutionGraph_BUILD_LIBRARY_STATIC)
     message(STATUS "====================================================")
     message(STATUS "Configuring target: ExecutionGraph::CoreS")
-    add_ExecutionGraph_lib("STATIC" "ExecutionGraph-CoreS" "CoreS" ON)
+    add_ExecutionGraph_lib("STATIC" "ExecutionGraph-CoreS" "CoreS" ON
+                           ExecutionGraph_SRC 
+                           ExecutionGraph_INC 
+                           ExecutionGraph_INC_DIRS)
     print_target_properties(ExecutionGraph::CoreS)
 endif()
+
+if(ExecutionGraph_BUILD_SERIALIZATION)
+    message(STATUS "====================================================")
+    message(STATUS "Configuring target: ExecutionGraph::Serialization")
+    add_ExecutionGraph_lib("SHARED" "ExecutionGraph-Serialization" "Serialization" ON
+                           ExecutionGraph_SER_SRC 
+                           ExecutionGraph_SER_INC 
+                           ExecutionGraph_SER_INC_DIRS)
+    print_target_properties(ExecutionGraph::Serialization)
+    
+    if(ExecutionGraph_BUILD_LIBRARY_STATIC)
+        message(STATUS "====================================================")
+        message(STATUS "Configuring target: ExecutionGraph::SerializationS")
+        add_ExecutionGraph_lib("STATIC" "ExecutionGraph-SerializationS" "SerializationS" ON
+                                ExecutionGraph_SER_SRC 
+                                ExecutionGraph_SER_INC 
+                                ExecutionGraph_SER_INC_DIRS)
+        print_target_properties(ExecutionGraph::SerializationS)
+    endif()
+endif()
+
 
 ################################
 # Make Target: Library for tests
 ################################
-
 if(ExecutionGraph_BUILD_TESTS)
-    
     message(STATUS "====================================================")
     message(STATUS "Configuring target: ExecutionGraph::CoreForTests")
-    
-    add_ExecutionGraph_lib("SHARED" "ExecutionGraph-CoreForTests" "CoreForTests" OFF)
-
-    # set build flag, for import/export specifiers in platform.hpp
-    # Building a library means we only export the symbols which have ExecutionGraph_EXPORT set in the Platform.hpp file
-    # We define all other symbols to be hidden by default as suggested by https://gcc.gnu.org/wiki/Visibility
-    if( ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR 
-        ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR 
-        ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
-        target_compile_options(ExecutionGraph-CoreForTests PRIVATE -DExecutionGraph_BUILD_TESTS)
-    elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MVCC")
-        target_compile_options(ExecutionGraph-CoreForTests PRIVATE /DExecutionGraph_BUILD_TESTS)
-    else()
-        message(FATAL_ERROR "Could not set compile options for compiler id: '${CMAKE_CXX_COMPILER_ID}'")
-    endif()
-
-    print_target_properties(ExecutionGraph::CoreForTests)
+    add_library("ExecutionGraph-CoreForTests" INTERFACE)
+    set_property(TARGET ExecutionGraph-CoreForTests
+                 PROPERTY INTERFACE_LINK_LIBRARIES ExecutionGraph::Core)
+    add_library("ExecutionGraph::CoreForTests" ALIAS "ExecutionGraph-CoreForTests")
 endif()
 
 # Configuring Installstep

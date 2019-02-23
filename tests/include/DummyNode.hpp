@@ -13,7 +13,6 @@
 #ifndef tests_DummmyNode_hpp
 #define tests_DummmyNode_hpp
 
-#include <rttr/registration>
 #include <executionGraph/common/TypeDefs.hpp>
 #include <executionGraph/config/Config.hpp>
 
@@ -24,19 +23,6 @@ class DummyNode : public TConfig::NodeBaseType
 public:
     EXECGRAPH_DEFINE_CONFIG(TConfig);
     using Base = typename Config::NodeBaseType;
-
-private:
-    RTTR_ENABLE(Base)
-public:
-    struct AutoRegisterRTTR
-    {
-        AutoRegisterRTTR()
-        {
-            rttr::registration::class_<DummyNode>("DummyNode")
-                .template constructor<NodeId>()(
-                    rttr::policy::ctor::as_raw_ptr);
-        }
-    };
 
 public:
     enum Ins

@@ -20,10 +20,10 @@
 #include <executionGraph/serialization/FileMapper.hpp>
 #include <executionGraph/serialization/LogicNodeSerializer.hpp>
 #include <executionGraph/serialization/schemas/cpp/ExecutionGraph_generated.h>
-#include "../files/testbuffer_generated.h"
-#include "DummyNode.hpp"
+#include <executionGraphGui/backend/nodes/DummyNode.hpp>
 #include "GraphGenerator.hpp"
 #include "TestFunctions.hpp"
+#include "testbuffer_generated.h"
 
 #ifdef __clang__
 #    pragma clang diagnostic push
@@ -63,7 +63,7 @@ namespace s = executionGraph::serialization;
 using Config        = executionGraph::GeneralConfig<>;
 using GraphType     = executionGraph::ExecutionTree<Config>;
 using DummyNodeType = DummyNode<Config>;
-static const DummyNodeType::AutoRegisterRTTR autoRegisterRTTR;
+static const DummyNodeType::AutoRegisterRTTR autoRegisterRTTR("Test");
 
 struct DummyNodeSerializer
 {
@@ -167,8 +167,8 @@ MY_TEST(FlatBuffer, GraphSimple)
     {
         EXECGRAPH_LOG_TRACE("Read graph simple");
         executionGraph::FileMapper mapper("myGraph.eg");
-        std::tie(buf, size) = mapper.data();
-        auto graph          = s::GetExecutionGraph(buf);
+        buf        = mapper.data();
+        auto graph = s::GetExecutionGraph(buf);
         ASSERT_TRUE(graph->nodes() != nullptr && graph->nodes()->size() == nNodes) << " Wupi, wrong serialization!";
     }
 

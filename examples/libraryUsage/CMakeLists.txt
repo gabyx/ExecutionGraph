@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 message("ExecutionGraph_DIR set to '${ExecutionGraph_DIR}'")
 
 # add ExecutionGraph
-find_package(ExecutionGraph CONFIG)
+find_package(ExecutionGraph CONFIG REQUIRED)
 
 # add simple executable
 add_executable(libraryUsage ./main.cpp)

@@ -11,7 +11,6 @@
 //! ========================================================================================
 #include "executionGraph/graphs/ExecutionTree.hpp"
 #include "executionGraph/nodes/LogicNode.hpp"
-#include "executionGraph/nodes/LogicSocket.hpp"
 
 using namespace executionGraph;
 
@@ -109,5 +108,5 @@ int main()
     // Execute the default group 0
     execTree.runExecute(0);
 
-    EXECGRAPH_LOG_INFO("Result : " << resultNode->getOutVal<IntegerNode<Config>::Result1>());
+    EXECGRAPH_LOG_INFO("Result : {0}", resultNode->getOutVal<IntNode::Result1>());
 }

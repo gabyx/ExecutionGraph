@@ -14,7 +14,6 @@
 
 #include <memory>
 #include <vector>
-#include <rttr/type>
 #include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/DemangleTypes.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
@@ -81,8 +80,6 @@ namespace executionGraph
     template<typename TConfig>
     class LogicNode
     {
-        RTTR_ENABLE()
-
     public:
         EXECGRAPH_DEFINE_CONFIG(TConfig);
 

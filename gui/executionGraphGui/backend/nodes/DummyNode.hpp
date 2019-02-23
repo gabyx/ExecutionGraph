@@ -25,7 +25,7 @@ public:
     using Base = typename Config::NodeBaseType;
 
 private:
-    RTTR_ENABLE(Base)
+    RTTR_ENABLE()
 
 public:
     //! Class which is used as a static, for RTTR Registration

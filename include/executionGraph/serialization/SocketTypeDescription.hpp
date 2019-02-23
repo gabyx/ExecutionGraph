@@ -18,7 +18,7 @@
 
 namespace executionGraph
 {
-    //! A simple socket descriptio, describing a LogicSocket.
+    //! A simple socket description, describing a LogicSocket.
     struct SocketTypeDescription
     {
         std::string m_type;           //!< The unique RTTI name of the socket

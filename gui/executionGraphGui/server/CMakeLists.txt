@@ -25,7 +25,9 @@ function(defineCompileDefs target includeDirs)
 
     setTargetCompileOptionsExecutionGraph(${target} ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
     target_include_directories(${target} PRIVATE ${includeDirs})
-    target_link_libraries(${target} PRIVATE ExecutionGraph::Core ExecutionGraphGui::Core-Dependencies)
+    target_link_libraries(${target} PRIVATE ExecutionGraph::Core
+                                            ExecutionGraph::Serialization 
+                                            ExecutionGraphGui::Core-Dependencies)
 
     cotire(${target})
 

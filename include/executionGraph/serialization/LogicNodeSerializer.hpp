@@ -13,7 +13,9 @@
 #pragma once
 
 #include <type_traits>
+#include <flatbuffers/flatbuffers.h>
 #include <meta/meta.hpp>
+#include <rttr/type>
 #include "executionGraph/common/Factory.hpp"
 #include "executionGraph/common/MetaVisit.hpp"
 #include "executionGraph/serialization/Conversions.hpp"

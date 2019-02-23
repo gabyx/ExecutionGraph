@@ -7,13 +7,6 @@ set(ExecutionGraph_TESTS_INPUT_FILES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/files")
 set(ExecutionGraph_TESTS_INPUT_FILES_ADD_DIR "${ExecutionGraph_ROOT_DIR}/additional/tests/files")
 set(ExecutionGraph_TESTS_VALIDATION_FILES_DIR "${ExecutionGraph_ROOT_DIR}/additional/tests/files/validation")
 
-# WRITE CONFIGURATION FILE
-configure_file (
-  "${CMAKE_CURRENT_SOURCE_DIR}/include/TestConfig.hpp.in.cmake"
-  ${CMAKE_CURRENT_BINARY_DIR}/include/TestConfig.hpp
-)
-#=========================
-
 set(INCLUDE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/TestFunctions.hpp
 )
@@ -70,11 +63,6 @@ defineCompileDefs(${EXEC_NAME})
 # TaskQueue Test
 set(EXEC_NAME ${PROJECT_NAME}Test-TaskQueue)
 add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_TaskQueue.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-defineCompileDefs(${EXEC_NAME})
-
-# Flatbuffer Test
-set(EXEC_NAME ${PROJECT_NAME}Test-Flatbuffer)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Flatbuffer.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 defineCompileDefs(${EXEC_NAME})
 
 # MetaProgramming Test
