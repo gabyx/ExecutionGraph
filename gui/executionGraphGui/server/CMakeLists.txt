@@ -29,7 +29,7 @@ function(defineCompileDefs target includeDirs)
                                             ExecutionGraph::Serialization 
                                             ExecutionGraphGui::Core-Dependencies)
 
-    set_target_properties(${target} PROPERTIES INSTALL_RPATH "$ORIGIN/../lib")
+    set_target_properties(${target} PROPERTIES INSTALL_RPATH "$ORIGIN/../lib;$ORIGIN/..")
 
     cotire(${target})
 
@@ -39,6 +39,12 @@ endfunction()
 
 add_executable(ExecutionGraphServer ${ExecutionGraphGUIServer_SRCS})
 defineCompileDefs(ExecutionGraphServer ${ExecutionGraphServer_INC_DIRS})
+
+# Spezial for 
+# add_executable(ExecutionGraphServer-ForClient ${ExecutionGraphGUIServer_SRCS})
+# defineCompileDefs(ExecutionGraphServer-ForClient ${ExecutionGraphServer_INC_DIRS})
+# set_target_properties(ExecutionGraphServer-ForClient PROPERTIES BUILD_RPATH 
+#                                                      "$ORIGIN")
 
 install(TARGETS ExecutionGraphServer EXPORT ExecutionGraphTargets
         RUNTIME       DESTINATION ${ExecutionGraph_RUNTIME_INSTALL_DIR}

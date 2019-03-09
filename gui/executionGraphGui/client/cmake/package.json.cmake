@@ -16,19 +16,25 @@
       "build"
     ],
     "extraResources": [],
+    "extraFiles" : [
+      {
+        "from": "build/server",
+        "to": "server"
+      }
+    ],
     "linux": {
       "target": "tar.gz",
       "icon": "@ExecutionGraph_CLIENT_DIR@/apps/electron/resources/icon.png"
     },
     "mac": {
       "target": "dmg",
-      "category": "com.${name}.app",
+      "category": "com.executiongraph.app",
       "icon": "@ExecutionGraph_CLIENT_DIR@/apps/electron/resources/icon.png"
     },
     "win": {
       "target": "zip",
       "icon": "@ExecutionGraph_CLIENT_DIR@/apps/electron/resources/icon.png"
-    },
-  }
+    }
+  },
   "main": "build/main.js"
 }
