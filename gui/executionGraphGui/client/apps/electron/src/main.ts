@@ -29,7 +29,7 @@ function createWindow() {
 
   if (serve) {
     const loadUrl = 'http://localhost:4200';
-    const projectPath = path.join(app.getAppPath(), '..');
+    const projectPath = path.join(__dirname, '..');
     console.log(`Serving form ${projectPath}`);
 
     // Reload initial page to not get mixed up with client side routing
@@ -59,7 +59,7 @@ function createWindow() {
   win.webContents.openDevTools();
 
   // Start Execution Graph Server
-  const serverExec = path.join(app.getAppPath(), '../server/bin/ExecutionGraphServer');
+  const serverExec = path.join(app.getAppPath(), '../../server/bin/ExecutionGraphServer');
   if (fs.existsSync(serverExec)) {
     console.log(`Starting up server: '${serverExec}'`);
     execFile(serverExec, ['--address', '127.0.0.1', '--port', '8089', '--threads', '2'], (err, data) => {
