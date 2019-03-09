@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "license": "MPL 2.0",
   "author": "Gabriel Nützi, Simon Spörri",
-  "description": "Write execution graphs n shit yo",
+  "description": "Build and execute data flow graphs",
   "scripts": {
     "copy-flatbuffer-files": "bash scripts/copyFlatBuffersBuildFiles.sh",
     "prebuild": "npm run copy-flatbuffer-files",
@@ -38,7 +38,8 @@
     "electron:package-test": "electron-builder --dir dist",
     "electron:package": "electron-builder",
     "native:package": "npm-run-all -s build-prod electron:build electron:package",
-    "native:package-to": "npm-run-all -s \"build-prod -- --output-path {1}/apps/eg\" \"electron:build -- --outDir {1}\" --",
+    "native:cmake-build-to": "npm-run-all -s \"build-prod -- --output-path {1}/apps/eg\" \"electron:build -- --outDir {1}\" --",
+    "native:cmake-package-to": "npm-run-all \"electron:package -- --projectDir {2} --{3}\" --",
     "affected": "./node_modules/.bin/nx affected",
     "pre-commit": "npm run format && npm run lint"
   },

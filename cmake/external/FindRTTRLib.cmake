@@ -25,8 +25,14 @@ if(${USE_SUPERBUILD})
                             PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/rttr"
                             TIMEOUT 10
                             UPDATE_DISCONNECTED  ON
-                            CMAKE_ARGS "-DCMAKE_BUILD_TYPE=Release" "-DCMAKE_VERBOSE_MAKEFILE=ON" "-DBUILD_STATIC=OFF" "-DBUILD_EXAMPLES=OFF"
-                                        "-DBUILD_BENCHMARKS=OFF" "-DBUILD_UNIT_TESTS=OFF" "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
+                            CMAKE_ARGS "-DCMAKE_BUILD_TYPE=Release" 
+                                       "-DCMAKE_VERBOSE_MAKEFILE=ON" 
+                                       "-DBUILD_STATIC=ON" 
+                                       "-DBUILD_EXAMPLES=OFF"
+                                       "-DBUILD_BENCHMARKS=OFF" 
+                                       "-DBUILD_UNIT_TESTS=OFF"
+                                       "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+                                       "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
                             INSTALL_DIR "${INSTALL_DIR}")
 
         message(STATUS "rttr library setup -> build it!")
@@ -44,7 +50,7 @@ endif()
 
 if(TARGET "RTTR::Core")
     add_library(rttrLib INTERFACE IMPORTED)
-    set_property(TARGET rttrLib PROPERTY INTERFACE_LINK_LIBRARIES RTTR::Core)
+    set_property(TARGET rttrLib PROPERTY INTERFACE_LINK_LIBRARIES RTTR::Core_Lib)
 
     message(STATUS "rttr library found! Config File: ${RTTR_CONFIG}")
     message(STATUS "rttr library added targets: rttrLib")

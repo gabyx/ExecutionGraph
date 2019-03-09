@@ -59,16 +59,18 @@ function createWindow() {
   win.webContents.openDevTools();
 
   // Start Execution Graph Server
-  const serverExec = path.join(__dirname, 'ExecutionGraphServer');
+  const serverExec = path.join(app.getAppPath(), '../../server/bin/ExecutionGraphServer');
   if (fs.existsSync(serverExec)) {
     console.log(`Starting up server: '${serverExec}'`);
     execFile(serverExec, ['--address', '127.0.0.1', '--port', '8089', '--threads', '2'], (err, data) => {
       if (err) {
-        console.error(err);
+        console.error(`Error starting: '${serverExec}': '${err}'`);
         return;
       }
       console.log(data.toString());
     });
+  } else {
+    console.error(`Server executable '${serverExec}' not found!`);
   }
 
   // Emitted when the window is closed.
