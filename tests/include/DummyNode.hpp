@@ -16,54 +16,59 @@
 #include <executionGraph/common/TypeDefs.hpp>
 #include <executionGraph/config/Config.hpp>
 
+struct InSocketDecleration
+{
+    constexpr InSocketDecleration(IndexType index,
+                                  std::string_view name)
+        : m_index(index), m_name(name) {}
+
+    IndexType m_index;
+    std::string_view m_name;
+}
+
 //! Stupid dummy Node for testing.
-template<typename TConfig>
-class DummyNode : public TConfig::NodeBaseType
+class DummyNode : public LogicNode
 {
 public:
-    EXECGRAPH_DEFINE_CONFIG(TConfig);
-    using Base = typename Config::NodeBaseType;
+    static constexpr InSocketDecleration<int> inDeclValue1{0, "Value1"};
+    static constexpr InSocketDecleration<int> inDeclValue2{1, "Value2"};
+    static constexpr OutSocketDecleration<int> outDeclResult{0, "Result"};
 
-public:
-    enum Ins
+    using InSocketList  = decltype(getInSocketList(inDeclValue1, inDeclValue2));
+    using OutSocketList = decltype(getOutSocketList(outDeclResult));
+
+    template<typename SocketDecl>
+    auto& outSocket()
     {
-        Value1,
-        Value2,
-        Value3NotAdded
-    };
-    enum Outs
+        using T = SocketDecl::DataType;
+        return std::get<getIndex>(m_outSockets);
+    }
+
+    template<typename SocketDecl>
+    auto& inSocket(const SocketDecl& decl)
     {
-        Result1,
-    };
-    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs)
-
-    using InSockets = InSocketDeclList<InSocketDecl<Value1, int>,
-                                       InSocketDecl<Value2, int>>;
-
-    using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, int>>;
-
-    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
+        using T = SocketDecl::DataType;
+        return std::get<LogicSocketInput<T>>(m_inSockets);
+    }
 
     template<typename... Args>
     DummyNode(Args&&... args)
         : Base(std::forward<Args>(args)...)
     {
-        // Add all sockets
-        this->template addSockets<InSockets>();
-        this->template addSockets<OutSockets>(std::make_tuple(0));
+        Base::registerSockets(m_inSockets, m_outSockets);
     }
 
     void reset() override{};
 
     void compute() override
     {
-        // ugly syntax due to template shit
-        //        this->template getValue<typename OutSockets::template Get<Result1>>() =
-        //            this->template getValue<typename InSockets::template Get<Value1>>() +
-        //            this->template getValue<typename InSockets::template Get<Value2>>();
-        getOutVal<Result1>() = getInVal<Value1>() + getInVal<Value2>();
-        /* + getInVal<Value3NotAdded>() // would be a compile error */
     }
+
+private:
+    InSocketList m_inSockets;
+    OutSocketList m_outSockets;
 };
+
+a.oSocket<>()
 
 #endif

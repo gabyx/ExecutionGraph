@@ -71,7 +71,7 @@ struct DummyNodeSerializer
     //! for the DummyNode `node`.
     struct Writer
     {
-        EXECGRAPH_DEFINE_CONFIG(Config);
+        EXECGRAPH_DEFINE_TYPES(Config);
 
         using Key = DummyNodeType;
 
@@ -93,7 +93,7 @@ struct DummyNodeSerializer
     //! buffer `node`.
     struct Reader
     {
-        EXECGRAPH_DEFINE_CONFIG(Config);
+        EXECGRAPH_DEFINE_TYPES(Config);
 
         using Key = DummyNodeType;
 

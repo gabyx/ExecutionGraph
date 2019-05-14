@@ -21,7 +21,7 @@ template<typename TConfig>
 class DummyNode : public TConfig::NodeBaseType
 {
 public:
-    EXECGRAPH_DEFINE_CONFIG(TConfig);
+    EXECGRAPH_DEFINE_TYPES(TConfig);
     using Base = typename Config::NodeBaseType;
 
 private:

@@ -60,7 +60,7 @@ namespace executionGraph
     public:
         using GraphType = TGraphType;
         using TConfig   = typename GraphType::Config;
-        EXECGRAPH_DEFINE_CONFIG(TConfig);
+        EXECGRAPH_DEFINE_TYPES(TConfig);
         using LogicNodeSerializer = TLogicNodeSerializer;
 
         ExecutionGraphSerializer(LogicNodeSerializer& nodeSerializer)
@@ -245,7 +245,7 @@ namespace executionGraph
                     // Serialize all Write-Links
                     for(auto& writeSocket : inputSocket->getWritingSockets())
                     {
-                        socketLinks.emplace_back(s::SocketLinkDescription{writeSocket->getParent().getId(),
+                        socketLinks.emplace_back(s::SocketLinkDescription{writeSocket->parent().getId(),
                                                                           writeSocket->getIndex(),
                                                                           node->getId(),
                                                                           inputSocket->getIndex(),
@@ -254,8 +254,8 @@ namespace executionGraph
                     // Serialize Get-Link
                     if(inputSocket->hasGetLink())
                     {
-                        SocketOutputBaseType* outSocket = inputSocket->followGetLink();
-                        socketLinks.emplace_back(s::SocketLinkDescription{outSocket->getParent().getId(),
+                        LogicSocketOutputBase* outSocket = inputSocket->followGetLink();
+                        socketLinks.emplace_back(s::SocketLinkDescription{outSocket->parent().getId(),
                                                                           outSocket->getIndex(),
                                                                           node->getId(),
                                                                           inputSocket->getIndex(),

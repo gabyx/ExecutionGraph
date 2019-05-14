@@ -52,7 +52,7 @@ namespace executionGraph
     class LogicNodeSerializer final
     {
     public:
-        EXECGRAPH_DEFINE_CONFIG(TConfig);
+        EXECGRAPH_DEFINE_TYPES(TConfig);
 
     public:
         LogicNodeSerializer()  = default;
@@ -187,17 +187,17 @@ namespace executionGraph
                 std::vector<flatbuffers::Offset<LogicSocket>> socketOffs;
                 for(auto& socket : sockets)
                 {
-                    EXECGRAPH_ASSERT(socket->getType() < socketDescriptions.size(), "Socket type wrong!");
+                    EXECGRAPH_ASSERT(socket->type() < socketDescriptions.size(), "Socket type wrong!");
 
                     flatbuffers::Offset<flatbuffers::String> typeOff, typeNameOff;
                     if(fullTypeSpec)
                     {
-                        typeOff     = builder.CreateString(socketDescriptions[socket->getType()].m_type);
-                        typeNameOff = builder.CreateString(socketDescriptions[socket->getType()].m_name);
+                        typeOff     = builder.CreateString(socketDescriptions[socket->type()].m_type);
+                        typeNameOff = builder.CreateString(socketDescriptions[socket->type()].m_name);
                     }
 
                     LogicSocketBuilder soBuilder(builder);
-                    soBuilder.add_typeIndex(socket->getType());
+                    soBuilder.add_typeIndex(socket->type());
                     soBuilder.add_type(typeOff);
                     soBuilder.add_typeName(typeNameOff);
 

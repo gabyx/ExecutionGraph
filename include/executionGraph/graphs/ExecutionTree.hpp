@@ -45,7 +45,7 @@ namespace executionGraph
     class ExecutionTree final
     {
     public:
-        EXECGRAPH_DEFINE_CONFIG(TConfig);
+        EXECGRAPH_DEFINE_TYPES(TConfig);
 
         enum NodeClassification : unsigned char
         {
@@ -367,13 +367,13 @@ namespace executionGraph
             {
                 auto* outSocket = node.getISocket(inS).followGetLink();
                 EXECGRAPH_THROW_TYPE_IF(!outSocket || (outSocket->getIndex() != *outS ||
-                                                       outSocket->getParent().getId() != *outN),
+                                                       outSocket->parent().getId() != *outN),
                                         NodeConnectionException,
                                         "The output socket '{0}' of node '{1}' of the get link does "
                                         "not correspond to the one you want to remove "
                                         "(node id: '{2}', output socket: '{3}')",
                                         outSocket->getIndex(),
-                                        outSocket->getParent().getId(),
+                                        outSocket->parent().getId(),
                                         *outN,
                                         *outS);
             }
@@ -560,7 +560,7 @@ namespace executionGraph
             void connectAllDanglingInputs(NodeData& nodeData)
             {
                 // All input sockets need to be connected!
-                for(SocketInputBasePointer& inSocket : nodeData.m_node->getInputs())
+                for(SocketPointer& inSocket : nodeData.m_node->getInputs())
                 {
                     // Socket is dangling!
                     if(inSocket->getConnectionCount() == 0)
@@ -579,7 +579,7 @@ namespace executionGraph
             {
                 auto check = [&](auto* socket, const NodeData& nodeDataWithLowerPrio) {
                     // Get NodeData of parentNode
-                    auto& parentNode = socket->getParent();
+                    auto& parentNode = socket->parent();
 
                     // Check first if it is a constant node.
                     auto itConstant = m_constNodes.find(parentNode.getId());
@@ -810,7 +810,7 @@ namespace executionGraph
 
                 auto addParentsToStack = [&](auto* socket) {
                     // Get NodeData of parentNode
-                    auto& parentNode = socket->getParent();
+                    auto& parentNode = socket->parent();
                     auto itParent    = m_nonConstNodes.find(parentNode.getId());
                     if(itParent == m_nonConstNodes.end())
                     {
@@ -1034,7 +1034,7 @@ namespace executionGraph
 
                 auto addParentsToStack = [&](auto* socket) {
                     // Get NodeData of parentNode
-                    auto& parentNode = socket->getParent();
+                    auto& parentNode = socket->parent();
                     auto itParent    = m_nonConstNodes.find(parentNode.getId());
                     if(itParent == m_nonConstNodes.end())
                     {
@@ -1075,7 +1075,7 @@ namespace executionGraph
             {
                 auto assignToChild = [&](auto* socket) {
                     // Get NodeData of parentNode
-                    auto& parentNode = socket->getParent();
+                    auto& parentNode = socket->parent();
                     auto itParent    = m_nonConstNodes.find(parentNode.getId());
                     EXECGRAPH_THROW_IF(itParent == m_nonConstNodes.end(),
                                        "Node with id: '{0}' has not been added to the execution tree!",
@@ -1153,7 +1153,7 @@ namespace executionGraph
                     if(socket->hasGetLink())
                     {
                         auto* outputSocket = socket->followGetLink();
-                        auto& parentNode   = outputSocket->getParent();
+                        auto& parentNode   = outputSocket->parent();
                         // If we reached the start node, return!
                         if(m_start == &parentNode)
                         {

@@ -233,7 +233,7 @@ namespace executionGraph
          *
          *   auto value = obj.withWLock([](auto& data) {
          *     data.doStuff();
-         *     return data.getValue();
+         *     return data.data();
          *   });
          */
         template<class Function>

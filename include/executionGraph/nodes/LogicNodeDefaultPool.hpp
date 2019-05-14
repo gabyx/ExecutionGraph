@@ -24,7 +24,7 @@ namespace executionGraph
     class LogicNodeDefaultPool final : public TConfig::NodeBaseType
     {
     public:
-        EXECGRAPH_DEFINE_CONFIG(TConfig);
+        EXECGRAPH_DEFINE_TYPES(TConfig);
         using Base = typename TConfig::NodeBaseType;
 
         template<typename... Args>
@@ -41,11 +41,11 @@ namespace executionGraph
         }
 
         //! Connects the input socket `inSocket` to this default output socket which is
-        //! given by `inSocket.getType()` which corresponds
+        //! given by `inSocket.type()` which corresponds
         //! by default to the type-matching output socket index of this class.
-        void connect(SocketInputBaseType& inSocket)
+        void connect(LogicSocketInputBase& inSocket)
         {
-            IndexType defaultOutSocketIdx = inSocket.getType();  // the type index corresponds to our output socket index.
+            IndexType defaultOutSocketIdx = inSocket.type();  // the type index corresponds to our output socket index.
             if(this->hasOSocket(defaultOutSocketIdx))
             {
                 inSocket.setGetLink(this->getOSocket(defaultOutSocketIdx));
