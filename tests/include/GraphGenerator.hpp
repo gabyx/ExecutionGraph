@@ -91,14 +91,14 @@ std::unique_ptr<GraphType> createRandomTree(std::size_t nNodes,
     {
         auto* node = execTree->getNode(i);
 
-        // EXECGRAPH_LOG_TRACE("id: " << i << " has " << node->getConnectedInputCount() <<" connected inputs.");
-        // EXECGRAPH_LOG_TRACE("id: " << i << " has " << node->getConnectedOutputCount() <<" connected output.");
-        if(node->getConnectedInputCount() == 0)
+        // EXECGRAPH_LOG_TRACE("id: " << i << " has " << node->connectedInputCount() <<" connected inputs.");
+        // EXECGRAPH_LOG_TRACE("id: " << i << " has " << node->connectedOutputCount() <<" connected output.");
+        if(node->connectedInputCount() == 0)
         {
             execTree->setNodeClass(*node, GraphType::NodeClassification::InputNode);
         }
 
-        if(node->getConnectedOutputCount() == 0)
+        if(node->connectedOutputCount() == 0)
         {
             execTree->setNodeClass(*node, GraphType::NodeClassification::OutputNode);
         }

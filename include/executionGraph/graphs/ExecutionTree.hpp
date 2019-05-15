@@ -560,7 +560,7 @@ namespace executionGraph
             void connectAllDanglingInputs(NodeData& nodeData)
             {
                 // All input sockets need to be connected!
-                for(SocketPointer& inSocket : nodeData.m_node->getInputs())
+                for(const SocketPointer& inSocket : nodeData.m_node->getInputs())
                 {
                     // Socket is dangling!
                     if(inSocket->getConnectionCount() == 0)

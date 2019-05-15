@@ -18,25 +18,11 @@
 #include "executionGraph/common/DemangleTypes.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 
-//! Some handy macros to redefine getters to shortcut the following ugly syntax inside a derivation of LogicNode:
-//! Accessing the value in socket Result1 : this->template getData<typename OutSockets::template Get<Result1>>();
-#define EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(InputEnum, InSocketDeclList, OutputEnum, OutSocketDeclList)           \
-    template<InputEnum S>                                                                                               \
-    inline auto& getInVal() const { return this->template getData<typename InSocketDeclList::template Get<S>>(); }      \
-                                                                                                                        \
-    template<OutputEnum S>                                                                                              \
-    inline auto& getOutVal() { return this->template getData<typename OutSocketDeclList::template Get<S>>(); }          \
-                                                                                                                        \
-    template<OutputEnum S>                                                                                              \
-    inline auto& getInVal() const { return this->template getData<typename OutSocketDeclList::template Get<S>>(); }     \
-                                                                                                                        \
-    template<InputEnum S>                                                                                               \
-    static constexpr executionGraph::SocketIndex getInIdx() { return InSocketDeclList::template Get<S>::Index::value; } \
-    template<OutputEnum S>                                                                                              \
-    static constexpr executionGraph::SocketIndex getOutIdx() { return OutSocketDeclList::template Get<S>::Index::value; }
-
 namespace executionGraph
 {
+    class LogicSocketInputBase;
+    class LogicSocketOutputBase;
+
     /**
  @brief The execution node (node) class which is the base class
         for every node in an execution graph.
@@ -82,12 +68,12 @@ namespace executionGraph
     public:
         EXECGRAPH_DEFINE_TYPES();
 
-        using SocketInputListType  = std::vector<SocketPointer>;
-        using SocketOutputListType = std::vector<SocketPointer>;
+        using SocketInputListType  = std::vector<SocketPointer<LogicSocketInputBase>>;
+        using SocketOutputListType = std::vector<SocketPointer<LogicSocketOutputBase>>;
 
     public:
         //! The basic constructor of a node.
-        LogicNode(NodeId id)
+        LogicNode(NodeId id = NodeIdUninitialized)
             : m_id(id)
         {
         }
@@ -104,41 +90,18 @@ namespace executionGraph
         virtual void compute() = 0;
 
         inline NodeId getId() const { return m_id; }
+        inline void setId(NodeId id) { m_id = id; }
 
         //! Get the list of input sockets.
-        const SocketInputListType& getInputs() const { return m_inputs; }
-        SocketInputListType& getInputs() { return m_inputs; }
+        inline const SocketInputListType& getInputs() const { return m_inputs; }
+        inline SocketInputListType& getInputs() { return m_inputs; }
         //! Get the list of output sockets.
-        const SocketOutputListType& getOutputs() const { return m_outputs; }
-        SocketOutputListType& getOutputs() { return m_outputs; }
+        inline const SocketOutputListType& getOutputs() const { return m_outputs; }
+        inline SocketOutputListType& getOutputs() { return m_outputs; }
 
-        //! Get the number of input sockets which are connected to other nodes.
-        inline IndexType getConnectedInputCount() const
-        {
-            IndexType count = 0;
-            for(auto& socket : this->getInputs())
-            {
-                if(socket->getConnectionCount() > 0)
-                {
-                    ++count;
-                }
-            }
-            return count;
-        }
+        IndexType connectedInputCount() const;
+        IndexType connectedOutputCount() const;
 
-        //! Get the number of output sockets which are connected to other nodes.
-        inline IndexType getConnectedOutputCount() const
-        {
-            IndexType count = 0;
-            for(auto& socket : this->getOutputs())
-            {
-                if(socket->getConnectionCount() > 0)
-                {
-                    ++count;
-                }
-            }
-            return count;
-        }
         // bool hasISocket(SocketIndex idx) const { return idx < m_inputs.size(); }
         // bool hasOSocket(SocketIndex idx) const { return idx < m_outputs.size(); }
 
@@ -309,29 +272,29 @@ namespace executionGraph
         //! Adding of sockets is protected and should only be done in constructor!
         //@{
     protected:
-        //! Add an input socket with default value from the default output socket `defaultOutputSocketId`.
-        template<typename TData>
-        void addISock()
-        {
-            SocketIndex id = m_inputs.size();
+        // //! Add an input socket with default value from the default output socket `defaultOutputSocketId`.
+        // template<typename TData>
+        // void addISock()
+        // {
+        //     SocketIndex id = m_inputs.size();
 
-            auto p = SocketPointer<LogicSocketInputBase>(
-                new LogicSocketInput<TData>(id, *this),
-                [](LogicSocketInputBase* s) { delete static_cast<LogicSocketInput<TData>*>(s); });
-            m_inputs.push_back(std::move(p));
-        }
+        //     auto p = SocketPointer<LogicSocketInputBase>(
+        //         new LogicSocketInput<TData>(id, *this),
+        //         [](LogicSocketInputBase* s) { delete static_cast<LogicSocketInput<TData>*>(s); });
+        //     m_inputs.push_back(std::move(p));
+        // }
 
-        //! Add an output socket with default value `defaultValue`.
-        template<typename TData, typename T>
-        void addOSock(T&& defaultValue)
-        {
-            SocketIndex id = m_outputs.size();
+        // //! Add an output socket with default value `defaultValue`.
+        // template<typename TData, typename T>
+        // void addOSock(T&& defaultValue)
+        // {
+        //     SocketIndex id = m_outputs.size();
 
-            auto p = SocketPointer<LogicSocketOutputBase>(
-                new LogicSocketOutput<TData>(std::forward<T>(defaultValue), id, *this),
-                [](LogicSocketOutputBase* s) { delete static_cast<LogicSocketOutput<TData>*>(s); });
-            m_outputs.push_back(std::move(p));
-        }
+        //     auto p = SocketPointer<LogicSocketOutputBase>(
+        //         new LogicSocketOutput<TData>(std::forward<T>(defaultValue), id, *this),
+        //         [](LogicSocketOutputBase* s) { delete static_cast<LogicSocketOutput<TData>*>(s); });
+        //     m_outputs.push_back(std::move(p));
+        // }
 
         // //! Add all input sockets defined in the type list `SocketDeclList`.
         // template<typename SocketDeclList,
@@ -363,7 +326,7 @@ namespace executionGraph
         //@}
 
     protected:
-        const NodeId m_id;               //!< The unique id of the node.
+        NodeId m_id;                     //!< The id of the node.
         SocketInputListType m_inputs;    //!< The input sockets.
         SocketOutputListType m_outputs;  //!< The output sockets.
     };

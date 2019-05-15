@@ -18,7 +18,7 @@ function(include_all_source_ExecutionGraph
     set(SOURCES
         ${ExecutionGraph_ROOT_DIR}/src/DemangleTypes.cpp
         ${ExecutionGraph_ROOT_DIR}/src/LogicSocket.cpp
-        ${ExecutionGraph_ROOT_DIR}/src/LogicNode.cpp
+        # ${ExecutionGraph_ROOT_DIR}/src/LogicNode.cpp
         ${ExecutionGraph_ROOT_DIR}/src/FileSystem.cpp
         ${ExecutionGraph_ROOT_DIR}/src/FileMapper.cpp
     )
@@ -49,22 +49,22 @@ function(include_all_source_ExecutionGraph
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/TaskQueue.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/ThreadPool.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/TypeDefs.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/graphs/CycleDescription.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/graphs/ExecutionTree.hpp
+        # ${ExecutionGraph_ROOT_DIR}/include/executionGraph/graphs/CycleDescription.hpp
+        # ${ExecutionGraph_ROOT_DIR}/include/executionGraph/graphs/ExecutionTree.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/LogicCommon.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/LogicNodeDefaultPool.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/LogicNode.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/LogicSocketDefaultTypes.hpp
+        # ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/LogicNodeDefaultPool.hpp
+        # ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/LogicNode.hpp
+        # ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/LogicSocketDefaultTypes.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/LogicSocket.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/SocketLinkDescription.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/Conversions.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/ExecutionGraphSerializer.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/FileMapper.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/GraphTypeDescription.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/GraphTypeDescriptionSerializer.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/LogicNodeSerializer.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/NodeTypeDescription.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/SocketTypeDescription.hpp
+        # ${ExecutionGraph_ROOT_DIR}/include/executionGraph/nodes/SocketLinkDescription.hpp
+        # ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/Conversions.hpp
+        # ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/ExecutionGraphSerializer.hpp
+        # ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/FileMapper.hpp
+        # ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/GraphTypeDescription.hpp
+        # ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/GraphTypeDescriptionSerializer.hpp
+        # ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/LogicNodeSerializer.hpp
+        # ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/NodeTypeDescription.hpp
+        # ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/SocketTypeDescription.hpp
         ${ExecutionGraph_CONFIG_FILE}
     )
 

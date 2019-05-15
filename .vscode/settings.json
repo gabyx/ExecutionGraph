@@ -177,7 +177,8 @@
   "cmake.configureSettings": {
     "ExecutionGraph_BUILD_TESTS": true,
     "ExecutionGraph_BUILD_LIBRARY": true,
-    "ExecutionGraph_BUILD_GUI": true,
+    "ExecutionGraph_BUILD_GUI": false,
+    "ExecutionGraph_BUILD_SERIALIZATION": false,
     "ExecutionGraph_EXTERNAL_BUILD_DIR": "${workspaceRoot}/buildExternal",
     "ExecutionGraph_FORCE_MSGLOG_LEVEL" : "TRACE",
     "ExecutionGraph_USE_ADDRESS_SANITIZER": true,

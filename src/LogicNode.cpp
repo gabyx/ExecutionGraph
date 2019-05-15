@@ -16,4 +16,31 @@
 
 namespace executionGraph
 {
+    //! Get the number of input sockets which are connected to other nodes.
+    IndexType LogicNode::connectedInputCount() const
+    {
+        IndexType count = 0;
+        for(auto& socket : this->getInputs())
+        {
+            if(socket->getConnectionCount() > 0)
+            {
+                ++count;
+            }
+        }
+        return count;
+    }
+
+    //! Get the number of output sockets which are connected to other nodes.
+    IndexType LogicNode::connectedOutputCount() const
+    {
+        IndexType count = 0;
+        for(auto& socket : this->getOutputs())
+        {
+            if(socket->getConnectionCount() > 0)
+            {
+                ++count;
+            }
+        }
+        return count;
+    }
 }  // namespace executionGraph

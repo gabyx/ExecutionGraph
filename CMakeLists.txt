@@ -168,10 +168,11 @@ list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "fmtLib")
 find_package(CrossGUIDLib REQUIRED)
  list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "crossguidLib")
 
+# Try to find the RTTR library 
+find_package(RTTRLib REQUIRED)
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "rttrLib")
+
 if(${ExecutionGraph_BUILD_SERIALIZATION})
-    # Try to find the RTTR library 
-    find_package(RTTRLib REQUIRED)
-    list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "rttrLib")
     # Try to find flatbuffer library
     find_package(FlatBuffersLib REQUIRED)
     list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "flatbuffersLib")

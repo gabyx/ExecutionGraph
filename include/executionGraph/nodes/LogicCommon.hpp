@@ -18,20 +18,33 @@
 #include "executionGraph/common/EnumClassHelper.hpp"
 #include "executionGraph/common/SfinaeMacros.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
-#include "executionGraph/nodes/LogicSocketDefaultTypes.hpp"
 
 #define EXECGRAPH_DEFINE_TYPES()                   \
     using NodeId      = executionGraph::NodeId;    \
     using IndexType   = executionGraph::IndexType; \
-    using SocketIndex = executionGraph::SocketIndex;
+    using SocketIndex = executionGraph::SocketIndex
 
 namespace executionGraph
 {
+    // Forward declarations
+    class LogicNode;
+    class LogicSocketBase;
+    class LogicSocketInputBase;
+    class LogicSocketOutputBase;
     template<typename T>
-    using SocketPointer = std::unique_ptr<T, void (*)(T*)>;  //! The general socket pointer type.
+    class LogicSocketInput;
+    template<typename T>
+    class LogicSocketOutput;
+    template<typename T>
+    class LogicSocketData;
 
-    using IndexType   = uint64_t;   //! A general index type.
-    using NodeId      = uint64_t;   //! Node Id type.
+    template<typename T>
+    using SocketPointer = T*;  //! The general socket pointer type.
+
+    using IndexType                             = uint64_t;  //! A general index type.
+    using NodeId                                = uint64_t;  //! Node Id type.
+    static constexpr NodeId NodeIdUninitialized = std::numeric_limits<uint64_t>::max();
+
     using SocketIndex = IndexType;  //! The socket index type.
 
 }  // namespace executionGraph
