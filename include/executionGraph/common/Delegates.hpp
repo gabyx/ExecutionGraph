@@ -18,7 +18,7 @@
 
 #include "executionGraph/common/SfinaeMacros.hpp"
 
-namespace execGraph
+namespace executionGraph
 {
     template<typename T>
     class Delegate;
@@ -296,7 +296,7 @@ namespace execGraph
             return (static_cast<T*>(pObject)->first->*static_cast<T*>(pObject)->second)(std::forward<Args>(args)...);
         }
     };
-}  // namespace execGraph
+}  // namespace executionGraph
 
 namespace std
 {

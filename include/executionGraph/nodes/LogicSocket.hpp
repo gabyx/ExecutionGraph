@@ -242,12 +242,12 @@ namespace executionGraph
         }
 
         //! Copy not allowed (since parent pointer)
-        LogicSocketInput(LogicSocketInput& other) = delete;
-        LogicSocketInput& operator=(LogicSocketInput& other) = delete;
+        LogicSocketInput(const LogicSocketInput& other) = delete;
+        LogicSocketInput& operator=(const LogicSocketInput& other) = delete;
 
         //! Move allowed
+        LogicSocketInput(LogicSocketInput&& other) = default;
         LogicSocketInput& operator=(LogicSocketInput&& other) = default;
-        LogicSocketInput(LogicSocketInput&& other)            = default;
 
         //! If the socket has data.
         inline bool hasData() { return m_data != nullptr; }
@@ -282,12 +282,12 @@ namespace executionGraph
         }
 
         //! Copy not allowed (since parent pointer)
-        LogicSocketOutput(LogicSocketOutput& other) = delete;
-        LogicSocketOutput& operator=(LogicSocketOutput& other) = delete;
+        LogicSocketOutput(const LogicSocketOutput& other) = delete;
+        LogicSocketOutput& operator=(const LogicSocketOutput& other) = delete;
 
         //! Move allowed
+        LogicSocketOutput(LogicSocketOutput&& other) = default;
         LogicSocketOutput& operator=(LogicSocketOutput&& other) = default;
-        LogicSocketOutput(LogicSocketOutput&& other)            = default;
 
         //! Set the data value of the socket.
         template<typename T>

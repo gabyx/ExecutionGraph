@@ -11,6 +11,7 @@
 // =========================================================================================
 
 //#include <executionGraph/nodes/LogicNode.hpp>
+#include <executionGraph/common/TupleUtil.hpp>
 #include <executionGraph/nodes/LogicSocket.hpp>
 #include "DummyNode.hpp"
 #include "TestFunctions.hpp"

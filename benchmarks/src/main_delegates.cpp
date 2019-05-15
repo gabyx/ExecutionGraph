@@ -20,7 +20,7 @@
 #include "BenchmarkConfig.hpp"
 #include "BenchmarkFunctions.hpp"
 
-using namespace execGraph;
+using namespace executionGraph;
 
 using Type = std::vector<int>;
 
