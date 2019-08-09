@@ -27,7 +27,7 @@ overloaded(Ts...)->overloaded<Ts...>;
 
 namespace meta
 {
-    namespace details
+    namespace detail
     {
         template<typename Func, typename Type>
         struct Wrapper
@@ -57,7 +57,7 @@ namespace meta
             }
         };
 
-    }  // namespace details
+    }  // namespace detail
 
     //! Apply the function `Func` with the type
     //! in the `List` at position `index`.
@@ -65,7 +65,7 @@ namespace meta
     auto visit(std::size_t index, Func&& f)
     {
         using F            = decltype(std::forward<Func>(f));  // Define either an lvalue, or rvalue;
-        constexpr auto map = details::visit<List, F>::makeMap();
+        constexpr auto map = detail::visit<List, F>::makeMap();
         EXECGRAPH_THROW_IF(index >= map.size(), "Index {0} >= {1} : out of range!", index, map.size());
         return map[index](std::forward<Func>(f));
     }

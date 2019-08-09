@@ -58,7 +58,7 @@ namespace executionGraph
 
         }  // namespace details
 
-        //! Execute lambda for each tuple element.
+        //! Execute a functor `f` for each tuple element.
         template<typename Tuple,
                  typename F>
         constexpr void forEach(Tuple&& tuple, F&& f)
@@ -69,7 +69,7 @@ namespace executionGraph
                              std::make_index_sequence<N>{});
         }
 
-        //! Execute lambda for each tuple element with index.
+        //! Execute functor `f` for each tuple element with index.
         template<typename Tuple,
                  typename F>
         constexpr void forEachIdx(Tuple&& tuple, F&& f)
@@ -80,14 +80,19 @@ namespace executionGraph
                                 std::make_index_sequence<N>{});
         }
 
-        template<typename Tuple,
+        //! Invoke a functor `f` with all tuple elements injected into.
+        //! Optional shuffling with a index list `Incides`.
+        template<typename Indices = void,
+                 typename Tuple,
                  typename F>
         constexpr auto invoke(Tuple&& tuple, F&& f)
         {
-            constexpr std::size_t N = std::tuple_size_v<std::remove_reference_t<Tuple>>;
+            using Idx = std::conditional_t<std::is_same_v<Indices, void>,
+                                           std::make_index_sequence<std::tuple_size_v<std::remove_cvref_t<Tuple>>>,
+                                           Indices>;
             return details::invoke(std::forward<Tuple>(tuple),
                                    std::forward<F>(f),
-                                   std::make_index_sequence<N>{});
+                                   Idx{});
         }
 
     }  // namespace tupleUtil

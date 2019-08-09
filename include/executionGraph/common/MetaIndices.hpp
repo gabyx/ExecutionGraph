@@ -2,7 +2,7 @@
 //  ExecutionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
 //
-//  @date Wed May 15 2019
+//  @date Mon May 20 2019
 //  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
 //
 //  This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,24 +12,22 @@
 
 #pragma once
 
-namespace executionGraph
+#include <meta/meta.hpp>
+
+namespace meta
 {
-    //! Data wrapper for the output socket.
-    template<typename TData>
-    class LogicSocketData
+    namespace detail
     {
-    public:
-        using DataType = TData;
+        template<typename L>
+        struct to_index_sequence;
 
-    public:
-        template<typename T>
-        LogicSocketData(T&& value)
-            : m_data(std::forward<T>(value)) {}
+        template<typename T, std::size_t... I>
+        struct to_index_sequence<list<std::integral_constant<T, I>...>>
+        {
+            using type = std::index_sequence<I...>;
+        };
+    }  // namespace detail
 
-        inline DataType& data() { return m_data; }
-        inline const DataType& data() const { return m_data; }
-
-    private:
-        DataType m_data;  //!< The data.
-    };
-}  // namespace executionGraph
+    template<typename List>
+    using to_index_sequence = _t<detail::to_index_sequence<List>>;
+}  // namespace meta

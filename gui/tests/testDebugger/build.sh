@@ -34,7 +34,7 @@ export LDFLAGS="$LDFLAGS -L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llv
 export CPPFLAGS="$CPPFLAGS -I/usr/local/opt/llvm/include -I/usr/local/opt/llvm/include/c++/v1/"
 
 clang++ -g -g3 -arch x86_64 -mmacosx-version-min=10.9 \
-        -std=c++17 -lc++experimental \
+        -std=c++20 -lc++experimental \
         -fsanitize=leak -fsanitize=address \
         $LDFLAGS \
         $CPPFLAGS \
