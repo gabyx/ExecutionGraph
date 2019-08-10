@@ -165,16 +165,16 @@ namespace executionGraph
         // //! Get the output socket value from a SocketDeclaration `OutputSocketDeclaration`.
         // template<typename TSocketDeclaration,
         //          EXECGRAPH_SFINAE_ENABLE_IF((meta::is<TSocketDeclaration, details::OutputSocketDeclaration>::value))>
-        // typename TSocketDeclaration::DataType& data();
+        // typename TSocketDeclaration::Data& data();
         // //! Get the output socket value from a SocketDeclaration `OutputSocketDeclaration`.
         // template<typename TSocketDeclaration,
         //          EXECGRAPH_SFINAE_ENABLE_IF((meta::is<TSocketDeclaration, details::OutputSocketDeclaration>::value))>
-        // const typename TSocketDeclaration::DataType& data() const;
+        // const typename TSocketDeclaration::Data& data() const;
 
         // //! Get the input socket value from a SocketDeclaration `InputSocketDeclaration`.
         // template<typename TSocketDeclaration,
         //          EXECGRAPH_SFINAE_ENABLE_IF((meta::is<TSocketDeclaration, details::InputSocketDeclaration>::value))>
-        // const typename TSocketDeclaration::DataType& data() const;
+        // const typename TSocketDeclaration::Data& data() const;
 
         // //! Constructs a Get-Link to get the data from output socket at index `outS`
         // //! of node `outN` at the input socket at index `inS` of node
@@ -303,7 +303,7 @@ namespace executionGraph
         // {
         //     auto add = [&](auto socketDeclaration) {
         //         using SocketDeclaration = decltype(socketDeclaration);
-        //         this->template addISock<typename SocketDeclaration::DataType>();
+        //         this->template addISock<typename SocketDeclaration::Data>();
         //     };
 
         //     meta::for_each(typename SocketDeclList::TypeList{}, add);
@@ -318,7 +318,7 @@ namespace executionGraph
         // {
         //     auto add = [&](auto socketDeclaration) {
         //         using SocketDeclaration = decltype(socketDeclaration);
-        //         this->template addOSock<typename SocketDeclaration::DataType>(std::move(std::get<SocketDeclaration::Index::value>(defaultValues)));
+        //         this->template addOSock<typename SocketDeclaration::Data>(std::move(std::get<SocketDeclaration::Index::value>(defaultValues)));
         //     };
 
         //     meta::for_each(typename SocketDeclList::TypeList{}, add);
@@ -389,29 +389,29 @@ namespace executionGraph
 
     // template<typename TConfig>
     // template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF_IMPL((meta::is<TSocketDeclaration, details::OutputSocketDeclaration>::value))>
-    // typename TSocketDeclaration::DataType& LogicNode<TConfig>::data()
+    // typename TSocketDeclaration::Data& LogicNode<TConfig>::data()
     // {
     //     auto idx = TSocketDeclaration::Index::value;
     //     EXECGRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
-    //     return m_outputs[idx]->template castToType<typename TSocketDeclaration::DataType>().data();
+    //     return m_outputs[idx]->template castToType<typename TSocketDeclaration::Data>().data();
     // }
 
     // template<typename TConfig>
     // template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF_IMPL((meta::is<TSocketDeclaration, details::InputSocketDeclaration>::value))>
-    // const typename TSocketDeclaration::DataType& LogicNode<TConfig>::data() const
+    // const typename TSocketDeclaration::Data& LogicNode<TConfig>::data() const
     // {
     //     auto idx = TSocketDeclaration::Index::value;
     //     EXECGRAPH_ASSERT(idx < m_inputs.size(), "Wrong index!");
-    //     return m_inputs[idx]->template castToType<typename TSocketDeclaration::DataType>().data();
+    //     return m_inputs[idx]->template castToType<typename TSocketDeclaration::Data>().data();
     // }
 
     // template<typename TConfig>
     // template<typename TSocketDeclaration, EXECGRAPH_SFINAE_ENABLE_IF_IMPL((meta::is<TSocketDeclaration, details::OutputSocketDeclaration>::value))>
-    // const typename TSocketDeclaration::DataType& LogicNode<TConfig>::data() const
+    // const typename TSocketDeclaration::Data& LogicNode<TConfig>::data() const
     // {
     //     auto idx = TSocketDeclaration::Index::value;
     //     EXECGRAPH_ASSERT(idx < m_outputs.size(), "Wrong index!");
-    //     return m_outputs[idx]->template castToType<typename TSocketDeclaration::DataType>().data();
+    //     return m_outputs[idx]->template castToType<typename TSocketDeclaration::Data>().data();
     // }
 
 }  // namespace executionGraph

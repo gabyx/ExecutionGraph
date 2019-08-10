@@ -232,11 +232,11 @@ namespace executionGraph
 
     public:
         EXECGRAPH_DEFINE_TYPES();
-        using DataType = TData;
+        using Data = TData;
 
         template<typename... Args>
         LogicSocketInput(Args&&... args)
-            : LogicSocketInputBase(rttr::type::get<DataType>(),
+            : LogicSocketInputBase(rttr::type::get<Data>(),
                                    std::forward<Args>(args)...)
         {
         }
@@ -255,13 +255,13 @@ namespace executionGraph
         //! Get the data value of the socket. (follow Get-Link).
         //! If this input socket has not been connected, this results in an access violation!
         //! The graph checks that all input nodes ar connected when solving the execution order!
-        inline const DataType& data() const
+        inline const Data& data() const
         {
             EXECGRAPH_ASSERT(hasData(),
                              "Input socket index: '{0}' of node id: '{1}' not connected",
                              this->getIndex(),
                              this->parent().getId());
-            return static_cast<const LogicSocketData<DataType>*>(m_data)->data();
+            return static_cast<const LogicSocketData<Data>*>(m_data)->data();
         }
     };
 
@@ -270,12 +270,12 @@ namespace executionGraph
     {
     public:
         EXECGRAPH_DEFINE_TYPES();
-        using DataType = TData;
+        using Data = TData;
 
         template<typename T, typename... Args>
         LogicSocketOutput(T&& initValue, Args&&... args)
             : LogicSocketOutputBase(this,
-                                    rttr::type::get<DataType>(),
+                                    rttr::type::get<Data>(),
                                     std::forward<Args>(args)...)
             , m_storage(std::forward<T>(initValue))
         {
@@ -300,12 +300,12 @@ namespace executionGraph
         }
 
         //! Get the data value of the socket.
-        inline const DataType& data() const { return m_storage.data(); }
+        inline const Data& data() const { return m_storage.data(); }
         //! Non-const overload.
-        inline DataType& data() { return m_storage.data(); }
+        inline Data& data() { return m_storage.data(); }
 
     private:
-        LogicSocketData<DataType> m_storage;
+        LogicSocketData<Data> m_storage;
     };
 
     //! Remove the Get-Link and optionally notify output.

@@ -33,8 +33,8 @@ namespace executionGraph
         {
             // Add a ouput socket with a default-initialized value.
             auto add = [&](auto&& type) {
-                using DataType = std::remove_cv_t<std::remove_reference_t<decltype(type)>>;
-                this->template addOSock<DataType>(DataType{});
+                using Data = std::remove_cv_t<std::remove_reference_t<decltype(type)>>;
+                this->template addOSock<Data>(Data{});
             };
             // Add output socket with default values for all types!
             meta::for_each(SocketTypes{}, add);
@@ -62,11 +62,11 @@ namespace executionGraph
         template<typename T>
         void setDefaultValue(T&& defaultValue)
         {
-            using DataType = std::remove_cv_t<std::remove_reference_t<T>>;
-            static_assert(!std::is_same<meta::find<SocketTypes, DataType>, meta::list<>>::value,
+            using Data = std::remove_cv_t<std::remove_reference_t<T>>;
+            static_assert(!std::is_same<meta::find<SocketTypes, Data>, meta::list<>>::value,
                           "Data type T is not in SocketTypes!");
             // Set the global default value
-            this->template getOutVal<DataType>(meta::find_index<SocketTypes, DataType>::value) = std::forward<T>(defaultValue);
+            this->template getOutVal<Data>(meta::find_index<SocketTypes, Data>::value) = std::forward<T>(defaultValue);
         }
 
         //! Add a new default value with type `T` (needs to be in the list `SocketTypes`)

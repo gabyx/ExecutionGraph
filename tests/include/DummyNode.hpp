@@ -33,18 +33,19 @@ namespace executionGraph
         return idx;
     }
 
-    template<typename T,
+    template<typename TData,
              typename TNode,
-             typename TIndex>
-    struct InputDescription
+             typename TIndex,
+             typename IsInput>
+    struct SocketDescription
     {
     public:
-        using DataType   = T;
-        using SocketType = LogicSocketInput<DataType>;
+        using Data       = TData;
+        using SocketType = LogicSocketInput<Data>;
         using Node       = TNode;
         using Index      = TIndex;
 
-        constexpr InputDescription(std::string_view name)
+        constexpr SocketDescription(std::string_view name)
             : m_name(name)
         {
         }
@@ -55,17 +56,29 @@ namespace executionGraph
         }
         constexpr auto& name() const { return m_name; }
 
+        static constexpr auto isInput() { return IsInput::value; }
+        static constexpr auto isOutput() { return !isInput(); }
+
     private:
         const std::string_view m_name;
     };
 
-    template<typename T,
+    template<typename TData,
              typename TNode,
              typename TIndex>
-    struct OutputDescription : public InputDescription<T, TNode, TIndex>
-    {};
+    using InputDescription = SocketDescription<TData,
+                                               TNode,
+                                               TIndex,
+                                               meta::bool_<true>>;
+    template<typename TData,
+             typename TNode,
+             typename TIndex>
+    using OutputDescription = SocketDescription<TData,
+                                                TNode,
+                                                TIndex,
+                                                meta::bool_<false>>;
 
-    template<template<typename, typename, typename> class Desc,
+    template<typename CallableDesc,
              IndexType Idx,
              typename TNode,
              typename TSockets>
@@ -73,8 +86,11 @@ namespace executionGraph
                                   TSockets TNode::*sockets)
     {
         static_assert(Idx < std::tuple_size_v<TSockets>, "Wrong index!");
-        using T = typename std::tuple_element_t<Idx, TSockets>::DataType;
-        return Desc<T, TNode, meta::int_<Idx>>{name};
+        using Data = typename std::tuple_element_t<Idx, TSockets>::Data;
+        return meta::invoke<CallableDesc,
+                            Data,
+                            TNode,
+                            meta::size_t<Idx>>{name};
     }
 
     template<IndexType Idx,
@@ -83,7 +99,7 @@ namespace executionGraph
     constexpr auto makeInputDesc(std::string_view name,
                                  TSockets TNode::*sockets)
     {
-        return makeSocketDesc<InputDescription, Idx>(name, sockets);
+        return makeSocketDesc<meta::quote<InputDescription>, Idx>(name, sockets);
     }
 
     template<IndexType Idx,
@@ -92,7 +108,7 @@ namespace executionGraph
     constexpr auto makeOutputDesc(std::string_view name,
                                   TSockets TNode::*sockets)
     {
-        return makeSocketDesc<OutputDescription, Idx>(name, sockets);
+        return makeSocketDesc<meta::quote<OutputDescription>, Idx>(name, sockets);
     }
 
     namespace makeSocketsDetails
@@ -100,42 +116,89 @@ namespace executionGraph
         template<typename A, typename B>
         using comp = meta::less<typename meta::at_c<A, 1>::Index,
                                 typename meta::at_c<B, 1>::Index>;
+
         template<typename T>
         using getIdx = typename T::Index;
+
+        template<typename T>
+        using naked = std::remove_cvref_t<T>;
+
+        //! Test if all descriptions are input or output descriptions
+        template<typename... SocketDesc>
+        constexpr bool eitherInputsOrOutputs()
+        {
+            using namespace makeSocketsDetails;
+            using namespace meta;
+            return (... && naked<SocketDesc>::isInput()) ||
+                   (... && naked<SocketDesc>::isOutput());
+        }
+
+        //! Test if all description have the same node type.
+        template<typename... SocketDesc>
+        constexpr bool allSameNode()
+        {
+            using namespace makeSocketsDetails;
+            using namespace meta;
+            using List = list<naked<SocketDesc>...>;
+            return (... && std::is_same_v<typename naked<SocketDesc>::Node,
+                                          typename at_c<List, 0>::Node>);
+        }
+
+        //! Returns the indices list denoting the sorted descriptions `descs`.
+        template<bool requireSocketIndexSequence = true,
+                 typename... SocketDesc>
+        constexpr auto sortDescriptions(const std::tuple<SocketDesc...>& descs)
+        {
+            constexpr auto N = sizeof...(SocketDesc);
+
+            using namespace makeSocketsDetails;
+            using namespace meta::placeholders;
+            using namespace meta;
+
+            using List = list<naked<SocketDesc>...>;
+
+            static_assert(!requireSocketIndexSequence ||
+                              unique<transform<List, quote<getIdx>>>::size() == N,
+                          "Socket description indices are not monotone increasing by one");
+
+            using EnumeratedList = zip<list<as_list<make_index_sequence<N>>, List>>;
+
+            // Sort the list
+            using Sorted = sort<EnumeratedList,
+                                lambda<_a, _b, defer<comp, _a, _b>>>;
+
+            using SortedIndices = unique<transform<Sorted,
+                                                   bind_back<quote<at>, size_t<0>>>>;
+
+            static_assert(!requireSocketIndexSequence ||
+                              (at<List, front<SortedIndices>>::Index::value == 0 &&
+                               at<List, back<SortedIndices>>::Index::value + 1 == N),
+                          "Socket description indices are not monotone increasing by one");
+
+            return to_index_sequence<SortedIndices>{};
+        }
     };  // namespace makeSocketsDetails
 
     template<typename... InputDesc,
              typename Node,
              std::enable_if_t<(... && meta::is<std::remove_cvref_t<InputDesc>,
-                                               InputDescription>::value),
+                                               SocketDescription>::value),
                               int> = 0>
     auto makeSockets(const std::tuple<InputDesc...>& descs, Node& node)
     {
-        // The InputDescriptions::Index can be in any order
+        using namespace makeSocketsDetails;
+        // The SocketDescriptions::Index can be in any order
         // -> sort them and insert the sockets in order.
 
-        using namespace makeSocketsDetails;
-        using namespace meta::placeholders;
-        using namespace meta;
-        constexpr auto N = sizeof...(InputDesc);
+        static_assert(allSameNode<InputDesc...>(),
+                      "You cannot mix descriptions for different nodes!");
 
-        using List           = list<std::remove_cvref_t<InputDesc>...>;
-        using EnumeratedList = zip<list<as_list<make_index_sequence<N>>, List>>;
-
-        // Sort the list
-        using Sorted        = sort<EnumeratedList, lambda<_a, _b, defer<comp, _a, _b>>>;
-        using SortedIndices = unique<transform<Sorted,
-                                               bind_back<quote<at>, size_t<0>>>>;
-
-        static_assert(SortedIndices::size() == N,
-                      "You have duplicate or to little unique InputDescriptions");
-
-        using Indices = to_index_sequence<SortedIndices>;
+        using Indices = decltype(sortDescriptions(descs));
         return tupleUtil::invoke<Indices>(descs,
                                           [&](auto&&... desc) {
                                               return std::make_tuple(
-                                                  typename std::remove_cvref_t<decltype(desc)>::SocketType(desc.index(),
-                                                                                                           node)...);
+                                                  typename naked<decltype(desc)>::SocketType(desc.index(),
+                                                                                             node)...);
                                           });
     }
 
@@ -144,16 +207,16 @@ namespace executionGraph
     {
     private:
         using In = LogicSocketInput<int>;
-
         std::tuple<In, In, In> m_inSockets;
 
     public:
         static constexpr auto in0Decl = makeInputDesc<0>("Value0", &DummyNode::m_inSockets);
         static constexpr auto in2Decl = makeInputDesc<2>("Value2", &DummyNode::m_inSockets);
         static constexpr auto in1Decl = makeInputDesc<1>("Value1", &DummyNode::m_inSockets);
-        static constexpr auto insDecl = std::forward_as_tuple(in0Decl,
-                                                              in2Decl,
-                                                              in1Decl);
+
+        static constexpr auto insDecl = std::forward_as_tuple(in2Decl,
+                                                              in1Decl,
+                                                              in0Decl);
 
     private:
         using Out = executionGraph::LogicSocketOutput<int>;
@@ -195,7 +258,7 @@ namespace executionGraph
             std::get<in0Decl.index()>(m_inSockets);
         }
 
-        // static constexpr InputDescription<int> inDeclValue2{1, "Value2"};
+        // static constexpr SocketDescription<int> inDeclValue2{1, "Value2"};
         // static constexpr OutSocketDecleration<int> outDeclResult{0, "Result"};
 
         // using InSocketList  = decltype(getInSocketList(inDeclValue1, inDeclValue2));
@@ -204,14 +267,14 @@ namespace executionGraph
         // template<typename SocketDecl>
         // auto& outSocket()
         // {
-        //     using T = SocketDecl::DataType;
+        //     using T = SocketDecl::Data;
         //     return std::get<getIndex>(m_outSockets);
         // }
 
         // template<typename SocketDecl>
         // auto& inSocket(const SocketDecl& decl)
         // {
-        //     using T = SocketDecl::DataType;
+        //     using T = SocketDecl::Data;
         //     return std::get<LogicSocketInput<T>>(m_inSockets);
         // }
 

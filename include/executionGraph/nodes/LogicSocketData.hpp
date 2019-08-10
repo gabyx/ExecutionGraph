@@ -19,17 +19,17 @@ namespace executionGraph
     class LogicSocketData
     {
     public:
-        using DataType = TData;
+        using Data = TData;
 
     public:
         template<typename T>
         LogicSocketData(T&& value)
             : m_data(std::forward<T>(value)) {}
 
-        inline DataType& data() { return m_data; }
-        inline const DataType& data() const { return m_data; }
+        inline Data& data() { return m_data; }
+        inline const Data& data() const { return m_data; }
 
     private:
-        DataType m_data;  //!< The data.
+        Data m_data;  //!< The data.
     };
 }  // namespace executionGraph

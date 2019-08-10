@@ -1,16 +1,17 @@
 {
     "recommendations": [
         "ms-vscode.cpptools",
-        "twxs.cmake",
-        "vector-of-bool.cmake-tools",
-        "yzane.markdown-pdf",
-        "shd101wyy.markdown-preview-enhanced",
         "EditorConfig.editorconfig",
+        "eamodio.gitlens",
+        "cschlosser.doxdocgen"
+        "vector-of-bool.cmake-tools",
+        "twxs.cmake",
         "msjsdiag.debugger-for-chrome",
+        "joelday.docthis",
         "doi.fileheadercomment",
         "gaborv.flatbuffers",
-        "eamodio.gitlens",
-        "joelday.docthis",
-        "ms-vscode.vscode-typescript-tslint-plugin"
+        "yzane.markdown-pdf",
+        "shd101wyy.markdown-preview-enhanced",
+        "ms-vscode.vscode-typescript-tslint-plugin",
     ]
 }
