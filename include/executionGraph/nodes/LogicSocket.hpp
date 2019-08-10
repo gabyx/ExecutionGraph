@@ -46,8 +46,7 @@ namespace executionGraph
         inline SocketIndex getIndex() const { return m_index; }
         inline const rttr::type& type() const { return m_type; }
 
-        inline const LogicNode& parent() const { return m_parent; }
-        inline LogicNode& parent() { return m_parent; }
+        inline LogicNode& parent() const { return m_parent; }
 
         template<typename T>
         bool isType() const { return type() == rttr::type::get<T>(); }

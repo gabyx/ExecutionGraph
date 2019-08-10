@@ -23,16 +23,6 @@
 
 namespace executionGraph
 {
-    template<typename Tuple>
-    constexpr auto makeSorted(Tuple&& t)
-    {
-        using A  = std::array<IndexType, std::tuple_size_v<Tuple>>;
-        auto idx = tupleUtil::invoke(t, [](auto... a) { return A{a.m_index...}; });
-        //std::sort(begin(idx), end(idx), [](auto& a, auto& b) { return a < b; });
-
-        return idx;
-    }
-
     template<typename TData,
              typename TNode,
              typename TIndex,
@@ -147,7 +137,7 @@ namespace executionGraph
         //! Returns the indices list denoting the sorted descriptions `descs`.
         template<bool requireSocketIndexSequence = true,
                  typename... SocketDesc>
-        constexpr auto sortDescriptions(const std::tuple<SocketDesc...>& descs)
+        constexpr auto sortDescriptions()
         {
             constexpr auto N = sizeof...(SocketDesc);
 
@@ -179,12 +169,12 @@ namespace executionGraph
         }
     };  // namespace makeSocketsDetails
 
+    //! Make input sockets from `InputSocketDescriptions`.
     template<typename... InputDesc,
              typename Node,
-             std::enable_if_t<(... && meta::is<std::remove_cvref_t<InputDesc>,
-                                               SocketDescription>::value),
-                              int> = 0>
-    auto makeSockets(const std::tuple<InputDesc...>& descs, Node& node)
+             std::enable_if_t<(... && std::remove_cvref_t<InputDesc>::isInput()), int> = 0>
+    auto makeSockets(std::tuple<InputDesc&...> descs,
+                     Node& node)
     {
         using namespace makeSocketsDetails;
         // The SocketDescriptions::Index can be in any order
@@ -193,13 +183,44 @@ namespace executionGraph
         static_assert(allSameNode<InputDesc...>(),
                       "You cannot mix descriptions for different nodes!");
 
-        using Indices = decltype(sortDescriptions(descs));
-        return tupleUtil::invoke<Indices>(descs,
-                                          [&](auto&&... desc) {
-                                              return std::make_tuple(
-                                                  typename naked<decltype(desc)>::SocketType(desc.index(),
-                                                                                             node)...);
-                                          });
+        constexpr auto indices = sortDescriptions<true, InputDesc...>();
+        return tupleUtil::invoke(descs,
+                                 [&](auto&&... desc) {
+                                     return std::make_tuple(
+                                         typename naked<decltype(desc)>::SocketType(desc.index(), node)...);
+                                 },
+                                 indices);
+    }
+
+    template<typename... OutputDesc,
+             typename... Data,
+             typename Node,
+             std::enable_if_t<(... && std::remove_cvref_t<OutputDesc>::isInput()), int> = 0>
+    auto makeSockets(std::tuple<OutputDesc&...> descs,
+                     std::tuple<Data...> defaultValues,
+                     Node& node)
+    {
+        static_assert((... && std::is_reference_v<Data>),
+                      "Default values need to be lvalue/rvalue-References");
+
+        using namespace makeSocketsDetails;
+        // The SocketDescriptions::Index can be in any order
+        // -> sort them and insert the sockets in order.
+
+        static_assert(allSameNode<OutputDesc...>(),
+                      "You cannot mix descriptions for different nodes!");
+
+        constexpr auto indices = sortDescriptions<true, OutputDesc...>();
+
+        auto params = tupleUtil::zip(descs, defaultValues);
+        decltype(params)::A;
+
+        // return tupleUtil::invoke(params,
+        //                          [&](auto&&... params) {
+        //                               return std::make_tuple(
+        //                                  typename naked<decltype(desc)>::SocketType(desc.index(), node)...);
+        //                          },
+        //                          indices);
     }
 
     //! Stupid dummy Node for testing.
@@ -214,7 +235,7 @@ namespace executionGraph
         static constexpr auto in2Decl = makeInputDesc<2>("Value2", &DummyNode::m_inSockets);
         static constexpr auto in1Decl = makeInputDesc<1>("Value1", &DummyNode::m_inSockets);
 
-        static constexpr auto insDecl = std::forward_as_tuple(in2Decl,
+        static constexpr auto inDecls = std::forward_as_tuple(in2Decl,
                                                               in1Decl,
                                                               in0Decl);
 
@@ -226,7 +247,7 @@ namespace executionGraph
         static constexpr auto out0Decl = makeOutputDesc<0>("Value0", &DummyNode::m_outSockets);
         static constexpr auto out2Decl = makeOutputDesc<2>("Value2", &DummyNode::m_outSockets);
         static constexpr auto out1Decl = makeOutputDesc<1>("Value1", &DummyNode::m_outSockets);
-        static constexpr auto outsDecl = std::forward_as_tuple(out0Decl,
+        static constexpr auto outDecls = std::forward_as_tuple(out0Decl,
                                                                out2Decl,
                                                                out1Decl);
 
@@ -234,11 +255,12 @@ namespace executionGraph
         template<typename... Args>
         DummyNode(Args&&... args)
             : executionGraph::LogicNode(std::forward<Args>(args)...)
-            , m_inSockets(makeSockets(insDecl, *this))
+            , m_inSockets(makeSockets(inDecls, *this))
             , m_outSockets({Out{1123, 0, *this},
                             Out{11, 1, *this},
                             Out{55, 2, *this}})
         {
+            //makeSockets(outDecls, std::forward_as_tuple(1123, 11, 44), *this);
             // // register in node.
             // if(std::tuple_size_v<decltype(m_inSockets)> != 0)
             // {

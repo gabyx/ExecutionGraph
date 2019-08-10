@@ -24,36 +24,47 @@ namespace executionGraph
         {
             template<typename Tuple,
                      typename F,
-                     std::size_t... Indices>
+                     std::size_t... Index>
             constexpr void forEach(Tuple&& tuple,
                                    F&& f,
-                                   std::index_sequence<Indices...>)
+                                   std::index_sequence<Index...>)
             {
                 using swallow = int[];
                 (void)swallow{0,
-                              (f(std::get<Indices>(std::forward<Tuple>(tuple))), 0)...};
+                              (f(std::get<Index>(std::forward<Tuple>(tuple))), 0)...};
             }
 
             template<typename Tuple,
                      typename F,
-                     std::size_t... Indices>
+                     std::size_t... Index>
             constexpr void forEachIdx(Tuple&& tuple,
                                       F&& f,
-                                      std::index_sequence<Indices...>)
+                                      std::index_sequence<Index...>)
             {
                 using swallow = int[];
                 (void)swallow{0,
-                              (f(std::get<Indices>(std::forward<Tuple>(tuple)), Indices), 0)...};
+                              (f(std::get<Index>(std::forward<Tuple>(tuple)), Index), 0)...};
             }
 
             template<typename Tuple,
                      typename F,
-                     std::size_t... Indices>
+                     std::size_t... Index>
             constexpr auto invoke(Tuple&& tuple,
                                   F&& f,
-                                  std::index_sequence<Indices...>)
+                                  std::index_sequence<Index...>)
             {
-                return f(std::get<Indices>(std::forward<Tuple>(tuple))...);
+                return f(std::get<Index>(std::forward<Tuple>(tuple))...);
+            }
+
+            template<typename TupleA,
+                     typename... Tuple,
+                     std::size_t... Index>
+            constexpr auto zip(std::index_sequence<Index...>,
+                               TupleA&& tuple,
+                               Tuple&&... args)
+            {
+                return std::make_tuple(std::make_tuple(std::get<Index>(std::forward<TupleA>(tuple)),
+                                                       std::get<Index>(std::forward<Tuple>(args)))...);
             }
 
         }  // namespace details
@@ -81,18 +92,29 @@ namespace executionGraph
         }
 
         //! Invoke a functor `f` with all tuple elements injected into.
-        //! Optional shuffling with a index list `Incides`.
-        template<typename Indices = void,
-                 typename Tuple,
-                 typename F>
-        constexpr auto invoke(Tuple&& tuple, F&& f)
+        //! Optional shuffling with a index list `incices`.
+        template<typename Tuple,
+                 typename F,
+                 typename Index>
+        constexpr auto invoke(Tuple&& tuple,
+                              F&& f,
+                              Index indices =
+                                  std::make_index_sequence<std::tuple_size_v<std::remove_cvref_t<Tuple>>>{})
         {
-            using Idx = std::conditional_t<std::is_same_v<Indices, void>,
-                                           std::make_index_sequence<std::tuple_size_v<std::remove_cvref_t<Tuple>>>,
-                                           Indices>;
             return details::invoke(std::forward<Tuple>(tuple),
                                    std::forward<F>(f),
-                                   Idx{});
+                                   indices);
+        }
+
+        template<typename TupleA, typename... Tuple>
+        constexpr auto zip(TupleA&& tuple, Tuple&&... args)
+        {
+            constexpr auto N = std::tuple_size_v<TupleA>;
+            static_assert((... && (N == std::tuple_size_v<Tuple>)),
+                          "Not all tuples have the same size");
+            return details::zip(std::make_index_sequence<N>{},
+                                std::forward<TupleA>(tuple),
+                                std::forward<Tuple>(args)...);
         }
 
     }  // namespace tupleUtil

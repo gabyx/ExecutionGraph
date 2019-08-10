@@ -31,3 +31,16 @@ namespace meta
     template<typename List>
     using to_index_sequence = _t<detail::to_index_sequence<List>>;
 }  // namespace meta
+
+namespace executionGraph
+{
+    namespace arrayUtil
+    {
+        //! Convert an `integer_sequence` into an `std::array`
+        template<typename T, T... I>
+        constexpr auto toArray(std::integer_sequence<T, I...> sequence)
+        {
+            return std::array<T, sizeof...(I)>{I...};
+        }
+    }  // namespace arrayUtil
+}  // namespace executionGraph
