@@ -32,6 +32,9 @@ namespace executionGraph
     public:
         EXECGRAPH_DEFINE_TYPES();
 
+        LogicSocketBase(LogicSocketBase&&) = default;
+        LogicSocketBase& operator=(LogicSocketBase&&) = default;
+
     protected:
         LogicSocketBase(const rttr::type& type,
                         SocketIndex index,
@@ -140,14 +143,14 @@ namespace executionGraph
         friend class LogicSocketInputBase;
 
     protected:
-        template<typename T, typename... Args>
-        LogicSocketOutputBase(const T& data, Args&&... args)
+        template<typename... Args>
+        LogicSocketOutputBase(Args&&... args)
             : LogicSocketBase(std::forward<Args>(args)...)
-            , m_data(static_cast<const void*>(&data))
         {
         }
 
-        ~LogicSocketOutputBase();
+        LogicSocketOutputBase(LogicSocketOutputBase&&) = default;
+        LogicSocketOutputBase& operator=(LogicSocketOutputBase&&) = default;
 
     public:
         //! Cast to a logic socket of type `LogicSocketOutput`<T>*.
@@ -213,6 +216,10 @@ namespace executionGraph
             }
         }
 
+        //! Set the data reference of this socket.
+        template<typename T>
+        inline void setData(const T& data) { m_data = &data; }
+
     protected:
         //! All Write-Links attached to this Socket.
         std::vector<LogicSocketInputBase*> m_writeTo;
@@ -220,7 +227,8 @@ namespace executionGraph
         std::unordered_set<LogicSocketInputBase*> m_getterChilds;
 
     private:
-        void const* const m_data = nullptr;  //!< The raw pointer to the actual data of this output socket.
+        //! The raw pointer to the actual data of this output socket.
+        void const* const m_data = nullptr;
     };
 
     template<typename TData>
@@ -271,13 +279,15 @@ namespace executionGraph
         EXECGRAPH_DEFINE_TYPES();
         using Data = TData;
 
-        template<typename T, typename... Args>
+        template<typename T,
+                 typename... Args,
+                 std::enable_if_t<!meta::is<T, LogicSocketOutput>::value, int> = 0>
         LogicSocketOutput(T&& initValue, Args&&... args)
-            : LogicSocketOutputBase(this,
-                                    rttr::type::get<Data>(),
+            : LogicSocketOutputBase(rttr::type::get<Data>(),
                                     std::forward<Args>(args)...)
             , m_storage(std::forward<T>(initValue))
         {
+            setData(data());
         }
 
         //! Copy not allowed (since parent pointer)
