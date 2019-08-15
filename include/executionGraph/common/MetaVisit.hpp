@@ -15,7 +15,8 @@
 #include <meta/meta.hpp>
 #include "executionGraph/common/Exception.hpp"
 
-//! Making a overloaded functor inherited from several lambdas to use in std::visit, or meta::visit.
+//! Making a overloaded functor inherited
+//! from several lambdas to use in std::visit, or meta::visit.
 template<class... Ts>
 struct overloaded : Ts...
 {

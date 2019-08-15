@@ -20,6 +20,9 @@
 #include "TestFunctions.hpp"
 
 #include <executionGraph/common/MetaVisit.hpp>
+#include <executionGraph/common/TupleUtil.hpp>
+
+using namespace executionGraph;
 
 MY_TEST(MetaProgramming, Test1)
 {
@@ -59,6 +62,63 @@ MY_TEST(MetaProgramming, Overloaded)
         [](short type) { return 2; }};
 
     ASSERT_EQ(meta::visit<List>(2, f), 2) << "Meta Visit failed!";
+}
+
+MY_TEST(MetaProgramming, TupleZip)
+{
+    std::tuple<int, double, std::string> a = {1, 2.0, "Jeah"};
+    std::tuple<double, std::string, int> b = {2.0, "Jeah", 1};
+
+    // Forward can be used in this case.
+    auto t = tupleUtil::zip(a, b, std::forward_as_tuple(std::string("Jeah"), 1, 2.0));
+
+    static_assert(std::is_same_v<decltype(t),
+                                 std::tuple<decltype(a),
+                                            decltype(b),
+                                            std::tuple<std::string, int, double>>>,
+                  "Type not right!");
+
+    tupleUtil::forEach(t, [](auto&& e) {
+        tupleUtil::forEach(
+            e,
+            overloaded{[](int a) {
+                           ASSERT_EQ(a, 1) << "int is not 1";
+                       },
+                       [](double a) {
+                           ASSERT_EQ(a, 2.0) << "double is not 2.0";
+                       },
+                       [](std::string& a) {
+                           ASSERT_EQ(a, "Jeah") << "std::string is not 'Jeah'";
+                       }});
+    });
+}
+
+MY_TEST(MetaProgramming, TupleZipForward)
+{
+    std::tuple<int, double, std::string> a = {1, 2.0, "Jeah"};
+    std::tuple<double, std::string, int> b = {2.0, "Jeah", 1};
+    std::tuple<std::string, int, double> c = {"Jeah", 1, 2.0};
+
+    auto t = tupleUtil::zipForward(a, b, std::move(c));
+    static_assert(std::is_same_v<decltype(t),
+                                 std::tuple<std::tuple<int&, double&, std::string&&>,
+                                            std::tuple<double&, std::string&, int&&>,
+                                            std::tuple<std::string&, int&, double&&>>>,
+                  "Type not right!");
+
+    tupleUtil::forEach(t, [](auto&& e) {
+        tupleUtil::forEach(
+            e,
+            overloaded{[](int a) {
+                           ASSERT_EQ(a, 1) << "int is not 1";
+                       },
+                       [](double a) {
+                           ASSERT_EQ(a, 2.0) << "double is not 2.0";
+                       },
+                       [](std::string& a) {
+                           ASSERT_EQ(a, "Jeah") << "std::string is not 'Jeah'";
+                       }});
+    });
 }
 
 int main(int argc, char** argv)

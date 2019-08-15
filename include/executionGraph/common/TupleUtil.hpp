@@ -16,6 +16,8 @@
 #include <tuple>
 #include <utility>
 
+#include "executionGraph/common/MetaIndices.hpp"
+
 namespace executionGraph
 {
     namespace tupleUtil
@@ -56,15 +58,28 @@ namespace executionGraph
                 return f(std::get<Index>(std::forward<Tuple>(tuple))...);
             }
 
-            template<typename TupleA,
+            template<std::size_t I,
+                     bool doForward = false,
+                     typename... Tuple>
+            constexpr auto zip_at(Tuple&&... tuple)
+            {
+                if constexpr(doForward)
+                {
+                    return std::forward_as_tuple(std::get<I>(std::forward<Tuple>(tuple))...);
+                }
+                else
+                {
+                    return std::make_tuple(std::get<I>(std::forward<Tuple>(tuple))...);
+                }
+            }
+
+            template<bool doForward = false,
                      typename... Tuple,
                      std::size_t... Index>
             constexpr auto zip(std::index_sequence<Index...>,
-                               TupleA&& tuple,
-                               Tuple&&... args)
+                               Tuple&&... tuple)
             {
-                return std::make_tuple(std::make_tuple(std::get<Index>(std::forward<TupleA>(tuple)),
-                                                       std::get<Index>(std::forward<Tuple>(args)))...);
+                return std::make_tuple(zip_at<Index, doForward>(std::forward<Tuple>(tuple)...)...);
             }
 
         }  // namespace details
@@ -74,7 +89,7 @@ namespace executionGraph
                  typename F>
         constexpr void forEach(Tuple&& tuple, F&& f)
         {
-            constexpr std::size_t N = std::tuple_size_v<std::remove_reference_t<Tuple>>;
+            constexpr std::size_t N = std::tuple_size_v<std::remove_cvref_t<Tuple>>;
             details::forEach(std::forward<Tuple>(tuple),
                              std::forward<F>(f),
                              std::make_index_sequence<N>{});
@@ -85,7 +100,7 @@ namespace executionGraph
                  typename F>
         constexpr void forEachIdx(Tuple&& tuple, F&& f)
         {
-            constexpr std::size_t N = std::tuple_size_v<std::remove_reference_t<Tuple>>;
+            constexpr std::size_t N = std::tuple_size_v<std::remove_cvref_t<Tuple>>;
             details::forEachIdx(std::forward<Tuple>(tuple),
                                 std::forward<F>(f),
                                 std::make_index_sequence<N>{});
@@ -106,15 +121,29 @@ namespace executionGraph
                                    indices);
         }
 
-        template<typename TupleA, typename... Tuple>
+        // Zip multiple tuples together.
+        template<bool doForward = false,
+                 typename TupleA,
+                 typename... Tuple>
         constexpr auto zip(TupleA&& tuple, Tuple&&... args)
         {
-            constexpr auto N = std::tuple_size_v<TupleA>;
-            static_assert((... && (N == std::tuple_size_v<Tuple>)),
+            using namespace meta;
+
+            constexpr auto N = std::tuple_size_v<std::remove_cvref_t<TupleA>>;
+            static_assert((... && (N == std::tuple_size_v<std::remove_cvref_t<Tuple>>)),
                           "Not all tuples have the same size");
-            return details::zip(std::make_index_sequence<N>{},
-                                std::forward<TupleA>(tuple),
-                                std::forward<Tuple>(args)...);
+
+            return details::zip<doForward>(std::make_index_sequence<N>{},
+                                           std::forward<TupleA>(tuple),
+                                           std::forward<Tuple>(args)...);
+        }
+
+        //! Zip multiple tuples together using
+        //! `std::forward_as_tuple`
+        template<typename... Tuple>
+        constexpr auto zipForward(Tuple&&... tuple)
+        {
+            return zip<true>(std::forward<Tuple>(tuple)...);
         }
 
     }  // namespace tupleUtil
