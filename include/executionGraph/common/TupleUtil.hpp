@@ -110,11 +110,10 @@ namespace executionGraph
         //! Optional shuffling with a index list `incices`.
         template<typename Tuple,
                  typename F,
-                 typename Index>
+                 typename Index = std::make_index_sequence<std::tuple_size_v<std::remove_cvref_t<Tuple>>>>
         constexpr auto invoke(Tuple&& tuple,
                               F&& f,
-                              Index indices =
-                                  std::make_index_sequence<std::tuple_size_v<std::remove_cvref_t<Tuple>>>{})
+                              Index indices = {})
         {
             return details::invoke(std::forward<Tuple>(tuple),
                                    std::forward<F>(f),

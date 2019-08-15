@@ -212,15 +212,15 @@ namespace executionGraph
 
         constexpr auto indices = sortDescriptions<true, OutputDesc...>();
 
-        auto params = tupleUtil::zip(descs, defaultValues);
-        decltype(params)::A;
+        auto params = tupleUtil::zipForward(descs, defaultValues);
 
-        // return tupleUtil::invoke(params,
-        //                          [&](auto&&... params) {
-        //                               return std::make_tuple(
-        //                                  typename naked<decltype(desc)>::SocketType(desc.index(), node)...);
-        //                          },
-        //                          indices);
+        return tupleUtil::invoke(std::move(params),
+                                 [&](auto&&... paramsTuple) {
+                                     return std::make_tuple(
+                                         typename naked<decltype(std::get<0>(paramTuple))>::SocketType(std::get<1>(paramTuple)
+                                                                                                           node)...);
+                                 },
+                                 indices);
     }
 
     //! Stupid dummy Node for testing.

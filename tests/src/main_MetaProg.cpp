@@ -121,6 +121,44 @@ MY_TEST(MetaProgramming, TupleZipForward)
     });
 }
 
+MY_TEST(MetaProgramming, InvokeForward)
+{
+    struct A
+    {
+        A() {}
+        A(const A&)
+        {
+            copied = true;
+        }
+        A(A&&)
+        {
+            moved = true;
+        }
+        bool copied = false;
+        bool moved  = false;
+    };
+
+    int i = 0;
+
+    auto test = [&](auto&& a) {
+        if(i == 0 || i == 1)
+        {
+            ASSERT_TRUE(a.copied == true && a.moved == false) << "Value not copied!";
+        }
+        else
+        {
+            ASSERT_TRUE(a.copied == false && a.moved == true) << "Value was not moved";
+        }
+        ++i;
+    };
+
+    A a, b, c;
+    auto t = std::forward_as_tuple(a, b, std::move(c));
+    tupleUtil::invoke(std::move(t), [&](auto&&... arg) {
+        return (... && (test(A{std::forward<decltype(arg)>(arg)}), true));
+    });
+}
+
 int main(int argc, char** argv)
 {
     testing::InitGoogleTest(&argc, argv);
