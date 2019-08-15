@@ -31,7 +31,9 @@ namespace executionGraph
     {
     public:
         using Data       = TData;
-        using SocketType = LogicSocketInput<Data>;
+        using SocketType = meta::if_<IsInput,
+                                     LogicSocketInput<Data>,
+                                     LogicSocketOutput<Data>>;
         using Node       = TNode;
         using Index      = TIndex;
 
@@ -195,7 +197,7 @@ namespace executionGraph
     template<typename... OutputDesc,
              typename... Data,
              typename Node,
-             std::enable_if_t<(... && std::remove_cvref_t<OutputDesc>::isInput()), int> = 0>
+             std::enable_if_t<(... && std::remove_cvref_t<OutputDesc>::isOutput()), int> = 0>
     auto makeSockets(std::tuple<OutputDesc&...> descs,
                      std::tuple<Data...> defaultValues,
                      Node& node)
@@ -214,11 +216,11 @@ namespace executionGraph
 
         auto params = tupleUtil::zipForward(descs, defaultValues);
 
-        return tupleUtil::invoke(std::move(params),
-                                 [&](auto&&... paramsTuple) {
+        return tupleUtil::invoke(std::move(params), /* move: to properly forward with std::get below */
+                                 [&](auto&&... descAndValue) {
                                      return std::make_tuple(
-                                         typename naked<decltype(std::get<0>(paramTuple))>::SocketType(std::get<1>(paramTuple)
-                                                                                                           node)...);
+                                         typename naked<decltype(std::get<0>(descAndValue))>::SocketType(
+                                             std::get<1>(descAndValue), std::get<0>(descAndValue).index(), node)...);
                                  },
                                  indices);
     }
@@ -256,27 +258,8 @@ namespace executionGraph
         DummyNode(Args&&... args)
             : executionGraph::LogicNode(std::forward<Args>(args)...)
             , m_inSockets(makeSockets(inDecls, *this))
-            , m_outSockets({Out{1123, 0, *this},
-                            Out{11, 1, *this},
-                            Out{55, 2, *this}})
+            , m_outSockets(makeSockets(outDecls, std::forward_as_tuple(1123, 11, 44), *this))
         {
-            //makeSockets(outDecls, std::forward_as_tuple(1123, 11, 44), *this);
-            // // register in node.
-            // if(std::tuple_size_v<decltype(m_inSockets)> != 0)
-            // {
-            //     IndexType minIdx = std::numeric_limits<IndexType>::max();
-            //     IndexType maxIdx = 0;
-            //     tupleUtil::forEach(allDecl, [](auto&& decl) {
-            //         minIdx = std::min(minIdx, decl.m_index);
-            //         maxIdx = std::min(maxIdx, decl.m_index);
-            //     });
-            //     EXECGRAPH_THROW_IF(maxIdx - minIdx == std::tuple_size_v<decltype(allDecl)>, "Wrong!");
-
-            //     tupleUtil::forEachIdx(m_inSockets,
-            //                           [&](auto&& socket, auto socketIdx) {
-            //                               //m_inputs[socketIdx] = &socket;
-            //                           });
-            // }
             std::get<in0Decl.index()>(m_inSockets);
         }
 
