@@ -55,6 +55,16 @@ namespace executionGraph{
         #define EXECGRAPH_THROW_BADSOCKETCAST_IF(cond, mess, ...) EXECGRAPH_ASSERT_TYPE(cond, BadSocketCastException, mess, __VA_ARGS__)
     #endif
 
+    #cmakedefine ExecutionGraph_THROW_IF_NODE_DATA_NO_STORAGE
+    #ifdef ExecutionGraph_THROW_IF_NODE_DATA_NO_STORAGE
+        #define EXECGRAPH_THROW_IF_NODE_DATA_NO_STORAGE
+        static const bool throwIfDataNodeNoStorage = true;
+        #define EXECGRAPH_THROW_NODE_DATA_NO_STORAGE_IF(cond, mess, ...) EXECGRAPH_THROW_IF(cond, mess, __VA_ARGS__)
+    #else
+        static const bool throwIfDataNodeNoStorage = false;
+        #define EXECGRAPH_THROW_NODE_DATA_NO_STORAGE_IF(cond, mess, ...) EXECGRAPH_ASSERT(cond, mess, __VA_ARGS__)
+    #endif
+
     #cmakedefine ExecutionGraph_HAS_RTTR
     #ifdef ExecutionGraph_HAS_RTTR
         #define EXECGRAPH_HAS_RTTR

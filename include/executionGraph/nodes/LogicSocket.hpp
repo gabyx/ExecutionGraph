@@ -36,9 +36,9 @@ namespace executionGraph
         LogicSocketBase& operator=(LogicSocketBase&&) = default;
 
     protected:
-        LogicSocketBase(const rttr::type& type,
+        LogicSocketBase(rttr::type type,
                         SocketIndex index,
-                        LogicNode& parent)
+                        LogicNode& parent) noexcept
             : m_type(type)
             , m_index(index)
             , m_parent(parent)
@@ -46,16 +46,16 @@ namespace executionGraph
         }
 
     public:
-        inline SocketIndex getIndex() const { return m_index; }
-        inline const rttr::type& type() const { return m_type; }
+        inline SocketIndex getIndex() noexcept const { return m_index; }
+        inline const rttr::type& type() noexcept const { return m_type; }
 
-        inline LogicNode& parent() const { return m_parent; }
+        inline LogicNode& parent() noexcept const { return m_parent; }
 
         template<typename T>
-        bool isType() const { return type() == rttr::type::get<T>(); }
+        bool isType() const noexcept { return type() == rttr::type::get<T>(); }
 
     protected:
-        const rttr::type m_type;    //!< The index in to the meta::list SocketTypes, which type this is!
+        const rttr::type m_type;    //!< The type of this socket.
         const SocketIndex m_index;  //!< The index of the slot at which this socket is installed in a LogicNode.
         LogicNode& m_parent;        //!< The parent node of of this socket.
     };
@@ -69,17 +69,17 @@ namespace executionGraph
         friend class LogicSocketOutputBase;
 
         template<typename... Args>
-        LogicSocketInputBase(Args&&... args)
+        LogicSocketInputBase(Args&&... args) noexcept
             : LogicSocketBase(std::forward<Args>(args)...)
         {
         }
 
-        ~LogicSocketInputBase();
+        ~LogicSocketInputBase() noexcept;
 
         //! Cast to a logic socket of type `LogicSocketInput<T>*`.
         //! The cast fails at runtime if the data type `T` does not match!
         template<typename T>
-        auto* castToType() const
+        auto* castToType() const noexcept(!throwIfBadSocketCast)
         {
             EXECGRAPH_THROW_BADSOCKETCAST_IF(!this->template isType<T>(),
                                              "Casting socket index '{0}' with type index '{1}' into type"
@@ -94,7 +94,7 @@ namespace executionGraph
 
         //! Non-const overload.
         template<typename T>
-        auto* castToType()
+        auto* castToType() noexcept(!throwIfBadSocketCast)
         {
             return const_cast<LogicSocketInput<T>*>(static_cast<LogicSocketInputBase const*>(this)->castToType<T>());
         }
@@ -103,20 +103,20 @@ namespace executionGraph
         void setGetLink(LogicSocketOutputBase& outputSocket);
 
         //! Remove the Get-Link to an output socket.
-        inline void removeGetLink()
+        inline void removeGetLink() noexcept
         {
             removeGetLink<true>();
         }
 
         //! Check if the socket has a Get-Link to an output socket.
-        inline bool hasGetLink() const { return m_getFrom != nullptr; }
+        inline bool hasGetLink() const noexcept { return m_getFrom != nullptr; }
         //! Get the output socket to which the Get-Link points.
-        inline LogicSocketOutputBase* followGetLink() { return m_getFrom; }
+        inline LogicSocketOutputBase* followGetLink() noexcept { return m_getFrom; }
 
         //! Get all sockets writing to this input socket.
-        inline const auto& getWritingSockets() const { return m_writingParents; }
+        inline const auto& getWritingSockets() const noexcept { return m_writingParents; }
         //! Get the connection count of this input socket.
-        inline IndexType getConnectionCount() const
+        inline IndexType getConnectionCount() const noexcept
         {
             return (hasGetLink() ? 1 : 0) + m_writingParents.size();
         }
@@ -124,11 +124,11 @@ namespace executionGraph
     protected:
         //! Remove the Get-Link and optionally notify output.
         template<bool notifyOutput = true>
-        void removeGetLink();
+        void removeGetLink() noexcept;
 
         //! Callback when the output socket has remove its Write-Link
         //! to this input socket.
-        void onRemoveWritter(LogicSocketOutputBase& outputSocket);
+        void onRemoveWritter(LogicSocketOutputBase& outputSocket) noexcept;
 
         LogicSocketOutputBase* m_getFrom = nullptr;                   //!< The single Get-Link attached to this Socket.
         void const* m_data               = nullptr;                   //!< The pointer to the actual data of this input node.
@@ -179,7 +179,7 @@ namespace executionGraph
         void addWriteLink(LogicSocketInputBase& inputSocket);
 
         //! Remove Write-Link to the input socket `inputSocket`.
-        void removeWriteLink(LogicSocketInputBase& inputSocket)
+        void removeWriteLink(LogicSocketInputBase& inputSocket) noexcept
         {
             removeWriteLink<true>(inputSocket);
         }
@@ -202,7 +202,7 @@ namespace executionGraph
         void removeWriteLink(LogicSocketInputBase& inputSocket);
 
         //! Callback when input socket `child` has removed its Get-Link.
-        inline void onRemoveGetter(LogicSocketInputBase& inputSocket)
+        inline void onRemoveGetter(LogicSocketInputBase& inputSocket) noexcept
         {
             m_getterChilds.erase(&inputSocket);
         }

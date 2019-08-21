@@ -27,7 +27,16 @@
 #    define EXECGRAPH_DEBUG_ONLY(code) code
 #    define EXECGRAPH_VERIFY(condition, ...) EXECGRAPH_ASSERT(condition, __VA_ARGS__)
 #    define EXECGRAPH_ASSERT(condition, ...) EXECGRAPH_ASSERT_TYPE(condition, executionGraph::ExceptionFatal, __VA_ARGS__)
-#    define EXECGRAPH_ASSERT_TYPE(condition, Type, ...) EXECGRAPH_THROW_TYPE_IF(!(condition), Type, __VA_ARGS__)
+#    define EXECGRAPH_ASSERT_TYPE(condition, Type, ...)           \
+        if(!(condition))                                          \
+        {                                                         \
+            EXECGRAPH_LOG_ERROR("{0} : \n{1}\n@ {2} [{3}]",       \
+                                #condition,                       \
+                                fmt::format(__VA_ARGS__),         \
+                                __FILE__,                         \
+                                __LINE__)                         \
+            EXECGRAPH_THROW_TYPE(!(condition), Type, __VA_ARGS__) \
+        }
 #endif
 
 //! Some warning macro.

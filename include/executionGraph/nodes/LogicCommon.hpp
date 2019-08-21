@@ -19,9 +19,10 @@
 #include "executionGraph/common/SfinaeMacros.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 
-#define EXECGRAPH_DEFINE_TYPES()                   \
-    using NodeId      = executionGraph::NodeId;    \
-    using IndexType   = executionGraph::IndexType; \
+#define EXECGRAPH_DEFINE_TYPES()                    \
+    using NodeId      = executionGraph::NodeId;     \
+    using NodeDataId  = executionGraph::NodeDataId; \
+    using IndexType   = executionGraph::IndexType;  \
     using SocketIndex = executionGraph::SocketIndex
 
 namespace executionGraph
@@ -41,9 +42,12 @@ namespace executionGraph
     template<typename T>
     using SocketPointer = T*;  //! The general socket pointer type.
 
-    using IndexType                             = uint64_t;  //! A general index type.
-    using NodeId                                = uint64_t;  //! Node Id type.
-    static constexpr NodeId NodeIdUninitialized = std::numeric_limits<uint64_t>::max();
+    using IndexType  = uint64_t;   //! A general index type.
+    using NodeId     = IndexType;  //! Node Id type.
+    using NodeDataId = IndexType;  //! DataNode Id type.
+
+    static constexpr NodeId nodeIdInvalid         = std::numeric_limits<IndexType>::max();
+    static constexpr NodeDataId nodeDataIdInvalid = std::numeric_limits<IndexType>::max();
 
     using SocketIndex = IndexType;  //! The socket index type.
 

@@ -73,7 +73,7 @@ namespace executionGraph
 
     public:
         //! The basic constructor of a node.
-        LogicNode(NodeId id = NodeIdUninitialized)
+        LogicNode(NodeId id = nodeIdInvalid)
             : m_id(id)
         {
         }
