@@ -16,6 +16,8 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
+#include "executionGraph/common/Log.hpp"
+
 namespace executionGraph
 {
     namespace details
@@ -50,6 +52,16 @@ namespace executionGraph
 
 #define EXECGRAPH_THROW(...) EXECGRAPH_THROW_TYPE(executionGraph::Exception, __VA_ARGS__)
 #define EXECGRAPH_THROW_IF(condition, ...) EXECGRAPH_THROW_TYPE_IF(condition, executionGraph::Exception, __VA_ARGS__)
+#define EXECGRAPH_LOGTHROW_IF(condition, ...)           \
+    if(!(condition))                                    \
+    {                                                   \
+        EXECGRAPH_LOG_ERROR("{0} : \n{1}\n@ {2} [{3}]", \
+                            #condition,                 \
+                            fmt::format(__VA_ARGS__),   \
+                            __FILE__,                   \
+                            __LINE__)                   \
+        EXECGRAPH_THROW(__VA_ARGS__)                    \
+    }
 
 namespace executionGraph
 {

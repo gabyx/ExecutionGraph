@@ -79,24 +79,24 @@ namespace executionGraph
         //! Cast to a logic socket of type `LogicSocketInput<T>*`.
         //! The cast fails at runtime if the data type `T` does not match!
         template<typename T>
-        auto* castToType() const noexcept(!throwIfBadSocketCast)
+        auto& castToType() const noexcept
         {
-            EXECGRAPH_THROW_BADSOCKETCAST_IF(!this->template isType<T>(),
-                                             "Casting socket index '{0}' with type index '{1}' into type"
-                                             "'{2}' of node id: '{3}' which is wrong!",
-                                             this->getIndex(),
-                                             this->type(),
-                                             demangle<T>(),
-                                             this->parent().getId());
+            EXECGRAPH_LOGTHROW_IF(!this->template isType<T>(),
+                                  "Casting socket index '{0}' with type index '{1}' into type"
+                                  "'{2}' of node id: '{3}' which is wrong!",
+                                  this->getIndex(),
+                                  this->type(),
+                                  rttr::type::get<T>().get_name(),
+                                  this->parent().getId());
 
-            return static_cast<const LogicSocketInput<T>*>(this);
+            return static_cast<const LogicSocketInput<T>&>(*this);
         }
 
         //! Non-const overload.
         template<typename T>
-        auto* castToType() noexcept(!throwIfBadSocketCast)
+        auto& castToType() noexcept(!throwIfBadSocketCast)
         {
-            return const_cast<LogicSocketInput<T>*>(static_cast<LogicSocketInputBase const*>(this)->castToType<T>());
+            return const_cast<LogicSocketInput<T>&>(static_cast<LogicSocketInputBase const*>(this)->castToType<T>());
         }
 
         //! Set the Get-Link to an output socket.
@@ -156,24 +156,27 @@ namespace executionGraph
         //! Cast to a logic socket of type `LogicSocketOutput`<T>*.
         //! The cast fails at runtime if the data type `T` does not match!
         template<typename T>
-        auto* castToType() const noexcept(throwIfBadSocketCast)
+        auto& castToType() const noexcept
         {
-            EXECGRAPH_THROW_BADSOCKETCAST_IF(this->m_type != rttr::type::get<T>(),
-                                             "Casting socket index '{0}' with type index '{1}' into "
-                                             "'{2}' of node id: '{3}' which is wrong!",
-                                             this->m_index,
-                                             this->type(),
-                                             demangle<T>(),
-                                             this->m_parent.getId());
+            if constexpr(throwIfBadSocketCast)
+            {
+                EXECGRAPH_LOGTHROW_IF(this->m_type != rttr::type::get<T>(),
+                                      "Casting socket index '{0}' with type index '{1}' into "
+                                      "'{2}' of node id: '{3}' which is wrong!",
+                                      this->getIndex(),
+                                      this->type(),
+                                      rttr::type::get<T>().get_name(),
+                                      this->parent().getId());
+            }
 
-            return static_cast<const LogicSocketOutput<T>*>(this);
+            return static_cast<const LogicSocketOutput<T>&>(*this);
         }
 
         //! Non-const overload.
         template<typename T>
         auto* castToType()
         {
-            return const_cast<LogicSocketOutput<T>*>(static_cast<LogicSocketOutputBase const*>(this)->castToType<T>());
+            return const_cast<LogicSocketOutput<T>&>(static_cast<LogicSocketOutputBase const*>(this)->castToType<T>());
         }
 
         void addWriteLink(LogicSocketInputBase& inputSocket);
