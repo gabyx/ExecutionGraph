@@ -150,10 +150,10 @@
     ]
   },
   "files.exclude": {
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
     "**/.DS_Store": true,
+    "**/.git": false,
+    "**/.hg": true,
+    "**/.svn": true,
     "**/bower_components": true,
     "**/jspm_packages": true,
     "**/node_modules": true

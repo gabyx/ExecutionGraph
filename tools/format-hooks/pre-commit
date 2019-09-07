@@ -1,8 +1,6 @@
 #!/bin/bash
 
-
-
-if [ "$1" == "--formatAll" ] ; then
+if [ "$1" == "--formatAll" ]; then
   formatAll="true"
   title="Format all:"
 else
@@ -11,18 +9,20 @@ fi
 
 echo "$title [START]"
 
-function exitTrap()
-{
+function exitTrap() {
   ret=$?
-  trap '' SIGINT SIGHUP SIGTERM SIGQUIT   # ignore signals
-  if [ $ret -gt 0 ] ; then
+  trap '' SIGINT SIGHUP SIGTERM SIGQUIT # ignore signals
+  if [ $ret -gt 0 ]; then
     echo "$title [failed]"
     [ -f "${preCommitFileChanged}" ] && rm "${preCommitFileChanged}"
   fi
 }
 trap exitTrap EXIT
 
-owndir="$(cd "$(dirname "$0")"; pwd -P)"
+owndir="$(
+  cd "$(dirname "$0")"
+  pwd -P
+)"
 
 root="$(git rev-parse --show-toplevel)"
 [ -d "$root" ] || exit 1
@@ -35,26 +35,25 @@ preCommitFileChanged="${root}/.pre-commit-changed"
 OS_NAME=$(uname)
 
 # Get only changed files or all files
-if [ -z "${formatAll}" ] ; then
+if [ -z "${formatAll}" ]; then
   echo "$title get files with diffs ..."
-  allFiles=$(git diff --name-only --cached | tr '\n' '\0' | base64 )
+  allFiles=$(git diff --name-only --cached | tr '\n' '\0' | base64)
 else
   echo "$title get all files ..."
-  allFiles=$(git ls-tree -r HEAD --name-only --full-name ${root} | tr '\n' '\0' | base64 )
+  allFiles=$(git ls-tree -r HEAD --name-only --full-name ${root} | tr '\n' '\0' | base64)
 fi
 
-function findExecutables(){
-  find "$owndir/autoformat" -type f -perm +0111 > /dev/null 2>&1
-  if [ $? -eq 0 ] ; then
+function findExecutables() {
+  find "$owndir/autoformat" -type f -perm +0111 >/dev/null 2>&1
+  if [ $? -eq 0 ]; then
     find "$owndir/autoformat" -type f -perm +0111
   else
     find "$owndir/autoformat" -type f -executable
   fi
 }
 
-function getArgsBase64Decode(){
-  echo "test" | base64 -d > /dev/null
-  if [ $? -eq 0 ] ; then
+function getArgsBase64Decode() {
+  if echo "test" | base64 -d &>/dev/null; then
     echo "-d"
   else
     echo "-D"
@@ -68,15 +67,21 @@ disabledFormatters=$(git config precommit-format.disabledFormattersRegex)
 enabledFormatters=$(git config precommit-format.enabledFormattersRegex)
 
 findExecutables | {
-  while read formatter ; do
+  while read formatter; do
     # check the formatter is disabled
-    if [ ! -z "${enabledFormatters}" ] ; then
-      echo "$formatter" | grep -Eqi "${enabledFormatters}" || \
-        { echo "Skip formatter '${formatter}'' [disabled by git config]"; continue ; }
+    if [ ! -z "${enabledFormatters}" ]; then
+      echo "$formatter" | grep -Eqi "${enabledFormatters}" ||
+        {
+          echo "Skip formatter '${formatter}'' [disabled by git config]"
+          continue
+        }
     fi
-    if [ ! -z "${disabledFormatters}" ] ; then
-      echo "$formatter" | grep -Eqi "${disabledFormatters}" && \
-        { echo "Skip formatter '${formatter}'' [disabled by git config]"; continue ; }
+    if [ ! -z "${disabledFormatters}" ]; then
+      echo "$formatter" | grep -Eqi "${disabledFormatters}" &&
+        {
+          echo "Skip formatter '${formatter}'' [disabled by git config]"
+          continue
+        }
     fi
 
     echo "Formatting: '${formatter}':"
@@ -88,7 +93,10 @@ findExecutables | {
 
     # format all files
     echo -ne "$allFiles" | base64 ${decodeArgs} | {
-      while IFS=; read -r -d $'\0' orig ; do
+      while
+        IFS=
+        read -r -d $'\0' orig
+      do
         orig="${root}/${orig}"
 
         # file is getting deleted, ignore
@@ -106,18 +114,27 @@ findExecutables | {
 
         # if none, ignore
         [ "$match_pattern" -o "$match_magic" ] || continue
-        
+
         # format
-        "$formatter" "$orig" || { echo "[1] exit"; exit 1; }
-        
-        # notify post-commit 
-        echo "$orig" >> "${preCommitFileChanged}"
-        
+        "$formatter" "$orig" || {
+          echo "[1] exit"
+          exit 1
+        }
+
+        # notify post-commit
+        echo "$orig" >>"${preCommitFileChanged}"
+
         [ ! -z "${formatAll}" ] && git add "$orig" || true
 
-      done 
-    } || { echo "[2] exit"; exit 1; }
+      done
+    } || {
+      echo "[2] exit"
+      exit 1
+    }
   done
-} || { echo "[3] exit"; exit 1; }
+} || {
+  echo "[3] exit"
+  exit 1
+}
 
 echo "$title [DONE]"
