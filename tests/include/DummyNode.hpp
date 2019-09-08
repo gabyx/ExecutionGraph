@@ -258,13 +258,9 @@ namespace executionGraph
         DummyNode(Args&&... args)
             : executionGraph::LogicNode(std::forward<Args>(args)...)
             , m_inSockets(makeSockets(inDecls, *this))
-<<<<<<< HEAD
             , m_outSockets(makeSockets(outDecls,
                                        std::forward_as_tuple(1123, 11, 44),
                                        *this))
-=======
-            , m_outSockets(makeSockets(outDecls, std::forward_as_tuple(1123, 11, 44), *this))
->>>>>>> e339915d84e95e9f38ad645e26246a0c79579088
         {
             std::get<in0Decl.index()>(m_inSockets);
         }
