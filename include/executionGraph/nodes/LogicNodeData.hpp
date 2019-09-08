@@ -109,6 +109,13 @@ namespace executionGraph
         void* m_data    = nullptr;            //!< Fast access pointer to underlying data.
     };
 
+    // class DataStorageDeleter
+    // {
+    //     public:
+    //         DataStorageDeleter() = default;
+    //         DataStorageDeleter(IDataNodeDeleter)
+    // }
+
     template<typename TData>
     class DataStorage final
     {
@@ -127,7 +134,7 @@ namespace executionGraph
         const Data& data() const noexcept { return m_data; }
 
     private:
-        Data m_data;  //!< The data.
+        TData m_data;  //!< The data.
     };
 
     template<typename TData>

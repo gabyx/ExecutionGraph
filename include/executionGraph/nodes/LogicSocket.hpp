@@ -46,10 +46,10 @@ namespace executionGraph
         }
 
     public:
-        inline SocketIndex getIndex() noexcept const { return m_index; }
-        inline const rttr::type& type() noexcept const { return m_type; }
+        inline SocketIndex getIndex() const noexcept { return m_index; }
+        inline const rttr::type& type() const noexcept { return m_type; }
 
-        inline LogicNode& parent() noexcept const { return m_parent; }
+        inline LogicNode& parent() const noexcept { return m_parent; }
 
         template<typename T>
         bool isType() const noexcept { return type() == rttr::type::get<T>(); }
@@ -322,7 +322,7 @@ namespace executionGraph
 
     //! Remove the Get-Link and optionally notify output.
     template<bool notifyOutput>
-    void LogicSocketInputBase::removeGetLink()
+    void LogicSocketInputBase::removeGetLink() noexcept
     {
         if(hasGetLink())
         {

@@ -14,29 +14,33 @@
 
 #include "executionGraph/common/Exception.hpp"
 #include "executionGraph/common/Log.hpp"
+#include "executionGraph/common/Macros.hpp"
 #include "executionGraph/config/Config.hpp"
 
 //! Some assert macro.
 #ifdef NDEBUG
-#    define EXECGRAPH_DEBUG_ONLY(code)
-#    define EXECGRAPH_ASSERT(condition, ...)
-#    define EXECGRAPH_VERIFY(condition, ...) condition;
-#    define EXECGRAPH_ASSERT_TYPE(condition, type, ...)
+#    define EXECGRAPH_DEBUG_ONLY(code) ASSERT_SEMICOLON
+#    define EXECGRAPH_ASSERT(condition, ...) ASSERT_SEMICOLON
+#    define EXECGRAPH_VERIFY(condition, ...) \
+        condition;                           \
+        ASSERT_SEMICOLON
+#    define EXECGRAPH_ASSERT_TYPE(condition, type, ...) ASSERT_SEMICOLON
 #else
 // Debug!
 #    define EXECGRAPH_DEBUG_ONLY(code) code
 #    define EXECGRAPH_VERIFY(condition, ...) EXECGRAPH_ASSERT(condition, __VA_ARGS__)
 #    define EXECGRAPH_ASSERT(condition, ...) EXECGRAPH_ASSERT_TYPE(condition, executionGraph::ExceptionFatal, __VA_ARGS__)
-#    define EXECGRAPH_ASSERT_TYPE(condition, Type, ...)           \
-        if(!(condition))                                          \
-        {                                                         \
-            EXECGRAPH_LOG_ERROR("{0} : \n{1}\n@ {2} [{3}]",       \
-                                #condition,                       \
-                                fmt::format(__VA_ARGS__),         \
-                                __FILE__,                         \
-                                __LINE__)                         \
-            EXECGRAPH_THROW_TYPE(!(condition), Type, __VA_ARGS__) \
-        }
+#    define EXECGRAPH_ASSERT_TYPE(condition, Type, ...)              \
+        if(!(condition))                                             \
+        {                                                            \
+            EXECGRAPH_LOG_ERROR("{0} : \n{1}\n@ {2} [{3}]",          \
+                                #condition,                          \
+                                fmt::format(__VA_ARGS__),            \
+                                __FILE__,                            \
+                                __LINE__)                            \
+            EXECGRAPH_THROW_TYPE_IF(!(condition), Type, __VA_ARGS__) \
+        }                                                            \
+        ASSERT_SEMICOLON
 #endif
 
 //! Some warning macro.
@@ -50,4 +54,5 @@
                                __FILE__,                   \
                                __LINE__)                   \
         }                                                  \
-    }
+    }                                                      \
+    ASSERT_SEMICOLON
