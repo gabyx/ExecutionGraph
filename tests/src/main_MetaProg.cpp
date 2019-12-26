@@ -154,6 +154,10 @@ MY_TEST(MetaProgramming, InvokeForward)
 
     A a, b, c;
     auto t = std::forward_as_tuple(a, b, std::move(c));
+    tupleUtil::invoke(t, [&](auto&&... arg) {
+        return (... && (test(A{std::forward<decltype(arg)>(arg)}), true));
+    });
+    i = 0;
     tupleUtil::invoke(std::move(t), [&](auto&&... arg) {
         return (... && (test(A{std::forward<decltype(arg)>(arg)}), true));
     });

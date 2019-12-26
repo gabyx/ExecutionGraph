@@ -29,6 +29,7 @@ namespace executionGraph
 {
     // Forward declarations
     class LogicNode;
+    
     class LogicSocketBase;
     class LogicSocketInputBase;
     class LogicSocketOutputBase;
@@ -36,8 +37,10 @@ namespace executionGraph
     class LogicSocketInput;
     template<typename T>
     class LogicSocketOutput;
+
+    class LogicNodeDataBase;
     template<typename T>
-    class LogicSocketData;
+    class LogicNodeData;
 
     template<typename T>
     using SocketPointer = T*;  //! The general socket pointer type.

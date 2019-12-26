@@ -18,14 +18,14 @@
 #include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
-#include "executionGraph/nodes/LogicSocketData.hpp"
+#include "executionGraph/nodes/LogicDataHandle.hpp"
 
 namespace executionGraph
 {
     template<typename>
     class LogicNodeData;
 
-    class LogicDataNodeBase
+    class LogicNodeDataBase
     {
         template<typename>
         friend class LogicNodeData;
@@ -33,17 +33,17 @@ namespace executionGraph
     public:
         EXECGRAPH_DEFINE_TYPES();
 
-        auto type() { return m_type; }
+        auto type() const noexcept { return m_type; }
 
         template<typename T>
         bool isType() const noexcept { return type() == rttr::type::get<T>(); }
 
-        //! Cast to a logic data node of type `LogicDataNode<T>*`.
+        //! Cast to a logic data node of type `LogicNodeData<T>*`.
         //! The cast fails at runtime if the data type `T` does not match!
         template<typename T>
         auto& castToType() const noexcept
         {
-            if constexpr(throwIfDataNodeNoStorage)
+            if constexpr(throwIfNodeDataNoStorage)
             {
                 EXECGRAPH_LOGTHROW_IF(!isType<T>(),
                                       "Casting node data with id '{0}' and type '{1}' into type"
@@ -53,111 +53,57 @@ namespace executionGraph
                                       rttr::type::get<T>().get_name());
             }
 
-            return static_cast<const LogicDataNode<T>&>(*this);
+            return static_cast<const LogicNodeData<T>&>(*this);
         }
 
         //! Non-const overload.
         template<typename T>
         auto& castToType() noexcept
         {
-            return const_cast<LogicDataNode<T>&>(
-                static_cast<const LogicDataNodeBase*>(this)->castToType<T>());
+            return const_cast<LogicNodeData<T>&>(
+                static_cast<const LogicNodeDataBase*>(this)->castToType<T>());
         }
 
-        NodeDataId getId() const noexcept { return m_id; }
+        NodeDataId id() const noexcept { return m_id; }
         void setId(NodeDataId id) noexcept { m_id = id; }
 
     protected:
-        bool hasData() const noexcept { return m_data != nullptr; }
-
-        template<typename TData>
-        void setData(TData* data) noexcept
-        {
-            EXECGRAPH_ASSERT(rttr::type::get<TData>() == m_type,
-                             "You cannot set a pointer to different underlying data!");
-            m_data = data;
-        }
-
-        template<typename Data>
-        const Data& data() noexcept
-        {
-            if constexpr(throwIfDataNodeNoStorage)
-            {
-                EXECGRAPH_LOGTHROW_IF(!hasData(),
-                                      "Node data with id: {0} has no assigned storage!",
-                                      id());
-            }
-
-            return *static_cast<const Data*>(m_data);
-        }
-        template<typename Data>
-        Data& data() noexcept
-        {
-            return const_cast<Data&>(static_cast<const Base&>(*this).data());
-        }
-
-    protected:
-        LogicDataNodeBase(rttr::type type,
+        LogicNodeDataBase(rttr::type type,
                           NodeDataId id)
             : m_type(type)
             , m_id(id)
         {}
 
+        virtual ~LogicNodeDataBase() = default;
+
     private:
-        const rttr::type m_type;              //!< The type of this node node.
+        const rttr::type m_type;              //!< The type of this node.
         NodeDataId m_id = nodeDataIdInvalid;  //!< Id of this node.
-        void* m_data    = nullptr;            //!< Fast access pointer to underlying data.
-    };
-
-    // class DataStorageDeleter
-    // {
-    //     public:
-    //         DataStorageDeleter() = default;
-    //         DataStorageDeleter(IDataNodeDeleter)
-    // }
-
-    template<typename TData>
-    class DataStorage final
-    {
-    public:
-        using Data = TData;
-
-    public:
-        LogicSocketData() noexcept = default;
-
-        template<typename T>
-        LogicSocketData(T&& value) noexcept
-            : m_data(std::forward<T>(value))
-        {}
-
-        Data& data() noexcept { return m_data; }
-        const Data& data() const noexcept { return m_data; }
-
-    private:
-        TData m_data;  //!< The data.
     };
 
     template<typename TData>
-    class LogicDataNodeLinks
+    class LogicNodeDataLinks
     {
     public:
+        using Data         = TData;
         using InputSocket  = LogicSocketInput<Data>;
         using OutputSocket = LogicSocketOutput<Data>;
 
     protected:
-        DataNodeLink() noexcept = default;
+        LogicNodeDataLinks() noexcept = default;
 
     public:
-        ~DataNodeLink() noexcept
+        ~LogicNodeDataLinks() noexcept
         {
-            for(auto* output : m_outputs)
-            {
-                output->onRemoveWriteLink(*this);
-            }
-            for(auto* input : m_inputs)
-            {
-                input->onRemoveGetLink(*this);
-            }
+            // @todo comment in
+            // for(auto* output : m_outputs)
+            // {
+            //     output->onRemoveWriteLink(*this);
+            // }
+            // for(auto* input : m_inputs)
+            // {
+            //     input->onRemoveGetLink(*this);
+            // }
         }
 
     private:
@@ -189,36 +135,40 @@ namespace executionGraph
     };
 
     template<typename...>
-    class LogicDataNodeRef;
+    class LogicNodeDataRef;
 
-    template<typename TData,
-             typename TStorage = void>
-    class LogicDataNode final : public LogicDataNodeBase,
-                                public LogicDataNodeLinks<TData>
+    template<typename TData>
+    class LogicNodeData final : public LogicNodeDataBase,
+                                public LogicNodeDataLinks<TData>
     {
     public:
-        using Base = LogicDataNodeBase;
+        using Base = LogicNodeDataBase;
         using Data = TData;
-        static_assert(!std::is_const_v<Data>, "Only non-const type allowed!");
 
-        using Storage = meta::if_<std::is_same_v<TStorage, void>,
-                                  meta::lazy::invoke<TStorage, Data>,
-                                  DataStorage<Data>>;
+        using DataHandle      = LogicDataHandle<Data>;
+        using DataHandleConst = LogicDataHandle<const Data>;
 
-        using Reference = LogicDataNodeRef<Data, Storage>;
+        static_assert(!std::is_const_v<Data> && !std::is_reference_v<Data>,
+                      "Only non-const non-reference types allowed!");
 
-        friend class Reference;
-        friend class InputSocket;
-        friend class OutputSocket;
+        using Reference    = LogicNodeDataRef<Data>;
+        using InputSocket  = typename LogicNodeDataLinks<Data>::InputSocket;
+        using OutputSocket = typename LogicNodeDataLinks<Data>::OutputSocket;
+
+        friend Reference;
+        friend InputSocket;
+        friend OutputSocket;
 
     public:
         template<typename... Args>
-        LogicDataNode(Args&&... args) noexcept
-            : Base(std::forward<Args>(args)...)
+        LogicNodeData(NodeDataId id,
+                      Args&&... args) noexcept
+            : Base(rttr::type::get<Data>(), id)
+            , m_data(std::forward<Args>(args)...)
         {
         }
 
-        ~LogicDataNode() noexcept
+        ~LogicNodeData() noexcept
         {
             for(auto* ref : m_refs)
             {
@@ -226,28 +176,25 @@ namespace executionGraph
             }
         };
 
-        const Data& data() const noexcept
+        auto cdata() const noexcept
         {
-            return data<Data>();
-        }
-        Data& data() noexcept
-        {
-            return data<Data>();
+            return DataHandleConst{m_data};
         }
 
-    public:
-        template<typename... Args>
-        void emplaceStorage(Args&&... args) noexcept
+        auto data() const noexcept
         {
-            m_storage.emplace(std::forward<Args>(args)...);
-            m_data = &m_storage->data();
+            return cdata();
+        }
+        auto data() noexcept
+        {
+            return DataHandle{m_data};
         }
 
     private:
         bool removeReference(const Reference& ref) noexcept
         {
-            ref.onRemoveReference();
-            return m_refs.erase(&ref).second;
+            const_cast<Reference&>(ref).onRemoveReference();
+            return m_refs.erase(&ref) > 0;
         }
 
         bool onSetReference(const Reference& ref) noexcept
@@ -257,76 +204,63 @@ namespace executionGraph
 
         bool onRemoveReference(const Reference& ref) noexcept
         {
-            return m_refs.erase(&ref).second;
+            return m_refs.erase(&ref) > 0;
         }
 
     private:
         //! The underlying data storage.
-        std::optional<Storage> m_storage;
+        Data m_data;
         //! All data nodes refs referencing this data node.
         std::unordered_set<const Reference*> m_refs;
     };
 
-    template<typename... Args>
-    class LogicDataNodeRef final : public LogicDataNodeBase,
-                                   public LogicDataNodeLinks<typename LogicDataNode<Args...>::Data>
+    template<typename... TArgs>
+    class LogicNodeDataRef final : public LogicNodeDataBase,
+                                   public LogicNodeDataLinks<typename LogicNodeData<TArgs...>::Data>
     {
     public:
-        using Base     = LogicDataNodeBase;
-        using DataNode = LogicDataNode<Args...>;
-        using Data     = typename DataNode::Data;
-        static_assert(!std::is_const_v<Data>, "Only non-const type allowed!");
+        using Base     = LogicNodeDataBase;
+        using NodeData = LogicNodeData<TArgs...>;
+        using Data     = typename NodeData::Data;
 
-        friend class DataNode;
+        using DataHandle      = typename NodeData::DataHandle;
+        using DataHandleConst = typename NodeData::DataHandleConst;
+
+        static_assert(!std::is_const_v<Data> && !std::is_reference_v<Data>,
+                      "Only non-const non-reference types allowed!");
+
+        friend NodeData;
 
     public:
         template<typename... Args>
-        LogicDataNodeRef(Args&&... args) noexcept
-            : Base(std::forward<Args>(args)...)
+        LogicNodeDataRef(Args&&... args) noexcept
+            : Base(rttr::type::get<Data>(), std::forward<Args>(args)...)
         {
         }
 
-        ~LogicDataNodeRef() noexcept
+        ~LogicNodeDataRef() noexcept
         {
             removeReference();
         }
 
-        const Data& data() const noexcept
+        DataHandleConst data() const noexcept
         {
-            if constexpr(throwIfDataNodeNoStorage)
-            {
-                EXECGRAPH_LOGTHROW_IF(!hasData(),
-                                      "Node data with id: {0} has no assigned storage!",
-                                      id());
-            }
-
-            return *static_cast<Data&>(*Base::data());
+            return m_node->data();
         }
-        Data& data() noexcept
+        DataHandle data() noexcept
         {
-            return const_cast<Data&>(static_cast<const LogicDataNode&>(*this).data());
+            return m_node->data();
         }
 
     public:
-        void setReference(DataNode& node) noexcept
+        void setReference(const NodeData& node) noexcept
         {
             if(m_node)
             {
                 m_node->onRemoveReference(*this);
             }
-            m_node = node;
-            node->onSetReference(*this);
-        }
-
-    public:
-        bool resolveData() noexcept
-        {
-            if(m_node && m_node->hasData())
-            {
-                m_data = &m_node->data();
-                return true;
-            }
-            return false;
+            m_node = &const_cast<NodeData&>(node);
+            m_node->onSetReference(*this);
         }
 
     private:
@@ -345,7 +279,7 @@ namespace executionGraph
         }
 
     private:
-        DataNode* m_node = nullptr;
+        NodeData* m_node = nullptr;
     };
 
 }  // namespace executionGraph

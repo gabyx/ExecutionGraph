@@ -44,6 +44,9 @@ endfunction()
 set(EXEC_NAME ${PROJECT_NAME}Test-LogicNodes)
 add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_LogicNode.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 defineCompileDefs(${EXEC_NAME})
+set(EXEC_NAME ${PROJECT_NAME}Test-LogicNodeData)
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_LogicNodeData.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME})
 
 #ExecutionTree Test
 set(EXEC_NAME ${PROJECT_NAME}Test-ExecutionTree)

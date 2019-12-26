@@ -19,7 +19,7 @@ if(${USE_SUPERBUILD})
         
         ExternalProject_Add(fmt
                             GIT_REPOSITORY      "${URL}"
-                            GIT_TAG             "5.2.1"
+                            GIT_TAG             "6.1.2"
                             GIT_SHALLOW         ON
                             PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/fmt"
                             TIMEOUT 10

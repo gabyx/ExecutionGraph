@@ -14,6 +14,7 @@
 
 #include <unordered_set>
 #include <vector>
+#include <meta/meta.hpp>
 #include <rttr/type>
 
 #include "executionGraph/common/Assert.hpp"
@@ -22,7 +23,6 @@
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 #include "executionGraph/nodes/LogicNode.hpp"
-#include "executionGraph/nodes/LogicSocketData.hpp"
 
 namespace executionGraph
 {
@@ -38,10 +38,10 @@ namespace executionGraph
     protected:
         LogicSocketBase(rttr::type type,
                         SocketIndex index,
-                        LogicNode& parent) noexcept
+                        const LogicNode& parent) noexcept
             : m_type(type)
             , m_index(index)
-            , m_parent(parent)
+            , m_parent(&parent)
         {
         }
 
@@ -49,15 +49,15 @@ namespace executionGraph
         inline SocketIndex getIndex() const noexcept { return m_index; }
         inline const rttr::type& type() const noexcept { return m_type; }
 
-        inline LogicNode& parent() const noexcept { return m_parent; }
+        inline const LogicNode& parent() const noexcept { return *m_parent; }
 
         template<typename T>
         bool isType() const noexcept { return type() == rttr::type::get<T>(); }
 
     protected:
-        const rttr::type m_type;    //!< The type of this socket.
-        const SocketIndex m_index;  //!< The index of the slot at which this socket is installed in a LogicNode.
-        LogicNode& m_parent;        //!< The parent node of of this socket.
+        rttr::type m_type;                    //!< The type of this socket.
+        SocketIndex m_index;                  //!< The index of the slot at which this socket is installed in a LogicNode.
+        const LogicNode* m_parent = nullptr;  //!< The parent node of of this socket.
     };
 
     //! The input socket base class for all input sockets of a node.
@@ -65,8 +65,6 @@ namespace executionGraph
     {
     public:
         EXECGRAPH_DEFINE_TYPES();
-
-        friend class LogicSocketOutputBase;
 
         template<typename... Args>
         LogicSocketInputBase(Args&&... args) noexcept
@@ -99,40 +97,10 @@ namespace executionGraph
             return const_cast<LogicSocketInput<T>&>(static_cast<LogicSocketInputBase const*>(this)->castToType<T>());
         }
 
-        //! Set the Get-Link to an output socket.
-        void setGetLink(LogicSocketOutputBase& outputSocket);
-
-        //! Remove the Get-Link to an output socket.
-        inline void removeGetLink() noexcept
-        {
-            removeGetLink<true>();
-        }
-
-        //! Check if the socket has a Get-Link to an output socket.
-        inline bool hasGetLink() const noexcept { return m_getFrom != nullptr; }
-        //! Get the output socket to which the Get-Link points.
-        inline LogicSocketOutputBase* followGetLink() noexcept { return m_getFrom; }
-
-        //! Get all sockets writing to this input socket.
-        inline const auto& getWritingSockets() const noexcept { return m_writingParents; }
-        //! Get the connection count of this input socket.
-        inline IndexType getConnectionCount() const noexcept
-        {
-            return (hasGetLink() ? 1 : 0) + m_writingParents.size();
-        }
+        const LogicNodeDataBase* dataNode() { return m_dataNode; }
 
     protected:
-        //! Remove the Get-Link and optionally notify output.
-        template<bool notifyOutput = true>
-        void removeGetLink() noexcept;
-
-        //! Callback when the output socket has remove its Write-Link
-        //! to this input socket.
-        void onRemoveWritter(LogicSocketOutputBase& outputSocket) noexcept;
-
-        LogicSocketOutputBase* m_getFrom = nullptr;                   //!< The single Get-Link attached to this Socket.
-        void const* m_data               = nullptr;                   //!< The pointer to the actual data of this input node.
-        std::unordered_set<LogicSocketOutputBase*> m_writingParents;  //!< All parent output sockets which write to this input.
+        const LogicNodeDataBase* m_dataNode = nullptr;  //! Connected data node.
     };
 
     //! The input socket base class for all input/output sockets of a node.
@@ -140,7 +108,6 @@ namespace executionGraph
     {
     public:
         EXECGRAPH_DEFINE_TYPES();
-        friend class LogicSocketInputBase;
 
     protected:
         template<typename... Args>
@@ -148,6 +115,8 @@ namespace executionGraph
             : LogicSocketBase(std::forward<Args>(args)...)
         {
         }
+
+        ~LogicSocketOutputBase() noexcept;
 
         LogicSocketOutputBase(LogicSocketOutputBase&&) = default;
         LogicSocketOutputBase& operator=(LogicSocketOutputBase&&) = default;
@@ -178,77 +147,28 @@ namespace executionGraph
         {
             return const_cast<LogicSocketOutput<T>&>(static_cast<LogicSocketOutputBase const*>(this)->castToType<T>());
         }
-
-        void addWriteLink(LogicSocketInputBase& inputSocket);
-
-        //! Remove Write-Link to the input socket `inputSocket`.
-        void removeWriteLink(LogicSocketInputBase& inputSocket) noexcept
-        {
-            removeWriteLink<true>(inputSocket);
-        }
-
-        //! Remove all Write-Links to input sockets.
-        void removeWriteLinks()
-        {
-            for(auto* inputSocket : m_writeTo)
-            {
-                inputSocket->onRemoveWritter(*this);
-            }
-            m_writeTo.clear();
-        }
-
-        const auto& getGetterSockets() { return m_getterChilds; }
-        IndexType getConnectionCount() { return m_writeTo.size() + m_getterChilds.size(); }
-
-    protected:
-        template<bool notifyInput = true>
-        void removeWriteLink(LogicSocketInputBase& inputSocket);
-
-        //! Callback when input socket `child` has removed its Get-Link.
-        inline void onRemoveGetter(LogicSocketInputBase& inputSocket) noexcept
-        {
-            m_getterChilds.erase(&inputSocket);
-        }
-
-        //! Write out value to all connected (Write-Link) input sockets.
-        inline void executeWriteLinks()
-        {
-            for(auto* inputSocket : this->m_writeTo)
-            {
-                inputSocket->m_data = m_data;  // Set data pointer in input socket.
-            }
-        }
-
-        //! Set the data reference of this socket.
-        template<typename T>
-        inline void setData(const T& data) { m_data = &data; }
-
-    protected:
-        //! All Write-Links attached to this Socket.
-        std::vector<LogicSocketInputBase*> m_writeTo;
-        //< All child sockets which have a Get-Link to this socket.
-        std::unordered_set<LogicSocketInputBase*> m_getterChilds;
-
-    private:
-        //! The raw pointer to the actual data of this output socket.
-        void const* const m_data = nullptr;
     };
 
     template<typename TData>
     class LogicSocketInput final : public LogicSocketInputBase
     {
-    private:
-        using LogicSocketInputBase::m_data;
-
     public:
         EXECGRAPH_DEFINE_TYPES();
         using Data = TData;
+        using NodeData = LogicNodeData<Data>;
 
         template<typename... Args>
         LogicSocketInput(Args&&... args)
-            : LogicSocketInputBase(rttr::type::get<Data>(),
-                                   std::forward<Args>(args)...)
+            : LogicSocketInputBase(rttr::type::get<Data>(), std::forward<Args>(args)...)
         {
+        }
+
+        ~LogicSocketInput()
+        {
+            if(m_dataNode)
+            {
+                const_cast<NodeData&>(nodeData).onRemoveGetLink(*this);
+            }
         }
 
         //! Copy not allowed (since parent pointer)
@@ -259,20 +179,26 @@ namespace executionGraph
         LogicSocketInput(LogicSocketInput&& other) = default;
         LogicSocketInput& operator=(LogicSocketInput&& other) = default;
 
-        //! If the socket has data.
-        inline bool hasData() { return m_data != nullptr; }
-
-        //! Get the data value of the socket. (follow Get-Link).
-        //! If this input socket has not been connected, this results in an access violation!
-        //! The graph checks that all input nodes ar connected when solving the execution order!
-        inline const Data& data() const
+        //! Connect a data node.
+        bool connect(const NodeData& nodeData)
         {
-            EXECGRAPH_ASSERT(hasData(),
-                             "Input socket index: '{0}' of node id: '{1}' not connected",
-                             this->getIndex(),
-                             this->parent().getId());
-            return static_cast<const LogicSocketData<Data>*>(m_data)->data();
+            m_dataNode = &nodeData;
+            const_expr<NodeData*>(m_dataNode)->onAddGetLink(*this);
         }
+
+        //! Disconnect the data node.
+        bool disconnect()
+        {
+            const_expr<NodeData*>(m_dataNode)->onRemoveGetLink(*this);
+            m_dataNode = nullptr;
+        }
+
+    auto data() { }
+    
+    const NodeData* dataNode() { return m_dataNode; }
+
+    protected:
+        const NodeData* m_dataNode = nullptr;  //! Connected data node.
     };
 
     template<typename TData>
@@ -282,15 +208,10 @@ namespace executionGraph
         EXECGRAPH_DEFINE_TYPES();
         using Data = TData;
 
-        template<typename T,
-                 typename... Args,
-                 std::enable_if_t<!meta::is<T, LogicSocketOutput>::value, int> = 0>
-        LogicSocketOutput(T&& initValue, Args&&... args)
-            : LogicSocketOutputBase(rttr::type::get<Data>(),
-                                    std::forward<Args>(args)...)
-            , m_storage(std::forward<T>(initValue))
+        template<typename... Args>
+        LogicSocketOutput(Args&&... args)
+            : LogicSocketOutputBase(rttr::type::get<Data>(), std::forward<Args>(args)...)
         {
-            setData(data());
         }
 
         //! Copy not allowed (since parent pointer)
@@ -301,59 +222,24 @@ namespace executionGraph
         LogicSocketOutput(LogicSocketOutput&& other) = default;
         LogicSocketOutput& operator=(LogicSocketOutput&& other) = default;
 
-        //! Set the data value of the socket.
-        template<typename T>
-        void setData(T&& value)
+           //! Connect a data node.
+        bool connect(NodeData& nodeData)
         {
-            // Set the value
-            data() = std::forward<T>(value);
-            // Forward the value to all Write-Links
-            this->executeWriteLinks();
+            m_dataNode = &nodeData;
+            m_dataNode->onAddGetLink(*this);
         }
 
-        //! Get the data value of the socket.
-        inline const Data& data() const { return m_storage.data(); }
-        //! Non-const overload.
-        inline Data& data() { return m_storage.data(); }
+        //! Disconnect the data node.
+        bool disconnect()
+        {
+            m_dataNode->onRemoveGetLink(*this);
+            m_dataNode = nullptr;
+        }
+    
+        NodeData* dataNode() { return m_dataNode; }
 
-    private:
-        LogicSocketData<Data> m_storage;
+    protected:
+        NodeData* m_dataNode = nullptr;  //! Connected data node.
     };
 
-    //! Remove the Get-Link and optionally notify output.
-    template<bool notifyOutput>
-    void LogicSocketInputBase::removeGetLink() noexcept
-    {
-        if(hasGetLink())
-        {
-            // Set the data pointer to nullptr only if it points to
-            // the getter at the moment, otherwise leave it as is.
-            if(m_getFrom->m_data == m_data)
-            {
-                m_data = nullptr;
-            }
-
-            if(notifyOutput)
-            {
-                m_getFrom->onRemoveGetter(*this);
-            }
-            m_getFrom = nullptr;
-        }
-    }
-
-    //! Remove Write-Link to input socket `inputSocket` and
-    //! optionaly notify the input socket.
-    template<bool notifyInput>
-    void LogicSocketOutputBase::removeWriteLink(LogicSocketInputBase& inputSocket)
-    {
-        auto it = std::find(m_writeTo.begin(), m_writeTo.end(), &inputSocket);
-        if(it != m_writeTo.end())
-        {
-            m_writeTo.erase(it);
-        }
-        if(notifyInput)
-        {
-            inputSocket.onRemoveWritter(*this);
-        }
-    }
 }  // namespace executionGraph
