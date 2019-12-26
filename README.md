@@ -67,7 +67,7 @@ brew install --HEAD llvm --with-toolchain --with-lldb
 ```
 or manually install
 ```bash
-git clone https://github.com/llvm-project/llvm-project-20170507 llvm-project
+git clone https://github.com/llvm/llvm-project llvm-project
 mkdir llvm-build && cd llvm-build
 cmake ../llvm-project/llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS="clang;libcxx;libcxxabi;lldb;compiler-rt;lld;polly" -DCMAKE_INSTALL_PREFIX="/usr/local/opt/llvm-latest"
 make -j install
