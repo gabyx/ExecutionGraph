@@ -11,10 +11,10 @@
 // =========================================================================================
 
 //#include <executionGraph/nodes/LogicNode.hpp>
+#include <rttr/registration>
 #include <executionGraph/common/TupleUtil.hpp>
 #include <executionGraph/nodes/LogicNodeData.hpp>
 #include "TestFunctions.hpp"
-#include <rttr/registration>
 using namespace executionGraph;
 
 MY_TEST(NodeData, Constructor)
@@ -26,11 +26,34 @@ MY_TEST(NodeData, Constructor)
     *r.data() = 3;
 }
 
-MY_TEST(NodeData, Handles)
+MY_TEST(NodeData, HandlesBasic)
 {
-    LogicNodeData<int> n{1};
+    LogicNodeData<int> n{1, 100};
+    static_assert(std::is_same_v<decltype(*n.data()), int&>, "Wrong type");
+    static_assert(std::is_same_v<decltype(*n.cdata()), const int&>, "Wrong type");
+    const auto& cn = n;
+    static_assert(std::is_same_v<decltype(*cn.data()), const int&>, "Wrong type");
+    static_assert(std::is_same_v<decltype(*cn.cdata()), const int&>, "Wrong type");
+    auto n2    = std::move(n);
+    *n2.data() = 4;
+    ASSERT_EQ(*n2.data(), 4);
+}
 
-    n.data();
+MY_TEST(NodeData, HandlesClass)
+{
+    struct A
+    {
+        int a;
+    };
+    LogicNodeData<A> n{1, 100};
+    static_assert(std::is_same_v<decltype(*n.data()), A&>, "Wrong type");
+    static_assert(std::is_same_v<decltype(*n.cdata()), const A&>, "Wrong type");
+    const auto& cn = n;
+    static_assert(std::is_same_v<decltype(*cn.data()), const A&>, "Wrong type");
+    static_assert(std::is_same_v<decltype(*cn.cdata()), const A&>, "Wrong type");
+    auto n2      = std::move(n);
+    n2.data()->a = 4;
+    ASSERT_EQ(n2.data()->a, 4);
 }
 
 int main(int argc, char** argv)

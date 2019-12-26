@@ -107,4 +107,4 @@ namespace executionGraph
         SocketInputListType m_inputs;    //!< The input sockets.
         SocketOutputListType m_outputs;  //!< The output sockets.
     };
-
+}  // namespace executionGraph

@@ -164,7 +164,7 @@ namespace executionGraph
         LogicNodeData(NodeDataId id,
                       Args&&... args) noexcept
             : Base(rttr::type::get<Data>(), id)
-            , m_data(std::forward<Args>(args)...)
+            , m_data{std::forward<Args>(args)...}
         {
         }
 

@@ -97,10 +97,10 @@ namespace executionGraph
             return const_cast<LogicSocketInput<T>&>(static_cast<LogicSocketInputBase const*>(this)->castToType<T>());
         }
 
-        const LogicNodeDataBase* dataNode() { return m_dataNode; }
+        const LogicNodeDataBase* dataNode() { return m_nodeData; }
 
     protected:
-        const LogicNodeDataBase* m_dataNode = nullptr;  //! Connected data node.
+        const LogicNodeDataBase* m_nodeData = nullptr;  //! Connected data node.
     };
 
     //! The input socket base class for all input/output sockets of a node.
@@ -154,9 +154,10 @@ namespace executionGraph
     {
     public:
         EXECGRAPH_DEFINE_TYPES();
-        using Data = TData;
+        using Data     = TData;
         using NodeData = LogicNodeData<Data>;
 
+    public:
         template<typename... Args>
         LogicSocketInput(Args&&... args)
             : LogicSocketInputBase(rttr::type::get<Data>(), std::forward<Args>(args)...)
@@ -165,10 +166,6 @@ namespace executionGraph
 
         ~LogicSocketInput()
         {
-            if(m_dataNode)
-            {
-                const_cast<NodeData&>(nodeData).onRemoveGetLink(*this);
-            }
         }
 
         //! Copy not allowed (since parent pointer)
@@ -182,23 +179,23 @@ namespace executionGraph
         //! Connect a data node.
         bool connect(const NodeData& nodeData)
         {
-            m_dataNode = &nodeData;
-            const_expr<NodeData*>(m_dataNode)->onAddGetLink(*this);
+            m_nodeData = &nodeData;
+            const_expr<NodeData*>(m_nodeData)->onAddGetLink(*this);
         }
 
         //! Disconnect the data node.
         bool disconnect()
         {
-            const_expr<NodeData*>(m_dataNode)->onRemoveGetLink(*this);
-            m_dataNode = nullptr;
+            const_expr<NodeData*>(m_nodeData)->onRemoveGetLink(*this);
+            m_nodeData = nullptr;
         }
 
-    auto data() { }
-    
-    const NodeData* dataNode() { return m_dataNode; }
+        auto data() {}
+
+        const NodeData* dataNode() { return m_nodeData; }
 
     protected:
-        const NodeData* m_dataNode = nullptr;  //! Connected data node.
+        const NodeData* m_nodeData = nullptr;  //! Connected data node.
     };
 
     template<typename TData>
@@ -206,8 +203,10 @@ namespace executionGraph
     {
     public:
         EXECGRAPH_DEFINE_TYPES();
-        using Data = TData;
+        using Data     = TData;
+        using NodeData = LogicNodeData<Data>;
 
+    public:
         template<typename... Args>
         LogicSocketOutput(Args&&... args)
             : LogicSocketOutputBase(rttr::type::get<Data>(), std::forward<Args>(args)...)
@@ -222,24 +221,24 @@ namespace executionGraph
         LogicSocketOutput(LogicSocketOutput&& other) = default;
         LogicSocketOutput& operator=(LogicSocketOutput&& other) = default;
 
-           //! Connect a data node.
+        //! Connect a data node.
         bool connect(NodeData& nodeData)
         {
-            m_dataNode = &nodeData;
-            m_dataNode->onAddGetLink(*this);
+            m_nodeData = &nodeData;
+            m_nodeData->onAddWriteLink(*this);
         }
 
         //! Disconnect the data node.
         bool disconnect()
         {
-            m_dataNode->onRemoveGetLink(*this);
-            m_dataNode = nullptr;
+            m_nodeData->onRemoveWriteLink(*this);
+            m_nodeData = nullptr;
         }
-    
-        NodeData* dataNode() { return m_dataNode; }
+
+        NodeData* dataNode() { return m_nodeData; }
 
     protected:
-        NodeData* m_dataNode = nullptr;  //! Connected data node.
+        NodeData* m_nodeData = nullptr;  //! Connected data node.
     };
 
 }  // namespace executionGraph
