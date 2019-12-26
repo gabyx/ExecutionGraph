@@ -50,7 +50,7 @@ endif()
 
 if(TARGET "RTTR::Core")
     add_library(rttrLib INTERFACE IMPORTED)
-    set_property(TARGET rttrLib PROPERTY INTERFACE_LINK_LIBRARIES RTTR::Core_Lib)
+    set_property(TARGET rttrLib PROPERTY INTERFACE_LINK_LIBRARIES RTTR::Core)
 
     message(STATUS "rttr library found! Config File: ${RTTR_CONFIG}")
     message(STATUS "rttr library added targets: rttrLib")
