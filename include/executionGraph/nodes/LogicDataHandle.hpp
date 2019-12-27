@@ -14,7 +14,6 @@
 
 #include <type_traits>
 #include <meta/meta.hpp>
-
 #include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
@@ -58,28 +57,33 @@ namespace executionGraph
         LogicDataHandle& operator=(const LogicDataHandle&) = delete;
 
         //! Move constructor.
-        template<typename T, std::enable_if_t<constructibleFrom<T>, int> = 0>
+        // clang-format off
+        template<typename T> requires constructibleFrom<T>
         LogicDataHandle(LogicDataHandle<T>&& handle) noexcept
         {
             *this = std::move(handle);
         }
+        // clang-format on
 
-        // Move assignment.
-        template<typename T, std::enable_if_t<constructibleFrom<T>, int> = 0>
+        //! Move assignment.
+        // clang-format off
+        template<typename T> requires constructibleFrom<T>
         LogicDataHandle& operator=(LogicDataHandle<T>&& handle) noexcept
         {
             m_data        = handle.m_data;
             handle.m_data = nullptr;
             return *this;
         }
+        // clang-format on
 
     private:
-        //! Construct from a NodeData.
-        template<typename T, std::enable_if_t<constructibleFrom<T>, int> = 0>
+        //! Construct from reference to a data value `data`.
+        // clang-format off
+        template<typename T> requires constructibleFrom<T> 
         explicit LogicDataHandle(T& data) noexcept
             : m_data(&data)
-        {
-        }
+        {}
+        // clang-format on
 
     public:
         bool operator==(std::nullptr_t) noexcept
@@ -107,7 +111,7 @@ namespace executionGraph
         }
 
         //! Data-access.
-        auto* operator-> () const noexcept
+        auto* operator->() const noexcept
         {
             return m_data;
         }

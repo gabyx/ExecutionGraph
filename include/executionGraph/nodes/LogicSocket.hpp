@@ -20,6 +20,7 @@
 #include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/DemangleTypes.hpp"
 #include "executionGraph/common/EnumClassHelper.hpp"
+#include "executionGraph/common/TupleUtil.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 #include "executionGraph/nodes/LogicNode.hpp"
@@ -66,14 +67,16 @@ namespace executionGraph
     public:
         EXECGRAPH_DEFINE_TYPES();
 
+    protected:
         template<typename... Args>
         LogicSocketInputBase(Args&&... args) noexcept
             : LogicSocketBase(std::forward<Args>(args)...)
         {
         }
 
-        ~LogicSocketInputBase() noexcept;
+        ~LogicSocketInputBase() noexcept = default;
 
+    public:
         //! Cast to a logic socket of type `LogicSocketInput<T>*`.
         //! The cast fails at runtime if the data type `T` does not match!
         template<typename T>
@@ -116,7 +119,7 @@ namespace executionGraph
         {
         }
 
-        ~LogicSocketOutputBase() noexcept;
+        ~LogicSocketOutputBase() noexcept = default;
 
         LogicSocketOutputBase(LogicSocketOutputBase&&) = default;
         LogicSocketOutputBase& operator=(LogicSocketOutputBase&&) = default;
@@ -164,9 +167,7 @@ namespace executionGraph
         {
         }
 
-        ~LogicSocketInput()
-        {
-        }
+        ~LogicSocketInput() noexcept = default;
 
         //! Copy not allowed (since parent pointer)
         LogicSocketInput(const LogicSocketInput& other) = delete;
@@ -213,6 +214,8 @@ namespace executionGraph
         {
         }
 
+        ~LogicSocketOutput() noexcept = default;
+
         //! Copy not allowed (since parent pointer)
         LogicSocketOutput(const LogicSocketOutput& other) = delete;
         LogicSocketOutput& operator=(const LogicSocketOutput& other) = delete;
@@ -240,5 +243,118 @@ namespace executionGraph
     protected:
         NodeData* m_nodeData = nullptr;  //! Connected data node.
     };
+
+    namespace makeSocketsDetails
+    {
+        template<typename A, typename B>
+        using comp = meta::less<typename meta::at_c<A, 1>::Index,
+                                typename meta::at_c<B, 1>::Index>;
+
+        template<typename A>
+        using getIdx = typename meta::at_c<A, 1>::Index;
+
+        template<typename T>
+        using naked = std::remove_cvref_t<T>;
+
+        //! Test if all descriptions are input or output descriptions
+        template<typename... SocketDesc>
+        constexpr bool eitherInputsOrOutputs()
+        {
+            using namespace makeSocketsDetails;
+            using namespace meta;
+            return (... && naked<SocketDesc>::isInput()) ||
+                   (... && naked<SocketDesc>::isOutput());
+        }
+
+        //! Test if all description have the same node type.
+        template<typename... SocketDesc>
+        constexpr bool allSameNode()
+        {
+            using namespace makeSocketsDetails;
+            using namespace meta;
+            using List = list<naked<SocketDesc>...>;
+            return (... && std::is_same_v<typename naked<SocketDesc>::Node,
+                                          typename at_c<List, 0>::Node>);
+        }
+
+        //! Returns the indices list denoting the sorted descriptions `descs`.
+        template<bool checkIncreasingByOne = true,
+                 typename... SocketDesc>
+        constexpr auto sortDescriptions()
+        {
+            constexpr auto N = sizeof...(SocketDesc);
+
+            using namespace makeSocketsDetails;
+            using namespace meta::placeholders;
+            using namespace meta;
+
+            using List = list<naked<SocketDesc>...>;
+
+            using EnumeratedList = zip<list<as_list<make_index_sequence<N>>, List>>;
+
+            // Sort the list
+            using Sorted = sort<EnumeratedList,
+                                lambda<_a, _b, defer<comp, _a, _b>>>;
+
+            static_assert(!checkIncreasingByOne ||
+                              std::is_same_v<transform<Sorted, quote<getIdx>>,
+                                             as_list<make_index_sequence<N>>>,
+                          "Socket description indices are not monotone increasing by one");
+
+            using SortedIndices = unique<transform<Sorted,
+                                                   bind_back<quote<at>, meta::size_t<0>>>>;
+
+            return to_index_sequence<SortedIndices>{};
+        }
+    };  // namespace makeSocketsDetails
+
+    //! Make input sockets from `InputSocketDescriptions`.
+    template<typename... Descriptions,
+             typename Node>
+    auto makeSockets(const std::tuple<Descriptions&...>& descs,
+                     const Node& node)
+    {
+        static_assert(makeSocketsDetails::eitherInputsOrOutputs<Descriptions...>(),
+                      "Either all inputs or outputs!");
+
+        using namespace makeSocketsDetails;
+        // The SocketDescriptions::Index can be in any order
+        // -> sort them and insert the sockets in order.
+
+        static_assert(allSameNode<Descriptions...>(),
+                      "You cannot mix descriptions for different nodes!");
+
+        constexpr auto indices = sortDescriptions<true, Descriptions...>();
+        return tupleUtil::invoke(
+            descs,
+            [&](auto&&... desc) {
+                return std::make_tuple(
+                    typename naked<decltype(desc)>::SocketType(desc.index(), node)...);
+            },
+            indices);
+    }
+
+    template<typename InputDescs>
+    using InputSocketsType = decltype(makeSockets(std::declval<InputDescs>(),
+                                                  std::declval<LogicNode>()));
+    template<typename OutputDescs>
+    using OutputSocketsType = decltype(makeSockets(std::declval<OutputDescs>(),
+                                                   std::declval<LogicNode>()));
+
+    //! Convert a tuple of sockets into a container `Container`
+    //! of pointers pointing to the passed sockets.
+    //! Used to registers sockets
+    template<typename Container, typename... Type>
+    auto makePtrList(std::tuple<Type...>& sockets)
+    {
+        using Pointer = typename Container::value_type;
+        static_assert(std::is_pointer_v<Pointer>,
+                      "Value type needs to be pointer");
+        return tupleUtil::invoke(
+            sockets,
+            [](auto&... socket) {
+                return Container{Pointer{&socket}...};
+            });
+    }
 
 }  // namespace executionGraph

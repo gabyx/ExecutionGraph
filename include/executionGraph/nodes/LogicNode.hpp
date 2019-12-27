@@ -68,8 +68,8 @@ namespace executionGraph
     public:
         EXECGRAPH_DEFINE_TYPES();
 
-        using SocketInputListType  = std::vector<SocketPointer<LogicSocketInputBase>>;
-        using SocketOutputListType = std::vector<SocketPointer<LogicSocketOutputBase>>;
+        using InputSockets  = std::vector<LogicSocketInputBase*>;
+        using OutputSockets = std::vector<LogicSocketOutputBase*>;
 
     public:
         //! The basic constructor of a node.
@@ -89,22 +89,38 @@ namespace executionGraph
         //! The main compute function of this execution node.
         virtual void compute() = 0;
 
-        inline NodeId getId() const { return m_id; }
-        inline void setId(NodeId id) { m_id = id; }
+    public:
+        NodeId getId() const { return m_id; }
+        void setId(NodeId id) { m_id = id; }
+
+    protected:
+        template<typename... Sockets>
+        void registerInputs(std::tuple<Sockets...>& sockets)
+        {
+            m_inputs = makePtrList<InputSockets>(sockets);
+        }
+
+        template<typename... Sockets>
+        void registerOutputs(std::tuple<Sockets...>& sockets)
+        {
+            m_outputs = makePtrList<OutputSockets>(sockets);
+        }
+
+    public:
 
         //! Get the list of input sockets.
-        inline const SocketInputListType& getInputs() const { return m_inputs; }
-        inline SocketInputListType& getInputs() { return m_inputs; }
+        const InputSockets& getInputs() const { return m_inputs; }
+        InputSockets& getInputs() { return m_inputs; }
         //! Get the list of output sockets.
-        inline const SocketOutputListType& getOutputs() const { return m_outputs; }
-        inline SocketOutputListType& getOutputs() { return m_outputs; }
+        const OutputSockets& getOutputs() const { return m_outputs; }
+        OutputSockets& getOutputs() { return m_outputs; }
 
         IndexType connectedInputCount() const;
         IndexType connectedOutputCount() const;
 
     protected:
-        NodeId m_id;                     //!< The id of the node.
-        SocketInputListType m_inputs;    //!< The input sockets.
-        SocketOutputListType m_outputs;  //!< The output sockets.
+        NodeId m_id;              //!< The id of the node.
+        InputSockets m_inputs;    //!< The input sockets.
+        OutputSockets m_outputs;  //!< The output sockets.
     };
 }  // namespace executionGraph

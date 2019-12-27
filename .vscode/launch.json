@@ -65,6 +65,18 @@
       "MIMode": "lldb"
     },
     {
+      "name": "[lldb] ExecutionGraphTests-LogicNodes",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/tests/ExecutionGraphTest-LogicNodes",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb"
+    },
+    {
       "name": "[lldb] ExecutionGraphTests-LogicNodeData",
       "type": "cppdbg",
       "request": "launch",

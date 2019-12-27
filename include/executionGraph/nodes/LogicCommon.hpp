@@ -42,9 +42,6 @@ namespace executionGraph
     template<typename T>
     class LogicNodeData;
 
-    template<typename T>
-    using SocketPointer = T*;  //! The general socket pointer type.
-
     using IndexType  = uint64_t;   //! A general index type.
     using NodeId     = IndexType;  //! Node Id type.
     using NodeDataId = IndexType;  //! DataNode Id type.

@@ -14,20 +14,4 @@
 
 namespace executionGraph
 {
-    LogicSocketInputBase::~LogicSocketInputBase() noexcept
-    {
-        EXECGRAPH_LOG_TRACE("Destructor: LogicSocketInputBase: index: '{0}', parent: '{1}'",
-                            this->getIndex(),
-                            fmt::ptr(&this->parent()));
-
-    }
-
-    LogicSocketOutputBase::~LogicSocketOutputBase() noexcept
-    {
-        EXECGRAPH_LOG_TRACE("Destructor: LogicSocketOutputBase: index: '{0}', parent: '{1}'",
-                            this->getIndex(),
-                            fmt::ptr(&this->parent()));
-
-      
-    }
 }  // namespace executionGraph
