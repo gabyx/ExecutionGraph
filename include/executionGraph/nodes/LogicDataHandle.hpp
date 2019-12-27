@@ -21,6 +21,14 @@
 
 namespace executionGraph
 {
+    /* ---------------------------------------------------------------------------------------*/
+    /*!
+        Data handle for `LogicDataNode<T>`.
+
+        @date Fri Dec 27 2019
+        @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+    */
+    /* ---------------------------------------------------------------------------------------*/
     template<typename TData>
     class LogicDataHandle final
     {
