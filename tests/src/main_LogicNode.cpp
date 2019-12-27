@@ -22,6 +22,7 @@ MY_TEST(Node_Test, Int_Int)
 {
     // Integer node connection (wrong connection)
     DummyNode node1(1);
+    node1.compute();
     DummyNode node2(2);
 
     //node1.addWriteLink(0, node2, 1);  // Correct connection!

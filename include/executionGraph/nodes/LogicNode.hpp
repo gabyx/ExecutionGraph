@@ -107,7 +107,6 @@ namespace executionGraph
         }
 
     public:
-
         //! Get the list of input sockets.
         const InputSockets& getInputs() const { return m_inputs; }
         InputSockets& getInputs() { return m_inputs; }

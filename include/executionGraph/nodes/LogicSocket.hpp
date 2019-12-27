@@ -191,8 +191,6 @@ namespace executionGraph
             m_nodeData = nullptr;
         }
 
-        auto data() {}
-
         const NodeData* dataNode() { return m_nodeData; }
 
     protected:

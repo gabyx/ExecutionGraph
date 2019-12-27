@@ -57,33 +57,30 @@ namespace executionGraph
         LogicDataHandle& operator=(const LogicDataHandle&) = delete;
 
         //! Move constructor.
-        // clang-format off
-        template<typename T> requires constructibleFrom<T>
+        template<typename T,
+                 EXECGRAPH_ENABLE_IF(constructibleFrom<T>)>
         LogicDataHandle(LogicDataHandle<T>&& handle) noexcept
         {
             *this = std::move(handle);
         }
-        // clang-format on
 
         //! Move assignment.
-        // clang-format off
-        template<typename T> requires constructibleFrom<T>
+        template<typename T,
+                 EXECGRAPH_ENABLE_IF(constructibleFrom<T>)>
         LogicDataHandle& operator=(LogicDataHandle<T>&& handle) noexcept
         {
             m_data        = handle.m_data;
             handle.m_data = nullptr;
             return *this;
         }
-        // clang-format on
 
     private:
         //! Construct from reference to a data value `data`.
-        // clang-format off
-        template<typename T> requires constructibleFrom<T> 
+        template<typename T,
+                 EXECGRAPH_ENABLE_IF(constructibleFrom<T>)>
         explicit LogicDataHandle(T& data) noexcept
             : m_data(&data)
         {}
-        // clang-format on
 
     public:
         bool operator==(std::nullptr_t) noexcept

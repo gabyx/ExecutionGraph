@@ -28,6 +28,7 @@ namespace executionGraph
     class DummyNode : public LogicNode
     {
         using Base = LogicNode;
+        EXECGRAPH_DEFINE_NODE(DummyNode);
 
     public:
         EXECGRAPH_DEFINE_INPUT_DESCR(in0Decl, int, 0, "Value0");
@@ -58,30 +59,31 @@ namespace executionGraph
             registerOutputs(m_outSockets);
         }
 
-        // static constexpr SocketDescription<int> inDeclValue2{1, "Value2"};
-        // static constexpr OutSocketDecleration<int> outDeclResult{0, "Result"};
+    public:
+        template<typename SocketDesc,
+                 EXECGRAPH_ENABLE_IF((meta::is_v<SocketDesc, LogicSocketDescription> &&
+                                      SocketDesc::isInput() &&
+                                      SocketDesc::template belongsToNode<DummyNode>()))>
+        auto& socket(const SocketDesc&)
+        {
+            return std::get<SocketDesc::index()>(m_inSockets);
+        }
 
-        // using InSocketList  = decltype(getInSocketList(inDeclValue1, inDeclValue2));
-        // using OutSocketList = decltype(getOutSocketList(outDeclResult));
+        template<typename SocketDesc,
+                 EXECGRAPH_ENABLE_IF((meta::is_v<SocketDesc, LogicSocketDescription> &&
+                                      SocketDesc::isOutput() &&
+                                      SocketDesc::template belongsToNode<DummyNode>()))>
+        auto& socket(const SocketDesc&)
+        {
+            return std::get<SocketDesc::index()>(m_outSockets);
+        }
 
-        // template<typename SocketDecl>
-        // auto& outSocket()
-        // {
-        //     using T = SocketDecl::Data;
-        //     return std::get<getIndex>(m_outSockets);
-        // }
-
-        // template<typename SocketDecl>
-        // auto& inSocket(const SocketDecl& decl)
-        // {
-        //     using T = SocketDecl::Data;
-        //     return std::get<LogicSocketInput<T>>(m_inSockets);
-        // }
-
+    public:
         void reset() override{};
 
         void compute() override
         {
+            EXECGRAPH_THROW_IF(socket(out0Decl).dataNode() == nullptr, "Wups");
         }
 
     private:

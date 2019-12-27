@@ -20,8 +20,8 @@
 
     @code
     template<typename T,
-              EXECGRAPH_SFINAE_ENABLE_IF( T::value == 2 ),
-              EXECGRAPH_SFINAE_ENABLE_IF( T::size == 5 ),
+              EXECGRAPH_ENABLE_IF( T::value == 2 ),
+              EXECGRAPH_ENABLE_IF( T::size == 5 ),
     >
     void foo(){}
     @endcode
@@ -29,12 +29,12 @@
     @code
     template<typename T, typename = void> struct A;
     template<typename T> 
-    struct A<T, EXECGRAPH_SFINAE_ENABLE_IF_CLASS(T::a ==3)>
+    struct A<T, EXECGRAPH_ENABLE_IF_CLASS(T::a ==3)>
     {
         // code
     }
     template<typename T> 
-    struct A<T, EXECGRAPH_SFINAE_ENABLE_IF_CLASS(T::a ==4)>
+    struct A<T, EXECGRAPH_ENABLE_IF_CLASS(T::a ==4)>
     {
         // code
     }
@@ -46,7 +46,5 @@
  */
 /* ---------------------------------------------------------------------------------------*/
 
-#define EXECGRAPH_SFINAE_ENABLE_IF_IMPL(__meta__) typename std::enable_if<(__meta__)>::type*
-#define EXECGRAPH_SFINAE_ENABLE_IF(__meta__) EXECGRAPH_SFINAE_ENABLE_IF_IMPL(__meta__) = nullptr
-
-#define EXECGRAPH_SFINAE_ENABLE_IF_CLASS(__meta__) typename std::enable_if<(__meta__)>::type
+#define EXECGRAPH_ENABLE_IF(condition) std::enable_if_t<(condition), int> = 0
+#define EXECGRAPH_ENABLE_IF_CLASS(condition) std::enable_if_t<(condition), void>
