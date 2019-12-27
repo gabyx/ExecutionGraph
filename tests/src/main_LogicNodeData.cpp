@@ -34,8 +34,11 @@ MY_TEST(NodeData, HandlesBasic)
     const auto& cn = n;
     static_assert(std::is_same_v<decltype(*cn.data()), const int&>, "Wrong type");
     static_assert(std::is_same_v<decltype(*cn.cdata()), const int&>, "Wrong type");
-    auto n2    = std::move(n);
-    *n2.data() = 4;
+    auto n2      = std::move(n);
+    auto handle1 = n2.data();
+    *handle1     = 4;
+    auto handle2 = std::move(handle1);
+    ASSERT_TRUE(handle1 == nullptr);
     ASSERT_EQ(*n2.data(), 4);
 }
 
@@ -52,7 +55,10 @@ MY_TEST(NodeData, HandlesClass)
     static_assert(std::is_same_v<decltype(*cn.data()), const A&>, "Wrong type");
     static_assert(std::is_same_v<decltype(*cn.cdata()), const A&>, "Wrong type");
     auto n2      = std::move(n);
-    n2.data()->a = 4;
+    auto handle1 = n2.data();
+    handle1->a   = 4;
+    auto handle2 = std::move(handle1);
+    ASSERT_TRUE(handle1 == nullptr);
     ASSERT_EQ(n2.data()->a, 4);
 }
 

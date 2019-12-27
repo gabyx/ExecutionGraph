@@ -70,6 +70,7 @@ namespace executionGraph
         {
             m_data        = handle.m_data;
             handle.m_data = nullptr;
+            return *this;
         }
 
     private:
