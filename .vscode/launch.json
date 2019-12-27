@@ -70,7 +70,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/build/tests/ExecutionGraphTest-LogicNodeData",
       "args": [],
-      "stopAtEntry": true,
+      "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],
       "externalConsole": false,
@@ -82,10 +82,14 @@
       "request": "launch",
       "program": "${workspaceFolder}/build/gui/executionGraphGui/server/ExecutionGraphServer",
       "args": [
-        "--address", "127.0.0.1",
-        "--rootPath", "${workspaceFolder}/docs",
-        "--port", "8089",
-        "--threads", "2"
+        "--address",
+        "127.0.0.1",
+        "--rootPath",
+        "${workspaceFolder}/docs",
+        "--port",
+        "8089",
+        "--threads",
+        "2"
       ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
@@ -113,7 +117,7 @@
       "args": ["."],
       "protocol": "inspector",
       "skipFiles": ["ConsoleSink.ts", "MultiSinkLogger.ts"],
-      "stopOnEntry": true,
+      "stopOnEntry": true
     }
   ]
 }
