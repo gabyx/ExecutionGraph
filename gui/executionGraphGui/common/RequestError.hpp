@@ -29,5 +29,5 @@ public:
         : executionGraph::Exception(s) {}
 };
 
-#define EXECGRAPHGUI_THROW_BAD_REQUEST_IF(condition, ...) EXECGRAPHGUI_THROW_TYPE_IF(condition, BadRequestError, __VA_ARGS__)
-#define EXECGRAPHGUI_THROW_BAD_REQUEST(...) EXECGRAPHGUI_THROW_TYPE(BadRequestError, __VA_ARGS__)
+#define EGGUI_THROW_BAD_REQUEST_IF(condition, ...) EGGUI_THROW_TYPE_IF(condition, BadRequestError, __VA_ARGS__)
+#define EGGUI_THROW_BAD_REQUEST(...) EGGUI_THROW_TYPE(BadRequestError, __VA_ARGS__)

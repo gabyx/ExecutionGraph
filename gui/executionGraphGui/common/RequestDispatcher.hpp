@@ -48,7 +48,7 @@ namespace details
                 m_handler->handleRequest(m_request, m_response);
                 if(!m_response.isResolved())
                 {
-                    EXECGRAPHGUI_THROW(
+                    EGGUI_THROW(
                         "RequestDispatcher: Request id: '{0}' (url: '{1}') "
                         "has not been handled correctly, it will be cancled!",
                         m_request.getId().toString(),
@@ -64,7 +64,7 @@ namespace details
 
         void onTaskException(std::exception_ptr e)
         {
-            EXECGRAPHGUI_BACKENDLOG_WARN(
+            EGGUI_BACKENDLOG_WARN(
                 "RequestDispatcher: Exception in handler! -> Cancel request id: '{0}' [url: '{1}']",
                 m_request.getId().toString(),
                 m_request.target());
@@ -157,10 +157,10 @@ public:
         std::scoped_lock<std::mutex> lock(m_access);
 
         const auto& requestTargets = handler->requestTargets();
-        EXECGRAPHGUI_THROW_IF(!handler || requestTargets.size() == 0, "nullptr or no Requests");
+        EGGUI_THROW_IF(!handler || requestTargets.size() == 0, "nullptr or no Requests");
 
         const Id& id = handler->getId();
-        EXECGRAPHGUI_THROW_IF(m_handlerStorage.find(id) != m_handlerStorage.end(),
+        EGGUI_THROW_IF(m_handlerStorage.find(id) != m_handlerStorage.end(),
                               "MessageHandler with id: '{0}' already exists!",
                               id.toString());
 
@@ -168,7 +168,7 @@ public:
 
         for(auto& target : p.first->second.m_targets)
         {
-            EXECGRAPHGUI_THROW_IF(m_specificHandlers.find(target) != m_specificHandlers.end(),
+            EGGUI_THROW_IF(m_specificHandlers.find(target) != m_specificHandlers.end(),
                                   "Handler for request target: '{0}' already registered!",
                                   target);
             m_specificHandlers[target] = &(p.first->second);

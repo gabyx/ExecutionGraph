@@ -69,7 +69,7 @@ AppCLArgs::AppCLArgs(int argc, char* argv[])
     }
     catch(args::ParseError e)
     {
-        EXECGRAPHGUI_THROW("Parser Error: '{0}'\n{1}", e.what(), m_parser);
+        EGGUI_THROW("Parser Error: '{0}'\n{1}", e.what(), m_parser);
     }
 }
 

@@ -58,7 +58,7 @@ namespace executionGraph
 
         //! Move constructor.
         template<typename T,
-                 EXECGRAPH_ENABLE_IF(constructibleFrom<T>)>
+                 EG_ENABLE_IF(constructibleFrom<T>)>
         LogicDataHandle(LogicDataHandle<T>&& handle) noexcept
         {
             *this = std::move(handle);
@@ -66,7 +66,7 @@ namespace executionGraph
 
         //! Move assignment.
         template<typename T,
-                 EXECGRAPH_ENABLE_IF(constructibleFrom<T>)>
+                 EG_ENABLE_IF(constructibleFrom<T>)>
         LogicDataHandle& operator=(LogicDataHandle<T>&& handle) noexcept
         {
             m_data        = handle.m_data;
@@ -77,7 +77,7 @@ namespace executionGraph
     private:
         //! Construct from reference to a data value `data`.
         template<typename T,
-                 EXECGRAPH_ENABLE_IF(constructibleFrom<T>)>
+                 EG_ENABLE_IF(constructibleFrom<T>)>
         explicit LogicDataHandle(T& data) noexcept
             : m_data(&data)
         {}

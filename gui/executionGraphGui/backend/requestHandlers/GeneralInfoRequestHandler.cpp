@@ -55,7 +55,7 @@ GeneralInfoRequestHandler::requestTargets() const
 void GeneralInfoRequestHandler::handleRequest(const Request& request,
                                               ResponsePromise& response)
 {
-    EXECGRAPHGUI_BACKENDLOG_INFO("GeneralInfoRequestHandler::handleRequest");
+    EGGUI_BACKENDLOG_INFO("GeneralInfoRequestHandler::handleRequest");
     m_functionMap.dispatch(request.target().native(), *this, request, response);
 }
 
@@ -63,7 +63,7 @@ void GeneralInfoRequestHandler::handleRequest(const Request& request,
 void GeneralInfoRequestHandler::handleGetAllGraphTypeDescriptions(const Request& request,
                                                                   ResponsePromise& response)
 {
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(request.payload() != std::nullopt,
+    EGGUI_THROW_BAD_REQUEST_IF(request.payload() != std::nullopt,
                                       "There should not be any request payload for this request");
     using Allocator = ResponsePromise::Allocator;
 

@@ -71,7 +71,7 @@ struct DummyNodeSerializer
     //! for the DummyNode `node`.
     struct Writer
     {
-        EXECGRAPH_DEFINE_TYPES(Config);
+        EG_DEFINE_TYPES(Config);
 
         using Key = DummyNodeType;
 
@@ -93,7 +93,7 @@ struct DummyNodeSerializer
     //! buffer `node`.
     struct Reader
     {
-        EXECGRAPH_DEFINE_TYPES(Config);
+        EG_DEFINE_TYPES(Config);
 
         using Key = DummyNodeType;
 
@@ -116,7 +116,7 @@ MY_TEST(FlatBuffer, GraphSimple)
     auto makeLogicNodes = [&](auto& builder) {
         std::vector<flatbuffers::Offset<s::LogicNode>> nodes;
 
-        EXECGRAPH_LOG_TRACE("Serializing '{0}' nodes", nNodes);
+        EG_LOG_TRACE("Serializing '{0}' nodes", nNodes);
         for(int i = 0; i < nNodes; ++i)
         {
             uint64_t id = i;
@@ -143,7 +143,7 @@ MY_TEST(FlatBuffer, GraphSimple)
             lnBuilder.add_data(data);
             nodes.push_back(lnBuilder.Finish());
         }
-        EXECGRAPH_LOG_TRACE("Serializing done!");
+        EG_LOG_TRACE("Serializing done!");
         return builder.CreateVector(nodes);
     };
 
@@ -158,14 +158,14 @@ MY_TEST(FlatBuffer, GraphSimple)
     const uint8_t* buf = builder.GetBufferPointer();
     std::size_t size   = builder.GetSize();
 
-    EXECGRAPH_LOG_TRACE("Write file");
+    EG_LOG_TRACE("Write file");
     std::ofstream file("myGraph.eg", std::ios_base::trunc | std::ios_base::binary | std::ios_base::in);
     file.write(reinterpret_cast<const char*>(buf), size);
     file.close();
-    EXECGRAPH_LOG_TRACE("Write file done");
+    EG_LOG_TRACE("Write file done");
 
     {
-        EXECGRAPH_LOG_TRACE("Read graph simple");
+        EG_LOG_TRACE("Read graph simple");
         executionGraph::FileMapper mapper("myGraph.eg");
         buf        = mapper.data();
         auto graph = s::GetExecutionGraph(buf);
@@ -173,7 +173,7 @@ MY_TEST(FlatBuffer, GraphSimple)
     }
 
     {
-        EXECGRAPH_LOG_TRACE("Read graph by Serializer");
+        EG_LOG_TRACE("Read graph by Serializer");
 
         using LogicNodeS = LogicNodeSerializer<Config,
                                                meta::list<DummyNodeSerializer>>;
@@ -185,7 +185,7 @@ MY_TEST(FlatBuffer, GraphSimple)
         GraphTypeDescription::NodeTypeDescriptionList nodeTypeDescs = {
             NodeTypeDescription{rttr::type::get<DummyNodeType>().get_name().to_string()}};
 
-        EXECGRAPH_LOG_TRACE("Write graph by Serializer");
+        EG_LOG_TRACE("Write graph by Serializer");
         serializer.write(execGraph,
                          makeGraphTypeDescription<Config>(IdNamed{"Graph1"},
                                                           nodeTypeDescs,
@@ -201,13 +201,13 @@ MY_TEST(FlatBuffer, RandomTree)
 {
     using namespace executionGraph;
 
-    EXECGRAPH_LOG_TRACE("Build graph");
+    EG_LOG_TRACE("Build graph");
     auto execGraph   = createRandomTree<GraphType, DummyNodeType>(3, 123456);
     using LogicNodeS = LogicNodeSerializer<Config,
                                            meta::list<DummyNodeSerializer>>;
     LogicNodeS nodeSerializer;
     ExecutionGraphSerializer<GraphType, LogicNodeS> serializer(nodeSerializer);
-    EXECGRAPH_LOG_TRACE("Write graph by Serializer");
+    EG_LOG_TRACE("Write graph by Serializer");
 
     GraphTypeDescription::NodeTypeDescriptionList nodeTypeDescs = {
         NodeTypeDescription{rttr::type::get<DummyNodeType>().get_name().to_string()}};

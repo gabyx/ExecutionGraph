@@ -19,7 +19,7 @@
 
 namespace executionGraph
 {
-    class EXECGRAPH_EXPORT GraphTypeDescriptionSerializer
+    class EG_EXPORT GraphTypeDescriptionSerializer
     {
     public:
         static flatbuffers::Offset<serialization::GraphTypeDescription> write(flatbuffers::FlatBufferBuilder& builder,

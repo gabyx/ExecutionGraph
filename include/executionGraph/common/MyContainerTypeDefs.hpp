@@ -41,7 +41,7 @@ namespace executionGraph
 }  // namespace executionGraph
 
 /** @brief This macro is used to typedef all custom container types. */
-#define EXECGRAPH_DEFINE_CONTAINER_TYPES                                                                      \
+#define EG_DEFINE_CONTAINER_TYPES                                                                      \
                                                                                                               \
     template<typename Key, typename Type, typename Comp = std::less<Key>>                                     \
     using StdMapAligned = executionGraph::MyContainers::StdMapAligned<Key, Type, Comp>;                       \

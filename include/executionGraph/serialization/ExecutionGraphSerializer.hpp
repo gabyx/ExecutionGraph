@@ -30,18 +30,18 @@ namespace executionGraph
     const executionGraph::serialization::ExecutionGraph* getGraphSerialization(BufferView buffer)
     {
         namespace s = serialization;
-        EXECGRAPH_ASSERT(buffer.data() != nullptr, "Buffer is nullptr!");
+        EG_ASSERT(buffer.data() != nullptr, "Buffer is nullptr!");
 
         // Deserialize
-        EXECGRAPH_THROW_IF(!s::ExecutionGraphBufferHasIdentifier(buffer.data()),
+        EG_THROW_IF(!s::ExecutionGraphBufferHasIdentifier(buffer.data()),
                            "File identifier not found!");
 
         flatbuffers::Verifier verifier(buffer.data(), buffer.size(), 64, 1000000000);
-        EXECGRAPH_THROW_IF(!s::VerifyExecutionGraphBuffer(verifier),
+        EG_THROW_IF(!s::VerifyExecutionGraphBuffer(verifier),
                            "Buffer could not be verified!");
 
         auto graph = s::GetExecutionGraph(buffer.data());
-        EXECGRAPH_THROW_IF(graph == nullptr,
+        EG_THROW_IF(graph == nullptr,
                            "Deserialization is invalid!");
         return graph;
     }
@@ -60,7 +60,7 @@ namespace executionGraph
     public:
         using GraphType = TGraphType;
         using TConfig   = typename GraphType::Config;
-        EXECGRAPH_DEFINE_TYPES(TConfig);
+        EG_DEFINE_TYPES(TConfig);
         using LogicNodeSerializer = TLogicNodeSerializer;
 
         ExecutionGraphSerializer(LogicNodeSerializer& nodeSerializer)
@@ -94,7 +94,7 @@ namespace executionGraph
             }
             catch(const Exception& e)
             {
-                EXECGRAPH_THROW("Loading of file '{0}' failed: '{1}",
+                EG_THROW("Loading of file '{0}' failed: '{1}",
                                 filePath,
                                 e.what());
             }
@@ -119,7 +119,7 @@ namespace executionGraph
             FinishExecutionGraphBuffer(builder, graphOffset);
 
             std::ofstream file;
-            EXECGRAPH_THROW_IF(!overwrite && std::filesystem::exists(filePath),
+            EG_THROW_IF(!overwrite && std::filesystem::exists(filePath),
                                "File '{0}' already exists!",
                                filePath);
 
@@ -292,12 +292,12 @@ namespace executionGraph
                 std::unique_ptr<NodeBaseType> logicNode = m_nodeSerializer.read(*node);
                 if(logicNode)
                 {
-                    EXECGRAPH_LOG_TRACE("Adding node with id: '{0}', type: '{0}'", node->id(), node->type()->str());
+                    EG_LOG_TRACE("Adding node with id: '{0}', type: '{0}'", node->id(), node->type()->str());
                     execGraph.addNode(std::move(logicNode));
                 }
                 else
                 {
-                    EXECGRAPH_THROW("Could not load node with id: '{0}'", node->id());
+                    EG_THROW("Could not load node with id: '{0}'", node->id());
                 }
             }
         }

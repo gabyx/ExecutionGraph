@@ -25,7 +25,7 @@
 class BackendRequestHandler : public executionGraph::IObjectID
 {
     RTTR_ENABLE()
-    EXECGRAPH_NAMED_OBJECT_ID_DECLARATION
+    EG_NAMED_OBJECT_ID_DECLARATION
 
 public:
     static const std::path targetBase;  //!< The base targe path for all request targets.

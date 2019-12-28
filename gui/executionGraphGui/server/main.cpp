@@ -37,7 +37,7 @@ auto runWorkers(IOContext& ioc, std::size_t threads)
     boost::asio::signal_set signals(ioc, SIGINT, SIGTERM);
     signals.async_wait(
         [&](boost::system::error_code const&, int) {
-            EXECGRAPHGUI_BACKENDLOG_INFO("ExecutionGraph Server shutting down ...");
+            EGGUI_BACKENDLOG_INFO("ExecutionGraph Server shutting down ...");
             // Stop the `io_context`. This will cause `run()`
             // to return immediately, eventually destroying the
             // `io_context` and all of the sockets in it.
@@ -46,17 +46,17 @@ auto runWorkers(IOContext& ioc, std::size_t threads)
 
     auto run = [&ioc](auto threadIdx) {
         // If an exception is not handled and
-        EXECGRAPHGUI_BACKENDLOG_INFO("Start thread '{0}' ...", threadIdx);
+        EGGUI_BACKENDLOG_INFO("Start thread '{0}' ...", threadIdx);
         try
         {
             ioc.run();  // Blocking!
         }
         catch(std::exception& e)
         {
-            EXECGRAPHGUI_BACKENDLOG_FATAL("Stop Executor: Exception on thread '{0}' : '{1}'", threadIdx, e.what());
+            EGGUI_BACKENDLOG_FATAL("Stop Executor: Exception on thread '{0}' : '{1}'", threadIdx, e.what());
             ioc.stop();  // Non blocking!
         }
-        EXECGRAPHGUI_BACKENDLOG_INFO("End thread '{0}' ...", threadIdx);
+        EGGUI_BACKENDLOG_INFO("End thread '{0}' ...", threadIdx);
     };
 
     // Run the I/O service on the requested number of threads.
@@ -91,7 +91,7 @@ int main(int argc, const char* argv[])
     ServerCLArgs args(argc, argv);
 
     // Make all loggers.
-    EXECGRAPH_INSTANCIATE_SINGLETON_CTOR(Loggers, loggers, (args.logPath()));
+    EG_INSTANCIATE_SINGLETON_CTOR(Loggers, loggers, (args.logPath()));
 
     // Make a allocator for messages (requests/responses etc.)
     auto allocator = std::make_shared<BufferPool>();
@@ -100,7 +100,7 @@ int main(int argc, const char* argv[])
     auto dispatcher = std::make_shared<BackendRequestDispatcher>();
     setupBackends(dispatcher, args.rootPath());
 
-    EXECGRAPHGUI_BACKENDLOG_INFO(
+    EGGUI_BACKENDLOG_INFO(
         "Starting ExecutionGraph Server at '{0}:{1} with '{2}' threads.\n"
         "Logs located at '{3}'\n"
         "Root path: '{4}'",
@@ -143,7 +143,7 @@ int main(int argc, const char* argv[])
     boost::asio::signal_set signals(ioc, SIGINT, SIGTERM);
     signals.async_wait(
         [&](boost::system::error_code const&, int) {
-            EXECGRAPHGUI_BACKENDLOG_INFO("ExecutionGraph Server shutting down ...");
+            EGGUI_BACKENDLOG_INFO("ExecutionGraph Server shutting down ...");
             // Stop the `io_context`. This will cause `run()`
             // to return immediately, eventually destroying the
             // `io_context` and all of the sockets in it.
@@ -164,6 +164,6 @@ int main(int argc, const char* argv[])
 
 #endif
 
-    EXECGRAPHGUI_BACKENDLOG_INFO("ExecutionGraph Server shutdown.");
+    EGGUI_BACKENDLOG_INFO("ExecutionGraph Server shutdown.");
     return EXIT_SUCCESS;
 }

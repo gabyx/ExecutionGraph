@@ -26,14 +26,14 @@ using tcp       = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
 
 void HttpWorker::start()
 {
-    EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}::start()", m_name);
+    EGGUI_BACKENDLOG_DEBUG("{0}::start()", m_name);
     accept();
     checkDeadline();
 }
 
 void HttpWorker::accept()
 {
-    EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}::post async_accept()", m_name);
+    EGGUI_BACKENDLOG_DEBUG("{0}::post async_accept()", m_name);
 
     // Clean up any previous connection.
     beast::error_code ec;
@@ -58,7 +58,7 @@ void HttpWorker::accept()
 
 void HttpWorker::readRequest()
 {
-    EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}::post async_read()", m_name);
+    EGGUI_BACKENDLOG_DEBUG("{0}::post async_read()", m_name);
     // On each read the parser needs to be destroyed and
     // recreated.
     // Arguments passed to the parser constructor are
@@ -76,7 +76,7 @@ void HttpWorker::readRequest()
         [this](beast::error_code ec, std::size_t) {
             if(ec)
             {
-                EXECGRAPHGUI_BACKENDLOG_ERROR("{0}:: '{1}'", m_name, ec.message());
+                EGGUI_BACKENDLOG_ERROR("{0}:: '{1}'", m_name, ec.message());
                 accept();
             }
             else
@@ -88,7 +88,7 @@ void HttpWorker::readRequest()
 
 void HttpWorker::processRequest(const Request& request)
 {
-    EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}::processRequest()", m_name);
+    EGGUI_BACKENDLOG_DEBUG("{0}::processRequest()", m_name);
 
     switch(request.method())
     {
@@ -112,7 +112,7 @@ void HttpWorker::processRequest(const Request& request)
 void HttpWorker::sendBadResponse(http::status status,
                                  std::string const& error)
 {
-    EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}::sendBadResponse()", m_name);
+    EGGUI_BACKENDLOG_DEBUG("{0}::sendBadResponse()", m_name);
 
     m_responseStringSerializer.reset();
     m_responseString.reset();
@@ -133,7 +133,7 @@ void HttpWorker::sendBadResponse(http::status status,
     http::async_write(m_socket,
                       *m_responseStringSerializer,
                       [this](beast::error_code ec, std::size_t) {
-                          EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}:: write completed -> socket shutdown", m_name);
+                          EGGUI_BACKENDLOG_DEBUG("{0}:: write completed -> socket shutdown", m_name);
                           m_socket.shutdown(tcp::socket::shutdown_send, ec);
                           accept();
                       });
@@ -158,7 +158,7 @@ void HttpWorker::sendFile(std::string_view target)
         path = m_rootPath / "index.html";
     }
 
-    EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}::sendFile() : '{1}'",
+    EGGUI_BACKENDLOG_DEBUG("{0}::sendFile() : '{1}'",
                                   m_name,
                                   target);
 
@@ -193,7 +193,7 @@ void HttpWorker::sendFile(std::string_view target)
     http::async_write(m_socket,
                       *m_responseFileSerializer,
                       [this](beast::error_code ec, std::size_t) {
-                          EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}:: write completed -> socket shutdown send", m_name);
+                          EGGUI_BACKENDLOG_DEBUG("{0}:: write completed -> socket shutdown send", m_name);
                           m_socket.shutdown(tcp::socket::shutdown_send, ec);
                           accept();
                       });
@@ -201,11 +201,11 @@ void HttpWorker::sendFile(std::string_view target)
 
 void HttpWorker::checkDeadline()
 {
-    // EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}:: check deadline", m_name);
+    // EGGUI_BACKENDLOG_DEBUG("{0}:: check deadline", m_name);
     // The deadline may have moved, so check it has really passed.
     if(m_requestDeadline.expiry() <= std::chrono::steady_clock::now())
     {
-        EXECGRAPHGUI_BACKENDLOG_DEBUG("{0}:: deadline expired -> close socket",
+        EGGUI_BACKENDLOG_DEBUG("{0}:: deadline expired -> close socket",
                                       m_name);
         // Close socket to cancel any outstanding operation.
         m_socket.close();

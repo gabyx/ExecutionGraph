@@ -20,7 +20,7 @@ namespace executionGraph
 {
     namespace details
     {
-        EXECGRAPH_EXPORT std::string demangle(const char* name);
+        EG_EXPORT std::string demangle(const char* name);
     }
 
     template<typename T>
@@ -35,5 +35,5 @@ namespace executionGraph
         return details::demangle(typeid(T).name());
     }
 
-    EXECGRAPH_EXPORT std::string shortenTemplateBrackets(std::string s, unsigned int fromLevel = 1);
+    EG_EXPORT std::string shortenTemplateBrackets(std::string s, unsigned int fromLevel = 1);
 }  // namespace executionGraph

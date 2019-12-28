@@ -40,9 +40,9 @@ std::unique_ptr<GraphType> createRandomTree(std::size_t nNodes,
     for(int i = 0; i < nNodes; ++i)
     {
         vec[i] = std::make_unique<NodeType>(i);
-        EXECGRAPH_LOG_TRACE_CONT("{0},", vec[i]->getId());
+        EG_LOG_TRACE_CONT("{0},", vec[i]->getId());
     }
-    EXECGRAPH_LOG_TRACE_CONT("\n");
+    EG_LOG_TRACE_CONT("\n");
 
     // Links
     std::vector<int> idWithConnectionToZero;
@@ -53,7 +53,7 @@ std::unique_ptr<GraphType> createRandomTree(std::size_t nNodes,
     {
         // Make link from input 1
         int id = (dis(gen) / ((double)nNodes)) * (i - 1);
-        //EXECGRAPH_LOG_TRACE(id << "-->" << i <<"[0]");
+        //EG_LOG_TRACE(id << "-->" << i <<"[0]");
         vec[i]->setGetLink(*vec[id], 0, 0);
 
         if(idWithConnectionToZero[id])
@@ -64,7 +64,7 @@ std::unique_ptr<GraphType> createRandomTree(std::size_t nNodes,
         // Make link from input 2
 
         id = (dis(gen) / ((double)nNodes)) * (i - 1);
-        //EXECGRAPH_LOG_TRACE(id << "-->" << i <<"[1]");
+        //EG_LOG_TRACE(id << "-->" << i <<"[1]");
         vec[i]->setGetLink(*vec[id], 0, 1);
 
         if(idWithConnectionToZero[id])
@@ -91,8 +91,8 @@ std::unique_ptr<GraphType> createRandomTree(std::size_t nNodes,
     {
         auto* node = execTree->getNode(i);
 
-        // EXECGRAPH_LOG_TRACE("id: " << i << " has " << node->connectedInputCount() <<" connected inputs.");
-        // EXECGRAPH_LOG_TRACE("id: " << i << " has " << node->connectedOutputCount() <<" connected output.");
+        // EG_LOG_TRACE("id: " << i << " has " << node->connectedInputCount() <<" connected inputs.");
+        // EG_LOG_TRACE("id: " << i << " has " << node->connectedOutputCount() <<" connected output.");
         if(node->connectedInputCount() == 0)
         {
             execTree->setNodeClass(*node, GraphType::NodeClassification::InputNode);

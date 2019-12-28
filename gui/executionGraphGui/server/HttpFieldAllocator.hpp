@@ -65,7 +65,7 @@ namespace details
             auto last = p_ + n;
             if(last >= end())
             {
-                EXECGRAPHGUI_THROW_TYPE(std::bad_alloc);
+                EGGUI_THROW_TYPE(std::bad_alloc);
             }
             ++count_;
             auto p = p_;

@@ -32,14 +32,14 @@ public:
     {
         Result1,
     };
-    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs);
+    EG_DEFINE_SOCKET_TRAITS(Ins, Outs);
 
     using InSockets = InSocketDeclList<InSocketDecl<Value1, int>,
                                        InSocketDecl<Value2, int>>;
 
     using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, int>>;
 
-    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
+    EG_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
 
     template<typename... Args>
     IntegerNode(Args&&... args)
@@ -104,9 +104,9 @@ int main()
 
     // Build the execution order
     execTree.setup();
-    EXECGRAPH_LOG_INFO(execTree.getExecutionOrderInfo());
+    EG_LOG_INFO(execTree.getExecutionOrderInfo());
     // Execute the default group 0
     execTree.runExecute(0);
 
-    EXECGRAPH_LOG_INFO("Result : {0}", resultNode->getOutVal<IntNode::Result1>());
+    EG_LOG_INFO("Result : {0}", resultNode->getOutVal<IntNode::Result1>());
 }

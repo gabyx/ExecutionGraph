@@ -30,14 +30,14 @@ DummyRequestHandler::requestTargets() const
 
 void DummyRequestHandler::handleRequest(const Request& request, ResponsePromise& response)
 {
-    EXECGRAPHGUI_BACKENDLOG_INFO("DummyRequestHandler::handleRequest");
+    EGGUI_BACKENDLOG_INFO("DummyRequestHandler::handleRequest");
     using namespace std::chrono_literals;
 
-    EXECGRAPHGUI_BACKENDLOG_INFO("DummyRequestHandler: Computing started [1sec] ...");
+    EGGUI_BACKENDLOG_INFO("DummyRequestHandler: Computing started [1sec] ...");
     std::this_thread::sleep_for(1.0s);
-    EXECGRAPHGUI_BACKENDLOG_INFO("DummyRequestHandler: Computing finished!");
+    EGGUI_BACKENDLOG_INFO("DummyRequestHandler: Computing finished!");
 
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(std::rand() % 2 == 0,
+    EGGUI_THROW_BAD_REQUEST_IF(std::rand() % 2 == 0,
                                       "DummyRequestHandler: Spontanously deciced to throw a meaningless exception! Because its fun!")
 
     auto buffer = makeBinaryBuffer(response.getAllocator(), c_debugResponse.size());
@@ -48,7 +48,7 @@ void DummyRequestHandler::handleRequest(const Request& request, ResponsePromise&
         *it = v;
         ++it;
     }
-    EXECGRAPHGUI_BACKENDLOG_INFO("DummyRequestHandler: Allocated Payload");
+    EGGUI_BACKENDLOG_INFO("DummyRequestHandler: Allocated Payload");
 
     // Set the response ready!
     response.setReady(ResponsePromise::Payload{std::move(buffer), "application/octet-stream"});

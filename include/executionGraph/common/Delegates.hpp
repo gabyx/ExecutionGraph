@@ -73,7 +73,7 @@ namespace executionGraph
         }
 
         //! One Argument Constructor ==============================================
-        template<typename T, EXECGRAPH_ENABLE_IF((!std::is_same<Delegate, std::decay<T>>::value))>
+        template<typename T, EG_ENABLE_IF((!std::is_same<Delegate, std::decay<T>>::value))>
         Delegate(T&& f)
             : m_functorStorage(operator new(sizeof(std::decay_t<T>)), functorDeleter<std::decay_t<T>>)
             , m_functorStorage_size(sizeof(std::decay_t<T>))
@@ -100,7 +100,7 @@ namespace executionGraph
             return *this = from(static_cast<C const*>(m_pObject), rhs);
         }
 
-        template<typename T, EXECGRAPH_ENABLE_IF((!std::is_same<Delegate, typename std::decay_t<T>>::value))>
+        template<typename T, EG_ENABLE_IF((!std::is_same<Delegate, typename std::decay_t<T>>::value))>
         Delegate& operator=(T&& f)
         {
             using FunctorType = typename std::decay_t<T>;

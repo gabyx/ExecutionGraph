@@ -18,7 +18,7 @@
 class Backend : public executionGraph::IObjectID
 {
     RTTR_ENABLE()
-    EXECGRAPH_NAMED_OBJECT_ID_DECLARATION
+    EG_NAMED_OBJECT_ID_DECLARATION
 
 protected:
     Backend(const IdNamed& id)

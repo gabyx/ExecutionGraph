@@ -28,24 +28,24 @@ namespace executionGraph
     class DummyNode : public LogicNode
     {
         using Base = LogicNode;
-        EXECGRAPH_DEFINE_NODE(DummyNode);
+        EG_DEFINE_NODE(DummyNode);
 
     public:
-        EXECGRAPH_DEFINE_INPUT_DESC(in0Decl, int, 0, "Value0");
-        EXECGRAPH_DEFINE_INPUT_DESC(in2Decl, float, 2, "Value2");
-        EXECGRAPH_DEFINE_INPUT_DESC(in1Decl, double, 1, "Value1");
+        EG_DEFINE_INPUT_DESC(in0Decl, int, 0, "Value0");
+        EG_DEFINE_INPUT_DESC(in2Decl, float, 2, "Value2");
+        EG_DEFINE_INPUT_DESC(in1Decl, double, 1, "Value1");
 
     private:
-        EXECGRAPH_DEFINE_DESCS(inDecls, in0Decl, in2Decl, in1Decl);
+        EG_DEFINE_DESCS(inDecls, in0Decl, in2Decl, in1Decl);
         InputSocketsTuple<decltype(inDecls)> m_inSockets;
 
     public:
-        EXECGRAPH_DEFINE_OUTPUT_DESC(out0Decl, int, 0, "Value0");
-        EXECGRAPH_DEFINE_OUTPUT_DESC(out2Decl, float, 2, "Value2");
-        EXECGRAPH_DEFINE_OUTPUT_DESC(out1Decl, double, 1, "Value1");
+        EG_DEFINE_OUTPUT_DESC(out0Decl, int, 0, "Value0");
+        EG_DEFINE_OUTPUT_DESC(out2Decl, float, 2, "Value2");
+        EG_DEFINE_OUTPUT_DESC(out1Decl, double, 1, "Value1");
 
     private:
-        EXECGRAPH_DEFINE_DESCS(outDecls, out1Decl, out2Decl, out0Decl);
+        EG_DEFINE_DESCS(outDecls, out1Decl, out2Decl, out0Decl);
         OutputSocketsTuple<decltype(outDecls)> m_outSockets;
 
     public:
@@ -60,14 +60,14 @@ namespace executionGraph
         }
 
     public:
-        EXECGRAPH_DEFINE_SOCKET_GETTERS(Node, m_inSockets, m_outSockets);
+        EG_DEFINE_SOCKET_GETTERS(Node, m_inSockets, m_outSockets);
 
     public:
         void reset() override{};
 
         void compute() override
         {
-            EXECGRAPH_THROW_IF(socket(out0Decl).dataNode() == nullptr, "Wups");
+            EG_THROW_IF(socket(out0Decl).dataNode() == nullptr, "Wups");
         }
 
     private:

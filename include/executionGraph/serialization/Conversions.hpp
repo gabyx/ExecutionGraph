@@ -16,5 +16,5 @@
 
 namespace rttr
 {
-    rttr::string_view EXECGRAPH_EXPORT toRttr(std::string_view s);
+    rttr::string_view EG_EXPORT toRttr(std::string_view s);
 }  // namespace rttr

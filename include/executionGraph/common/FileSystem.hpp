@@ -33,6 +33,6 @@ namespace std
 
 namespace executionGraph
 {
-    EXECGRAPH_EXPORT std::path splitLeadingSlashes(const std::path& path);
-    EXECGRAPH_EXPORT std::optional<std::path> splitPrefixFromPath(const std::path& path, const std::path& prefix);
+    EG_EXPORT std::path splitLeadingSlashes(const std::path& path);
+    EG_EXPORT std::optional<std::path> splitPrefixFromPath(const std::path& path, const std::path& prefix);
 }  // namespace executionGraph

@@ -23,27 +23,27 @@ namespace executionGraph
 #if(defined _WIN32) || (defined __CYGWIN__) || (defined WIN32)
 #    ifdef ExecutionGraph_BUILD_LIBRARY  // This macro is given to the compiler when building the library!
 #        ifdef __GNUC__
-#            define EXECGRAPH_EXPORT __attribute__((dllexport))
+#            define EG_EXPORT __attribute__((dllexport))
 #        else
-#            define EXECGRAPH_EXPORT __declspec(dllexport)  // Note: actually gcc seems to also supports this syntax.
+#            define EG_EXPORT __declspec(dllexport)  // Note: actually gcc seems to also supports this syntax.
 #        endif
 #    else
 #        ifdef __GNUC__
-#            define EXECGRAPH_EXPORT __attribute__((dllimport))
+#            define EG_EXPORT __attribute__((dllimport))
 #        else
-#            define EXECGRAPH_EXPORT __declspec(dllimport)  // Note: actually gcc seems to also supports this syntax.
+#            define EG_EXPORT __declspec(dllimport)  // Note: actually gcc seems to also supports this syntax.
 #        endif
 #    endif
 #else
 #    ifdef ExecutionGraph_BUILD_LIBRARY
 #        if __GNUC__ >= 4 || __clang__
-#            define EXECGRAPH_EXPORT __attribute__((visibility("default")))
+#            define EG_EXPORT __attribute__((visibility("default")))
 #        else
-#            define EXECGRAPH_EXPORT
+#            define EG_EXPORT
 #            warning "Unknown compiler: Exporting everything into library!"
 #        endif
 #    else
-#        define EXECGRAPH_EXPORT
+#        define EG_EXPORT
 #    endif
 #endif
 

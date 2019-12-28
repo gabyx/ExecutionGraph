@@ -33,7 +33,7 @@ class BufferPool;
 class BackendResourceHandler final : public CefResourceHandler,
                                      public executionGraph::IObjectID
 {
-    EXECGRAPH_NAMED_OBJECT_ID_DECLARATION
+    EG_NAMED_OBJECT_ID_DECLARATION
 
 public:
     template<typename Deleter>

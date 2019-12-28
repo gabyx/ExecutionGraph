@@ -67,7 +67,7 @@ namespace meta
     {
         using F            = decltype(std::forward<Func>(f));  // Define either an lvalue, or rvalue;
         constexpr auto map = detail::visit<List, F>::makeMap();
-        EXECGRAPH_THROW_IF(index >= map.size(), "Index {0} >= {1} : out of range!", index, map.size());
+        EG_THROW_IF(index >= map.size(), "Index {0} >= {1} : out of range!", index, map.size());
         return map[index](std::forward<Func>(f));
     }
 

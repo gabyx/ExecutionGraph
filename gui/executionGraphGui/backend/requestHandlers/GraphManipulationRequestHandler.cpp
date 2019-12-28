@@ -57,7 +57,7 @@ GraphManipulationRequestHandler::requestTargets() const
 void GraphManipulationRequestHandler::handleRequest(const Request& request,
                                                     ResponsePromise& response)
 {
-    EXECGRAPHGUI_BACKENDLOG_INFO("GraphManipulationRequestHandler::handleRequest");
+    EGGUI_BACKENDLOG_INFO("GraphManipulationRequestHandler::handleRequest");
     m_functionMap.dispatch(request.target().native(), *this, request, response);
 }
 
@@ -67,7 +67,7 @@ void GraphManipulationRequestHandler::handleAddNode(const Request& request,
 {
     // Request validation
     auto& payload = request.payload();
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
+    EGGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request data is null!");
 
     auto nodeReq = getRootOfPayloadAndVerify<s::AddNodeRequest>(*payload);
@@ -111,7 +111,7 @@ void GraphManipulationRequestHandler::handleRemoveNode(const Request& request,
 {
     // Request validation
     auto& payload = request.payload();
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
+    EGGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request data is null!");
 
     auto nodeReq = getRootOfPayloadAndVerify<s::RemoveNodeRequest>(*payload);
@@ -132,7 +132,7 @@ void GraphManipulationRequestHandler::handleAddConnection(const Request& request
 {
     // Request validation
     auto& payload = request.payload();
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
+    EGGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request data is null!");
 
     auto connectionReq = getRootOfPayloadAndVerify<s::AddConnectionRequest>(*payload);
@@ -164,7 +164,7 @@ void GraphManipulationRequestHandler::handleRemoveConnection(const Request& requ
 {
     // Request validation
     auto& payload = request.payload();
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
+    EGGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request data is null!");
 
     auto connectionReq = getRootOfPayloadAndVerify<s::RemoveConnectionRequest>(*payload);

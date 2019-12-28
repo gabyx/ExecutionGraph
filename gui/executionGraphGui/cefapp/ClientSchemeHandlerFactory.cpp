@@ -25,7 +25,7 @@ CefRefPtr<CefResourceHandler> ClientSchemeHandlerFactory::Create(CefRefPtr<CefBr
 
     CefString url = request->GetURL();
 
-    EXECGRAPHGUI_APPLOG_DEBUG("ClientSchemeHandlerFactory: handling url: '{0}' ...",
+    EGGUI_APPLOG_DEBUG("ClientSchemeHandlerFactory: handling url: '{0}' ...",
                               url.ToString());
     CefURLParts urlParts;
     if(CefParseURL(url, urlParts))
@@ -35,12 +35,12 @@ CefRefPtr<CefResourceHandler> ClientSchemeHandlerFactory::Create(CefRefPtr<CefBr
         if(!std::filesystem::exists(filePath) && std::filesystem::is_regular_file(filePath))
         {
             filePath = m_folderPath / "index.html";
-            EXECGRAPHGUI_APPLOG_WARN("ClientSchemeHandlerFactory: url '{0}' mapped to index: '{1}'",
+            EGGUI_APPLOG_WARN("ClientSchemeHandlerFactory: url '{0}' mapped to index: '{1}'",
                                      url.ToString(),
                                      filePath.string());
         }
 
-        EXECGRAPHGUI_APPLOG_DEBUG("ClientSchemeHandlerFactory: make stream for file: '{0}' ...",
+        EGGUI_APPLOG_DEBUG("ClientSchemeHandlerFactory: make stream for file: '{0}' ...",
                                   filePath.string());
         CefRefPtr<CefStreamReader> fileStream = CefStreamReader::CreateForFile(filePath.string());
 
@@ -55,11 +55,11 @@ CefRefPtr<CefResourceHandler> ClientSchemeHandlerFactory::Create(CefRefPtr<CefBr
                 mimeType = "font/" + fileExtension;
             }
 
-            EXECGRAPHGUI_APPLOG_INFO("ClientSchemeHandlerFactory: url '{0}' handled!", url.ToString());
+            EGGUI_APPLOG_INFO("ClientSchemeHandlerFactory: url '{0}' handled!", url.ToString());
             return CefRefPtr<CefStreamResourceHandler>(new CefStreamResourceHandler(mimeType, fileStream));
         }
     }
 
-    EXECGRAPHGUI_APPLOG_DEBUG("ClientSchemeHandlerFactory: url '{0}' not handled!", url.ToString());
+    EGGUI_APPLOG_DEBUG("ClientSchemeHandlerFactory: url '{0}' not handled!", url.ToString());
     return nullptr;
 }

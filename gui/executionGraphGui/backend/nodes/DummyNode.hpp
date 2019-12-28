@@ -21,7 +21,7 @@ template<typename TConfig>
 class DummyNode : public TConfig::NodeBaseType
 {
 public:
-    EXECGRAPH_DEFINE_TYPES(TConfig);
+    EG_DEFINE_TYPES(TConfig);
     using Base = typename Config::NodeBaseType;
 
 private:
@@ -51,14 +51,14 @@ public:
     {
         Result1,
     };
-    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs)
+    EG_DEFINE_SOCKET_TRAITS(Ins, Outs)
     using InSockets = InSocketDeclList<InSocketDecl<Value1, int>,
                                        InSocketDecl<Value2, int>>;
 
     using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, int>>;
-    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
-    EXECGRAPH_DEFINE_STATIC_IN_SOCKET_NAMES(InSockets, "Val1", "Val2")
-    EXECGRAPH_DEFINE_STATIC_OUT_SOCKET_NAMES(OutSockets, "Res")
+    EG_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
+    EG_DEFINE_STATIC_IN_SOCKET_NAMES(InSockets, "Val1", "Val2")
+    EG_DEFINE_STATIC_OUT_SOCKET_NAMES(OutSockets, "Res")
     //@}
 
     template<typename... Args>

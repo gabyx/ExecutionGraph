@@ -136,7 +136,7 @@ private:
     //! Allocates a buffer with size `bytes` and copies over the current bytes to the new buffer.
     void reallocate(std::uint64_t bytes)
     {
-        EXECGRAPHGUI_ASSERT(bytes > 0, "Invalid size!");
+        EGGUI_ASSERT(bytes > 0, "Invalid size!");
         // allocate (`allocate_unique` only captures allocator by reference, there we store the allocator here)
         auto buffer = foonathan::memory::allocate_unique<uint8_t[]>(*m_allocator, bytes);
         // copy data m_buffer -> buffer

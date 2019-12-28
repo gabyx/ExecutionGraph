@@ -178,7 +178,7 @@ namespace
         };
 
         auto p = splitPath(req.target());
-        EXECGRAPHGUI_BACKENDLOG_DEBUG("Target: category: '{0}', subcategory: '{1}'",
+        EGGUI_BACKENDLOG_DEBUG("Target: category: '{0}', subcategory: '{1}'",
                                       p.first,
                                       p.second);
 
@@ -199,7 +199,7 @@ namespace
         {
             try
             {
-                EXECGRAPHGUI_THROW_IF(!responeFuture.isValid(), "Future is not valid!");
+                EGGUI_THROW_IF(!responeFuture.isValid(), "Future is not valid!");
                 auto payload  = responeFuture.waitForPayload();
                 auto mimeType = payload.mimeType();
 
@@ -217,19 +217,19 @@ namespace
             catch(const BadRequestError& e)
             {
                 auto m = fmt::format("BadRequest: '{0}'", e.what());
-                EXECGRAPHGUI_BACKENDLOG_ERROR(m);
+                EGGUI_BACKENDLOG_ERROR(m);
                 send(makeBadResponse(req, m));
             }
             catch(const InternalBackendError& e)
             {
                 auto m = fmt::format("InternalBackendError: '{0}'", e.what());
-                EXECGRAPHGUI_BACKENDLOG_ERROR(m);
+                EGGUI_BACKENDLOG_ERROR(m);
                 send(makeServerError(req, m));
             }
             catch(const std::exception& e)
             {
                 auto m = fmt::format("Unknown Error: '{0}'", e.what());
-                EXECGRAPHGUI_BACKENDLOG_ERROR(m);
+                EGGUI_BACKENDLOG_ERROR(m);
                 send(makeServerError(req, m));
             }
         }
@@ -254,7 +254,7 @@ struct HttpSession::Send
     template<typename Message>
     void operator()(Message&& msg)
     {
-        EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: post send response ...",
+        EGGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: post send response ...",
                                       m_session);
 
         // The lifetime of the message has to extend
@@ -284,12 +284,12 @@ HttpSession::HttpSession(tcp::socket socket,
     , m_dispatcher(dispatcher)
     , m_allocator(allocator)
 {
-    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: Ctor", fmt::ptr(this));
+    EGGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: Ctor", fmt::ptr(this));
 }
 
 HttpSession::~HttpSession()
 {
-    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: Dtor", fmt::ptr(this));
+    EGGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: Dtor", fmt::ptr(this));
 }
 
 //! Start the asynchronous operation.
@@ -310,7 +310,7 @@ void HttpSession::doRead()
     };
 
     // Read a request.
-    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: post read request ...", fmt::ptr(this));
+    EGGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: post read request ...", fmt::ptr(this));
     http::async_read(m_socket,
                      m_buffer,
                      m_request,
@@ -326,7 +326,7 @@ void HttpSession::onRead(boost::system::error_code ec,
     // This means they closed the connection.
     if(ec == http::error::end_of_stream)
     {
-        EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}::onRead : end of stream --> close()", fmt::ptr(this));
+        EGGUI_BACKENDLOG_DEBUG("HttpSession @{0}::onRead : end of stream --> close()", fmt::ptr(this));
         return doClose();
     }
 
@@ -337,7 +337,7 @@ void HttpSession::onRead(boost::system::error_code ec,
 
     auto payloadSize = m_request.payload_size();
 
-    EXECGRAPHGUI_BACKENDLOG_DEBUG(
+    EGGUI_BACKENDLOG_DEBUG(
         "HttpSession @{0} ::handleRequest : "
         "Request[ method: '{1}' target: '{2}', payload: '{3}' bytes ]",
         fmt::ptr(this),
@@ -361,7 +361,7 @@ void HttpSession::onWrite(boost::system::error_code ec,
                           std::size_t bytesTransferred,
                           bool close)
 {
-    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}::onWrite(...)", fmt::ptr(this));
+    EGGUI_BACKENDLOG_DEBUG("HttpSession @{0}::onWrite(...)", fmt::ptr(this));
     boost::ignore_unused(bytesTransferred);
 
     if(ec)
@@ -382,7 +382,7 @@ void HttpSession::onWrite(boost::system::error_code ec,
 
 void HttpSession::doClose()
 {
-    EXECGRAPHGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: doClose()", fmt::ptr(this));
+    EGGUI_BACKENDLOG_DEBUG("HttpSession @{0}:: doClose()", fmt::ptr(this));
     // Send a TCP shutdown
     boost::system::error_code ec;
     m_socket.shutdown(tcp::socket::shutdown_send, ec);

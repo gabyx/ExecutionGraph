@@ -25,20 +25,20 @@ namespace executionGraph{
     static const unsigned int versionPatch =  @ExecutionGraph_VERSION_PATCH@ ;
     
     //! Force log level
-    #define EXECGRAPH_FORCE_MSGLOG_LEVEL @ExecutionGraph_FORCE_MSGLOG_LEVEL@
+    #define EG_FORCE_MSGLOG_LEVEL @ExecutionGraph_FORCE_MSGLOG_LEVEL@
     
     #cmakedefine ExecutionGraph_OPENMP_SUPPORT
     #ifdef ExecutionGraph_OPENMP_SUPPORT
         static const bool haveOpenMpSupport = true;
         #cmakedefine ExecutionGraph_OPENMP_USE_NTHREADS
         #ifdef ExecutionGraph_OPENMP_USE_NTHREADS
-            #define EXECGRAPH_OPENMP_USE_NTHREADS
-            static const int openMpUseNThreads = EXECGRAPH_OPENMP_NTHREADS;
-            #define EXECGRAPH_OPENMP_NTHREADS @ExecutionGraph_OPENMP_NTHREADS@
-            #define EXECGRAPH_OPENMP_NUMTHREADS num_threads(EXECGRAPH_OPENMP_NTHREADS)
+            #define EG_OPENMP_USE_NTHREADS
+            static const int openMpUseNThreads = EG_OPENMP_NTHREADS;
+            #define EG_OPENMP_NTHREADS @ExecutionGraph_OPENMP_NTHREADS@
+            #define EG_OPENMP_NUMTHREADS num_threads(EG_OPENMP_NTHREADS)
         #else
             static const unsigned int openMpUseNThreads = 0;
-            #define EXECGRAPH_OPENMP_NUMTHREADS
+            #define EG_OPENMP_NUMTHREADS
         #endif
     #else
         static const bool haveOpenMpSupport = false;
@@ -47,7 +47,7 @@ namespace executionGraph{
     
     #cmakedefine ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS
     #ifdef ExecutionGraph_THROW_IF_BAD_SOCKET_CASTS
-        #define EXECGRAPH_THROW_IF_BAD_SOCKET_CASTS
+        #define EG_THROW_IF_BAD_SOCKET_CASTS
         static const bool throwIfBadSocketCast = true;
     #else
         static const bool throwIfBadSocketCast = false;
@@ -55,7 +55,7 @@ namespace executionGraph{
 
     #cmakedefine ExecutionGraph_THROW_IF_NODE_DATA_NO_STORAGE
     #ifdef ExecutionGraph_THROW_IF_NODE_DATA_NO_STORAGE
-        #define EXECGRAPH_THROW_IF_NODE_DATA_NO_STORAGE
+        #define EG_THROW_IF_NODE_DATA_NO_STORAGE
         static const bool throwIfNodeDataNoStorage = true;
     #else
         static const bool throwIfNodeDataNoStorage = false;
@@ -63,16 +63,16 @@ namespace executionGraph{
 
     #cmakedefine ExecutionGraph_HAS_RTTR
     #ifdef ExecutionGraph_HAS_RTTR
-        #define EXECGRAPH_HAS_RTTR
+        #define EG_HAS_RTTR
     #else
-        #undef EXECGRAPH_HAS_RTTR
+        #undef EG_HAS_RTTR
     #endif
 
     #cmakedefine ExecutionGraph_HAS_FLATBUFFERS
     #ifdef ExecutionGraph_HAS_FLATBUFFERS
-        #define EXECGRAPH_HAS_FLATBUFFERS
+        #define EG_HAS_FLATBUFFERS
     #else
-        #undef EXECGRAPH_HAS_FLATBUFFERS
+        #undef EG_HAS_FLATBUFFERS
     #endif
 
 }

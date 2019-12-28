@@ -54,7 +54,7 @@ const std::unordered_set<GraphSerializationRequestHandler::HandlerKey>& GraphSer
 void GraphSerializationRequestHandler::handleRequest(const Request& request,
                                                      ResponsePromise& response)
 {
-    EXECGRAPHGUI_BACKENDLOG_INFO("GraphSerializationRequestHandler::handleRequest");
+    EGGUI_BACKENDLOG_INFO("GraphSerializationRequestHandler::handleRequest");
     m_functionMap.dispatch(request.target().native(), *this, request, response);
 }
 
@@ -64,7 +64,7 @@ void GraphSerializationRequestHandler::handleSaveGraph(const Request& request,
 {
     // Request validation
     auto& payload = request.payload();
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt, "Request data is null!");
+    EGGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt, "Request data is null!");
 
     auto saveReq = getRootOfPayloadAndVerify<s::SaveGraphRequest>(*payload);
 
@@ -86,7 +86,7 @@ void GraphSerializationRequestHandler::handleLoadGraph(const Request& request,
 {
     // Request validation
     auto& payload = request.payload();
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
+    EGGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request data is null!");
 
     auto loadReq = getRootOfPayloadAndVerify<s::LoadGraphRequest>(*payload);

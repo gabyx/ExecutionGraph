@@ -25,7 +25,7 @@ auto getRootOfPayloadAndVerify(const BinaryPayload& payload)
     if(verifyBuffer)
     {
         flatbuffers::Verifier v(buffer.data(), buffer.size());
-        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(!v.VerifyBuffer<MessageType>(),
+        EGGUI_THROW_BAD_REQUEST_IF(!v.VerifyBuffer<MessageType>(),
                                           "Flatbuffer corrupt!");
     }
     return flatbuffers::GetRoot<MessageType>(buffer.data());

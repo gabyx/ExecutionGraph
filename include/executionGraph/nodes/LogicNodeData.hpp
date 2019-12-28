@@ -31,7 +31,7 @@ namespace executionGraph
         friend class LogicNodeData;
 
     public:
-        EXECGRAPH_DEFINE_TYPES();
+        EG_DEFINE_TYPES();
 
         auto type() const noexcept { return m_type; }
 
@@ -45,7 +45,7 @@ namespace executionGraph
         {
             if constexpr(throwIfNodeDataNoStorage)
             {
-                EXECGRAPH_LOGTHROW_IF(!isType<T>(),
+                EG_LOGTHROW_IF(!isType<T>(),
                                       "Casting node data with id '{0}' and type '{1}' into type"
                                       "'{2}' which is wrong!",
                                       id(),

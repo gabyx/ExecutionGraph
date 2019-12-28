@@ -43,7 +43,7 @@ std::mutex PrintThread::s_mutex{};
 
 void doRandomStuff(std::thread::id threadId, int i, const std::string& name, bool doThrow = false)
 {
-    EXECGRAPH_THROW_IF(i < 0, "Wow, a moved task gets executed!! WTF!");
+    EG_THROW_IF(i < 0, "Wow, a moved task gets executed!! WTF!");
     DEFINE_RANDOM_GENERATOR_FUNC(i);
     using namespace std::chrono_literals;
     auto sleep = int(rand() * 2000);
@@ -53,7 +53,7 @@ void doRandomStuff(std::thread::id threadId, int i, const std::string& name, boo
 
     if(doThrow)
     {
-        EXECGRAPH_THROW_IF(i % 5 == 0, "Ups, task failed for test!");
+        EG_THROW_IF(i % 5 == 0, "Ups, task failed for test!");
     }
 }
 

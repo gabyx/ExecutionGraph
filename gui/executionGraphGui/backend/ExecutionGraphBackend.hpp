@@ -260,7 +260,7 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
         }
         catch(executionGraph::Exception& e)
         {
-            EXECGRAPHGUI_THROW_BAD_REQUEST(
+            EGGUI_THROW_BAD_REQUEST(
                 "Construction of node with type: '{0}' "
                 "for graph id '{1}' failed: '{2}'",
                 type,
@@ -268,7 +268,7 @@ void ExecutionGraphBackend::addNode(const Id& graphId,
                 e.what());
         }
 
-        EXECGRAPH_ASSERT(node != nullptr, "Node is nullptr!!?");
+        EG_ASSERT(node != nullptr, "Node is nullptr!!?");
 
         // Create the response (with the graph locked)
         responseCreator(*graphL, *node);
@@ -308,7 +308,7 @@ void ExecutionGraphBackend::addConnection(const Id& graphId,
         auto graphL = graph->wlock();
         try
         {
-            EXECGRAPHGUI_THROW_BAD_REQUEST_IF(checkForCycles, "Checking cycles not yet implemented!");
+            EGGUI_THROW_BAD_REQUEST_IF(checkForCycles, "Checking cycles not yet implemented!");
 
             if(isWriteLink)
             {
@@ -321,7 +321,7 @@ void ExecutionGraphBackend::addConnection(const Id& graphId,
         }
         catch(executionGraph::Exception& e)
         {
-            EXECGRAPHGUI_THROW_BAD_REQUEST(
+            EGGUI_THROW_BAD_REQUEST(
                 std::string("Adding connection from output node id '{0}' [socket idx: '{1}'] ") +
                     (isWriteLink ? "<-- " : "--> ") + "input node id '{2}' [socket idx: '{3}' not successful!",
                 outNodeId,
@@ -360,12 +360,12 @@ void ExecutionGraphBackend::loadGraph(std::path filePath,
 
     auto& idsToIdx = getGraphTypeDescriptionsToIndex();
     auto it        = idsToIdx.find(graphDescId);
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(it == idsToIdx.end(),
+    EGGUI_THROW_BAD_REQUEST_IF(it == idsToIdx.end(),
                                       "Graph type id: '{0}' is not supported in the backend",
                                       graphDescId.toString());
 
     auto itDesc = getGraphTypeDescriptions().find(graphDescId);
-    EXECGRAPH_ASSERT(itDesc != getGraphTypeDescriptions().end(),
+    EG_ASSERT(itDesc != getGraphTypeDescriptions().end(),
                      "Graph Description not mapped (?)");
     auto& graphDesc = itDesc->second;
 

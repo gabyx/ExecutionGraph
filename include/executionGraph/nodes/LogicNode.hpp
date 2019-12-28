@@ -66,7 +66,7 @@ namespace executionGraph
     class LogicNode
     {
     public:
-        EXECGRAPH_DEFINE_TYPES();
+        EG_DEFINE_TYPES();
 
         using InputSockets  = std::vector<LogicSocketInputBase*>;
         using OutputSockets = std::vector<LogicSocketOutputBase*>;
@@ -123,8 +123,8 @@ namespace executionGraph
         OutputSockets m_outputs;  //!< The output sockets.
     };
 
-#define EXECGRAPH_DEFINE_NODE(TNode) \
+#define EG_DEFINE_NODE(TNode) \
 private:                             \
     using Node = TNode
-    
+
 }  // namespace executionGraph

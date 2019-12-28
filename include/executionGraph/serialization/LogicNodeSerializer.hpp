@@ -52,7 +52,7 @@ namespace executionGraph
     class LogicNodeSerializer final
     {
     public:
-        EXECGRAPH_DEFINE_TYPES(TConfig);
+        EG_DEFINE_TYPES(TConfig);
 
     public:
         LogicNodeSerializer()  = default;
@@ -81,18 +81,18 @@ namespace executionGraph
 
             if(optNode)
             {
-                EXECGRAPH_THROW_IF(*optNode == nullptr,
+                EG_THROW_IF(*optNode == nullptr,
                                    "FactoryRead::create provided nullptr for type '{0}'!",
                                    type)
                 return std::move(*optNode);
             }
             else
             {
-                EXECGRAPH_THROW_IF(additionalData != nullptr,
+                EG_THROW_IF(additionalData != nullptr,
                                    "Cannot construct type: '{0}' without ReadFactory (add data!)!",
                                    type)
                 // try to construct over RTTR
-                EXECGRAPH_THROW_IF(!rttrType.is_derived_from(rttr::type::get<NodeBaseType>()),
+                EG_THROW_IF(!rttrType.is_derived_from(rttr::type::get<NodeBaseType>()),
                                    "Type: '{0}' is not derived from NodeBaseType!"
                                    "Did you correctly init RTTR?",
                                    type);
@@ -100,11 +100,11 @@ namespace executionGraph
                 rttr::variant instance;
 
                 rttr::constructor ctor = rttrType.get_constructor({rttr::type::get<NodeId>()});
-                EXECGRAPH_THROW_IF(!ctor.is_valid(), "Ctor is invalid for type: '{0}'", type);
+                EG_THROW_IF(!ctor.is_valid(), "Ctor is invalid for type: '{0}'", type);
                 instance = ctor.invoke(nodeId);
 
-                EXECGRAPH_THROW_IF(!instance.is_valid(), "Variant instance is not valid!");
-                EXECGRAPH_THROW_IF(!instance.get_type().is_pointer(), "Variant instance type needs to be a pointer!");
+                EG_THROW_IF(!instance.is_valid(), "Variant instance is not valid!");
+                EG_THROW_IF(!instance.get_type().is_pointer(), "Variant instance type needs to be a pointer!");
 
                 return std::unique_ptr<NodeBaseType>{instance.get_value<NodeBaseType*>()};  // Return the instance
             }
@@ -187,7 +187,7 @@ namespace executionGraph
                 std::vector<flatbuffers::Offset<LogicSocket>> socketOffs;
                 for(auto& socket : sockets)
                 {
-                    EXECGRAPH_ASSERT(socket->type() < socketDescriptions.size(), "Socket type wrong!");
+                    EG_ASSERT(socket->type() < socketDescriptions.size(), "Socket type wrong!");
 
                     flatbuffers::Offset<flatbuffers::String> typeOff, typeNameOff;
                     if(fullTypeSpec)
@@ -228,7 +228,7 @@ namespace executionGraph
                 {
                     correct = node.template hasOSocketType<T>(index);
                 }
-                EXECGRAPH_THROW_IF(!correct,
+                EG_THROW_IF(!correct,
                                    "Node '{0}' has no {1}"
                                    "socket type '{2}' at index '{3}'! "
                                    "The deserialization should have added this sockets throught the constructor! ",

@@ -18,80 +18,80 @@
 #include <executionGraph/common/Singleton.hpp>
 
 // Undef all macros
-#define EXECGRAPHGUI_APPLOG_TRACE(...)
-#define EXECGRAPHGUI_APPLOG_DEBUG(...)
-#define EXECGRAPHGUI_APPLOG_INFO(...)
-#define EXECGRAPHGUI_APPLOG_WARN(...)
-#define EXECGRAPHGUI_APPLOG_ERROR(...)
-#define EXECGRAPHGUI_APPLOG_FATAL(...)
+#define EGGUI_APPLOG_TRACE(...)
+#define EGGUI_APPLOG_DEBUG(...)
+#define EGGUI_APPLOG_INFO(...)
+#define EGGUI_APPLOG_WARN(...)
+#define EGGUI_APPLOG_ERROR(...)
+#define EGGUI_APPLOG_FATAL(...)
 
-#define EXECGRAPHGUI_BACKENDLOG_TRACE(...)
-#define EXECGRAPHGUI_BACKENDLOG_DEBUG(...)
-#define EXECGRAPHGUI_BACKENDLOG_INFO(...)
-#define EXECGRAPHGUI_BACKENDLOG_WARN(...)
-#define EXECGRAPHGUI_BACKENDLOG_ERROR(...)
-#define EXECGRAPHGUI_BACKENDLOG_FATAL(...)
+#define EGGUI_BACKENDLOG_TRACE(...)
+#define EGGUI_BACKENDLOG_DEBUG(...)
+#define EGGUI_BACKENDLOG_INFO(...)
+#define EGGUI_BACKENDLOG_WARN(...)
+#define EGGUI_BACKENDLOG_ERROR(...)
+#define EGGUI_BACKENDLOG_FATAL(...)
 
-#define EXECGRAPHGUI_LOGCODE_TRACE(...)
-#define EXECGRAPHGUI_LOGCODE_DEBUG(...)
-#define EXECGRAPHGUI_LOGCODE_INFO(...)
-#define EXECGRAPHGUI_LOGCODE_WARN(...)
-#define EXECGRAPHGUI_LOGCODE_ERROR(...)
-#define EXECGRAPHGUI_LOGCODE_FATAL(...)
+#define EGGUI_LOGCODE_TRACE(...)
+#define EGGUI_LOGCODE_DEBUG(...)
+#define EGGUI_LOGCODE_INFO(...)
+#define EGGUI_LOGCODE_WARN(...)
+#define EGGUI_LOGCODE_ERROR(...)
+#define EGGUI_LOGCODE_FATAL(...)
 
 // Define only those which are active!
-#if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_TRACE
-#    undef EXECGRAPHGUI_APPLOG_TRACE
-#    define EXECGRAPHGUI_APPLOG_TRACE(...) Loggers::getInstance().getAppLogger().trace(__VA_ARGS__)
-#    undef EXECGRAPHGUI_BACKENDLOG_TRACE
-#    define EXECGRAPHGUI_BACKENDLOG_TRACE(...) Loggers::getInstance().getBackendLogger().trace(__VA_ARGS__)
-#    undef EXECGRAPHGUI_LOGCODE_TRACE
-#    define EXECGRAPHGUI_LOGCODE_TRACE(expr) expr
+#if EG_LOGLEVEL_CURRENT <= EG_LOGLEVEL_TRACE
+#    undef EGGUI_APPLOG_TRACE
+#    define EGGUI_APPLOG_TRACE(...) Loggers::getInstance().getAppLogger().trace(__VA_ARGS__)
+#    undef EGGUI_BACKENDLOG_TRACE
+#    define EGGUI_BACKENDLOG_TRACE(...) Loggers::getInstance().getBackendLogger().trace(__VA_ARGS__)
+#    undef EGGUI_LOGCODE_TRACE
+#    define EGGUI_LOGCODE_TRACE(expr) expr
 #endif
 
-#if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_DEBUG
-#    undef EXECGRAPHGUI_APPLOG_DEBUG
-#    define EXECGRAPHGUI_APPLOG_DEBUG(...) Loggers::getInstance().getAppLogger().debug(__VA_ARGS__)
-#    undef EXECGRAPHGUI_BACKENDLOG_DEBUG
-#    define EXECGRAPHGUI_BACKENDLOG_DEBUG(...) Loggers::getInstance().getBackendLogger().debug(__VA_ARGS__)
-#    undef EXECGRAPHGUI_LOGCODE_DEBUG
-#    define EXECGRAPHGUI_LOGCODE_DEBUG(expr) expr
+#if EG_LOGLEVEL_CURRENT <= EG_LOGLEVEL_DEBUG
+#    undef EGGUI_APPLOG_DEBUG
+#    define EGGUI_APPLOG_DEBUG(...) Loggers::getInstance().getAppLogger().debug(__VA_ARGS__)
+#    undef EGGUI_BACKENDLOG_DEBUG
+#    define EGGUI_BACKENDLOG_DEBUG(...) Loggers::getInstance().getBackendLogger().debug(__VA_ARGS__)
+#    undef EGGUI_LOGCODE_DEBUG
+#    define EGGUI_LOGCODE_DEBUG(expr) expr
 #endif
 
-#if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_INFO
-#    undef EXECGRAPHGUI_APPLOG_INFO
-#    define EXECGRAPHGUI_APPLOG_INFO(...) Loggers::getInstance().getAppLogger().info(__VA_ARGS__)
-#    undef EXECGRAPHGUI_BACKENDLOG_INFO
-#    define EXECGRAPHGUI_BACKENDLOG_INFO(...) Loggers::getInstance().getBackendLogger().info(__VA_ARGS__)
-#    undef EXECGRAPHGUI_LOGCODE_INFO
-#    define EXECGRAPHGUI_LOGCODE_INFO(expr) expr
+#if EG_LOGLEVEL_CURRENT <= EG_LOGLEVEL_INFO
+#    undef EGGUI_APPLOG_INFO
+#    define EGGUI_APPLOG_INFO(...) Loggers::getInstance().getAppLogger().info(__VA_ARGS__)
+#    undef EGGUI_BACKENDLOG_INFO
+#    define EGGUI_BACKENDLOG_INFO(...) Loggers::getInstance().getBackendLogger().info(__VA_ARGS__)
+#    undef EGGUI_LOGCODE_INFO
+#    define EGGUI_LOGCODE_INFO(expr) expr
 #endif
 
-#if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_WARN
-#    undef EXECGRAPHGUI_APPLOG_WARN
-#    define EXECGRAPHGUI_APPLOG_WARN(...) Loggers::getInstance().getAppLogger().warn(__VA_ARGS__)
-#    undef EXECGRAPHGUI_BACKENDLOG_WARN
-#    define EXECGRAPHGUI_BACKENDLOG_WARN(...) Loggers::getInstance().getBackendLogger().warn(__VA_ARGS__)
-#    undef EXECGRAPHGUI_LOGCODE_WARN
-#    define EXECGRAPHGUI_LOGCODE_WARN(expr) expr
+#if EG_LOGLEVEL_CURRENT <= EG_LOGLEVEL_WARN
+#    undef EGGUI_APPLOG_WARN
+#    define EGGUI_APPLOG_WARN(...) Loggers::getInstance().getAppLogger().warn(__VA_ARGS__)
+#    undef EGGUI_BACKENDLOG_WARN
+#    define EGGUI_BACKENDLOG_WARN(...) Loggers::getInstance().getBackendLogger().warn(__VA_ARGS__)
+#    undef EGGUI_LOGCODE_WARN
+#    define EGGUI_LOGCODE_WARN(expr) expr
 #endif
 
-#if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_ERROR
-#    undef EXECGRAPHGUI_APPLOG_ERROR
-#    define EXECGRAPHGUI_APPLOG_ERROR(...) Loggers::getInstance().getAppLogger().error(__VA_ARGS__)
-#    undef EXECGRAPHGUI_BACKENDLOG_ERROR
-#    define EXECGRAPHGUI_BACKENDLOG_ERROR(...) Loggers::getInstance().getBackendLogger().error(__VA_ARGS__)
-#    undef EXECGRAPHGUI_LOGCODE_ERROR
-#    define EXECGRAPHGUI_LOGCODE_ERROR(expr) expr
+#if EG_LOGLEVEL_CURRENT <= EG_LOGLEVEL_ERROR
+#    undef EGGUI_APPLOG_ERROR
+#    define EGGUI_APPLOG_ERROR(...) Loggers::getInstance().getAppLogger().error(__VA_ARGS__)
+#    undef EGGUI_BACKENDLOG_ERROR
+#    define EGGUI_BACKENDLOG_ERROR(...) Loggers::getInstance().getBackendLogger().error(__VA_ARGS__)
+#    undef EGGUI_LOGCODE_ERROR
+#    define EGGUI_LOGCODE_ERROR(expr) expr
 #endif
 
-#if EXECGRAPH_LOGLEVEL_CURRENT <= EXECGRAPH_LOGLEVEL_FATAL
-#    undef EXECGRAPHGUI_APPLOG_FATAL
-#    define EXECGRAPHGUI_APPLOG_FATAL(...) Loggers::getInstance().getAppLogger().critical(__VA_ARGS__)
-#    undef EXECGRAPHGUI_BACKENDLOG_FATAL
-#    define EXECGRAPHGUI_BACKENDLOG_FATAL(...) Loggers::getInstance().getBackendLogger().critical(__VA_ARGS__)
-#    undef EXECGRAPHGUI_LOGCODE_FATAL
-#    define EXECGRAPHGUI_LOGCODE_FATAL(expr) expr
+#if EG_LOGLEVEL_CURRENT <= EG_LOGLEVEL_FATAL
+#    undef EGGUI_APPLOG_FATAL
+#    define EGGUI_APPLOG_FATAL(...) Loggers::getInstance().getAppLogger().critical(__VA_ARGS__)
+#    undef EGGUI_BACKENDLOG_FATAL
+#    define EGGUI_BACKENDLOG_FATAL(...) Loggers::getInstance().getBackendLogger().critical(__VA_ARGS__)
+#    undef EGGUI_LOGCODE_FATAL
+#    define EGGUI_LOGCODE_FATAL(expr) expr
 #endif
 
 /* ---------------------------------------------------------------------------------------*/

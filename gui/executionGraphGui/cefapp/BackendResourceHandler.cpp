@@ -37,7 +37,7 @@ namespace
         {
             ss << byte << ",";
         }
-        EXECGRAPHGUI_APPLOG_DEBUG("PostData received: '{0}'", ss.str());
+        EGGUI_APPLOG_DEBUG("PostData received: '{0}'", ss.str());
     }
 
     //! Read the post data `postData` and store it in the `BinaryBuffer`.
@@ -47,7 +47,7 @@ namespace
                       std::optional<RequestCef::Payload>& payload,
                       std::shared_ptr<RawAllocator> allocator)
     {
-        EXECGRAPHGUI_ASSERT(!mimeType.empty(), "No MIME-type!");
+        EGGUI_ASSERT(!mimeType.empty(), "No MIME-type!");
 
         // Read post data
         if(postData && postData->GetElementCount() != 0)
@@ -59,20 +59,20 @@ namespace
 
             if(element->GetBytesCount() == 0)
             {
-                EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler: Received no bytes!");
+                EGGUI_APPLOG_ERROR("BackendResourceHandler: Received no bytes!");
                 return false;  // dont continue
             }
 
             // Allocate BinaryBuffer
             BinaryBuffer<BufferPool> buffer(allocator, element->GetBytesCount());
             element->GetBytes(buffer.size(), static_cast<void*>(buffer.data()));
-            EXECGRAPHGUI_LOGCODE_DEBUG(printPostData(buffer));
-            EXECGRAPHGUI_APPLOG_DEBUG("BackendResourceHandler: Read last post data element: bytes: '{0}'.", element->GetBytesCount());
+            EGGUI_LOGCODE_DEBUG(printPostData(buffer));
+            EGGUI_APPLOG_DEBUG("BackendResourceHandler: Read last post data element: bytes: '{0}'.", element->GetBytesCount());
             payload = RequestCef::Payload{std::move(buffer), mimeType};
             return true;  // continue
         }
 
-        EXECGRAPHGUI_APPLOG_WARN("BackendResourceHandler: Received no post data!");
+        EGGUI_APPLOG_WARN("BackendResourceHandler: Received no post data!");
         return false;  // dont continue
     }
 
@@ -82,7 +82,7 @@ namespace
 void BackendResourceHandler::Cancel()
 {
     CEF_REQUIRE_IO_THREAD();
-    EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler: '{0}' : cancelled!", getName());
+    EGGUI_APPLOG_ERROR("BackendResourceHandler: '{0}' : cancelled!", getName());
 
     // if from external this handling can be cancelled
     // we need to properly wait for pending launched tasks
@@ -106,7 +106,7 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
 
     try
     {
-        EXECGRAPHGUI_THROW_IF(!m_responseFuture.isValid(), "Future is invalid!");
+        EGGUI_THROW_IF(!m_responseFuture.isValid(), "Future is invalid!");
 
         m_payload = m_responseFuture.waitForPayload();  // Get the payload!
 
@@ -122,7 +122,7 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
     }
     catch(const BadRequestError& e)
     {
-        EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler: Bad request: '{0}'", e.what());
+        EGGUI_APPLOG_ERROR("BackendResourceHandler: Bad request: '{0}'", e.what());
         response->SetStatusText(e.what());
         response->SetStatus(400);  // http status code: 400 : Bad request!
         return;
@@ -138,7 +138,7 @@ void BackendResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
         error = e.what();
     }
 
-    EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler: Exception in GetResponseHeaders");
+    EGGUI_APPLOG_ERROR("BackendResourceHandler: Exception in GetResponseHeaders");
     response->SetStatusText(error);
     response->SetStatus(500);  // http status code: 500 : Internal server error!
 }
@@ -189,7 +189,7 @@ bool BackendResourceHandler::ReadResponse(void* dataOut,
 {
     CEF_REQUIRE_IO_THREAD();
 
-    EXECGRAPHGUI_ASSERT(m_buffer, "We need a buffer set! We should not come to this method!");
+    EGGUI_ASSERT(m_buffer, "We need a buffer set! We should not come to this method!");
 
     // Handle the repsponse
     if(m_bytesRead < m_bufferSize)
@@ -218,7 +218,7 @@ bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
     CefURLParts urlParts;
     if(!CefParseURL(url, urlParts))
     {
-        EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler: '{0}' : url '{1}': url parse failed!",
+        EGGUI_APPLOG_ERROR("BackendResourceHandler: '{0}' : url '{1}': url parse failed!",
                                   getName(),
                                   url.ToString());
         return false;
@@ -230,7 +230,7 @@ bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
 
     if(m_target.empty())
     {
-        EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler '{0}' : url '{1}': requestId extract failed!",
+        EGGUI_APPLOG_ERROR("BackendResourceHandler '{0}' : url '{1}': requestId extract failed!",
                                   getName(),
                                   url.ToString());
         return false;
@@ -249,7 +249,7 @@ bool BackendResourceHandler::initRequest(CefRefPtr<CefRequest> request)
         m_mimeType = it->second;
         if(m_mimeType != "application/octet-stream" && m_mimeType != "application/json")
         {
-            EXECGRAPHGUI_APPLOG_ERROR("BackendResourceHandler: '{0}' : url '{1}': Content-Type: '{2}' can not be handled!",
+            EGGUI_APPLOG_ERROR("BackendResourceHandler: '{0}' : url '{1}': Content-Type: '{2}' can not be handled!",
                                       getName(),
                                       url.ToString(),
                                       m_mimeType);

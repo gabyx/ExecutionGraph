@@ -85,7 +85,7 @@ namespace
 
         //! Serialize file info.
         auto buildFileInfo = [&getStats, &basePath](auto& builder, const auto& e) {
-            EXECGRAPHGUI_BACKENDLOG_TRACE("Build file info: '{0}'", e.path());
+            EGGUI_BACKENDLOG_TRACE("Build file info: '{0}'", e.path());
             auto t = getStats(builder, e);
             return sG::CreatePathInfoDirect(builder,
                                             std::filesystem::relative(e.path(), basePath).native().c_str(),
@@ -100,7 +100,7 @@ namespace
         auto buildDirectoryInfo = [&getStats, &basePath](auto& builder,
                                                          const auto& e,
                                                          Directory* d = nullptr) {
-            EXECGRAPHGUI_BACKENDLOG_TRACE("Build dir info: '{0}'", e.path());
+            EGGUI_BACKENDLOG_TRACE("Build dir info: '{0}'", e.path());
             auto t = getStats(builder, e);
             return sG::CreatePathInfoDirect(builder,
                                             std::filesystem::relative(e.path(), basePath).native().c_str(),
@@ -236,7 +236,7 @@ FileBrowserRequestHandler::requestTargets() const
 void FileBrowserRequestHandler::handleRequest(const Request& request,
                                               ResponsePromise& response)
 {
-    EXECGRAPHGUI_BACKENDLOG_INFO("FileBrowserRequestHandler::handleRequest");
+    EGGUI_BACKENDLOG_INFO("FileBrowserRequestHandler::handleRequest");
     m_functionMap.dispatch(request.target().native(), *this, request, response);
 }
 
@@ -248,7 +248,7 @@ void FileBrowserRequestHandler::handleGetPathInfo(const Request& request,
 
     // Request validation
     auto& payload = request.payload();
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
+    EGGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt,
                                       "Request Directory is null!");
 
     auto browseReq = getRootOfPayloadAndVerify<sG::BrowseRequest>(*payload);
@@ -261,10 +261,10 @@ void FileBrowserRequestHandler::handleGetPathInfo(const Request& request,
     }
     root = std::filesystem::canonical(root);
 
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(root.native().find(m_rootPath.native()) != 0,
+    EGGUI_THROW_BAD_REQUEST_IF(root.native().find(m_rootPath.native()) != 0,
                                       "Not allowed to browse before root path: '{0}'!",
                                       root);
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(!std::filesystem::exists(root),
+    EGGUI_THROW_BAD_REQUEST_IF(!std::filesystem::exists(root),
                                       "FileBrowse path {0} does not exist!",
                                       root);
 

@@ -37,7 +37,7 @@
 /* ---------------------------------------------------------------------------------------*/
 class Request : public executionGraph::IObjectID
 {
-    EXECGRAPH_OBJECT_ID_DECLARATION
+    EG_OBJECT_ID_DECLARATION
     RTTR_ENABLE()
 
 public:

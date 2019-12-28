@@ -51,7 +51,7 @@ namespace executionGraph
         //! Get the RTTI of the socket with type `type`.
         const std::string& getSocketRTTI(IndexType type)
         {
-            EXECGRAPH_ASSERT(type < m_socketTypeDescription.size(),
+            EG_ASSERT(type < m_socketTypeDescription.size(),
                              "Index type: '{0}' out of range!",
                              type);
             return m_socketTypeDescription[type].m_type;

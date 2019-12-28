@@ -36,7 +36,7 @@ using executionGraph
     class ITask
     {
         //! No move/copy allowed!
-        EXECGRAPH_DISALLOW_COPY_AND_MOVE(ITask)
+        EG_DISALLOW_COPY_AND_MOVE(ITask)
     protected:
         ITask() = default;
 

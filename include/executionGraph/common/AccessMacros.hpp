@@ -12,16 +12,16 @@
 
 #pragma once
 
-#define EXECGRAPH_DISALLOW_COPY(Class) \
+#define EG_DISALLOW_COPY(Class) \
 public:                                \
     Class(const Class&) = delete;      \
     Class& operator=(const Class&) = delete;
 
-#define EXECGRAPH_DISALLOW_MOVE(Class) \
+#define EG_DISALLOW_MOVE(Class) \
 public:                                \
     Class(Class&&) = delete;           \
     Class& operator=(Class&&) = delete;
 
-#define EXECGRAPH_DISALLOW_COPY_AND_MOVE(Class) \
-    EXECGRAPH_DISALLOW_COPY(Class)              \
-    EXECGRAPH_DISALLOW_MOVE(Class)
+#define EG_DISALLOW_COPY_AND_MOVE(Class) \
+    EG_DISALLOW_COPY(Class)              \
+    EG_DISALLOW_MOVE(Class)

@@ -26,7 +26,7 @@ namespace executionGraph
         @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
     */
     /* ---------------------------------------------------------------------------------------*/
-    class EXECGRAPH_EXPORT FileMapper final
+    class EG_EXPORT FileMapper final
     {
     public:
         FileMapper(const std::path& filePath) noexcept(false);

@@ -22,10 +22,10 @@ void fail(const ErrorCode& ec, const T& what)
 {
     if constexpr(doThrow)
     {
-        EXECGRAPH_THROW("Failure: {0} : {1}", what, ec.message());
+        EG_THROW("Failure: {0} : {1}", what, ec.message());
     }
     else
     {
-        EXECGRAPHGUI_BACKENDLOG_ERROR("Failure: {0} : {1}", what, ec.message());
+        EGGUI_BACKENDLOG_ERROR("Failure: {0} : {1}", what, ec.message());
     }
 }

@@ -138,7 +138,7 @@ void ExecutionGraphBackend::saveGraph(const Id& graphId,
         typename ExecutionGraphBackendDefs<Config>::GraphSerializer graphS(nodeS);
 
         auto descIt = descs.find(id);
-        EXECGRAPHGUI_ASSERT(descIt != descs.end(), "Graph Description not mapped (?)");
+        EGGUI_ASSERT(descIt != descs.end(), "Graph Description not mapped (?)");
 
         graph->withRLock([&](auto& graph) { graphS.write(graph,
                                                          descIt->second,
@@ -156,7 +156,7 @@ Id ExecutionGraphBackend::addGraph(const Id& graphType)
     const auto& idToIdx = getGraphTypeDescriptionsToIndex();
     auto it             = idToIdx.find(graphType);
 
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(it == idToIdx.end(),
+    EGGUI_THROW_BAD_REQUEST_IF(it == idToIdx.end(),
                                       "Graph type id: '{0}' not supported in backend!",
                                       graphType.toString());
 
@@ -185,7 +185,7 @@ void ExecutionGraphBackend::removeGraph(const Id& graphId)
     std::shared_ptr<GraphStatus> graphStatus;
     m_status.withWLock([&graphId, &graphStatus](auto& status) {
         auto it = status.find(graphId);
-        EXECGRAPHGUI_ASSERT(it != status.cend(),
+        EGGUI_ASSERT(it != status.cend(),
                             "No status for graph id '{0}'",
                             graphId.toString());
         graphStatus = it->second;
@@ -198,7 +198,7 @@ void ExecutionGraphBackend::removeGraph(const Id& graphId)
     // Wait till all other requests are finished
     auto result = graphStatus->waitUntilOtherRequestsFinished();
 
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(!result.second,
+    EGGUI_THROW_BAD_REQUEST_IF(!result.second,
                                       "Time-out while waiting for all request to "
                                       "finish on graph '{0}'! Try later!",
                                       graphId.toString());
@@ -237,7 +237,7 @@ void ExecutionGraphBackend::removeNode(const Id& graphId, NodeId nodeId)
     auto remove = [&](auto& graph) {
         // Remove the node (gets destroyed right here after this scope!)
         auto node = graph->wlock()->removeNode(nodeId);
-        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(
+        EGGUI_THROW_BAD_REQUEST_IF(
             node == nullptr, "Node with id '{0}' does not exist in graph with id '{1}'", nodeId, graphId.toString());
     };
 
@@ -278,7 +278,7 @@ void ExecutionGraphBackend::removeConnection(const Id& graphId,
         }  // Locking end
         catch(executionGraph::Exception& e)
         {
-            EXECGRAPHGUI_THROW_BAD_REQUEST(
+            EGGUI_THROW_BAD_REQUEST(
                 std::string("Removing connection from output node id '{0}' [socket idx: '{1}'] ") +
                     (isWriteLink ? "<-- " : "--> ") + "input node id '{2}' [socket idx: '{3}' not successful!",
                 outNodeId,
@@ -299,11 +299,11 @@ Deferred ExecutionGraphBackend::initRequest(Id graphId)
     m_status.withWLock([&graphId](auto& stati) {
         auto it = stati.find(graphId);
 
-        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(
+        EGGUI_THROW_BAD_REQUEST_IF(
             it == stati.end(), "No status for graph id: '{0}', Graph doesn't exist!", graphId.toString());
 
         auto& status = it->second;
-        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(!status->isRequestHandlingEnabled(),
+        EGGUI_THROW_BAD_REQUEST_IF(!status->isRequestHandlingEnabled(),
                                           "Request is cancled since, request handling on "
                                           "the graph with id: '{0}' is disabled!",
                                           graphId.toString());
@@ -330,13 +330,13 @@ Deferred ExecutionGraphBackend::initRequest(Id graphId)
 void ExecutionGraphBackend::clearGraphData(Id graphId)
 {
     auto nErased = m_graphs.wlock()->erase(graphId);
-    EXECGRAPH_ASSERT(nErased != 0, "No such graph with id: '{0}' removed!", graphId.toString());
+    EG_ASSERT(nErased != 0, "No such graph with id: '{0}' removed!", graphId.toString());
 
     nErased = m_status.wlock()->erase(graphId);
-    EXECGRAPH_ASSERT(nErased != 0, "No such graph status with id: '{0}' removed!", graphId.toString());
+    EG_ASSERT(nErased != 0, "No such graph status with id: '{0}' removed!", graphId.toString());
 
     // nErased = m_executor.wlock()->erase(graphId);
-    // EXECGRAPH_ASSERT(nErased == 0,
+    // EG_ASSERT(nErased == 0,
     //                  "No such graph status with id: '{0}' removed!",
     //                  graphId.toString());
 }
@@ -346,7 +346,7 @@ ExecutionGraphBackend::GraphVariant ExecutionGraphBackend::getGraph(const Id& gr
 {
     return m_graphs.withRLock([&](auto& graphs) {
         auto graphIt = graphs.find(graphId);
-        EXECGRAPHGUI_THROW_BAD_REQUEST_IF(
+        EGGUI_THROW_BAD_REQUEST_IF(
             graphIt == graphs.cend(), "Graph id: '{0}' does not exist!", graphId.toString());
         return graphIt->second;
     });

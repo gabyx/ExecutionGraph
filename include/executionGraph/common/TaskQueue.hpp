@@ -36,7 +36,7 @@ namespace executionGraph
     class TaskQueue
     {
         //! No move/copy allowed!
-        EXECGRAPH_DISALLOW_COPY_AND_MOVE(TaskQueue)
+        EG_DISALLOW_COPY_AND_MOVE(TaskQueue)
 
     public:
         using Task = TTask;

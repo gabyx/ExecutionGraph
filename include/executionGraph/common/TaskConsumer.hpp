@@ -38,7 +38,7 @@ namespace executionGraph
     class TaskConsumer
     {
         //! No move/copy allowed!
-        EXECGRAPH_DISALLOW_COPY_AND_MOVE(TaskConsumer)
+        EG_DISALLOW_COPY_AND_MOVE(TaskConsumer)
 
     public:
         using TaskQueue = TTaskQueue;
@@ -79,7 +79,7 @@ namespace executionGraph
 
         //! Dispatching for std::shared_ptr.
         template<typename T>
-        struct Dispatch<T, EXECGRAPH_ENABLE_IF_CLASS(IsPointerType<T>{})>
+        struct Dispatch<T, EG_ENABLE_IF_CLASS(IsPointerType<T>{})>
         {
             template<typename... Args>
             static void runTask(T&& task, Args&&... args)
@@ -95,7 +95,7 @@ namespace executionGraph
 
         //! Dispatching for normal types.
         template<typename T>
-        struct Dispatch<T, EXECGRAPH_ENABLE_IF_CLASS(!IsPointerType<T>{})>
+        struct Dispatch<T, EG_ENABLE_IF_CLASS(!IsPointerType<T>{})>
         {
             template<typename TT, typename... Args>
             static void runTask(TT&& task, Args&&... args)

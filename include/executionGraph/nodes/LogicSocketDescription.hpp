@@ -128,13 +128,13 @@ namespace executionGraph
     constexpr bool belongSocketDescriptionsToSameNodes = (... && naked<SocketDescB>::template belongsToNode<
                                                                      typename naked<SocketDescA>::Node>());
 
-#define EXECGRAPH_DEFINE_INPUT_DESC(descName, TData, Idx, name) \
+#define EG_DEFINE_INPUT_DESC(descName, TData, Idx, name) \
     static constexpr auto descName = makeInputDescription<TData, Idx, Node>(name)
 
-#define EXECGRAPH_DEFINE_OUTPUT_DESC(descName, TData, Idx, name) \
+#define EG_DEFINE_OUTPUT_DESC(descName, TData, Idx, name) \
     static constexpr auto descName = makeOutputDescription<TData, Idx, Node>(name)
 
-#define EXECGRAPH_DEFINE_DESCS(descName, descName1, ...)                               \
+#define EG_DEFINE_DESCS(descName, descName1, ...)                               \
     static constexpr auto descName = std::forward_as_tuple(descName1, __VA_ARGS__);    \
     static_assert(tupleUtil::invoke(descName, [](auto&&... desc) {                     \
                       return belongSocketDescriptionsToSameNodes<decltype(desc)...> && \

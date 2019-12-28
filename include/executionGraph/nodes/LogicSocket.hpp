@@ -32,7 +32,7 @@ namespace executionGraph
     class LogicSocketBase
     {
     public:
-        EXECGRAPH_DEFINE_TYPES();
+        EG_DEFINE_TYPES();
 
         LogicSocketBase(LogicSocketBase&&) = default;
         LogicSocketBase& operator=(LogicSocketBase&&) = default;
@@ -69,7 +69,7 @@ namespace executionGraph
     class LogicSocketInputBase : public LogicSocketBase
     {
     public:
-        EXECGRAPH_DEFINE_TYPES();
+        EG_DEFINE_TYPES();
 
     protected:
         template<typename... Args>
@@ -86,7 +86,7 @@ namespace executionGraph
         template<typename T>
         auto& castToType() const noexcept
         {
-            EXECGRAPH_LOGTHROW_IF(!this->template isType<T>(),
+            EG_LOGTHROW_IF(!this->template isType<T>(),
                                   "Casting socket index '{0}' with type index '{1}' into type"
                                   "'{2}' of node id: '{3}' which is wrong!",
                                   this->getIndex(),
@@ -114,7 +114,7 @@ namespace executionGraph
     class LogicSocketOutputBase : public LogicSocketBase
     {
     public:
-        EXECGRAPH_DEFINE_TYPES();
+        EG_DEFINE_TYPES();
 
     protected:
         template<typename... Args>
@@ -136,7 +136,7 @@ namespace executionGraph
         {
             if constexpr(throwIfBadSocketCast)
             {
-                EXECGRAPH_LOGTHROW_IF(this->m_type != rttr::type::get<T>(),
+                EG_LOGTHROW_IF(this->m_type != rttr::type::get<T>(),
                                       "Casting socket index '{0}' with type index '{1}' into "
                                       "'{2}' of node id: '{3}' which is wrong!",
                                       this->getIndex(),
@@ -168,7 +168,7 @@ namespace executionGraph
     class LogicSocketInput final : public LogicSocketInputBase
     {
     public:
-        EXECGRAPH_DEFINE_TYPES();
+        EG_DEFINE_TYPES();
         using Data     = TData;
         using NodeData = LogicNodeData<Data>;
 
@@ -221,7 +221,7 @@ namespace executionGraph
     class LogicSocketOutput final : public LogicSocketOutputBase
     {
     public:
-        EXECGRAPH_DEFINE_TYPES();
+        EG_DEFINE_TYPES();
         using Data     = TData;
         using NodeData = LogicNodeData<Data>;
 
@@ -365,7 +365,7 @@ namespace executionGraph
     // from a socket description `LogicSocketDescription`
     template<typename Sockets,
              typename SocketDesc,
-             EXECGRAPH_ENABLE_IF((meta::is_v<Sockets, std::tuple> &&
+             EG_ENABLE_IF((meta::is_v<Sockets, std::tuple> &&
                                   isInputDescriptions<SocketDesc>))>
     auto& getInputSocket(Sockets& sockets, const SocketDesc&)
     {
@@ -376,23 +376,23 @@ namespace executionGraph
     // from a socket description `LogicSocketDescription`
     template<typename Sockets,
              typename SocketDesc,
-             EXECGRAPH_ENABLE_IF((meta::is_v<Sockets, std::tuple> &&
+             EG_ENABLE_IF((meta::is_v<Sockets, std::tuple> &&
                                   isOutputDescriptions<SocketDesc>))>
     auto& getOutputSocket(Sockets& sockets, const SocketDesc&)
     {
         return std::get<SocketDesc::index()>(sockets);
     }
 
-#define EXECGRAPH_DEFINE_SOCKET_GETTERS(Node, inputSockets, outputSockets)      \
+#define EG_DEFINE_SOCKET_GETTERS(Node, inputSockets, outputSockets)      \
     template<typename SocketDesc,                                               \
-             EXECGRAPH_ENABLE_IF((isInputDescriptions<SocketDesc> &&            \
+             EG_ENABLE_IF((isInputDescriptions<SocketDesc> &&            \
                                   SocketDesc::template belongsToNode<Node>()))> \
     auto& socket(const SocketDesc& desc)                                        \
     {                                                                           \
         return executionGraph::getInputSocket(inputSockets, desc);              \
     }                                                                           \
     template<typename SocketDesc,                                               \
-             EXECGRAPH_ENABLE_IF((isOutputDescriptions<SocketDesc> &&           \
+             EG_ENABLE_IF((isOutputDescriptions<SocketDesc> &&           \
                                   SocketDesc::template belongsToNode<Node>()))> \
     auto& socket(const SocketDesc& desc)                                        \
     {                                                                           \

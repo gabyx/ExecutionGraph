@@ -40,7 +40,7 @@ namespace executionGraph
 }  // namespace executionGraph
 
 // clang-format off
-#define EXECGRAPH_OBJECT_ID_DECLARATION_IMPL(TMemberId, OverrideKeyWord) \
+#define EG_OBJECT_ID_DECLARATION_IMPL(TMemberId, OverrideKeyWord) \
 public:                                                                  \
     using Id = executionGraph::Id;                                       \
     const Id& getId() const OverrideKeyWord { return m_id; }       \
@@ -48,21 +48,21 @@ public:                                                                  \
 private:                                                                 \
     const executionGraph::TMemberId m_id;
 
-#define EXECGRAPH_OBJECT_ID_DECLARATION \
-    EXECGRAPH_OBJECT_ID_DECLARATION_IMPL(Id, override final)
-#define EXECGRAPH_OBJECT_ID_NON_VIRTUAL_DECLARATION \
-    EXECGRAPH_OBJECT_ID_DECLARATION_IMPL(Id, )
+#define EG_OBJECT_ID_DECLARATION \
+    EG_OBJECT_ID_DECLARATION_IMPL(Id, override final)
+#define EG_OBJECT_ID_NON_VIRTUAL_DECLARATION \
+    EG_OBJECT_ID_DECLARATION_IMPL(Id, )
 
-#define EXECGRAPH_NAMED_OBJECT_ID_DECLARATION_IMPL(OverrideKeyWord)              \
-    EXECGRAPH_OBJECT_ID_DECLARATION_IMPL(IdNamed, OverrideKeyWord)               \
+#define EG_NAMED_OBJECT_ID_DECLARATION_IMPL(OverrideKeyWord)              \
+    EG_OBJECT_ID_DECLARATION_IMPL(IdNamed, OverrideKeyWord)               \
 public:                                                                          \
     using IdNamed = executionGraph::IdNamed;                                     \
     std::string getName() const { return m_id.getName(); }                       \
     const std::string& getShortName() const { return m_id.getShortName(); }
 
-#define EXECGRAPH_NAMED_OBJECT_ID_DECLARATION \
-    EXECGRAPH_NAMED_OBJECT_ID_DECLARATION_IMPL(override)
-#define EXECGRAPH_NAMED_OBJECT_ID_NON_VIRTUAL_DECLARATION \
-    EXECGRAPH_NAMED_OBJECT_ID_DECLARATION_IMPL()
+#define EG_NAMED_OBJECT_ID_DECLARATION \
+    EG_NAMED_OBJECT_ID_DECLARATION_IMPL(override)
+#define EG_NAMED_OBJECT_ID_NON_VIRTUAL_DECLARATION \
+    EG_NAMED_OBJECT_ID_DECLARATION_IMPL()
 
 // clang-format on

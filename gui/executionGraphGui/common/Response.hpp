@@ -61,7 +61,7 @@ public:
     {
         if(m_resolveOnDestruction && !isResolved())
         {
-            EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', has not been resolved. It will be cancled!", m_requestId.toString());
+            EGGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', has not been resolved. It will be cancled!", m_requestId.toString());
             setCanceled(std::make_exception_ptr(std::runtime_error("Cancled promise on destruction, because not handled properly!")));
         }
     };
@@ -94,7 +94,7 @@ public:
         m_promisePayload.set_value(std::move(payload));
         if(m_state != State::Nothing)
         {
-            EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', is already set to a state!", m_requestId.toString());
+            EGGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', is already set to a state!", m_requestId.toString());
             return;
         }
         m_state = State::Ready;
@@ -106,7 +106,7 @@ public:
         m_promisePayload.set_value(Payload{Payload::Buffer{m_allocator}, "application/octet-stream"});
         if(m_state != State::Nothing)
         {
-            EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', is already set to a state!", m_requestId.toString());
+            EGGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', is already set to a state!", m_requestId.toString());
             return;
         }
         m_state = State::Ready;
@@ -118,7 +118,7 @@ public:
     {
         if(m_state != State::Nothing)
         {
-            EXECGRAPHGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', is already set to a state!", m_requestId.toString());
+            EGGUI_BACKENDLOG_WARN("ResponsePromise for request id: '{0}', is already set to a state!", m_requestId.toString());
             return;
         }
         m_state = State::Canceled;

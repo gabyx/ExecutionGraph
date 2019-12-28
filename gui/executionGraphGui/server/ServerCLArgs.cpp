@@ -61,7 +61,7 @@ ServerCLArgs::ServerCLArgs(int argc, const char* argv[])
 
         // Check address.
         std::regex ip("(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])");
-        EXECGRAPHGUI_THROW_TYPE_IF(!std::regex_match(m_address.Get(), ip),
+        EGGUI_THROW_TYPE_IF(!std::regex_match(m_address.Get(), ip),
                                    args::ParseError,
                                    "IP Address '{0}' has wrong format!",
                                    m_address.Get());
@@ -72,7 +72,7 @@ ServerCLArgs::ServerCLArgs(int argc, const char* argv[])
             m_rootPath.Get() = this->initialPath() / m_rootPath.Get();
         }
 
-        EXECGRAPHGUI_THROW_TYPE_IF(!std::filesystem::exists(m_rootPath.Get()),
+        EGGUI_THROW_TYPE_IF(!std::filesystem::exists(m_rootPath.Get()),
                                    args::ParseError,
                                    "Root path does not exist!");
     }

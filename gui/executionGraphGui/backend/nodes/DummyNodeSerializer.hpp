@@ -27,7 +27,7 @@ struct DummyNodeSerializer
     //! for the DummyNode `node`.
     struct Writer
     {
-        EXECGRAPH_DEFINE_TYPES(TConfig);
+        EG_DEFINE_TYPES(TConfig);
         using Key = DummyNodeType;
 
         static std::pair<const uint8_t*, std::size_t>
@@ -41,7 +41,7 @@ struct DummyNodeSerializer
     //! buffer `node`.
     struct Reader
     {
-        EXECGRAPH_DEFINE_TYPES(TConfig);
+        EG_DEFINE_TYPES(TConfig);
         using Key = DummyNodeType;
 
         static std::unique_ptr<NodeBaseType>

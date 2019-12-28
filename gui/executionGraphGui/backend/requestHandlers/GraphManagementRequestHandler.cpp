@@ -54,7 +54,7 @@ const std::unordered_set<GraphManagementRequestHandler::HandlerKey>& GraphManage
 //! Handle the operation of adding a graph.
 void GraphManagementRequestHandler::handleRequest(const Request& request, ResponsePromise& response)
 {
-    EXECGRAPHGUI_BACKENDLOG_INFO("GraphManagementRequestHandler::handleRequest");
+    EGGUI_BACKENDLOG_INFO("GraphManagementRequestHandler::handleRequest");
     m_functionMap.dispatch(request.target().native(), *this, request, response);
 }
 
@@ -63,7 +63,7 @@ void GraphManagementRequestHandler::handleAddGraph(const Request& request, Respo
 {
     // Request validation
     auto& payload = request.payload();
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt, "Request data is null!");
+    EGGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt, "Request data is null!");
 
     auto graphReq = getRootOfPayloadAndVerify<s::AddGraphRequest>(*payload);
 
@@ -90,7 +90,7 @@ void GraphManagementRequestHandler::handleRemoveGraph(const Request& request, Re
 {
     // Request validation
     auto& payload = request.payload();
-    EXECGRAPHGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt, "Request data is null!");
+    EGGUI_THROW_BAD_REQUEST_IF(payload == std::nullopt, "Request data is null!");
 
     auto nodeReq = getRootOfPayloadAndVerify<s::RemoveGraphRequest>(*payload);
 

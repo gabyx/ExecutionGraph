@@ -24,7 +24,7 @@ namespace executionGraph
     class LogicNodeDefaultPool final : public TConfig::NodeBaseType
     {
     public:
-        EXECGRAPH_DEFINE_TYPES(TConfig);
+        EG_DEFINE_TYPES(TConfig);
         using Base = typename TConfig::NodeBaseType;
 
         template<typename... Args>
@@ -52,7 +52,7 @@ namespace executionGraph
             }
             else
             {
-                EXECGRAPH_THROW_TYPE(NodeConnectionException,
+                EG_THROW_TYPE(NodeConnectionException,
                                      "Default output socket idx: '{0}' does not exist in default output socket pool!",
                                      defaultOutSocketIdx);
             }
@@ -74,7 +74,7 @@ namespace executionGraph
         template<typename T>
         IndexType addNewDefaultValue(T&& defaultValue)
         {
-            EXECGRAPH_THROW("Needs implementation!");
+            EG_THROW("Needs implementation!");
         }
 
         void reset() {}

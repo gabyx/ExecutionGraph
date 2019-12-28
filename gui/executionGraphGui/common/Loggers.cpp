@@ -41,6 +41,6 @@ Loggers::Loggers(const std::path& logPath)
     }
     catch(const spdlog::spdlog_ex& ex)
     {
-        EXECGRAPHGUI_THROW("Log initialization failed: '{0}'", ex.what());
+        EGGUI_THROW("Log initialization failed: '{0}'", ex.what());
     }
 }

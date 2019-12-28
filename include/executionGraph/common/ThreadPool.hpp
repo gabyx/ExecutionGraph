@@ -30,7 +30,7 @@ namespace executionGraph
     class ThreadPool
     {
         //! No move/copy allowed!
-        EXECGRAPH_DISALLOW_COPY_AND_MOVE(ThreadPool)
+        EG_DISALLOW_COPY_AND_MOVE(ThreadPool)
 
     public:
         using Task     = TTask;

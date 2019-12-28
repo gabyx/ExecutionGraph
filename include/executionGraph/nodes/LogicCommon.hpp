@@ -19,7 +19,7 @@
 #include "executionGraph/common/SfinaeMacros.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 
-#define EXECGRAPH_DEFINE_TYPES()                    \
+#define EG_DEFINE_TYPES()                    \
     using NodeId      = executionGraph::NodeId;     \
     using NodeDataId  = executionGraph::NodeDataId; \
     using IndexType   = executionGraph::IndexType;  \

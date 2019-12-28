@@ -60,14 +60,14 @@ public:
     {
         Result1,
     };
-    EXECGRAPH_DEFINE_SOCKET_TRAITS(Ins, Outs)
+    EG_DEFINE_SOCKET_TRAITS(Ins, Outs)
 
     using InSockets = InSocketDeclList<InSocketDecl<Value1, std::shared_ptr<A>>,
                                        InSocketDecl<Value2, std::shared_ptr<A>>>;
 
     using OutSockets = OutSocketDeclList<OutSocketDecl<Result1, std::shared_ptr<A>>>;
 
-    EXECGRAPH_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
+    EG_DEFINE_LOGIC_NODE_VALUE_GETTERS(Ins, InSockets, Outs, OutSockets)
 
     template<typename... Args>
     CustomDummyNode(Args&&... args)
@@ -110,7 +110,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     try
     {
         node1a->getISocket<double>(0);
-        EXECGRAPH_THROW("Should throw exception here!");
+        EG_THROW("Should throw exception here!");
     }
     catch(BadSocketCastException& e)
     {
@@ -118,7 +118,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     }
     catch(...)
     {
-        EXECGRAPH_THROW("Wrong Exception thrown!");
+        EG_THROW("Wrong Exception thrown!");
     }
     // Link
     node4a->setGetLink(*node3a, 0, 0);
@@ -148,12 +148,12 @@ MY_TEST(ExecutionTree_Test, Int_Int)
 
     execTree.setup();
 
-    EXECGRAPH_LOG_TRACE("{0}", execTree.getExecutionOrderInfo());
+    EG_LOG_TRACE("{0}", execTree.getExecutionOrderInfo());
 
     execTree.runExecute(0);
 
-    EXECGRAPH_LOG_TRACE("Result : '{0}'", resultNode->getOutVal<CustomDummyNode<Config>::Result1>()->memory[1]);
-    EXECGRAPH_THROW_IF(resultNode->getOutVal<CustomDummyNode<Config>::Result1>()->memory[1] != 30, "wrong result");
+    EG_LOG_TRACE("Result : '{0}'", resultNode->getOutVal<CustomDummyNode<Config>::Result1>()->memory[1]);
+    EG_THROW_IF(resultNode->getOutVal<CustomDummyNode<Config>::Result1>()->memory[1] != 30, "wrong result");
 }
 
 int main(int argc, char** argv)

@@ -118,7 +118,7 @@ namespace executionGraph
         using MatrixMap = Eigen::Map<EigenType>;
     }  // namespace MyMatrix
 
-    struct EXECGRAPH_EXPORT MyMatrixIOFormat
+    struct EG_EXPORT MyMatrixIOFormat
     {
         static const Eigen::IOFormat Matlab;
         static const Eigen::IOFormat CommaSep;
@@ -126,7 +126,7 @@ namespace executionGraph
     };
 }  // namespace executionGraph
 
-#define EXECGRAPH_DEFINE_MATRIX_SPECIALTYPES                                     \
+#define EG_DEFINE_MATRIX_SPECIALTYPES                                     \
     template<typename Derived>                                                   \
     using MatrixBase = executionGraph::MyMatrix::MatrixBase<Derived>;            \
     template<typename Derived>                                                   \
@@ -153,7 +153,7 @@ namespace executionGraph
  * @brief This macro is used to typedef all custom matrix types which have
  * nothing to do with the system.
  */
-#define EXECGRAPH_DEFINE_MATRIX_TYPES_OF(_PREC_)                                   \
+#define EG_DEFINE_MATRIX_TYPES_OF(_PREC_)                                   \
     using Matrix44        = executionGraph::MyMatrix::Matrix44<_PREC_>;            \
     using Matrix33        = executionGraph::MyMatrix::Matrix33<_PREC_>;            \
     using Matrix22        = executionGraph::MyMatrix::Matrix22<_PREC_>;            \
@@ -195,4 +195,4 @@ namespace executionGraph
     using Array3    = executionGraph::MyMatrix::Array3<_PREC_>;                    \
     using Array2    = executionGraph::MyMatrix::Array2<_PREC_>;                    \
                                                                                    \
-    EXECGRAPH_DEFINE_MATRIX_SPECIALTYPES
+    EG_DEFINE_MATRIX_SPECIALTYPES

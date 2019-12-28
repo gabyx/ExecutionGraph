@@ -15,27 +15,27 @@
 #include "executionGraphGui/common/Loggers.hpp"
 
 // Define some asserts
-#define EXECGRAPH_STRINGIFY(x) #x
-#define EXECGRAPH_TOSTRING(x) EXECGRAPH_STRINGIFY(x)
+#define EG_STRINGIFY(x) #x
+#define EG_TOSTRING(x) EG_STRINGIFY(x)
 
 #ifdef NDEBUG
-#    define EXECGRAPHGUI_ASSERT(condition, ...)                                                    \
+#    define EGGUI_ASSERT(condition, ...)                                                    \
         {                                                                                          \
             if(!(condition))                                                                       \
             {                                                                                      \
-                EXECGRAPHGUI_APPLOG_FATAL(__VA_ARGS__);                                            \
-                EXECGRAPHGUI_THROW("Exception: @ " __FILE__ "(" EXECGRAPH_TOSTRING(__LINE__) ")"); \
+                EGGUI_APPLOG_FATAL(__VA_ARGS__);                                            \
+                EGGUI_THROW("Exception: @ " __FILE__ "(" EG_TOSTRING(__LINE__) ")"); \
             }                                                                                      \
         }
 
-#    define EXECGRAPHGUI_VERIFY(condition, ...) EXECGRAPHGUI_ASSERT(condition, __VA_ARGS__)
+#    define EGGUI_VERIFY(condition, ...) EGGUI_ASSERT(condition, __VA_ARGS__)
 #else
-#    define EXECGRAPHGUI_ASSERT(condition, ...)         \
+#    define EGGUI_ASSERT(condition, ...)         \
         {                                               \
             if(!(condition))                            \
             {                                           \
-                EXECGRAPHGUI_APPLOG_FATAL(__VA_ARGS__); \
+                EGGUI_APPLOG_FATAL(__VA_ARGS__); \
             }                                           \
         }
-#    define EXECGRAPHGUI_VERIFY(condition, ...) EXECGRAPHGUI_ASSERT(condition, __VA_ARGS__)
+#    define EGGUI_VERIFY(condition, ...) EGGUI_ASSERT(condition, __VA_ARGS__)
 #endif
