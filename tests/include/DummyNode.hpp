@@ -31,22 +31,22 @@ namespace executionGraph
         EXECGRAPH_DEFINE_NODE(DummyNode);
 
     public:
-        EXECGRAPH_DEFINE_INPUT_DESCR(in0Decl, int, 0, "Value0");
-        EXECGRAPH_DEFINE_INPUT_DESCR(in2Decl, float, 2, "Value2");
-        EXECGRAPH_DEFINE_INPUT_DESCR(in1Decl, double, 1, "Value1");
+        EXECGRAPH_DEFINE_INPUT_DESC(in0Decl, int, 0, "Value0");
+        EXECGRAPH_DEFINE_INPUT_DESC(in2Decl, float, 2, "Value2");
+        EXECGRAPH_DEFINE_INPUT_DESC(in1Decl, double, 1, "Value1");
 
     private:
         EXECGRAPH_DEFINE_DESCS(inDecls, in0Decl, in2Decl, in1Decl);
-        InputSocketsType<decltype(inDecls)> m_inSockets;
+        InputSocketsTuple<decltype(inDecls)> m_inSockets;
 
     public:
-        EXECGRAPH_DEFINE_OUTPUT_DESCR(out0Decl, int, 0, "Value0");
-        EXECGRAPH_DEFINE_OUTPUT_DESCR(out2Decl, float, 2, "Value2");
-        EXECGRAPH_DEFINE_OUTPUT_DESCR(out1Decl, double, 1, "Value1");
+        EXECGRAPH_DEFINE_OUTPUT_DESC(out0Decl, int, 0, "Value0");
+        EXECGRAPH_DEFINE_OUTPUT_DESC(out2Decl, float, 2, "Value2");
+        EXECGRAPH_DEFINE_OUTPUT_DESC(out1Decl, double, 1, "Value1");
 
     private:
         EXECGRAPH_DEFINE_DESCS(outDecls, out1Decl, out2Decl, out0Decl);
-        OutputSocketsType<decltype(outDecls)> m_outSockets;
+        OutputSocketsTuple<decltype(outDecls)> m_outSockets;
 
     public:
         template<typename... Args>
@@ -60,23 +60,7 @@ namespace executionGraph
         }
 
     public:
-        template<typename SocketDesc,
-                 EXECGRAPH_ENABLE_IF((meta::is_v<SocketDesc, LogicSocketDescription> &&
-                                      SocketDesc::isInput() &&
-                                      SocketDesc::template belongsToNode<DummyNode>()))>
-        auto& socket(const SocketDesc&)
-        {
-            return std::get<SocketDesc::index()>(m_inSockets);
-        }
-
-        template<typename SocketDesc,
-                 EXECGRAPH_ENABLE_IF((meta::is_v<SocketDesc, LogicSocketDescription> &&
-                                      SocketDesc::isOutput() &&
-                                      SocketDesc::template belongsToNode<DummyNode>()))>
-        auto& socket(const SocketDesc&)
-        {
-            return std::get<SocketDesc::index()>(m_outSockets);
-        }
+        EXECGRAPH_DEFINE_SOCKET_GETTERS(Node, m_inSockets, m_outSockets);
 
     public:
         void reset() override{};

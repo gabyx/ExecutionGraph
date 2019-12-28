@@ -13,6 +13,8 @@
 #pragma once
 
 #include <meta/meta.hpp>
+#include "executionGraph/common/MetaCommon.hpp"
+#include "executionGraph/common/MetaIndices.hpp"
 #include "executionGraph/common/MetaInvoke.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
@@ -58,8 +60,12 @@ namespace executionGraph
         static constexpr bool isInput() { return IsInput::value; }
         static constexpr bool isOutput() { return !isInput(); }
 
-        template<typename T>
-        static constexpr bool belongsToNode(const T* = nullptr) { return std::is_same_v<T, Node>; }
+        template<typename T, bool strict = true>
+        static constexpr bool belongsToNode(const T* = nullptr)
+        {
+            // A `Node == void` belongs to every node if non-strict.
+            return (!strict && std::is_same_v<Node, void>) || std::is_same_v<T, Node>;
+        }
 
     private:
         //! @todo This needs c++20 constexpr std::string ...
@@ -108,17 +114,33 @@ namespace executionGraph
                                      TNode>(std::move(name));
     }
 
-#define EXECGRAPH_DEFINE_NODE(ClassType) \
-private:                                 \
-    using NodeType = ClassType
+    //! Test if all description are input descriptions.
+    template<typename... SocketDesc>
+    constexpr bool isInputDescriptions = (... && (meta::is_v<naked<SocketDesc>, LogicSocketDescription> &&
+                                                  naked<SocketDesc>::isInput()));
+    //! Test if all description are output descriptions.
+    template<typename... SocketDesc>
+    constexpr bool isOutputDescriptions = (... && (meta::is_v<naked<SocketDesc>, LogicSocketDescription> &&
+                                                   naked<SocketDesc>::isOutput()));
 
-#define EXECGRAPH_DEFINE_INPUT_DESCR(descName, TData, Idx, name) \
-    static constexpr auto descName = makeInputDescription<TData, Idx, NodeType>(name)
+    //! Test if all description have the same node type.
+    template<typename SocketDescA, typename... SocketDescB>
+    constexpr bool belongSocketDescriptionsToSameNodes = (... && naked<SocketDescB>::template belongsToNode<
+                                                                     typename naked<SocketDescA>::Node>());
 
-#define EXECGRAPH_DEFINE_OUTPUT_DESCR(descName, TData, Idx, name) \
-    static constexpr auto descName = makeOutputDescription<TData, Idx, NodeType>(name)
+#define EXECGRAPH_DEFINE_INPUT_DESC(descName, TData, Idx, name) \
+    static constexpr auto descName = makeInputDescription<TData, Idx, Node>(name)
 
-#define EXECGRAPH_DEFINE_DESCS(descName, descName1, descName2, ...) \
-    static constexpr auto descName = std::forward_as_tuple(descName1, descName2, __VA_ARGS__)
+#define EXECGRAPH_DEFINE_OUTPUT_DESC(descName, TData, Idx, name) \
+    static constexpr auto descName = makeOutputDescription<TData, Idx, Node>(name)
+
+#define EXECGRAPH_DEFINE_DESCS(descName, descName1, ...)                               \
+    static constexpr auto descName = std::forward_as_tuple(descName1, __VA_ARGS__);    \
+    static_assert(tupleUtil::invoke(descName, [](auto&&... desc) {                     \
+                      return belongSocketDescriptionsToSameNodes<decltype(desc)...> && \
+                             (isInputDescriptions<decltype(desc)...> ||                \
+                              isOutputDescriptions<decltype(desc)...>);                \
+                  }),                                                                  \
+                  "All input or ouput sockets and on same node!");
 
 }  // namespace executionGraph

@@ -122,4 +122,9 @@ namespace executionGraph
         InputSockets m_inputs;    //!< The input sockets.
         OutputSockets m_outputs;  //!< The output sockets.
     };
+
+#define EXECGRAPH_DEFINE_NODE(TNode) \
+private:                             \
+    using Node = TNode
+    
 }  // namespace executionGraph

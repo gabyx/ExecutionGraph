@@ -24,10 +24,11 @@
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 #include "executionGraph/nodes/LogicNode.hpp"
+#include "executionGraph/nodes/LogicSocketDescription.hpp"
 
 namespace executionGraph
 {
-    //! The socket base class for all input/output sockets of a node.
+    //! The socket base class.
     class LogicSocketBase
     {
     public:
@@ -53,7 +54,10 @@ namespace executionGraph
         inline const LogicNode& parent() const noexcept { return *m_parent; }
 
         template<typename T>
-        bool isType() const noexcept { return type() == rttr::type::get<T>(); }
+        bool isType() const noexcept
+        {
+            return type() == rttr::type::get<T>();
+        }
 
     protected:
         rttr::type m_type;                    //!< The type of this socket.
@@ -61,7 +65,7 @@ namespace executionGraph
         const LogicNode* m_parent = nullptr;  //!< The parent node of of this socket.
     };
 
-    //! The input socket base class for all input sockets of a node.
+    //! The input socket base class.
     class LogicSocketInputBase : public LogicSocketBase
     {
     public:
@@ -106,7 +110,7 @@ namespace executionGraph
         const LogicNodeDataBase* m_nodeData = nullptr;  //! Connected data node.
     };
 
-    //! The input socket base class for all input/output sockets of a node.
+    //! The output socket base class.
     class LogicSocketOutputBase : public LogicSocketBase
     {
     public:
@@ -152,6 +156,14 @@ namespace executionGraph
         }
     };
 
+    /* ---------------------------------------------------------------------------------------*/
+    /*!
+        The input socket.
+
+        @date Sat Dec 28 2019
+        @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+    */
+    /* ---------------------------------------------------------------------------------------*/
     template<typename TData>
     class LogicSocketInput final : public LogicSocketInputBase
     {
@@ -197,6 +209,14 @@ namespace executionGraph
         const NodeData* m_nodeData = nullptr;  //! Connected data node.
     };
 
+    /* ---------------------------------------------------------------------------------------*/
+    /*
+        The output socket.
+
+        @date Sat Dec 28 2019
+        @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+    */
+    /* ---------------------------------------------------------------------------------------*/
     template<typename TData>
     class LogicSocketOutput final : public LogicSocketOutputBase
     {
@@ -242,84 +262,65 @@ namespace executionGraph
         NodeData* m_nodeData = nullptr;  //! Connected data node.
     };
 
-    namespace makeSocketsDetails
+    namespace details
     {
-        template<typename A, typename B>
-        using comp = meta::less<typename meta::at_c<A, 1>::Index,
-                                typename meta::at_c<B, 1>::Index>;
-
-        template<typename A>
-        using getIdx = typename meta::at_c<A, 1>::Index;
-
-        template<typename T>
-        using naked = std::remove_cvref_t<T>;
-
-        //! Test if all descriptions are input or output descriptions
-        template<typename... SocketDesc>
-        constexpr bool eitherInputsOrOutputs()
+        namespace makeSockets
         {
-            using namespace makeSocketsDetails;
-            using namespace meta;
-            return (... && naked<SocketDesc>::isInput()) ||
-                   (... && naked<SocketDesc>::isOutput());
-        }
+            template<typename A, typename B>
+            using comp = meta::less<typename meta::at_c<A, 1>::Index,
+                                    typename meta::at_c<B, 1>::Index>;
 
-        //! Test if all description have the same node type.
-        template<typename... SocketDesc>
-        constexpr bool allSameNode()
-        {
-            using namespace makeSocketsDetails;
-            using namespace meta;
-            using List = list<naked<SocketDesc>...>;
-            return (... && std::is_same_v<typename naked<SocketDesc>::Node,
-                                          typename at_c<List, 0>::Node>);
-        }
+            template<typename A>
+            using getIdx = typename meta::at_c<A, 1>::Index;
 
-        //! Returns the indices list denoting the sorted descriptions `descs`.
-        template<bool checkIncreasingByOne = true,
-                 typename... SocketDesc>
-        constexpr auto sortDescriptions()
-        {
-            constexpr auto N = sizeof...(SocketDesc);
+            //! Returns the indices list denoting the sorted descriptions `descs`.
+            template<bool checkIncreasingByOne = true,
+                     typename... SocketDesc>
+            constexpr auto sortDescriptions()
+            {
+                constexpr auto N = sizeof...(SocketDesc);
 
-            using namespace makeSocketsDetails;
-            using namespace meta::placeholders;
-            using namespace meta;
+                using namespace meta::placeholders;
+                using namespace meta;
 
-            using List = list<naked<SocketDesc>...>;
+                using List = list<naked<SocketDesc>...>;
 
-            using EnumeratedList = zip<list<as_list<make_index_sequence<N>>, List>>;
+                using EnumeratedList = zip<list<as_list<make_index_sequence<N>>, List>>;
 
-            // Sort the list
-            using Sorted = sort<EnumeratedList,
-                                lambda<_a, _b, defer<comp, _a, _b>>>;
+                // Sort the list
+                using Sorted = sort<EnumeratedList,
+                                    lambda<_a, _b, defer<comp, _a, _b>>>;
 
-            static_assert(!checkIncreasingByOne ||
-                              std::is_same_v<transform<Sorted, quote<getIdx>>,
-                                             as_list<make_index_sequence<N>>>,
-                          "Socket description indices are not monotone increasing by one");
+                static_assert(!checkIncreasingByOne ||
+                                  std::is_same_v<transform<Sorted, quote<getIdx>>,
+                                                 as_list<make_index_sequence<N>>>,
+                              "Socket description indices are not monotone increasing by one");
 
-            using SortedIndices = unique<transform<Sorted,
-                                                   bind_back<quote<at>, meta::size_t<0>>>>;
+                using SortedIndices = unique<transform<Sorted,
+                                                       bind_back<quote<at>, meta::size_t<0>>>>;
 
-            return to_index_sequence<SortedIndices>{};
-        }
-    };  // namespace makeSocketsDetails
+                return to_index_sequence<SortedIndices>{};
+            }
+        }  // namespace makeSockets
+    }      // namespace details
 
-    //! Make input sockets from `InputSocketDescriptions`.
+    //! Make a container for input socket from `LogicSocketDescription`s.
+    //! @return A `std::tuple` of `LogicSocket<...>`.
     template<typename... Descriptions,
              typename Node>
     auto makeSockets(const std::tuple<Descriptions&...>& descs,
                      const Node& node)
     {
-        static_assert(makeSocketsDetails::eitherInputsOrOutputs<Descriptions...>(),
+        using namespace details::makeSockets;
+
+        static_assert(isInputDescriptions<Descriptions...> ||
+                          isOutputDescriptions<Descriptions...>,
                       "Either all inputs or outputs!");
 
-        using namespace makeSocketsDetails;
         // The SocketDescriptions::Index can be in any order
         // -> sort them and insert the sockets in order.
 
-        static_assert(allSameNode<Descriptions...>(),
+        static_assert(belongSocketDescriptionsToSameNodes<Descriptions...>,
                       "You cannot mix descriptions for different nodes!");
 
         constexpr auto indices = sortDescriptions<true, Descriptions...>();
@@ -332,12 +333,17 @@ namespace executionGraph
             indices);
     }
 
+    //! The container type for input sockets used in specific node implementation.
+    //! A `std::tuple` of `LogicSocket<...>`.
     template<typename InputDescs>
-    using InputSocketsType = decltype(makeSockets(std::declval<InputDescs>(),
-                                                  std::declval<LogicNode>()));
-    template<typename OutputDescs>
-    using OutputSocketsType = decltype(makeSockets(std::declval<OutputDescs>(),
+    using InputSocketsTuple = decltype(makeSockets(std::declval<InputDescs>(),
                                                    std::declval<LogicNode>()));
+
+    //! The container type for output sockets used in specific node implementation.
+    //! A `std::tuple` of `LogicSocket<...>`.
+    template<typename OutputDescs>
+    using OutputSocketsTuple = decltype(makeSockets(std::declval<OutputDescs>(),
+                                                    std::declval<LogicNode>()));
 
     //! Convert a tuple of sockets into a container `Container`
     //! of pointers pointing to the passed sockets.
@@ -354,5 +360,44 @@ namespace executionGraph
                 return Container{Pointer{&socket}...};
             });
     }
+
+    //! Get an input socket of a tuple-like socket-container
+    // from a socket description `LogicSocketDescription`
+    template<typename Sockets,
+             typename SocketDesc,
+             EXECGRAPH_ENABLE_IF((meta::is_v<Sockets, std::tuple> &&
+                                  isInputDescriptions<SocketDesc>))>
+    auto& getInputSocket(Sockets& sockets, const SocketDesc&)
+    {
+        return std::get<SocketDesc::index()>(sockets);
+    }
+
+    //! Get an output socket of a tuple-like socket-container
+    // from a socket description `LogicSocketDescription`
+    template<typename Sockets,
+             typename SocketDesc,
+             EXECGRAPH_ENABLE_IF((meta::is_v<Sockets, std::tuple> &&
+                                  isOutputDescriptions<SocketDesc>))>
+    auto& getOutputSocket(Sockets& sockets, const SocketDesc&)
+    {
+        return std::get<SocketDesc::index()>(sockets);
+    }
+
+#define EXECGRAPH_DEFINE_SOCKET_GETTERS(Node, inputSockets, outputSockets)      \
+    template<typename SocketDesc,                                               \
+             EXECGRAPH_ENABLE_IF((isInputDescriptions<SocketDesc> &&            \
+                                  SocketDesc::template belongsToNode<Node>()))> \
+    auto& socket(const SocketDesc& desc)                                        \
+    {                                                                           \
+        return executionGraph::getInputSocket(inputSockets, desc);              \
+    }                                                                           \
+    template<typename SocketDesc,                                               \
+             EXECGRAPH_ENABLE_IF((isOutputDescriptions<SocketDesc> &&           \
+                                  SocketDesc::template belongsToNode<Node>()))> \
+    auto& socket(const SocketDesc& desc)                                        \
+    {                                                                           \
+        return executionGraph::getOutputSocket(outputSockets, desc);            \
+    }                                                                           \
+    using __FILE__##__LINE__##FORCE_SEMICOLON = int
 
 }  // namespace executionGraph
