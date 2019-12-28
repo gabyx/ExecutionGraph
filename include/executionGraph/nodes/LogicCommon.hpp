@@ -19,7 +19,7 @@
 #include "executionGraph/common/SfinaeMacros.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 
-#define EG_DEFINE_TYPES()                    \
+#define EG_DEFINE_TYPES()                           \
     using NodeId      = executionGraph::NodeId;     \
     using NodeDataId  = executionGraph::NodeDataId; \
     using IndexType   = executionGraph::IndexType;  \
@@ -29,7 +29,7 @@ namespace executionGraph
 {
     // Forward declarations
     class LogicNode;
-    
+
     class LogicSocketBase;
     class LogicSocketInputBase;
     class LogicSocketOutputBase;
@@ -50,5 +50,16 @@ namespace executionGraph
     static constexpr NodeDataId nodeDataIdInvalid = std::numeric_limits<IndexType>::max();
 
     using SocketIndex = IndexType;  //! The socket index type.
+
+
+
+
+    template<typename TData>
+    struct ConnectionConfig
+    {
+        using InputSocket  = LogicSocketInput<TData>;
+        using OutputSocket = LogicSocketOutput<TData>;
+        using NodeData     = LogicNodeData<TData>;
+    };
 
 }  // namespace executionGraph

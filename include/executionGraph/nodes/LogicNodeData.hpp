@@ -36,7 +36,10 @@ namespace executionGraph
         auto type() const noexcept { return m_type; }
 
         template<typename T>
-        bool isType() const noexcept { return type() == rttr::type::get<T>(); }
+        bool isType() const noexcept
+        {
+            return type() == rttr::type::get<T>();
+        }
 
         //! Cast to a logic data node of type `LogicNodeData<T>*`.
         //! The cast fails at runtime if the data type `T` does not match!
@@ -46,11 +49,11 @@ namespace executionGraph
             if constexpr(throwIfNodeDataNoStorage)
             {
                 EG_LOGTHROW_IF(!isType<T>(),
-                                      "Casting node data with id '{0}' and type '{1}' into type"
-                                      "'{2}' which is wrong!",
-                                      id(),
-                                      type(),
-                                      rttr::type::get<T>().get_name());
+                               "Casting node data with id '{0}' and type '{1}' into type"
+                               "'{2}' which is wrong!",
+                               id(),
+                               type(),
+                               rttr::type::get<T>().get_name());
             }
 
             return static_cast<const LogicNodeData<T>&>(*this);
@@ -81,48 +84,88 @@ namespace executionGraph
         NodeDataId m_id = nodeDataIdInvalid;  //!< Id of this node.
     };
 
-    template<typename TData>
-    class LogicNodeDataLinks
+    template<typename TConfig,
+             typename Derived>
+    class LogicNodeDataConnections
     {
     public:
-        using Data         = TData;
-        using InputSocket  = LogicSocketInput<Data>;
-        using OutputSocket = LogicSocketOutput<Data>;
+        using InputSocket  = typename TConfig::InputSocket;
+        using OutputSocket = typename TConfig::OutputSocket;
+
+        friend InputSocket;
+        friend OutputSocket;
 
     protected:
-        LogicNodeDataLinks() noexcept = default;
+        LogicNodeDataConnections() noexcept = default;
 
     public:
-        ~LogicNodeDataLinks() noexcept
+        ~LogicNodeDataConnections() noexcept
         {
-            // @todo comment in
-            // for(auto* output : m_outputs)
-            // {
-            //     output->onRemoveWriteLink(*this);
-            // }
-            // for(auto* input : m_inputs)
-            // {
-            //     input->onRemoveGetLink(*this);
-            // }
+            for(auto* socket : m_inputs)
+            {
+                socket->onDisconnect();
+            }
+            for(auto* socket : m_outputs)
+            {
+                socket->onDisconnect();
+            }
+        }
+
+    public:
+        template<typename Socket>
+        void connect(Socket& socket) noexcept;
+
+        template<typename Socket>
+        void disconnect(Socket& socket) noexcept;
+
+        bool isConnected(const InputSocket& socket) noexcept
+        {
+            return m_inputs.find(const_cast<InputSocket*>(&socket)) != m_inputs.end();
+        }
+
+        bool isConnected(const OutputSocket& socket) noexcept
+        {
+            return m_outputs.find(const_cast<OutputSocket*>(&socket)) != m_outputs.end();
+        }
+
+    protected:
+        void onConnect(const InputSocket& socket) noexcept
+        {
+            EG_VERIFY(addGetLink(socket), "Not connected!");
+        }
+
+        void onConnect(const OutputSocket& socket) noexcept
+        {
+            EG_VERIFY(addWriteLink(socket), "Not connected!");
+        }
+
+        void onDisconnect(const InputSocket& socket) noexcept
+        {
+            EG_VERIFY(removeGetLink(socket), "Not connected!");
+        }
+
+        void onDisconnect(const OutputSocket& socket) noexcept
+        {
+            EG_VERIFY(removeWriteLink(socket), "Not connected!");
         }
 
     private:
-        bool onAddWriteLink(const OutputSocket& output) noexcept
+        bool addWriteLink(const OutputSocket& output) noexcept
         {
             return m_outputs.emplace(&const_cast<OutputSocket&>(output)).second;
         }
-        bool onRemoveWriteLink(const OutputSocket& output) noexcept
+        bool removeWriteLink(const OutputSocket& output) noexcept
         {
-            return m_outputs.erase(&const_cast<OutputSocket&>(output)).second;
+            return m_outputs.erase(&const_cast<OutputSocket&>(output)) > 0;
         }
 
-        bool onAddGetLink(const InputSocket& input) noexcept
+        bool addGetLink(const InputSocket& input) noexcept
         {
             return m_inputs.emplace(&const_cast<InputSocket&>(input)).second;
         }
-        bool onRemoveGetLink(const InputSocket& input) noexcept
+        bool removeGetLink(const InputSocket& input) noexcept
         {
-            return m_inputs.erase(&const_cast<InputSocket&>(input)).second;
+            return m_inputs.erase(&const_cast<InputSocket&>(input)) > 0;
         }
 
     public:
@@ -139,11 +182,12 @@ namespace executionGraph
 
     template<typename TData>
     class LogicNodeData final : public LogicNodeDataBase,
-                                public LogicNodeDataLinks<TData>
+                                public LogicNodeDataConnections<ConnectionConfig<TData>,
+                                                                LogicNodeData<TData>>
     {
     public:
-        using Base = LogicNodeDataBase;
         using Data = TData;
+        using Base = LogicNodeDataBase;
 
         using DataHandle      = LogicDataHandle<Data>;
         using DataHandleConst = LogicDataHandle<const Data>;
@@ -151,13 +195,9 @@ namespace executionGraph
         static_assert(!std::is_const_v<Data> && !std::is_reference_v<Data>,
                       "Only non-const non-reference types allowed!");
 
-        using Reference    = LogicNodeDataRef<Data>;
-        using InputSocket  = typename LogicNodeDataLinks<Data>::InputSocket;
-        using OutputSocket = typename LogicNodeDataLinks<Data>::OutputSocket;
+        using Reference = LogicNodeDataRef<Data>;
 
         friend Reference;
-        friend InputSocket;
-        friend OutputSocket;
 
     public:
         template<typename... Args>
@@ -176,6 +216,7 @@ namespace executionGraph
             }
         };
 
+    public:
         auto cdata() const noexcept
         {
             return DataHandleConst{m_data};
@@ -215,13 +256,13 @@ namespace executionGraph
     };
 
     template<typename... TArgs>
-    class LogicNodeDataRef final : public LogicNodeDataBase,
-                                   public LogicNodeDataLinks<typename LogicNodeData<TArgs...>::Data>
+    class LogicNodeDataRef final : public LogicNodeDataBase
     {
     public:
-        using Base     = LogicNodeDataBase;
         using NodeData = LogicNodeData<TArgs...>;
         using Data     = typename NodeData::Data;
+
+        using Base = LogicNodeDataBase;
 
         using DataHandle      = typename NodeData::DataHandle;
         using DataHandleConst = typename NodeData::DataHandleConst;
@@ -281,5 +322,25 @@ namespace executionGraph
     private:
         NodeData* m_node = nullptr;
     };
+
+    template<typename TConfig, typename Derived>
+    template<typename Socket>
+    void LogicNodeDataConnections<TConfig, Derived>::connect(Socket& socket) noexcept
+    {
+        disconnect();
+        onConnect(socket);
+        socket.onConnect(static_cast<Derived&>(*this));
+    }
+
+    template<typename TConfig, typename Derived>
+    template<typename Socket>
+    void LogicNodeDataConnections<TConfig, Derived>::disconnect(Socket& socket) noexcept
+    {
+        if(isConnected(socket))
+        {
+            onDisconnect(socket);
+            socket.onDisconnect();
+        }
+    }
 
 }  // namespace executionGraph

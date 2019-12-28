@@ -12,6 +12,7 @@
 
 //#include <executionGraph/nodes/LogicNode.hpp>
 #include <executionGraph/common/TupleUtil.hpp>
+#include <executionGraph/nodes/LogicNodeData.hpp>
 #include <executionGraph/nodes/LogicSocket.hpp>
 #include "DummyNode.hpp"
 #include "TestFunctions.hpp"
@@ -21,9 +22,11 @@ using namespace executionGraph;
 MY_TEST(Node_Test, Int_Int)
 {
     // Integer node connection (wrong connection)
+    LogicNodeData<float> f(1);
     DummyNode node1(1);
-    node1.compute();
     DummyNode node2(2);
+    node1.socket(node1.out2Decl).connect(f);
+    //node2.socket(node2.in2Decl)·connect(f);
 
     //node1.addWriteLink(0, node2, 1);  // Correct connection!
 

@@ -87,12 +87,12 @@ namespace executionGraph
         auto& castToType() const noexcept
         {
             EG_LOGTHROW_IF(!this->template isType<T>(),
-                                  "Casting socket index '{0}' with type index '{1}' into type"
-                                  "'{2}' of node id: '{3}' which is wrong!",
-                                  this->getIndex(),
-                                  this->type(),
-                                  rttr::type::get<T>().get_name(),
-                                  this->parent().getId());
+                           "Casting socket index '{0}' with type index '{1}' into type"
+                           "'{2}' of node id: '{3}' which is wrong!",
+                           this->getIndex(),
+                           this->type(),
+                           rttr::type::get<T>().get_name(),
+                           this->parent().getId());
 
             return static_cast<const LogicSocketInput<T>&>(*this);
         }
@@ -104,10 +104,9 @@ namespace executionGraph
             return const_cast<LogicSocketInput<T>&>(static_cast<LogicSocketInputBase const*>(this)->castToType<T>());
         }
 
-        const LogicNodeDataBase* dataNode() { return m_nodeData; }
-
-    protected:
-        const LogicNodeDataBase* m_nodeData = nullptr;  //! Connected data node.
+    public:
+        static constexpr bool isInput() { return true; }
+        static constexpr bool isOutput() { return false; }
     };
 
     //! The output socket base class.
@@ -137,12 +136,12 @@ namespace executionGraph
             if constexpr(throwIfBadSocketCast)
             {
                 EG_LOGTHROW_IF(this->m_type != rttr::type::get<T>(),
-                                      "Casting socket index '{0}' with type index '{1}' into "
-                                      "'{2}' of node id: '{3}' which is wrong!",
-                                      this->getIndex(),
-                                      this->type(),
-                                      rttr::type::get<T>().get_name(),
-                                      this->parent().getId());
+                               "Casting socket index '{0}' with type index '{1}' into "
+                               "'{2}' of node id: '{3}' which is wrong!",
+                               this->getIndex(),
+                               this->type(),
+                               rttr::type::get<T>().get_name(),
+                               this->parent().getId());
             }
 
             return static_cast<const LogicSocketOutput<T>&>(*this);
@@ -154,6 +153,54 @@ namespace executionGraph
         {
             return const_cast<LogicSocketOutput<T>&>(static_cast<LogicSocketOutputBase const*>(this)->castToType<T>());
         }
+
+    public:
+        static constexpr bool isInput() { return false; }
+        static constexpr bool isOutput() { return true; }
+    };
+
+    template<typename TConfig, typename Derived>
+    class LogicSocketConnections
+    {
+    public:
+        using NodeData = typename TConfig::NodeData;
+        
+        // @todo Compile Problem
+        // https://wandbox.org/permlink/jZtZV6Gl6KeGsxPH
+
+        friend NodeData;
+
+    protected:
+        LogicSocketConnections() = default;
+
+    public:
+        ~LogicSocketConnections()
+        {
+            //disconnect();
+        }
+
+    public:
+        //! Connect a data node.
+        void connect(NodeData& nodeData) noexcept;
+
+        //! Disconnect the data node.
+        void disconnect() noexcept;
+
+        NodeData* dataNode() { return m_nodeData; }
+
+    protected:
+        void onConnect(const NodeData& nodeData) noexcept
+        {
+            m_nodeData = const_cast<NodeData*>(&nodeData);
+        }
+
+        void onDisconnect() noexcept
+        {
+            m_nodeData = nullptr;
+        }
+
+    private:
+        NodeData* m_nodeData = nullptr;  //! Connected data node.
     };
 
     /* ---------------------------------------------------------------------------------------*/
@@ -165,12 +212,13 @@ namespace executionGraph
     */
     /* ---------------------------------------------------------------------------------------*/
     template<typename TData>
-    class LogicSocketInput final : public LogicSocketInputBase
+    class LogicSocketInput final : public LogicSocketInputBase,
+                                   public LogicSocketConnections<ConnectionConfig<TData>,
+                                                                 LogicSocketInput<TData>>
     {
     public:
         EG_DEFINE_TYPES();
-        using Data     = TData;
-        using NodeData = LogicNodeData<Data>;
+        using Data                = TData;
 
     public:
         template<typename... Args>
@@ -188,25 +236,6 @@ namespace executionGraph
         //! Move allowed
         LogicSocketInput(LogicSocketInput&& other) = default;
         LogicSocketInput& operator=(LogicSocketInput&& other) = default;
-
-        //! Connect a data node.
-        bool connect(const NodeData& nodeData)
-        {
-            m_nodeData = &nodeData;
-            const_expr<NodeData*>(m_nodeData)->onAddGetLink(*this);
-        }
-
-        //! Disconnect the data node.
-        bool disconnect()
-        {
-            const_expr<NodeData*>(m_nodeData)->onRemoveGetLink(*this);
-            m_nodeData = nullptr;
-        }
-
-        const NodeData* dataNode() { return m_nodeData; }
-
-    protected:
-        const NodeData* m_nodeData = nullptr;  //! Connected data node.
     };
 
     /* ---------------------------------------------------------------------------------------*/
@@ -218,12 +247,15 @@ namespace executionGraph
     */
     /* ---------------------------------------------------------------------------------------*/
     template<typename TData>
-    class LogicSocketOutput final : public LogicSocketOutputBase
+    class LogicSocketOutput final : public LogicSocketOutputBase,
+                                    public LogicSocketConnections<ConnectionConfig<TData>,
+                                                                  LogicSocketOutput<TData>>
     {
     public:
         EG_DEFINE_TYPES();
-        using Data     = TData;
-        using NodeData = LogicNodeData<Data>;
+        using Data                = TData;
+        using ConnectionInterface = LogicSocketConnections<ConnectionConfig<Data>,
+                                                           LogicSocketInput<TData>>;
 
     public:
         template<typename... Args>
@@ -241,25 +273,6 @@ namespace executionGraph
         //! Move allowed
         LogicSocketOutput(LogicSocketOutput&& other) = default;
         LogicSocketOutput& operator=(LogicSocketOutput&& other) = default;
-
-        //! Connect a data node.
-        bool connect(NodeData& nodeData)
-        {
-            m_nodeData = &nodeData;
-            m_nodeData->onAddWriteLink(*this);
-        }
-
-        //! Disconnect the data node.
-        bool disconnect()
-        {
-            m_nodeData->onRemoveWriteLink(*this);
-            m_nodeData = nullptr;
-        }
-
-        NodeData* dataNode() { return m_nodeData; }
-
-    protected:
-        NodeData* m_nodeData = nullptr;  //! Connected data node.
     };
 
     namespace details
@@ -362,42 +375,62 @@ namespace executionGraph
     }
 
     //! Get an input socket of a tuple-like socket-container
-    // from a socket description `LogicSocketDescription`
+    //! from a socket description `LogicSocketDescription`
     template<typename Sockets,
              typename SocketDesc,
              EG_ENABLE_IF((meta::is_v<Sockets, std::tuple> &&
-                                  isInputDescriptions<SocketDesc>))>
+                           isInputDescriptions<SocketDesc>))>
     auto& getInputSocket(Sockets& sockets, const SocketDesc&)
     {
         return std::get<SocketDesc::index()>(sockets);
     }
 
     //! Get an output socket of a tuple-like socket-container
-    // from a socket description `LogicSocketDescription`
+    //! from a socket description `LogicSocketDescription`
     template<typename Sockets,
              typename SocketDesc,
              EG_ENABLE_IF((meta::is_v<Sockets, std::tuple> &&
-                                  isOutputDescriptions<SocketDesc>))>
+                           isOutputDescriptions<SocketDesc>))>
     auto& getOutputSocket(Sockets& sockets, const SocketDesc&)
     {
         return std::get<SocketDesc::index()>(sockets);
     }
 
 #define EG_DEFINE_SOCKET_GETTERS(Node, inputSockets, outputSockets)      \
-    template<typename SocketDesc,                                               \
+    template<typename SocketDesc,                                        \
              EG_ENABLE_IF((isInputDescriptions<SocketDesc> &&            \
-                                  SocketDesc::template belongsToNode<Node>()))> \
-    auto& socket(const SocketDesc& desc)                                        \
-    {                                                                           \
-        return executionGraph::getInputSocket(inputSockets, desc);              \
-    }                                                                           \
-    template<typename SocketDesc,                                               \
+                           SocketDesc::template belongsToNode<Node>()))> \
+    auto& socket(const SocketDesc& desc)                                 \
+    {                                                                    \
+        return executionGraph::getInputSocket(inputSockets, desc);       \
+    }                                                                    \
+    template<typename SocketDesc,                                        \
              EG_ENABLE_IF((isOutputDescriptions<SocketDesc> &&           \
-                                  SocketDesc::template belongsToNode<Node>()))> \
-    auto& socket(const SocketDesc& desc)                                        \
-    {                                                                           \
-        return executionGraph::getOutputSocket(outputSockets, desc);            \
-    }                                                                           \
+                           SocketDesc::template belongsToNode<Node>()))> \
+    auto& socket(const SocketDesc& desc)                                 \
+    {                                                                    \
+        return executionGraph::getOutputSocket(outputSockets, desc);     \
+    }                                                                    \
     using __FILE__##__LINE__##FORCE_SEMICOLON = int
+
+    //! Connect a data node.
+    template<typename TNodeData, typename Derived>
+    void LogicSocketConnections<TNodeData, Derived>::connect(NodeData& nodeData) noexcept
+    {
+        disconnect();
+        onConnect(nodeData);
+        m_nodeData->onConnect(static_cast<Derived&>(*this));
+    }
+
+    //! Disconnect the data node.
+    template<typename TNodeData, typename Derived>
+    void LogicSocketConnections<TNodeData, Derived>::disconnect() noexcept
+    {
+        if(m_nodeData)
+        {
+            m_nodeData->onDisconnect(static_cast<Derived&>(*this));
+            onDisconnect();
+        }
+    }
 
 }  // namespace executionGraph

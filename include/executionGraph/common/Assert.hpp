@@ -22,7 +22,7 @@
 #    define EG_DEBUG_ONLY(code) ASSERT_SEMICOLON
 #    define EG_ASSERT(condition, ...) ASSERT_SEMICOLON
 #    define EG_VERIFY(condition, ...) \
-        condition;                           \
+        condition;                    \
         ASSERT_SEMICOLON
 #    define EG_ASSERT_TYPE(condition, type, ...) ASSERT_SEMICOLON
 #else
@@ -31,28 +31,28 @@
 #    define EG_VERIFY(condition, ...) EG_ASSERT(condition, __VA_ARGS__)
 #    define EG_ASSERT(condition, ...) EG_ASSERT_TYPE(condition, executionGraph::ExceptionFatal, __VA_ARGS__)
 #    define EG_ASSERT_TYPE(condition, Type, ...)              \
-        if(!(condition))                                             \
-        {                                                            \
+        if(!(condition))                                      \
+        {                                                     \
             EG_LOG_ERROR("{0} : \n{1}\n@ {2} [{3}]",          \
-                                #condition,                          \
-                                fmt::format(__VA_ARGS__),            \
-                                __FILE__,                            \
-                                __LINE__)                            \
+                         #condition,                          \
+                         fmt::format(__VA_ARGS__),            \
+                         __FILE__,                            \
+                         __LINE__)                            \
             EG_THROW_TYPE_IF(!(condition), Type, __VA_ARGS__) \
-        }                                                            \
+        }                                                     \
         ASSERT_SEMICOLON
 #endif
 
 //! Some warning macro.
 #define EG_WARN(condition, ...)                     \
-    {                                                      \
-        if(!(condition))                                   \
-        {                                                  \
+    {                                               \
+        if(!(condition))                            \
+        {                                           \
             EG_LOG_WARN("{0} : \n{1}\n@ {2} [{3}]", \
-                               #condition,                 \
-                               fmt::format(__VA_ARGS__),   \
-                               __FILE__,                   \
-                               __LINE__)                   \
-        }                                                  \
-    }                                                      \
+                        #condition,                 \
+                        fmt::format(__VA_ARGS__),   \
+                        __FILE__,                   \
+                        __LINE__)                   \
+        }                                           \
+    }                                               \
     ASSERT_SEMICOLON
