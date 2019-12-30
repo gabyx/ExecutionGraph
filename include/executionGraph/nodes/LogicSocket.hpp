@@ -159,16 +159,16 @@ namespace executionGraph
         static constexpr bool isOutput() { return true; }
     };
 
-    template<typename TConfig, typename Derived>
+    template<typename TTraits, typename Derived>
     class LogicSocketConnections
     {
     public:
-        using NodeData = typename TConfig::NodeData;
-        
-        // @todo Compile Problem
-        // https://wandbox.org/permlink/qYBeKCJ0ymRyITls
+        using NodeData            = typename TTraits::NodeDataConnections;
+        using NodeDataConnections = typename TTraits::NodeDataConnections;
+        static_assert(std::is_base_of_v<NodeDataConnections, NodeData>,
+                      "NodeDataConnections needs to be a base of NodeData");
 
-        friend NodeData;
+        friend NodeDataConnections;
 
     protected:
         LogicSocketConnections() = default;
@@ -176,15 +176,27 @@ namespace executionGraph
     public:
         ~LogicSocketConnections()
         {
-            //disconnect();
+            disconnect();
         }
 
     public:
         //! Connect a data node.
-        void connect(NodeData& nodeData) noexcept;
+        void connect(NodeDataConnections& nodeData) noexcept
+        {
+            disconnect();
+            onConnect(nodeData);
+            m_nodeData->onConnect(static_cast<Derived&>(*this));
+        }
 
         //! Disconnect the data node.
-        void disconnect() noexcept;
+        void disconnect() noexcept
+        {
+            if(m_nodeData)
+            {
+                m_nodeData->onDisconnect(static_cast<Derived&>(*this));
+                onDisconnect();
+            }
+        }
 
         NodeData* dataNode() { return m_nodeData; }
 
@@ -213,12 +225,11 @@ namespace executionGraph
     /* ---------------------------------------------------------------------------------------*/
     template<typename TData>
     class LogicSocketInput final : public LogicSocketInputBase,
-                                   public LogicSocketConnections<ConnectionConfig<TData>,
-                                                                 LogicSocketInput<TData>>
+                                   public ConnectionTraits<TData>::InputSocketConnections
     {
     public:
         EG_DEFINE_TYPES();
-        using Data                = TData;
+        using Data = TData;
 
     public:
         template<typename... Args>
@@ -248,14 +259,11 @@ namespace executionGraph
     /* ---------------------------------------------------------------------------------------*/
     template<typename TData>
     class LogicSocketOutput final : public LogicSocketOutputBase,
-                                    public LogicSocketConnections<ConnectionConfig<TData>,
-                                                                  LogicSocketOutput<TData>>
+                                    public ConnectionTraits<TData>::OutputSocketConnections
     {
     public:
         EG_DEFINE_TYPES();
-        using Data                = TData;
-        using ConnectionInterface = LogicSocketConnections<ConnectionConfig<Data>,
-                                                           LogicSocketInput<TData>>;
+        using Data = TData;
 
     public:
         template<typename... Args>
@@ -412,25 +420,5 @@ namespace executionGraph
         return executionGraph::getOutputSocket(outputSockets, desc);     \
     }                                                                    \
     using __FILE__##__LINE__##FORCE_SEMICOLON = int
-
-    //! Connect a data node.
-    template<typename TNodeData, typename Derived>
-    void LogicSocketConnections<TNodeData, Derived>::connect(NodeData& nodeData) noexcept
-    {
-        disconnect();
-        onConnect(nodeData);
-        m_nodeData->onConnect(static_cast<Derived&>(*this));
-    }
-
-    //! Disconnect the data node.
-    template<typename TNodeData, typename Derived>
-    void LogicSocketConnections<TNodeData, Derived>::disconnect() noexcept
-    {
-        if(m_nodeData)
-        {
-            m_nodeData->onDisconnect(static_cast<Derived&>(*this));
-            onDisconnect();
-        }
-    }
 
 }  // namespace executionGraph

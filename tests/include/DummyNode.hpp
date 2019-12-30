@@ -61,17 +61,15 @@ namespace executionGraph
 
     public:
         EG_DEFINE_SOCKET_GETTERS(Node, m_inSockets, m_outSockets);
-
+        // EG_DEFINE_SOCKET_CHECKS 
     public:
-        void reset() override{};
+        void reset() override{
+            //EG_THROW_IF(checkRequiredSocketConnections)
+        };
 
         void compute() override
         {
-            EG_THROW_IF(socket(out0Decl).dataNode() == nullptr, "Wups");
+            socket(out0Decl).dataNode()
         }
-
-    private:
-        // InSocketList m_inSockets;
-        // OutSocketList m_outSockets;
     };
 }  // namespace executionGraph

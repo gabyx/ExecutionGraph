@@ -27,7 +27,8 @@
 
 namespace executionGraph
 {
-    // Forward declarations
+    /*! Forward declarations of fixed types. */
+    //@{
     class LogicNode;
 
     class LogicSocketBase;
@@ -38,9 +39,8 @@ namespace executionGraph
     template<typename T>
     class LogicSocketOutput;
 
-    class LogicNodeDataBase;
-    template<typename T>
-    class LogicNodeData;
+    template<typename Config, typename Derived>
+    class LogicSocketConnections;
 
     using IndexType  = uint64_t;   //! A general index type.
     using NodeId     = IndexType;  //! Node Id type.
@@ -51,15 +51,29 @@ namespace executionGraph
 
     using SocketIndex = IndexType;  //! The socket index type.
 
+    class LogicNodeDataBase;
+    template<typename T>
+    class LogicNodeData;
+    template<typename Config, typename Derived>
+    class LogicNodeDataConnections;
+    //@}
 
-
-
+    /*! Forward declarations of user-defined types (@todo make available). 
+        See https://wandbox.org/permlink/KiZnp9QHafZuvoXa
+    */
+    //@{
     template<typename TData>
-    struct ConnectionConfig
+    struct ConnectionTraits
     {
-        using InputSocket  = LogicSocketInput<TData>;
-        using OutputSocket = LogicSocketOutput<TData>;
-        using NodeData     = LogicNodeData<TData>;
+        using Data                    = TData;
+        using InputSocket             = LogicSocketInput<Data>;
+        using OutputSocket            = LogicSocketOutput<Data>;
+        using InputSocketConnections  = LogicSocketConnections<ConnectionTraits, InputSocket>;
+        using OutputSocketConnections = LogicSocketConnections<ConnectionTraits, OutputSocket>;
+
+        using NodeData            = LogicNodeData<Data>;
+        using NodeDataConnections = LogicNodeDataConnections<ConnectionTraits, NodeData>;
     };
+    //@}
 
 }  // namespace executionGraph

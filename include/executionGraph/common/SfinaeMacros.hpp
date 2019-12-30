@@ -46,5 +46,5 @@
  */
 /* ---------------------------------------------------------------------------------------*/
 
-#define EG_ENABLE_IF(condition) std::enable_if_t<(condition), int> = 0
-#define EG_ENABLE_IF_CLASS(condition) std::enable_if_t<(condition), void>
+#define EG_ENABLE_IF(...) std::enable_if_t<(__VA_ARGS__), int> = 0
+#define EG_ENABLE_IF_CLASS(...) std::enable_if_t<(__VA_ARGS__), void>

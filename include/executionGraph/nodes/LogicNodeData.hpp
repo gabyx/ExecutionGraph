@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <type_traits>
 #include <unordered_set>
 #include <meta/meta.hpp>
 #include <rttr/type>
@@ -84,16 +85,26 @@ namespace executionGraph
         NodeDataId m_id = nodeDataIdInvalid;  //!< Id of this node.
     };
 
-    template<typename TConfig,
-             typename Derived>
+    template<typename TTraits, typename Derived>
     class LogicNodeDataConnections
     {
     public:
-        using InputSocket  = typename TConfig::InputSocket;
-        using OutputSocket = typename TConfig::OutputSocket;
+        using InputSocket             = typename TTraits::InputSocket;
+        using OutputSocket            = typename TTraits::OutputSocket;
+        using InputSocketConnections  = typename TTraits::InputSocketConnections;
+        using OutputSocketConnections = typename TTraits::OutputSocketConnections;
 
-        friend InputSocket;
-        friend OutputSocket;
+    private:
+        template<typename T>
+        static constexpr bool isInputConnection = std::is_base_of_v<InputSocketConnections, T>;
+        template<typename T>
+        static constexpr bool isOutputConnection = std::is_base_of_v<OutputSocketConnections, T>;
+
+        static_assert(isInputConnection<InputSocket> && isOutputConnection<OutputSocket>,
+                      "SocketConnections needs to be a base of InputSocket and OutputSocket");
+
+        friend InputSocketConnections;
+        friend OutputSocketConnections;
 
     protected:
         LogicNodeDataConnections() noexcept = default;
@@ -103,20 +114,46 @@ namespace executionGraph
         {
             for(auto* socket : m_inputs)
             {
-                socket->onDisconnect();
+                static_cast<InputSocketConnections*>(socket)->onDisconnect();
             }
             for(auto* socket : m_outputs)
             {
-                socket->onDisconnect();
+                static_cast<OutputSocketConnections*>(socket)->onDisconnect();
             }
         }
 
     public:
         template<typename Socket>
-        void connect(Socket& socket) noexcept;
+        void connect(Socket& socket) noexcept
+        {
+            disconnect();
+            onConnect(socket);
+            if constexpr(isInputConnection<Socket>)
+            {
+                static_cast<InputSocketConnections&>(socket).onConnect(static_cast<Derived&>(*this));
+            }
+            else
+            {
+                static_cast<OutputSocketConnections&>(socket).onConnect(static_cast<Derived&>(*this));
+            }
+        }
 
         template<typename Socket>
-        void disconnect(Socket& socket) noexcept;
+        void disconnect(Socket& socket) noexcept
+        {
+            if(isConnected(socket))
+            {
+                onDisconnect(socket);
+                if constexpr(isInputConnection<Socket>)
+                {
+                    static_cast<InputSocketConnections&>(socket).onDisconnect();
+                }
+                else
+                {
+                    static_cast<OutputSocketConnections&>(socket).onDisconnect();
+                }
+            }
+        }
 
         bool isConnected(const InputSocket& socket) noexcept
         {
@@ -182,8 +219,8 @@ namespace executionGraph
 
     template<typename TData>
     class LogicNodeData final : public LogicNodeDataBase,
-                                public LogicNodeDataConnections<ConnectionConfig<TData>,
-                                                                LogicNodeData<TData>>
+                                public ConnectionTraits<TData>::NodeDataConnections
+
     {
     public:
         using Data = TData;
@@ -322,25 +359,4 @@ namespace executionGraph
     private:
         NodeData* m_node = nullptr;
     };
-
-    template<typename TConfig, typename Derived>
-    template<typename Socket>
-    void LogicNodeDataConnections<TConfig, Derived>::connect(Socket& socket) noexcept
-    {
-        disconnect();
-        onConnect(socket);
-        socket.onConnect(static_cast<Derived&>(*this));
-    }
-
-    template<typename TConfig, typename Derived>
-    template<typename Socket>
-    void LogicNodeDataConnections<TConfig, Derived>::disconnect(Socket& socket) noexcept
-    {
-        if(isConnected(socket))
-        {
-            onDisconnect(socket);
-            socket.onDisconnect();
-        }
-    }
-
 }  // namespace executionGraph
