@@ -20,21 +20,10 @@
 #include "executionGraph/common/MetaInvoke.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
+#include "executionGraph/nodes/LogicSocketFlags.hpp"
 
 namespace executionGraph
 {
-    enum class ELogicSocketFlags : std::size_t
-    {
-        NoFlags = 0,
-        //! If the socket is a output socket, otherwise its a input socket.
-        Output = 1,
-        //! If the socket is optional meaning it needs no data node connection.
-        Optional = 2
-    };
-
-    template<ELogicSocketFlags... E>
-    using LogicSocketFlags = meta::list<decltype(enumToIntC(E))...>;
-
     /* ---------------------------------------------------------------------------------------*/
     /*!
         Describing input and output sockets. 
@@ -49,38 +38,37 @@ namespace executionGraph
     /* ---------------------------------------------------------------------------------------*/
     template<typename TData,
              typename TIndex,
-             typename Flags = LogicSocketFlags<>,
-             typename TNode = void>
+             typename TFlags = LogicSocketFlagsList<>,
+             typename TNode  = void>
     class LogicSocketDescription
     {
     public:
         using Data   = TData;
         using Index  = TIndex;
         using Node   = TNode;
+        using Flags  = TFlags;
         using EFlags = ELogicSocketFlags;
 
-        static_assert(std::is_same_v<SocketIndex, Index::value_type>,
+        static_assert(std::is_same_v<SocketIndex, typename Index::value_type>,
                       "Wrong index type");
 
     private:
-        static constexpr auto m_flags = EnumFlags<EFlags>{
-            meta::accumulate<Flags,
-                             meta::size_t<0>,
-                             meta::quote<meta::bit_or>>::value};
+        static constexpr auto m_flags = convertSocketFlags(Flags{});
 
     public:
         constexpr LogicSocketDescription(std::string_view name)
-            : m_name(name) {}
+            : m_name(name)
+        {}
 
         static constexpr SocketIndex index() { return Index::value; }
 
-        static constexpr const auto& flags() { return flags; };
+        static constexpr const auto& flags() { return m_flags; };
+        static constexpr bool isOutput() { return flags().isSet(EFlags::Output); }
         static constexpr bool isInput() { return !isOutput(); }
-        static constexpr bool isOutput() { return flags.isSet(EFlags::Output); }
 
         constexpr const auto& name() const { return m_name; }
 
-        using SocketType = meta::if_<meta::bool_<flags().isSet()>,
+        using SocketType = meta::if_<meta::bool_<isInput()>,
                                      LogicSocketInput<Data>,
                                      LogicSocketOutput<Data>>;
 
@@ -97,13 +85,13 @@ namespace executionGraph
         const std::string_view m_name;
     };
 
-    template<typename Data, typename Index, typename Flags = LogicSocketFlags<>, typename Node = void>
+    template<typename Data, typename Index, typename Flags = LogicSocketFlagsList<>, typename Node = void>
     using InputDescription = LogicSocketDescription<Data,
                                                     Index,
                                                     Flags,
                                                     Node>;
 
-    template<typename Data, typename Index, typename Flags = LogicSocketFlags<>, typename Node = void>
+    template<typename Data, typename Index, typename Flags = LogicSocketFlagsList<>, typename Node = void>
     using OutputDescription = LogicSocketDescription<Data,
                                                      Index,
                                                      Flags,
@@ -112,7 +100,7 @@ namespace executionGraph
     template<typename CallableDesc,
              typename Data,
              IndexType Idx,
-             typename FlagsList = LogicSocketFlags<>,
+             typename FlagsList = LogicSocketFlagsList<>,
              typename Node      = void>
     constexpr auto makeSocketDescription(std::string_view name)
     {
@@ -123,8 +111,8 @@ namespace executionGraph
                             Node>{std::move(name)};
     }
 
-    template<typename Data, IndexType Idx, typename FlagsList = LogicSocketFlags<>, typename Node = void>
-    constexpr auto makeInputDescription(std::string_view name)
+    template<typename Data, IndexType Idx, typename FlagsList = LogicSocketFlagsList<>, typename Node = void>
+    consteval auto makeInputDescription(std::string_view name)
     {
         return makeSocketDescription<meta::quote<InputDescription>,
                                      Data,
@@ -133,13 +121,15 @@ namespace executionGraph
                                      Node>(std::move(name));
     }
 
-    template<typename Data, IndexType Idx, typename FlagsList = LogicSocketFlags<>, typename Node = void>
-    constexpr auto makeOutputDescription(std::string_view name)
+    template<typename Data, IndexType Idx, typename FlagsList = LogicSocketFlagsList<>, typename Node = void>
+    consteval auto makeOutputDescription(std::string_view name)
     {
+        using EFlags = ELogicSocketFlags;
         return makeSocketDescription<meta::quote<OutputDescription>,
                                      Data,
                                      Idx,
-                                     meta::push_back<FlagsList, decltype(enumToIntC(ELogicSocketFlags::Output))>,
+                                     meta::join<meta::list<FlagsList,
+                                                           LogicSocketFlagsList<EFlags::Output>>>,
                                      Node>(std::move(name));
     }
 
@@ -158,10 +148,10 @@ namespace executionGraph
                                                                      typename naked<SocketDescA>::Node>());
 
 #define EG_DEFINE_INPUT_DESC(descName, TData, Idx, name) \
-    static constexpr auto descName = makeInputDescription<TData, Idx, LogicSocketFlags<>, Node>(name)
+    static constexpr auto descName = makeInputDescription<TData, Idx, LogicSocketFlagsList<>, Node>(name)
 
 #define EG_DEFINE_OUTPUT_DESC(descName, TData, Idx, name) \
-    static constexpr auto descName = makeOutputDescription<TData, Idx, LogicSocketFlags<>, Node>(name)
+    static constexpr auto descName = makeOutputDescription<TData, Idx, LogicSocketFlagsList<>, Node>(name)
 
 #define EG_DEFINE_DESCS(descName, descName1, ...)                                      \
     static constexpr auto descName = std::forward_as_tuple(descName1, __VA_ARGS__);    \

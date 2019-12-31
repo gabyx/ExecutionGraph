@@ -43,6 +43,7 @@ namespace executionGraph
         EG_DEFINE_OUTPUT_DESC(out0Decl, int, 0, "Value0");
         EG_DEFINE_OUTPUT_DESC(out2Decl, float, 2, "Value2");
         EG_DEFINE_OUTPUT_DESC(out1Decl, double, 1, "Value1");
+        static_assert(out0Decl.isOutput(), "Wups");
 
     private:
         EG_DEFINE_DESCS(outDecls, out1Decl, out2Decl, out0Decl);
@@ -69,7 +70,7 @@ namespace executionGraph
 
         void compute() override
         {
-            socket(out0Decl).dataNode()
+            socket(out0Decl).dataNode();
         }
     };
 }  // namespace executionGraph

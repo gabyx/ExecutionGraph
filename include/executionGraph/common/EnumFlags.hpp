@@ -41,40 +41,40 @@ namespace executionGraph
         static constexpr bool isFlagsOrEnum = (... && (isFlags<T> || isEnum<T>));
 
     public:
-        constexpr EnumFlags() = default;
-        constexpr EnumFlags(EnumFlags&) = default;
-        constexpr EnumFlags(EnumFlags&&) = default;
+        constexpr EnumFlags() noexcept = default;
+        constexpr EnumFlags(const EnumFlags&) noexcept = default;
+        constexpr EnumFlags(EnumFlags&&) noexcept = default;
 
-        constexpr explicit EnumFlags(Integral i)
+        constexpr explicit EnumFlags(Integral i) noexcept
             : m_flags(i) {}
 
-        constexpr EnumFlags(Enum e)
-            : m_flags(1 << enumToInt(e)) {}
+        constexpr EnumFlags(Enum e) noexcept
+            : m_flags(enumToInt(e)) {}
 
         template<typename F,
                  typename... FF,
                  EG_ENABLE_IF(isFlagsOrEnum<F, FF...> && sizeof...(FF) > 0)>
-        constexpr EnumFlags(F f, FF... ff)
+        constexpr EnumFlags(F f, FF... ff) noexcept
             : EnumFlags(ff...)
         {
             set(EnumFlags{f});
         }
 
-        constexpr auto value() { return m_flags.value(); }
+        constexpr auto value() const { return m_flags.value(); }
 
-        constexpr auto& reset()
+        constexpr auto& reset() noexcept
         {
             m_flags.reset();
             return *this;
         }
 
-        constexpr auto& set(EnumFlags f)
+        constexpr auto& set(EnumFlags f) noexcept
         {
             m_flags |= f.m_flags;
             return *this;
         }
 
-        constexpr auto& unset(EnumFlags f)
+        constexpr auto& unset(EnumFlags f) noexcept
         {
             m_flags &= ~f.m_flags;
             return *this;
@@ -83,7 +83,7 @@ namespace executionGraph
         template<typename F,
                  typename... FF,
                  EG_ENABLE_IF(isFlagsOrEnum<F, FF...> && sizeof...(FF) > 0)>
-        constexpr auto& set(F f, FF... ff)
+        constexpr auto& set(F f, FF... ff) noexcept
         {
             return set(f).set(ff...);
         }
@@ -91,16 +91,16 @@ namespace executionGraph
         template<typename F,
                  typename... FF,
                  EG_ENABLE_IF(isFlagsOrEnum<F, FF...> && sizeof...(FF) > 0)>
-        constexpr auto& unset(F f, FF... ff)
+        constexpr auto& unset(F f, FF... ff) noexcept
         {
             return unset(f).unset(f).unset(ff...);
         }
 
-        constexpr bool isAllSet() { return m_flags.all(); }
-        constexpr bool isAnySet() { return m_flags.any(); }
-        constexpr bool isNone() { return m_flags.none(); }
+        constexpr bool isAllSet() const noexcept { return m_flags.all(); }
+        constexpr bool isAnySet() const noexcept { return m_flags.any(); }
+        constexpr bool isNone() const noexcept { return m_flags.none(); }
 
-        constexpr bool isSet(EnumFlags f)
+        constexpr bool isSet(EnumFlags f) const noexcept
         {
             return (m_flags & f.m_flags) == f.m_flags;
         }
@@ -108,12 +108,12 @@ namespace executionGraph
        template<typename F,
                  typename... FF,
                  EG_ENABLE_IF(isFlagsOrEnum<F, FF...> && sizeof...(FF) > 0)>
-        constexpr bool isSet(F f, FF... ff)
+        constexpr bool isSet(F f, FF... ff) const noexcept
         {
             return (isSet(f) && ... && isSet(ff));
         }
 
-        constexpr bool isUnset(EnumFlags f)
+        constexpr bool isUnset(EnumFlags f) const noexcept
         {
             return EnumFlags{*this}.unset(f) == *this;
         }
@@ -121,7 +121,7 @@ namespace executionGraph
        template<typename F,
                  typename... FF,
                  EG_ENABLE_IF(isFlagsOrEnum<F, FF...> && sizeof...(FF) > 0)>
-        constexpr bool isUnset(F f, FF... ff)
+        constexpr bool isUnset(F f, FF... ff) const noexcept
         {
             return (isUnset(f) && ... && isUnset(ff));
         }
@@ -129,7 +129,7 @@ namespace executionGraph
        template<typename F,
                  typename... FF,
                  EG_ENABLE_IF(isFlagsOrEnum<F, FF...> && sizeof...(FF) > 0)>
-        constexpr bool isAnySet(F f, FF... ff)
+        constexpr bool isAnySet(F f, FF... ff) const noexcept
         {
             return (isSet(f) ||... || isSet(ff));
         }
@@ -137,24 +137,24 @@ namespace executionGraph
         template<typename F,
                  typename... FF,
                  EG_ENABLE_IF(isFlagsOrEnum<F, FF...> && sizeof...(FF) > 0)>
-        constexpr bool isAnyUnset(F f, FF... ff)
+        constexpr bool isAnyUnset(F f, FF... ff) const noexcept
         {
             return (isUnset(f) ||...|| isUnset(ff));
         }
 
-        constexpr bool operator==(const EnumFlags& other)
+        constexpr bool operator==(const EnumFlags& other) const noexcept
         {
             return m_flags == other.m_flags;
         }
 
-        constexpr bool operator!=(const EnumFlags& other)
+        constexpr bool operator!=(const EnumFlags& other) const noexcept
         {
             return m_flags != other.m_flags;
         }
 
     private:
-        EnumFlags(FlagsInternal&& flags)
-            : m_flags(std::forward<FlagsInternal>(flags))
+        EnumFlags(FlagsInternal&& flags) noexcept
+            : m_flags(std::forward<FlagsInternal>(flags)) 
         {
         }
 

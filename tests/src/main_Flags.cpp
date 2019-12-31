@@ -42,6 +42,15 @@ MY_TEST(Flags, Test)
         ASSERT_TRUE(f.isAnySet(E::A, E::C));
         ASSERT_TRUE(!f.isNone());
     }
+
+    {
+        constexpr EnumFlags<E> f = {E::D,E::A};
+        static_assert(f.isSet(E::A, E::D), "Wrong");
+        static_assert(f.isUnset(E::B, E::C), "Wrong");
+        static_assert(f.isAnySet(E::A, E::C), "Wrong");
+        static_assert(!f.isNone(), "Wrong");
+    }
+
 }
 
 int main(int argc, char** argv)

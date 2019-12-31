@@ -18,16 +18,17 @@ namespace executionGraph
 {
     /** This function casts any enum class to the underlying type */
     template<typename E>
-    static constexpr auto enumToInt(const E e) -> typename std::underlying_type<E>::type
+    static constexpr auto enumToInt(E e) -> typename std::underlying_type<E>::type
     {
         return static_cast<typename std::underlying_type<E>::type>(e);
     }
 
-    template<typename E>
-    static constexpr auto enumToIntC(const E e) -> typename std::underlying_type<E>::type
-    {
-        return std::integral_constant<typename std::underlying_type<E>::type, enumToInt(e)>{};
-    }
+    //! @todo P1073R3: consteval not implemented yet, so enumToIntC(E e)
+    //! -> does not compile since template `integral_constan`
+    //! needs a constexpr as second parameter.
+    template<auto e>
+    using enumToIntC = std::integral_constant<typename std::underlying_type<decltype(e)>::type, enumToInt(e)>;
+
 }  // namespace executionGraph
 
 // EnumClassHelper_hpp
