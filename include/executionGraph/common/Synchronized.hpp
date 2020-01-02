@@ -258,4 +258,4 @@ namespace executionGraph
         mutable MutexType m_mutex;  //!< MutexType for `m_data`.
         DataType m_data;            //!< The actual guarded data.
     };
-};  // namespace executionGraph
+}  // namespace executionGraph

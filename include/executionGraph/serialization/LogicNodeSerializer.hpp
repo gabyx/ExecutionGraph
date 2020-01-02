@@ -52,7 +52,7 @@ namespace executionGraph
     class LogicNodeSerializer final
     {
     public:
-        EG_DEFINE_TYPES(TConfig);
+        EG_DEFINE_TYPES();
 
     public:
         LogicNodeSerializer()  = default;

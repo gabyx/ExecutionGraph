@@ -25,7 +25,9 @@ if(${USE_SUPERBUILD})
                             PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/rttr"
                             TIMEOUT 10
                             UPDATE_DISCONNECTED  ON
-                            CMAKE_ARGS "-DCMAKE_BUILD_TYPE=Release" 
+                            CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+                                       "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+                                       "-DCMAKE_BUILD_TYPE=Release" 
                                        "-DCMAKE_VERBOSE_MAKEFILE=ON" 
                                        "-DBUILD_STATIC=ON" 
                                        "-DBUILD_EXAMPLES=OFF"

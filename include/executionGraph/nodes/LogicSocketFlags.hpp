@@ -33,7 +33,7 @@ namespace executionGraph
     using LogicSocketEnumFlags = EnumFlags<ELogicSocketFlags>;
 
     template<typename... I>
-    consteval auto convertSocketFlags(meta::list<I...>)
+    constexpr auto convertSocketFlags(meta::list<I...>)
     {
         return LogicSocketEnumFlags{LogicSocketEnumFlags{I::value}...};
     }

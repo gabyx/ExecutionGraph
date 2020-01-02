@@ -60,7 +60,7 @@ namespace executionGraph
     public:
         using GraphType = TGraphType;
         using TConfig   = typename GraphType::Config;
-        EG_DEFINE_TYPES(TConfig);
+        EG_DEFINE_TYPES();
         using LogicNodeSerializer = TLogicNodeSerializer;
 
         ExecutionGraphSerializer(LogicNodeSerializer& nodeSerializer)

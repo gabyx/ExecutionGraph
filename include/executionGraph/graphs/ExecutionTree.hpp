@@ -45,7 +45,7 @@ namespace executionGraph
     class ExecutionTree final
     {
     public:
-        EG_DEFINE_TYPES(TConfig);
+        EG_DEFINE_TYPES();
 
         enum NodeClassification : unsigned char
         {

@@ -71,7 +71,7 @@ struct DummyNodeSerializer
     //! for the DummyNode `node`.
     struct Writer
     {
-        EG_DEFINE_TYPES(Config);
+        EG_DEFINE_TYPES();
 
         using Key = DummyNodeType;
 
@@ -93,7 +93,7 @@ struct DummyNodeSerializer
     //! buffer `node`.
     struct Reader
     {
-        EG_DEFINE_TYPES(Config);
+        EG_DEFINE_TYPES();
 
         using Key = DummyNodeType;
 

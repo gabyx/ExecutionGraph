@@ -24,7 +24,9 @@ if(${USE_SUPERBUILD})
                             PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/flatbuffers"
                             TIMEOUT 10
                             UPDATE_DISCONNECTED  ON
-                            CMAKE_ARGS "-DCMAKE_BUILD_TYPE=Release" "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
+                            CMAKE_ARGS "-DCMAKE_BUILD_TYPE=Release" 
+                                       "-DFLATBUFFERS_BUILD_TESTS=OFF" 
+                                       "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
                             INSTALL_DIR "${INSTALL_DIR}")
 
         ExternalProject_Get_property(flatbuffers BINARY_DIR)

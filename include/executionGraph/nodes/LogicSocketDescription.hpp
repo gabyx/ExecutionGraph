@@ -112,7 +112,7 @@ namespace executionGraph
     }
 
     template<typename Data, IndexType Idx, typename FlagsList = LogicSocketFlagsList<>, typename Node = void>
-    consteval auto makeInputDescription(std::string_view name)
+    constexpr auto makeInputDescription(std::string_view name)
     {
         return makeSocketDescription<meta::quote<InputDescription>,
                                      Data,
@@ -122,7 +122,7 @@ namespace executionGraph
     }
 
     template<typename Data, IndexType Idx, typename FlagsList = LogicSocketFlagsList<>, typename Node = void>
-    consteval auto makeOutputDescription(std::string_view name)
+    constexpr auto makeOutputDescription(std::string_view name)
     {
         using EFlags = ELogicSocketFlags;
         return makeSocketDescription<meta::quote<OutputDescription>,
@@ -160,6 +160,6 @@ namespace executionGraph
                              (isInputDescriptions<decltype(desc)...> ||                \
                               isOutputDescriptions<decltype(desc)...>);                \
                   }),                                                                  \
-                  "All input or ouput sockets and on same node!");
+                  "All input or ouput sockets and on same node!")
 
 }  // namespace executionGraph
