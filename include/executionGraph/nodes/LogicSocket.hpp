@@ -18,6 +18,7 @@
 #include <rttr/type>
 
 #include "executionGraph/common/Assert.hpp"
+#include "executionGraph/common/ConstExprAlgos.hpp"
 #include "executionGraph/common/DemangleTypes.hpp"
 #include "executionGraph/common/EnumClassHelper.hpp"
 #include "executionGraph/common/TupleUtil.hpp"
@@ -283,88 +284,44 @@ namespace executionGraph
         LogicSocketOutput& operator=(LogicSocketOutput&& other) = default;
     };
 
-    namespace details
-    {
-        namespace makeSockets
-        {
-            template<typename A, typename B>
-            using comp = meta::less<typename meta::at_c<A, 1>::Index,
-                                    typename meta::at_c<B, 1>::Index>;
-
-            template<typename A>
-            using getIdx = typename meta::at_c<A, 1>::Index;
-
-            //! Returns the indices list denoting the sorted descriptions `descs`.
-            template<bool checkIncreasingByOne = true,
-                     typename... SocketDesc>
-            constexpr auto sortDescriptions()
-            {
-                constexpr auto N = sizeof...(SocketDesc);
-
-                using namespace meta::placeholders;
-                using namespace meta;
-
-                using List = list<naked<SocketDesc>...>;
-
-                using EnumeratedList = zip<list<as_list<make_index_sequence<N>>, List>>;
-
-                // Sort the list
-                using Sorted = sort<EnumeratedList,
-                                    lambda<_a, _b, defer<comp, _a, _b>>>;
-
-                static_assert(!checkIncreasingByOne ||
-                                  std::is_same_v<transform<Sorted, quote<getIdx>>,
-                                                 as_list<make_index_sequence<N>>>,
-                              "Socket description indices are not monotone increasing by one");
-
-                using SortedIndices = unique<transform<Sorted,
-                                                       bind_back<quote<at>, meta::size_t<0>>>>;
-
-                return to_index_sequence<SortedIndices>{};
-            }
-        }  // namespace makeSockets
-    }      // namespace details
-
     //! Make a container for input socket from `LogicSocketDescription`s.
     //! @return A `std::tuple` of `LogicSocket<...>`.
-    template<typename... Descriptions,
-             typename Node>
-    auto makeSockets(const std::tuple<Descriptions&...>& descs,
-                     const Node& node)
+    template<auto& descs,
+             typename Node,
+             EG_ENABLE_IF((meta::is<naked<decltype(descs)>, std::tuple>::value) &&
+                          std::is_constant_evaluated())>
+    auto makeSockets(const Node& node)
     {
-        using namespace details::makeSockets;
+        []<typename... Descs>(std::tuple<Descs...>)
+        {
+            static_assert(isInputDescriptions<Descs...> ||
+                              isOutputDescriptions<Descs...>,
+                          "Either all inputs or outputs!");
+            static_assert(belongSocketDescriptionsToSameNodes<Descs...>,
+                          "You cannot mix descriptions for different nodes!");
+        }
+        (descs);
 
-        static_assert(isInputDescriptions<Descriptions...> ||
-                          isOutputDescriptions<Descriptions...>,
-                      "Either all inputs or outputs!");
-
-        // The SocketDescriptions::Index can be in any order
-        // -> sort them and insert the sockets in order.
-
-        static_assert(belongSocketDescriptionsToSameNodes<Descriptions...>,
-                      "You cannot mix descriptions for different nodes!");
-
-        constexpr auto indices = sortDescriptions<true, Descriptions...>();
         return tupleUtil::invoke(
             descs,
-            [&](auto&&... desc) {
+            [&](auto&&... ds) {
+                std::array indices = {ds.index()...};
+                static_assert(cx::is_sorted(indices.begin(), indices.end()),
+                              "All socket description need to be sorted!");
                 return std::make_tuple(
-                    typename naked<decltype(desc)>::SocketType(desc.index(), node)...);
-            },
-            indices);
+                    typename naked<decltype(ds)>::SocketType(ds.index(), node)...);
+            });
     }
 
     //! The container type for input sockets used in specific node implementation.
     //! A `std::tuple` of `LogicSocket<...>`.
-    template<typename InputDescs>
-    using InputSocketsTuple = decltype(makeSockets(std::declval<InputDescs>(),
-                                                   std::declval<LogicNode>()));
+    template<auto& inputDescs>
+    using InputSocketsTuple = decltype(makeSockets<inputDescs>(std::declval<LogicNode>()));
 
     //! The container type for output sockets used in specific node implementation.
     //! A `std::tuple` of `LogicSocket<...>`.
-    template<typename OutputDescs>
-    using OutputSocketsTuple = decltype(makeSockets(std::declval<OutputDescs>(),
-                                                    std::declval<LogicNode>()));
+    template<auto& outputDescs>
+    using OutputSocketsTuple = decltype(makeSockets<outputDescs>(std::declval<LogicNode>()));
 
     //! Convert a tuple of sockets into a container `Container`
     //! of pointers pointing to the passed sockets.

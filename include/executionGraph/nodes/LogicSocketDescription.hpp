@@ -18,6 +18,7 @@
 #include "executionGraph/common/MetaCommon.hpp"
 #include "executionGraph/common/MetaIndices.hpp"
 #include "executionGraph/common/MetaInvoke.hpp"
+#include "executionGraph/common/TupleUtil.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 #include "executionGraph/nodes/LogicSocketFlags.hpp"
@@ -97,6 +98,18 @@ namespace executionGraph
                                                      Flags,
                                                      Node>;
 
+    namespace details
+    {
+        template<auto&... socketDescs>
+        constexpr auto sortSocketDescriptions()
+        {
+            return tupleUtil::sort<std::forward_as_tuple(socketDescs...),
+                                   [](auto&& descA, auto&& descB) {
+                                       return descA.index() < descB.index();
+                                   }>();
+        }
+    }  // namespace details
+
     template<typename CallableDesc,
              typename Data,
              IndexType Idx,
@@ -153,13 +166,12 @@ namespace executionGraph
 #define EG_DEFINE_OUTPUT_DESC(descName, TData, Idx, name) \
     static constexpr auto descName = makeOutputDescription<TData, Idx, LogicSocketFlagsList<>, Node>(name)
 
-#define EG_DEFINE_DESCS(descName, descName1, ...)                                      \
-    static constexpr auto descName = std::forward_as_tuple(descName1, __VA_ARGS__);    \
-    static_assert(tupleUtil::invoke(descName, [](auto&&... desc) {                     \
-                      return belongSocketDescriptionsToSameNodes<decltype(desc)...> && \
-                             (isInputDescriptions<decltype(desc)...> ||                \
-                              isOutputDescriptions<decltype(desc)...>);                \
-                  }),                                                                  \
-                  "All input or ouput sockets and on same node!")
-
+#define EG_DEFINE_DESCS(descName, descName1, ...)                                               \
+    static constexpr auto descName = details::sortSocketDescriptions<descName1, __VA_ARGS__>(); \
+    static_assert(tupleUtil::invoke(descName, [](auto&&... desc) {                              \
+                      return belongSocketDescriptionsToSameNodes<decltype(desc)...> &&          \
+                             (isInputDescriptions<decltype(desc)...> ||                         \
+                              isOutputDescriptions<decltype(desc)...>);                         \
+                  }),                                                                           \
+                  "All descriptions must be input or ouput and on the same node!")
 }  // namespace executionGraph

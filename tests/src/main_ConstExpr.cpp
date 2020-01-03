@@ -64,20 +64,14 @@ namespace details
         using getIdx = typename meta::at_c<A, 1>::Index;
 
         //! Returns the indices list denoting the sorted descriptions `descs`.
-        template<bool checkIncreasingByOne = true,
-                 typename... SocketDescs>
-    constexpr auto sortDescriptions(std::tuple<SocketDescs...> descs)
-    {
-        using Tuple = std::tuple<SocketDescs...>;
-        using Array = std::array<std::size_t, std::tuple_size_v<Tuple>>;
-
-        auto indices = tupleUtil::invoke(descs,
-                                            [](auto&&... desc) {
-                                                return Array{desc.index()...};
-                                            });
-        std::sort(indices.begin(), indices.end());
-        return indices;
-    }
+        template<auto& tuple,
+                 EG_ENABLE_IF(meta::is<naked<decltype(tuple)>, std::tuple>)>
+        constexpr auto sortDescriptions()
+        {
+            return tupleUtil::sortForward<tuple, [](auto&& descA, auto&& descB){
+                descA.index() < descB.index();
+            });
+        }
     }  // namespace sockets
 }  // namespace details
 
@@ -114,7 +108,6 @@ MY_TEST(ConstExpr, Test)
 
     // Constexpr evaluation
     {
-        
         auto t      = makeSockets(decls);
         using Tuple = naked<decltype(t)>;
         static_assert(std::is_same_v<std::tuple_element_t<0, Tuple>, int> &&

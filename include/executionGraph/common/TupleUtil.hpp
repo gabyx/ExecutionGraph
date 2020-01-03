@@ -82,6 +82,14 @@ namespace executionGraph
                 return f(details::get<Index>(std::forward<Tuple>(t))...);
             }
 
+            // template<auto& t,
+            //          typename F,
+            //          std::size_t... Index>
+            // constexpr decltype(auto) invokeC(std::index_sequence<Index...>)
+            // {
+            //     return F::invoke<details::get<Index>(t)...>();
+            // }
+
             template<std::size_t I,
                      bool doForward = false,
                      typename... Tuple>
@@ -106,7 +114,7 @@ namespace executionGraph
                 return std::make_tuple(zip_at<Index, doForward>(std::forward<Tuple>(t)...)...);
             }
 
-            template<auto& t, auto pred, bool doForward = false>
+            template<auto t, auto pred, bool doForward = false>
             constexpr auto sort()
             {
                 using namespace meta;
@@ -203,7 +211,7 @@ namespace executionGraph
         }
 
         //! Sorting a constexpr `tuple` by a constexpr `pred`.
-        template<auto& t, auto pred>
+        template<auto t, auto pred>
         constexpr auto sort()
         {
             return details::sort<t, pred>();
@@ -211,7 +219,7 @@ namespace executionGraph
 
         //! Sorting a constexpr `tuple` by a constexpr `pred` using
         //! `std::forward_as_tuple`
-        template<auto& t, auto pred>
+        template<auto t, auto pred>
         constexpr auto sortForward()
         {
             return details::sort<t, pred, true>();
@@ -220,6 +228,15 @@ namespace executionGraph
         template<typename Tuple,
                  EG_ENABLE_IF(meta::is<naked<Tuple>, std::tuple>::value)>
         constexpr auto forward(Tuple&& t)
+        {
+            return invoke(t,
+                          [](auto&&... args) { return std::forward_as_tuple(
+                                                   std::forward<decltype(args)>(args)...); });
+        }
+
+        template<auto& t,
+                 EG_ENABLE_IF(meta::is<naked<decltype(t)>, std::tuple>::value)>
+        constexpr auto forwardS()
         {
             return invoke(t,
                           [](auto&&... args) { return std::forward_as_tuple(

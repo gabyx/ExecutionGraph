@@ -37,24 +37,23 @@ namespace executionGraph
 
     private:
         EG_DEFINE_DESCS(inDecls, in0Decl, in2Decl, in1Decl);
-        InputSocketsTuple<decltype(inDecls)> m_inSockets;
+        InputSocketsTuple<inDecls> m_inSockets;
 
     public:
         EG_DEFINE_OUTPUT_DESC(out0Decl, int, 0, "Value0");
         EG_DEFINE_OUTPUT_DESC(out2Decl, float, 2, "Value2");
         EG_DEFINE_OUTPUT_DESC(out1Decl, double, 1, "Value1");
-        static_assert(out0Decl.isOutput(), "Wups");
 
     private:
         EG_DEFINE_DESCS(outDecls, out1Decl, out2Decl, out0Decl);
-        OutputSocketsTuple<decltype(outDecls)> m_outSockets;
+        OutputSocketsTuple<outDecls> m_outSockets;
 
     public:
         template<typename... Args>
         DummyNode(Args&&... args)
             : executionGraph::LogicNode(std::forward<Args>(args)...)
-            , m_inSockets(makeSockets(inDecls, *this))
-            , m_outSockets(makeSockets(outDecls, *this))
+            , m_inSockets(makeSockets<inDecls>(*this))
+            , m_outSockets(makeSockets<outDecls>(*this))
         {
             registerInputs(m_inSockets);
             registerOutputs(m_outSockets);

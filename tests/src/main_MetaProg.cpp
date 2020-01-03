@@ -171,7 +171,6 @@ MY_TEST(MetaProgramming, InvokeForward)
             return true;
         },
         t);
-
 }
 
 template<typename T>
@@ -185,20 +184,53 @@ private:
     constexpr A() = default;
 };
 
+template<auto&... d>
+constexpr auto sortWrapper()
+{
+    constexpr auto p = [](auto&& a, auto&& b) { return a.val < b.val; };
+    // `d` needs static storage duration because we take addresses here
+    constexpr auto t = std::forward_as_tuple(d...);
+    return tupleUtil::sortForward<t, p>();
+}
+
 MY_TEST(MetaProgramming, TupleSort)
 {
     static constexpr auto t = std::make_tuple(A{10.0}, A{9}, A{8.0f}, A{7.0}, A{6.0}, A{5});
     constexpr auto p        = [](auto&& a, auto&& b) { return a.val < b.val; };
 
-    constexpr auto s          = tupleUtil::sort<t, p>();
-    static constexpr auto res = std::make_tuple(A{5}, A{6.0}, A{7.0}, A{8.0f}, A{9}, A{10.0});
-    static_assert(std::is_same_v<decltype(s), decltype(res)>, "not correct");
-    static_assert(std::get<0>(res).val == std::get<0>(s).val, "not correct");
+    {
+        constexpr auto s          = tupleUtil::sort<t, p>();
+        static constexpr auto res = std::make_tuple(A{5}, A{6.0}, A{7.0}, A{8.0f}, A{9}, A{10.0});
+        static_assert(std::is_same_v<decltype(s), decltype(res)>, "not correct");
+        static_assert(std::get<0>(res).val == std::get<0>(s).val, "not correct");
 
-    constexpr auto sF   = tupleUtil::sortForward<t, p>();
-    constexpr auto resF = tupleUtil::forward(res);
-    static_assert(std::is_same_v<decltype(sF), decltype(resF)>, "not correct");
-    static_assert(std::get<0>(resF).val == std::get<0>(sF).val, "not correct");
+        constexpr auto sF   = tupleUtil::sortForward<t, p>();
+        constexpr auto resF = tupleUtil::forward(res);
+        static_assert(std::is_same_v<decltype(sF), decltype(resF)>, "not correct");
+        static_assert(std::get<0>(resF).val == std::get<0>(sF).val, "not correct");
+    }
+
+    {
+        static constexpr A a{1};
+        static constexpr A b{2};
+        constexpr auto t = std::forward_as_tuple(b, a);
+        static_assert(&a == &std::get<1>(t), "address should be the same");
+
+        constexpr auto tf = tupleUtil::forward(t);
+        static_assert(&b == &std::get<0>(tf), "address should be the same");
+
+        constexpr auto s1 = tupleUtil::sortForward<tf, p>();
+        static_assert(&b == &std::get<1>(s1), "address should be the same");
+
+        constexpr auto s2 = tupleUtil::sortForward<std::forward_as_tuple(b, a), p>();
+        static_assert(&b == &std::get<1>(s2), "address should be the same");
+
+        constexpr auto s3 = tupleUtil::sort<std::forward_as_tuple(b, a), p>();
+        static_assert(&b != &std::get<1>(s3), "address should be the same");
+
+        constexpr auto s4 = sortWrapper<b, a>();
+        static_assert(&b == &std::get<1>(s4), "address should be the same");
+    }
 }
 
 MY_TEST(MetaProgramming, ConstexprForward)
