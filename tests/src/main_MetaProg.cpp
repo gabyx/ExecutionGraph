@@ -121,46 +121,104 @@ MY_TEST(MetaProgramming, TupleZipForward)
     });
 }
 
-MY_TEST(MetaProgramming, InvokeForward)
+MY_TEST(MetaProgramming, Invoke)
 {
     struct A
     {
-        A() {}
-        A(const A&)
-        {
-            copied = true;
-        }
-        A(A&&)
-        {
-            moved = true;
-        }
-        bool copied = false;
-        bool moved  = false;
+        int v;
     };
 
-    int i = 0;
+    A a;
+    A& b = a;
 
-    auto test = [&](auto&& a) {
-        if(i == 0 || i == 1)
-        {
-            ASSERT_TRUE(a.copied == true && a.moved == false) << "Value not copied!";
-        }
-        else
-        {
-            ASSERT_TRUE(a.copied == false && a.moved == true) << "Value was not moved";
-        }
-        ++i;
-    };
+    auto t  = std::make_tuple(A{1}, A{2}, A{3});
+    auto& r = tupleUtil::invoke(t, [&](auto&&... v) -> decltype(auto) {
+        return b;
+    });
 
+    static_assert(std::is_same_v<decltype(r), A&>, "Wrong Type");
+}
+
+MY_TEST(MetaProgramming, InvokeForward)
+{
+    struct A
+    {};
     A a, b, c;
     auto t = std::forward_as_tuple(a, b, std::move(c));
-    tupleUtil::invoke(t, [&](auto&&... arg) {
-        return (... && (test(A{std::forward<decltype(arg)>(arg)}), true));
+
+    tupleUtil::invoke(std::move(t), [&](auto&& arg1, auto&& arg2, auto&& arg3) {
+        static_assert(std::is_same_v<decltype(arg1), A&> &&
+                          std::is_same_v<decltype(arg2), A&> &&
+                          std::is_same_v<decltype(arg3), A&&>,
+                      "Wrong Types");
+        return true;
     });
-    i = 0;
-    tupleUtil::invoke(std::move(t), [&](auto&&... arg) {
-        return (... && (test(A{std::forward<decltype(arg)>(arg)}), true));
+
+    tupleUtil::invoke(t, [&](auto&& arg1, auto&& arg2, auto&& arg3) {
+        static_assert(std::is_same_v<decltype(arg1), A&> &&
+                          std::is_same_v<decltype(arg2), A&> &&
+                          std::is_same_v<decltype(arg3), A&&>,
+                      "Wrong Types");
+        return true;
     });
+
+    std::apply(
+        [&](auto&& arg1, auto&& arg2, auto&& arg3) {
+            static_assert(std::is_same_v<decltype(arg1), A&> &&
+                              std::is_same_v<decltype(arg2), A&> &&
+                              std::is_same_v<decltype(arg3), A&>,  // A lvalue-reference here is the behavior of `std::get`
+                          "Wrong Types");
+            return true;
+        },
+        t);
+
+}
+
+template<typename T>
+struct A
+{
+    constexpr A(T t)
+        : val(t){};
+    T val;
+
+private:
+    constexpr A() = default;
+};
+
+MY_TEST(MetaProgramming, TupleSort)
+{
+    static constexpr auto t = std::make_tuple(A{10.0}, A{9}, A{8.0f}, A{7.0}, A{6.0}, A{5});
+    constexpr auto p        = [](auto&& a, auto&& b) { return a.val < b.val; };
+
+    constexpr auto s          = tupleUtil::sort<t, p>();
+    static constexpr auto res = std::make_tuple(A{5}, A{6.0}, A{7.0}, A{8.0f}, A{9}, A{10.0});
+    static_assert(std::is_same_v<decltype(s), decltype(res)>, "not correct");
+    static_assert(std::get<0>(res).val == std::get<0>(s).val, "not correct");
+
+    constexpr auto sF   = tupleUtil::sortForward<t, p>();
+    constexpr auto resF = tupleUtil::forward(res);
+    static_assert(std::is_same_v<decltype(sF), decltype(resF)>, "not correct");
+    static_assert(std::get<0>(resF).val == std::get<0>(sF).val, "not correct");
+}
+
+MY_TEST(MetaProgramming, ConstexprForward)
+{
+    // Compile time...
+    static constexpr auto t = std::make_tuple(A{10.0}, A{9}, A{8.0f});
+    constexpr auto tF       = tupleUtil::forward(t);
+    static_assert(std::is_same_v<decltype(tF),
+                                 const std::tuple<const A<double>&,
+                                                  const A<int>&,
+                                                  const A<float>&>>,
+                  "not correct");
+    // Runtime...
+    auto t2  = std::make_tuple(A{10.0}, A{9}, A{8.0f});
+    auto tF2 = tupleUtil::forward(t2);
+    static_assert(std::is_same_v<decltype(tF2),
+                                 std::tuple<A<double>&,
+                                            A<int>&,
+                                            A<float>&>>,
+                  "not correct");
 }
 
 int main(int argc, char** argv)
