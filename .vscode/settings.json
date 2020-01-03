@@ -16,7 +16,7 @@
     "ExecutionGraph_EXTERNAL_BUILD_DIR": "${workspaceRoot}/buildExternal",
     "ExecutionGraph_FORCE_MSGLOG_LEVEL": "TRACE",
     "ExecutionGraph_USE_ADDRESS_SANITIZER": true,
-    "CMAKE_MAKEFILE_VERBOSE":true
+    "CMAKE_VERBOSE_MAKEFILE":true
   },
   "cmake.useCMakeServer": true,
   "editor.formatOnSave": false,
@@ -176,7 +176,8 @@
     "utility": "cpp",
     "valarray": "cpp",
     "variant": "cpp",
-    "vector": "cpp"
+    "vector": "cpp",
+    "shared_mutex": "cpp"
   },
   "files.exclude": {
     "**/.DS_Store": true,

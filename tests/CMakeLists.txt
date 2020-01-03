@@ -81,3 +81,7 @@ defineCompileDefs(${EXEC_NAME})
 set(EXEC_NAME ${PROJECT_NAME}Test-Flags)
 add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Flags.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 defineCompileDefs(${EXEC_NAME})
+
+set(EXEC_NAME ${PROJECT_NAME}Test-ConstExpr)
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_ConstExpr.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+defineCompileDefs(${EXEC_NAME})

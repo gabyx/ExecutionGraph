@@ -209,7 +209,7 @@ function(setTargetCompileOptionsExecutionGraph target use_address_san use_leak_s
         endif()
     endif()
 
-    target_compile_features(${target} PUBLIC cxx_std_17)
+    target_compile_features(${target} PUBLIC cxx_std_20)
 
     # Compile flags.
     target_compile_options(${target} PRIVATE ${CXX_FLAGS} $<$<CONFIG:Debug>:${CXX_FLAGS_DEBUG}>)
