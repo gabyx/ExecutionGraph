@@ -38,30 +38,25 @@ namespace executionGraph
     */
     /* ---------------------------------------------------------------------------------------*/
     template<typename TData,
-             typename TIndex,
              typename TFlags = LogicSocketFlagsList<>,
              typename TNode  = void>
     class LogicSocketDescription
     {
     public:
         using Data   = TData;
-        using Index  = TIndex;
         using Node   = TNode;
         using Flags  = TFlags;
         using EFlags = ELogicSocketFlags;
-
-        static_assert(std::is_same_v<SocketIndex, typename Index::value_type>,
-                      "Wrong index type");
 
     private:
         static constexpr auto m_flags = convertSocketFlags(Flags{});
 
     public:
-        constexpr LogicSocketDescription(std::string_view name)
-            : m_name(name)
+        constexpr LogicSocketDescription(SocketIndex index, std::string_view name)
+            : m_index(index), m_name(name)
         {}
 
-        static constexpr SocketIndex index() { return Index::value; }
+        constexpr SocketIndex index() const { return m_index; }
 
         static constexpr const auto& flags() { return m_flags; };
         static constexpr bool isOutput() { return flags().isSet(EFlags::Output); }
@@ -82,19 +77,18 @@ namespace executionGraph
         }
 
     private:
+        SocketIndex m_index;
         //! @todo This needs c++20 constexpr std::string ...
-        const std::string_view m_name;
+        std::string_view m_name;
     };
 
-    template<typename Data, typename Index, typename Flags = LogicSocketFlagsList<>, typename Node = void>
+    template<typename Data, typename Flags = LogicSocketFlagsList<>, typename Node = void>
     using InputDescription = LogicSocketDescription<Data,
-                                                    Index,
                                                     Flags,
                                                     Node>;
 
-    template<typename Data, typename Index, typename Flags = LogicSocketFlagsList<>, typename Node = void>
+    template<typename Data, typename Flags = LogicSocketFlagsList<>, typename Node = void>
     using OutputDescription = LogicSocketDescription<Data,
-                                                     Index,
                                                      Flags,
                                                      Node>;
 
@@ -110,40 +104,37 @@ namespace executionGraph
         }
     }  // namespace details
 
+    //! Make socket
     template<typename CallableDesc,
              typename Data,
-             IndexType Idx,
              typename FlagsList = LogicSocketFlagsList<>,
              typename Node      = void>
-    constexpr auto makeSocketDescription(std::string_view name)
+    constexpr auto makeSocketDescription(SocketIndex index, std::string_view name)
     {
         return meta::invoke<CallableDesc,
                             Data,
-                            meta::size_t<Idx>,
                             FlagsList,
-                            Node>{std::move(name)};
+                            Node>{index, name};
     }
 
-    template<typename Data, IndexType Idx, typename FlagsList = LogicSocketFlagsList<>, typename Node = void>
-    constexpr auto makeInputDescription(std::string_view name)
+    template<typename Data, typename FlagsList = LogicSocketFlagsList<>, typename Node = void>
+    constexpr auto makeInputDescription(SocketIndex index, std::string_view name)
     {
         return makeSocketDescription<meta::quote<InputDescription>,
                                      Data,
-                                     Idx,
                                      FlagsList,
-                                     Node>(std::move(name));
+                                     Node>(index, name);
     }
 
-    template<typename Data, IndexType Idx, typename FlagsList = LogicSocketFlagsList<>, typename Node = void>
-    constexpr auto makeOutputDescription(std::string_view name)
+    template<typename Data, typename FlagsList = LogicSocketFlagsList<>, typename Node = void>
+    constexpr auto makeOutputDescription(SocketIndex index, std::string_view name)
     {
         using EFlags = ELogicSocketFlags;
         return makeSocketDescription<meta::quote<OutputDescription>,
                                      Data,
-                                     Idx,
                                      meta::join<meta::list<FlagsList,
                                                            LogicSocketFlagsList<EFlags::Output>>>,
-                                     Node>(std::move(name));
+                                     Node>(index, name);
     }
 
     //! Test if all description are input descriptions.
@@ -160,11 +151,11 @@ namespace executionGraph
     constexpr bool belongSocketDescriptionsToSameNodes = (... && naked<SocketDescB>::template belongsToNode<
                                                                      typename naked<SocketDescA>::Node>());
 
-#define EG_DEFINE_INPUT_DESC(descName, TData, Idx, name) \
-    static constexpr auto descName = makeInputDescription<TData, Idx, LogicSocketFlagsList<>, Node>(name)
+#define EG_DEFINE_INPUT_DESC(descName, TData, index, name) \
+    static constexpr auto descName = makeInputDescription<TData, LogicSocketFlagsList<>, Node>(index, name)
 
-#define EG_DEFINE_OUTPUT_DESC(descName, TData, Idx, name) \
-    static constexpr auto descName = makeOutputDescription<TData, Idx, LogicSocketFlagsList<>, Node>(name)
+#define EG_DEFINE_OUTPUT_DESC(descName, TData, index, name) \
+    static constexpr auto descName = makeOutputDescription<TData, LogicSocketFlagsList<>, Node>(index, name)
 
 #define EG_DEFINE_DESCS(descName, descName1, ...)                                               \
     static constexpr auto descName = details::sortSocketDescriptions<descName1, __VA_ARGS__>(); \
