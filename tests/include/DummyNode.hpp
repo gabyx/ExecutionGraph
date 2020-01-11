@@ -31,18 +31,18 @@ namespace executionGraph
         EG_DEFINE_NODE(DummyNode);
 
     public:
-        EG_DEFINE_INPUT_DESC(in0Decl, int, 0, "Value0");
-        EG_DEFINE_INPUT_DESC(in2Decl, float, 2, "Value2");
-        EG_DEFINE_INPUT_DESC(in1Decl, double, 1, "Value1");
+        EG_DEFINE_INPUT_DESC(in0Decl, int, 0, "Value0"_cs);
+        EG_DEFINE_INPUT_DESC(in2Decl, float, 2, "Value2"_cs);
+        EG_DEFINE_INPUT_DESC(in1Decl, double, 1, "Value1"_cs);
 
     private:
         EG_DEFINE_DESCS(inDecls, in0Decl, in2Decl, in1Decl);
         InputSocketsTuple<inDecls> m_inSockets;
 
     public:
-        EG_DEFINE_OUTPUT_DESC(out0Decl, int, 0, "Value0");
-        EG_DEFINE_OUTPUT_DESC(out2Decl, float, 2, "Value2");
-        EG_DEFINE_OUTPUT_DESC(out1Decl, double, 1, "Value1");
+        EG_DEFINE_OUTPUT_DESC(out0Decl, int, 0, "Value0"_cs);
+        EG_DEFINE_OUTPUT_DESC(out2Decl, float, 2, "Value2"_cs);
+        EG_DEFINE_OUTPUT_DESC(out1Decl, double, 1, "Value1"_cs);
 
     private:
         EG_DEFINE_DESCS(outDecls, out1Decl, out2Decl, out0Decl);
@@ -61,7 +61,7 @@ namespace executionGraph
 
     public:
         EG_DEFINE_SOCKET_GETTERS(Node, m_inSockets, m_outSockets);
-        // EG_DEFINE_SOCKET_CHECKS 
+        //EG_DEFINE_SOCKET_CHECKS 
     public:
         void reset() override{
             //EG_THROW_IF(checkRequiredSocketConnections)

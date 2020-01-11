@@ -13,6 +13,7 @@
 #pragma once
 
 #include <meta/meta.hpp>
+#include "executionGraph/common/CharSequence.hpp"
 #include "executionGraph/common/EnumClassHelper.hpp"
 #include "executionGraph/common/EnumFlags.hpp"
 #include "executionGraph/common/MetaCommon.hpp"
@@ -47,8 +48,9 @@ namespace executionGraph
         using EFlags = typename LogicSocketEnumFlags::Enum;
 
     public:
+        template<typename Char, Char... Cs>
         constexpr LogicSocketDescription(SocketIndex index,
-                                         std::string_view name,
+                                         CharSequence<Char, Cs...> name,
                                          LogicSocketEnumFlags flags = {})
             : m_index(index), m_name(name), m_flags(flags)
         {}
@@ -74,9 +76,11 @@ namespace executionGraph
         LogicSocketEnumFlags m_flags;
     };
 
+    //! The input socket description type.
     template<typename Data, typename Node = void>
     using InputDescription = LogicSocketDescription<Data, Node>;
 
+    //! The output socket descritption type.
     template<typename Data, typename Node = void>
     using OutputDescription = LogicSocketDescription<Data, Node>;
 
@@ -92,19 +96,19 @@ namespace executionGraph
         }
     }  // namespace details
 
-    //! Make a input socket description
-    template<typename Data, typename Node = void>
+    //! Make a input socket description.
+    template<typename Data, typename Node = void, typename Char, Char... Cs>
     constexpr auto makeInputDescription(SocketIndex index,
-                                        std::string_view name,
+                                        CharSequence<Char, Cs...> name,
                                         LogicSocketEnumFlags flags = {})
     {
         return InputDescription<Data, Node>(index, name, flags);
     }
 
-    //! Make a output socket description
-    template<typename Data, typename Node = void>
+    //! Make a output socket description.
+    template<typename Data, typename Node = void, typename Char, Char... Cs>
     constexpr auto makeOutputDescription(SocketIndex index,
-                                         std::string_view name,
+                                         CharSequence<Char, Cs...> name,
                                          LogicSocketEnumFlags flags = {})
     {
         using EFlags = ELogicSocketFlags;
@@ -133,12 +137,16 @@ namespace executionGraph
         return (... && naked<SocketDescB>::template belongsToNode<typename naked<SocketDescA>::Node>());
     }
 
+//! Define a input socket description.
 #define EG_DEFINE_INPUT_DESC(descName, TData, index, ...) \
     static constexpr auto descName = makeInputDescription<TData, Node>(index, __VA_ARGS__)
 
+//! Define a output socket description.
 #define EG_DEFINE_OUTPUT_DESC(descName, TData, index, ...) \
     static constexpr auto descName = makeOutputDescription<TData, Node>(index, __VA_ARGS__)
 
+//! Define a `std::tuple<SocketDesc&...>` of either input or output socket description
+//! sorted by socket index.
 #define EG_DEFINE_DESCS(descName, descName1, ...)                                               \
     static constexpr auto descName = details::sortSocketDescriptions<descName1, __VA_ARGS__>(); \
     static_assert(tupleUtil::invoke(descName, [](auto&&... descs) {                             \
