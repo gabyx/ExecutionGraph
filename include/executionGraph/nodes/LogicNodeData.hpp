@@ -20,71 +20,11 @@
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 #include "executionGraph/nodes/LogicDataHandle.hpp"
+#include "executionGraph/nodes/LogicNodeDataBase.hpp"
+#include "executionGraph/nodes/LogicSocketBase.hpp"
 
 namespace executionGraph
 {
-    template<typename>
-    class LogicNodeData;
-
-    class LogicNodeDataBase
-    {
-        template<typename>
-        friend class LogicNodeData;
-
-    public:
-        EG_DEFINE_TYPES();
-
-        auto type() const noexcept { return m_type; }
-
-        template<typename T>
-        bool isType() const noexcept
-        {
-            return type() == rttr::type::get<T>();
-        }
-
-        //! Cast to a logic data node of type `LogicNodeData<T>*`.
-        //! The cast fails at runtime if the data type `T` does not match!
-        template<typename T>
-        auto& castToType() const noexcept
-        {
-            if constexpr(throwIfNodeDataNoStorage)
-            {
-                EG_LOGTHROW_IF(!isType<T>(),
-                               "Casting node data with id '{0}' and type '{1}' into type"
-                               "'{2}' which is wrong!",
-                               id(),
-                               type(),
-                               rttr::type::get<T>().get_name());
-            }
-
-            return static_cast<const LogicNodeData<T>&>(*this);
-        }
-
-        //! Non-const overload.
-        template<typename T>
-        auto& castToType() noexcept
-        {
-            return const_cast<LogicNodeData<T>&>(
-                static_cast<const LogicNodeDataBase*>(this)->castToType<T>());
-        }
-
-        NodeDataId id() const noexcept { return m_id; }
-        void setId(NodeDataId id) noexcept { m_id = id; }
-
-    protected:
-        LogicNodeDataBase(rttr::type type,
-                          NodeDataId id)
-            : m_type(type)
-            , m_id(id)
-        {}
-
-        virtual ~LogicNodeDataBase() = default;
-
-    private:
-        const rttr::type m_type;              //!< The type of this node.
-        NodeDataId m_id = nodeDataIdInvalid;  //!< Id of this node.
-    };
-
     template<typename TTraits, typename Derived>
     class LogicNodeDataConnections
     {
@@ -109,7 +49,6 @@ namespace executionGraph
     protected:
         LogicNodeDataConnections() noexcept = default;
 
-    public:
         ~LogicNodeDataConnections() noexcept
         {
             for(auto* socket : m_inputs)
@@ -126,15 +65,17 @@ namespace executionGraph
         template<typename Socket>
         void connect(Socket& socket) noexcept
         {
-            disconnect();
-            onConnect(socket);
-            if constexpr(isInputConnection<Socket>)
+            if(!isConnected(socket))
             {
-                static_cast<InputSocketConnections&>(socket).onConnect(static_cast<Derived&>(*this));
-            }
-            else
-            {
-                static_cast<OutputSocketConnections&>(socket).onConnect(static_cast<Derived&>(*this));
+                onConnect(socket);
+                if constexpr(isInputConnection<Socket>)
+                {
+                    static_cast<InputSocketConnections&>(socket).onConnect(static_cast<Derived&>(*this));
+                }
+                else
+                {
+                    static_cast<OutputSocketConnections&>(socket).onConnect(static_cast<Derived&>(*this));
+                }
             }
         }
 
@@ -210,8 +151,8 @@ namespace executionGraph
         const auto& inputs() const noexcept { return m_inputs; }
 
     private:
-        std::unordered_set<InputSocket*> m_inputs;    //! All inputs getting this data node.
-        std::unordered_set<OutputSocket*> m_outputs;  //! All outputs writting to his data node.
+        std::unordered_set<InputSocket*> m_inputs;    //! All inputs reading this data node.
+        std::unordered_set<OutputSocket*> m_outputs;  //! All outputs writting to this data node.
     };
 
     template<typename...>
@@ -223,14 +164,17 @@ namespace executionGraph
 
     {
     public:
-        using Data = TData;
-        using Base = LogicNodeDataBase;
-
+        using Data            = TData;
+        using Base            = LogicNodeDataBase;
+        using ConnectionBase  = ConnectionTraits<TData>::NodeDataConnections;
         using DataHandle      = LogicDataHandle<Data>;
         using DataHandleConst = LogicDataHandle<const Data>;
 
         static_assert(!std::is_const_v<Data> && !std::is_reference_v<Data>,
                       "Only non-const non-reference types allowed!");
+
+        using InputSocket  = typename ConnectionTraits<Data>::InputSocket;
+        using OutputSocket = typename ConnectionTraits<Data>::OutputSocket;
 
         using Reference = LogicNodeDataRef<Data>;
 
@@ -266,6 +210,17 @@ namespace executionGraph
         auto data() noexcept
         {
             return DataHandle{m_data};
+        }
+
+    public:
+        void connect(LogicSocketInputBase& inputSocket) noexcept(false) override
+        {
+            ConnectionBase::connect(inputSocket.castToType<Data, true>());
+        }
+
+        void connect(LogicSocketOutputBase& outputSocket) noexcept(false) override
+        {
+            ConnectionBase::connect(outputSocket.castToType<Data, true>());
         }
 
     private:

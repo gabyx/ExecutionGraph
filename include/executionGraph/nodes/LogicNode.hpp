@@ -16,6 +16,7 @@
 #include <vector>
 #include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/DemangleTypes.hpp"
+#include "executionGraph/common/Exception.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 
 namespace executionGraph
@@ -110,12 +111,38 @@ namespace executionGraph
         //! Get the list of input sockets.
         const InputSockets& getInputs() const { return m_inputs; }
         InputSockets& getInputs() { return m_inputs; }
+
         //! Get the list of output sockets.
         const OutputSockets& getOutputs() const { return m_outputs; }
         OutputSockets& getOutputs() { return m_outputs; }
 
-        IndexType connectedInputCount() const;
-        IndexType connectedOutputCount() const;
+        //! Get the input socket at index `index`.
+        const LogicSocketInputBase* input(SocketIndex index) const
+        {
+            EG_THROW_IF(index < m_inputs.size(), "Wrong index");
+            return m_inputs[index];
+        }
+
+        //! Get the input socket at index `index`.
+        LogicSocketInputBase* input(SocketIndex index)
+        {
+            EG_THROW_IF(index < m_inputs.size(), "Wrong index");
+            return m_inputs[index];
+        }
+
+        //! Get the output socket at index `index`.
+        const LogicSocketOutputBase* output(SocketIndex index) const
+        {
+            EG_THROW_IF(index < m_outputs.size(), "Wrong index");
+            return m_outputs[index];
+        }
+
+        //! Get the output socket at index `index`.
+        LogicSocketOutputBase* output(SocketIndex index)
+        {
+            EG_THROW_IF(index < m_outputs.size(), "Wrong index");
+            return m_outputs[index];
+        }
 
     protected:
         NodeId m_id;              //!< The id of the node.
@@ -124,7 +151,7 @@ namespace executionGraph
     };
 
 #define EG_DEFINE_NODE(TNode) \
-private:                             \
+private:                      \
     using Node = TNode
 
 }  // namespace executionGraph

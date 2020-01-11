@@ -25,141 +25,12 @@
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 #include "executionGraph/nodes/LogicNode.hpp"
+#include "executionGraph/nodes/LogicNodeDataBase.hpp"
+#include "executionGraph/nodes/LogicSocketBase.hpp"
 #include "executionGraph/nodes/LogicSocketDescription.hpp"
 
 namespace executionGraph
 {
-    //! The socket base class.
-    class LogicSocketBase
-    {
-    public:
-        EG_DEFINE_TYPES();
-
-        LogicSocketBase(LogicSocketBase&&) = default;
-        LogicSocketBase& operator=(LogicSocketBase&&) = default;
-
-    protected:
-        LogicSocketBase(rttr::type type,
-                        SocketIndex index,
-                        const LogicNode& parent) noexcept
-            : m_type(type)
-            , m_index(index)
-            , m_parent(&parent)
-        {
-        }
-
-    public:
-        inline SocketIndex getIndex() const noexcept { return m_index; }
-        inline const rttr::type& type() const noexcept { return m_type; }
-
-        inline const LogicNode& parent() const noexcept { return *m_parent; }
-
-        template<typename T>
-        bool isType() const noexcept
-        {
-            return type() == rttr::type::get<T>();
-        }
-
-    protected:
-        rttr::type m_type;                    //!< The type of this socket.
-        SocketIndex m_index;                  //!< The index of the slot at which this socket is installed in a LogicNode.
-        const LogicNode* m_parent = nullptr;  //!< The parent node of of this socket.
-    };
-
-    //! The input socket base class.
-    class LogicSocketInputBase : public LogicSocketBase
-    {
-    public:
-        EG_DEFINE_TYPES();
-
-    protected:
-        template<typename... Args>
-        LogicSocketInputBase(Args&&... args) noexcept
-            : LogicSocketBase(std::forward<Args>(args)...)
-        {
-        }
-
-        ~LogicSocketInputBase() noexcept = default;
-
-    public:
-        //! Cast to a logic socket of type `LogicSocketInput<T>*`.
-        //! The cast fails at runtime if the data type `T` does not match!
-        template<typename T>
-        auto& castToType() const noexcept
-        {
-            EG_LOGTHROW_IF(!this->template isType<T>(),
-                           "Casting socket index '{0}' with type index '{1}' into type"
-                           "'{2}' of node id: '{3}' which is wrong!",
-                           this->getIndex(),
-                           this->type(),
-                           rttr::type::get<T>().get_name(),
-                           this->parent().getId());
-
-            return static_cast<const LogicSocketInput<T>&>(*this);
-        }
-
-        //! Non-const overload.
-        template<typename T>
-        auto& castToType() noexcept(!throwIfBadSocketCast)
-        {
-            return const_cast<LogicSocketInput<T>&>(static_cast<LogicSocketInputBase const*>(this)->castToType<T>());
-        }
-
-    public:
-        static constexpr bool isInput() { return true; }
-        static constexpr bool isOutput() { return false; }
-    };
-
-    //! The output socket base class.
-    class LogicSocketOutputBase : public LogicSocketBase
-    {
-    public:
-        EG_DEFINE_TYPES();
-
-    protected:
-        template<typename... Args>
-        LogicSocketOutputBase(Args&&... args)
-            : LogicSocketBase(std::forward<Args>(args)...)
-        {
-        }
-
-        ~LogicSocketOutputBase() noexcept = default;
-
-        LogicSocketOutputBase(LogicSocketOutputBase&&) = default;
-        LogicSocketOutputBase& operator=(LogicSocketOutputBase&&) = default;
-
-    public:
-        //! Cast to a logic socket of type `LogicSocketOutput`<T>*.
-        //! The cast fails at runtime if the data type `T` does not match!
-        template<typename T>
-        auto& castToType() const noexcept
-        {
-            if constexpr(throwIfBadSocketCast)
-            {
-                EG_LOGTHROW_IF(this->m_type != rttr::type::get<T>(),
-                               "Casting socket index '{0}' with type index '{1}' into "
-                               "'{2}' of node id: '{3}' which is wrong!",
-                               this->getIndex(),
-                               this->type(),
-                               rttr::type::get<T>().get_name(),
-                               this->parent().getId());
-            }
-
-            return static_cast<const LogicSocketOutput<T>&>(*this);
-        }
-
-        //! Non-const overload.
-        template<typename T>
-        auto* castToType()
-        {
-            return const_cast<LogicSocketOutput<T>&>(static_cast<LogicSocketOutputBase const*>(this)->castToType<T>());
-        }
-
-    public:
-        static constexpr bool isInput() { return false; }
-        static constexpr bool isOutput() { return true; }
-    };
-
     template<typename TTraits, typename Derived>
     class LogicSocketConnections
     {
@@ -173,8 +44,6 @@ namespace executionGraph
 
     protected:
         LogicSocketConnections() = default;
-
-    public:
         ~LogicSocketConnections()
         {
             disconnect();
@@ -199,7 +68,8 @@ namespace executionGraph
             }
         }
 
-        NodeData* dataNode() { return m_nodeData; }
+        NodeData* data() { return m_nodeData; }
+        const NodeData* data() const { return m_nodeData; }
 
     protected:
         void onConnect(const NodeData& nodeData) noexcept
@@ -230,7 +100,8 @@ namespace executionGraph
     {
     public:
         EG_DEFINE_TYPES();
-        using Data = TData;
+        using Data            = TData;
+        using ConnectionsBase = ConnectionTraits<Data>::InputSocketConnections;
 
     public:
         template<typename... Args>
@@ -248,6 +119,11 @@ namespace executionGraph
         //! Move allowed
         LogicSocketInput(LogicSocketInput&& other) = default;
         LogicSocketInput& operator=(LogicSocketInput&& other) = default;
+
+        virtual void connect(LogicNodeDataBase& nodeData) noexcept(false) override
+        {
+            ConnectionsBase::connect(nodeData.castToType<Data, true>());
+        }
     };
 
     /* ---------------------------------------------------------------------------------------*/
@@ -264,7 +140,8 @@ namespace executionGraph
     {
     public:
         EG_DEFINE_TYPES();
-        using Data = TData;
+        using Data            = TData;
+        using ConnectionsBase = ConnectionTraits<Data>::OutputSocketConnections;
 
     public:
         template<typename... Args>
@@ -282,6 +159,12 @@ namespace executionGraph
         //! Move allowed
         LogicSocketOutput(LogicSocketOutput&& other) = default;
         LogicSocketOutput& operator=(LogicSocketOutput&& other) = default;
+
+        //! Connect a generic data node.
+        virtual void connect(LogicNodeDataBase& nodeData) noexcept(false) override
+        {
+            ConnectionsBase::connect(nodeData.castToType<Data, true>());
+        }
     };
 
     template<auto socketDesc>

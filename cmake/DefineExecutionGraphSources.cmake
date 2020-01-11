@@ -18,6 +18,8 @@ function(include_all_source_ExecutionGraph
     set(SOURCES
         ${ExecutionGraph_ROOT_DIR}/src/DemangleTypes.cpp
         ${ExecutionGraph_ROOT_DIR}/src/LogicSocket.cpp
+        ${ExecutionGraph_ROOT_DIR}/src/LogicSocketBase.cpp
+        ${ExecutionGraph_ROOT_DIR}/src/LogicNodeData.cpp
         # ${ExecutionGraph_ROOT_DIR}/src/LogicNode.cpp
         ${ExecutionGraph_ROOT_DIR}/src/FileSystem.cpp
         ${ExecutionGraph_ROOT_DIR}/src/FileMapper.cpp
