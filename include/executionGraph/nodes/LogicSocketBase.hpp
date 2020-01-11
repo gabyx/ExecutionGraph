@@ -101,8 +101,9 @@ namespace executionGraph
         template<typename T, bool doThrow = false>
         auto& castToType() noexcept
         {
-            return const_cast<LogicSocketInput<T>&>(static_cast<LogicSocketInputBase const*>(this)
-                                                        ->castToType<T, doThrow>());
+            return const_cast<LogicSocketInput<T>&>(
+                static_cast<LogicSocketInputBase const*>(this)
+                    ->castToType<T, doThrow>());
         }
 
     public:
@@ -151,8 +152,9 @@ namespace executionGraph
         template<typename T, bool doThrow = false>
         auto& castToType() noexcept(false)
         {
-            return const_cast<LogicSocketOutput<T>&>(static_cast<LogicSocketOutputBase const*>(this)
-                                                         ->castToType<T, doThrow>());
+            return const_cast<LogicSocketOutput<T>&>(
+                static_cast<LogicSocketOutputBase const*>(this)
+                    ->castToType<T, doThrow>());
         }
 
     public:
