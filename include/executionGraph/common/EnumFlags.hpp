@@ -24,12 +24,9 @@ namespace executionGraph
     class EnumFlags final
     {
     public:
-        using Enum     = TEnum;
-        using Integral = std::underlying_type_t<Enum>;
-
-    private:
-        static constexpr auto nBits = sizeof(Integral) * 8;
-        using FlagsInternal         = Bitset2::bitset2<nBits, Integral>;
+        using Enum      = TEnum;
+        using UIntgeral = std::underlying_type_t<Enum>;
+        static_assert(std::is_unsigned_v<UIntgeral>, "UIntgeral must be unsigned");
 
     private:
         template<typename... T>
@@ -41,11 +38,11 @@ namespace executionGraph
         static constexpr bool isFlagsOrEnum = (... && (isFlags<T> || isEnum<T>));
 
     public:
-        constexpr EnumFlags() noexcept = default;
+        constexpr EnumFlags() noexcept                 = default;
         constexpr EnumFlags(const EnumFlags&) noexcept = default;
-        constexpr EnumFlags(EnumFlags&&) noexcept = default;
+        constexpr EnumFlags(EnumFlags&&) noexcept      = default;
 
-        constexpr explicit EnumFlags(Integral i) noexcept
+        constexpr explicit EnumFlags(UIntgeral i) noexcept
             : m_flags(i) {}
 
         constexpr EnumFlags(Enum e) noexcept
@@ -64,7 +61,7 @@ namespace executionGraph
 
         constexpr auto& reset() noexcept
         {
-            m_flags.reset();
+            m_flags = 0;
             return *this;
         }
 
@@ -96,16 +93,15 @@ namespace executionGraph
             return unset(f).unset(f).unset(ff...);
         }
 
-        constexpr bool isAllSet() const noexcept { return m_flags.all(); }
-        constexpr bool isAnySet() const noexcept { return m_flags.any(); }
-        constexpr bool isNone() const noexcept { return m_flags.none(); }
+        constexpr bool isAnySet() const noexcept { return m_flags != 0; }
+        constexpr bool isNoneSet() const noexcept { return m_flags == 0; }
 
         constexpr bool isSet(EnumFlags f) const noexcept
         {
             return (m_flags & f.m_flags) == f.m_flags;
         }
 
-       template<typename F,
+        template<typename F,
                  typename... FF,
                  EG_ENABLE_IF(isFlagsOrEnum<F, FF...> && sizeof...(FF) > 0)>
         constexpr bool isSet(F f, FF... ff) const noexcept
@@ -118,7 +114,7 @@ namespace executionGraph
             return EnumFlags{*this}.unset(f) == *this;
         }
 
-       template<typename F,
+        template<typename F,
                  typename... FF,
                  EG_ENABLE_IF(isFlagsOrEnum<F, FF...> && sizeof...(FF) > 0)>
         constexpr bool isUnset(F f, FF... ff) const noexcept
@@ -126,12 +122,12 @@ namespace executionGraph
             return (isUnset(f) && ... && isUnset(ff));
         }
 
-       template<typename F,
+        template<typename F,
                  typename... FF,
                  EG_ENABLE_IF(isFlagsOrEnum<F, FF...> && sizeof...(FF) > 0)>
         constexpr bool isAnySet(F f, FF... ff) const noexcept
         {
-            return (isSet(f) ||... || isSet(ff));
+            return (isSet(f) || ... || isSet(ff));
         }
 
         template<typename F,
@@ -139,25 +135,31 @@ namespace executionGraph
                  EG_ENABLE_IF(isFlagsOrEnum<F, FF...> && sizeof...(FF) > 0)>
         constexpr bool isAnyUnset(F f, FF... ff) const noexcept
         {
-            return (isUnset(f) ||...|| isUnset(ff));
+            return (isUnset(f) || ... || isUnset(ff));
         }
 
-        constexpr bool operator==(const EnumFlags& other) const noexcept
+        constexpr bool operator==(EnumFlags other) const noexcept
         {
             return m_flags == other.m_flags;
         }
 
-        constexpr bool operator!=(const EnumFlags& other) const noexcept
+        constexpr bool operator!=(EnumFlags other) const noexcept
         {
             return m_flags != other.m_flags;
         }
 
-    private:
-        EnumFlags(FlagsInternal&& flags) noexcept
-            : m_flags(std::forward<FlagsInternal>(flags)) 
+        constexpr auto& operator+(EnumFlags other) noexcept
         {
+            return set(other);
         }
 
-        FlagsInternal m_flags;
+        constexpr auto& operator-(EnumFlags other) noexcept
+        {
+            return unset(other);
+        }
+
+    private:
+        UIntgeral m_flags;
     };
+
 }  // namespace executionGraph

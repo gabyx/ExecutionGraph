@@ -82,14 +82,6 @@ namespace executionGraph
                 return f(details::get<Index>(std::forward<Tuple>(t))...);
             }
 
-            // template<auto& t,
-            //          typename F,
-            //          std::size_t... Index>
-            // constexpr decltype(auto) invokeC(std::index_sequence<Index...>)
-            // {
-            //     return F::invoke<details::get<Index>(t)...>();
-            // }
-
             template<std::size_t I,
                      bool doForward = false,
                      typename... Tuple>
@@ -182,6 +174,17 @@ namespace executionGraph
             return details::invoke(std::forward<Tuple>(t),
                                    std::forward<F>(f),
                                    indices);
+        }
+
+        template<typename Tuple,
+                 typename F,
+                 typename Index = std::make_index_sequence<std::tuple_size_v<naked<Tuple>>>,
+                 EG_ENABLE_IF(meta::is<naked<Tuple>, std::tuple>::value)>
+        constexpr decltype(auto) indexed(Tuple&& t,
+                                        F&& f,
+                                        Index indices = {})
+        {
+            return f(std::forward<Tuple>(t), indices);
         }
 
         // Zip multiple tuples together.

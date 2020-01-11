@@ -284,32 +284,51 @@ namespace executionGraph
         LogicSocketOutput& operator=(LogicSocketOutput&& other) = default;
     };
 
+    template<auto socketDesc>
+    using SocketType = meta::if_<meta::bool_<socketDesc.isInput()>,
+                                 LogicSocketInput<typename naked<decltype(socketDesc)>::Data>,
+                                 LogicSocketOutput<typename naked<decltype(socketDesc)>::Data>>;
+
+    namespace details
+    {
+        template<std::size_t I, auto& descs, typename... Args>
+        auto makeSocket(Args&&... args)
+        {
+            constexpr auto& desc = std::get<I>(descs);
+            using S              = meta::if_<meta::bool_<desc.isInput()>,
+                                LogicSocketInput<typename naked<decltype(desc)>::Data>,
+                                LogicSocketOutput<typename naked<decltype(desc)>::Data>>;
+            return S{desc.index(), std::forward<Args>(args)...};
+        }
+
+    }  // namespace details
+
     //! Make a container for input socket from `LogicSocketDescription`s.
     //! @return A `std::tuple` of `LogicSocket<...>`.
     template<auto& descs,
              typename Node,
-             EG_ENABLE_IF((meta::is<naked<decltype(descs)>, std::tuple>::value) &&
+             typename Tuple = naked<decltype(descs)>,
+             EG_ENABLE_IF((meta::is<Tuple, std::tuple>::value) &&
                           std::is_constant_evaluated())>
     auto makeSockets(const Node& node)
     {
-        []<typename... Descs>(std::tuple<Descs...>)
-        {
-            static_assert(isInputDescriptions<Descs...> ||
-                              isOutputDescriptions<Descs...>,
-                          "Either all inputs or outputs!");
-            static_assert(belongSocketDescriptionsToSameNodes<Descs...>,
-                          "You cannot mix descriptions for different nodes!");
-        }
-        (descs);
-
-        return tupleUtil::invoke(
+        constexpr bool check = tupleUtil::invoke(
             descs,
-            [&](auto&&... ds) {
+            [](auto&&... ds) {
                 std::array indices = {ds.index()...};
-                static_assert(cx::is_sorted(indices.begin(), indices.end()),
-                              "All socket description need to be sorted!");
-                return std::make_tuple(
-                    typename naked<decltype(ds)>::SocketType(ds.index(), node)...);
+                return belongSocketDescriptionsToSameNodes(ds...) &&
+                       (isInputDescriptions(ds...) || isOutputDescriptions(ds...)) &&
+                       cx::is_sorted(indices.begin(), indices.end());
+            });
+        static_assert(check,
+                      "Don't mix descriptions for different nodes "
+                      "and only provide all input or all output descriptions "
+                      "sorted by socket index.");
+
+        return tupleUtil::indexed(
+            descs,
+            [&]<std::size_t... I>(auto&, std::index_sequence<I...>) {
+                return std::make_tuple(details::makeSocket<I, descs>(node)...);
             });
     }
 
@@ -345,7 +364,7 @@ namespace executionGraph
              typename Sockets,
              typename SocketDesc = naked<decltype(socketDesc)>,
              EG_ENABLE_IF((meta::is_v<Sockets, std::tuple> &&
-                           isInputDescriptions<SocketDesc>))>
+                           isInputDescriptions(socketDesc)))>
     auto& getInputSocket(Sockets& sockets)
     {
         return std::get<socketDesc.index()>(sockets);
@@ -357,7 +376,7 @@ namespace executionGraph
              typename Sockets,
              typename SocketDesc = naked<decltype(socketDesc)>,
              EG_ENABLE_IF((meta::is_v<Sockets, std::tuple> &&
-                           isOutputDescriptions<SocketDesc>))>
+                           isOutputDescriptions(socketDesc)))>
     auto& getOutputSocket(Sockets& sockets)
     {
         return std::get<socketDesc.index()>(sockets);
@@ -366,7 +385,7 @@ namespace executionGraph
 #define EG_DEFINE_SOCKET_GETTERS(Node, inputSockets, outputSockets)        \
     template<auto& socketDesc,                                             \
              typename SocketDesc = naked<decltype(socketDesc)>,            \
-             EG_ENABLE_IF((isInputDescriptions<SocketDesc> &&              \
+             EG_ENABLE_IF((isInputDescriptions(socketDesc) &&              \
                            SocketDesc::template belongsToNode<Node>()))>   \
     auto& socket()                                                         \
     {                                                                      \
@@ -374,7 +393,7 @@ namespace executionGraph
     }                                                                      \
     template<auto& socketDesc,                                             \
              typename SocketDesc = naked<decltype(socketDesc)>,            \
-             EG_ENABLE_IF((isOutputDescriptions<SocketDesc> &&             \
+             EG_ENABLE_IF((isOutputDescriptions(socketDesc) &&             \
                            SocketDesc::template belongsToNode<Node>()))>   \
     auto& socket()                                                         \
     {                                                                      \

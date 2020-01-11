@@ -26,29 +26,23 @@ MY_TEST(Flags, Test)
         D = 1 << 3,
         E = 1 << 4
     };
+    using Flags = EnumFlags<E>;
 
     {
-        EnumFlags<E> f{E::D,E::A};
-        ASSERT_TRUE(f.isSet(E::A, E::D));
-        ASSERT_TRUE(f.isUnset(E::B, E::C));
-        ASSERT_TRUE(f.isAnySet(E::A, E::C));
-        ASSERT_TRUE(!f.isNone());
+        constexpr Flags f = {};
+        static_assert(f.isNoneSet());
     }
-
     {
-        EnumFlags<E> f = {E::D,E::A};
-        ASSERT_TRUE(f.isSet(E::A, E::D));
-        ASSERT_TRUE(f.isUnset(E::B, E::C));
-        ASSERT_TRUE(f.isAnySet(E::A, E::C));
-        ASSERT_TRUE(!f.isNone());
-    }
-
-    {
-        constexpr EnumFlags<E> f = {E::D,E::A};
+        constexpr Flags f = {E::D,E::A};
         static_assert(f.isSet(E::A, E::D), "Wrong");
         static_assert(f.isUnset(E::B, E::C), "Wrong");
         static_assert(f.isAnySet(E::A, E::C), "Wrong");
-        static_assert(!f.isNone(), "Wrong");
+        static_assert(!f.isNoneSet(), "Wrong");
+    }
+    {
+        constexpr Flags f = {E::D,E::A};
+        constexpr Flags g= {E::B};
+        static_assert((Flags{f,g,E::C} + Flags{E::E}).isSet(E::A,E::B,E::C,E::D,E::E), "Wrong");
     }
 
 }

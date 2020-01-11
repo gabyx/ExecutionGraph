@@ -139,6 +139,32 @@ MY_TEST(MetaProgramming, Invoke)
     static_assert(std::is_same_v<decltype(r), A&>, "Wrong Type");
 }
 
+
+template<typename T>
+constexpr bool testTupleInvokeImpl(T&& v)
+{
+    return v.v <= 3;
+}
+
+template<auto& t>
+constexpr bool testTupleInvoke()
+{
+    return tupleUtil::invoke(t, [](auto&&... v) {
+        return (... && testTupleInvokeImpl(v));
+    });
+}
+
+MY_TEST(MetaProgramming, InvokeConstExpr)
+{
+    struct A
+    {
+        int v;
+    };
+
+    static constexpr auto t = std::make_tuple(A{1}, A{2}, A{3});
+    static_assert(testTupleInvoke<t>(), "Wrong Type");
+}
+
 MY_TEST(MetaProgramming, InvokeForward)
 {
     struct A
