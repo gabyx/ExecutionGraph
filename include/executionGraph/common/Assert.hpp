@@ -30,16 +30,16 @@
 #    define EG_DEBUG_ONLY(code) code
 #    define EG_VERIFY(condition, ...) EG_ASSERT(condition, __VA_ARGS__)
 #    define EG_ASSERT(condition, ...) EG_ASSERT_TYPE(condition, executionGraph::ExceptionFatal, __VA_ARGS__)
-#    define EG_ASSERT_TYPE(condition, Type, ...)              \
-        if(!(condition))                                      \
-        {                                                     \
-            EG_LOG_ERROR("{0} : \n{1}\n@ {2} [{3}]",          \
-                         #condition,                          \
-                         fmt::format(__VA_ARGS__),            \
-                         __FILE__,                            \
-                         __LINE__)                            \
-            EG_THROW_TYPE_IF(!(condition), Type, __VA_ARGS__) \
-        }                                                     \
+#    define EG_ASSERT_TYPE(condition, Type, ...)               \
+        if(!(condition))                                       \
+        {                                                      \
+            EG_LOG_ERROR("{0} : \n{1}\n@ {2} [{3}]",           \
+                         #condition,                           \
+                         fmt::format(__VA_ARGS__),             \
+                         __FILE__,                             \
+                         __LINE__);                            \
+            EG_THROW_TYPE_IF(!(condition), Type, __VA_ARGS__); \
+        }                                                      \
         ASSERT_SEMICOLON
 #endif
 
@@ -52,7 +52,7 @@
                         #condition,                 \
                         fmt::format(__VA_ARGS__),   \
                         __FILE__,                   \
-                        __LINE__)                   \
+                        __LINE__);                  \
         }                                           \
     }                                               \
     ASSERT_SEMICOLON

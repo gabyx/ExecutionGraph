@@ -119,28 +119,28 @@ namespace executionGraph
         //! Get the input socket at index `index`.
         const LogicSocketInputBase* input(SocketIndex index) const
         {
-            EG_THROW_IF(index < m_inputs.size(), "Wrong index");
+            EG_THROW_IF(index >= m_inputs.size(), "Wrong index");
             return m_inputs[index];
         }
 
         //! Get the input socket at index `index`.
         LogicSocketInputBase* input(SocketIndex index)
         {
-            EG_THROW_IF(index < m_inputs.size(), "Wrong index");
+            EG_THROW_IF(index >= m_inputs.size(), "Wrong index");
             return m_inputs[index];
         }
 
         //! Get the output socket at index `index`.
         const LogicSocketOutputBase* output(SocketIndex index) const
         {
-            EG_THROW_IF(index < m_outputs.size(), "Wrong index");
+            EG_THROW_IF(index >= m_outputs.size(), "Wrong index");
             return m_outputs[index];
         }
 
         //! Get the output socket at index `index`.
         LogicSocketOutputBase* output(SocketIndex index)
         {
-            EG_THROW_IF(index < m_outputs.size(), "Wrong index");
+            EG_THROW_IF(index >= m_outputs.size(), "Wrong index");
             return m_outputs[index];
         }
 

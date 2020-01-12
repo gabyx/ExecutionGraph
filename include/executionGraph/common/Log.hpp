@@ -29,26 +29,29 @@
 
 // To Concat EG_LOGLEVEL_ and EG_FORCE_MSGLOG_LEVEL
 #define CONCATT(L) EG_LOGLEVEL_##L  // x and y will not be expanded, just pasted
-#define CONCAT(L) CONCATT(L)               // x and y will be expanded before the call to STEP2
+#define CONCAT(L) CONCATT(L)        // x and y will be expanded before the call to STEP2
 #define EG_LOGLEVEL_CURRENT CONCAT(EG_FORCE_MSGLOG_LEVEL)
 
-#define EG_LOGMSG(LEVEL, ...)                        \
-    if(CONCAT(LEVEL) <= EG_LOGLEVEL_CURRENT)         \
+#define EG_LOGMSG(LEVEL, ...)                               \
+    if(CONCAT(LEVEL) <= EG_LOGLEVEL_CURRENT)                \
     {                                                       \
         std::cerr << fmt::format(__VA_ARGS__) << std::endl; \
-    }
+    }                                                       \
+    ASSERT_SEMICOLON
 
-#define EG_LOGMSG_LEVEL(LEVEL, ...)                                     \
-    if(CONCAT(LEVEL) <= EG_LOGLEVEL_CURRENT)                            \
+#define EG_LOGMSG_LEVEL(LEVEL, ...)                                            \
+    if(CONCAT(LEVEL) <= EG_LOGLEVEL_CURRENT)                                   \
     {                                                                          \
         std::cerr << "[" #LEVEL "] " << fmt::format(__VA_ARGS__) << std::endl; \
-    }
+    }                                                                          \
+    ASSERT_SEMICOLON
 
-#define EG_LOGMSG_CONT_LEVEL(LEVEL, ...)                   \
-    if(CONCAT(LEVEL) <= EG_LOGLEVEL_CURRENT)               \
+#define EG_LOGMSG_CONT_LEVEL(LEVEL, ...)                          \
+    if(CONCAT(LEVEL) <= EG_LOGLEVEL_CURRENT)                      \
     {                                                             \
         std::cerr << "[" #LEVEL "] " << fmt::format(__VA_ARGS__); \
-    }
+    }                                                             \
+    ASSERT_SEMICOLON
 
 // Undefine all log macros
 #define EG_LOG_TRACE(...)

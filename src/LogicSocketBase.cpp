@@ -20,24 +20,24 @@ namespace executionGraph
 {
     namespace details
     {
-        void throwSocketCast(bool assert,
+        void throwSocketCast(bool condition,
                              const LogicSocketInputBase& socket,
-                             const rttr::type& type)
+                             const rttr::type& type) noexcept(false)
         {
-            EG_LOGTHROW_IF(assert,
-                           "Casting input socket index '{0}' with type index '{1}' into type"
+            EG_LOGTHROW_IF(condition,
+                           "Casting input socket index '{0}' with type index '{1}' into type "
                            "'{2}' of node id '{3}' which is wrong!",
                            socket.index(),
                            socket.type().get_name(),
                            type.get_name(),
                            socket.parent().getId());
         }
-        void throwSocketCast(bool assert,
+        void throwSocketCast(bool condition,
                              const LogicSocketOutputBase& socket,
-                             const rttr::type& type)
+                             const rttr::type& type) noexcept(false)
         {
-            EG_LOGTHROW_IF(assert,
-                           "Casting output socket index '{0}' with type index '{1}' into type"
+            EG_LOGTHROW_IF(condition,
+                           "Casting output socket index '{0}' with type index '{1}' into type "
                            "'{2}' of node id '{3}' which is wrong!",
                            socket.index(),
                            socket.type().get_name(),

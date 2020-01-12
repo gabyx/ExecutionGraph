@@ -59,6 +59,10 @@ namespace executionGraph
             registerOutputs(m_outSockets);
         }
 
+        ~DummyNode()
+        {
+        }
+
     public:
         EG_DEFINE_SOCKET_GETTERS(Node, m_inSockets, m_outSockets);
         //EG_DEFINE_SOCKET_CHECKS 

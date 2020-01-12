@@ -41,58 +41,74 @@ namespace executionGraph
         friend NodeDataConnections;
 
     public:
-        LogicSocketConnections(Parent& parent) noexcept
-            : m_parent(parent){};
+        explicit LogicSocketConnections(Parent& parent) noexcept
+            : m_parent(&parent)
+        {
+        };
 
         ~LogicSocketConnections() noexcept
         {
             disconnect();
         }
 
+        LogicSocketConnections(const LogicSocketConnections&) = delete;
+        LogicSocketConnections& operator=(const LogicSocketConnections&) = delete;
+
+        LogicSocketConnections(LogicSocketConnections&& other)
+        {
+            // Connections are not moved!
+        }
+
+        LogicSocketConnections& operator=(LogicSocketConnections&& other) = delete;
+
     public:
+        void init(Parent& parent)
+        {
+            m_parent = &parent;
+        }
         //! Connect a data node.
-        void connect(NodeDataConnections& nodeData) noexcept
+        void connect(NodeDataConnections& connections) noexcept
         {
             disconnect();
-            onConnect(nodeData);
-            m_nodeData->onConnect(parent());
+            onConnect(connections);
+            m_connections->onConnect(parent());
         }
 
         //! Disconnect the data node.
         void disconnect() noexcept
         {
-            if(m_nodeData)
+            if(m_connections)
             {
-                m_nodeData->onDisconnect(parent());
+                m_connections->onDisconnect(parent());
                 onDisconnect();
             }
         }
 
         NodeData* nodeData()
         {
-            return isConnected() ? &m_nodeData->parent() : nullptr;
+            return isConnected() ? &m_connections->parent() : nullptr;
         }
         const NodeData* nodeData() const { return const_cast<LogicSocketConnections&>(*this).nodeData(); }
 
-        bool isConnected() { return m_nodeData != nullptr; }
+        bool isConnected() { return m_connections != nullptr; }
 
     protected:
-        Parent& parent() { return m_parent; }
-        const Parent& parent() const { return m_parent; }
+        Parent& parent() { return *m_parent; }
+        const Parent& parent() const { return *m_parent; }
 
         void onConnect(const NodeDataConnections& nodeData) noexcept
         {
-            m_nodeData = const_cast<NodeDataConnections*>(&nodeData);
+            m_connections = const_cast<NodeDataConnections*>(&nodeData);
         }
 
         void onDisconnect() noexcept
         {
-            m_nodeData = nullptr;
+            m_connections = nullptr;
         }
 
     private:
-        NodeDataConnections* m_nodeData = nullptr;  //! Connected data node.
-        Parent& m_parent;
+        NodeDataConnections* m_connections = nullptr;  //! Connected data node.
+        Parent* m_parent                   = nullptr;
     };
 
     /* ---------------------------------------------------------------------------------------*/
@@ -114,7 +130,7 @@ namespace executionGraph
 
     public:
         template<typename... Args>
-        LogicSocketInput(Args&&... args)
+        explicit LogicSocketInput(Args&&... args)
             : LogicSocketInputBase(rttr::type::get<Data>(), std::forward<Args>(args)...)
             , m_connections(*this)
         {
@@ -127,8 +143,13 @@ namespace executionGraph
         LogicSocketInput& operator=(const LogicSocketInput& other) = delete;
 
         //! Move allowed
-        LogicSocketInput(LogicSocketInput&& other) = default;
-        LogicSocketInput& operator=(LogicSocketInput&& other) = default;
+        LogicSocketInput(LogicSocketInput&& other)
+            : Base(std::move(other))
+            , m_connections(*this)
+        {
+            // Connections are not moved!
+        }
+        LogicSocketInput& operator=(LogicSocketInput&& other) = delete;
 
     public:
         auto dataHandle() const
@@ -154,12 +175,12 @@ namespace executionGraph
             m_connections.disconnect();
         }
 
-        auto& connections() noexcept
+        Connections& connections() noexcept
         {
             return m_connections;
         }
 
-        const auto& connections() const noexcept
+        const Connections& connections() const noexcept
         {
             return m_connections;
         }
@@ -203,8 +224,13 @@ namespace executionGraph
         LogicSocketOutput& operator=(const LogicSocketOutput& other) = delete;
 
         //! Move allowed
-        LogicSocketOutput(LogicSocketOutput&& other) = default;
-        LogicSocketOutput& operator=(LogicSocketOutput&& other) = default;
+        LogicSocketOutput(LogicSocketOutput&& other)
+            : Base(std::move(other))
+            , m_connections(*this)
+        {
+            // Connections are not moved!
+        }
+        LogicSocketOutput& operator=(LogicSocketOutput&& other) = delete;
 
     public:
         auto dataHandle() const
@@ -230,12 +256,12 @@ namespace executionGraph
             m_connections.disconnect();
         }
 
-        auto& connections() noexcept
+        Connections& connections() noexcept
         {
             return m_connections;
         }
 
-        const auto& connections() const noexcept
+        const Connections& connections() const noexcept
         {
             return m_connections;
         }
@@ -362,6 +388,6 @@ namespace executionGraph
     {                                                                      \
         return executionGraph::getOutputSocket<socketDesc>(outputSockets); \
     }                                                                      \
-    using __FILE__##__LINE__##FORCE_SEMICOLON = int
+    ASSERT_SEMICOLON_DECL
 
 }  // namespace executionGraph

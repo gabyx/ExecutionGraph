@@ -13,3 +13,4 @@
 #pragma once
 
 #define ASSERT_SEMICOLON do{} while(false)
+#define ASSERT_SEMICOLON_DECL using __FILE__##__LINE__ = int

@@ -28,6 +28,21 @@ namespace executionGraph
         template<typename>
         friend class LogicNodeData;
 
+    protected:
+        LogicNodeDataBase(rttr::type type, NodeDataId id)
+            : m_type(type)
+            , m_id(id)
+        {}
+
+    public:
+        virtual ~LogicNodeDataBase() = default;
+
+        LogicNodeDataBase(const LogicNodeDataBase& other) = default;
+        LogicNodeDataBase& operator=(const LogicNodeDataBase& other) = default;
+
+        LogicNodeDataBase(LogicNodeDataBase&& other) = default;
+        LogicNodeDataBase& operator=(LogicNodeDataBase&& other) = default;
+
     public:
         EG_DEFINE_TYPES();
 
@@ -68,21 +83,12 @@ namespace executionGraph
     public:
         virtual void connect(LogicSocketInputBase& inputSocket) noexcept(false)   = 0;
         virtual void connect(LogicSocketOutputBase& outputSocket) noexcept(false) = 0;
-        virtual void disconnect(LogicSocketInputBase& inputSocket) noexcept   = 0;
-        virtual void disconnect(LogicSocketOutputBase& outputSocket) noexcept = 0;
+        virtual void disconnect(LogicSocketInputBase& inputSocket) noexcept       = 0;
+        virtual void disconnect(LogicSocketOutputBase& outputSocket) noexcept     = 0;
 
     public:
         NodeDataId id() const noexcept { return m_id; }
         void setId(NodeDataId id) noexcept { m_id = id; }
-
-    protected:
-        LogicNodeDataBase(rttr::type type,
-                          NodeDataId id)
-            : m_type(type)
-            , m_id(id)
-        {}
-
-        virtual ~LogicNodeDataBase() = default;
 
     private:
         const rttr::type m_type;              //!< The type of this node.

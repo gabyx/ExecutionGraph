@@ -44,8 +44,10 @@ namespace executionGraph
         friend OutputSocketConnection;
 
     public:
-        LogicNodeDataConnections(Parent& parent) noexcept
-            : m_parent(parent){};
+        explicit LogicNodeDataConnections(Parent& parent) noexcept
+            : m_parent(&parent)
+        {
+        };
 
         ~LogicNodeDataConnections() noexcept
         {
@@ -59,7 +61,21 @@ namespace executionGraph
             }
         }
 
+        LogicNodeDataConnections(const LogicNodeDataConnections&) = delete;
+        LogicNodeDataConnections& operator=(const LogicNodeDataConnections&) = delete;
+
+        LogicNodeDataConnections(LogicNodeDataConnections&& other)
+        {
+            // Connections are not  moved!
+        }
+        LogicNodeDataConnections& operator=(LogicNodeDataConnections&& other) = delete;
+
     public:
+        void init(Parent& parent)
+        {
+            m_parent = &parent;
+        }
+
         template<typename Socket,
                  EG_ENABLE_IF(isInputConnection<Socket> || isOutputConnection<Socket>)>
         void connect(Socket& socket) noexcept
@@ -67,7 +83,7 @@ namespace executionGraph
             if(!isConnected(socket))
             {
                 onConnect(socket);
-                socket.connections().onConnect(parent());
+                socket.connections().onConnect(*this);
             }
         }
 
@@ -93,8 +109,8 @@ namespace executionGraph
         }
 
     protected:
-        Parent& parent() { return m_parent; }
-        const Parent& parent() const { return m_parent; }
+        Parent& parent() { return *m_parent; }
+        const Parent& parent() const { return *m_parent; }
 
         void onConnect(const InputSocket& socket) noexcept
         {
@@ -108,12 +124,12 @@ namespace executionGraph
 
         void onDisconnect(const InputSocket& socket) noexcept
         {
-            EG_VERIFY(removeGetLink(socket), "Not connected!");
+            EG_VERIFY(removeGetLink(socket), "Not disconnected!");
         }
 
         void onDisconnect(const OutputSocket& socket) noexcept
         {
-            EG_VERIFY(removeWriteLink(socket), "Not connected!");
+            EG_VERIFY(removeWriteLink(socket), "Not disconnected!");
         }
 
     private:
@@ -144,7 +160,8 @@ namespace executionGraph
         std::unordered_set<InputSocket*> m_inputs;
         //! All outputs writting to this data node.
         std::unordered_set<OutputSocket*> m_outputs;
-        Parent& m_parent;  //! The parent of this class.
+        //! The parent of this class.
+        Parent* m_parent = nullptr;
     };
 
     template<typename...>
@@ -187,6 +204,30 @@ namespace executionGraph
                 removeReference(*ref);
             }
         };
+
+        //! Copy allowed
+        LogicNodeData(const LogicNodeData& other)
+            : m_connections(*this)
+        {
+            *this = other;
+        };
+        LogicNodeData& operator=(const LogicNodeData& other)
+        {
+            Base::operator=(other);
+            m_data        = other.m_data;
+        }
+
+        //! Move allowed
+        LogicNodeData(LogicNodeData&& other)
+            : m_connections(*this)
+        {
+            *this = std::move(other);
+        };
+        LogicNodeData& operator=(LogicNodeData&& other)
+        {
+            Base::operator=(std::move(other));
+            m_data        = std::move(other.m_data);
+        }
 
     public:
         auto dataHandleConst() const noexcept

@@ -14,7 +14,7 @@
     "ExecutionGraph_BUILD_SERIALIZATION": false,
     "ExecutionGraph_BUILD_TESTS": true,
     "ExecutionGraph_EXTERNAL_BUILD_DIR": "${workspaceRoot}/buildExternal",
-    "ExecutionGraph_FORCE_MSGLOG_LEVEL": "TRACE",
+    "ExecutionGraph_FORCE_MSGLOG_LEVEL": "DEBUG",
     "ExecutionGraph_USE_ADDRESS_SANITIZER": true,
     "CMAKE_VERBOSE_MAKEFILE":true
   },
