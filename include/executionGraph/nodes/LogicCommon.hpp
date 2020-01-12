@@ -68,11 +68,11 @@ namespace executionGraph
         using Data                    = TData;
         using InputSocket             = LogicSocketInput<Data>;
         using OutputSocket            = LogicSocketOutput<Data>;
-        using InputSocketConnections  = LogicSocketConnections<ConnectionTraits, InputSocket>;
-        using OutputSocketConnections = LogicSocketConnections<ConnectionTraits, OutputSocket>;
+        using InputSocketConnection  = LogicSocketConnections<ConnectionTraits, InputSocket>;
+        using OutputSocketConnection = LogicSocketConnections<ConnectionTraits, OutputSocket>;
 
         using NodeData            = LogicNodeData<Data>;
-        using NodeDataConnections = LogicNodeDataConnections<ConnectionTraits, NodeData>;
+        using NodeDataConnections = LogicNodeDataConnections<ConnectionTraits, LogicNodeData<Data>>;
     };
     //@}
 

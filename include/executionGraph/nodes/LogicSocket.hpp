@@ -31,20 +31,20 @@
 
 namespace executionGraph
 {
-    template<typename TTraits, typename Derived>
+    template<typename TTraits, typename Parent>
     class LogicSocketConnections
     {
     public:
-        using NodeData            = typename TTraits::NodeDataConnections;
+        using NodeData            = typename TTraits::NodeData;
         using NodeDataConnections = typename TTraits::NodeDataConnections;
-        static_assert(std::is_base_of_v<NodeDataConnections, NodeData>,
-                      "NodeDataConnections needs to be a base of NodeData");
 
         friend NodeDataConnections;
 
-    protected:
-        LogicSocketConnections() = default;
-        ~LogicSocketConnections()
+    public:
+        LogicSocketConnections(Parent& parent) noexcept
+            : m_parent(parent){};
+
+        ~LogicSocketConnections() noexcept
         {
             disconnect();
         }
@@ -55,7 +55,7 @@ namespace executionGraph
         {
             disconnect();
             onConnect(nodeData);
-            m_nodeData->onConnect(static_cast<Derived&>(*this));
+            m_nodeData->onConnect(parent());
         }
 
         //! Disconnect the data node.
@@ -63,18 +63,26 @@ namespace executionGraph
         {
             if(m_nodeData)
             {
-                m_nodeData->onDisconnect(static_cast<Derived&>(*this));
+                m_nodeData->onDisconnect(parent());
                 onDisconnect();
             }
         }
 
-        NodeData* data() { return m_nodeData; }
-        const NodeData* data() const { return m_nodeData; }
+        NodeData* nodeData()
+        {
+            return isConnected() ? &m_nodeData->parent() : nullptr;
+        }
+        const NodeData* nodeData() const { return const_cast<LogicSocketConnections&>(*this).nodeData(); }
+
+        bool isConnected() { return m_nodeData != nullptr; }
 
     protected:
-        void onConnect(const NodeData& nodeData) noexcept
+        Parent& parent() { return m_parent; }
+        const Parent& parent() const { return m_parent; }
+
+        void onConnect(const NodeDataConnections& nodeData) noexcept
         {
-            m_nodeData = const_cast<NodeData*>(&nodeData);
+            m_nodeData = const_cast<NodeDataConnections*>(&nodeData);
         }
 
         void onDisconnect() noexcept
@@ -83,7 +91,8 @@ namespace executionGraph
         }
 
     private:
-        NodeData* m_nodeData = nullptr;  //! Connected data node.
+        NodeDataConnections* m_nodeData = nullptr;  //! Connected data node.
+        Parent& m_parent;
     };
 
     /* ---------------------------------------------------------------------------------------*/
@@ -95,18 +104,19 @@ namespace executionGraph
     */
     /* ---------------------------------------------------------------------------------------*/
     template<typename TData>
-    class LogicSocketInput final : public LogicSocketInputBase,
-                                   public ConnectionTraits<TData>::InputSocketConnections
+    class LogicSocketInput final : public LogicSocketInputBase
     {
     public:
         EG_DEFINE_TYPES();
-        using Data            = TData;
-        using ConnectionsBase = ConnectionTraits<Data>::InputSocketConnections;
+        using Base        = LogicSocketInputBase;
+        using Data        = TData;
+        using Connections = ConnectionTraits<Data>::InputSocketConnection;
 
     public:
         template<typename... Args>
         LogicSocketInput(Args&&... args)
             : LogicSocketInputBase(rttr::type::get<Data>(), std::forward<Args>(args)...)
+            , m_connections(*this)
         {
         }
 
@@ -120,10 +130,45 @@ namespace executionGraph
         LogicSocketInput(LogicSocketInput&& other) = default;
         LogicSocketInput& operator=(LogicSocketInput&& other) = default;
 
-        virtual void connect(LogicNodeDataBase& nodeData) noexcept(false) override
+    public:
+        auto dataHandle() const
         {
-            ConnectionsBase::connect(nodeData.castToType<Data, true>());
+            EG_ASSERT_MSG(m_connections.isConnected(), "Socket not connected");
+            return m_connections.nodeData()->dataHandleConst();
         }
+        auto dataHandle()
+        {
+            EG_ASSERT_MSG(m_connections.isConnected(), "Socket not connected");
+            return m_connections.nodeData()->dataHandleConst();
+        }
+
+    public:
+        template<typename T>
+        void connect(T& nodeData)
+        {
+            m_connections.connect(nodeData.connections());
+        }
+
+        void disconnect() noexcept override
+        {
+            m_connections.disconnect();
+        }
+
+        auto& connections() noexcept
+        {
+            return m_connections;
+        }
+
+        const auto& connections() const noexcept
+        {
+            return m_connections;
+        }
+
+    private:
+        using Base::connect;
+
+    private:
+        Connections m_connections;
     };
 
     /* ---------------------------------------------------------------------------------------*/
@@ -135,18 +180,19 @@ namespace executionGraph
     */
     /* ---------------------------------------------------------------------------------------*/
     template<typename TData>
-    class LogicSocketOutput final : public LogicSocketOutputBase,
-                                    public ConnectionTraits<TData>::OutputSocketConnections
+    class LogicSocketOutput final : public LogicSocketOutputBase
     {
     public:
         EG_DEFINE_TYPES();
-        using Data            = TData;
-        using ConnectionsBase = ConnectionTraits<Data>::OutputSocketConnections;
+        using Base        = LogicSocketOutputBase;
+        using Data        = TData;
+        using Connections = ConnectionTraits<Data>::OutputSocketConnection;
 
     public:
         template<typename... Args>
         LogicSocketOutput(Args&&... args)
             : LogicSocketOutputBase(rttr::type::get<Data>(), std::forward<Args>(args)...)
+            , m_connections(*this)
         {
         }
 
@@ -160,11 +206,45 @@ namespace executionGraph
         LogicSocketOutput(LogicSocketOutput&& other) = default;
         LogicSocketOutput& operator=(LogicSocketOutput&& other) = default;
 
-        //! Connect a generic data node.
-        virtual void connect(LogicNodeDataBase& nodeData) noexcept(false) override
+    public:
+        auto dataHandle() const
         {
-            ConnectionsBase::connect(nodeData.castToType<Data, true>());
+            EG_ASSERT(m_connections.isConnected(), "Socket not connected");
+            return m_connections.nodeData()->dataHandleConst();
         }
+        auto dataHandle()
+        {
+            EG_ASSERT(m_connections.isConnected(), "Socket not connected");
+            return m_connections.nodeData()->dataHandleConst();
+        }
+
+    public:
+        template<typename T>
+        void connect(T& nodeData)
+        {
+            m_connections.connect(nodeData.connections());
+        }
+
+        void disconnect() noexcept override
+        {
+            m_connections.disconnect();
+        }
+
+        auto& connections() noexcept
+        {
+            return m_connections;
+        }
+
+        const auto& connections() const noexcept
+        {
+            return m_connections;
+        }
+
+    private:
+        using Base::connect;
+
+    private:
+        Connections m_connections;
     };
 
     template<auto socketDesc>

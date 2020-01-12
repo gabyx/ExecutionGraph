@@ -25,74 +25,60 @@
 
 namespace executionGraph
 {
-    template<typename TTraits, typename Derived>
+    template<typename TTraits, typename Parent>
     class LogicNodeDataConnections
     {
     public:
-        using InputSocket             = typename TTraits::InputSocket;
-        using OutputSocket            = typename TTraits::OutputSocket;
-        using InputSocketConnections  = typename TTraits::InputSocketConnections;
-        using OutputSocketConnections = typename TTraits::OutputSocketConnections;
+        using InputSocket            = typename TTraits::InputSocket;
+        using OutputSocket           = typename TTraits::OutputSocket;
+        using InputSocketConnection  = typename TTraits::InputSocketConnection;
+        using OutputSocketConnection = typename TTraits::OutputSocketConnection;
 
     private:
         template<typename T>
-        static constexpr bool isInputConnection = std::is_base_of_v<InputSocketConnections, T>;
+        static constexpr bool isInputConnection = std::is_same_v<InputSocket, T>;
         template<typename T>
-        static constexpr bool isOutputConnection = std::is_base_of_v<OutputSocketConnections, T>;
+        static constexpr bool isOutputConnection = std::is_base_of_v<OutputSocket, T>;
 
-        static_assert(isInputConnection<InputSocket> && isOutputConnection<OutputSocket>,
-                      "SocketConnections needs to be a base of InputSocket and OutputSocket");
+        friend InputSocketConnection;
+        friend OutputSocketConnection;
 
-        friend InputSocketConnections;
-        friend OutputSocketConnections;
-
-    protected:
-        LogicNodeDataConnections() noexcept = default;
+    public:
+        LogicNodeDataConnections(Parent& parent) noexcept
+            : m_parent(parent){};
 
         ~LogicNodeDataConnections() noexcept
         {
             for(auto* socket : m_inputs)
             {
-                static_cast<InputSocketConnections*>(socket)->onDisconnect();
+                socket->connections().onDisconnect();
             }
             for(auto* socket : m_outputs)
             {
-                static_cast<OutputSocketConnections*>(socket)->onDisconnect();
+                socket->connections().onDisconnect();
             }
         }
 
     public:
-        template<typename Socket>
+        template<typename Socket,
+                 EG_ENABLE_IF(isInputConnection<Socket> || isOutputConnection<Socket>)>
         void connect(Socket& socket) noexcept
         {
             if(!isConnected(socket))
             {
                 onConnect(socket);
-                if constexpr(isInputConnection<Socket>)
-                {
-                    static_cast<InputSocketConnections&>(socket).onConnect(static_cast<Derived&>(*this));
-                }
-                else
-                {
-                    static_cast<OutputSocketConnections&>(socket).onConnect(static_cast<Derived&>(*this));
-                }
+                socket.connections().onConnect(parent());
             }
         }
 
-        template<typename Socket>
+        template<typename Socket,
+                 EG_ENABLE_IF(isInputConnection<Socket> || isOutputConnection<Socket>)>
         void disconnect(Socket& socket) noexcept
         {
             if(isConnected(socket))
             {
                 onDisconnect(socket);
-                if constexpr(isInputConnection<Socket>)
-                {
-                    static_cast<InputSocketConnections&>(socket).onDisconnect();
-                }
-                else
-                {
-                    static_cast<OutputSocketConnections&>(socket).onDisconnect();
-                }
+                socket.connections().onDisconnect();
             }
         }
 
@@ -107,6 +93,9 @@ namespace executionGraph
         }
 
     protected:
+        Parent& parent() { return m_parent; }
+        const Parent& parent() const { return m_parent; }
+
         void onConnect(const InputSocket& socket) noexcept
         {
             EG_VERIFY(addGetLink(socket), "Not connected!");
@@ -151,22 +140,23 @@ namespace executionGraph
         const auto& inputs() const noexcept { return m_inputs; }
 
     private:
-        std::unordered_set<InputSocket*> m_inputs;    //! All inputs reading this data node.
-        std::unordered_set<OutputSocket*> m_outputs;  //! All outputs writting to this data node.
+        //! All inputs reading this data node.
+        std::unordered_set<InputSocket*> m_inputs;
+        //! All outputs writting to this data node.
+        std::unordered_set<OutputSocket*> m_outputs;
+        Parent& m_parent;  //! The parent of this class.
     };
 
     template<typename...>
     class LogicNodeDataRef;
 
     template<typename TData>
-    class LogicNodeData final : public LogicNodeDataBase,
-                                public ConnectionTraits<TData>::NodeDataConnections
-
+    class LogicNodeData final : public LogicNodeDataBase
     {
     public:
         using Data            = TData;
         using Base            = LogicNodeDataBase;
-        using ConnectionBase  = ConnectionTraits<TData>::NodeDataConnections;
+        using Connections     = ConnectionTraits<TData>::NodeDataConnections;
         using DataHandle      = LogicDataHandle<Data>;
         using DataHandleConst = LogicDataHandle<const Data>;
 
@@ -186,6 +176,7 @@ namespace executionGraph
                       Args&&... args) noexcept
             : Base(rttr::type::get<Data>(), id)
             , m_data{std::forward<Args>(args)...}
+            , m_connections(*this)
         {
         }
 
@@ -198,16 +189,16 @@ namespace executionGraph
         };
 
     public:
-        auto cdata() const noexcept
+        auto dataHandleConst() const noexcept
         {
             return DataHandleConst{m_data};
         }
 
-        auto data() const noexcept
+        auto dataHandle() const noexcept
         {
-            return cdata();
+            return dataHandleConst();
         }
-        auto data() noexcept
+        auto dataHandle() noexcept
         {
             return DataHandle{m_data};
         }
@@ -215,12 +206,33 @@ namespace executionGraph
     public:
         void connect(LogicSocketInputBase& inputSocket) noexcept(false) override
         {
-            ConnectionBase::connect(inputSocket.castToType<Data, true>());
+            m_connections.connect(inputSocket.castToType<Data, true>());
         }
 
         void connect(LogicSocketOutputBase& outputSocket) noexcept(false) override
         {
-            ConnectionBase::connect(outputSocket.castToType<Data, true>());
+            m_connections.connect(outputSocket.castToType<Data, true>());
+        }
+
+        void disconnect(LogicSocketInputBase& inputSocket) noexcept override
+        {
+            m_connections.disconnect(inputSocket.castToType<Data, true>());
+        }
+
+        void disconnect(LogicSocketOutputBase& outputSocket) noexcept override
+        {
+            m_connections.disconnect(outputSocket.castToType<Data, true>());
+        }
+
+    public:
+        auto& connections() noexcept
+        {
+            return m_connections;
+        }
+
+        const auto& connections() const noexcept
+        {
+            return m_connections;
         }
 
     private:
@@ -245,6 +257,8 @@ namespace executionGraph
         Data m_data;
         //! All data nodes refs referencing this data node.
         std::unordered_set<const Reference*> m_refs;
+        //! The connections.
+        Connections m_connections;
     };
 
     template<typename... TArgs>

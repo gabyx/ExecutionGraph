@@ -45,4 +45,14 @@ namespace executionGraph
                            socket.parent().getId());
         }
     }  // namespace details
+
+    // void LogicSocketInputBase::connect(LogicNodeDataBase& nodeData) noexcept(false)
+    // {
+    //     nodeData.connect(*this);
+    // }
+
+    // void LogicSocketOutputBase::connect(LogicNodeDataBase& nodeData) noexcept(false)
+    // {
+    //     nodeData.connect(*this);
+    // }
 }  // namespace executionGraph

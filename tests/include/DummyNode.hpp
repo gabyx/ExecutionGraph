@@ -69,7 +69,7 @@ namespace executionGraph
 
         void compute() override
         {
-            socket<out0Decl>().data();
+            socket<out0Decl>().dataHandle();
         }
     };
 }  // namespace executionGraph

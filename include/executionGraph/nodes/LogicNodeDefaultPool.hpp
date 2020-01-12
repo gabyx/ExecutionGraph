@@ -39,7 +39,7 @@ namespace executionGraph
             // Add output socket with default values for all types!
             meta::for_each(SocketTypes{}, add);
         }
-
+w
         //! Connects the input socket `inSocket` to this default output socket which is
         //! given by `inSocket.type()` which corresponds
         //! by default to the type-matching output socket index of this class.

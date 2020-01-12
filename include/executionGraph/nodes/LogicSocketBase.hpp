@@ -13,6 +13,7 @@
 #pragma once
 
 #include <rttr/type>
+#include "executionGraph/common/MetaCommon.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 
@@ -107,7 +108,14 @@ namespace executionGraph
         }
 
     public:
-        virtual void connect(LogicNodeDataBase& nodeData) = 0;
+        template<typename T,
+                 EG_ENABLE_IF(std::is_base_of_v<LogicNodeDataBase, naked<T>>)>
+        void connect(T& nodeData) noexcept(false)
+        {
+            nodeData.connect(*this);
+        }
+
+        virtual void disconnect() noexcept = 0;
 
     public:
         static constexpr bool isInput() { return true; }
@@ -158,7 +166,14 @@ namespace executionGraph
         }
 
     public:
-        virtual void connect(LogicNodeDataBase& nodeData) noexcept(false) = 0;
+        template<typename T,
+                 EG_ENABLE_IF(std::is_base_of_v<LogicNodeDataBase, naked<T>>)>
+        void connect(T& nodeData) noexcept(false)
+        {
+            nodeData.connect(*this);
+        }
+
+        virtual void disconnect() noexcept = 0;
 
     public:
         static constexpr bool isInput() { return false; }
