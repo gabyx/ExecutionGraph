@@ -204,7 +204,7 @@ namespace executionGraph
 
                     auto groupsOffset = builder.CreateVector(groups.data(), groups.size());
                     ExecutionGraphNodePropertiesBuilder nodePropsBuilder(builder);
-                    nodePropsBuilder.add_nodeId(node->getId());
+                    nodePropsBuilder.add_nodeId(node->id());
                     using NodeClassification = typename GraphType::NodeClassification;
                     auto enumClass =
                         EnumValuesNodeClassification()[static_cast<std::underlying_type_t<NodeClassification>>(
@@ -245,20 +245,20 @@ namespace executionGraph
                     // Serialize all Write-Links
                     for(auto& writeSocket : inputSocket->getWritingSockets())
                     {
-                        socketLinks.emplace_back(s::SocketLinkDescription{writeSocket->parent().getId(),
-                                                                          writeSocket->getIndex(),
-                                                                          node->getId(),
-                                                                          inputSocket->getIndex(),
+                        socketLinks.emplace_back(s::SocketLinkDescription{writeSocket->parent().id(),
+                                                                          writeSocket->index(),
+                                                                          node->id(),
+                                                                          inputSocket->index(),
                                                                           true});
                     }
                     // Serialize Get-Link
                     if(inputSocket->hasGetLink())
                     {
                         LogicSocketOutputBase* outSocket = inputSocket->followGetLink();
-                        socketLinks.emplace_back(s::SocketLinkDescription{outSocket->parent().getId(),
-                                                                          outSocket->getIndex(),
-                                                                          node->getId(),
-                                                                          inputSocket->getIndex(),
+                        socketLinks.emplace_back(s::SocketLinkDescription{outSocket->parent().id(),
+                                                                          outSocket->index(),
+                                                                          node->id(),
+                                                                          inputSocket->index(),
                                                                           false});
                     }
                 }

@@ -71,7 +71,7 @@ namespace executionGraph
             }
         }
 
-        auto getId() { return m_thread.get_id(); }
+        auto id() { return m_thread.get_id(); }
 
     private:
         template<typename T, typename = void>
@@ -133,7 +133,7 @@ namespace executionGraph
                 auto optionalTask = m_queue->pop();
                 if(optionalTask)
                 {
-                    Run(*optionalTask, getId());
+                    Run(*optionalTask, id());
                 }
             }
         }

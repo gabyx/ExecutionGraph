@@ -40,7 +40,7 @@ std::unique_ptr<GraphType> createRandomTree(std::size_t nNodes,
     for(int i = 0; i < nNodes; ++i)
     {
         vec[i] = std::make_unique<NodeType>(i);
-        EG_LOG_TRACE_CONT("{0},", vec[i]->getId());
+        EG_LOG_TRACE_CONT("{0},", vec[i]->id());
     }
     EG_LOG_TRACE_CONT("\n");
 

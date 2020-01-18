@@ -24,35 +24,27 @@ namespace executionGraph
                              const LogicSocketInputBase& socket,
                              const rttr::type& type) noexcept(false)
         {
-            EG_LOGTHROW_IF(condition,
-                           "Casting input socket index '{0}' with type index '{1}' into type "
-                           "'{2}' of node id '{3}' which is wrong!",
-                           socket.index(),
-                           socket.type().get_name(),
-                           type.get_name(),
-                           socket.parent().getId());
+            EG_LOGTHROW_TYPE_IF(condition,
+                                BadSocketCastException,
+                                "Casting input socket index '{0}' with type index '{1}' into type "
+                                "'{2}' of node id '{3}' is wrong!",
+                                socket.index(),
+                                socket.type().get_name(),
+                                type.get_name(),
+                                socket.parent().id());
         }
         void throwSocketCast(bool condition,
                              const LogicSocketOutputBase& socket,
                              const rttr::type& type) noexcept(false)
         {
-            EG_LOGTHROW_IF(condition,
-                           "Casting output socket index '{0}' with type index '{1}' into type "
-                           "'{2}' of node id '{3}' which is wrong!",
-                           socket.index(),
-                           socket.type().get_name(),
-                           type.get_name(),
-                           socket.parent().getId());
+            EG_LOGTHROW_TYPE_IF(condition,
+                                BadSocketCastException,
+                                "Casting output socket index '{0}' with type index '{1}' into type "
+                                "'{2}' of node id '{3}' is wrong!",
+                                socket.index(),
+                                socket.type().get_name(),
+                                type.get_name(),
+                                socket.parent().id());
         }
     }  // namespace details
-
-    // void LogicSocketInputBase::connect(LogicNodeDataBase& nodeData) noexcept(false)
-    // {
-    //     nodeData.connect(*this);
-    // }
-
-    // void LogicSocketOutputBase::connect(LogicNodeDataBase& nodeData) noexcept(false)
-    // {
-    //     nodeData.connect(*this);
-    // }
 }  // namespace executionGraph

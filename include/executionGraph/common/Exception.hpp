@@ -54,16 +54,17 @@ namespace executionGraph
 
 #define EG_THROW(...) EG_THROW_TYPE(executionGraph::Exception, __VA_ARGS__)
 #define EG_THROW_IF(condition, ...) EG_THROW_TYPE_IF(condition, executionGraph::Exception, __VA_ARGS__)
-#define EG_LOGTHROW_IF(condition, ...)           \
-    if(condition)                                \
-    {                                            \
-        EG_LOG_ERROR("{0} : \n{1}\n@ {2} [{3}]", \
-                     #condition,                 \
-                     fmt::format(__VA_ARGS__),   \
-                     __FILE__,                   \
-                     __LINE__);                  \
-        EG_THROW(__VA_ARGS__);                   \
-    }                                            \
+#define EG_LOGTHROW_IF(condition, ...) EG_LOGTHROW_TYPE_IF(condition, executionGraph::Exception, __VA_ARGS__)
+#define EG_LOGTHROW_TYPE_IF(condition, type, ...) \
+    if(condition)                                 \
+    {                                             \
+        EG_LOG_ERROR("{0} : \n{1}\n@ {2} [{3}]",  \
+                     #condition,                  \
+                     fmt::format(__VA_ARGS__),    \
+                     __FILE__,                    \
+                     __LINE__);                   \
+        EG_THROW_TYPE(type, __VA_ARGS__);         \
+    }                                             \
     ASSERT_SEMICOLON
 
 namespace executionGraph

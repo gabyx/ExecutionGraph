@@ -35,7 +35,7 @@ namespace executionGraph
         virtual ~IObjectID() = default;
 
     public:
-        virtual const Id& getId() const = 0;
+        virtual const Id& id() const = 0;
     };
 }  // namespace executionGraph
 
@@ -43,7 +43,7 @@ namespace executionGraph
 #define EG_OBJECT_ID_DECLARATION_IMPL(TMemberId, OverrideKeyWord) \
 public:                                                                  \
     using Id = executionGraph::Id;                                       \
-    const Id& getId() const OverrideKeyWord { return m_id; }       \
+    const Id& id() const OverrideKeyWord { return m_id; }       \
                                                                          \
 private:                                                                 \
     const executionGraph::TMemberId m_id;

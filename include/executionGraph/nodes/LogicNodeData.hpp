@@ -45,9 +45,7 @@ namespace executionGraph
 
     public:
         explicit LogicNodeDataConnections(Parent& parent) noexcept
-            : m_parent(&parent)
-        {
-        };
+            : m_parent(&parent){};
 
         ~LogicNodeDataConnections() noexcept
         {
@@ -247,22 +245,53 @@ namespace executionGraph
     public:
         void connect(LogicSocketInputBase& inputSocket) noexcept(false) override
         {
-            m_connections.connect(inputSocket.castToType<Data, true>());
+            connectImpl(inputSocket);
         }
 
         void connect(LogicSocketOutputBase& outputSocket) noexcept(false) override
         {
-            m_connections.connect(outputSocket.castToType<Data, true>());
+            connectImpl(outputSocket);
         }
 
         void disconnect(LogicSocketInputBase& inputSocket) noexcept override
         {
-            m_connections.disconnect(inputSocket.castToType<Data, true>());
+            connectImpl<true>(inputSocket);
         }
 
         void disconnect(LogicSocketOutputBase& outputSocket) noexcept override
         {
-            m_connections.disconnect(outputSocket.castToType<Data, true>());
+            connectImpl<true>(outputSocket);
+        }
+
+    private:
+        template<bool disconnect = false, typename Socket>
+        void connectImpl(Socket& socket) noexcept(false)
+        {
+            try
+            {
+                auto& s = socket.template castToType<Data, true>();
+                if constexpr(disconnect)
+                {
+                    m_connections.connect(s);
+                }
+                else
+                {
+                    m_connections.disconnect(s);
+                }
+            }
+            catch(BadSocketCastException&)
+            {
+                EG_THROW_TYPE(NodeConnectionException,
+                              "{0} failed from socket index '{1}' [{2}] at node id '{3}'" 
+                              "to data node id '{4}' [{5}]",
+                              socket.parent().id(),
+                              socket.index(),
+                              socket.type().get_name(),
+                              id(),
+                              type().get_name(),
+                              disconnect ? "Connection"
+                                         : "Disconnection");
+            }
         }
 
     public:

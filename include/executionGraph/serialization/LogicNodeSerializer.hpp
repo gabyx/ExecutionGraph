@@ -132,7 +132,7 @@ namespace executionGraph
             using namespace s;
             namespace fb = flatbuffers;
 
-            NodeId id        = node.getId();
+            NodeId id        = node.id();
             std::string type = rttr::type::get(node).get_name().to_string();
             auto typeOffset  = builder.CreateString(type);
 
@@ -233,7 +233,7 @@ namespace executionGraph
                                    "socket type '{2}' at index '{3}'! "
                                    "The deserialization should have added this sockets throught the constructor! ",
                                    ((checkInput) ? "input" : "output"),
-                                   node->getId(),
+                                   node->id(),
                                    rttr::type::get<T>().get_name().to_string(),
                                    index);
             }

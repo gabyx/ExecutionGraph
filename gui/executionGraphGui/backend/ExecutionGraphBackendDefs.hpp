@@ -52,7 +52,7 @@ class ExecutionGraphBackendDefs<executionGraph::GeneralConfig<>>
 {
 public:
     // Get the unique id of this graph type.
-    static executionGraph::IdNamed getId()
+    static executionGraph::IdNamed id()
     {
         return executionGraph::IdNamed{"DefaultGraph", std::string("2992ebff-c950-4184-8876-5fe6ac029aa5")};
     }

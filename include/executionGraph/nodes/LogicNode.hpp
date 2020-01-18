@@ -93,7 +93,7 @@ namespace executionGraph
         virtual void compute() = 0;
 
     public:
-        NodeId getId() const { return m_id; }
+        NodeId id() const { return m_id; }
         void setId(NodeId id) { m_id = id; }
 
     protected:

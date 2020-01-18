@@ -171,7 +171,7 @@ bool BackendResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request,
     // Make a RequestCef (move the payload into it)
     auto requestCef = std::make_unique<RequestCef>(m_target, std::move(payload));
     // Make a ResponseCef
-    auto responseCef = std::make_unique<ResponsePromiseCef>(cbResponseHeaderReady, requestCef->getId(), m_allocator, true);
+    auto responseCef = std::make_unique<ResponsePromiseCef>(cbResponseHeaderReady, requestCef->id(), m_allocator, true);
     // Get the future out
     m_responseFuture = ResponseFuture(*responseCef);
 

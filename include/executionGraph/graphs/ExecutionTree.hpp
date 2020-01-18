@@ -158,7 +158,7 @@ namespace executionGraph
         //! Invalidates the execution order.
         void setNodeClass(NodeBaseType& node, NodeClassification newType)
         {
-            setNodeClass(node.getId(), newType);
+            setNodeClass(node.id()(), newType);
         }
 
         //! Generate a new unique node id (not yet contained in the graph).
@@ -222,7 +222,7 @@ namespace executionGraph
                               GroupId groupId         = 0)
         {
             EG_THROW_IF(node == nullptr, "Nullptr added!");
-            auto id = node->getId();
+            auto id = node->id()();
 
             EG_THROW_IF(m_nodes.find(id) != m_nodes.end(),
                                "Node id: '{0}' already added in tree!",
@@ -367,13 +367,13 @@ namespace executionGraph
             {
                 auto* outSocket = node.getISocket(inS).followGetLink();
                 EG_THROW_TYPE_IF(!outSocket || (outSocket->getIndex() != *outS ||
-                                                       outSocket->parent().getId() != *outN),
+                                                       outSocket->parent().id()() != *outN),
                                         NodeConnectionException,
                                         "The output socket '{0}' of node '{1}' of the get link does "
                                         "not correspond to the one you want to remove "
                                         "(node id: '{2}', output socket: '{3}')",
                                         outSocket->getIndex(),
-                                        outSocket->parent().getId(),
+                                        outSocket->parent().id()(),
                                         *outN,
                                         *outS);
             }
@@ -488,7 +488,7 @@ namespace executionGraph
                 }
                 EG_WARN(outputReachedInput,
                                "Output node id: '{0}' did not reach any input!",
-                               outNode->getId());
+                               outNode->id()());
             }
 
             m_executionOrderUpToDate = true;
@@ -512,7 +512,7 @@ namespace executionGraph
                     {
                         auto* n = nodeData->m_node.get();
                         s << suffix
-                          << fmt::printf(fmt, n->getId(), nodeData->m_priority, rttr::type::get(*n).get_name())
+                          << fmt::printf(fmt, n->id()(), nodeData->m_priority, rttr::type::get(*n).get_name())
                           << std::endl;
                     }
                 }
@@ -569,7 +569,7 @@ namespace executionGraph
                                                 NodeConnectionException,
                                                 "Input socket index: '{0}' of node: '{1}' is dangling and cannot be connected to default output, since it is not set!",
                                                 inSocket->getIndex(),
-                                                nodeData.m_node->getId());
+                                                nodeData.m_node->id()());
                         m_defaultOutputSockets->connect(*inSocket);
                     }
                 }
@@ -582,26 +582,26 @@ namespace executionGraph
                     auto& parentNode = socket->parent();
 
                     // Check first if it is a constant node.
-                    auto itConstant = m_constNodes.find(parentNode.getId());
+                    auto itConstant = m_constNodes.find(parentNode.id()());
                     if(itConstant != m_constNodes.end())
                     {
                         // nothing to check for constant nodes
                         return;
                     }
 
-                    auto itParent = nodes.find(parentNode.getId());
+                    auto itParent = nodes.find(parentNode.id()());
                     EG_THROW_IF(itParent == nodes.end(),
                                        "Node with id: '{0}' has not been added to the execution tree!",
-                                       parentNode.getId());
+                                       parentNode.id()());
                     const NodeData& parentNodeData = itParent->second;
 
                     EG_THROW_IF(parentNodeData.m_priority <= nodeDataWithLowerPrio.m_priority,
                                        "Parent node id: '{0}' [prio: '{1}' ]"
                                        "has not a higher priority as node id: '{2}' "
                                        "which is wrong!",
-                                       parentNodeData.m_node->getId(),
+                                       parentNodeData.m_node->id()(),
                                        parentNodeData.m_priority,
-                                       nodeDataWithLowerPrio.m_node->getId());
+                                       nodeDataWithLowerPrio.m_node->id()());
                 };
 
                 for(auto& pair : nodes)
@@ -702,12 +702,12 @@ namespace executionGraph
                     if(nodeData->isFlagSet(NodeData::Visited))
                     {
                         EG_EXECTREE_SOLVER_LOG("DFS Start: Node id: '{0}'  already visited -> skip it.",
-                                                      nodeData->m_node->getId());
+                                                      nodeData->m_node->id()());
                         continue;
                     }
 
                     EG_EXECTREE_SOLVER_LOG("DFS Start: Node id: '{0}'",
-                                                  nodeData->m_node->getId());
+                                                  nodeData->m_node->id()());
 
                     // Start a depth-first recursion from this node (exploring its subtree)
                     m_dfrStack.clear();
@@ -775,13 +775,13 @@ namespace executionGraph
                 auto it = m_dfrStack.begin();
                 if(it != m_dfrStack.end() && (*it)->isFlagSet(NodeData::OnCurrentDFRPath))
                 {
-                    ss << (*(it++))->m_node->getId();
+                    ss << (*(it++))->m_node->id()();
                 }
                 for(; it != m_dfrStack.end(); ++it)
                 {
                     if((*it)->isFlagSet(NodeData::OnCurrentDFRPath))
                     {
-                        ss << " ---> " << (*it)->m_node->getId();
+                        ss << " ---> " << (*it)->m_node->id()();
                     }
                 }
                 return ss.str();
@@ -794,7 +794,7 @@ namespace executionGraph
                 ss << "[ ";
                 for(auto* nodeData : m_dfrStack)
                 {
-                    ss << nodeData->m_node->getId() << (nodeData->isFlagSet(NodeData::Visited) ? "*" : " ") << ", ";
+                    ss << nodeData->m_node->id()() << (nodeData->isFlagSet(NodeData::Visited) ? "*" : " ") << ", ";
                 }
                 ss << " ]";
                 return ss.str();
@@ -806,17 +806,17 @@ namespace executionGraph
              */
             void visit(NodeData& nodeData)
             {
-                EG_EXECTREE_SOLVER_LOG("visit: '{0}'", nodeData.m_node->getId());
+                EG_EXECTREE_SOLVER_LOG("visit: '{0}'", nodeData.m_node->id()());
 
                 auto addParentsToStack = [&](auto* socket) {
                     // Get NodeData of parentNode
                     auto& parentNode = socket->parent();
-                    auto itParent    = m_nonConstNodes.find(parentNode.getId());
+                    auto itParent    = m_nonConstNodes.find(parentNode.id()());
                     if(itParent == m_nonConstNodes.end())
                     {
-                        EG_ASSERT(this->m_constNodes.find(parentNode.getId()) != this->m_constNodes.end(),
+                        EG_ASSERT(this->m_constNodes.find(parentNode.id()()) != this->m_constNodes.end(),
                                          "Parent node with id: '{0}' is not a constant node!",
-                                         parentNode.getId());
+                                         parentNode.id()());
                         return;
                     }
 
@@ -922,7 +922,7 @@ namespace executionGraph
                 {
                     NodeData* nodeData = &keyValue.second;
 
-                    EG_EXECTREE_SOLVER_LOG("DFS Start: Node id: '{0}'", nodeData->m_node->getId());
+                    EG_EXECTREE_SOLVER_LOG("DFS Start: Node id: '{0}'", nodeData->m_node->id()());
                     // Skip visited nodes.
                     if(nodeData->isFlagSet(NodeData::Visited))
                     {
@@ -999,13 +999,13 @@ namespace executionGraph
                 auto it = m_dfrStack.begin();
                 if(it != m_dfrStack.end() && (*it)->isFlagSet(NodeData::OnCurrentDFRPath))
                 {
-                    ss << (*(it++))->m_node->getId();
+                    ss << (*(it++))->m_node->id()();
                 }
                 for(; it != m_dfrStack.end(); ++it)
                 {
                     if((*it)->isFlagSet(NodeData::OnCurrentDFRPath))
                     {
-                        ss << " ---> " << (*it)->m_node->getId();
+                        ss << " ---> " << (*it)->m_node->id()();
                     }
                 }
                 return ss.str();
@@ -1018,7 +1018,7 @@ namespace executionGraph
                 ss << "[ ";
                 for(auto* nodeData : m_dfrStack)
                 {
-                    ss << nodeData->m_node->getId() << (nodeData->isFlagSet(NodeData::Visited) ? "*" : " ") << ", ";
+                    ss << nodeData->m_node->id()() << (nodeData->isFlagSet(NodeData::Visited) ? "*" : " ") << ", ";
                 }
                 ss << " ]";
                 return ss.str();
@@ -1030,17 +1030,17 @@ namespace executionGraph
              */
             void visit(NodeData& nodeData)
             {
-                EG_EXECTREE_SOLVER_LOG("visit: '{0}'", nodeData.m_node->getId());
+                EG_EXECTREE_SOLVER_LOG("visit: '{0}'", nodeData.m_node->id()());
 
                 auto addParentsToStack = [&](auto* socket) {
                     // Get NodeData of parentNode
                     auto& parentNode = socket->parent();
-                    auto itParent    = m_nonConstNodes.find(parentNode.getId());
+                    auto itParent    = m_nonConstNodes.find(parentNode.id()());
                     if(itParent == m_nonConstNodes.end())
                     {
-                        EG_ASSERT(this->m_constNodes.find(parentNode.getId()) != this->m_constNodes.end(),
+                        EG_ASSERT(this->m_constNodes.find(parentNode.id()()) != this->m_constNodes.end(),
                                          "Parent node with id: '{0}' is not a constant node!",
-                                         parentNode.getId());
+                                         parentNode.id()());
                         return;
                     }
                     NodeData* parentNodeData = &itParent->second;
@@ -1076,10 +1076,10 @@ namespace executionGraph
                 auto assignToChild = [&](auto* socket) {
                     // Get NodeData of parentNode
                     auto& parentNode = socket->parent();
-                    auto itParent    = m_nonConstNodes.find(parentNode.getId());
+                    auto itParent    = m_nonConstNodes.find(parentNode.id()());
                     EG_THROW_IF(itParent == m_nonConstNodes.end(),
                                        "Node with id: '{0}' has not been added to the execution tree!",
-                                       parentNode.getId());
+                                       parentNode.id()());
                     NodeData* parentNodeData = &itParent->second;
 
                     if(parentNodeData->m_priority <= nodeData.m_priority)

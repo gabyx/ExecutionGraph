@@ -51,7 +51,7 @@ namespace details
                     EGGUI_THROW(
                         "RequestDispatcher: Request id: '{0}' (url: '{1}') "
                         "has not been handled correctly, it will be cancled!",
-                        m_request.getId().toString(),
+                        m_request.id().toString(),
                         m_request.target());
                 }
             }
@@ -66,7 +66,7 @@ namespace details
         {
             EGGUI_BACKENDLOG_WARN(
                 "RequestDispatcher: Exception in handler! -> Cancel request id: '{0}' [url: '{1}']",
-                m_request.getId().toString(),
+                m_request.id().toString(),
                 m_request.target());
             m_response.setCanceled(e);
         };
@@ -159,7 +159,7 @@ public:
         const auto& requestTargets = handler->requestTargets();
         EGGUI_THROW_IF(!handler || requestTargets.size() == 0, "nullptr or no Requests");
 
-        const Id& id = handler->getId();
+        const Id& id = handler->id();
         EGGUI_THROW_IF(m_handlerStorage.find(id) != m_handlerStorage.end(),
                               "MessageHandler with id: '{0}' already exists!",
                               id.toString());

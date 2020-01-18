@@ -59,7 +59,7 @@ namespace executionGraph
 
     protected:
         //! Get the unique identifier.
-        const xg::Guid& getId() { return m_guid; }
+        const xg::Guid& id() { return m_guid; }
 
     private:
         xg::Guid m_guid;  //!< The unique identifier.

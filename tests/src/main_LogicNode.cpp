@@ -12,9 +12,9 @@
 
 //#include <executionGraph/nodes/LogicNode.hpp>
 #include <executionGraph/common/TupleUtil.hpp>
-#include <executionGraph/nodes/LogicNodeBase.hpp>
 #include <executionGraph/nodes/LogicNodeData.hpp>
 #include <executionGraph/nodes/LogicSocket.hpp>
+#include <executionGraph/common/Exception.hpp>
 #include "DummyNode.hpp"
 #include "TestFunctions.hpp"
 
@@ -52,7 +52,17 @@ MY_TEST(Node_Test, Wrong_Connections)
     DummyNode node(0);
 
     LogicNode* n = &node;
-    n->socket()
+    bool catchedException = false;
+    try
+    {
+        n->output(1)->connect(i); // Wrong connection.
+    }
+    catch(NodeConnectionException&)
+    {
+        catchedException = true;
+    }
+
+    ASSERT_TRUE(catchedException) << "Exception should have been thrown";
 }
 
 int main(int argc, char** argv)

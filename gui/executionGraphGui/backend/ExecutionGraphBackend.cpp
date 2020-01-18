@@ -46,7 +46,7 @@ namespace
 
             forEachConfig([&](auto graphConfig, auto idx) {
                 using Config = decltype(graphConfig);
-                ids[idx]     = ExecutionGraphBackendDefs<Config>::getId();
+                ids[idx]     = ExecutionGraphBackendDefs<Config>::id();
             });
 
             return ids;
