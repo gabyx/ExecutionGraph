@@ -231,7 +231,7 @@ MY_TEST(MetaProgramming, TupleSort)
         static_assert(std::get<0>(res).val == std::get<0>(s).val, "not correct");
 
         constexpr auto sF   = tupleUtil::sortForward<t, p>();
-        constexpr auto resF = tupleUtil::forward(res);
+        constexpr auto resF = tupleUtil::toReferences(res);
         static_assert(std::is_same_v<decltype(sF), decltype(resF)>, "not correct");
         static_assert(std::get<0>(resF).val == std::get<0>(sF).val, "not correct");
     }
@@ -242,7 +242,7 @@ MY_TEST(MetaProgramming, TupleSort)
         constexpr auto t = std::forward_as_tuple(b, a);
         static_assert(&a == &std::get<1>(t), "address should be the same");
 
-        constexpr auto tf = tupleUtil::forward(t);
+        constexpr auto tf = tupleUtil::toReferences(t);
         static_assert(&b == &std::get<0>(tf), "address should be the same");
 
         constexpr auto s1 = tupleUtil::sortForward<tf, p>();
@@ -263,7 +263,7 @@ MY_TEST(MetaProgramming, ConstexprForward)
 {
     // Compile time...
     static constexpr auto t = std::make_tuple(A{10.0}, A{9}, A{8.0f});
-    constexpr auto tF       = tupleUtil::forward(t);
+    constexpr auto tF       = tupleUtil::toReferences(t);
     static_assert(std::is_same_v<decltype(tF),
                                  const std::tuple<const A<double>&,
                                                   const A<int>&,
@@ -271,7 +271,7 @@ MY_TEST(MetaProgramming, ConstexprForward)
                   "not correct");
     // Runtime...
     auto t2  = std::make_tuple(A{10.0}, A{9}, A{8.0f});
-    auto tF2 = tupleUtil::forward(t2);
+    auto tF2 = tupleUtil::toReferences(t2);
     static_assert(std::is_same_v<decltype(tF2),
                                  std::tuple<A<double>&,
                                             A<int>&,

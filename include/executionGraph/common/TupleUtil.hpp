@@ -13,9 +13,9 @@
 #pragma once
 
 #include <cstddef>
+#include <memory>
 #include <tuple>
 #include <utility>
-
 #include <meta/meta.hpp>
 #include "executionGraph/common/MetaCommon.hpp"
 #include "executionGraph/common/MetaIndices.hpp"
@@ -178,11 +178,11 @@ namespace executionGraph
 
         template<typename Tuple,
                  typename F,
-                 typename Index = std::make_index_sequence<std::tuple_size_v<naked<Tuple>>>,
+                 typename Indices = std::make_index_sequence<std::tuple_size_v<naked<Tuple>>>,
                  EG_ENABLE_IF(meta::is<naked<Tuple>, std::tuple>::value)>
         constexpr decltype(auto) indexed(Tuple&& t,
-                                        F&& f,
-                                        Index indices = {})
+                                         F&& f,
+                                         Indices indices = {})
         {
             return f(std::forward<Tuple>(t), indices);
         }
@@ -228,22 +228,37 @@ namespace executionGraph
             return details::sort<t, pred, true>();
         }
 
+        //! Constructing a tuple of references to the values of `t`.
         template<typename Tuple,
                  EG_ENABLE_IF(meta::is<naked<Tuple>, std::tuple>::value)>
-        constexpr auto forward(Tuple&& t)
+        constexpr auto toReferences(Tuple&& t)
+        {
+            return invoke(std::forward<Tuple>(t),
+                          [](auto&&... args) { return std::forward_as_tuple(
+                                                   std::forward<decltype(args)>(args)...); });
+        }
+
+        //! Constructing a tuple of references to the values of a constexpr `t`.
+        template<auto& t,
+                 EG_ENABLE_IF(meta::is<naked<decltype(t)>, std::tuple>::value)>
+        constexpr auto toReferencesS()
         {
             return invoke(t,
                           [](auto&&... args) { return std::forward_as_tuple(
                                                    std::forward<decltype(args)>(args)...); });
         }
 
-        template<auto& t,
-                 EG_ENABLE_IF(meta::is<naked<decltype(t)>, std::tuple>::value)>
-        constexpr auto forwardS()
+        //! Constructing a tuple of pointers to the values of `t`.
+        template<auto construct = [](auto*... p) { return std::make_tuple(p...); },
+                 typename Tuple>
+        constexpr auto toPointers(Tuple&& t)
         {
-            return invoke(t,
-                          [](auto&&... args) { return std::forward_as_tuple(
-                                                   std::forward<decltype(args)>(args)...); });
+            return tupleUtil::invoke(
+                std::forward<Tuple>(t),
+                [](auto&... value) {
+                    return construct(std::addressof(value)...);
+                });
         }
+
     }  // namespace tupleUtil
 }  // namespace executionGraph

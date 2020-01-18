@@ -17,6 +17,7 @@
 #include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/DemangleTypes.hpp"
 #include "executionGraph/common/Exception.hpp"
+#include "executionGraph/common/TupleUtil.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 
 namespace executionGraph
@@ -24,46 +25,44 @@ namespace executionGraph
     class LogicSocketInputBase;
     class LogicSocketOutputBase;
 
-    /**
- @brief The execution node (node) class which is the base class
+    /*!
+        The execution node (node) class which is the base class
         for every node in an execution graph.
 
         // clang-format off
         General Concept
-                               +-------------+                                       +-------------+
-                               | LogicNode A |                                       | LogicNode B |
-                               |             |                                       |             |
-                               |     +-------+-----+                           +-----+-----+       |
-                               |     |  Out Socket |                           | In Socket |       |
-                               |     |             |                           |           |       |
-                               |     | m_writeTo[0]|@------( Write-Link )----> |           |       |
-                               |     |             |                           |           |       |
-                               |     |             |                           |           |       |
-                               |     |             |                           |           |       |
-                               |     |             | <-----(  Get-Link  )-----@| m_getFrom |       |
-                               |     |             |                           |           |       |
-                               |     |             |                           |           |       |
-                               |     |   T m_data  |                           | T* m_data |       |
-                               |     +-------+-----+                           +-----+-----+       |
-                               |             |                                       |             |
-                               +-------------+                                       +-------------+
-
-                Function Behavior in Out Socket:  (this =  Out)  ++      Function Behavior in In Socket:  (this = In)
-                ================================                 ||      ===============================
-                                                                 ||
-                -data():  gets this->m_data,                 ||      -data(): gets the value *this->m_data
-                                                                 ||                   Exception if nullptr
-                                                                 ||
-                                                                 ||
-                -setData():  set all Write-Links directly       ||      -setData(): sets internal this->m_data
-                              (m_writeTo array) and set          ||
-                              this->m_data also because this     ||
-                              might have other                   ||
-                              Get-Links                          ||
-                                                                 ++
+                  +--------------------------------+
+                  | LogcNode                       |
+                  |                                |
+       +-----------------------+      +------------------------+  
+       | LogicSocketInputBase* |      | LogicSocketOutputBase* |   
+       +-----------------------+      +------------------------+  
+                  |                                |
+                 ...                              ...
+                  |                                |
+              more input                       more output
+            socket pointers                  socket pointers   
+                  |                                |
+                  +--------------------------------+
+                                  ^
+                                  |-------------- Derived -----------------|
+                                                                           |
+                                                            +--------------------------------+
+                                                            | DerivedNode : LogcNode         |
+                                                            |                                |
+       +------------------+                     +----------------------+        +-----------------------+                     +------------------+
+       | LogicNodeData<T> | <-- Connection ---  | LogicSocketInput<T>  |        | LogicSocketOutput<T>  |  --- Connection --> | LogicNodeData<T> | 
+       +------------------+                     +----------------------+        +-----------------------+                     +------------------+
+                                                            |                                |
+                                                           ...                              ...
+                                                            |                                |
+                                                        more input                       more output
+                                                         sockets                          sockets                   
+                                                            |                                |
+                                                            +--------------------------------+
+        
         // clang-format on
-*/
-
+    */
     class LogicNode
     {
     public:
@@ -84,6 +83,9 @@ namespace executionGraph
 
         virtual ~LogicNode() = default;
 
+        //! The init function.
+        virtual void init() = 0;
+
         //! The reset function.
         virtual void reset() = 0;
 
@@ -95,16 +97,20 @@ namespace executionGraph
         void setId(NodeId id) { m_id = id; }
 
     protected:
+        //! Registers input sockets for this node.
         template<typename... Sockets>
         void registerInputs(std::tuple<Sockets...>& sockets)
         {
-            m_inputs = makePtrList<InputSockets>(sockets);
+            m_inputs = tupleUtil::toPointers<
+                [](auto*... p) { return InputSockets{p...}; }>(sockets);
         }
 
+        //! Registers output sockets for this node.
         template<typename... Sockets>
         void registerOutputs(std::tuple<Sockets...>& sockets)
         {
-            m_outputs = makePtrList<OutputSockets>(sockets);
+            m_outputs = tupleUtil::toPointers<
+                [](auto*... p) { return OutputSockets{p...}; }>(sockets);
         }
 
     public:

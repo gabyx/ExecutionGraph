@@ -32,8 +32,8 @@ namespace executionGraph
 
     public:
         EG_DEFINE_INPUT_DESC(in0Decl, int, 0, "Value0"_cs);
-        EG_DEFINE_INPUT_DESC(in2Decl, float, 2, "Value2"_cs);
-        EG_DEFINE_INPUT_DESC(in1Decl, double, 1, "Value1"_cs);
+        EG_DEFINE_INPUT_DESC(in1Decl, float, 1, "Value1"_cs);
+        EG_DEFINE_INPUT_DESC(in2Decl, double, 2, "Value2"_cs);
 
     private:
         EG_DEFINE_DESCS(inDecls, in0Decl, in2Decl, in1Decl);
@@ -41,8 +41,8 @@ namespace executionGraph
 
     public:
         EG_DEFINE_OUTPUT_DESC(out0Decl, int, 0, "Value0"_cs);
-        EG_DEFINE_OUTPUT_DESC(out2Decl, float, 2, "Value2"_cs);
-        EG_DEFINE_OUTPUT_DESC(out1Decl, double, 1, "Value1"_cs);
+        EG_DEFINE_OUTPUT_DESC(out1Decl, float, 1, "Value1"_cs);
+        EG_DEFINE_OUTPUT_DESC(out2Decl, double, 2, "Value2"_cs);
 
     private:
         EG_DEFINE_DESCS(outDecls, out1Decl, out2Decl, out0Decl);
@@ -59,21 +59,35 @@ namespace executionGraph
             registerOutputs(m_outSockets);
         }
 
-        ~DummyNode()
-        {
-        }
+        ~DummyNode() = default;
 
     public:
         EG_DEFINE_SOCKET_GETTERS(Node, m_inSockets, m_outSockets);
-        //EG_DEFINE_SOCKET_CHECKS 
+        //EG_DEFINE_SOCKET_CHECKS
     public:
-        void reset() override{
-            //EG_THROW_IF(checkRequiredSocketConnections)
-        };
+        void init() override {}
+
+        void reset() override {}
 
         void compute() override
         {
-            socket<out0Decl>().dataHandle();
+            auto handles = makeHandles<in0Decl,
+                                       in1Decl,
+                                       in2Decl,
+                                       out0Decl,
+                                       out1Decl,
+                                       out2Decl>();
+            invoke(handles,
+                   [](auto& in0,
+                      auto& in1,
+                      auto& in2,
+                      auto& out0,
+                      auto& out1,
+                      auto& out2) {
+                       out0 = in0 + 1;
+                       out1 = in1 + 1.f;
+                       out2 = in2 + 1.0;
+                   });
         }
     };
 }  // namespace executionGraph

@@ -15,6 +15,7 @@
 #include <type_traits>
 #include <meta/meta.hpp>
 #include "executionGraph/common/Assert.hpp"
+#include "executionGraph/common/SfinaeMacros.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 
@@ -113,8 +114,26 @@ namespace executionGraph
             return m_data;
         }
 
+        auto& get() const noexcept
+        {
+            return *m_data;
+        }
+
     private:
         Data* m_data = nullptr;
     };
 
+    //! Invoke a function `f` with all data handles values.
+    template<typename... Handles,
+             typename F,
+             EG_ENABLE_IF((... && meta::is_v<naked<Handles>, LogicDataHandle>))>
+    decltype(auto) invoke(const std::tuple<Handles...>& handles,
+                          F&& f)
+    {
+        return tupleUtil::invoke(
+            handles,
+            [&](const auto&... handles) {
+                return f(handles.get()...);
+            });
+    }
 }  // namespace executionGraph

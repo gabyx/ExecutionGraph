@@ -12,6 +12,7 @@
 
 //#include <executionGraph/nodes/LogicNode.hpp>
 #include <executionGraph/common/TupleUtil.hpp>
+#include <executionGraph/nodes/LogicNodeBase.hpp>
 #include <executionGraph/nodes/LogicNodeData.hpp>
 #include <executionGraph/nodes/LogicSocket.hpp>
 #include "DummyNode.hpp"
@@ -22,42 +23,37 @@ using namespace executionGraph;
 MY_TEST(Node_Test, Int_Int)
 {
     // Integer node connection (wrong connection)
-    LogicNodeData<float> f(1);
+    LogicNodeData<int> i0(0, 0);
+    LogicNodeData<float> i1(1, 0.f);
+    LogicNodeData<double> i2(2, 0.0);
+
+    LogicNodeData<int> o0(0, 2);
+    LogicNodeData<float> o1(1, 2.0f);
+    LogicNodeData<double> o2(2, 2.0);
+
     DummyNode node1(1);
-    //DummyNode node2(2);
-    //node1.socket<node1.out2Decl>().connect(f);
-    node1.output(2)->connect(f);
-    //node2.socket(node2.in2Decl)·connect(f);
+    node1.socket<node1.in0Decl>().connect(i0);
+    node1.socket<node1.in1Decl>().connect(i1);
+    node1.socket<node1.in2Decl>().connect(i2);
+    node1.socket<node1.out0Decl>().connect(o0);
+    node1.socket<node1.out1Decl>().connect(o1);
+    node1.socket<node1.out2Decl>().connect(o2);
 
-    //node1.addWriteLink(0, node2, 1);  // Correct connection!
-
-    // try
-    // {
-    // node1.addWriteLink(0, node2, 2);  // Wrong connection!
-    // }
-    // catch(NodeConnectionException& e)
-    // {
-    // EG_LOG_TRACE("Correct Exception: '{0}'", e.what());
-    // return;
-    // }
-
-    // throw std::runtime_error("Exception not catched!!!");
+    node1.compute();
+    ASSERT_EQ(o0.dataHandle().get(), 1);
+    ASSERT_EQ(o1.dataHandle().get(), 1.f);
+    ASSERT_EQ(o2.dataHandle().get(), 1.0);
 }
 
-// MY_TEST(Node_Test, Int_Int2)
-// {
-//     // Integer node connection (wrong connection)
-//     DummyNode node1(1);
-//     DummyNode node2(2);
+MY_TEST(Node_Test, Wrong_Connections)
+{
+    // Integer node connection (wrong connection)
+    LogicNodeData<int> i(0);
+    DummyNode node(0);
 
-//     node1.addWriteLink(0, node2, 0);
-//     node1.addWriteLink(0, node2, 1);
-
-//     ASSERT_EQ(node1.connectedInputCount(), 0) << "Connected input count wrong";
-//     ASSERT_EQ(node1.connectedOutputCount(), 1) << "Connected input count wrong";
-//     ASSERT_EQ(node2.connectedInputCount(), 2) << "Connected input count wrong";
-//     ASSERT_EQ(node2.connectedOutputCount(), 0) << "Connected input count wrong";
-// }
+    LogicNode* n = &node;
+    n->socket()
+}
 
 int main(int argc, char** argv)
 {
