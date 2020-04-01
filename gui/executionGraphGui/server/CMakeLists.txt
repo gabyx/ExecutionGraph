@@ -31,7 +31,9 @@ function(defineCompileDefs target includeDirs)
 
     set_target_properties(${target} PROPERTIES INSTALL_RPATH "$ORIGIN/../lib;$ORIGIN/..")
 
-    cotire(${target})
+    if(${ExecutionGraph_SETUP_COTIRE_TARGETS}) 
+        cotire(${target})
+    endif()
 
     print_target_properties(${target})
 

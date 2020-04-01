@@ -165,6 +165,16 @@ namespace executionGraph
     template<typename...>
     class LogicNodeDataRef;
 
+    /* ---------------------------------------------------------------------------------------*/
+    /*!
+         Basic Implementation of the data node. 
+         No locking mechanism is implemented here.
+         This node owns the data which is constructed in place in the constructor
+
+        @date Wed Apr 01 2020
+        @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+    */
+    /* ---------------------------------------------------------------------------------------*/
     template<typename TData>
     class LogicNodeData final : public LogicNodeDataBase
     {

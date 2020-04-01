@@ -282,9 +282,7 @@ namespace executionGraph
         auto makeSocket(Args&&... args)
         {
             constexpr auto& desc = std::get<I>(descs);
-            using S              = meta::if_<meta::bool_<desc.isInput()>,
-                                LogicSocketInput<typename naked<decltype(desc)>::Data>,
-                                LogicSocketOutput<typename naked<decltype(desc)>::Data>>;
+            using S              = SocketType<desc>;
             return S{desc.index(), std::forward<Args>(args)...};
         }
 

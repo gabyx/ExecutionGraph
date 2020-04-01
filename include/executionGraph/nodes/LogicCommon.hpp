@@ -52,9 +52,11 @@ namespace executionGraph
     using SocketIndex = IndexType;  //! The socket index type.
 
     class LogicNodeDataBase;
-    template<typename T>
+    
+    template<typename Data>
     class LogicNodeData;
-    template<typename Config, typename Derived>
+
+    template<typename ConnectionTraits, typename Derived>
     class LogicNodeDataConnections;
     //@}
 
@@ -65,9 +67,9 @@ namespace executionGraph
     template<typename TData>
     struct ConnectionTraits
     {
-        using Data                    = TData;
-        using InputSocket             = LogicSocketInput<Data>;
-        using OutputSocket            = LogicSocketOutput<Data>;
+        using Data                   = TData;
+        using InputSocket            = LogicSocketInput<Data>;
+        using OutputSocket           = LogicSocketOutput<Data>;
         using InputSocketConnection  = LogicSocketConnections<ConnectionTraits, InputSocket>;
         using OutputSocketConnection = LogicSocketConnections<ConnectionTraits, OutputSocket>;
 

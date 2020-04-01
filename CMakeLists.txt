@@ -81,6 +81,7 @@ include(PrintMacros)
 include(FirstCMakeRun)
 # Speed up the build
 include(cotire) 
+set(ExecutionGraph_SETUP_COTIRE_TARGETS OFF)
 
 # Define Install Directories
 # Install stuff (default location is not some where on the system! for safty reasons)

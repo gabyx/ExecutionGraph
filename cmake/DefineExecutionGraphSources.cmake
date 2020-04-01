@@ -40,8 +40,6 @@ function(include_all_source_ExecutionGraph
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/ITask.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Log.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/MetaVisit.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/MyContainerTypeDefs.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/MyMatrixTypeDefs.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Platform.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/SfinaeMacros.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/common/Singleton.hpp

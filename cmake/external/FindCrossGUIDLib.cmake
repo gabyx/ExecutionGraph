@@ -1,7 +1,7 @@
 # Try to find the crossguid Library Library 
 include(FindPackageHandleStandardArgs)
 
-set(URL "https://github.com/gabyx/crossguid.git")
+set(URL "https://github.com/graeme-hill/crossguid.git")
 set(INSTALL_DIR "${ExecutionGraph_EXTERNAL_INSTALL_DIR}/crossguid")
 
 message(STATUS "crossguid library finding ...")
@@ -21,7 +21,6 @@ if(${USE_SUPERBUILD})
                             UPDATE_DISCONNECTED  ON
                             CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                                        "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-                                       "-DCMAKE_CXX_STANDARD=17"
                                        "-DCMAKE_BUILD_TYPE=Release" 
                                        "-DCMAKE_VERBOSE_MAKEFILE=ON" 
                                        "-DCROSSGUID_TESTS=OFF" 

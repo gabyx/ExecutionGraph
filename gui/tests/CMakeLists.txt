@@ -24,7 +24,9 @@ function(defineCompileDefs target addLibs addTest)
     target_link_libraries(${target} PRIVATE ExecutionGraph::CoreForTests ExecutionGraph::Serialization gtest gmock_main ${addLibs})
     add_dependencies(build_and_test ${target})
 
-    cotire(${target})
+     if(${ExecutionGraph_SETUP_COTIRE_TARGETS}) 
+        cotire(${target})
+    endif()
 
     print_target_properties(${target})
 

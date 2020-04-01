@@ -62,8 +62,10 @@ function(defineCompileDefs target)
         target_compile_options(${target} PRIVATE /DExecutionGraph_BUILD_TESTS )
     endif()
 
-    cotire(${target})
-
+    if(${ExecutionGraph_SETUP_COTIRE_TARGETS}) 
+        cotire(${target})
+    endif()
+    
     print_target_properties(${target})
 
     add_test(NAME ${target} COMMAND ${target})

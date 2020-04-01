@@ -32,7 +32,9 @@ function(defineCompileDefs target)
     target_link_libraries(${target} PRIVATE ExecutionGraph::CoreForTests gtest gmock_main)
     add_dependencies(build_and_test ${target})
 
-    cotire(${target})
+     if(${ExecutionGraph_SETUP_COTIRE_TARGETS}) 
+        cotire(${target})
+    endif()
 
     print_target_properties(${target})
 

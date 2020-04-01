@@ -23,6 +23,15 @@ namespace executionGraph
     template<typename>
     class LogicNodeData;
 
+    /* ---------------------------------------------------------------------------------------*/
+    /*!
+        Base class for any data node.
+
+        @date Wed Apr 01 2020
+        @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+    */
+    /* ---------------------------------------------------------------------------------------*/
+
     class LogicNodeDataBase
     {
         template<typename>
