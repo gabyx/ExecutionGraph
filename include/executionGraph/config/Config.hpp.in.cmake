@@ -56,9 +56,9 @@ namespace executionGraph{
     #cmakedefine ExecutionGraph_THROW_IF_NODE_DATA_NO_STORAGE
     #ifdef ExecutionGraph_THROW_IF_NODE_DATA_NO_STORAGE
         #define EG_THROW_IF_NODE_DATA_NO_STORAGE
-        static const bool throwIfNodeDataNoStorage = true;
+        static const bool throwIfSocketDataNoStorage = true;
     #else
-        static const bool throwIfNodeDataNoStorage = false;
+        static const bool throwIfSocketDataNoStorage = false;
     #endif
 
     #cmakedefine ExecutionGraph_HAS_RTTR

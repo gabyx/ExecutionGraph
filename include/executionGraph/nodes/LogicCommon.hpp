@@ -19,11 +19,11 @@
 #include "executionGraph/common/SfinaeMacros.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 
-#define EG_DEFINE_TYPES()                           \
-    using NodeId      = executionGraph::NodeId;     \
-    using NodeDataId  = executionGraph::NodeDataId; \
-    using IndexType   = executionGraph::IndexType;  \
-    using SocketIndex = executionGraph::SocketIndex
+#define EG_DEFINE_TYPES()                              \
+    using NodeId       = executionGraph::NodeId;       \
+    using SocketDataId = executionGraph::SocketDataId; \
+    using IndexType    = executionGraph::IndexType;    \
+    using SocketIndex  = executionGraph::SocketIndex
 
 namespace executionGraph
 {
@@ -42,22 +42,22 @@ namespace executionGraph
     template<typename Config, typename Derived>
     class LogicSocketConnections;
 
-    using IndexType  = uint64_t;   //! A general index type.
-    using NodeId     = IndexType;  //! Node Id type.
-    using NodeDataId = IndexType;  //! DataNode Id type.
+    using IndexType    = uint64_t;   //! A general index type.
+    using NodeId       = IndexType;  //! Node Id type.
+    using SocketDataId = IndexType;  //! DataNode Id type.
 
-    static constexpr NodeId nodeIdInvalid         = std::numeric_limits<IndexType>::max();
-    static constexpr NodeDataId nodeDataIdInvalid = std::numeric_limits<IndexType>::max();
+    static constexpr NodeId nodeIdInvalid             = std::numeric_limits<IndexType>::max();
+    static constexpr SocketDataId socketDataIdInvalid = std::numeric_limits<IndexType>::max();
 
     using SocketIndex = IndexType;  //! The socket index type.
 
-    class LogicNodeDataBase;
-    
+    class LogicSocketDataBase;
+
     template<typename Data>
-    class LogicNodeData;
+    class LogicSocketData;
 
     template<typename ConnectionTraits, typename Derived>
-    class LogicNodeDataConnections;
+    class LogicSocketDataConnections;
     //@}
 
     /*! Forward declarations of user-defined types (@todo make available). 
@@ -67,14 +67,14 @@ namespace executionGraph
     template<typename TData>
     struct ConnectionTraits
     {
-        using Data                   = TData;
-        using InputSocket            = LogicSocketInput<Data>;
-        using OutputSocket           = LogicSocketOutput<Data>;
-        using InputSocketConnection  = LogicSocketConnections<ConnectionTraits, InputSocket>;
-        using OutputSocketConnection = LogicSocketConnections<ConnectionTraits, OutputSocket>;
+        using Data                    = TData;
+        using InputSocket             = LogicSocketInput<Data>;
+        using OutputSocket            = LogicSocketOutput<Data>;
+        using InputSocketConnections  = LogicSocketConnections<ConnectionTraits, InputSocket>;
+        using OutputSocketConnections = LogicSocketConnections<ConnectionTraits, OutputSocket>;
 
-        using NodeData            = LogicNodeData<Data>;
-        using NodeDataConnections = LogicNodeDataConnections<ConnectionTraits, LogicNodeData<Data>>;
+        using SocketData            = LogicSocketData<Data>;
+        using SocketDataConnections = LogicSocketDataConnections<ConnectionTraits, SocketData>;
     };
     //@}
 

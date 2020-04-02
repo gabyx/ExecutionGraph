@@ -61,7 +61,7 @@ namespace executionGraph{
         + castToType<T>() -> LogicSocketOutput<T>
     }
 
-    class LogicNodeData<Data>{
+    class LogicSocketData<Data>{
         + dataHandle() [const]
         + dataHandleConst()
 
@@ -76,13 +76,13 @@ namespace executionGraph{
         - Connections m_connections
     } 
 
-    class LogicNodeDataRef<Args...>{
-        + setReference(nodeData)
+    class LogicSocketDataRef<Args...>{
+        + setReference(socketData)
         --
-        - LogicNodeData<Args>* m_nodeData
+        - LogicSocketData<Args>* m_socketData
     } 
 
-    class LogicNodeDataBase{
+    class LogicSocketDataBase{
 
     }
 }
@@ -94,8 +94,8 @@ executionGraph::LogicSocketOutput -up-|> executionGraph::LogicSocketOutputBase
 
 executionGraph::LogicSocketInputBase -up-|> executionGraph::LogicSocketBase
 executionGraph::LogicSocketOutputBase -up-|> executionGraph::LogicSocketBase
-executionGraph::LogicSocketBase -[hidden]-> executionGraph::LogicNodeData
-executionGraph::LogicSocketBase -up[hidden]-> executionGraph::LogicNodeData
+executionGraph::LogicSocketBase -[hidden]-> executionGraph::LogicSocketData
+executionGraph::LogicSocketBase -up[hidden]-> executionGraph::LogicSocketData
 
 
 DummyNode "*" *-up- executionGraph::LogicSocketInput
@@ -103,11 +103,11 @@ DummyNode "*" *-up- executionGraph::LogicSocketOutput
 
 executionGraph::LogicSocketBase "1" *-down- executionGraph::LogicNode
 
-executionGraph::LogicNodeData -up-|>  executionGraph::LogicNodeDataBase
+executionGraph::LogicSocketData -up-|>  executionGraph::LogicSocketDataBase
 
-executionGraph::LogicNodeData "*" *-down- executionGraph::LogicSocketInputBase
-executionGraph::LogicNodeData "*" *-down- executionGraph::LogicSocketOutputBase
+executionGraph::LogicSocketData "*" *-down- executionGraph::LogicSocketInputBase
+executionGraph::LogicSocketData "*" *-down- executionGraph::LogicSocketOutputBase
 
-executionGraph::LogicNodeData -right-* "1" executionGraph::LogicNodeDataRef
+executionGraph::LogicSocketData -right-* "1" executionGraph::LogicSocketDataRef
 
 @enduml

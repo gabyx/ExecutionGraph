@@ -25,8 +25,8 @@
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 #include "executionGraph/nodes/LogicNode.hpp"
-#include "executionGraph/nodes/LogicNodeDataBase.hpp"
 #include "executionGraph/nodes/LogicSocketBase.hpp"
+#include "executionGraph/nodes/LogicSocketDataBase.hpp"
 #include "executionGraph/nodes/LogicSocketDescription.hpp"
 
 namespace executionGraph
@@ -35,10 +35,10 @@ namespace executionGraph
     class LogicSocketConnections
     {
     public:
-        using NodeData            = typename TTraits::NodeData;
-        using NodeDataConnections = typename TTraits::NodeDataConnections;
+        using SocketData            = typename TTraits::SocketData;
+        using SocketDataConnections = typename TTraits::SocketDataConnections;
 
-        friend NodeDataConnections;
+        friend SocketDataConnections;
 
     public:
         explicit LogicSocketConnections(Parent& parent) noexcept
@@ -65,7 +65,7 @@ namespace executionGraph
             m_parent = &parent;
         }
         //! Connect a data node.
-        void connect(NodeDataConnections& connections) noexcept
+        void connect(SocketDataConnections& connections) noexcept
         {
             disconnect();
             onConnect(connections);
@@ -82,11 +82,11 @@ namespace executionGraph
             }
         }
 
-        NodeData* nodeData()
+        SocketData* socketData()
         {
             return isConnected() ? &m_connections->parent() : nullptr;
         }
-        const NodeData* nodeData() const { return const_cast<LogicSocketConnections&>(*this).nodeData(); }
+        const SocketData* socketData() const { return const_cast<LogicSocketConnections&>(*this).socketData(); }
 
         bool isConnected() const { return m_connections != nullptr; }
 
@@ -94,9 +94,9 @@ namespace executionGraph
         Parent& parent() { return *m_parent; }
         const Parent& parent() const { return *m_parent; }
 
-        void onConnect(const NodeDataConnections& nodeData) noexcept
+        void onConnect(const SocketDataConnections& socketData) noexcept
         {
-            m_connections = const_cast<NodeDataConnections*>(&nodeData);
+            m_connections = const_cast<SocketDataConnections*>(&socketData);
         }
 
         void onDisconnect() noexcept
@@ -105,8 +105,8 @@ namespace executionGraph
         }
 
     private:
-        NodeDataConnections* m_connections = nullptr;  //! Connected data node.
-        Parent* m_parent                   = nullptr;
+        SocketDataConnections* m_connections = nullptr;  //! Connected data node.
+        Parent* m_parent                     = nullptr;
     };
 
     /* ---------------------------------------------------------------------------------------*/
@@ -124,7 +124,7 @@ namespace executionGraph
         EG_DEFINE_TYPES();
         using Base        = LogicSocketInputBase;
         using Data        = TData;
-        using Connections = ConnectionTraits<Data>::InputSocketConnection;
+        using Connections = ConnectionTraits<Data>::InputSocketConnections;
 
     public:
         template<typename... Args>
@@ -153,19 +153,19 @@ namespace executionGraph
         auto dataHandle() const
         {
             EG_ASSERT(m_connections.isConnected(), "Socket not connected");
-            return m_connections.nodeData()->dataHandleConst();
+            return m_connections.socketData()->dataHandleConst();
         }
         auto dataHandle()
         {
             EG_ASSERT_MSG(m_connections.isConnected(), "Socket not connected");
-            return m_connections.nodeData()->dataHandleConst();
+            return m_connections.socketData()->dataHandleConst();
         }
 
     public:
         template<typename T>
-        void connect(T& nodeData)
+        void connect(T& socketData)
         {
-            m_connections.connect(nodeData.connections());
+            m_connections.connect(socketData.connections());
         }
 
         void disconnect() noexcept override
@@ -205,7 +205,7 @@ namespace executionGraph
         EG_DEFINE_TYPES();
         using Base        = LogicSocketOutputBase;
         using Data        = TData;
-        using Connections = ConnectionTraits<Data>::OutputSocketConnection;
+        using Connections = ConnectionTraits<Data>::OutputSocketConnections;
 
     public:
         template<typename... Args>
@@ -234,19 +234,19 @@ namespace executionGraph
         auto dataHandle() const
         {
             EG_ASSERT(m_connections.isConnected(), "Socket not connected");
-            return m_connections.nodeData()->dataHandleConst();
+            return m_connections.socketData()->dataHandleConst();
         }
         auto dataHandle()
         {
             EG_ASSERT(m_connections.isConnected(), "Socket not connected");
-            return m_connections.nodeData()->dataHandle();
+            return m_connections.socketData()->dataHandle();
         }
 
     public:
         template<typename T>
-        void connect(T& nodeData)
+        void connect(T& socketData)
         {
-            m_connections.connect(nodeData.connections());
+            m_connections.connect(socketData.connections());
         }
 
         void disconnect() noexcept override

@@ -11,10 +11,10 @@
 // =========================================================================================
 
 //#include <executionGraph/nodes/LogicNode.hpp>
-#include <executionGraph/common/TupleUtil.hpp>
-#include <executionGraph/nodes/LogicNodeData.hpp>
-#include <executionGraph/nodes/LogicSocket.hpp>
 #include <executionGraph/common/Exception.hpp>
+#include <executionGraph/common/TupleUtil.hpp>
+#include <executionGraph/nodes/LogicSocket.hpp>
+#include <executionGraph/nodes/LogicSocketData.hpp>
 #include "DummyNode.hpp"
 #include "TestFunctions.hpp"
 
@@ -23,13 +23,13 @@ using namespace executionGraph;
 MY_TEST(Node_Test, Int_Int)
 {
     // Integer node connection (wrong connection)
-    LogicNodeData<int> i0(0, 0);
-    LogicNodeData<float> i1(1, 0.f);
-    LogicNodeData<double> i2(2, 0.0);
+    LogicSocketData<int> i0(0, 0);
+    LogicSocketData<float> i1(1, 0.f);
+    LogicSocketData<double> i2(2, 0.0);
 
-    LogicNodeData<int> o0(0, 2);
-    LogicNodeData<float> o1(1, 2.0f);
-    LogicNodeData<double> o2(2, 2.0);
+    LogicSocketData<int> o0(0, 2);
+    LogicSocketData<float> o1(1, 2.0f);
+    LogicSocketData<double> o2(2, 2.0);
 
     DummyNode node1(1);
     node1.socket<node1.in0Decl>().connect(i0);
@@ -48,14 +48,14 @@ MY_TEST(Node_Test, Int_Int)
 MY_TEST(Node_Test, Wrong_Connections)
 {
     // Integer node connection (wrong connection)
-    LogicNodeData<int> i(0);
+    LogicSocketData<int> i(0);
     DummyNode node(0);
 
-    LogicNode* n = &node;
+    LogicNode* n          = &node;
     bool catchedException = false;
     try
     {
-        n->output(1)->connect(i); // Wrong connection.
+        n->output(1)->connect(i);  // Wrong connection.
     }
     catch(NodeConnectionException&)
     {

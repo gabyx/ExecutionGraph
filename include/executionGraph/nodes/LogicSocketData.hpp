@@ -20,19 +20,19 @@
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 #include "executionGraph/nodes/LogicDataHandle.hpp"
-#include "executionGraph/nodes/LogicNodeDataBase.hpp"
 #include "executionGraph/nodes/LogicSocketBase.hpp"
+#include "executionGraph/nodes/LogicSocketDataBase.hpp"
 
 namespace executionGraph
 {
     template<typename TTraits, typename Parent>
-    class LogicNodeDataConnections
+    class LogicSocketDataConnections
     {
     public:
-        using InputSocket            = typename TTraits::InputSocket;
-        using OutputSocket           = typename TTraits::OutputSocket;
-        using InputSocketConnection  = typename TTraits::InputSocketConnection;
-        using OutputSocketConnection = typename TTraits::OutputSocketConnection;
+        using InputSocket             = typename TTraits::InputSocket;
+        using OutputSocket            = typename TTraits::OutputSocket;
+        using InputSocketConnections  = typename TTraits::InputSocketConnections;
+        using OutputSocketConnections = typename TTraits::OutputSocketConnections;
 
     private:
         template<typename T>
@@ -40,14 +40,14 @@ namespace executionGraph
         template<typename T>
         static constexpr bool isOutputConnection = std::is_base_of_v<OutputSocket, T>;
 
-        friend InputSocketConnection;
-        friend OutputSocketConnection;
+        friend InputSocketConnections;
+        friend OutputSocketConnections;
 
     public:
-        explicit LogicNodeDataConnections(Parent& parent) noexcept
+        explicit LogicSocketDataConnections(Parent& parent) noexcept
             : m_parent(&parent){};
 
-        ~LogicNodeDataConnections() noexcept
+        ~LogicSocketDataConnections() noexcept
         {
             for(auto* socket : m_inputs)
             {
@@ -59,14 +59,14 @@ namespace executionGraph
             }
         }
 
-        LogicNodeDataConnections(const LogicNodeDataConnections&) = delete;
-        LogicNodeDataConnections& operator=(const LogicNodeDataConnections&) = delete;
+        LogicSocketDataConnections(const LogicSocketDataConnections&) = delete;
+        LogicSocketDataConnections& operator=(const LogicSocketDataConnections&) = delete;
 
-        LogicNodeDataConnections(LogicNodeDataConnections&& other)
+        LogicSocketDataConnections(LogicSocketDataConnections&& other)
         {
             // Connections are not  moved!
         }
-        LogicNodeDataConnections& operator=(LogicNodeDataConnections&& other) = delete;
+        LogicSocketDataConnections& operator=(LogicSocketDataConnections&& other) = delete;
 
     public:
         void init(Parent& parent)
@@ -163,7 +163,7 @@ namespace executionGraph
     };
 
     template<typename...>
-    class LogicNodeDataRef;
+    class LogicSocketDataRef;
 
     /* ---------------------------------------------------------------------------------------*/
     /*!
@@ -176,12 +176,12 @@ namespace executionGraph
     */
     /* ---------------------------------------------------------------------------------------*/
     template<typename TData>
-    class LogicNodeData final : public LogicNodeDataBase
+    class LogicSocketData final : public LogicSocketDataBase
     {
     public:
         using Data            = TData;
-        using Base            = LogicNodeDataBase;
-        using Connections     = ConnectionTraits<TData>::NodeDataConnections;
+        using Base            = LogicSocketDataBase;
+        using Connections     = ConnectionTraits<TData>::SocketDataConnections;
         using DataHandle      = LogicDataHandle<Data>;
         using DataHandleConst = LogicDataHandle<const Data>;
 
@@ -191,21 +191,21 @@ namespace executionGraph
         using InputSocket  = typename ConnectionTraits<Data>::InputSocket;
         using OutputSocket = typename ConnectionTraits<Data>::OutputSocket;
 
-        using Reference = LogicNodeDataRef<Data>;
+        using Reference = LogicSocketDataRef<Data>;
 
         friend Reference;
 
     public:
         template<typename... Args>
-        LogicNodeData(NodeDataId id,
-                      Args&&... args) noexcept
+        LogicSocketData(SocketDataId id,
+                        Args&&... args) noexcept
             : Base(rttr::type::get<Data>(), id)
             , m_data{std::forward<Args>(args)...}
             , m_connections(*this)
         {
         }
 
-        ~LogicNodeData() noexcept
+        ~LogicSocketData() noexcept
         {
             for(auto* ref : m_refs)
             {
@@ -214,24 +214,24 @@ namespace executionGraph
         };
 
         //! Copy allowed
-        LogicNodeData(const LogicNodeData& other)
+        LogicSocketData(const LogicSocketData& other)
             : m_connections(*this)
         {
             *this = other;
         };
-        LogicNodeData& operator=(const LogicNodeData& other)
+        LogicSocketData& operator=(const LogicSocketData& other)
         {
             Base::operator=(other);
             m_data        = other.m_data;
         }
 
         //! Move allowed
-        LogicNodeData(LogicNodeData&& other)
+        LogicSocketData(LogicSocketData&& other)
             : m_connections(*this)
         {
             *this = std::move(other);
         };
-        LogicNodeData& operator=(LogicNodeData&& other)
+        LogicSocketData& operator=(LogicSocketData&& other)
         {
             Base::operator=(std::move(other));
             m_data        = std::move(other.m_data);
@@ -292,7 +292,7 @@ namespace executionGraph
             catch(BadSocketCastException&)
             {
                 EG_THROW_TYPE(NodeConnectionException,
-                              "{0} failed from socket index '{1}' [{2}] at node id '{3}'" 
+                              "{0} failed from socket index '{1}' [{2}] at node id '{3}'"
                               "to data node id '{4}' [{5}]",
                               socket.parent().id(),
                               socket.index(),
@@ -342,30 +342,30 @@ namespace executionGraph
     };
 
     template<typename... TArgs>
-    class LogicNodeDataRef final : public LogicNodeDataBase
+    class LogicSocketDataRef final : public LogicSocketDataBase
     {
     public:
-        using NodeData = LogicNodeData<TArgs...>;
-        using Data     = typename NodeData::Data;
+        using SocketData = LogicSocketData<TArgs...>;
+        using Data       = typename SocketData::Data;
 
-        using Base = LogicNodeDataBase;
+        using Base = LogicSocketDataBase;
 
-        using DataHandle      = typename NodeData::DataHandle;
-        using DataHandleConst = typename NodeData::DataHandleConst;
+        using DataHandle      = typename SocketData::DataHandle;
+        using DataHandleConst = typename SocketData::DataHandleConst;
 
         static_assert(!std::is_const_v<Data> && !std::is_reference_v<Data>,
                       "Only non-const non-reference types allowed!");
 
-        friend NodeData;
+        friend SocketData;
 
     public:
         template<typename... Args>
-        LogicNodeDataRef(Args&&... args) noexcept
+        LogicSocketDataRef(Args&&... args) noexcept
             : Base(rttr::type::get<Data>(), std::forward<Args>(args)...)
         {
         }
 
-        ~LogicNodeDataRef() noexcept
+        ~LogicSocketDataRef() noexcept
         {
             removeReference();
         }
@@ -380,13 +380,13 @@ namespace executionGraph
         }
 
     public:
-        void setReference(const NodeData& node) noexcept
+        void setReference(const SocketData& node) noexcept
         {
             if(m_node)
             {
                 m_node->onRemoveReference(*this);
             }
-            m_node = &const_cast<NodeData&>(node);
+            m_node = &const_cast<SocketData&>(node);
             m_node->onSetReference(*this);
         }
 
@@ -406,6 +406,6 @@ namespace executionGraph
         }
 
     private:
-        NodeData* m_node = nullptr;
+        SocketData* m_node = nullptr;
     };
 }  // namespace executionGraph

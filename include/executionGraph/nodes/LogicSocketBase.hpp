@@ -109,10 +109,10 @@ namespace executionGraph
 
     public:
         template<typename T,
-                 EG_ENABLE_IF(std::is_base_of_v<LogicNodeDataBase, naked<T>>)>
-        void connect(T& nodeData) noexcept(false)
+                 EG_ENABLE_IF(std::is_base_of_v<LogicSocketDataBase, naked<T>>)>
+        void connect(T& socketData) noexcept(false)
         {
-            nodeData.connect(*this);
+            socketData.connect(*this);
         }
 
         virtual void disconnect() noexcept = 0;
@@ -167,10 +167,10 @@ namespace executionGraph
 
     public:
         template<typename T,
-                 EG_ENABLE_IF(std::is_base_of_v<LogicNodeDataBase, naked<T>>)>
-        void connect(T& nodeData) noexcept(false)
+                 EG_ENABLE_IF(std::is_base_of_v<LogicSocketDataBase, naked<T>>)>
+        void connect(T& socketData) noexcept(false)
         {
-            nodeData.connect(*this);
+            socketData.connect(*this);
         }
 
         virtual void disconnect() noexcept = 0;

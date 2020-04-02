@@ -51,7 +51,7 @@ namespace executionGraph
                                                             | DerivedNode : LogcNode         |
                                                             |                                |
        +------------------+                     +----------------------+        +-----------------------+                     +------------------+
-       | LogicNodeData<T> | <-- Connection ---  | LogicSocketInput<T>  |        | LogicSocketOutput<T>  |  --- Connection --> | LogicNodeData<T> | 
+       | LogicSocketData<T> | <-- Connection ---  | LogicSocketInput<T>  |        | LogicSocketOutput<T>  |  --- Connection --> | LogicSocketData<T> | 
        +------------------+                     +----------------------+        +-----------------------+                     +------------------+
                                                             |                                |
                                                            ...                              ...

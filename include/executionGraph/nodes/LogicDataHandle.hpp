@@ -39,7 +39,7 @@ namespace executionGraph
         using RawData = std::remove_const_t<Data>;
 
     private:
-        friend class LogicNodeData<RawData>;
+        friend class LogicSocketData<RawData>;
 
     private:
         template<typename T>
