@@ -4,7 +4,7 @@
         "EditorConfig.editorconfig",
         "eamodio.gitlens",
         "cschlosser.doxdocgen"
-        "vector-of-bool.cmake-tools",
+        "ms-vscode.cmake-tools",
         "twxs.cmake",
         "msjsdiag.debugger-for-chrome",
         "joelday.docthis",

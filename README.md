@@ -112,8 +112,8 @@ This project supports [Visual Studio Code](https://code.visualstudio.com/) which
 If you start developing, install the pre-commit/post-commit hooks with:
 ```bash
 sudo npm install -g json-fmt xmllint prettier
-sudo apt-get install plantuml # or sudo brew install plantuml
-cd .git && mv hooks hooks.old && ln -s ../tools/git-hooks hooks
+sudo apt install plantuml # or sudo brew install plantuml
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/rycus86/githooks/master/install.sh)"
 ```
 
 ### Codeformatting

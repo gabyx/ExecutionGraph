@@ -31,4 +31,5 @@ function makeUMLs() {
 }
 
 makeUMLs "$1" "$REPO_DIR/gui"
+makeUMLs "$1" "$REPO_DIR/docs"
 

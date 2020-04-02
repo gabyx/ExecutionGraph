@@ -1,0 +1,113 @@
+
+@startuml core
+set namespaceSeparator ::
+skinparam shadowing false
+skinparam defaultFontName "Fira Code"
+
+class DummyNode{
+    --  In/Out Declerations --
+    + inDecls
+    + outDecls
+    -- Sockets --
+    - m_inSockets
+    - m_outSockets
+}
+
+namespace executionGraph{
+
+    class LogicNode{
+        + init()
+        + reset()
+        + compute()
+
+        + registerInputs(...)
+        + registerOutputs(...)
+        --
+        - m_inputs
+        - m_outputs
+    }
+
+    class LogicSocketInput<Data> {
+        + dataHandle() [const]
+        + connect(...)
+        + disconnect()
+
+        + connections() [const]
+        --
+        - Connections m_connections
+    }
+
+    class LogicSocketOutput<Data> {
+        + dataHandle() [const]
+        + connect(...)
+        + disconnect()
+
+        + connections() [const]
+        --
+        - Connections m_connections
+    }
+
+    class LogicSocketBase {
+        + type()
+        + index()
+        + parent()
+    }
+
+    class LogicSocketInputBase {
+        + castToType<T>() -> LogicSocketInput<T>
+    }
+
+    class LogicSocketOutputBase {
+        + castToType<T>() -> LogicSocketOutput<T>
+    }
+
+    class LogicNodeData<Data>{
+        + dataHandle() [const]
+        + dataHandleConst()
+
+        + connect(inputSocket)
+        + disconnect(inputSocket)
+        + connect(outputSocket)
+        + disconnect(outputSocket)
+
+        + connections() [const]
+        --
+        - Data m_data
+        - Connections m_connections
+    } 
+
+    class LogicNodeDataRef<Args...>{
+        + setReference(nodeData)
+        --
+        - LogicNodeData<Args>* m_nodeData
+    } 
+
+    class LogicNodeDataBase{
+
+    }
+}
+
+DummyNode -up-|> executionGraph::LogicNode
+
+executionGraph::LogicSocketInput -up-|> executionGraph::LogicSocketInputBase
+executionGraph::LogicSocketOutput -up-|> executionGraph::LogicSocketOutputBase
+
+executionGraph::LogicSocketInputBase -up-|> executionGraph::LogicSocketBase
+executionGraph::LogicSocketOutputBase -up-|> executionGraph::LogicSocketBase
+executionGraph::LogicSocketBase -[hidden]-> executionGraph::LogicNodeData
+executionGraph::LogicSocketBase -up[hidden]-> executionGraph::LogicNodeData
+
+
+DummyNode "*" *-up- executionGraph::LogicSocketInput
+DummyNode "*" *-up- executionGraph::LogicSocketOutput
+
+executionGraph::LogicSocketBase "1" *-down- executionGraph::LogicNode
+
+executionGraph::LogicNodeData -up-|>  executionGraph::LogicNodeDataBase
+
+executionGraph::LogicNodeData "*" *-down- executionGraph::LogicSocketInputBase
+executionGraph::LogicNodeData "*" *-down- executionGraph::LogicSocketOutputBase
+
+executionGraph::LogicNodeData -right-* "1" executionGraph::LogicNodeDataRef
+
+@enduml
