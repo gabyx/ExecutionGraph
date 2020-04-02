@@ -29,8 +29,6 @@ namespace executionGraph{
 
     class LogicSocketInput<Data> {
         + dataHandle() [const]
-        + connect(...)
-        + disconnect()
 
         + connections() [const]
         --
@@ -39,8 +37,6 @@ namespace executionGraph{
 
     class LogicSocketOutput<Data> {
         + dataHandle() [const]
-        + connect(...)
-        + disconnect()
 
         + connections() [const]
         --
@@ -61,14 +57,29 @@ namespace executionGraph{
         + castToType<T>() -> LogicSocketOutput<T>
     }
 
+    class LogicSocketConnections<Traits, ParentSocket>{
+        Connection for input/output sockets
+        --
+        + connect(socketData)
+        + disconnect(socketData)
+        --
+        SocketDataConnections* m_connections
+        Parent* m_parent
+    }
+
+    class LogicSocketDataConnections<Traits, ParentSocket>{
+        Connection for data sockets
+        --
+        + connect(socket)
+        + disconnect(socket)
+        --
+        m_inputs
+        m_outputs
+    }
+
     class LogicSocketData<Data>{
         + dataHandle() [const]
         + dataHandleConst()
-
-        + connect(inputSocket)
-        + disconnect(inputSocket)
-        + connect(outputSocket)
-        + disconnect(outputSocket)
 
         + connections() [const]
         --
@@ -101,13 +112,18 @@ executionGraph::LogicSocketBase -up[hidden]-> executionGraph::LogicSocketData
 DummyNode "*" *-up- executionGraph::LogicSocketInput
 DummyNode "*" *-up- executionGraph::LogicSocketOutput
 
-executionGraph::LogicSocketBase "1" *-down- executionGraph::LogicNode
+executionGraph::LogicSocketBase "1" o-down- executionGraph::LogicNode
 
 executionGraph::LogicSocketData -up-|>  executionGraph::LogicSocketDataBase
 
-executionGraph::LogicSocketData "*" *-down- executionGraph::LogicSocketInputBase
-executionGraph::LogicSocketData "*" *-down- executionGraph::LogicSocketOutputBase
+executionGraph::LogicSocketData "*" o-down- executionGraph::LogicSocketInputBase
+executionGraph::LogicSocketData "*" o-down- executionGraph::LogicSocketOutputBase
 
-executionGraph::LogicSocketData -right-* "1" executionGraph::LogicSocketDataRef
+executionGraph::LogicSocketData -right-o "1" executionGraph::LogicSocketDataRef
 
+
+executionGraph::LogicSocketInput "1" *-- executionGraph::LogicSocketConnections
+executionGraph::LogicSocketOutput "1" *-- executionGraph::LogicSocketConnections
+
+executionGraph::LogicSocketData "1" *-right- executionGraph::LogicSocketDataConnections
 @enduml
