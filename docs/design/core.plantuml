@@ -67,31 +67,35 @@ namespace executionGraph{
         Parent* m_parent
     }
 
-    class LogicSocketDataConnections<Traits, ParentSocket>{
-        Connection for data sockets
-        --
-        + connect(socket)
-        + disconnect(socket)
-        --
-        m_inputs
-        m_outputs
+    namespace userData{
+        class LogicSocketDataConnections<Traits, ParentSocket>{
+            Connection for data sockets
+            --
+            + connect(socket)
+            + disconnect(socket)
+            --
+            m_inputs
+            m_outputs
+        }
+
+        class LogicSocketData<Data>{
+            + dataHandle() [const]
+            + dataHandleConst()
+
+            + connections() [const]
+            --
+            - Data m_data
+            - Connections m_connections
+        }
+
+
+        class LogicSocketDataRef<Args...>{
+            + setReference(socketData)
+            --
+            - LogicSocketData<Args>* m_socketData
+        }
+
     }
-
-    class LogicSocketData<Data>{
-        + dataHandle() [const]
-        + dataHandleConst()
-
-        + connections() [const]
-        --
-        - Data m_data
-        - Connections m_connections
-    } 
-
-    class LogicSocketDataRef<Args...>{
-        + setReference(socketData)
-        --
-        - LogicSocketData<Args>* m_socketData
-    } 
 
     class LogicSocketDataBase{
 
@@ -105,25 +109,24 @@ executionGraph::LogicSocketOutput -up-|> executionGraph::LogicSocketOutputBase
 
 executionGraph::LogicSocketInputBase -up-|> executionGraph::LogicSocketBase
 executionGraph::LogicSocketOutputBase -up-|> executionGraph::LogicSocketBase
-executionGraph::LogicSocketBase -[hidden]-> executionGraph::LogicSocketData
-executionGraph::LogicSocketBase -up[hidden]-> executionGraph::LogicSocketData
+executionGraph::LogicSocketBase -[hidden]-> executionGraph::userData::LogicSocketData
+executionGraph::LogicSocketBase -up[hidden]-> executionGraph::userData::LogicSocketData
 
 
 DummyNode "*" *-up- executionGraph::LogicSocketInput
 DummyNode "*" *-up- executionGraph::LogicSocketOutput
 
-executionGraph::LogicSocketBase "1" o-down- executionGraph::LogicNode
-
-executionGraph::LogicSocketData -up-|>  executionGraph::LogicSocketDataBase
-
-executionGraph::LogicSocketData "*" o-down- executionGraph::LogicSocketInputBase
-executionGraph::LogicSocketData "*" o-down- executionGraph::LogicSocketOutputBase
-
-executionGraph::LogicSocketData -right-o "1" executionGraph::LogicSocketDataRef
-
-
 executionGraph::LogicSocketInput "1" *-- executionGraph::LogicSocketConnections
 executionGraph::LogicSocketOutput "1" *-- executionGraph::LogicSocketConnections
 
-executionGraph::LogicSocketData "1" *-right- executionGraph::LogicSocketDataConnections
+executionGraph::LogicSocketBase "1" o-down- executionGraph::LogicNode
+
+executionGraph::userData::LogicSocketData -up-|> executionGraph::LogicSocketDataBase
+executionGraph::userData::LogicSocketDataConnections "*" o-down- executionGraph::LogicSocketInputBase
+executionGraph::userData::LogicSocketDataConnections "*" o-down- executionGraph::LogicSocketOutputBase
+executionGraph::userData::LogicSocketData -right-o "1" executionGraph::userData::LogicSocketDataRef
+executionGraph::userData::LogicSocketData "1" *-down- executionGraph::userData::LogicSocketDataConnections
+
+executionGraph::LogicSocketConnections "1" *-- executionGraph::userData::LogicSocketDataConnections : design-error
+
 @enduml
