@@ -218,5 +218,7 @@
     "**/buildExternal/**": true,
     "**/dist/**": true,
     "**/docs/demo/**": true
-  }
+  },
+  "plantuml.render": "PlantUMLServer",
+  "plantuml.server": "https://www.plantuml.com/plantuml"
 }

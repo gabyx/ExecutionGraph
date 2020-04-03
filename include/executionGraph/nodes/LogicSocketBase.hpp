@@ -51,10 +51,10 @@ namespace executionGraph
         ~LogicSocketBase() = default;
 
     public:
-        inline SocketIndex index() const noexcept { return m_index; }
-        inline const rttr::type& type() const noexcept { return m_type; }
+        SocketIndex index() const noexcept { return m_index; }
+        const rttr::type& type() const noexcept { return m_type; }
 
-        inline const LogicNode& parent() const noexcept { return *m_parent; }
+        const LogicNode& parent() const noexcept { return *m_parent; }
 
         template<typename T>
         bool isType() const noexcept

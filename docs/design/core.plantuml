@@ -4,6 +4,11 @@ set namespaceSeparator ::
 skinparam shadowing false
 skinparam defaultFontName "Fira Code"
 
+skinparam class{
+    BorderColor<< Connections >> Blue
+    BorderThickness<< Connections >> 3
+}
+
 class DummyNode{
     --  In/Out Declerations --
     + inDecls
@@ -57,7 +62,7 @@ namespace executionGraph{
         + castToType<T>() -> LogicSocketOutput<T>
     }
 
-    class LogicSocketConnections<Traits, ParentSocket>{
+    class LogicSocketConnections<Traits, ParentSocket> << Connections >>{
         Connection for input/output sockets
         --
         + connect(socketData)
@@ -68,7 +73,7 @@ namespace executionGraph{
     }
 
     namespace userData{
-        class LogicSocketDataConnections<Traits, ParentSocket>{
+        class LogicSocketDataConnections<Traits, ParentSocket> << Connections >> {
             Connection for data sockets
             --
             + connect(socket)
@@ -109,8 +114,11 @@ executionGraph::LogicSocketOutput -up-|> executionGraph::LogicSocketOutputBase
 
 executionGraph::LogicSocketInputBase -up-|> executionGraph::LogicSocketBase
 executionGraph::LogicSocketOutputBase -up-|> executionGraph::LogicSocketBase
-executionGraph::LogicSocketBase -[hidden]-> executionGraph::userData::LogicSocketData
-executionGraph::LogicSocketBase -up[hidden]-> executionGraph::userData::LogicSocketData
+executionGraph::LogicNode "*" o-up-> executionGraph::LogicSocketInputBase 
+executionGraph::LogicNode "*" o-up-> executionGraph::LogicSocketOutputBase 
+
+' executionGraph::LogicSocketBase -[hidden]-> executionGraph::userData::LogicSocketData
+' executionGraph::LogicSocketBase -up[hidden]-> executionGraph::userData::LogicSocketData
 
 
 DummyNode "*" *-up- executionGraph::LogicSocketInput
