@@ -65,8 +65,8 @@ namespace executionGraph
 
         //! Cast to a logic data node of type `LogicSocketData<T>*`.
         //! @throw if `doThrow` or `throwIfBadSocketCast` is `true`
-        template<typename T, bool doThrow = false>
-        auto& castToType() const noexcept(false)
+        template<typename T, bool doThrow = true>
+        auto& castToType() noexcept(!doThrow)
         {
             if constexpr(doThrow || throwIfSocketDataNoStorage)
             {
@@ -78,15 +78,15 @@ namespace executionGraph
                                rttr::type::get<T>().get_name());
             }
 
-            return static_cast<const LogicSocketData<T>&>(*this);
+            return static_cast<LogicSocketData<T>&>(*this);
         }
 
         //! Non-const overload.
-        template<typename T, bool doThrow = false>
-        auto& castToType() noexcept(false)
+        template<typename T, bool doThrow = true>
+        auto& castToType() const noexcept(!doThrow)
         {
-            return const_cast<LogicSocketData<T>&>(
-                static_cast<const LogicSocketDataBase*>(this)->castToType<T, doThrow>());
+            return static_cast<const LogicSocketData<T>&>(
+                const_cast<LogicSocketDataBase*>(this)->castToType<T, doThrow>());
         }
 
     public:

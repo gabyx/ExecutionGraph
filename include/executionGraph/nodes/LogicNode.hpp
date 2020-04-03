@@ -22,9 +22,6 @@
 
 namespace executionGraph
 {
-    class LogicSocketInputBase;
-    class LogicSocketOutputBase;
-
     /*!
         The execution node (node) class which is the base class
         for every node in an execution graph.

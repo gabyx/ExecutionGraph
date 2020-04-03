@@ -48,18 +48,11 @@ namespace executionGraph{
         - Connections m_connections
     }
 
-    class LogicSocketBase {
+    class LogicSocketBase<IsInput> {
         + type()
         + index()
         + parent()
-    }
-
-    class LogicSocketInputBase {
-        + castToType<T>() -> LogicSocketInput<T>
-    }
-
-    class LogicSocketOutputBase {
-        + castToType<T>() -> LogicSocketOutput<T>
+        + castToType<T>()
     }
 
     class LogicSocketConnections<Traits, ParentSocket> << Connections >>{
@@ -109,13 +102,10 @@ namespace executionGraph{
 
 DummyNode -up-|> executionGraph::LogicNode
 
-executionGraph::LogicSocketInput -up-|> executionGraph::LogicSocketInputBase
-executionGraph::LogicSocketOutput -up-|> executionGraph::LogicSocketOutputBase
+executionGraph::LogicSocketInput -up-|> executionGraph::LogicSocketBase
+executionGraph::LogicSocketOutput -up-|> executionGraph::LogicSocketBase
 
-executionGraph::LogicSocketInputBase -up-|> executionGraph::LogicSocketBase
-executionGraph::LogicSocketOutputBase -up-|> executionGraph::LogicSocketBase
-executionGraph::LogicNode "*" o-up-> executionGraph::LogicSocketInputBase 
-executionGraph::LogicNode "*" o-up-> executionGraph::LogicSocketOutputBase 
+executionGraph::LogicNode "*" o-up- executionGraph::LogicSocketBase 
 
 ' executionGraph::LogicSocketBase -[hidden]-> executionGraph::userData::LogicSocketData
 ' executionGraph::LogicSocketBase -up[hidden]-> executionGraph::userData::LogicSocketData
@@ -130,8 +120,7 @@ executionGraph::LogicSocketOutput "1" *-- executionGraph::LogicSocketConnections
 executionGraph::LogicSocketBase "1" o-down- executionGraph::LogicNode
 
 executionGraph::userData::LogicSocketData -up-|> executionGraph::LogicSocketDataBase
-executionGraph::userData::LogicSocketDataConnections "*" o-down- executionGraph::LogicSocketInputBase
-executionGraph::userData::LogicSocketDataConnections "*" o-down- executionGraph::LogicSocketOutputBase
+executionGraph::userData::LogicSocketDataConnections "*" o-down- executionGraph::LogicSocketBase
 executionGraph::userData::LogicSocketData -right-o "1" executionGraph::userData::LogicSocketDataRef
 executionGraph::userData::LogicSocketData "1" *-down- executionGraph::userData::LogicSocketDataConnections
 

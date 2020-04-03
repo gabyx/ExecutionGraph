@@ -30,6 +30,7 @@ namespace executionGraph
     }  // namespace details
 
     //! The socket base class.
+    template<typename IsInput>
     class LogicSocketBase
     {
     public:
@@ -62,121 +63,55 @@ namespace executionGraph
             return type() == rttr::type::get<T>();
         }
 
-    protected:
-        rttr::type m_type;                    //!< The type of this socket.
-        SocketIndex m_index;                  //!< The index of the slot at which this socket is installed in a LogicNode.
-        const LogicNode* m_parent = nullptr;  //!< The parent node of of this socket.
-    };
-
-    //! The input socket base class.
-    class LogicSocketInputBase : public LogicSocketBase
-    {
     public:
-        EG_DEFINE_TYPES();
-
-    protected:
-        template<typename... Args>
-        LogicSocketInputBase(Args&&... args) noexcept
-            : LogicSocketBase(std::forward<Args>(args)...)
+        template<typename T,
+                 EG_ENABLE_IF(std::is_base_of_v<LogicSocketDataBase, naked<T>>)>
+        void connect(T& socketData) noexcept(false)
         {
+            socketData.connect(*this);
         }
 
-        virtual ~LogicSocketInputBase() noexcept = default;
+        virtual void disconnect() noexcept = 0;
+
+    public:
+        static constexpr bool isInput() { return IsInput::value; }
+        static constexpr bool isOutput() { return !IsInput::value; }
 
     public:
         //! Cast to a logic socket of type `LogicSocketInput<T>*`.
         //! @throw if `doThrow` or `throwIfBadSocketCast` is `true`
-        template<typename T, bool doThrow = false>
-        auto& castToType() const noexcept
+        template<typename Data, bool doThrow = true>
+        auto& castToType() noexcept(!doThrow)
         {
+            using Socket = meta::if_<IsInput,
+                                     LogicSocketInput<Data>,
+                                     LogicSocketOutput<Data>>;
+
             if constexpr(doThrow || throwIfBadSocketCast)
             {
-                details::throwSocketCast(!this->template isType<T>(),
+                details::throwSocketCast(!this->template isType<Data>(),
                                          *this,
-                                         rttr::type::get<T>());
+                                         rttr::type::get<Data>());
             }
-            return static_cast<const LogicSocketInput<T>&>(*this);
+            return static_cast<Socket&>(*this);
         }
 
         //! Non-const overload.
-        template<typename T, bool doThrow = false>
-        auto& castToType() noexcept
+        template<typename Data, bool doThrow = false>
+        auto& castToType() const noexcept(!doThrow)
         {
-            return const_cast<LogicSocketInput<T>&>(
-                static_cast<LogicSocketInputBase const*>(this)
-                    ->castToType<T, doThrow>());
+            using Socket = meta::if_<IsInput,
+                                     LogicSocketInput<Data>,
+                                     LogicSocketOutput<Data>>;
+
+            return const_cast<const Socket&>(
+                const_cast<LogicSocketBase*>(this)
+                    ->castToType<Data, doThrow>());
         }
-
-    public:
-        template<typename T,
-                 EG_ENABLE_IF(std::is_base_of_v<LogicSocketDataBase, naked<T>>)>
-        void connect(T& socketData) noexcept(false)
-        {
-            socketData.connect(*this);
-        }
-
-        virtual void disconnect() noexcept = 0;
-
-    public:
-        static constexpr bool isInput() { return true; }
-        static constexpr bool isOutput() { return false; }
-    };
-
-    //! The output socket base class.
-    class LogicSocketOutputBase : public LogicSocketBase
-    {
-    public:
-        EG_DEFINE_TYPES();
 
     protected:
-        template<typename... Args>
-        LogicSocketOutputBase(Args&&... args)
-            : LogicSocketBase(std::forward<Args>(args)...)
-        {
-        }
-
-        virtual ~LogicSocketOutputBase() noexcept = default;
-
-        LogicSocketOutputBase(LogicSocketOutputBase&&) = default;
-        LogicSocketOutputBase& operator=(LogicSocketOutputBase&&) = default;
-
-    public:
-        //! Cast to a logic socket of type `LogicSocketOutput`<T>*.
-        //! @throw if `doThrow` or `throwIfBadSocketCast` is `true`
-        template<typename T, bool doThrow = false>
-        auto& castToType() const noexcept(false)
-        {
-            if constexpr(doThrow || throwIfBadSocketCast)
-            {
-                details::throwSocketCast(!this->template isType<T>(),
-                                         *this,
-                                         rttr::type::get<T>());
-            }
-
-            return static_cast<const LogicSocketOutput<T>&>(*this);
-        }
-
-        //! Non-const overload.
-        template<typename T, bool doThrow = false>
-        auto& castToType() noexcept(false)
-        {
-            return const_cast<LogicSocketOutput<T>&>(
-                static_cast<LogicSocketOutputBase const*>(this)
-                    ->castToType<T, doThrow>());
-        }
-
-    public:
-        template<typename T,
-                 EG_ENABLE_IF(std::is_base_of_v<LogicSocketDataBase, naked<T>>)>
-        void connect(T& socketData) noexcept(false)
-        {
-            socketData.connect(*this);
-        }
-
-        virtual void disconnect() noexcept = 0;
-
-    public:
-        static constexpr bool isInput() { return false; }
-        static constexpr bool isOutput() { return true; }
+        rttr::type m_type;                    //!< The type of this socket.
+        SocketIndex m_index;                  //!< The index of the slot at which this socket is installed in a LogicNode.
+        const LogicNode* m_parent = nullptr;  //!< The parent node of of this socket.
     };
 }  // namespace executionGraph

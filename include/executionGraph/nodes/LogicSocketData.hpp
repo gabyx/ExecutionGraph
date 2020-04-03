@@ -282,11 +282,11 @@ namespace executionGraph
                 auto& s = socket.template castToType<Data, true>();
                 if constexpr(disconnect)
                 {
-                    m_connections.connect(s);
+                    m_connections.disconnect(s);
                 }
                 else
                 {
-                    m_connections.disconnect(s);
+                    m_connections.connect(s);
                 }
             }
             catch(BadSocketCastException&)

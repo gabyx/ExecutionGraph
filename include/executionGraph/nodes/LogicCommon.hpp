@@ -15,6 +15,7 @@
 #include <array>
 #include <memory>
 #include <string>
+#include <meta/meta.hpp>
 #include "executionGraph/common/EnumClassHelper.hpp"
 #include "executionGraph/common/SfinaeMacros.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
@@ -31,9 +32,11 @@ namespace executionGraph
     //@{
     class LogicNode;
 
+    template<typename IsInput>
     class LogicSocketBase;
-    class LogicSocketInputBase;
-    class LogicSocketOutputBase;
+    using LogicSocketInputBase  = LogicSocketBase<meta::bool_<true>>;
+    using LogicSocketOutputBase = LogicSocketBase<meta::bool_<false>>;
+
     template<typename T>
     class LogicSocketInput;
     template<typename T>
