@@ -386,7 +386,7 @@ namespace executionGraph
     auto& socket()                                                                      \
     {                                                                                   \
         EG_STATIC_ASSERT(SocketDesc::template belongsToNode<Node>(),                    \
-                         "Descriptions does not belong to this node");                  \
+                         "Description does not belong to this node");                   \
                                                                                         \
         if constexpr(isInputDescriptions(socketDesc))                                   \
         {                                                                               \

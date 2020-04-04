@@ -21,8 +21,8 @@
 
 using namespace executionGraph;
 
-#ifndef EG_NO_COMPILE_TEST_INDEX
-EG_TEST(Node_Test, Connections)
+#if !defined(EG_NO_COMPILE_TEST_INDEX)
+EG_TEST(NodeTest, Connections)
 {
     // Integer node connection (wrong connection)
     LogicSocketData<int> i0(0, 0);
@@ -47,7 +47,7 @@ EG_TEST(Node_Test, Connections)
     ASSERT_EQ(o2.dataHandle().get(), 1.0);
 }
 
-EG_TEST(Node_Test, ConnectionsThroughBase)
+EG_TEST(NodeTest, ConnectionsThroughBase)
 {
     // Integer node connection (wrong connection)
     LogicSocketData<int> i0(0, 0);
@@ -63,11 +63,13 @@ EG_TEST(Node_Test, ConnectionsThroughBase)
 
     auto connectIn = [&]<auto & decl>(auto& data)
     {
-        static_cast<LogicSocketInputBase&>(node1.socket<decl>()).connect(static_cast<LogicSocketDataBase&>(data));
+        static_cast<LogicSocketInputBase&>(node1.socket<decl>())
+            .connect(static_cast<LogicSocketDataBase&>(data));
     };
     auto connectOut = [&]<auto & decl>(auto& data)
     {
-        static_cast<LogicSocketOutputBase&>(node1.socket<decl>()).connect(static_cast<LogicSocketDataBase&>(data));
+        static_cast<LogicSocketOutputBase&>(node1.socket<decl>())
+            .connect(static_cast<LogicSocketDataBase&>(data));
     };
 
     connectIn.operator()<node1.in0Decl>(i0);
@@ -83,7 +85,7 @@ EG_TEST(Node_Test, ConnectionsThroughBase)
     ASSERT_EQ(o2.dataHandle().get(), 1.0);
 }
 
-EG_TEST(Node_Test, WrongConnections)
+EG_TEST(NodeTest, WrongConnections)
 {
     // Integer node connection (wrong connection)
     LogicSocketData<int> i(0);
@@ -109,13 +111,14 @@ EG_TEST(Node_Test, WrongConnections)
 #endif
 
 #if EG_NO_COMPILE_TEST_INDEX == 0
-EG_TEST(Node_Test, WrongSocketOnWrongNode)
+EG_TEST(NodeTest, WrongSocketOnWrongNode)
 {
-    // Integer node connection (wrong connection)
+    // Integer node connection
     DummyNode<int> node1(1);
     DummyNode<float> node2(2);
 
-    node2.socket<node2.in0Decl>();
+    node2.socket<node1.in0Decl>();
+    // CompileErrorRegex: "Description does not belong to this node"
 }
 #endif
 
