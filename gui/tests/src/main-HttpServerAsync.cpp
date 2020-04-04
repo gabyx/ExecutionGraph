@@ -1,10 +1,10 @@
 // =========================================================================================
 //  ExecutionGraph
 //  Copyright (C) 2014 by Gabriel Nützi <gnuetzi (at) gmail (døt) com>
-// 
+//
 //  @date Sat Nov 24 2018
 //  @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
-// 
+//
 //  This Source Code Form is subject to the terms of the Mozilla Public
 //  License, v. 2.0. If a copy of the MPL was not distributed with this
 //  file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -15,13 +15,6 @@
 //
 //------------------------------------------------------------------------------
 
-#include <boost/beast/core.hpp>
-#include <boost/beast/http.hpp>
-#include <boost/beast/version.hpp>
-#include <boost/asio/bind_executor.hpp>
-#include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/strand.hpp>
-#include <boost/config.hpp>
 #include <algorithm>
 #include <cstdlib>
 #include <functional>
@@ -30,8 +23,15 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <boost/asio/bind_executor.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/strand.hpp>
+#include <boost/beast/core.hpp>
+#include <boost/beast/http.hpp>
+#include <boost/beast/version.hpp>
+#include <boost/config.hpp>
 
-using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
+using tcp      = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
 namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
 
 // Return a reasonable mime type based on the extension of a file.
@@ -39,34 +39,54 @@ boost::beast::string_view
 mime_type(boost::beast::string_view path)
 {
     using boost::beast::iequals;
-    auto const ext = [&path]
-    {
+    auto const ext = [&path] {
         auto const pos = path.rfind(".");
         if(pos == boost::beast::string_view::npos)
             return boost::beast::string_view{};
         return path.substr(pos);
     }();
-    if(iequals(ext, ".htm"))  return "text/html";
-    if(iequals(ext, ".html")) return "text/html";
-    if(iequals(ext, ".php"))  return "text/html";
-    if(iequals(ext, ".css"))  return "text/css";
-    if(iequals(ext, ".txt"))  return "text/plain";
-    if(iequals(ext, ".js"))   return "application/javascript";
-    if(iequals(ext, ".json")) return "application/json";
-    if(iequals(ext, ".xml"))  return "application/xml";
-    if(iequals(ext, ".swf"))  return "application/x-shockwave-flash";
-    if(iequals(ext, ".flv"))  return "video/x-flv";
-    if(iequals(ext, ".png"))  return "image/png";
-    if(iequals(ext, ".jpe"))  return "image/jpeg";
-    if(iequals(ext, ".jpeg")) return "image/jpeg";
-    if(iequals(ext, ".jpg"))  return "image/jpeg";
-    if(iequals(ext, ".gif"))  return "image/gif";
-    if(iequals(ext, ".bmp"))  return "image/bmp";
-    if(iequals(ext, ".ico"))  return "image/vnd.microsoft.icon";
-    if(iequals(ext, ".tiff")) return "image/tiff";
-    if(iequals(ext, ".tif"))  return "image/tiff";
-    if(iequals(ext, ".svg"))  return "image/svg+xml";
-    if(iequals(ext, ".svgz")) return "image/svg+xml";
+    if(iequals(ext, ".htm"))
+        return "text/html";
+    if(iequals(ext, ".html"))
+        return "text/html";
+    if(iequals(ext, ".php"))
+        return "text/html";
+    if(iequals(ext, ".css"))
+        return "text/css";
+    if(iequals(ext, ".txt"))
+        return "text/plain";
+    if(iequals(ext, ".js"))
+        return "application/javascript";
+    if(iequals(ext, ".json"))
+        return "application/json";
+    if(iequals(ext, ".xml"))
+        return "application/xml";
+    if(iequals(ext, ".swf"))
+        return "application/x-shockwave-flash";
+    if(iequals(ext, ".flv"))
+        return "video/x-flv";
+    if(iequals(ext, ".png"))
+        return "image/png";
+    if(iequals(ext, ".jpe"))
+        return "image/jpeg";
+    if(iequals(ext, ".jpeg"))
+        return "image/jpeg";
+    if(iequals(ext, ".jpg"))
+        return "image/jpeg";
+    if(iequals(ext, ".gif"))
+        return "image/gif";
+    if(iequals(ext, ".bmp"))
+        return "image/bmp";
+    if(iequals(ext, ".ico"))
+        return "image/vnd.microsoft.icon";
+    if(iequals(ext, ".tiff"))
+        return "image/tiff";
+    if(iequals(ext, ".tif"))
+        return "image/tiff";
+    if(iequals(ext, ".svg"))
+        return "image/svg+xml";
+    if(iequals(ext, ".svgz"))
+        return "image/svg+xml";
     return "application/text";
 }
 
@@ -102,62 +122,59 @@ path_cat(
 // contents of the request, so the interface requires the
 // caller to pass a generic lambda for receiving the response.
 template<
-    class Body, class Allocator,
+    class Body,
+    class Allocator,
     class Send>
-void
-handle_request(
+void handle_request(
     boost::beast::string_view doc_root,
     http::request<Body, http::basic_fields<Allocator>>&& req,
     Send&& send)
 {
     // Returns a bad request response
     auto const bad_request =
-    [&req](boost::beast::string_view why)
-    {
-        http::response<http::string_body> res{http::status::bad_request, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(req.keep_alive());
-        res.body() = why;
-        res.prepare_payload();
-        return res;
-    };
+        [&req](boost::beast::string_view why) {
+            http::response<http::string_body> res{http::status::bad_request, req.version()};
+            res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+            res.set(http::field::content_type, "text/html");
+            res.keep_alive(req.keep_alive());
+            res.body() = why;
+            res.prepare_payload();
+            return res;
+        };
 
     // Returns a not found response
     auto const not_found =
-    [&req](boost::beast::string_view target)
-    {
-        http::response<http::string_body> res{http::status::not_found, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(req.keep_alive());
-        res.body() = "The resource '" + std::string(target) + "' was not found.";
-        res.prepare_payload();
-        return res;
-    };
+        [&req](boost::beast::string_view target) {
+            http::response<http::string_body> res{http::status::not_found, req.version()};
+            res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+            res.set(http::field::content_type, "text/html");
+            res.keep_alive(req.keep_alive());
+            res.body() = "The resource '" + std::string(target) + "' was not found.";
+            res.prepare_payload();
+            return res;
+        };
 
     // Returns a server error response
     auto const server_error =
-    [&req](boost::beast::string_view what)
-    {
-        http::response<http::string_body> res{http::status::internal_server_error, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(req.keep_alive());
-        res.body() = "An error occurred: '" + std::string(what) + "'";
-        res.prepare_payload();
-        return res;
-    };
+        [&req](boost::beast::string_view what) {
+            http::response<http::string_body> res{http::status::internal_server_error, req.version()};
+            res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+            res.set(http::field::content_type, "text/html");
+            res.keep_alive(req.keep_alive());
+            res.body() = "An error occurred: '" + std::string(what) + "'";
+            res.prepare_payload();
+            return res;
+        };
 
     // Make sure we can handle the method
-    if( req.method() != http::verb::get &&
-        req.method() != http::verb::head)
+    if(req.method() != http::verb::get &&
+       req.method() != http::verb::head)
         return send(bad_request("Unknown HTTP-method"));
 
     // Request path must be absolute and not contain "..".
-    if( req.target().empty() ||
-        req.target()[0] != '/' ||
-        req.target().find("..") != boost::beast::string_view::npos)
+    if(req.target().empty() ||
+       req.target()[0] != '/' ||
+       req.target().find("..") != boost::beast::string_view::npos)
         return send(bad_request("Illegal request-target"));
 
     // Build the path to the requested file
@@ -207,8 +224,7 @@ handle_request(
 //------------------------------------------------------------------------------
 
 // Report a failure
-void
-fail(boost::system::error_code ec, char const* what)
+void fail(boost::system::error_code ec, char const* what)
 {
     std::cerr << what << ": " << ec.message() << "\n";
 }
@@ -222,8 +238,7 @@ class session : public std::enable_shared_from_this<session>
     {
         session& self_;
 
-        explicit
-        send_lambda(session& self)
+        explicit send_lambda(session& self)
             : self_(self)
         {
         }
@@ -259,7 +274,8 @@ class session : public std::enable_shared_from_this<session>
 
     tcp::socket socket_;
     boost::asio::strand<
-        boost::asio::io_context::executor_type> strand_;
+        boost::asio::io_context::executor_type>
+        strand_;
     boost::beast::flat_buffer buffer_;
     std::shared_ptr<std::string const> doc_root_;
     http::request<http::string_body> req_;
@@ -268,8 +284,7 @@ class session : public std::enable_shared_from_this<session>
 
 public:
     // Take ownership of the socket
-    explicit
-    session(
+    explicit session(
         tcp::socket socket,
         std::shared_ptr<std::string const> const& doc_root)
         : socket_(std::move(socket))
@@ -294,14 +309,7 @@ public:
         req_ = {};
 
         // Read a request
-        http::async_read(socket_, buffer_, req_,
-            boost::asio::bind_executor(
-                strand_,
-                std::bind(
-                    &session::onRead,
-                    shared_from_this(),
-                    std::placeholders::_1,
-                    std::placeholders::_2)));
+        http::async_read(socket_, buffer_, req_, boost::asio::bind_executor(strand_, std::bind(&session::onRead, shared_from_this(), std::placeholders::_1, std::placeholders::_2)));
     }
 
     void
@@ -416,7 +424,7 @@ public:
     void
     run()
     {
-        if(! acceptor_.is_open())
+        if(!acceptor_.is_open())
             return;
         doAccept();
     }
@@ -444,7 +452,8 @@ public:
             // Create the session and run it
             std::make_shared<session>(
                 std::move(socket_),
-                doc_root_)->run();
+                doc_root_)
+                ->run();
         }
 
         // Accept another connection
@@ -457,18 +466,17 @@ public:
 int main(int argc, char* argv[])
 {
     // Check command line arguments.
-    if (argc != 5)
+    if(argc != 5)
     {
-        std::cerr <<
-            "Usage: http-server-async <address> <port> <doc_root> <threads>\n" <<
-            "Example:\n" <<
-            "    http-server-async 0.0.0.0 8080 . 1\n";
+        std::cerr << "Usage: http-server-async <address> <port> <doc_root> <threads>\n"
+                  << "Example:\n"
+                  << "    http-server-async 0.0.0.0 8080 . 1\n";
         return EXIT_FAILURE;
     }
-    auto const address = boost::asio::ip::make_address(argv[1]);
-    auto const port = static_cast<unsigned short>(std::atoi(argv[2]));
+    auto const address  = boost::asio::ip::make_address(argv[1]);
+    auto const port     = static_cast<unsigned short>(std::atoi(argv[2]));
     auto const doc_root = std::make_shared<std::string>(argv[3]);
-    auto const threads = std::max<int>(1, std::atoi(argv[4]));
+    auto const threads  = std::max<int>(1, std::atoi(argv[4]));
 
     // The io_context is required for all I/O
     boost::asio::io_context ioc{threads};
@@ -477,17 +485,17 @@ int main(int argc, char* argv[])
     std::make_shared<listener>(
         ioc,
         tcp::endpoint{address, port},
-        doc_root)->run();
+        doc_root)
+        ->run();
 
     // Run the I/O service on the requested number of threads
     std::vector<std::thread> v;
     v.reserve(threads - 1);
     for(auto i = threads - 1; i > 0; --i)
         v.emplace_back(
-        [&ioc]
-        {
-            ioc.run();
-        });
+            [&ioc] {
+                ioc.run();
+            });
     ioc.run();
 
     return EXIT_SUCCESS;

@@ -38,20 +38,20 @@ endfunction()
 
 # Flatbuffer Test
 set(EXEC_NAME ${PROJECT_NAME}Test-Flatbuffer)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Flatbuffer.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main-Flatbuffer.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 defineCompileDefs(${EXEC_NAME} "flatbuffersLib" "rttrLib")
 
 # Memory Tests
 set(EXEC_NAME ${PROJECT_NAME}GuiTest-MemoryPoolNormal)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_MemoryPoolNormal.cpp ${SOURCE_FILES} ${INCLUDE_FILES})
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main-MemoryPoolNormal.cpp ${SOURCE_FILES} ${INCLUDE_FILES})
 defineCompileDefs(${EXEC_NAME} "memoryLib" "on")
 
 # Http Server
 set(EXEC_NAME ${PROJECT_NAME}GuiTest-HttpServer)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_HttpServer.cpp ${SOURCE_FILES} ${INCLUDE_FILES})
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main-HttpServer.cpp ${SOURCE_FILES} ${INCLUDE_FILES})
 defineCompileDefs(${EXEC_NAME} "boostBeastLib" "off")
 
 # Http Server Async
 set(EXEC_NAME ${PROJECT_NAME}GuiTest-HttpServerAsync)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_HttpServerAsync.cpp ${SOURCE_FILES} ${INCLUDE_FILES})
+add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main-HttpServerAsync.cpp ${SOURCE_FILES} ${INCLUDE_FILES})
 defineCompileDefs(${EXEC_NAME} "boostBeastLib" "off")

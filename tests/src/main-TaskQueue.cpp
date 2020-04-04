@@ -11,15 +11,16 @@
 //! ========================================================================================
 
 #include <array>
+#include <executionGraph/common/Exception.hpp>
+#include <executionGraph/common/StaticAssert.hpp>
+#include <executionGraph/common/TaskConsumer.hpp>
+#include <executionGraph/common/TaskQueue.hpp>
+#include <executionGraph/common/ThreadPool.hpp>
 #include "TestFunctions.hpp"
-#include "executionGraph/common/Exception.hpp"
-#include "executionGraph/common/TaskConsumer.hpp"
-#include "executionGraph/common/TaskQueue.hpp"
-#include "executionGraph/common/ThreadPool.hpp"
 
 #ifdef __clang__
-#    pragma clang diagnostic push
-#    pragma clang diagnostic ignored "-Wweak-vtables"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 
 using namespace executionGraph;
@@ -127,7 +128,7 @@ struct TaskB : ITask
     }
 };
 
-MY_TEST(ProducerConsumer, Test1)
+EG_TEST(ProducerConsumer, Test1)
 {
     DEFINE_RANDOM_GENERATOR_FUNC(hashString("Test1"))
 
@@ -163,7 +164,7 @@ MY_TEST(ProducerConsumer, Test1)
     }
 }
 
-MY_TEST(ProducerConsumer, VirtualTasks)
+EG_TEST(ProducerConsumer, VirtualTasks)
 {
     DEFINE_RANDOM_GENERATOR_FUNC(hashString("VirtualTasks"))
 
@@ -200,7 +201,7 @@ MY_TEST(ProducerConsumer, VirtualTasks)
     pool.join();
 }
 
-MY_TEST(TaskQueue, MovableTasksOnly)
+EG_TEST(TaskQueue, MovableTasksOnly)
 {
     struct A
     {
@@ -212,7 +213,7 @@ MY_TEST(TaskQueue, MovableTasksOnly)
 
         const int b;
     };
-    static_assert(std::is_move_constructible_v<A>);
+    EG_STATIC_ASSERT(std::is_move_constructible_v<A>);
     TaskQueue<A> q;
     q.emplace(3);
 }

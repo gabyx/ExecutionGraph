@@ -11,20 +11,40 @@
 // =========================================================================================
 
 //#include <executionGraph/nodes/LogicNode.hpp>
-#include <meta/meta.hpp>
 #include <executionGraph/common/EnumFlags.hpp>
-#include <executionGraph/common/MetaCommon.hpp>
-#include <executionGraph/common/TupleUtil.hpp>
-#include <executionGraph/common/TypeDefs.hpp>
-#include <executionGraph/nodes/LogicCommon.hpp>
-#include <executionGraph/nodes/LogicSocketFlags.hpp>
+#include <executionGraph/common/StaticAssert.hpp>
 #include "TestFunctions.hpp"
 
 using namespace executionGraph;
 
-MY_TEST(ConstExpr, Test)
+EG_TEST(Flags, Test)
 {
-   std::tuple<int, int
+    enum class E : std::size_t
+    {
+        A = 1 << 0,
+        B = 1 << 1,
+        C = 1 << 2,
+        D = 1 << 3,
+        E = 1 << 4
+    };
+    using Flags = EnumFlags<E>;
+
+    {
+        constexpr Flags f = {};
+        EG_STATIC_ASSERT(f.isNoneSet());
+    }
+    {
+        constexpr Flags f = {E::D, E::A};
+        EG_STATIC_ASSERT(f.isSet(E::A, E::D), "Wrong");
+        EG_STATIC_ASSERT(f.isUnset(E::B, E::C), "Wrong");
+        EG_STATIC_ASSERT(f.isAnySet(E::A, E::C), "Wrong");
+        EG_STATIC_ASSERT(!f.isNoneSet(), "Wrong");
+    }
+    {
+        constexpr Flags f = {E::D, E::A};
+        constexpr Flags g = {E::B};
+        EG_STATIC_ASSERT((Flags{f, g, E::C} + Flags{E::E}).isSet(E::A, E::B, E::C, E::D, E::E), "Wrong");
+    }
 }
 
 int main(int argc, char** argv)

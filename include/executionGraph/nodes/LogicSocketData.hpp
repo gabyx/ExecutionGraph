@@ -17,6 +17,7 @@
 #include <meta/meta.hpp>
 #include <rttr/type>
 #include "executionGraph/common/Assert.hpp"
+#include "executionGraph/common/StaticAssert.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 #include "executionGraph/nodes/LogicDataHandle.hpp"
@@ -185,8 +186,8 @@ namespace executionGraph
         using DataHandle      = LogicDataHandle<Data>;
         using DataHandleConst = LogicDataHandle<const Data>;
 
-        static_assert(!std::is_const_v<Data> && !std::is_reference_v<Data>,
-                      "Only non-const non-reference types allowed!");
+        EG_STATIC_ASSERT(!std::is_const_v<Data> && !std::is_reference_v<Data>,
+                         "Only non-const non-reference types allowed!");
 
         using InputSocket  = typename ConnectionTraits<Data>::InputSocket;
         using OutputSocket = typename ConnectionTraits<Data>::OutputSocket;
@@ -353,8 +354,8 @@ namespace executionGraph
         using DataHandle      = typename SocketData::DataHandle;
         using DataHandleConst = typename SocketData::DataHandleConst;
 
-        static_assert(!std::is_const_v<Data> && !std::is_reference_v<Data>,
-                      "Only non-const non-reference types allowed!");
+        EG_STATIC_ASSERT(!std::is_const_v<Data> && !std::is_reference_v<Data>,
+                         "Only non-const non-reference types allowed!");
 
         friend SocketData;
 

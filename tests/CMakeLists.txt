@@ -21,69 +21,63 @@ set(INCLUDE_DIRS
     ${CMAKE_CURRENT_BINARY_DIR}/include
 )
 
-# Define function to define compile definitions for all tests
-function(defineCompileDefs target)
+function(addTarget targetName name)
 
-    message(STATUS "====================================================")
-    message(STATUS "Configuring target: ${target}")
+    message(STATUS "Configuring target: ${targetName}")
+    add_executable(${targetName} 
+                   ${CMAKE_CURRENT_SOURCE_DIR}/src/main-${name}.cpp 
+                   ${SOURCE_FILES} 
+                   ${INCLUDE_FILES})
 
     setTargetCompileOptionsExecutionGraph(${target} ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
     target_include_directories(${target} PRIVATE ${INCLUDE_DIRS})
     target_link_libraries(${target} PRIVATE ExecutionGraph::CoreForTests gtest gmock_main)
     add_dependencies(build_and_test ${target})
 
-     if(${ExecutionGraph_SETUP_COTIRE_TARGETS}) 
+    if(${ExecutionGraph_SETUP_COTIRE_TARGETS}) 
         cotire(${target})
     endif()
 
-    print_target_properties(${target})
+endfunction()
 
-    add_test(NAME ${target} COMMAND ${target})
+# Define function to define compile definitions for all tests
+function(addTest name noCompile noCompileTests)
+
+    message(STATUS "====================================================")
+    set(target ${PROJECT_NAME}Test-${name})
+
+    #print_target_properties(${target})
+
+    addTarget(${target} ${name})
+    add_test(NAME ${target} COMMAND ${target})  
+
+    if(${noCompile})
+        message(STATUS "Adding '${noCompileTests}' no compile tests")
+        
+        foreach(testIndex RANGE noCompileTests)
+            set(targetNC "${target}-NoCompile-${testIndex}")
+
+            addTarget(${targetNC} ${name})
+            target_compile_definitions(${targetNC} PRIVATE "EG_NO_COMPILE_TEST_INDEX=${testIndex}")
+            set_target_properties(${targetNC} PROPERTIES EXCLUDE_FROM_ALL TRUE)
+
+            add_test(NAME ${targetNC}
+                    COMMAND ${CMAKE_COMMAND} --build . --target ${targetNC} --config $<CONFIGURATION>
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+            set_tests_properties(${targetNC} PROPERTIES WILL_FAIL TRUE)
+
+        endforeach()
+    endif()
 
 endfunction()
 
-# NodeTests
-set(EXEC_NAME ${PROJECT_NAME}Test-LogicNodes)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_LogicNode.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-defineCompileDefs(${EXEC_NAME})
-set(EXEC_NAME ${PROJECT_NAME}Test-LogicSocketData)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_LogicSocketData.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-defineCompileDefs(${EXEC_NAME})
-
-#ExecutionTree Test
-set(EXEC_NAME ${PROJECT_NAME}Test-ExecutionTree)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_ExecutionTree.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-defineCompileDefs(${EXEC_NAME})
-
-#ExecutionTree Test
-set(EXEC_NAME ${PROJECT_NAME}Test-CustomSocketTypes)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_CustomSocketTypes.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-defineCompileDefs(${EXEC_NAME})
-
-#Factory Test
-set(EXEC_NAME ${PROJECT_NAME}Test-Factory)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Factory.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-defineCompileDefs(${EXEC_NAME})
-
-# TaskQueue Test
-set(EXEC_NAME ${PROJECT_NAME}Test-TaskQueue)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_TaskQueue.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-defineCompileDefs(${EXEC_NAME})
-
-# MetaProgramming Test
-set(EXEC_NAME ${PROJECT_NAME}Test-MetaProgramming)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_MetaProg.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-defineCompileDefs(${EXEC_NAME})
-
-# Synchronized Test
-set(EXEC_NAME ${PROJECT_NAME}Test-Synchronized)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Synchronized.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-defineCompileDefs(${EXEC_NAME})
-
-set(EXEC_NAME ${PROJECT_NAME}Test-Flags)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_Flags.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-defineCompileDefs(${EXEC_NAME})
-
-set(EXEC_NAME ${PROJECT_NAME}Test-ConstExpr)
-add_executable(${EXEC_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_ConstExpr.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
-defineCompileDefs(${EXEC_NAME})
+addTest("LogicNode" ON 1)
+addTest("LogicSocketData" OFF 0)
+addTest("ExecutionTree" OFF 0)
+addTest("CustomSocketTypes" OFF 0)
+addTest("Factory" OFF 0)
+addTest("TaskQueue" OFF 0)
+addTest("MetaProgramming" OFF 0)
+addTest("Synchronized" OFF 0)
+addTest("Flags" OFF 0)
+addTest("ConstExpr" OFF 0)

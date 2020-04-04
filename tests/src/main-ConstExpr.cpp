@@ -11,40 +11,20 @@
 // =========================================================================================
 
 //#include <executionGraph/nodes/LogicNode.hpp>
+#include <meta/meta.hpp>
 #include <executionGraph/common/EnumFlags.hpp>
+#include <executionGraph/common/MetaCommon.hpp>
+#include <executionGraph/common/TupleUtil.hpp>
+#include <executionGraph/common/TypeDefs.hpp>
+#include <executionGraph/nodes/LogicCommon.hpp>
+#include <executionGraph/nodes/LogicSocketFlags.hpp>
 #include "TestFunctions.hpp"
 
 using namespace executionGraph;
 
-MY_TEST(Flags, Test)
+EG_TEST(ConstExpr, Test)
 {
-    enum class E : std::size_t
-    {
-        A = 1 << 0,
-        B = 1 << 1,
-        C = 1 << 2,
-        D = 1 << 3,
-        E = 1 << 4
-    };
-    using Flags = EnumFlags<E>;
-
-    {
-        constexpr Flags f = {};
-        static_assert(f.isNoneSet());
-    }
-    {
-        constexpr Flags f = {E::D,E::A};
-        static_assert(f.isSet(E::A, E::D), "Wrong");
-        static_assert(f.isUnset(E::B, E::C), "Wrong");
-        static_assert(f.isAnySet(E::A, E::C), "Wrong");
-        static_assert(!f.isNoneSet(), "Wrong");
-    }
-    {
-        constexpr Flags f = {E::D,E::A};
-        constexpr Flags g= {E::B};
-        static_assert((Flags{f,g,E::C} + Flags{E::E}).isSet(E::A,E::B,E::C,E::D,E::E), "Wrong");
-    }
-
+    std::tuple < int, int
 }
 
 int main(int argc, char** argv)

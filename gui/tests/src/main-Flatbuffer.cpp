@@ -26,11 +26,11 @@
 #include "testbuffer_generated.h"
 
 #ifdef __clang__
-#    pragma clang diagnostic push
-#    pragma clang diagnostic ignored "-Wweak-vtables"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 
-MY_TEST(FlatBuffer, Test1)
+EG_TEST(FlatBuffer, Test1)
 {
     unsigned int n = 100;
     namespace t    = test;
@@ -108,7 +108,7 @@ struct DummyNodeSerializer
     };
 };
 
-MY_TEST(FlatBuffer, GraphSimple)
+EG_TEST(FlatBuffer, GraphSimple)
 {
     using namespace executionGraph;
     unsigned int nNodes = 500;
@@ -197,7 +197,7 @@ MY_TEST(FlatBuffer, GraphSimple)
     std::filesystem::remove("myGraph.eg");
 }
 
-MY_TEST(FlatBuffer, RandomTree)
+EG_TEST(FlatBuffer, RandomTree)
 {
     using namespace executionGraph;
 

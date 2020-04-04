@@ -24,7 +24,8 @@ struct A
         : m_a{a} {}
     template<typename D>
     A(int a, D&& d)
-        : m_a{a}, deleter(d) {}
+        : m_a{a}, deleter(d)
+    {}
 
     ~A() { std::cout << "dtor A :" << m_a[0] << std::endl; }
 
@@ -38,7 +39,7 @@ struct A
     }
 };
 
-MY_TEST(MemoryPool, Test1)
+EG_TEST(MemoryPool, Test1)
 {
     using RawAllocator = memory_pool<>;
     using Ptr          = std::unique_ptr<A, allocator_deleter<A, RawAllocator>>;
@@ -61,7 +62,7 @@ MY_TEST(MemoryPool, Test1)
     std::shuffle(vec.begin(), vec.end(), std::mt19937{});
 }
 
-MY_TEST(MemoryPool, Test2)
+EG_TEST(MemoryPool, Test2)
 {
     using RawAllocator = memory_pool<node_pool, new_allocator>;
     using RawPtr       = std::unique_ptr<A, allocator_deallocator<A, RawAllocator>>;
@@ -88,7 +89,7 @@ MY_TEST(MemoryPool, Test2)
     }
 }
 
-MY_TEST(MemoryPool, Test3)
+EG_TEST(MemoryPool, Test3)
 {
     using RawAllocator = memory_pool<node_pool>;
     using RawPtr       = std::unique_ptr<uint8_t[], allocator_deleter<uint8_t[], RawAllocator>>;
@@ -103,7 +104,7 @@ MY_TEST(MemoryPool, Test3)
     }
 }
 
-MY_TEST(MemoryPool, TestingDefaultCTORDeleter)
+EG_TEST(MemoryPool, TestingDefaultCTORDeleter)
 {
     using RawAllocator = memory_pool<node_pool>;
     using Deleter      = allocator_deleter<uint8_t[], RawAllocator>;

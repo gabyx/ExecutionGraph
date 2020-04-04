@@ -20,8 +20,8 @@
 using namespace executionGraph;
 
 #ifdef __clang__
-#    pragma clang diagnostic push
-#    pragma clang diagnostic ignored "-Wweak-vtables"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 
 struct MyMessage2 final
@@ -69,7 +69,7 @@ struct CreatorC
 template<typename T, typename K>
 using comp = std::is_same<typename T::Key, K>;
 
-MY_TEST(FactoryTest, StaticFactory)
+EG_TEST(FactoryTest, StaticFactory)
 {
     using CreatorList    = meta::list<CreatorA, CreatorB, CreatorC>;
     using MySuperFactory = StaticFactory<CreatorList>;

@@ -31,7 +31,7 @@ struct A
     std::function<double()> rand;
 };
 
-MY_TEST(Synchronized, SetterGetter)
+EG_TEST(Synchronized, SetterGetter)
 {
     DEFINE_RANDOM_GENERATOR_FUNC(1);
     Synchronized<A> synced{rand};
@@ -60,7 +60,7 @@ MY_TEST(Synchronized, SetterGetter)
     ASSERT_EQ(r, 100);
 }
 
-MY_TEST(Synchronized, SetterGetterDefect)
+EG_TEST(Synchronized, SetterGetterDefect)
 {
     DEFINE_RANDOM_GENERATOR_FUNC(1);
 

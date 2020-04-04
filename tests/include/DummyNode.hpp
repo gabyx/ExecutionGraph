@@ -25,13 +25,14 @@
 namespace executionGraph
 {
     //! Stupid dummy Node for testing.
+    template<typename T>
     class DummyNode : public LogicNode
     {
         using Base = LogicNode;
         EG_DEFINE_NODE(DummyNode);
 
     public:
-        EG_DEFINE_INPUT_DESC(in0Decl, int, 0, "Value0"_cs);
+        EG_DEFINE_INPUT_DESC(in0Decl, T, 0, "Value0"_cs);
         EG_DEFINE_INPUT_DESC(in1Decl, float, 1, "Value1"_cs);
         EG_DEFINE_INPUT_DESC(in2Decl, double, 2, "Value2"_cs);
 
@@ -40,7 +41,7 @@ namespace executionGraph
         InputSocketsTuple<inDecls> m_inSockets;
 
     public:
-        EG_DEFINE_OUTPUT_DESC(out0Decl, int, 0, "Value0"_cs);
+        EG_DEFINE_OUTPUT_DESC(out0Decl, T, 0, "Value0"_cs);
         EG_DEFINE_OUTPUT_DESC(out1Decl, float, 1, "Value1"_cs);
         EG_DEFINE_OUTPUT_DESC(out2Decl, double, 2, "Value2"_cs);
 

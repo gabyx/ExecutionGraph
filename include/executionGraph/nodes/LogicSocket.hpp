@@ -21,6 +21,7 @@
 #include "executionGraph/common/ConstExprAlgos.hpp"
 #include "executionGraph/common/DemangleTypes.hpp"
 #include "executionGraph/common/EnumClassHelper.hpp"
+#include "executionGraph/common/StaticAssert.hpp"
 #include "executionGraph/common/TupleUtil.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
@@ -357,10 +358,10 @@ namespace executionGraph
                        (isInputDescriptions(ds...) || isOutputDescriptions(ds...)) &&
                        cx::is_sorted(indices.begin(), indices.end());
             });
-        static_assert(check,
-                      "Don't mix descriptions for different nodes "
-                      "and only provide all input or all output descriptions "
-                      "sorted by socket index.");
+        EG_STATIC_ASSERT(check,
+                         "Don't mix descriptions for different nodes "
+                         "and only provide all input or all output descriptions "
+                         "sorted by socket index.");
 
         return tupleUtil::indexed(
             descs,
@@ -379,47 +380,42 @@ namespace executionGraph
     template<auto& outputDescs>
     using OutputSocketsTuple = decltype(makeSockets<outputDescs>(std::declval<LogicNode>()));
 
-#define EG_DEFINE_SOCKET_GETTERS(Node, inputSockets, outputSockets)                 \
-    template<auto& socketDesc,                                                      \
-             typename SocketDesc = naked<decltype(socketDesc)>,                     \
-             EG_ENABLE_IF((isInputDescriptions(socketDesc) &&                       \
-                           SocketDesc::template belongsToNode<Node>()))>            \
-    auto& socket()                                                                  \
-    {                                                                               \
-        return executionGraph::details::getInputSocket<socketDesc>(inputSockets);   \
-    }                                                                               \
-    template<auto& socketDesc,                                                      \
-             typename SocketDesc = naked<decltype(socketDesc)>,                     \
-             EG_ENABLE_IF((isOutputDescriptions(socketDesc) &&                      \
-                           SocketDesc::template belongsToNode<Node>()))>            \
-    auto& socket()                                                                  \
-    {                                                                               \
-        return executionGraph::details::getOutputSocket<socketDesc>(outputSockets); \
-    }                                                                               \
-    template<auto& socketDesc,                                                      \
-             typename SocketDesc = naked<decltype(socketDesc)>,                     \
-             EG_ENABLE_IF((isInputDescriptions(socketDesc) &&                       \
-                           SocketDesc::template belongsToNode<Node>()))>            \
-    auto& handle()                                                                  \
-    {                                                                               \
-        return socket<socketDesc>().dataHandle();                                   \
-    }                                                                               \
-    template<auto& socketDesc,                                                      \
-             typename SocketDesc = naked<decltype(socketDesc)>,                     \
-             EG_ENABLE_IF((isOutputDescriptions(socketDesc) &&                      \
-                           SocketDesc::template belongsToNode<Node>()))>            \
-    auto& handle()                                                                  \
-    {                                                                               \
-        return socket<socketDesc>().dataHandle();                                   \
-    }                                                                               \
-    template<auto&... descs>                                                        \
-    auto makeHandles()                                                              \
-    {                                                                               \
-        static constexpr auto t = std::forward_as_tuple(descs...);                  \
-        return details::makeHandles<t>(                                             \
-            inputSockets,                                                           \
-            outputSockets);                                                         \
-    }                                                                               \
+#define EG_DEFINE_SOCKET_GETTERS(Node, inputSockets, outputSockets)                     \
+    template<auto& socketDesc,                                                          \
+             typename SocketDesc = naked<decltype(socketDesc)>>                         \
+    auto& socket()                                                                      \
+    {                                                                                   \
+        EG_STATIC_ASSERT(SocketDesc::template belongsToNode<Node>(),                    \
+                         "Descriptions does not belong to this node");                  \
+                                                                                        \
+        if constexpr(isInputDescriptions(socketDesc))                                   \
+        {                                                                               \
+            return executionGraph::details::getInputSocket<socketDesc>(inputSockets);   \
+        }                                                                               \
+        else                                                                            \
+        {                                                                               \
+            return executionGraph::details::getOutputSocket<socketDesc>(outputSockets); \
+        }                                                                               \
+    }                                                                                   \
+                                                                                        \
+    template<auto& socketDesc,                                                          \
+             typename SocketDesc = naked<decltype(socketDesc)>>                         \
+    auto& handle()                                                                      \
+    {                                                                                   \
+        EG_STATIC_ASSERT(SocketDesc::template belongsToNode<Node>(),                    \
+                         "Descriptions does not belong to this node");                  \
+                                                                                        \
+        return socket<socketDesc>().dataHandle();                                       \
+    }                                                                                   \
+                                                                                        \
+    template<auto&... descs>                                                            \
+    auto makeHandles()                                                                  \
+    {                                                                                   \
+        static constexpr auto t = std::forward_as_tuple(descs...);                      \
+        return details::makeHandles<t>(                                                 \
+            inputSockets,                                                               \
+            outputSockets);                                                             \
+    }                                                                                   \
     ASSERT_SEMICOLON_DECL
 
 }  // namespace executionGraph

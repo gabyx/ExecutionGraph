@@ -22,7 +22,7 @@ using namespace executionGraph;
 
 using Config = GeneralConfig<>;
 
-MY_TEST(ExecutionTree_Test, Int_Int)
+EG_TEST(ExecutionTree_Test, Int_Int)
 {
     using IntNode = DummyNode<Config>;
     auto node1a   = std::make_unique<IntNode>(0);  // "1a"
@@ -99,7 +99,7 @@ MY_TEST(ExecutionTree_Test, Int_Int)
     ASSERT_EQ(resultNode->getOutVal<DummyNode<Config>::Result1>(), 4) << "wrong result";
 }
 
-MY_TEST(ExecutionTree_Test, IntBig)
+EG_TEST(ExecutionTree_Test, IntBig)
 {
     ///
     using IntNode = DummyNode<Config>;

@@ -12,12 +12,13 @@
 
 //#include <executionGraph/nodes/LogicNode.hpp>
 #include <rttr/registration>
+#include <executionGraph/common/StaticAssert.hpp>
 #include <executionGraph/common/TupleUtil.hpp>
 #include <executionGraph/nodes/LogicSocketData.hpp>
 #include "TestFunctions.hpp"
 using namespace executionGraph;
 
-MY_TEST(SocketData, Constructor)
+EG_TEST(SocketData, Constructor)
 {
     LogicSocketData<int> n{1};
     LogicSocketDataRef<int> r{2};
@@ -26,14 +27,14 @@ MY_TEST(SocketData, Constructor)
     *r.data() = 3;
 }
 
-MY_TEST(SocketData, HandlesBasic)
+EG_TEST(SocketData, HandlesBasic)
 {
     LogicSocketData<int> n{1, 100};
-    static_assert(std::is_same_v<decltype(*n.data()), int&>, "Wrong type");
-    static_assert(std::is_same_v<decltype(*n.cdata()), const int&>, "Wrong type");
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*n.data()), int&>, "Wrong type");
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*n.cdata()), const int&>, "Wrong type");
     const auto& cn = n;
-    static_assert(std::is_same_v<decltype(*cn.data()), const int&>, "Wrong type");
-    static_assert(std::is_same_v<decltype(*cn.cdata()), const int&>, "Wrong type");
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*cn.data()), const int&>, "Wrong type");
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*cn.cdata()), const int&>, "Wrong type");
     auto n2      = std::move(n);
     auto handle1 = n2.data();
     *handle1     = 4;
@@ -42,18 +43,18 @@ MY_TEST(SocketData, HandlesBasic)
     ASSERT_EQ(*n2.data(), 4);
 }
 
-MY_TEST(SocketData, HandlesClass)
+EG_TEST(SocketData, HandlesClass)
 {
     struct A
     {
         int a;
     };
     LogicSocketData<A> n{1, 100};
-    static_assert(std::is_same_v<decltype(*n.data()), A&>, "Wrong type");
-    static_assert(std::is_same_v<decltype(*n.cdata()), const A&>, "Wrong type");
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*n.data()), A&>, "Wrong type");
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*n.cdata()), const A&>, "Wrong type");
     const auto& cn = n;
-    static_assert(std::is_same_v<decltype(*cn.data()), const A&>, "Wrong type");
-    static_assert(std::is_same_v<decltype(*cn.cdata()), const A&>, "Wrong type");
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*cn.data()), const A&>, "Wrong type");
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*cn.cdata()), const A&>, "Wrong type");
     auto n2      = std::move(n);
     auto handle1 = n2.data();
     handle1->a   = 4;

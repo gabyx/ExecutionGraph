@@ -92,7 +92,7 @@ public:
     }
 };
 
-MY_TEST(ExecutionTree_Test, Int_Int)
+EG_TEST(ExecutionTree_Test, Int_Int)
 {
     // Integer node connection (wrong connection)
     auto node1a = std::make_unique<CustomDummyNode<Config>>(0u);

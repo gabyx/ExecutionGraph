@@ -11,6 +11,7 @@
 // =========================================================================================
 
 //#include <executionGraph/nodes/LogicNode.hpp>
+//#define EG_EXCEPTIONALIZE_STATIC_ASSERT
 #include <executionGraph/common/Exception.hpp>
 #include <executionGraph/common/TupleUtil.hpp>
 #include <executionGraph/nodes/LogicSocket.hpp>
@@ -20,7 +21,8 @@
 
 using namespace executionGraph;
 
-MY_TEST(Node_Test, Connections)
+#ifndef EG_NO_COMPILE_TEST_INDEX
+EG_TEST(Node_Test, Connections)
 {
     // Integer node connection (wrong connection)
     LogicSocketData<int> i0(0, 0);
@@ -31,7 +33,7 @@ MY_TEST(Node_Test, Connections)
     LogicSocketData<float> o1(1, 2.0f);
     LogicSocketData<double> o2(2, 2.0);
 
-    DummyNode node1(1);
+    DummyNode<int> node1(1);
     node1.socket<node1.in0Decl>().connect(i0);
     node1.socket<node1.in1Decl>().connect(i1);
     node1.socket<node1.in2Decl>().connect(i2);
@@ -45,7 +47,7 @@ MY_TEST(Node_Test, Connections)
     ASSERT_EQ(o2.dataHandle().get(), 1.0);
 }
 
-MY_TEST(Node_Test, ConnectionsBase)
+EG_TEST(Node_Test, ConnectionsThroughBase)
 {
     // Integer node connection (wrong connection)
     LogicSocketData<int> i0(0, 0);
@@ -56,7 +58,8 @@ MY_TEST(Node_Test, ConnectionsBase)
     LogicSocketData<float> o1(1, 2.0f);
     LogicSocketData<double> o2(2, 2.0);
 
-    DummyNode node1(1);
+    DummyNode<int> node1(1);
+    LogicNode& node = node1;
 
     auto connectIn = [&]<auto & decl>(auto& data)
     {
@@ -80,17 +83,21 @@ MY_TEST(Node_Test, ConnectionsBase)
     ASSERT_EQ(o2.dataHandle().get(), 1.0);
 }
 
-MY_TEST(Node_Test, Wrong_Connections)
+EG_TEST(Node_Test, WrongConnections)
 {
     // Integer node connection (wrong connection)
     LogicSocketData<int> i(0);
-    DummyNode node(0);
+    DummyNode<int> node(0);
 
-    LogicNode* n          = &node;
-    bool catchedException = false;
+    LogicNode* n              = &node;
+    LogicSocketDataBase& data = i;
+    bool catchedException     = false;
+
+    n->output(0)->connect(data);
+
     try
     {
-        n->output(1)->connect(i);  // Wrong connection.
+        n->output(1)->connect(data);  // Wrong connection.
     }
     catch(NodeConnectionException&)
     {
@@ -99,6 +106,18 @@ MY_TEST(Node_Test, Wrong_Connections)
 
     ASSERT_TRUE(catchedException) << "Exception should have been thrown";
 }
+#endif
+
+#if EG_NO_COMPILE_TEST_INDEX == 0
+EG_TEST(Node_Test, WrongSocketOnWrongNode)
+{
+    // Integer node connection (wrong connection)
+    DummyNode<int> node1(1);
+    DummyNode<float> node2(2);
+
+    node2.socket<node2.in0Decl>();
+}
+#endif
 
 int main(int argc, char** argv)
 {

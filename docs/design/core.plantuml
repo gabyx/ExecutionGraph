@@ -7,12 +7,18 @@ skinparam defaultFontName "Fira Code"
 skinparam class{
     BorderColor<< Connections >> Blue
     BorderThickness<< Connections >> 3
+
+    BorderColor<< Node >> Green
+    BorderThickness<< Node >> 3
 }
 
 class DummyNode{
     --  In/Out Declerations --
     + inDecls
     + outDecls
+    --
+    + socket<decl>()
+    + dataHandle<decl>()
     -- Sockets --
     - m_inSockets
     - m_outSockets
@@ -20,11 +26,13 @@ class DummyNode{
 
 namespace executionGraph{
 
-    class LogicNode{
-        + init()
-        + reset()
-        + compute()
-
+    class LogicNode <<Node>> {
+        + id()
+        --
+        + virtual init() = 0
+        + virtual reset() = 0
+        + virtual compute() = 0
+        --
         + registerInputs(...)
         + registerOutputs(...)
         --
@@ -34,7 +42,9 @@ namespace executionGraph{
 
     class LogicSocketInput<Data> {
         + dataHandle() [const]
-
+        --
+        + connect<SocketData>(SocketData&)
+        + disconnect() override
         + connections() [const]
         --
         - Connections m_connections
@@ -42,7 +52,9 @@ namespace executionGraph{
 
     class LogicSocketOutput<Data> {
         + dataHandle() [const]
-
+        --
+        + connect<SocketData>(SocketData&)
+        + disconnect() override
         + connections() [const]
         --
         - Connections m_connections
@@ -53,33 +65,42 @@ namespace executionGraph{
         + index()
         + parent()
         + castToType<T>()
+        --
+        + connect<Socket>(Socket&)
+        + virtual disconnect() = 0
     }
 
     class LogicSocketConnections<Traits, ParentSocket> << Connections >>{
         Connection for input/output sockets
         --
-        + connect(socketData)
-        + disconnect(socketData)
+        + connect(SocketData&)
+        + disconnect(SocketData&)
         --
-        SocketDataConnections* m_connections
-        Parent* m_parent
+        - SocketDataConnections* m_connections
+        - Parent* m_parent
     }
 
     namespace userData{
         class LogicSocketDataConnections<Traits, ParentSocket> << Connections >> {
             Connection for data sockets
             --
-            + connect(socket)
-            + disconnect(socket)
+            + connect(InSocket&)
+            + disconnect(InSocket&)
+            + connect(OutSocket&)
+            + disconnect(OutSocket&)
             --
-            m_inputs
-            m_outputs
+            - m_inputs
+            - m_outputs
         }
 
         class LogicSocketData<Data>{
             + dataHandle() [const]
             + dataHandleConst()
-
+            --
+            + virtual connect(InSocketBase&) override
+            + virtual disconnect(InSocketBase&) override
+            + virtual connect(OutSocketBase&) override
+            + virtual disconnect(OutSocketBase&) override
             + connections() [const]
             --
             - Data m_data
@@ -96,6 +117,13 @@ namespace executionGraph{
     }
 
     class LogicSocketDataBase{
+        + virtual connect(InSocketBase&) = 0
+        + virtual disconnect(InSocketBase&) = 0
+        + virtual connect(OutSocketBase&) = 0
+        + virtual disconnect(OutSocketBase&) = 0
+        --
+        + type()
+        + id()
 
     }
 }

@@ -74,7 +74,7 @@ endfunction()
 
 # Delegates
 set(EXEC_NAME1 ${PROJECT_NAME}-BenchmarkDelegates)
-add_executable(${EXEC_NAME1}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_delegates.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
+add_executable(${EXEC_NAME1}  ${CMAKE_CURRENT_SOURCE_DIR}/src/main-delegates.cpp ${SOURCE_FILES} ${INCLUDE_FILES}   )
 defineCompileDefs(${EXEC_NAME1})
 
 

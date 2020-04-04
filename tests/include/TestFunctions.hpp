@@ -24,7 +24,7 @@
     std::uniform_real_distribution<double> uni(0.0, 1.0); \
     auto rand = [&]() { return uni(rng); };
 
-#define MY_TEST(name1, name2) TEST(name1, name2)
+#define EG_TEST(name1, name2) TEST(name1, name2)
 
 std::size_t hashString(std::string s);
 
