@@ -90,10 +90,10 @@ namespace executionGraph
         }
 
     public:
-        virtual void connect(LogicSocketInputBase& inputSocket) noexcept(false)   = 0;
-        virtual void connect(LogicSocketOutputBase& outputSocket) noexcept(false) = 0;
-        virtual void disconnect(LogicSocketInputBase& inputSocket) noexcept       = 0;
-        virtual void disconnect(LogicSocketOutputBase& outputSocket) noexcept     = 0;
+        virtual void connect(LogicSocketInputBase& inputSocket) noexcept(false)      = 0;
+        virtual void connect(LogicSocketOutputBase& outputSocket) noexcept(false)    = 0;
+        virtual void disconnect(LogicSocketInputBase& inputSocket) noexcept(false)   = 0;
+        virtual void disconnect(LogicSocketOutputBase& outputSocket) noexcept(false) = 0;
 
     public:
         SocketDataId id() const noexcept { return m_id; }

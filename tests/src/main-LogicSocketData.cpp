@@ -24,23 +24,24 @@ EG_TEST(SocketData, Constructor)
     LogicSocketDataRef<int> r{2};
 
     r.setReference(n);
-    *r.data() = 3;
+    *r.dataHandle() = 3;
 }
 
 EG_TEST(SocketData, HandlesBasic)
 {
     LogicSocketData<int> n{1, 100};
-    EG_STATIC_ASSERT(std::is_same_v<decltype(*n.data()), int&>, "Wrong type");
-    EG_STATIC_ASSERT(std::is_same_v<decltype(*n.cdata()), const int&>, "Wrong type");
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*n.dataHandle()), int&>, "Wrong type");
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*n.dataHandleConst()), const int&>, "Wrong type");
     const auto& cn = n;
-    EG_STATIC_ASSERT(std::is_same_v<decltype(*cn.data()), const int&>, "Wrong type");
-    EG_STATIC_ASSERT(std::is_same_v<decltype(*cn.cdata()), const int&>, "Wrong type");
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*cn.dataHandle()), const int&>, "Wrong type");
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*cn.dataHandleConst()), const int&>, "Wrong type");
     auto n2      = std::move(n);
-    auto handle1 = n2.data();
+    auto handle1 = n2.dataHandle();
     *handle1     = 4;
     auto handle2 = std::move(handle1);
     ASSERT_TRUE(handle1 == nullptr);
-    ASSERT_EQ(*n2.data(), 4);
+    ASSERT_TRUE(handle2 != nullptr);
+    ASSERT_EQ(*n2.dataHandle(), 4);
 }
 
 EG_TEST(SocketData, HandlesClass)
@@ -50,17 +51,18 @@ EG_TEST(SocketData, HandlesClass)
         int a;
     };
     LogicSocketData<A> n{1, 100};
-    EG_STATIC_ASSERT(std::is_same_v<decltype(*n.data()), A&>, "Wrong type");
-    EG_STATIC_ASSERT(std::is_same_v<decltype(*n.cdata()), const A&>, "Wrong type");
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*n.dataHandle()), A&>, "Wrong type");
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*n.dataHandleConst()), const A&>, "Wrong type");
     const auto& cn = n;
-    EG_STATIC_ASSERT(std::is_same_v<decltype(*cn.data()), const A&>, "Wrong type");
-    EG_STATIC_ASSERT(std::is_same_v<decltype(*cn.cdata()), const A&>, "Wrong type");
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*cn.dataHandle()), const A&>, "Wrong type");
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*cn.dataHandleConst()), const A&>, "Wrong type");
     auto n2      = std::move(n);
-    auto handle1 = n2.data();
+    auto handle1 = n2.dataHandle();
     handle1->a   = 4;
     auto handle2 = std::move(handle1);
     ASSERT_TRUE(handle1 == nullptr);
-    ASSERT_EQ(n2.data()->a, 4);
+    ASSERT_TRUE(handle2 != nullptr);
+    ASSERT_EQ(n2.dataHandle()->a, 4);
 }
 
 int main(int argc, char** argv)

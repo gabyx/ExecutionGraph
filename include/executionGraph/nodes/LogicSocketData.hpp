@@ -21,7 +21,7 @@
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 #include "executionGraph/nodes/LogicDataHandle.hpp"
-#include "executionGraph/nodes/LogicSocketBase.hpp"
+#include "executionGraph/nodes/LogicSocket.hpp"
 #include "executionGraph/nodes/LogicSocketDataBase.hpp"
 
 namespace executionGraph
@@ -39,7 +39,7 @@ namespace executionGraph
         template<typename T>
         static constexpr bool isInputConnection = std::is_same_v<InputSocket, T>;
         template<typename T>
-        static constexpr bool isOutputConnection = std::is_base_of_v<OutputSocket, T>;
+        static constexpr bool isOutputConnection = std::is_same_v<OutputSocket, T>;
 
         friend InputSocketConnections;
         friend OutputSocketConnections;
@@ -65,9 +65,18 @@ namespace executionGraph
 
         LogicSocketDataConnections(LogicSocketDataConnections&& other)
         {
-            // Connections are not  moved!
+            *this = std::move(other);
         }
-        LogicSocketDataConnections& operator=(LogicSocketDataConnections&& other) = delete;
+
+        LogicSocketDataConnections& operator=(LogicSocketDataConnections&& other)
+        {
+            m_inputs  = std::move(other.m_inputs);
+            m_outputs = std::move(other.m_outputs);
+
+            other.m_inputs.clear();
+            other.m_inputs.clear();
+            return *this;
+        };
 
     public:
         void init(Parent& parent)
@@ -75,10 +84,13 @@ namespace executionGraph
             m_parent = &parent;
         }
 
-        template<typename Socket,
-                 EG_ENABLE_IF(isInputConnection<Socket> || isOutputConnection<Socket>)>
+        template<typename Socket>
         void connect(Socket& socket) noexcept
         {
+            EG_STATIC_ASSERT(!std::is_const_v<Socket>, "Socket type is const");
+            EG_STATIC_ASSERT(isInputConnection<Socket> || isOutputConnection<Socket>,
+                             "Socket doesn't match this data socket");
+
             if(!isConnected(socket))
             {
                 onConnect(socket);
@@ -86,10 +98,13 @@ namespace executionGraph
             }
         }
 
-        template<typename Socket,
-                 EG_ENABLE_IF(isInputConnection<Socket> || isOutputConnection<Socket>)>
+        template<typename Socket>
         void disconnect(Socket& socket) noexcept
         {
+            EG_STATIC_ASSERT(!std::is_const_v<Socket>, "Socket type is const");
+            EG_STATIC_ASSERT(isInputConnection<Socket> || isOutputConnection<Socket>,
+                             "Socket doesn't match this data socket");
+
             if(isConnected(socket))
             {
                 onDisconnect(socket);
@@ -214,41 +229,31 @@ namespace executionGraph
             }
         };
 
-        //! Copy allowed
-        LogicSocketData(const LogicSocketData& other)
-            : m_connections(*this)
-        {
-            *this = other;
-        };
-        LogicSocketData& operator=(const LogicSocketData& other)
-        {
-            Base::operator=(other);
-            m_data        = other.m_data;
-        }
-
         //! Move allowed
         LogicSocketData(LogicSocketData&& other)
-            : m_connections(*this)
-        {
-            *this = std::move(other);
-        };
+            : Base(std::move(other))
+            , m_data{std::move(other.m_data)}
+            , m_connections{std::move(other.m_connections)} {};
+
         LogicSocketData& operator=(LogicSocketData&& other)
         {
             Base::operator=(std::move(other));
             m_data        = std::move(other.m_data);
+            m_connections = std::move(other.m_connections);
         }
 
     public:
-        auto dataHandleConst() const noexcept
+        DataHandleConst dataHandleConst() const noexcept
         {
             return DataHandleConst{m_data};
         }
 
-        auto dataHandle() const noexcept
+        DataHandleConst dataHandle() const noexcept
         {
             return dataHandleConst();
         }
-        auto dataHandle() noexcept
+
+        DataHandle dataHandle() noexcept
         {
             return DataHandle{m_data};
         }
@@ -264,14 +269,30 @@ namespace executionGraph
             connectImpl(outputSocket);
         }
 
-        void disconnect(LogicSocketInputBase& inputSocket) noexcept override
+        void disconnect(LogicSocketInputBase& inputSocket) noexcept(false) override
         {
             connectImpl<true>(inputSocket);
         }
 
-        void disconnect(LogicSocketOutputBase& outputSocket) noexcept override
+        void disconnect(LogicSocketOutputBase& outputSocket) noexcept(false) override
         {
             connectImpl<true>(outputSocket);
+        }
+
+        template<typename Socket,
+                 EG_ENABLE_IF(!std::is_same_v<Socket, LogicSocketInputBase> &&
+                              !std::is_same_v<Socket, LogicSocketOutputBase>)>
+        void connect(Socket& socket) noexcept
+        {
+            m_connections.connect(socket);
+        }
+
+        template<typename Socket,
+                 EG_ENABLE_IF(!std::is_same_v<Socket, LogicSocketInputBase> &&
+                              !std::is_same_v<Socket, LogicSocketOutputBase>)>
+        void disconnect(Socket& socket) noexcept
+        {
+            m_connections.connect(socket);
         }
 
     private:
@@ -280,7 +301,8 @@ namespace executionGraph
         {
             try
             {
-                auto& s = socket.template castToType<Data, true>();
+                auto& s = socket.template castToType<Data, true>();  //  throws ...
+
                 if constexpr(disconnect)
                 {
                     m_connections.disconnect(s);
@@ -371,13 +393,43 @@ namespace executionGraph
             removeReference();
         }
 
-        DataHandleConst data() const noexcept
+        DataHandleConst dataHandle() const noexcept
         {
-            return m_node->data();
+            return m_node->dataHandle();
         }
-        DataHandle data() noexcept
+        DataHandle dataHandle() noexcept
         {
-            return m_node->data();
+            return m_node->dataHandle();
+        }
+
+    public:
+        virtual void connect(LogicSocketInputBase& inputSocket) noexcept(false) override
+        {
+            if(m_node)
+            {
+                m_node->connect(inputSocket);
+            }
+        }
+        virtual void connect(LogicSocketOutputBase& outputSocket) noexcept(false) override
+        {
+            if(m_node)
+            {
+                m_node->connect(outputSocket);
+            }
+        }
+        virtual void disconnect(LogicSocketInputBase& inputSocket) noexcept(false) override
+        {
+            if(m_node)
+            {
+                m_node->disconnect(inputSocket);
+            }
+        }
+        virtual void disconnect(LogicSocketOutputBase& outputSocket) noexcept(false) override
+        {
+            if(m_node)
+            {
+                m_node->disconnect(outputSocket);
+            }
         }
 
     public:

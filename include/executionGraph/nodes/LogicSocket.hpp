@@ -65,6 +65,7 @@ namespace executionGraph
         {
             m_parent = &parent;
         }
+
         //! Connect a data node.
         void connect(SocketDataConnections& connections) noexcept
         {

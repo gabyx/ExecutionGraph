@@ -41,7 +41,7 @@ namespace executionGraph
         ThreadPool(std::size_t nThreads)
             : m_queue(std::make_shared<Queue>())
         {
-            for(auto i = 0; i < nThreads; ++i)
+            for(auto i = 0u; i < nThreads; ++i)
             {
                 m_consumers.emplace_back(std::make_unique<Consumer>(m_queue));
             }

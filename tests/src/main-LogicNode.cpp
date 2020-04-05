@@ -108,7 +108,7 @@ EG_TEST(NodeTest, WrongConnections)
 
     ASSERT_TRUE(catchedException) << "Exception should have been thrown";
 }
-#endif
+#else
 
 #if EG_NO_COMPILE_TEST_INDEX == 0
 EG_TEST(NodeTest, WrongSocketOnWrongNode)
@@ -120,6 +120,8 @@ EG_TEST(NodeTest, WrongSocketOnWrongNode)
     node2.socket<node1.in0Decl>();
     // CompileErrorRegex: "Description does not belong to this node"
 }
+#endif
+
 #endif
 
 int main(int argc, char** argv)
