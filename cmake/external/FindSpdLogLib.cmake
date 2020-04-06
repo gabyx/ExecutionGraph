@@ -1,4 +1,5 @@
-# Try to find the spdlog Library https://github.com/gabime/spdlog
+# Try to find the spdlog library
+
 include(FindPackageHandleStandardArgs)
 
 set(URL "https://github.com/gabime/spdlog")

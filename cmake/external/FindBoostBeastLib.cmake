@@ -1,4 +1,5 @@
-# Try to find the boost Library Library 
+# Try to find the boost library
+
 include(FindPackageHandleStandardArgs)
 
 set(URL "https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.bz2")

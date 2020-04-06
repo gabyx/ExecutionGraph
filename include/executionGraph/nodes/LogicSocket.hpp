@@ -32,14 +32,15 @@
 
 namespace executionGraph
 {
+    //! Wrapping functionality around connection on a socket.
     template<typename TTraits, typename Parent>
-    class LogicSocketConnections
+    class LogicSocketConnections final
     {
     public:
-        using SocketData            = typename TTraits::SocketData;
-        using SocketDataConnections = typename TTraits::SocketDataConnections;
+        using SocketData             = typename TTraits::SocketData;
+        using ISocketDataConnections = typename TTraits::ISocketDataConnections;
 
-        friend SocketDataConnections;
+        friend ISocketDataConnections;
 
     public:
         explicit LogicSocketConnections(Parent& parent) noexcept
@@ -67,48 +68,51 @@ namespace executionGraph
         }
 
         //! Connect a data node.
-        void connect(SocketDataConnections& connections) noexcept
+        void connect(ISocketDataConnections& dataConnections) noexcept
         {
             disconnect();
-            onConnect(connections);
-            m_connections->onConnect(parent());
+            onConnect(dataConnections);
+            m_dataConnection->onConnect(parent());
         }
 
         //! Disconnect the data node.
         void disconnect() noexcept
         {
-            if(m_connections)
+            if(m_dataConnection)
             {
-                m_connections->onDisconnect(parent());
+                m_dataConnection->onDisconnect(parent());
                 onDisconnect();
             }
         }
 
+        bool isConnected() const { return m_dataConnection != nullptr; }
+
         SocketData* socketData()
         {
-            return isConnected() ? &m_connections->parent() : nullptr;
+            //! @todo This cast needs to go aways, just to make it compile...
+            // make type erased valuesemantic datahandle...
+            return isConnected() ? &static_cast<typename TTraits::SocketDataConnections*>(m_dataConnection)->parent() : nullptr;
         }
         const SocketData* socketData() const { return const_cast<LogicSocketConnections&>(*this).socketData(); }
 
-        bool isConnected() const { return m_connections != nullptr; }
-
-    protected:
+    public:
         Parent& parent() { return *m_parent; }
         const Parent& parent() const { return *m_parent; }
 
-        void onConnect(const SocketDataConnections& socketData) noexcept
+    private:
+        void onConnect(const ISocketDataConnections& socketData) noexcept
         {
-            m_connections = const_cast<SocketDataConnections*>(&socketData);
+            m_dataConnection = const_cast<ISocketDataConnections*>(&socketData);
         }
 
         void onDisconnect() noexcept
         {
-            m_connections = nullptr;
+            m_dataConnection = nullptr;
         }
 
     private:
-        SocketDataConnections* m_connections = nullptr;  //! Connected data node.
-        Parent* m_parent                     = nullptr;
+        ISocketDataConnections* m_dataConnection = nullptr;  //! Connected data node.
+        Parent* m_parent                         = nullptr;  //! Parent of this connection wrapper.
     };
 
     /* ---------------------------------------------------------------------------------------*/

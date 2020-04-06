@@ -26,9 +26,55 @@
 
 namespace executionGraph
 {
-    template<typename TTraits, typename Parent>
-    class LogicSocketDataConnections
+    template<typename TTraits>
+    class ILogicSocketDataConnections
     {
+    public:
+        using Data         = typename TTraits::Data;
+        using InputSocket  = typename TTraits::InputSocket;
+        using OutputSocket = typename TTraits::OutputSocket;
+
+        using InputSocketConnections  = typename TTraits::InputSocketConnections;
+        using OutputSocketConnections = typename TTraits::OutputSocketConnections;
+
+        friend InputSocketConnections;
+        friend OutputSocketConnections;
+
+    private:
+        virtual void onConnect(const OutputSocket& outputSocket) = 0;
+        virtual void onConnect(const InputSocket& inputSocket)   = 0;
+
+        virtual void onDisconnect(const OutputSocket& outputSocket) = 0;
+        virtual void onDisconnect(const InputSocket& inputSocket)   = 0;
+
+    protected:
+        struct Forwarder
+        {
+            template<typename Socket>
+            void onDisconnect(Socket& socket) const
+            {
+                socket.connections().onDisconnect();
+            }
+
+            template<typename Socket>
+            void onConnect(Socket& socket, ILogicSocketDataConnections& self) const
+            {
+                socket.connections().onConnect(self);
+            }
+        };
+
+    protected:
+        const auto& forwarder() { return m_forwarder; }
+
+    private:
+        Forwarder m_forwarder;
+    };
+
+    template<typename TTraits, typename Parent>
+    class LogicSocketDataConnections final : public TTraits::ISocketDataConnections
+    {
+        using TTraits::ISocketDataConnections::forwarder;
+
     public:
         using InputSocket             = typename TTraits::InputSocket;
         using OutputSocket            = typename TTraits::OutputSocket;
@@ -41,9 +87,6 @@ namespace executionGraph
         template<typename T>
         static constexpr bool isOutputConnection = std::is_same_v<OutputSocket, T>;
 
-        friend InputSocketConnections;
-        friend OutputSocketConnections;
-
     public:
         explicit LogicSocketDataConnections(Parent& parent) noexcept
             : m_parent(&parent){};
@@ -52,11 +95,11 @@ namespace executionGraph
         {
             for(auto* socket : m_inputs)
             {
-                socket->connections().onDisconnect();
+                forwarder().onDisconnect(*socket);
             }
             for(auto* socket : m_outputs)
             {
-                socket->connections().onDisconnect();
+                forwarder().onDisconnect(*socket);
             }
         }
 
@@ -94,7 +137,7 @@ namespace executionGraph
             if(!isConnected(socket))
             {
                 onConnect(socket);
-                socket.connections().onConnect(*this);
+                forwarder().onConnect(socket, *this);
             }
         }
 
@@ -108,7 +151,7 @@ namespace executionGraph
             if(isConnected(socket))
             {
                 onDisconnect(socket);
-                socket.connections().onDisconnect();
+                forwarder().onDisconnect(socket);
             }
         }
 
@@ -122,26 +165,27 @@ namespace executionGraph
             return m_outputs.find(const_cast<OutputSocket*>(&socket)) != m_outputs.end();
         }
 
-    protected:
+    public:
         Parent& parent() { return *m_parent; }
         const Parent& parent() const { return *m_parent; }
 
-        void onConnect(const InputSocket& socket) noexcept
+    private:
+        void onConnect(const InputSocket& socket) noexcept override
         {
             EG_VERIFY(addGetLink(socket), "Not connected!");
         }
 
-        void onConnect(const OutputSocket& socket) noexcept
+        void onConnect(const OutputSocket& socket) noexcept override
         {
             EG_VERIFY(addWriteLink(socket), "Not connected!");
         }
 
-        void onDisconnect(const InputSocket& socket) noexcept
+        void onDisconnect(const InputSocket& socket) noexcept override
         {
             EG_VERIFY(removeGetLink(socket), "Not disconnected!");
         }
 
-        void onDisconnect(const OutputSocket& socket) noexcept
+        void onDisconnect(const OutputSocket& socket) noexcept override
         {
             EG_VERIFY(removeWriteLink(socket), "Not disconnected!");
         }

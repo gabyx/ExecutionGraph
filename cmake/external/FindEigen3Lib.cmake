@@ -1,6 +1,7 @@
-# Try to find the Eigen3 Library Library https://bitbucket.org/eigen/eigen
+# Try to find the eigen3 library
 # We use this library header only!, so we dont build it!
 # defines EIGEN_INCLUDE_DIR
+
 include(FindPackageHandleStandardArgs)
 
 set(URL "http://bitbucket.org/eigen/eigen/get/3.3.4.zip")
@@ -13,7 +14,7 @@ find_package(Eigen3)
 message(STATUS "eigen3 library: finding...")
 
 if(NOT EXISTS "${EIGEN3_INCLUDE_DIR}")
-    message(STATUS "eigen3 library: include dir not found -> download from https://bitbucket.org/eigen/eigen")
+    message(STATUS "eigen3 library: include dir not found -> download from ${URL}")
 
     include(DownloadProject)
     download_project(PROJ              eigen3
@@ -24,7 +25,7 @@ if(NOT EXISTS "${EIGEN3_INCLUDE_DIR}")
                     UPDATE_DISCONNECTED 1
                     INSTALL_DIR "${INSTALL_DIR}")
 
-    set(EIGEN3_INCLUDE_DIR "${eigen3_SOURCE_DIR}" CACHE STRING "eigen library (https://bitbucket.org/eigen/eigen) include directory" FORCE)
+    set(EIGEN3_INCLUDE_DIR "${eigen3_SOURCE_DIR}" CACHE STRING "eigen library (${URL}) include directory" FORCE)
     # define a path in the cache where to find this downloaded library
     set(EIGEN3_DIR "${CMAKE_BINARY_DIR}/external/install/eigen" CACHE STRING "eigen directory" FORCE)
 else()

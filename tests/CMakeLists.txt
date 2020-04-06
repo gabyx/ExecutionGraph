@@ -55,7 +55,7 @@ function(addTest name noCompile noCompileTests)
     if(${noCompile})
         message(STATUS "Adding '${noCompileTests}' no compile tests")
         
-        foreach(testIndex RANGE noCompileTests)
+        foreach(testIndex RANGE ${noCompileTests})
             set(targetNC "${target}-NoCompile-${testIndex}")
 
             addTarget(${targetNC} ${file})

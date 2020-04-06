@@ -12,6 +12,7 @@ find_package(MetaLib REQUIRED)
 find_package(FmtLib REQUIRED)
 find_package(FlatBuffersLib REQUIRED)
 find_package(RTTRLib REQUIRED) 
+find_package(PolymorphicValueLib REQUIRED) 
 find_package(CrossGUIDLib REQUIRED)
 
 if(${ExecutionGraph_BUILD_GUI})

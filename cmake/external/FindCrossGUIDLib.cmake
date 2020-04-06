@@ -1,4 +1,5 @@
-# Try to find the crossguid Library Library 
+# Try to find the crossguid library
+
 include(FindPackageHandleStandardArgs)
 
 set(URL "https://github.com/graeme-hill/crossguid.git")

@@ -1,4 +1,5 @@
-# Try to find the RTTR Library Library https://github.com/rttrorg/rttr.git
+# Try to find the RTTR library
+
 include(FindPackageHandleStandardArgs)
 
 # Try to find the library, if it is installed!
@@ -14,7 +15,7 @@ if(${USE_SUPERBUILD})
 
     if(NOT TARGET "RTTR::Core")
 
-        message(STATUS "rttr library: targer not found -> download from ${URL}")
+        message(STATUS "rttr library: target not found -> download from ${URL}")
 
         include(ExternalProject)
         

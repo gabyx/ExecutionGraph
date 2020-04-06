@@ -173,6 +173,10 @@ find_package(CrossGUIDLib REQUIRED)
 find_package(RTTRLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "rttrLib")
 
+# Try to find the polymorphic value library
+find_package(PolymorphicValueLib REQUIRED) 
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "polymorphicValueLib")
+
 if(${ExecutionGraph_BUILD_SERIALIZATION})
     # Try to find flatbuffer library
     find_package(FlatBuffersLib REQUIRED)

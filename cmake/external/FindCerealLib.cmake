@@ -1,4 +1,5 @@
 # Try to find the cereal library
+
 include(FindPackageHandleStandardArgs)
 
 set(URL "https://github.com/USCiLab/cereal.git")

@@ -1,4 +1,5 @@
-# Try to find the FlatBuffer Library https://github.com/google/flatbuffers.git
+# Try to find the flatbuffers library
+
 include(FindPackageHandleStandardArgs)
 
 # Try to find the library, if it is installed!
@@ -13,7 +14,7 @@ if(${USE_SUPERBUILD})
 
     if(NOT TARGET "flatbuffers::flatbuffers")
 
-        message(STATUS "flatbuffers library: targer not found -> download from ${URL}")
+        message(STATUS "flatbuffers library: target not found -> download from ${URL}")
 
         include(ExternalProject)
         

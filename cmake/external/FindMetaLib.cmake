@@ -1,4 +1,5 @@
-# Find the Meta include directory
+# Find the meta library
+
 include(FindPackageHandleStandardArgs)
 
 if(NOT EXISTS "${meta_INCLUDE_DIR}")

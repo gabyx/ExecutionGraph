@@ -1,4 +1,5 @@
-# Try to find the memory Library Library https://github.com/foonathan/memory.git
+# Try to find the memory allocators library
+
 include(FindPackageHandleStandardArgs)
 
 # Try to find the library, if it is installed!
@@ -13,7 +14,7 @@ if(${USE_SUPERBUILD})
 
     if(NOT TARGET "foonathan_memory")
 
-        message(STATUS "memory library: targer not found -> download from ${URL}")
+        message(STATUS "memory library: target not found -> download from ${URL}")
 
         include(ExternalProject)
         

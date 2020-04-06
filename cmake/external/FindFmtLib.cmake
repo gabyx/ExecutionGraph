@@ -1,4 +1,5 @@
-# Try to find the RTTR Library Library https://github.com/fmtlib/fmt.git
+# Try to find the fmt library
+
 include(FindPackageHandleStandardArgs)
 
 # Try to find the library, if it is installed!
@@ -13,7 +14,7 @@ if(${USE_SUPERBUILD})
 
     if(NOT TARGET "fmt::fmt-header-only")
 
-        message(STATUS "fmt library: targer not found -> download from ${URL}")
+        message(STATUS "fmt library: target not found -> download from ${URL}")
 
         include(ExternalProject)
         

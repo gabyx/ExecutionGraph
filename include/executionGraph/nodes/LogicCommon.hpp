@@ -59,6 +59,9 @@ namespace executionGraph
     template<typename Data>
     class LogicSocketData;
 
+    template<typename ConnectionTraits>
+    class ILogicSocketDataConnections;
+
     template<typename ConnectionTraits, typename Derived>
     class LogicSocketDataConnections;
     //@}
@@ -78,6 +81,9 @@ namespace executionGraph
 
         using SocketData            = LogicSocketData<Data>;
         using SocketDataConnections = LogicSocketDataConnections<ConnectionTraits, SocketData>;
+
+        using ISocketData            = typename LogicSocketData<Data>::Base;
+        using ISocketDataConnections = ILogicSocketDataConnections<ConnectionTraits>;
     };
     //@}
 
