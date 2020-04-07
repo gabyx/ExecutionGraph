@@ -13,6 +13,7 @@
 #pragma once
 
 #include <rttr/type>
+#include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/MetaCommon.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
@@ -33,6 +34,12 @@ namespace executionGraph
     template<typename IsInput>
     class LogicSocketBase
     {
+    private:
+        template<typename Data>
+        using Socket = meta::if_<IsInput,
+                                 LogicSocketInput<Data>,
+                                 LogicSocketOutput<Data>>;
+
     public:
         EG_DEFINE_TYPES();
 
@@ -55,7 +62,11 @@ namespace executionGraph
         SocketIndex index() const noexcept { return m_index; }
         const rttr::type& type() const noexcept { return m_type; }
 
-        const LogicNode& parent() const noexcept { return *m_parent; }
+        const LogicNode& parent() const noexcept
+        {
+            EG_ASSERT(m_parent, "Parent not set");
+            return *m_parent;
+        }
 
         template<typename T>
         bool isType() const noexcept
@@ -83,28 +94,20 @@ namespace executionGraph
         template<typename Data, bool doThrow = true>
         auto& castToType() noexcept(!doThrow)
         {
-            using Socket = meta::if_<IsInput,
-                                     LogicSocketInput<Data>,
-                                     LogicSocketOutput<Data>>;
-
             if constexpr(doThrow || throwIfBadSocketCast)
             {
                 details::throwSocketCast(!this->template isType<Data>(),
                                          *this,
                                          rttr::type::get<Data>());
             }
-            return static_cast<Socket&>(*this);
+            return static_cast<Socket<Data>&>(*this);
         }
 
         //! Non-const overload.
         template<typename Data, bool doThrow = false>
         auto& castToType() const noexcept(!doThrow)
         {
-            using Socket = meta::if_<IsInput,
-                                     LogicSocketInput<Data>,
-                                     LogicSocketOutput<Data>>;
-
-            return const_cast<const Socket&>(
+            return const_cast<const Socket<Data>&>(
                 const_cast<LogicSocketBase*>(this)
                     ->castToType<Data, doThrow>());
         }

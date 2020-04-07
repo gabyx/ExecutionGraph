@@ -17,6 +17,38 @@
 #include <foonathan/memory/smart_ptr.hpp>
 #include "executionGraphGui/common/Assert.hpp"
 
+using raw_ptr = std::unique_ptr<T, std::function<void(void*)>>;
+
+template<typename T,
+         class RawAllocator,
+         typename... Args>
+auto allocate_unique_erased(std::shared_ptr<RawAllocator> alloc, Args&&... args)
+{
+    auto memory = alloc->allocate_node(sizeof(T), alignof(T));
+    // raw_ptr deallocates memory in case of constructor exception
+    raw_ptr result(static_cast<T*>(memory),
+                   [alloc](void* p) {
+                       auto t = static_cast<T*>(p);
+                       /* ... do the deleteion part here by `alloc`*/
+                   });
+    // call constructor
+    ::new(memory) T(detail::forward<Args>(args)...);
+    // pass ownership to return value using a deleter that calls destructor
+    return std::move(result);
+}
+
+class node
+{
+    // ...
+    template<typename T, typename RawAllocator>
+    node(T obj, std::shared_ptr<RawAllocator> allocator)
+        : ptr_(allocate_unique_erased<wrapper<T>>(std::move(obj)))
+    {}
+    // ...
+
+    raw_ptr ptr_;
+}
+
 /* ---------------------------------------------------------------------------------------*/
 /*!
     Simple Binary Buffer

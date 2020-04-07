@@ -16,13 +16,11 @@
 #include <meta/meta.hpp>
 #include <rttr/type>
 #include "executionGraph/common/TypeDefs.hpp"
+#include "executionGraph/nodes/ILogicSocketDataAccess.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 
 namespace executionGraph
 {
-    template<typename>
-    class LogicSocketData;
-
     /* ---------------------------------------------------------------------------------------*/
     /*!
         Base class for any data node.
@@ -31,12 +29,8 @@ namespace executionGraph
         @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
     */
     /* ---------------------------------------------------------------------------------------*/
-
     class LogicSocketDataBase
     {
-        template<typename>
-        friend class LogicSocketData;
-
     protected:
         LogicSocketDataBase(rttr::type type, SocketDataId id)
             : m_type(type)
@@ -52,6 +46,15 @@ namespace executionGraph
         LogicSocketDataBase(LogicSocketDataBase&& other) = default;
         LogicSocketDataBase& operator=(LogicSocketDataBase&& other) = default;
 
+    protected:
+        template<typename Derived>
+        void init(Derived& derived)
+        {
+            static_assert(std::is_base_of_v<ILogicSocketDataAccess<typename Derived::Data>, Derived>,
+                          "Derived from this base needs to implement LogicSocketData<Data>");
+            m_dataAccess = &derived;
+        }
+
     public:
         EG_DEFINE_TYPES();
 
@@ -63,11 +66,13 @@ namespace executionGraph
             return type() == rttr::type::get<T>();
         }
 
-        //! Cast to a logic data node of type `LogicSocketData<T>*`.
+        //! Cast to the data acccess of type `ILogicSocketDataAcccess<T>&`.
         //! @throw if `doThrow` or `throwIfBadSocketCast` is `true`
         template<typename T, bool doThrow = true>
-        auto& castToType() noexcept(!doThrow)
+        auto& dataAccess() noexcept(!doThrow)
         {
+            EG_ASSERT(m_dataAccess, "Data access not set");
+
             if constexpr(doThrow || throwIfSocketDataNoStorage)
             {
                 EG_LOGTHROW_IF(!isType<T>(),
@@ -78,15 +83,15 @@ namespace executionGraph
                                rttr::type::get<T>().get_name());
             }
 
-            return static_cast<LogicSocketData<T>&>(*this);
+            return static_cast<ILogicSocketDataAccess<T>&>(*m_dataAccess);
         }
 
         //! Non-const overload.
         template<typename T, bool doThrow = true>
-        auto& castToType() const noexcept(!doThrow)
+        auto& dataAccess() const noexcept(!doThrow)
         {
             return static_cast<const LogicSocketData<T>&>(
-                const_cast<LogicSocketDataBase*>(this)->castToType<T, doThrow>());
+                const_cast<LogicSocketDataBase*>(this)->dataAccess<T, doThrow>());
         }
 
     public:
@@ -100,7 +105,8 @@ namespace executionGraph
         void setId(SocketDataId id) noexcept { m_id = id; }
 
     private:
-        const rttr::type m_type;                  //!< The type of this node.
-        SocketDataId m_id = socketDataIdInvalid;  //!< Id of this node.
+        const rttr::type m_type;                                         //!< The type of this node.
+        SocketDataId m_id                        = socketDataIdInvalid;  //!< Id of this node.
+        ILogicSocketDataAccessBase* m_dataAccess = nullptr;              //!< Data access.
     };
 }  // namespace executionGraph

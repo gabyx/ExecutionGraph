@@ -19,18 +19,18 @@
 
 //! Some assert macro.
 #ifdef NDEBUG
-#    define EG_DEBUG_ONLY(code) ASSERT_SEMICOLON
-#    define EG_ASSERT(condition, ...) ASSERT_SEMICOLON
-#    define EG_VERIFY(condition, ...) \
+    #define EG_DEBUG_ONLY(code) ASSERT_SEMICOLON
+    #define EG_ASSERT(condition, ...) ASSERT_SEMICOLON
+    #define EG_VERIFY(condition, ...) \
         condition;                    \
         ASSERT_SEMICOLON
-#    define EG_ASSERT_TYPE(condition, type, ...) ASSERT_SEMICOLON
+    #define EG_ASSERT_TYPE(condition, type, ...) ASSERT_SEMICOLON
 #else
-// Debug!
-#    define EG_DEBUG_ONLY(code) code
-#    define EG_VERIFY(condition, ...) EG_ASSERT(condition, __VA_ARGS__)
-#    define EG_ASSERT(condition, ...) EG_ASSERT_TYPE(condition, executionGraph::ExceptionFatal, __VA_ARGS__)
-#    define EG_ASSERT_TYPE(condition, Type, ...)               \
+    // Debug!
+    #define EG_DEBUG_ONLY(code) code
+    #define EG_VERIFY(condition, ...) EG_ASSERT(condition, __VA_ARGS__)
+    #define EG_ASSERT(condition, ...) EG_ASSERT_TYPE(condition, executionGraph::ExceptionFatal, __VA_ARGS__)
+    #define EG_ASSERT_TYPE(condition, Type, ...)               \
         if(!(condition))                                       \
         {                                                      \
             EG_LOG_ERROR("{0} : \n{1}\n@ {2} [{3}]",           \

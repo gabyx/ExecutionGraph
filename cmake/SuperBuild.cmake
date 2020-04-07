@@ -12,14 +12,14 @@ find_package(MetaLib REQUIRED)
 find_package(FmtLib REQUIRED)
 find_package(FlatBuffersLib REQUIRED)
 find_package(RTTRLib REQUIRED) 
-find_package(PolymorphicValueLib REQUIRED) 
+#find_package(PolymorphicValueLib REQUIRED) 
 find_package(CrossGUIDLib REQUIRED)
+find_package(MemoryLib REQUIRED) # memory pool
 
 if(${ExecutionGraph_BUILD_GUI})
     find_package(SpdLogLib REQUIRED) # for logging
     find_package(ArgsLib REQUIRED) # for commandline args
     find_package(BoostBeastLib REQUIRED)
-    find_package(MemoryLib REQUIRED) # memory pool
 endif()
 
 if(${ExecutionGraph_BUILD_TESTS})

@@ -174,8 +174,12 @@ find_package(RTTRLib REQUIRED)
 list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "rttrLib")
 
 # Try to find the polymorphic value library
-find_package(PolymorphicValueLib REQUIRED) 
-list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "polymorphicValueLib")
+# find_package(PolymorphicValueLib REQUIRED) 
+# list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "polymorphicValueLib")
+
+# Try to find the memory library
+find_package(MemoryLib REQUIRED)
+list(APPEND ExecutionGraphGui_LINK_TARGETS_CORE_DEP "memoryLib")
 
 if(${ExecutionGraph_BUILD_SERIALIZATION})
     # Try to find flatbuffer library
@@ -195,10 +199,6 @@ if(${ExecutionGraph_BUILD_GUI})
     # Try to find the spdlog
     find_package(SpdLogLib REQUIRED)
     list(APPEND ExecutionGraphGui_LINK_TARGETS_CORE_DEP "spdlogLib")
-
-    # Try to find the memory library
-    find_package(MemoryLib REQUIRED)
-    list(APPEND ExecutionGraphGui_LINK_TARGETS_CORE_DEP "memoryLib")
 
     find_package(BoostBeastLib REQUIRED)
     list(APPEND ExecutionGraphGui_LINK_TARGETS_CORE_DEP "boostBeastLib")

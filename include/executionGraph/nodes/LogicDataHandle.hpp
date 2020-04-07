@@ -39,7 +39,34 @@ namespace executionGraph
         using RawData = std::remove_const_t<Data>;
 
     private:
-        friend class LogicSocketData<RawData>;
+        class ILogicDataHandle
+        {
+        public:
+            virtual ~ILogicDataHandle() noexcept = default;
+
+        public:
+            //! Access to memory of the underlying data.
+            virtual Data* data() noexcept = 0;
+        };
+
+        //! Type-erased wrapper, to allow any type.
+        template<typename T>
+        class Wrapper final : public ILogicDataHandle
+        {
+        public:
+            Wrapper(T object) noexcept
+                : m_object(std::move(object))
+            {}
+
+        public:
+            Data* data() noexcept override
+            {
+                return m_object.data();
+            }
+
+        private:
+            T m_object;
+        };
 
     private:
         template<typename T>
@@ -47,10 +74,28 @@ namespace executionGraph
                                                                  std::remove_const_t<T>> &&
                                                   (isReadOnly || !std::is_const_v<T>);
 
+        template<typename Handle,
+                 typename T = std::remove_pointer_t<decltype(std::declval<Handle>().data())>>
+        static constexpr bool constructibleFromHandle = constructibleFrom<T>;
+
     public:
         LogicDataHandle() noexcept = default;
         explicit LogicDataHandle(std::nullptr_t) noexcept
             : LogicDataHandle(){};
+
+        //! Construct from other handle.
+        template<typename Handle,
+                 EG_ENABLE_IF(std::is_rvalue_reference_v<Handle&&>),
+                 EG_ENABLE_IF(constructibleFromHandle<Handle>)>
+        LogicDataHandle(Handle&& handle) noexcept
+        {
+            auto h   = std::make_unique<Wrapper<Handle>>(std::move(handle));
+            m_data   = h->data();
+            m_handle = std::move(h);
+        }
+
+        //! @todo Implement here an allocator constructor
+        //! with std::unique_ptr<T, std::function<void(void*)>
 
         //! Copy-construction not allowed.
         LogicDataHandle(const LogicDataHandle&) = delete;
@@ -70,18 +115,11 @@ namespace executionGraph
                  EG_ENABLE_IF(constructibleFrom<T>)>
         LogicDataHandle& operator=(LogicDataHandle<T>&& handle) noexcept
         {
+            m_handle      = std::move(handle.m_handle);
             m_data        = handle.m_data;
             handle.m_data = nullptr;
             return *this;
         }
-
-    private:
-        //! Construct from reference to a data value `data`.
-        template<typename T,
-                 EG_ENABLE_IF(constructibleFrom<T>)>
-        explicit LogicDataHandle(T& data) noexcept
-            : m_data(&data)
-        {}
 
     public:
         bool operator==(std::nullptr_t) noexcept
@@ -120,7 +158,8 @@ namespace executionGraph
         }
 
     private:
-        Data* m_data = nullptr;
+        std::unique_ptr<ILogicDataHandle> m_handle;  //! The type-erased data handle.
+        Data* m_data = nullptr;                      //! The actual data.
     };
 
     //! Invoke a function `f` with all data handles values.

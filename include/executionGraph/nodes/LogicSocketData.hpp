@@ -37,6 +37,8 @@ namespace executionGraph
         using InputSocketConnections  = typename TTraits::InputSocketConnections;
         using OutputSocketConnections = typename TTraits::OutputSocketConnections;
 
+        using ISocketData = typename TTraits::ISocketData;
+
         friend InputSocketConnections;
         friend OutputSocketConnections;
 
@@ -47,35 +49,49 @@ namespace executionGraph
         virtual void onDisconnect(const OutputSocket& outputSocket) = 0;
         virtual void onDisconnect(const InputSocket& inputSocket)   = 0;
 
+    public:
+        ISocketData& parent()
+        {
+            EG_ASSERT(m_parent, "Parent not set");
+            return *m_parent;
+        }
+
+        const ISocketData& parent() const
+        {
+            return const_cast<ILogicSocketDataConnections&>(*this).parent();
+        }
+
+    protected:
+        void init(ISocketData& parent)
+        {
+            m_parent = &parent;
+        }
+
     protected:
         struct Forwarder
         {
             template<typename Socket>
-            void onDisconnect(Socket& socket) const
+            static void onDisconnect(Socket& socket)
             {
                 socket.connections().onDisconnect();
             }
 
             template<typename Socket>
-            void onConnect(Socket& socket, ILogicSocketDataConnections& self) const
+            static void onConnect(Socket& socket, ILogicSocketDataConnections& self)
             {
                 socket.connections().onConnect(self);
             }
         };
 
-    protected:
-        const auto& forwarder() { return m_forwarder; }
-
     private:
-        Forwarder m_forwarder;
+        ISocketData* m_parent = nullptr;
     };
 
     template<typename TTraits, typename Parent>
     class LogicSocketDataConnections final : public TTraits::ISocketDataConnections
     {
-        using TTraits::ISocketDataConnections::forwarder;
-
     public:
+        using Base                    = typename TTraits::ISocketDataConnections;
         using InputSocket             = typename TTraits::InputSocket;
         using OutputSocket            = typename TTraits::OutputSocket;
         using InputSocketConnections  = typename TTraits::InputSocketConnections;
@@ -95,11 +111,11 @@ namespace executionGraph
         {
             for(auto* socket : m_inputs)
             {
-                forwarder().onDisconnect(*socket);
+                Base::Forwarder::onDisconnect(*socket);
             }
             for(auto* socket : m_outputs)
             {
-                forwarder().onDisconnect(*socket);
+                Base::Forwarder::onDisconnect(*socket);
             }
         }
 
@@ -124,6 +140,7 @@ namespace executionGraph
     public:
         void init(Parent& parent)
         {
+            Base::init(parent);
             m_parent = &parent;
         }
 
@@ -137,7 +154,7 @@ namespace executionGraph
             if(!isConnected(socket))
             {
                 onConnect(socket);
-                forwarder().onConnect(socket, *this);
+                Base::Forwarder::onConnect(socket, *this);
             }
         }
 
@@ -151,7 +168,7 @@ namespace executionGraph
             if(isConnected(socket))
             {
                 onDisconnect(socket);
-                forwarder().onDisconnect(socket);
+                Base::Forwarder::onDisconnect(socket);
             }
         }
 
@@ -166,8 +183,15 @@ namespace executionGraph
         }
 
     public:
-        Parent& parent() { return *m_parent; }
-        const Parent& parent() const { return *m_parent; }
+        Parent& parent()
+        {
+            EG_ASSERT(m_parent, "Parent not set");
+            return *m_parent;
+        }
+        const Parent& parent() const
+        {
+            return const_cast<LogicSocketDataConnections&>(*this).parent();
+        }
 
     private:
         void onConnect(const InputSocket& socket) noexcept override
@@ -227,7 +251,7 @@ namespace executionGraph
 
     /* ---------------------------------------------------------------------------------------*/
     /*!
-         Basic Implementation of the data node. 
+         A basic Implementation of the data node. 
          No locking mechanism is implemented here.
          This node owns the data which is constructed in place in the constructor
 
@@ -236,14 +260,15 @@ namespace executionGraph
     */
     /* ---------------------------------------------------------------------------------------*/
     template<typename TData>
-    class LogicSocketData final : public LogicSocketDataBase
+    class LogicSocketData final : public LogicSocketDataBase,
+                                  public ILogicSocketDataAccess<TData>
     {
     public:
-        using Data            = TData;
-        using Base            = LogicSocketDataBase;
-        using Connections     = ConnectionTraits<TData>::SocketDataConnections;
-        using DataHandle      = LogicDataHandle<Data>;
-        using DataHandleConst = LogicDataHandle<const Data>;
+        using Data           = TData;
+        using Base           = LogicSocketDataBase;
+        using BaseDataAccess = ILogicSocketDataAccess<TData>;
+
+        using Connections = ConnectionTraits<TData>::SocketDataConnections;
 
         EG_STATIC_ASSERT(!std::is_const_v<Data> && !std::is_reference_v<Data>,
                          "Only non-const non-reference types allowed!");
@@ -252,8 +277,19 @@ namespace executionGraph
         using OutputSocket = typename ConnectionTraits<Data>::OutputSocket;
 
         using Reference = LogicSocketDataRef<Data>;
-
         friend Reference;
+
+        using DataHandle      = typename BaseDataAccess::DataHandle;
+        using DataHandleConst = typename BaseDataAccess::DataHandleConst;
+
+    private:
+        //! DataHandle which is convertible to LogicDataHandle.
+        template<typename T>
+        struct InternalDataHandle
+        {
+            T& m_data = nullptr;
+            T* data() { return &m_data; }
+        };
 
     public:
         template<typename... Args>
@@ -263,6 +299,7 @@ namespace executionGraph
             , m_data{std::forward<Args>(args)...}
             , m_connections(*this)
         {
+            Base::init(*this);
         }
 
         ~LogicSocketData() noexcept
@@ -287,19 +324,19 @@ namespace executionGraph
         }
 
     public:
-        DataHandleConst dataHandleConst() const noexcept
+        DataHandleConst dataHandleConst() const noexcept override
         {
-            return DataHandleConst{m_data};
+            return DataHandleConst(InternalDataHandle<const Data>{m_data});
         }
 
-        DataHandleConst dataHandle() const noexcept
+        DataHandleConst dataHandle() const noexcept override
         {
             return dataHandleConst();
         }
 
-        DataHandle dataHandle() noexcept
+        DataHandle dataHandle() noexcept override
         {
-            return DataHandle{m_data};
+            return DataHandle(InternalDataHandle<Data>{m_data});
         }
 
     public:

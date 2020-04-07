@@ -37,7 +37,7 @@ namespace executionGraph
     class LogicSocketConnections final
     {
     public:
-        using SocketData             = typename TTraits::SocketData;
+        using ISocketData            = typename TTraits::ISocketData;
         using ISocketDataConnections = typename TTraits::ISocketDataConnections;
 
         friend ISocketDataConnections;
@@ -87,17 +87,22 @@ namespace executionGraph
 
         bool isConnected() const { return m_dataConnection != nullptr; }
 
-        SocketData* socketData()
+        ISocketData* socketData()
         {
-            //! @todo This cast needs to go aways, just to make it compile...
-            // make type erased valuesemantic datahandle...
-            return isConnected() ? &static_cast<typename TTraits::SocketDataConnections*>(m_dataConnection)->parent() : nullptr;
+            return isConnected() ? &m_dataConnection->parent() : nullptr;
         }
-        const SocketData* socketData() const { return const_cast<LogicSocketConnections&>(*this).socketData(); }
+        const ISocketData* socketData() const { return const_cast<LogicSocketConnections&>(*this).socketData(); }
 
     public:
-        Parent& parent() { return *m_parent; }
-        const Parent& parent() const { return *m_parent; }
+        const Parent& parent()
+        {
+            EG_ASSERT(m_parent, "Parent not set");
+            return *m_parent;
+        }
+        const Parent& parent() const
+        {
+            return const_cast<LogicSocketConnections&>(*this).parent();
+        }
 
     private:
         void onConnect(const ISocketDataConnections& socketData) noexcept
@@ -159,12 +164,12 @@ namespace executionGraph
         auto dataHandle() const
         {
             EG_ASSERT(m_connections.isConnected(), "Socket not connected");
-            return m_connections.socketData()->dataHandleConst();
+            return m_connections.socketData()->template dataAccess<Data>().dataHandleConst();
         }
         auto dataHandle()
         {
             EG_ASSERT_MSG(m_connections.isConnected(), "Socket not connected");
-            return m_connections.socketData()->dataHandleConst();
+            return m_connections.socketData()->template dataAccess<Data>().dataHandleConst();
         }
 
     public:
@@ -240,12 +245,12 @@ namespace executionGraph
         auto dataHandle() const
         {
             EG_ASSERT(m_connections.isConnected(), "Socket not connected");
-            return m_connections.socketData()->dataHandleConst();
+            return m_connections.socketData()->template dataAccess<Data>().dataHandleConst();
         }
         auto dataHandle()
         {
             EG_ASSERT(m_connections.isConnected(), "Socket not connected");
-            return m_connections.socketData()->dataHandle();
+            return m_connections.socketData()->template dataAccess<Data>().dataHandle();
         }
 
     public:
