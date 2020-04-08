@@ -3,6 +3,7 @@
 set namespaceSeparator ::
 skinparam shadowing false
 skinparam defaultFontName "Fira Code"
+skinparam nodesep 100
 
 skinparam class{
     BorderColor<< Connections >> Blue
@@ -24,6 +25,14 @@ class DummyNode{
     - m_outSockets
 }
 
+namespace customSocketData{
+    class LogicSocketDataConnections<Traits, ParentSocket> << Connections >> {
+    }
+
+    class LogicSocketData<Data>{
+    }
+}
+
 namespace executionGraph{
 
     class LogicNode <<Node>> {
@@ -40,47 +49,59 @@ namespace executionGraph{
         - m_outputs
     }
 
-    class LogicSocketInput<Data> {
-        + dataHandle() [const]
-        --
-        + connect<SocketData>(SocketData&)
-        + disconnect() override
-        + connections() [const]
-        --
-        - Connections m_connections
+    namespace socket {
+
+        class LogicSocketInput<Data> {
+            + dataHandle() [const]
+            --
+            + connect<SocketData>(SocketData&)
+            + disconnect() override
+            + connections() [const]
+            --
+            - m_connections : Connections
+        }
+
+        class LogicSocketOutput<Data> {
+            + dataHandle() [const]
+            --
+            + connect<SocketData>(SocketData&)
+            + disconnect() override
+            + connections() [const]
+            --
+            - m_connections : Connections
+        }
+
+        class LogicSocketBase<IsInput> {
+            + type()
+            + index()
+            + parent()
+            + castToType<T>()
+            --
+            + connect<Socket>(Socket&)
+            + virtual disconnect() = 0
+        }
+
+        class LogicSocketConnections<Traits, ParentSocket> << Connections >> {
+            Connection for input/output sockets
+            --
+            + connect(SocketData&)
+            + disconnect(SocketData&)
+            --
+            + parent() [const] : ParentSocket&
+            --
+            - SocketDataConnections* m_connections
+            - Parent* m_parent
+        }
     }
 
-    class LogicSocketOutput<Data> {
-        + dataHandle() [const]
+    class LogicSocketDataConnectionsBase<Traits>
+    {
+        + parent() [const] : SocketDataBase
         --
-        + connect<SocketData>(SocketData&)
-        + disconnect() override
-        + connections() [const]
-        --
-        - Connections m_connections
+        - m_parent : SocketDataBase
     }
 
-    class LogicSocketBase<IsInput> {
-        + type()
-        + index()
-        + parent()
-        + castToType<T>()
-        --
-        + connect<Socket>(Socket&)
-        + virtual disconnect() = 0
-    }
-
-    class LogicSocketConnections<Traits, ParentSocket> << Connections >>{
-        Connection for input/output sockets
-        --
-        + connect(SocketData&)
-        + disconnect(SocketData&)
-        --
-        - SocketDataConnections* m_connections
-        - Parent* m_parent
-    }
-
-    namespace userData{
+    namespace socketData{
         class LogicSocketDataConnections<Traits, ParentSocket> << Connections >> {
             Connection for data sockets
             --
@@ -89,31 +110,57 @@ namespace executionGraph{
             + connect(OutSocket&)
             + disconnect(OutSocket&)
             --
+            + parent() [const]
+            --
+            - m_parent : LogicSocketData
             - m_inputs
             - m_outputs
         }
 
         class LogicSocketData<Data>{
-            + dataHandle() [const]
-            + dataHandleConst()
-            --
             + virtual connect(InSocketBase&) override
             + virtual disconnect(InSocketBase&) override
             + virtual connect(OutSocketBase&) override
             + virtual disconnect(OutSocketBase&) override
             + connections() [const]
             --
-            - Data m_data
-            - Connections m_connections
+            - m_data : Data
+            - m_connections : Connections
         }
+    
 
+        ' class LogicSocketDataRef<Args...>{
+        '     + setReference(socketData)
+        '     --
+        '     - LogicSocketData<Args>* m_socketData
+        ' }
 
-        class LogicSocketDataRef<Args...>{
-            + setReference(socketData)
-            --
-            - LogicSocketData<Args>* m_socketData
-        }
+    }
 
+    class LogicDataHandle<Data>
+    {
+        value-semantic, type-erased, 
+        move-only RAII object
+        --
+        LogicDataHandle<Handle>(Handle&)
+        --
+        + operator bool()
+        + operator==(nullptr)
+        + operator!=(nullptr)
+        --
+        + operator*() : Data&
+        + operator->() const : Data*
+        + get() : Data&
+        --
+        - m_handle : std::unique_ptr<...>
+        - m_data : Data*
+    }
+
+    interface ILogicSocketDataAccessBase
+    interface ILogicSocketDataAccess<Data>
+    {
+        + dataHandleConst() const = 0
+        + dataHandle() [const] = 0
     }
 
     class LogicSocketDataBase{
@@ -122,35 +169,54 @@ namespace executionGraph{
         + virtual connect(OutSocketBase&) = 0
         + virtual disconnect(OutSocketBase&) = 0
         --
+        + dataAccess<T>() [const]
+        --
         + type()
         + id()
     }
 }
 
+executionGraph::socket::LogicSocketInput -up-|> executionGraph::socket::LogicSocketBase
+executionGraph::socket::LogicSocketOutput -up-|> executionGraph::socket::LogicSocketBase
+
+executionGraph::LogicNode "*" o-up- executionGraph::socket::LogicSocketBase 
+
+DummyNode "*" *-up- executionGraph::socket::LogicSocketInput
+DummyNode "*" *-up- executionGraph::socket::LogicSocketOutput
+
+executionGraph::socket::LogicSocketInput "1" *-- executionGraph::socket::LogicSocketConnections
+executionGraph::socket::LogicSocketOutput "1" *-- executionGraph::socket::LogicSocketConnections
+
+executionGraph::socket::LogicSocketBase "1" o-down- executionGraph::LogicNode
+executionGraph::socket::LogicSocketBase ...> executionGraph::socket::LogicSocketInput
+executionGraph::socket::LogicSocketBase ...> executionGraph::socket::LogicSocketOutput
+
+executionGraph::ILogicSocketDataAccess -up-|> executionGraph::ILogicSocketDataAccessBase
+executionGraph::ILogicSocketDataAccess .right.> executionGraph::LogicDataHandle
+
+executionGraph::socketData::LogicSocketData -up-|> executionGraph::LogicSocketDataBase
+executionGraph::socketData::LogicSocketData -up-|> executionGraph::ILogicSocketDataAccess
+
+executionGraph::LogicSocketDataBase ...> executionGraph::ILogicSocketDataAccess
+executionGraph::LogicSocketDataBase "1" o-down- executionGraph::ILogicSocketDataAccessBase
+
+executionGraph::socketData::LogicSocketDataConnections "*" o-down- executionGraph::socket::LogicSocketBase
+executionGraph::socketData::LogicSocketDataConnections -left-|> executionGraph::LogicSocketDataConnectionsBase
+
+executionGraph::LogicSocketDataConnectionsBase o-up- executionGraph::LogicSocketDataBase
+
+' executionGraph::socketData::LogicSocketData -right-o "1" executionGraph::socketData::LogicSocketDataRef
+executionGraph::socketData::LogicSocketData "1" *-down- executionGraph::socketData::LogicSocketDataConnections
+
+executionGraph::socket::LogicSocketConnections "1" o-up- executionGraph::LogicSocketDataConnectionsBase
+
+' --
+customSocketData::LogicSocketDataConnections -right-|> executionGraph::LogicSocketDataConnectionsBase
+customSocketData::LogicSocketData -right-|> executionGraph::LogicSocketDataBase
+customSocketData::LogicSocketData -up-|> executionGraph::ILogicSocketDataAccess
+customSocketData::LogicSocketData "1" *-down- customSocketData::LogicSocketDataConnections
 DummyNode -up-|> executionGraph::LogicNode
 
-executionGraph::LogicSocketInput -up-|> executionGraph::LogicSocketBase
-executionGraph::LogicSocketOutput -up-|> executionGraph::LogicSocketBase
-
-executionGraph::LogicNode "*" o-up- executionGraph::LogicSocketBase 
-
-' executionGraph::LogicSocketBase -[hidden]-> executionGraph::userData::LogicSocketData
-' executionGraph::LogicSocketBase -up[hidden]-> executionGraph::userData::LogicSocketData
-
-
-DummyNode "*" *-up- executionGraph::LogicSocketInput
-DummyNode "*" *-up- executionGraph::LogicSocketOutput
-
-executionGraph::LogicSocketInput "1" *-- executionGraph::LogicSocketConnections
-executionGraph::LogicSocketOutput "1" *-- executionGraph::LogicSocketConnections
-
-executionGraph::LogicSocketBase "1" o-down- executionGraph::LogicNode
-
-executionGraph::userData::LogicSocketData -up-|> executionGraph::LogicSocketDataBase
-executionGraph::userData::LogicSocketDataConnections "*" o-down- executionGraph::LogicSocketBase
-executionGraph::userData::LogicSocketData -right-o "1" executionGraph::userData::LogicSocketDataRef
-executionGraph::userData::LogicSocketData "1" *-down- executionGraph::userData::LogicSocketDataConnections
-
-executionGraph::LogicSocketConnections "1" *-- executionGraph::userData::LogicSocketDataConnections : design-error
+' customSocketData --> executionGraph
 
 @enduml

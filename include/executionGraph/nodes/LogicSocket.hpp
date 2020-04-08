@@ -37,10 +37,10 @@ namespace executionGraph
     class LogicSocketConnections final
     {
     public:
-        using ISocketData            = typename TTraits::ISocketData;
-        using ISocketDataConnections = typename TTraits::ISocketDataConnections;
+        using SocketDataBase            = typename TTraits::SocketDataBase;
+        using SocketDataConnectionsBase = typename TTraits::SocketDataConnectionsBase;
 
-        friend ISocketDataConnections;
+        friend SocketDataConnectionsBase;
 
     public:
         explicit LogicSocketConnections(Parent& parent) noexcept
@@ -68,7 +68,7 @@ namespace executionGraph
         }
 
         //! Connect a data node.
-        void connect(ISocketDataConnections& dataConnections) noexcept
+        void connect(SocketDataConnectionsBase& dataConnections) noexcept
         {
             disconnect();
             onConnect(dataConnections);
@@ -87,11 +87,11 @@ namespace executionGraph
 
         bool isConnected() const { return m_dataConnection != nullptr; }
 
-        ISocketData* socketData()
+        SocketDataBase* socketData()
         {
             return isConnected() ? &m_dataConnection->parent() : nullptr;
         }
-        const ISocketData* socketData() const { return const_cast<LogicSocketConnections&>(*this).socketData(); }
+        const SocketDataBase* socketData() const { return const_cast<LogicSocketConnections&>(*this).socketData(); }
 
     public:
         const Parent& parent()
@@ -105,9 +105,9 @@ namespace executionGraph
         }
 
     private:
-        void onConnect(const ISocketDataConnections& socketData) noexcept
+        void onConnect(const SocketDataConnectionsBase& socketData) noexcept
         {
-            m_dataConnection = const_cast<ISocketDataConnections*>(&socketData);
+            m_dataConnection = const_cast<SocketDataConnectionsBase*>(&socketData);
         }
 
         void onDisconnect() noexcept
@@ -116,8 +116,8 @@ namespace executionGraph
         }
 
     private:
-        ISocketDataConnections* m_dataConnection = nullptr;  //! Connected data node.
-        Parent* m_parent                         = nullptr;  //! Parent of this connection wrapper.
+        SocketDataConnectionsBase* m_dataConnection = nullptr;  //! Connected data node.
+        Parent* m_parent                            = nullptr;  //! Parent of this connection wrapper.
     };
 
     /* ---------------------------------------------------------------------------------------*/

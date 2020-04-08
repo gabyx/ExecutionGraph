@@ -27,7 +27,7 @@
 namespace executionGraph
 {
     template<typename TTraits>
-    class ILogicSocketDataConnections
+    class LogicSocketDataConnectionsBase
     {
     public:
         using Data         = typename TTraits::Data;
@@ -37,10 +37,16 @@ namespace executionGraph
         using InputSocketConnections  = typename TTraits::InputSocketConnections;
         using OutputSocketConnections = typename TTraits::OutputSocketConnections;
 
-        using ISocketData = typename TTraits::ISocketData;
+        using SocketDataBase = typename TTraits::SocketDataBase;
 
         friend InputSocketConnections;
         friend OutputSocketConnections;
+
+    public:
+        LogicSocketDataConnectionsBase(SocketDataBase& parent)
+            : m_parent(&parent)
+        {
+        }
 
     private:
         virtual void onConnect(const OutputSocket& outputSocket) = 0;
@@ -50,21 +56,15 @@ namespace executionGraph
         virtual void onDisconnect(const InputSocket& inputSocket)   = 0;
 
     public:
-        ISocketData& parent()
+        SocketDataBase& parent()
         {
             EG_ASSERT(m_parent, "Parent not set");
             return *m_parent;
         }
 
-        const ISocketData& parent() const
+        const SocketDataBase& parent() const
         {
-            return const_cast<ILogicSocketDataConnections&>(*this).parent();
-        }
-
-    protected:
-        void init(ISocketData& parent)
-        {
-            m_parent = &parent;
+            return const_cast<LogicSocketDataConnectionsBase&>(*this).parent();
         }
 
     protected:
@@ -77,21 +77,21 @@ namespace executionGraph
             }
 
             template<typename Socket>
-            static void onConnect(Socket& socket, ILogicSocketDataConnections& self)
+            static void onConnect(Socket& socket, LogicSocketDataConnectionsBase& self)
             {
                 socket.connections().onConnect(self);
             }
         };
 
     private:
-        ISocketData* m_parent = nullptr;
+        SocketDataBase* m_parent = nullptr;
     };
 
     template<typename TTraits, typename Parent>
-    class LogicSocketDataConnections final : public TTraits::ISocketDataConnections
+    class LogicSocketDataConnections final : public TTraits::SocketDataConnectionsBase
     {
     public:
-        using Base                    = typename TTraits::ISocketDataConnections;
+        using Base                    = typename TTraits::SocketDataConnectionsBase;
         using InputSocket             = typename TTraits::InputSocket;
         using OutputSocket            = typename TTraits::OutputSocket;
         using InputSocketConnections  = typename TTraits::InputSocketConnections;
@@ -105,7 +105,8 @@ namespace executionGraph
 
     public:
         explicit LogicSocketDataConnections(Parent& parent) noexcept
-            : m_parent(&parent){};
+            : Base(parent)
+            , m_parent(&parent){};
 
         ~LogicSocketDataConnections() noexcept
         {

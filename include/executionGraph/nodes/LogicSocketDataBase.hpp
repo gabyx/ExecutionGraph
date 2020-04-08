@@ -90,7 +90,7 @@ namespace executionGraph
         template<typename T, bool doThrow = true>
         auto& dataAccess() const noexcept(!doThrow)
         {
-            return static_cast<const LogicSocketData<T>&>(
+            return static_cast<const ILogicSocketDataAccess<T>&>(
                 const_cast<LogicSocketDataBase*>(this)->dataAccess<T, doThrow>());
         }
 
