@@ -39,12 +39,13 @@ namespace executionGraph
     public:
         using SocketDataBase            = typename TTraits::SocketDataBase;
         using SocketDataConnectionsBase = typename TTraits::SocketDataConnectionsBase;
+        using ISocketDataAccess         = typename TTraits::ISocketDataAccess;
 
         friend SocketDataConnectionsBase;
 
     public:
         explicit LogicSocketConnections(Parent& parent) noexcept
-            : m_parent(&parent){};
+            : m_parent(parent){};
 
         ~LogicSocketConnections() noexcept
         {
@@ -60,12 +61,6 @@ namespace executionGraph
         }
 
         LogicSocketConnections& operator=(LogicSocketConnections&& other) = delete;
-
-    public:
-        void init(Parent& parent)
-        {
-            m_parent = &parent;
-        }
 
         //! Connect a data node.
         void connect(SocketDataConnectionsBase& dataConnections) noexcept
@@ -87,17 +82,24 @@ namespace executionGraph
 
         bool isConnected() const { return m_dataConnection != nullptr; }
 
-        SocketDataBase* socketData()
+        ISocketDataAccess* dataAccess() const
         {
-            return isConnected() ? &m_dataConnection->parent() : nullptr;
+            return m_dataAccess;
         }
-        const SocketDataBase* socketData() const { return const_cast<LogicSocketConnections&>(*this).socketData(); }
+        const ISocketDataAccess* dataAccessConst() const
+        {
+            return const_cast<LogicSocketConnections&>(*this).dataAccess();
+        }
+
+        const SocketDataBase& socketData() const noexcept
+        {
+            return isConnected() ? m_dataConnection->parent() : nullptr;
+        }
 
     public:
         const Parent& parent()
         {
-            EG_ASSERT(m_parent, "Parent not set");
-            return *m_parent;
+            return m_parent;
         }
         const Parent& parent() const
         {
@@ -108,16 +110,19 @@ namespace executionGraph
         void onConnect(const SocketDataConnectionsBase& socketData) noexcept
         {
             m_dataConnection = const_cast<SocketDataConnectionsBase*>(&socketData);
+            m_dataAccess     = &m_dataConnection->dataAccess();
         }
 
         void onDisconnect() noexcept
         {
             m_dataConnection = nullptr;
+            m_dataAccess     = nullptr;
         }
 
     private:
-        SocketDataConnectionsBase* m_dataConnection = nullptr;  //! Connected data node.
-        Parent* m_parent                            = nullptr;  //! Parent of this connection wrapper.
+        Parent& m_parent;                                       //!< Parent of this connection wrapper.
+        SocketDataConnectionsBase* m_dataConnection = nullptr;  //!< Connected data node.
+        ISocketDataAccess* m_dataAccess             = nullptr;  //!< The data access.
     };
 
     /* ---------------------------------------------------------------------------------------*/
@@ -164,12 +169,12 @@ namespace executionGraph
         auto dataHandle() const
         {
             EG_ASSERT(m_connections.isConnected(), "Socket not connected");
-            return m_connections.socketData()->template dataAccess<Data>().dataHandleConst();
+            return m_connections.dataAccess()->dataHandleConst();
         }
         auto dataHandle()
         {
             EG_ASSERT_MSG(m_connections.isConnected(), "Socket not connected");
-            return m_connections.socketData()->template dataAccess<Data>().dataHandleConst();
+            return m_connections.dataAccess()->dataHandleConst();
         }
 
     public:
@@ -245,12 +250,12 @@ namespace executionGraph
         auto dataHandle() const
         {
             EG_ASSERT(m_connections.isConnected(), "Socket not connected");
-            return m_connections.socketData()->template dataAccess<Data>().dataHandleConst();
+            return m_connections.dataAccess()->dataHandleConst();
         }
         auto dataHandle()
         {
             EG_ASSERT(m_connections.isConnected(), "Socket not connected");
-            return m_connections.socketData()->template dataAccess<Data>().dataHandle();
+            return m_connections.dataAccess()->dataHandle();
         }
 
     public:

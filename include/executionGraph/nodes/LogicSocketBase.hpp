@@ -64,7 +64,6 @@ namespace executionGraph
 
         const LogicNode& parent() const noexcept
         {
-            EG_ASSERT(m_parent, "Parent not set");
             return *m_parent;
         }
 

@@ -32,10 +32,14 @@ namespace executionGraph
     class LogicSocketDataBase
     {
     protected:
-        LogicSocketDataBase(rttr::type type, SocketDataId id)
+        LogicSocketDataBase(rttr::type type,
+                            SocketDataId id,
+                            ILogicSocketDataAccessBase& dataAccess)
             : m_type(type)
             , m_id(id)
-        {}
+            , m_dataAccess(dataAccess)
+        {
+        }
 
     public:
         virtual ~LogicSocketDataBase() = default;
@@ -45,15 +49,6 @@ namespace executionGraph
 
         LogicSocketDataBase(LogicSocketDataBase&& other) = default;
         LogicSocketDataBase& operator=(LogicSocketDataBase&& other) = default;
-
-    protected:
-        template<typename Derived>
-        void init(Derived& derived)
-        {
-            static_assert(std::is_base_of_v<ILogicSocketDataAccess<typename Derived::Data>, Derived>,
-                          "Derived from this base needs to implement LogicSocketData<Data>");
-            m_dataAccess = &derived;
-        }
 
     public:
         EG_DEFINE_TYPES();
@@ -71,8 +66,6 @@ namespace executionGraph
         template<typename T, bool doThrow = true>
         auto& dataAccess() noexcept(!doThrow)
         {
-            EG_ASSERT(m_dataAccess, "Data access not set");
-
             if constexpr(doThrow || throwIfSocketDataNoStorage)
             {
                 EG_LOGTHROW_IF(!isType<T>(),
@@ -83,7 +76,7 @@ namespace executionGraph
                                rttr::type::get<T>().get_name());
             }
 
-            return static_cast<ILogicSocketDataAccess<T>&>(*m_dataAccess);
+            return static_cast<ILogicSocketDataAccess<T>&>(m_dataAccess);
         }
 
         //! Non-const overload.
@@ -105,8 +98,8 @@ namespace executionGraph
         void setId(SocketDataId id) noexcept { m_id = id; }
 
     private:
-        const rttr::type m_type;                                         //!< The type of this node.
-        SocketDataId m_id                        = socketDataIdInvalid;  //!< Id of this node.
-        ILogicSocketDataAccessBase* m_dataAccess = nullptr;              //!< Data access.
+        const rttr::type m_type;                   //!< The type of this node.
+        SocketDataId m_id = socketDataIdInvalid;   //!< Id of this node.
+        ILogicSocketDataAccessBase& m_dataAccess;  //!< Data access.
     };
 }  // namespace executionGraph

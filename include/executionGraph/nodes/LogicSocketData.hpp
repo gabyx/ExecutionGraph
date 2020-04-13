@@ -37,32 +37,43 @@ namespace executionGraph
         using InputSocketConnections  = typename TTraits::InputSocketConnections;
         using OutputSocketConnections = typename TTraits::OutputSocketConnections;
 
-        using SocketDataBase = typename TTraits::SocketDataBase;
+        using SocketDataBase    = typename TTraits::SocketDataBase;
+        using ISocketDataAccess = typename TTraits::ISocketDataAccess;
 
         friend InputSocketConnections;
         friend OutputSocketConnections;
 
     public:
         LogicSocketDataConnectionsBase(SocketDataBase& parent)
-            : m_parent(&parent)
+            : m_parent(parent)
         {
         }
 
     private:
-        virtual void onConnect(const OutputSocket& outputSocket) = 0;
-        virtual void onConnect(const InputSocket& inputSocket)   = 0;
+        virtual void onConnect(const OutputSocket& outputSocket) noexcept = 0;
+        virtual void onConnect(const InputSocket& inputSocket) noexcept   = 0;
 
-        virtual void onDisconnect(const OutputSocket& outputSocket) = 0;
-        virtual void onDisconnect(const InputSocket& inputSocket)   = 0;
+        virtual void onDisconnect(const OutputSocket& outputSocket) noexcept = 0;
+        virtual void onDisconnect(const InputSocket& inputSocket) noexcept   = 0;
 
-    public:
-        SocketDataBase& parent()
+        virtual ISocketDataAccess& dataAccess() noexcept = 0;
+        const ISocketDataAccess& dataAccess() const noexcept
         {
-            EG_ASSERT(m_parent, "Parent not set");
-            return *m_parent;
+            return dataAccessConst();
+        }
+        const ISocketDataAccess& dataAccessConst() const noexcept
+        {
+            return const_cast<LogicSocketDataConnectionsBase&>(*this)
+                .dataAccess();
         }
 
-        const SocketDataBase& parent() const
+    public:
+        SocketDataBase& parent() noexcept
+        {
+            return m_parent;
+        }
+
+        const SocketDataBase& parent() const noexcept
         {
             return const_cast<LogicSocketDataConnectionsBase&>(*this).parent();
         }
@@ -84,7 +95,7 @@ namespace executionGraph
         };
 
     private:
-        SocketDataBase* m_parent = nullptr;
+        SocketDataBase& m_parent;
     };
 
     template<typename TTraits, typename Parent>
@@ -96,6 +107,7 @@ namespace executionGraph
         using OutputSocket            = typename TTraits::OutputSocket;
         using InputSocketConnections  = typename TTraits::InputSocketConnections;
         using OutputSocketConnections = typename TTraits::OutputSocketConnections;
+        using ISocketDataAccess       = typename TTraits::ISocketDataAccess;
 
     private:
         template<typename T>
@@ -106,7 +118,7 @@ namespace executionGraph
     public:
         explicit LogicSocketDataConnections(Parent& parent) noexcept
             : Base(parent)
-            , m_parent(&parent){};
+            , m_parent(parent){};
 
         ~LogicSocketDataConnections() noexcept
         {
@@ -137,13 +149,6 @@ namespace executionGraph
             other.m_inputs.clear();
             return *this;
         };
-
-    public:
-        void init(Parent& parent)
-        {
-            Base::init(parent);
-            m_parent = &parent;
-        }
 
         template<typename Socket>
         void connect(Socket& socket) noexcept
@@ -186,8 +191,7 @@ namespace executionGraph
     public:
         Parent& parent()
         {
-            EG_ASSERT(m_parent, "Parent not set");
-            return *m_parent;
+            return m_parent;
         }
         const Parent& parent() const
         {
@@ -215,6 +219,12 @@ namespace executionGraph
             EG_VERIFY(removeWriteLink(socket), "Not disconnected!");
         }
 
+    public:
+        ISocketDataAccess& dataAccess() noexcept override
+        {
+            return parent().dataAccess();
+        };
+
     private:
         bool addWriteLink(const OutputSocket& output) noexcept
         {
@@ -239,12 +249,12 @@ namespace executionGraph
         const auto& inputs() const noexcept { return m_inputs; }
 
     private:
+        //! The parent of this class.
+        Parent& m_parent;
         //! All inputs reading this data node.
         std::unordered_set<InputSocket*> m_inputs;
         //! All outputs writting to this data node.
         std::unordered_set<OutputSocket*> m_outputs;
-        //! The parent of this class.
-        Parent* m_parent = nullptr;
     };
 
     template<typename...>
@@ -265,9 +275,9 @@ namespace executionGraph
                                   public ILogicSocketDataAccess<TData>
     {
     public:
-        using Data           = TData;
-        using Base           = LogicSocketDataBase;
-        using BaseDataAccess = ILogicSocketDataAccess<TData>;
+        using Data              = TData;
+        using Base              = LogicSocketDataBase;
+        using ISocketDataAccess = ILogicSocketDataAccess<TData>;
 
         using Connections = ConnectionTraits<TData>::SocketDataConnections;
 
@@ -280,8 +290,8 @@ namespace executionGraph
         using Reference = LogicSocketDataRef<Data>;
         friend Reference;
 
-        using DataHandle      = typename BaseDataAccess::DataHandle;
-        using DataHandleConst = typename BaseDataAccess::DataHandleConst;
+        using DataHandle      = typename ISocketDataAccess::DataHandle;
+        using DataHandleConst = typename ISocketDataAccess::DataHandleConst;
 
     private:
         //! DataHandle which is convertible to LogicDataHandle.
@@ -296,11 +306,10 @@ namespace executionGraph
         template<typename... Args>
         LogicSocketData(SocketDataId id,
                         Args&&... args) noexcept
-            : Base(rttr::type::get<Data>(), id)
+            : Base(rttr::type::get<Data>(), id, *this)
             , m_data{std::forward<Args>(args)...}
             , m_connections(*this)
         {
-            Base::init(*this);
         }
 
         ~LogicSocketData() noexcept
@@ -323,6 +332,14 @@ namespace executionGraph
             m_data        = std::move(other.m_data);
             m_connections = std::move(other.m_connections);
         }
+
+    public:
+        ISocketDataAccess& dataAccess() { return *this; }
+        const ISocketDataAccess& dataAccess() const
+        {
+            const_cast<LogicSocketData&>(*this).dataAccess();
+        }
+        const ISocketDataAccess& dataAccessConst() const { return *this; }
 
     public:
         DataHandleConst dataHandleConst() const noexcept override
