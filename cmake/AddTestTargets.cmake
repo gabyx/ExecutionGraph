@@ -9,7 +9,7 @@ function(addTestTarget targetName file addLibs)
                                           ${ExecutionGraph_USE_LEAK_SANITIZER})
     target_include_directories(${targetName} PRIVATE ${INCLUDE_DIRS})
     target_link_libraries(${targetName} PRIVATE ExecutionGraph::CoreForTests gtest gmock_main)
-    if(${addLibs})
+    if(addLibs)
         target_link_libraries(${targetName} PRIVATE ${addLibs})
     endif()
 
@@ -25,14 +25,13 @@ function(addTest name addLibs noCompile noCompileTests)
     message(STATUS "====================================================")
     set(target ${PROJECT_NAME}Test-${name})
 
-    # print_target_properties(${target})
     set(file ${CMAKE_CURRENT_SOURCE_DIR}/src/main-${name}.cpp)
 
     addTestTarget(${target} ${file} ${addLibs})
     add_dependencies(build_and_test ${target})
     add_test(NAME ${target} COMMAND ${target})
 
-    if(${noCompile})
+    if(noCompile)
         message(STATUS "Adding '${noCompileTests}' no compile tests")
 
         foreach(testIndex RANGE ${noCompileTests})
@@ -48,5 +47,7 @@ function(addTest name addLibs noCompile noCompileTests)
 
         endforeach()
     endif()
+
+    print_target_properties(${target})
 
 endfunction()

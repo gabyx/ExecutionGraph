@@ -177,7 +177,8 @@
     "valarray": "cpp",
     "variant": "cpp",
     "vector": "cpp",
-    "shared_mutex": "cpp"
+    "shared_mutex": "cpp",
+    "scoped_allocator": "cpp"
   },
   "files.exclude": {
     "**/.DS_Store": true,

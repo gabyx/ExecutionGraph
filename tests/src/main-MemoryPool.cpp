@@ -11,7 +11,9 @@
 //! ========================================================================================
 
 #include <vector>
+#include <foonathan/memory/fallback_allocator.hpp>
 #include <foonathan/memory/memory_pool.hpp>
+#include <foonathan/memory/memory_pool_collection.hpp>
 #include <foonathan/memory/smart_ptr.hpp>
 #include <foonathan/memory/static_allocator.hpp>
 #include "TestFunctions.hpp"
@@ -90,40 +92,54 @@ EG_TEST(MemoryPool, Test2)
     }
 }
 
-EG_TEST(MemoryPool, Test3)
+template<typename T>
+using RawPtr = std::unique_ptr<T, std::function<void(void*)>>;
+
+template<typename T,
+         typename RawAllocator,
+         typename... Args>
+auto allocate_unique_erased(const std::shared_ptr<RawAllocator>& alloc, Args&&... args)
 {
-    using RawAllocator = memory_pool<node_pool>;
-    using RawPtr       = std::unique_ptr<uint8_t[], allocator_deleter<uint8_t[], RawAllocator>>;
-    RawAllocator pool(10, 10 * 10);
+    using Traits = allocator_traits<RawAllocator>;
+    auto memory  = Traits::allocate_node(*alloc, sizeof(T), alignof(T));
 
-    RawPtr ptr(0, {foonathan::memory::make_allocator_reference(pool), 0});
+    // RawPtr deallocates memory in case of constructor exception below
+    RawPtr<T>
+        result(static_cast<T*>(memory),
+               [&alloc](void* object) {
+                   Traits::deallocate_node(*alloc, object, sizeof(T), alignof(T));
+               });
 
-    std::vector<RawPtr> vec;
-    for(auto i = 0; i < 30; ++i)
-    {
-        vec.emplace_back(allocate_unique<uint8_t[]>(pool, 10u));
-    }
+    // Call constructor
+    ::new(memory) T(detail::forward<Args>(args)...);
+
+    // Pass ownership to return value
+    // using a deleter that calls destructor
+    return RawPtr<T>{
+        result.release(),
+        [alloc](void* object) {
+            static_cast<T*>(object)->~T();
+            Traits::deallocate_node(*alloc, object, sizeof(T), alignof(T));
+        }};
 }
 
 EG_TEST(MemoryPool, AnyAllocator)
 {
-    memory::static_allocator_storage<4_KiB> storage;
-    using StaticPool = memory::memory_pool<memory::node_pool, memory::static_block_allocator>;
-    using DynamicPool = memory_pool<node_pool>;
-    using RawAllocator = fallback_allocator<StaticPool, DynamicPool>;
+    struct A
+    {};
+    struct B : public A
+    {
+        int a[2] = {1, 2};
+    };
 
-    // using RawPtr       = std::unique_ptr<uint8_t[], allocator_deleter<uint8_t[], RawAllocator>>;
-    // RawAllocator pool(10, 10 * 10);
+    using namespace literals;
+    using RawAllocator = memory_pool_collection<node_pool,
+                                                identity_buckets>;
+    auto spAlloc       = std::make_shared<RawAllocator>(50_MiB, 1000_MiB);
 
-    // RawPtr ptr(0, {foonathan::memory::make_allocator_reference(pool), 0});
-
-    // std::vector<RawPtr> vec;
-    // for(auto i = 0; i < 30; ++i)
-    // {
-    //     vec.emplace_back(allocate_unique<uint8_t[]>(pool, 10u));
-    // }
+    auto spB = allocate_unique_erased<B>(spAlloc);
+    ASSERT_EQ(spB->a[1], 2);
 }
-
 
 EG_TEST(MemoryPool, TestingDefaultCTORDeleter)
 {
