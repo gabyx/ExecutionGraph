@@ -13,7 +13,6 @@
 #pragma once
 
 #include <type_traits>
-#include <external/bitset2/bitset2.hpp>
 #include <meta/meta.hpp>
 #include "executionGraph/common/EnumClassHelper.hpp"
 #include "executionGraph/common/SfinaeMacros.hpp"
