@@ -1,0 +1,9 @@
+#!/bin/bash
+# format all .cpp|.hpp files in the repository
+
+set -e
+
+REPO_DIR="$(git rev-parse --show-toplevel)"
+
+cd "${REPO_DIR}"
+python3 -m cmake_format -c "${REPO_DIR}/.cmake-format.yaml" "$1"
