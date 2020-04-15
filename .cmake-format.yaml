@@ -7,6 +7,7 @@ parse:
       kwargs:
         PROJ: "*"
         PREFIX: "*"
+        URL: "*"
         GIT_REPOSITORY: "*"
         GIT_TAG: "*"
         GIT_SHALLOW: "*"
@@ -21,7 +22,7 @@ _help_format: Options affecting formatting.
 format:
   _help_line_width:
     - How wide to allow formatted cmake files
-  line_width: 140
+  line_width: 100
   _help_tab_size:
     - How many spaces to tab for indent
   tab_size: 4
@@ -75,7 +76,7 @@ format:
   line_ending: unix
   _help_command_case:
     - Format command names consistently as 'lower' or 'upper' case
-  command_case: canonical
+  command_case: unchanged
   _help_keyword_case:
     - Format keywords consistently as 'lower' or 'upper' case
   keyword_case: unchanged
@@ -146,7 +147,7 @@ markup:
   canonicalize_hashrulers: true
   _help_enable_markup:
     - enable comment markup parsing and reflow
-  enable_markup: true
+  enable_markup: false
 _help_lint: Options affecting the linter
 lint:
   _help_disabled_codes:

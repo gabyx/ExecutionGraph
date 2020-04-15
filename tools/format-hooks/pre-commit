@@ -89,10 +89,10 @@ findExecutables | {
     # get pattern files
     magic="$formatter".magic
     patterns="$formatter".patterns
-    [ -f "$patterns" -o -f "$magic" ] || continue
+    [ -f "$patterns" ] || [ -f "$magic" ] || continue
 
     # format all files
-    echo -ne "$allFiles" | base64 ${decodeArgs} | {
+    echo -ne "$allFiles" | base64 "${decodeArgs}" | {
       while
         IFS=
         read -r -d $'\0' orig
@@ -104,16 +104,16 @@ findExecutables | {
 
         # file matches one of the patterns
         match_pattern=''
-        [ -f "$patterns" ] && echo "$orig" | grep -Eqif "$patterns" && match_pattern='1'
+        [ -f "$patterns" ] && echo "$orig" | pcregrep -qi --file="$patterns" && match_pattern='1'
 
         # file’s libmagic output matches
         match_magic=''
         [ $match_pattern ] || {
-          [ -f "$magic" ] && file "$orig" | grep -Eqif "$magic" && match_magic='1'
+          [ -f "$magic" ] && file "$orig" | pcregrep -qi --file="$magic" && match_magic='1'
         }
 
         # if none, ignore
-        [ "$match_pattern" -o "$match_magic" ] || continue
+        [ "$match_pattern" ] || [ "$match_magic" ] || continue
 
         # format
         "$formatter" "$orig" || {

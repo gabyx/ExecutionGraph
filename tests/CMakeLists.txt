@@ -1,39 +1,30 @@
-
 # Add googletest
 find_package(GoogleTestLib)
 
 set(ExecutionGraph_TESTS_OUTPUT_FILES_DIR "${PROJECT_BINARY_DIR}")
 set(ExecutionGraph_TESTS_INPUT_FILES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/files")
 set(ExecutionGraph_TESTS_INPUT_FILES_ADD_DIR "${ExecutionGraph_ROOT_DIR}/additional/tests/files")
-set(ExecutionGraph_TESTS_VALIDATION_FILES_DIR "${ExecutionGraph_ROOT_DIR}/additional/tests/files/validation")
+set(ExecutionGraph_TESTS_VALIDATION_FILES_DIR
+    "${ExecutionGraph_ROOT_DIR}/additional/tests/files/validation")
 
-set(INCLUDE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/TestFunctions.hpp
-)
+set(INCLUDE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/TestFunctions.hpp)
 
-set(SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/TestFunctions.cpp
-)
+set(SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/TestFunctions.cpp)
 
 #include directories
-set(INCLUDE_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_BINARY_DIR}/include
-)
+set(INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include)
 
 function(addTarget targetName file)
 
     message(STATUS "Configuring target: ${targetName}")
-    add_executable(${targetName} 
-                   ${file}
-                   ${SOURCE_FILES} 
-                   ${INCLUDE_FILES})
+    add_executable(${targetName} ${file} ${SOURCE_FILES} ${INCLUDE_FILES})
 
-    setTargetCompileOptionsExecutionGraph(${targetName} ${ExecutionGraph_USE_ADDRESS_SANITIZER} ${ExecutionGraph_USE_LEAK_SANITIZER})
+    setTargetCompileOptionsExecutionGraph(${targetName} ${ExecutionGraph_USE_ADDRESS_SANITIZER}
+                                          ${ExecutionGraph_USE_LEAK_SANITIZER})
     target_include_directories(${targetName} PRIVATE ${INCLUDE_DIRS})
     target_link_libraries(${targetName} PRIVATE ExecutionGraph::CoreForTests gtest gmock_main)
 
-    if(${ExecutionGraph_SETUP_COTIRE_TARGETS}) 
+    if(${ExecutionGraph_SETUP_COTIRE_TARGETS})
         cotire(${targetName})
     endif()
 
@@ -50,11 +41,11 @@ function(addTest name noCompile noCompileTests)
 
     addTarget(${target} ${file})
     add_dependencies(build_and_test ${target})
-    add_test(NAME ${target} COMMAND ${target})  
+    add_test(NAME ${target} COMMAND ${target})
 
     if(${noCompile})
         message(STATUS "Adding '${noCompileTests}' no compile tests")
-        
+
         foreach(testIndex RANGE ${noCompileTests})
             set(targetNC "${target}-NoCompile-${testIndex}")
 
@@ -63,14 +54,8 @@ function(addTest name noCompile noCompileTests)
             set_target_properties(${targetNC} PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
             add_test(NAME ${targetNC}
-                    COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/scripts/noCompile.sh
-                            ${CMAKE_COMMAND}
-                            ${targetNC}
-                            $<CONFIGURATION>
-                            ${CMAKE_BINARY_DIR}
-                            ${testIndex}
-                            ${file}
-                    )
+                     COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/scripts/noCompile.sh ${CMAKE_COMMAND}
+                             ${targetNC} $<CONFIGURATION> ${CMAKE_BINARY_DIR} ${testIndex} ${file})
 
         endforeach()
     endif()

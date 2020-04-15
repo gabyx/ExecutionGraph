@@ -9,5 +9,4 @@ set(ExecutionGraphGUICommon_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/Response.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CommandLineArguments.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CommandLineArguments.cpp
-    PARENT_SCOPE
-)
+    PARENT_SCOPE)

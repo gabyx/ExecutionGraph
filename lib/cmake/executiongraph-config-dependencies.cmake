@@ -1,6 +1,6 @@
 include(CMakeFindDependencyMacro)
 
-# need to wrap in function, because otherwise variables in approxmvbb-config.cmake get overwritten 
+# need to wrap in function, because otherwise variables in approxmvbb-config.cmake get overwritten
 # especially _IMPORT_PREFIX
 function(define_dependencies)
 

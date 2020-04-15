@@ -7,9 +7,10 @@
 # being overriden.
 #
 IF(NOT NOT_FIRST_CMAKE_RUN)
-	SET(FIRST_CMAKE_RUN ON)
-	SET(NOT_FIRST_CMAKE_RUN ON CACHE INTERNAL "Indicate that this is not the first CMake run" FORCE)
+    SET(FIRST_CMAKE_RUN ON)
+    SET(NOT_FIRST_CMAKE_RUN
+        ON
+        CACHE INTERNAL "Indicate that this is not the first CMake run" FORCE)
 ELSE()
-	SET(FIRST_CMAKE_RUN OFF)
+    SET(FIRST_CMAKE_RUN OFF)
 ENDIF()
-

@@ -1,2 +1,2 @@
-\.(cmake)$
+(?<!in)\.(cmake)$
 CMakeLists\.txt$

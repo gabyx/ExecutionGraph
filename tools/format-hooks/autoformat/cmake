@@ -7,4 +7,4 @@ REPO_DIR="$(git rev-parse --show-toplevel)"
 
 cd "${REPO_DIR}"
 echo "  -> formatting file: $1"
-cmake-format -i -c "${REPO_DIR}/.cmake-format.yaml" "$1"
+cmake-format -l error -i "$1"

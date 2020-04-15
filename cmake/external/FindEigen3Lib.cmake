@@ -17,17 +17,19 @@ if(NOT EXISTS "${EIGEN3_INCLUDE_DIR}")
     message(STATUS "eigen3 library: include dir not found -> download from ${URL}")
 
     include(DownloadProject)
-    download_project(PROJ              eigen3
-                    PREFIX             "${ExecutionGraph_EXTERNAL_BUILD_DIR}/eigen"
-                    # HG_REPOSITORY     ${URL}
-                    # HG_TAG            ${TAG}
-                    URL                 ${URL}
-                    UPDATE_DISCONNECTED 1
-                    INSTALL_DIR "${INSTALL_DIR}")
+    download_project(
+        PROJ eigen3
+        PREFIX "${ExecutionGraph_EXTERNAL_BUILD_DIR}/eigen"
+        URL ${URL}
+        UPDATE_DISCONNECTED 1 INSTALL_DIR "${INSTALL_DIR}")
 
-    set(EIGEN3_INCLUDE_DIR "${eigen3_SOURCE_DIR}" CACHE STRING "eigen library (${URL}) include directory" FORCE)
+    set(EIGEN3_INCLUDE_DIR
+        "${eigen3_SOURCE_DIR}"
+        CACHE STRING "eigen library (${URL}) include directory" FORCE)
     # define a path in the cache where to find this downloaded library
-    set(EIGEN3_DIR "${CMAKE_BINARY_DIR}/external/install/eigen" CACHE STRING "eigen directory" FORCE)
+    set(EIGEN3_DIR
+        "${CMAKE_BINARY_DIR}/external/install/eigen"
+        CACHE STRING "eigen directory" FORCE)
 else()
     message(STATUS "eigen3 library found!")
 endif()
@@ -38,4 +40,3 @@ mark_as_advanced(EIGEN3_INCLUDE_DIR)
 add_library(eigenLib INTERFACE IMPORTED)
 set_property(TARGET eigenLib PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${EIGEN3_INCLUDE_DIR})
 message(STATUS "eigen3 library target added: eigenLib")
-

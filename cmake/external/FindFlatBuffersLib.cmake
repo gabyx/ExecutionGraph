@@ -17,18 +17,18 @@ if(${USE_SUPERBUILD})
         message(STATUS "flatbuffers library: target not found -> download from ${URL}")
 
         include(ExternalProject)
-        
-        ExternalProject_Add(flatbuffers
-                            GIT_REPOSITORY      "${URL}"
-                            GIT_TAG             "feature/short-names-js-ts"
-                            GIT_SHALLOW         OFF
-                            PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/flatbuffers"
-                            TIMEOUT 10
-                            UPDATE_DISCONNECTED  ON
-                            CMAKE_ARGS "-DCMAKE_BUILD_TYPE=Release" 
-                                       "-DFLATBUFFERS_BUILD_TESTS=OFF" 
-                                       "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
-                            INSTALL_DIR "${INSTALL_DIR}")
+
+        ExternalProject_Add(
+            flatbuffers
+            GIT_REPOSITORY "${URL}"
+            GIT_TAG "feature/short-names-js-ts"
+            GIT_SHALLOW OFF
+            PREFIX "${ExecutionGraph_EXTERNAL_BUILD_DIR}/flatbuffers"
+            TIMEOUT 10
+            UPDATE_DISCONNECTED ON
+            CMAKE_ARGS "-DCMAKE_BUILD_TYPE=Release" "-DFLATBUFFERS_BUILD_TESTS=OFF"
+                       "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
+            INSTALL_DIR "${INSTALL_DIR}")
 
         ExternalProject_Get_property(flatbuffers BINARY_DIR)
         message(STATUS "flatbuffers library setup -> build it!")
@@ -47,7 +47,9 @@ endif()
 if(TARGET "flatbuffers::flatbuffers")
     add_library(flatbuffersLib INTERFACE IMPORTED)
     set_property(TARGET flatbuffersLib PROPERTY INTERFACE_LINK_LIBRARIES flatbuffers::flatbuffers)
-    set_property(TARGET flatbuffersLib PROPERTY INTERFACE_COMPILE_DEFINITIONS "$<$<CONFIG:Debug>:FLATBUFFERS_DEBUG_VERIFICATION_FAILURE>")
+    set_property(
+        TARGET flatbuffersLib PROPERTY INTERFACE_COMPILE_DEFINITIONS
+                                       "$<$<CONFIG:Debug>:FLATBUFFERS_DEBUG_VERIFICATION_FAILURE>")
     message(STATUS "flatbuffers library found! Config File: ${FlatBuffers_CONFIG}")
     message(STATUS "flatbuffers library added targets: flatbufferLib")
 endif()

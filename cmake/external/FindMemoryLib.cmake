@@ -17,19 +17,22 @@ if(${USE_SUPERBUILD})
         message(STATUS "memory library: target not found -> download from ${URL}")
 
         include(ExternalProject)
-        
-        ExternalProject_Add(memory
-                            GIT_REPOSITORY      "${URL}"
-                            GIT_TAG             master
-                            GIT_SHALLOW         ON
-                            PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/memory"
-                            TIMEOUT 10
-                            UPDATE_DISCONNECTED  ON
-                            CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-                                       "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-                                       "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "-DFOONATHAN_MEMORY_BUILD_EXAMPLES=OFF" 
-                                       "-DFOONATHAN_MEMORY_BUILD_TESTS=OFF" "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
-                            INSTALL_DIR "${INSTALL_DIR}")
+
+        ExternalProject_Add(
+            memory
+            GIT_REPOSITORY "${URL}"
+            GIT_TAG master
+            GIT_SHALLOW ON
+            PREFIX "${ExecutionGraph_EXTERNAL_BUILD_DIR}/memory"
+            TIMEOUT 10
+            UPDATE_DISCONNECTED ON
+            CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+                       "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+                       "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+                       "-DFOONATHAN_MEMORY_BUILD_EXAMPLES=OFF"
+                       "-DFOONATHAN_MEMORY_BUILD_TESTS=OFF"
+                       "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
+            INSTALL_DIR "${INSTALL_DIR}")
 
         message(STATUS "memory library setup -> build it!")
     endif()

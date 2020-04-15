@@ -16,4 +16,3 @@ add_executable(libraryUsage ./main.cpp)
 
 # link with ExecutionGraph
 target_link_libraries(libraryUsage PRIVATE ExecutionGraph::Core)
-

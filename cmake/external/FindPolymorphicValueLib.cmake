@@ -17,21 +17,22 @@ if(${USE_SUPERBUILD})
         message(STATUS "polymorphic value library: target not found -> download from ${URL}")
 
         include(ExternalProject)
-        
-        ExternalProject_Add(polymorphicValue
-                            GIT_REPOSITORY      "${URL}"
-                            GIT_TAG             "master"
-                            GIT_SHALLOW         ON
-                            PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/polymorphic-value"
-                            TIMEOUT 10
-                            UPDATE_DISCONNECTED  ON
-                            CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-                                       "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-                                       "-DCMAKE_BUILD_TYPE=Release" 
-                                       "-DCMAKE_VERBOSE_MAKEFILE=ON"
-                                       "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}" 
-                                       "-DBUILD_TESTING=OFF" 
-                            INSTALL_DIR "${INSTALL_DIR}")
+
+        ExternalProject_Add(
+            polymorphicValue
+            GIT_REPOSITORY "${URL}"
+            GIT_TAG "master"
+            GIT_SHALLOW ON
+            PREFIX "${ExecutionGraph_EXTERNAL_BUILD_DIR}/polymorphic-value"
+            TIMEOUT 10
+            UPDATE_DISCONNECTED ON
+            CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+                       "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+                       "-DCMAKE_BUILD_TYPE=Release"
+                       "-DCMAKE_VERBOSE_MAKEFILE=ON"
+                       "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
+                       "-DBUILD_TESTING=OFF"
+            INSTALL_DIR "${INSTALL_DIR}")
 
         message(STATUS "polymorphic value library setup -> build it!")
     endif()
@@ -48,7 +49,8 @@ endif()
 
 if(TARGET "polymorphic_value::polymorphic_value")
     add_library(polymorphicValueLib INTERFACE IMPORTED)
-    set_property(TARGET polymorphicValueLib PROPERTY INTERFACE_LINK_LIBRARIES polymorphic_value::polymorphic_value)
+    set_property(TARGET polymorphicValueLib PROPERTY INTERFACE_LINK_LIBRARIES
+                                                     polymorphic_value::polymorphic_value)
 
     message(STATUS "polymorphic value library found! Config File: ${polymorphicValue_CONFIG}")
     message(STATUS "polymorphic value library added targets: polymorphicValueLib")

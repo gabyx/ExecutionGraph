@@ -1,15 +1,12 @@
-function(include_all_source_ExecutionGraph SRC INC INC_DIRS
-         ExecutionGraph_ROOT_DIR ExecutionGraph_BINARY_DIR)
+function(include_all_source_ExecutionGraph SRC INC INC_DIRS ExecutionGraph_ROOT_DIR
+         ExecutionGraph_BINARY_DIR)
 
     # Write Config files
     include(${ExecutionGraph_ROOT_DIR}/cmake/WriteConfigFile.cmake)
     set(ExecutionGraph_CONFIG_FILE
         ${ExecutionGraph_BINARY_DIR}/include/executionGraph/config/Config.hpp)
-    message(
-        STATUS "ExecutionGraph: Write config file ${ExecutionGraph_CONFIG_FILE}"
-    )
-    executiongraph_write_config_file(${ExecutionGraph_CONFIG_FILE}
-                                     ${ExecutionGraph_ROOT_DIR})
+    message(STATUS "ExecutionGraph: Write config file ${ExecutionGraph_CONFIG_FILE}")
+    executiongraph_write_config_file(${ExecutionGraph_CONFIG_FILE} ${ExecutionGraph_ROOT_DIR})
 
     # Add all external sources/headers include(${ExecutionGraph_ROOT_DIR}/cmake/
     # DefineExecutionGraphExternalSources.cmake) no external sources up to now
@@ -95,12 +92,11 @@ function(include_all_source_ExecutionGraph SRC INC INC_DIRS
 
 endfunction()
 
-function(include_all_source_ExecutionGraphSerialization SRC INC INC_DIRS
-         ExecutionGraph_ROOT_DIR ExecutionGraph_BINARY_DIR)
+function(include_all_source_ExecutionGraphSerialization SRC INC INC_DIRS ExecutionGraph_ROOT_DIR
+         ExecutionGraph_BINARY_DIR)
 
-    set(SOURCES
-        ${ExecutionGraph_ROOT_DIR}/src/GraphTypeDescriptionSerializer.cpp
-        ${ExecutionGraph_ROOT_DIR}/src/Conversions.cpp)
+    set(SOURCES ${ExecutionGraph_ROOT_DIR}/src/GraphTypeDescriptionSerializer.cpp
+                ${ExecutionGraph_ROOT_DIR}/src/Conversions.cpp)
 
     set(INCLUDES
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/ExecutionGraphSerializer.hpp
@@ -110,8 +106,7 @@ function(include_all_source_ExecutionGraphSerialization SRC INC INC_DIRS
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/SocketTypeDescription.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/LogicNodeSerializer.hpp
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/FileMapper.hpp
-        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/Conversions.hpp
-    )
+        ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/Conversions.hpp)
 
     set(SCHEMAS
         ${ExecutionGraph_ROOT_DIR}/include/executionGraph/serialization/schemas/LogicNode.fbs
@@ -158,8 +153,7 @@ function(include_all_source_ExecutionGraphSerialization SRC INC INC_DIRS
 
 endfunction()
 
-function(setTargetCompileOptionsExecutionGraph target use_address_san
-         use_leak_san)
+function(setTargetCompileOptionsExecutionGraph target use_address_san use_leak_san)
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang")
         message(STATUS "Setting Compile/Linker Options for Clang")
@@ -188,8 +182,7 @@ function(setTargetCompileOptionsExecutionGraph target use_address_san
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
         message(ERROR "MSVC is not yet supported!")
     else()
-        message(ERROR
-                "Compiler '${CMAKE_CXX_COMPILER_ID}' is not yet supported!")
+        message(ERROR "Compiler '${CMAKE_CXX_COMPILER_ID}' is not yet supported!")
     endif()
 
     if(${use_address_san})
@@ -204,8 +197,7 @@ function(setTargetCompileOptionsExecutionGraph target use_address_san
         elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
             message(FATAL_ERROR "MSVC is not yet supported!")
         else()
-            message(ERROR
-                    "Compiler '${CMAKE_CXX_COMPILER_ID}' is not yet supported!")
+            message(ERROR "Compiler '${CMAKE_CXX_COMPILER_ID}' is not yet supported!")
         endif()
     endif()
 
@@ -214,23 +206,18 @@ function(setTargetCompileOptionsExecutionGraph target use_address_san
             list(APPEND CXX_FLAGS_DEBUG "-fsanitize=leak")
             set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=leak")
         elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-            message(
-                FATAL_ERROR
-                    "AppleClang does not support -fsanitize=leak (please check)"
-            )
+            message(FATAL_ERROR "AppleClang does not support -fsanitize=leak (please check)")
         elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
             message(FATAL_ERROR "MSVC is not yet supported!")
         else()
-            message(ERROR
-                    "Compiler '${CMAKE_CXX_COMPILER_ID}' is not yet supported!")
+            message(ERROR "Compiler '${CMAKE_CXX_COMPILER_ID}' is not yet supported!")
         endif()
     endif()
 
     target_compile_features(${target} PUBLIC cxx_std_20)
 
     # Compile flags.
-    target_compile_options(
-        ${target} PRIVATE ${CXX_FLAGS} $<$<CONFIG:Debug>:${CXX_FLAGS_DEBUG}>)
+    target_compile_options(${target} PRIVATE ${CXX_FLAGS} $<$<CONFIG:Debug>:${CXX_FLAGS_DEBUG}>)
 
     # Linker flags.
     set_property(TARGET ${target} PROPERTY LINK_FLAGS ${LINKER_FLAGS})
@@ -240,9 +227,8 @@ function(setTargetCompileOptionsExecutionGraph target use_address_san
 
     if(OS_MACOSX)
         set_target_properties(
-            ${target}
-            PROPERTIES OSX_ARCHITECTURES_DEBUG "${CMAKE_OSX_ARCHITECTURES}"
-                       OSX_ARCHITECTURES_RELEASE "${CMAKE_OSX_ARCHITECTURES}")
+            ${target} PROPERTIES OSX_ARCHITECTURES_DEBUG "${CMAKE_OSX_ARCHITECTURES}"
+                                 OSX_ARCHITECTURES_RELEASE "${CMAKE_OSX_ARCHITECTURES}")
     endif()
 
 endfunction()

@@ -1,5 +1,4 @@
 set(ExecutionGraphGUIBackend_SRCS
-
     ${CMAKE_CURRENT_SOURCE_DIR}/Backend.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/BackendRequestHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/BackendRequestHandler.hpp
@@ -17,11 +16,7 @@ set(ExecutionGraphGUIBackend_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/requestHandlers/GraphManagementRequestHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/requestHandlers/GraphSerializationRequestHandler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/requestHandlers/GraphSerializationRequestHandler.cpp
-
     ${CMAKE_CURRENT_SOURCE_DIR}/ExecutionGraphBackendDefs.hpp
-
     ${CMAKE_CURRENT_SOURCE_DIR}/ExecutionGraphBackend.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ExecutionGraphBackend.cpp
-
-    PARENT_SCOPE
-)
+    PARENT_SCOPE)

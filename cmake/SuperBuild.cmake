@@ -1,18 +1,17 @@
-
 message(STATUS "=================================================================")
 message(STATUS "                   SUPER BUILD CONFIGURE [START]                  ")
 message(STATUS "=================================================================")
 
-include (ExternalProject)
+include(ExternalProject)
 set(ExecutionGraph_DEPENDENCIES)
 set(EXTRA_CMAKE_ARGS)
 
 # find_package(Eigen3Lib) # not really dependency yet
-find_package(MetaLib REQUIRED) 
+find_package(MetaLib REQUIRED)
 find_package(FmtLib REQUIRED)
 find_package(FlatBuffersLib REQUIRED)
-find_package(RTTRLib REQUIRED) 
-#find_package(PolymorphicValueLib REQUIRED) 
+find_package(RTTRLib REQUIRED)
+#find_package(PolymorphicValueLib REQUIRED)
 find_package(CrossGUIDLib REQUIRED)
 find_package(MemoryLib REQUIRED) # memory pool
 
@@ -30,4 +29,6 @@ message(STATUS "================================================================
 message(STATUS "                      SUPER BUILD CONFIGURE [DONE]                ")
 message(STATUS "=================================================================")
 
-set(USE_SUPERBUILD OFF CACHE STRING "If a superbuild should be made (building all dependencies)" FORCE)
+set(USE_SUPERBUILD
+    OFF
+    CACHE STRING "If a superbuild should be made (building all dependencies)" FORCE)

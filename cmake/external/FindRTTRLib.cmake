@@ -18,25 +18,26 @@ if(${USE_SUPERBUILD})
         message(STATUS "rttr library: target not found -> download from ${URL}")
 
         include(ExternalProject)
-        
-        ExternalProject_Add(rttr
-                            GIT_REPOSITORY      "${URL}"
-                            GIT_TAG             master
-                            GIT_SHALLOW         ON
-                            PREFIX              "${ExecutionGraph_EXTERNAL_BUILD_DIR}/rttr"
-                            TIMEOUT 10
-                            UPDATE_DISCONNECTED  ON
-                            CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-                                       "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-                                       "-DCMAKE_BUILD_TYPE=Release" 
-                                       "-DCMAKE_VERBOSE_MAKEFILE=ON" 
-                                       "-DBUILD_STATIC=ON" 
-                                       "-DBUILD_EXAMPLES=OFF"
-                                       "-DBUILD_BENCHMARKS=OFF" 
-                                       "-DBUILD_UNIT_TESTS=OFF"
-                                       "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
-                                       "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
-                            INSTALL_DIR "${INSTALL_DIR}")
+
+        ExternalProject_Add(
+            rttr
+            GIT_REPOSITORY "${URL}"
+            GIT_TAG master
+            GIT_SHALLOW ON
+            PREFIX "${ExecutionGraph_EXTERNAL_BUILD_DIR}/rttr"
+            TIMEOUT 10
+            UPDATE_DISCONNECTED ON
+            CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+                       "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+                       "-DCMAKE_BUILD_TYPE=Release"
+                       "-DCMAKE_VERBOSE_MAKEFILE=ON"
+                       "-DBUILD_STATIC=ON"
+                       "-DBUILD_EXAMPLES=OFF"
+                       "-DBUILD_BENCHMARKS=OFF"
+                       "-DBUILD_UNIT_TESTS=OFF"
+                       "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+                       "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
+            INSTALL_DIR "${INSTALL_DIR}")
 
         message(STATUS "rttr library setup -> build it!")
     endif()
