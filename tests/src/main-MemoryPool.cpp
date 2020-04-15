@@ -13,6 +13,7 @@
 #include <vector>
 #include <foonathan/memory/memory_pool.hpp>
 #include <foonathan/memory/smart_ptr.hpp>
+#include <foonathan/memory/static_allocator.hpp>
 #include "TestFunctions.hpp"
 
 using namespace foonathan::memory;
@@ -103,6 +104,26 @@ EG_TEST(MemoryPool, Test3)
         vec.emplace_back(allocate_unique<uint8_t[]>(pool, 10u));
     }
 }
+
+EG_TEST(MemoryPool, AnyAllocator)
+{
+    memory::static_allocator_storage<4_KiB> storage;
+    using StaticPool = memory::memory_pool<memory::node_pool, memory::static_block_allocator>;
+    using DynamicPool = memory_pool<node_pool>;
+    using RawAllocator = fallback_allocator<StaticPool, DynamicPool>;
+
+    // using RawPtr       = std::unique_ptr<uint8_t[], allocator_deleter<uint8_t[], RawAllocator>>;
+    // RawAllocator pool(10, 10 * 10);
+
+    // RawPtr ptr(0, {foonathan::memory::make_allocator_reference(pool), 0});
+
+    // std::vector<RawPtr> vec;
+    // for(auto i = 0; i < 30; ++i)
+    // {
+    //     vec.emplace_back(allocate_unique<uint8_t[]>(pool, 10u));
+    // }
+}
+
 
 EG_TEST(MemoryPool, TestingDefaultCTORDeleter)
 {
