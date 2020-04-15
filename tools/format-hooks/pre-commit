@@ -69,14 +69,14 @@ enabledFormatters=$(git config precommit-format.enabledFormattersRegex)
 findExecutables | {
   while read formatter; do
     # check the formatter is disabled
-    if [ ! -z "${enabledFormatters}" ]; then
+    if [ -n "${enabledFormatters}" ]; then
       echo "$formatter" | grep -Eqi "${enabledFormatters}" ||
         {
           echo "Skip formatter '${formatter}'' [disabled by git config]"
           continue
         }
     fi
-    if [ ! -z "${disabledFormatters}" ]; then
+    if [ -n "${disabledFormatters}" ]; then
       echo "$formatter" | grep -Eqi "${disabledFormatters}" &&
         {
           echo "Skip formatter '${formatter}'' [disabled by git config]"
