@@ -21,6 +21,8 @@
 
 namespace executionGraph
 {
+    class ILogicSocketDataAccessBase;
+
     /* ---------------------------------------------------------------------------------------*/
     /*!
         Base class for any data node.

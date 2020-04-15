@@ -8,7 +8,7 @@ REPO_DIR="$(git rev-parse --show-toplevel)"
 function formatFile() {
     set -e
     file=$1
-    echo "formatting file: $file"
+    echo "  -> formatting file: $file"
     clang-format -style="file" -assume-filename="" -fallback-style=none -i ${file} || { echo 'fatal: `clang-format` failed for:' "$file"; exit 1; }
 }
 export -f formatFile
