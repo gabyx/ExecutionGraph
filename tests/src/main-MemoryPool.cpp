@@ -133,9 +133,11 @@ EG_TEST(MemoryPool, AnyAllocator)
     };
 
     using namespace literals;
-    using RawAllocator = memory_pool_collection<node_pool,
-                                                identity_buckets>;
-    auto spAlloc       = std::make_shared<RawAllocator>(50_MiB, 1000_MiB);
+    using Poolocator = memory_pool_collection<node_pool,identity_buckets>;
+    using RawAllocTh = thread_safe_allocator<Poolocator>;
+
+    Poolocator alloc(50_MiB, 1000_MiB);
+    auto spAlloc = std::make_shared<RawAllocTh>(Poolocator{50_MiB, 1000_MiB});
 
     auto spB = allocate_unique_erased<B>(spAlloc);
     ASSERT_EQ(spB->a[1], 2);
