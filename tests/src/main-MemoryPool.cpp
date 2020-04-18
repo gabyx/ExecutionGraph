@@ -16,6 +16,7 @@
 #include <foonathan/memory/memory_pool_collection.hpp>
 #include <foonathan/memory/smart_ptr.hpp>
 #include <foonathan/memory/static_allocator.hpp>
+#include <executionGraph/common/AllocatorUtils.hpp>
 #include "TestFunctions.hpp"
 
 using namespace foonathan::memory;
@@ -92,37 +93,6 @@ EG_TEST(MemoryPool, Test2)
     }
 }
 
-template<typename T>
-using RawPtr = std::unique_ptr<T, std::function<void(void*)>>;
-
-template<typename T,
-         typename RawAllocator,
-         typename... Args>
-auto allocate_unique_erased(const std::shared_ptr<RawAllocator>& alloc, Args&&... args)
-{
-    using Traits = allocator_traits<RawAllocator>;
-    auto memory  = Traits::allocate_node(*alloc, sizeof(T), alignof(T));
-
-    // RawPtr deallocates memory in case of constructor exception below
-    RawPtr<T>
-        result(static_cast<T*>(memory),
-               [&alloc](void* object) {
-                   Traits::deallocate_node(*alloc, object, sizeof(T), alignof(T));
-               });
-
-    // Call constructor
-    ::new(memory) T(detail::forward<Args>(args)...);
-
-    // Pass ownership to return value
-    // using a deleter that calls destructor
-    return RawPtr<T>{
-        result.release(),
-        [alloc](void* object) {
-            static_cast<T*>(object)->~T();
-            Traits::deallocate_node(*alloc, object, sizeof(T), alignof(T));
-        }};
-}
-
 EG_TEST(MemoryPool, AnyAllocator)
 {
     struct A
@@ -133,14 +103,17 @@ EG_TEST(MemoryPool, AnyAllocator)
     };
 
     using namespace literals;
-    using Poolocator = memory_pool_collection<node_pool,identity_buckets>;
+    using Poolocator = memory_pool_collection<node_pool, identity_buckets>;
     using RawAllocTh = thread_safe_allocator<Poolocator>;
 
     Poolocator alloc(50_MiB, 1000_MiB);
     auto spAlloc = std::make_shared<RawAllocTh>(Poolocator{50_MiB, 1000_MiB});
 
-    auto spB = allocate_unique_erased<B>(spAlloc);
+    using namespace executionGraph;
+    auto spB = allocatorUtils::makeUniqueErased<B>(spAlloc);
     ASSERT_EQ(spB->a[1], 2);
+    UniquePtrErased<A> spA = std::move(spB);
+    ASSERT_TRUE(spA.get() != nullptr);
 }
 
 EG_TEST(MemoryPool, TestingDefaultCTORDeleter)

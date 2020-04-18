@@ -14,8 +14,10 @@
 
 #include <type_traits>
 #include <meta/meta.hpp>
+#include "executionGraph/common/AllocatorHelper.hpp"
 #include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/SfinaeMacros.hpp"
+#include "executionGraph/common/TupleUtil.hpp"
 #include "executionGraph/common/TypeDefs.hpp"
 #include "executionGraph/nodes/LogicCommon.hpp"
 
@@ -93,6 +95,17 @@ namespace executionGraph
             m_data   = h->data();
             m_handle = std::move(h);
         }
+
+        // template<typename... Args, typename Allocator>
+        // static create(std::tuple<Args...> forwardArgs, Allocator alloc)
+        // {
+        //     static_assert((... && std::is_reference_t<Args>),
+        //                   "All arguments need to be rvalue/lvalue-references");
+
+        //     auto h = 
+        //     m_data   = h->data();
+        //     m_handle = std::move(h);
+        // }
 
         //! @todo Implement here an allocator constructor
         //! with std::unique_ptr<T, std::function<void(void*)>
