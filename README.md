@@ -1,4 +1,4 @@
-**This library is in alpha and still under development. First usable version will be `v1.1`. Note: This library is under heavy development on the `dev` branch! Forking should mainly be considered for looking around, or contributing of course.**
+**This library is in alpha and still under development. First usable version will be `v1.1`. Note: This library is under heavy development on the `feature/v2` branch! Forking should mainly be considered for looking around, or contributing of course.**
 
 <img src="gui/executionGraphGui/client/apps/electron/resources/icon.svg" height="150px" style="display: inline;vertical-align: middle; horizontal-align:center"/>
 
