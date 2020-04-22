@@ -95,25 +95,45 @@ EG_TEST(MemoryPool, Test2)
 
 EG_TEST(MemoryPool, AnyAllocator)
 {
+    bool dtorCalled = false;
     struct A
-    {};
+    {
+        virtual ~A() {}
+    };
     struct B : public A
     {
-        int a[2] = {1, 2};
+        B(bool& d)
+            : dtorCalled(d) {}
+        ~B()
+        {
+            dtorCalled = true;
+        }
+        bool& dtorCalled;
+        int a[1024 * 1024 * 32];
     };
 
     using namespace literals;
-    using Poolocator = memory_pool_collection<node_pool, identity_buckets>;
+    using Poolocator = memory_pool_collection<node_pool, log2_buckets>;
     using RawAllocTh = thread_safe_allocator<Poolocator>;
 
-    Poolocator alloc(50_MiB, 1000_MiB);
-    auto spAlloc = std::make_shared<RawAllocTh>(Poolocator{50_MiB, 1000_MiB});
+    Poolocator alloc(1_GiB, 4_GiB);
+    auto spAlloc = std::make_shared<RawAllocTh>(std::move(alloc));
 
     using namespace executionGraph;
-    auto spB = allocatorUtils::makeUniqueErased<B>(spAlloc);
-    ASSERT_EQ(spB->a[1], 2);
-    UniquePtrErased<A> spA = std::move(spB);
-    ASSERT_TRUE(spA.get() != nullptr);
+
+    // Make type-erased unique_ptr with state-full allocator
+    {
+        // auto spB = allocatorUtils::makeUniqueErased<B>(spAlloc, dtorCalled);
+        // ASSERT_EQ(spB->dtorCalled, false);
+        // UniquePtrErased<A> spA = std::move(spB);
+        // ASSERT_TRUE(spA.get() != nullptr);
+        // spA = nullptr;
+        // ASSERT_EQ(dtorCalled, true);
+    }
+
+    {
+        auto spB = allocatorUtils::makeUniqueErased<B>(heap_allocator{}, dtorCalled);
+    }
 }
 
 EG_TEST(MemoryPool, TestingDefaultCTORDeleter)

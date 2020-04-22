@@ -14,7 +14,7 @@
 
 #include <type_traits>
 #include <meta/meta.hpp>
-#include "executionGraph/common/AllocatorHelper.hpp"
+#include "executionGraph/common/AllocatorUtils.hpp"
 #include "executionGraph/common/Assert.hpp"
 #include "executionGraph/common/SfinaeMacros.hpp"
 #include "executionGraph/common/TupleUtil.hpp"
@@ -96,16 +96,13 @@ namespace executionGraph
             m_handle = std::move(h);
         }
 
-        // template<typename... Args, typename Allocator>
-        // static create(std::tuple<Args...> forwardArgs, Allocator alloc)
-        // {
-        //     static_assert((... && std::is_reference_t<Args>),
-        //                   "All arguments need to be rvalue/lvalue-references");
-
-        //     auto h = 
-        //     m_data   = h->data();
-        //     m_handle = std::move(h);
-        // }
+        template<typename Handle, typename... Args, typename Allocator>
+        static create(Allocator alloc, Args&&... args)
+        {
+            auto h = 
+            m_data   = h->data();
+            m_handle = std::move(h);
+        }
 
         //! @todo Implement here an allocator constructor
         //! with std::unique_ptr<T, std::function<void(void*)>
@@ -171,7 +168,7 @@ namespace executionGraph
         }
 
     private:
-        std::unique_ptr<ILogicDataHandle> m_handle;  //! The type-erased data handle.
+        UniquePtrErased<ILogicDataHandle> m_handle;  //! The type-erased data handle.
         Data* m_data = nullptr;                      //! The actual data.
     };
 

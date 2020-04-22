@@ -22,6 +22,7 @@
 
 namespace executionGraph
 {
+    //! @todo We need here a move-only function since allocators are only movable!
     template<typename T>
     using UniquePtrErased = std::unique_ptr<T, std::function<void(void*)>>;
 
@@ -34,14 +35,14 @@ namespace executionGraph
 
             template<typename AllocHandle,
                      EG_ENABLE_IF(isSharedPtr<AllocHandle>::value)>
-            auto& get(AllocHandle& handle)
+            auto& get(const AllocHandle& handle) noexcept
             {
                 return *handle;
             }
 
             template<typename AllocHandle,
                      EG_ENABLE_IF(!isSharedPtr<AllocHandle>::value)>
-            auto& get(AllocHandle& handle)
+            auto& get(AllocHandle& handle) noexcept
             {
                 return handle;
             }
@@ -57,11 +58,9 @@ namespace executionGraph
                  typename... Args>
         UniquePtrErased<T> makeUniqueErased(RawAllocator alloc, Args&&... args)
         {
-            using namespace foonathan;
+            namespace memory = foonathan::memory;
 
-            using Allocator = meta::if_<details::isSharedPtr<RawAllocator>,
-                                        typename RawAllocator::element_type,
-                                        RawAllocator>;
+            using Allocator = std::remove_cvref_t<decltype(details::get(*static_cast<RawAllocator*>(0)))>;
 
             EG_STATIC_ASSERT(!std::is_const_v<Allocator>, "Allocator needs to be non-const");
 
@@ -70,28 +69,30 @@ namespace executionGraph
                              "A stateful RawAllocator needs to be a std::shared_ptr<RawAllocator> "
                              "because we cannot safely type-erase otherwise.");
 
-            using Traits = memory::allocator_traits<Allocator>;
-            auto memory  = Traits::allocate_node(details::get(alloc), sizeof(T), alignof(T));
+            // using Traits = memory::allocator_traits<Allocator>;
+            // void* node   = Traits::allocate_node(details::get(alloc), sizeof(T), alignof(T));
 
-            // RawPtr deallocates memory in case of constructor exception below
-            UniquePtrErased<T>
-                result(static_cast<T*>(memory),
-                       [&alloc](void* object) {
-                           Traits::deallocate_node(details::get(alloc), object, sizeof(T), alignof(T));
-                       });
+            // // RawPtr deallocates memory in case of constructor exception below
+            // UniquePtrErased<T>
+            //     result(static_cast<T*>(node),
+            //            [&alloc](void* object) mutable {
+            //                Traits::deallocate_node(details::get(alloc), object, sizeof(T), alignof(T));
+            //            });
 
-            // Call constructor
-            ::new(memory) T(std::forward<Args>(args)...);
+            // // Call constructor
+            // ::new(node) T(std::forward<Args>(args)...);
 
-            // Pass ownership to return value
-            // using a deleter that calls the destructor and deallocates
-            // The allocator is captured by value!
-            return UniquePtrErased<T>{
-                result.release(),
-                [alloc](void* object) {
-                    static_cast<T*>(object)->~T();
-                    Traits::deallocate_node(details::get(alloc), object, sizeof(T), alignof(T));
-                }};
+            // // Pass ownership to return value
+            // // using a deleter that calls the destructor and deallocates
+            // // The allocator is captured by value!
+            // return UniquePtrErased<T>{
+            //     result.release(),
+            //     [al = std::move(alloc)](void* object) mutable {
+            //         static_cast<T*>(object)->~T();
+            //         Traits::deallocate_node(details::get(al), object, sizeof(T), alignof(T));
+            //     }};
+
+            return nullptr;
         }
 
     }  // namespace allocatorUtils
