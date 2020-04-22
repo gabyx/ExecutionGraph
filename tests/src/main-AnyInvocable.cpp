@@ -74,6 +74,23 @@ EG_TEST(AnyInvocable, Test1)
         ASSERT_TRUE(i == nullptr && j == nullptr);
         ASSERT_TRUE(k != nullptr);
     }
+    {
+        // Throwing exception
+        M m(3);
+        AnyInvocable<int()> i = [m = std::move(m)] { EG_THROW("Wups"); return 3; };
+
+        auto j = std::move(i);
+        bool catched = false;
+        try
+        {
+            j();
+        }
+        catch(std::exception& e)
+        {
+            catched = true;
+        }
+        ASSERT_TRUE(catched) << "Exception not catched";
+    }
 #elif EG_NO_COMPILE_TEST_INDEX == 0
     {
         M m(3);

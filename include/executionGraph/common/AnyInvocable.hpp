@@ -21,6 +21,20 @@
 
 namespace executionGraph
 {
+    /* ---------------------------------------------------------------------------------------*/
+    /*!
+        AnyInvocable is a move-only `std::function`.
+
+        Note that this object is fully noexcept, 
+        and any exception arising from std::function is treated as hard error.
+
+        See [P0288R4](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p0288r4.html)
+        for C++20.
+
+        @date Wed Apr 22 2020
+        @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
+    */
+    /* ---------------------------------------------------------------------------------------*/
     template<typename T>
     class AnyInvocable final : private std::function<T>,
                                private MoveOnly
@@ -49,20 +63,21 @@ namespace executionGraph
                        EG_ENABLE_IF_CLASS(!std::is_copy_constructible_v<F> &&
                                           std::is_move_constructible_v<F>)>
         {
-            Wrapper(F&& func)
+            Wrapper(F&& func) noexcept
                 : func(std::forward<F>(func)) {}
 
-            Wrapper(Wrapper&&) = default;
-            Wrapper& operator=(Wrapper&&) = default;
+            Wrapper(Wrapper&&) noexcept = default;
+            Wrapper& operator=(Wrapper&&) noexcept = default;
 
             // These two functions are instantiated by `std::function`
             // and are never called
-            Wrapper(const Wrapper& rhs) : func(std::move(const_cast<Wrapper&>(rhs).func))
+            Wrapper(const Wrapper& rhs) noexcept
+                : func(std::move(const_cast<Wrapper&>(rhs).func))
             {
                 EG_THROW("You copied a move-only function !");
             }
 
-            Wrapper& operator=(Wrapper&)
+            Wrapper& operator=(Wrapper&) noexcept
             {
                 EG_THROW("You copied a move-only function !");
             }
@@ -85,29 +100,33 @@ namespace executionGraph
             : Base(nullptr) {}
 
         template<typename F>
-        AnyInvocable(F&& f)
+        AnyInvocable(F&& f) noexcept
             : Base(Wrapper<naked<F>>{std::forward<F>(f)})
-        {}
+        {
+            // even if std::function is not noexcept we 
+            // declare it here noexcept.
+        }
 
         template<typename F>
-        AnyInvocable& operator=(F&& f)
+        AnyInvocable& operator=(F&& f) noexcept
         {
+            // even if std::function is not noexcept we do so !
             Base::operator=(Wrapper<naked<F>>{std::forward<F>(f)});
             return *this;
         }
 
-        AnyInvocable& operator=(std::nullptr_t)
+        AnyInvocable& operator=(std::nullptr_t) noexcept
         {
             Base::operator=(nullptr);
             return *this;
         }
 
-        bool operator==(std::nullptr_t)
+        bool operator==(std::nullptr_t) noexcept
         {
             return static_cast<Base&>(*this) == nullptr;
         }
 
-        bool operator!=(std::nullptr_t)
+        bool operator!=(std::nullptr_t) noexcept
         {
             return static_cast<Base&>(*this) != nullptr;
         }
