@@ -33,8 +33,13 @@ compileOutputRegexes="$6"
 [ -f "$compileOutputRegexes" ] || die "[failure]: compile error reference '$compileOutputRegexes' not found"
 
 # Read all compile errors regex which need to match the compile output
-allRegexes=$(sed -rn -E "/^#if\s+EG_NO_COMPILE_TEST_INDEX\s+==\s+${testIndex}/,/^#endif/p" "$compileOutputRegexes" |
+allRegexes=$(sed -rn -E "/^\s*#.*EG_NO_COMPILE_TEST_INDEX\s+==\s+${testIndex}/,/^#(else|elif|endif)/p" "$compileOutputRegexes" |
     sed -rn 's@^\s*//\s+CompileErrorRegex:\s+"(.*)"@\1@p')
+
+if [ -z "$allRegexes" ]; then
+    printError "No compile error regex detected!"
+    exit 1
+fi
 
 cd "$workingDir" || die "working directory '$workingDir' wrong"
 out=$("${cmake}" --build . --target "$target" --config "$configuration" 2>&1 1>/dev/null )

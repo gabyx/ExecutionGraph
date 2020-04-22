@@ -16,7 +16,7 @@ set(INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}
 
 include(AddTestTargets)
 
-addTest("LogicNode" OFF ON 1)
+addTest("LogicNode" OFF ON 0)
 addTest("LogicSocketData" OFF OFF 0)
 # addTest("ExecutionTree" OFF OFF 0)
 # addTest("CustomSocketTypes" OFF OFF 0)
@@ -26,3 +26,4 @@ addTest("MetaProgramming" OFF OFF 0)
 addTest("Synchronized" OFF OFF 0)
 addTest("Flags" OFF OFF 0)
 addTest("MemoryPool" "memoryLib" OFF 0)
+addTest("AnyInvocable" OFF ON 2)
