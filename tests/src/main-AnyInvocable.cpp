@@ -79,13 +79,24 @@ EG_TEST(AnyInvocable, Test1)
         M m(3);
         AnyInvocable<int()> i = [m = std::move(m)] { EG_THROW("Wups"); return 3; };
 
-        auto j = std::move(i);
+        auto j       = std::move(i);
         bool catched = false;
         try
         {
             j();
         }
         catch(std::exception& e)
+        {
+            catched = true;
+        }
+        ASSERT_TRUE(catched) << "Exception not catched";
+
+        catched = false;
+        try
+        {
+            i();
+        }
+        catch(std::bad_function_call& e)
         {
             catched = true;
         }

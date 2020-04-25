@@ -31,14 +31,17 @@ struct A
         : m_a{a}, deleter(d)
     {}
 
-    ~A() { std::cout << "dtor A :" << m_a[0] << std::endl; }
+    ~A()
+    {
+        // std::cout << "dtor A :" << m_a[0] << std::endl;
+    }
 
     int m_a[100];
 
     std::function<void(A*)> deleter;  // Wrap here the deleter to delete over the pool
     void refCountDroppedToZero()
     {
-        std::cout << "refcount = 0 :";
+        // std::cout << "refcount = 0 :";
         deleter(this);  // do a delete over this deleter, calls dtor and deallocates
     }
 };
@@ -60,7 +63,7 @@ EG_TEST(MemoryPool, Test1)
         // call constructor (placement new)
         ::new(memory) A(i);
         // pass ownership to return value CefRefPtr which will use the internal BackendRequestHandler::m_deleter
-        std::cout << "allocated " << i << std::endl;
+        // std::cout << "allocated " << i << std::endl;
         vec.emplace_back(Ptr(result.release(), {pool}));
     }
     std::shuffle(vec.begin(), vec.end(), std::mt19937{});
@@ -82,7 +85,7 @@ EG_TEST(MemoryPool, Test2)
         // call constructor (placement new), insert a deleter into the instance
         ::new(memory) A(i, [&pool](auto* p) { allocator_deleter<A, RawAllocator>{pool}(p); });
         // pass ownership to return value CefRefPtr which will use the internal BackendRequestHandler::m_deleter
-        std::cout << "allocated " << i << std::endl;
+        // std::cout << "allocated " << i << std::endl;
         vec.emplace_back(result.release());
     }
 
@@ -123,16 +126,25 @@ EG_TEST(MemoryPool, AnyAllocator)
 
     // Make type-erased unique_ptr with state-full allocator
     {
-        // auto spB = allocatorUtils::makeUniqueErased<B>(spAlloc, dtorCalled);
-        // ASSERT_EQ(spB->dtorCalled, false);
-        // UniquePtrErased<A> spA = std::move(spB);
-        // ASSERT_TRUE(spA.get() != nullptr);
-        // spA = nullptr;
-        // ASSERT_EQ(dtorCalled, true);
+        dtorCalled = false;
+        auto spB   = allocatorUtils::makeUniqueErased<B>(spAlloc, dtorCalled);
+        spAlloc    = nullptr;  // set global reference to nullptr !
+        ASSERT_EQ(spB->dtorCalled, false);
+        UniquePtrErased<A> spA = std::move(spB);
+        ASSERT_TRUE(spA.get() != nullptr);
+        spA = nullptr;
+        ASSERT_EQ(dtorCalled, true);
     }
 
+    // Make type-erased unique_ptr with stateless allocator
     {
-        auto spB = allocatorUtils::makeUniqueErased<B>(heap_allocator{}, dtorCalled);
+        dtorCalled = false;
+        auto spB   = allocatorUtils::makeUniqueErased<B>(heap_allocator{}, dtorCalled);
+        ASSERT_EQ(spB->dtorCalled, false);
+        UniquePtrErased<A> spA = std::move(spB);
+        ASSERT_TRUE(spA.get() != nullptr);
+        spA = nullptr;
+        ASSERT_EQ(dtorCalled, true);
     }
 }
 
