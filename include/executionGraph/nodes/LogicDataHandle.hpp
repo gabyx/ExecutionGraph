@@ -39,6 +39,7 @@ namespace executionGraph
         static constexpr bool isReadOnly = std::is_const_v<TData>;
 
         using Data    = TData;
+        using Pointer = std::add_pointer<Data>;
         using RawData = std::remove_const_t<Data>;
 
         EG_STATIC_ASSERT(!std::is_reference_v<Data>, "Data needs to be no reference");
@@ -54,7 +55,7 @@ namespace executionGraph
 
         public:
             //! Access to memory of the underlying data.
-            virtual Data* data() noexcept = 0;
+            virtual Pointer data() noexcept = 0;
         };
 
         //! Type-erased wrapper, to allow any type which
@@ -69,7 +70,7 @@ namespace executionGraph
             {}
 
         public:
-            Data* data() noexcept override
+            Pointer data() noexcept override
             {
                 return m_handle.data();
             }
@@ -143,12 +144,40 @@ namespace executionGraph
         //! @todo make m_handle convertible to a const m_handle
         //! unique_ptr ...
 
-        //! Move constructor.
-        template<typename T,
-                 EG_ENABLE_IF(constructibleFrom<T>)>
+        //! Move construct for conversion to read-only handle.
+        template<typename T>
         LogicDataHandle(LogicDataHandle<T>&& handle) noexcept
         {
+            EG_STATIC_ASSERT(!LogicDataHandle<T>::isReadOnly || isReadOnly,
+                             "You are trying to cast a const handle to a non-const "
+                             "handle which is forbidden");
             *this = std::move(handle);
+        }
+
+        //! Move assignment for conversion to read-only handle.
+        //! Allowing only:
+        //! - const to const
+        //! - non-const to const/non-const
+        //! move constructions.
+        template<typename T>
+        LogicDataHandle& operator=(LogicDataHandle<T>&& handle) noexcept
+        {
+            EG_STATIC_ASSERT(!LogicDataHandle<T>::isReadOnly || isReadOnly,
+                             "You are trying to cast a const handle to a non-const "
+                             "handle which is forbidden");
+
+            EG_STATIC_ASSERT(sizeof(typename LogicDataHandle::ILogicDataHandle) ==
+                                 sizeof(typename LogicDataHandle<T>::ILogicDataHandle),
+                             "Size of both interface need to be the same");
+
+            // This ugly cast is safe because the deleter is the same which
+            // will get the same address, therefore memory deallocation should be fine.
+            auto* p  = reinterpret_cast<LogicDataHandle::ILogicDataHandle*>(handle.m_handle.release());
+            m_handle = {p, std::move(handle.m_handle.get_deleter())};
+
+            m_data        = handle.m_data;
+            handle.m_data = nullptr;
+            return *this;
         }
 
         //! Moves itself into a read-only handle.
@@ -158,17 +187,6 @@ namespace executionGraph
             EG_STATIC_ASSERT(!isReadOnly,
                              "DataHandle is already read-only, no need to convert it");
             return LogicDataHandle<const Data>{std::move(*this)};
-        }
-
-        //! Move assignment.
-        template<typename T,
-                 EG_ENABLE_IF(constructibleFrom<T>)>
-        LogicDataHandle& operator=(LogicDataHandle<T>&& handle) noexcept
-        {
-            m_handle      = std::move(handle.m_handle);
-            m_data        = handle.m_data;
-            handle.m_data = nullptr;
-            return *this;
         }
 
     public:
@@ -209,20 +227,31 @@ namespace executionGraph
 
     private:
         UniquePtrErased<ILogicDataHandle> m_handle;  //! The type-erased data handle.
-        Data* m_data = nullptr;                      //! The actual data.
+        Pointer m_data = nullptr;                    //! The actual data.
     };
+
+    //! Static handle cast.
+    template<typename T,
+             typename U>
+    LogicDataHandle<T> staticHandleCast(LogicDataHandle<U>&& r) noexcept
+    {
+        return LogicDataHandle<T>{std::move(r)};
+    }
 
     //! Invoke a function `f` with all data handles values.
     template<typename... Handles,
-             typename F,
-             EG_ENABLE_IF((... && meta::is_v<naked<Handles>, LogicDataHandle>))>
+             typename F>
     decltype(auto) invoke(const std::tuple<Handles...>& handles,
                           F&& f)
     {
+        EG_STATIC_ASSERT((... && meta::is_v<naked<Handles>, LogicDataHandle>),
+                         "Handles are not all of type `LogicDataHandle`");
+
         return tupleUtil::invoke(
             handles,
             [&](const auto&... handles) {
                 return f(handles.get()...);
             });
     }
+
 }  // namespace executionGraph
