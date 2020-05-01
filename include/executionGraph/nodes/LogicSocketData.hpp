@@ -43,11 +43,14 @@ namespace executionGraph
         friend InputSocketConnections;
         friend OutputSocketConnections;
 
-    public:
+    protected:
         LogicSocketDataConnectionsBase(SocketDataBase& parent)
             : m_parent(parent)
         {
         }
+
+        LogicSocketDataConnectionsBase(const LogicSocketDataConnectionsBase&)  = delete;
+        LogicSocketDataConnectionsBase(LogicSocketDataConnectionsBase&& other) = default;
 
     private:
         virtual void onConnect(const OutputSocket& outputSocket) noexcept = 0;
@@ -136,19 +139,15 @@ namespace executionGraph
         LogicSocketDataConnections& operator=(const LogicSocketDataConnections&) = delete;
 
         LogicSocketDataConnections(LogicSocketDataConnections&& other)
-        {
-            *this = std::move(other);
-        }
-
-        LogicSocketDataConnections& operator=(LogicSocketDataConnections&& other)
+            : Base(std::move(other))
+            , m_parent(other.m_parent)
         {
             m_inputs  = std::move(other.m_inputs);
             m_outputs = std::move(other.m_outputs);
 
             other.m_inputs.clear();
             other.m_inputs.clear();
-            return *this;
-        };
+        }
 
         template<typename Socket>
         void connect(Socket& socket) noexcept
@@ -487,77 +486,100 @@ namespace executionGraph
         {
         }
 
+        template<typename... Args>
+        LogicSocketDataRef(SocketData& socketData, Args&&... args) noexcept
+            : Base(rttr::type::get<Data>(), std::forward<Args>(args)..., socketData)
+            , m_socketData(&socketData)
+        {
+        }
+
         ~LogicSocketDataRef() noexcept
         {
-            removeReference();
+            setReference(nullptr);
         }
 
         DataHandleConst dataHandle() const noexcept
         {
-            return m_node->dataHandle();
+            EG_ASSERT(m_socketData,
+                      "Reference not set at data socket ref with id: '{0}'",
+                      id());
+            return m_socketData->dataHandle();
         }
+
         DataHandle dataHandle() noexcept
         {
-            return m_node->dataHandle();
+            EG_ASSERT(m_socketData,
+                      "Reference not set at data socket ref with id: '{0}'",
+                      id());
+            return m_socketData->dataHandle();
         }
+
+        DataHandleConst dataHandleConst() noexcept
+        {
+            EG_ASSERT(m_socketData,
+                      "Reference not set at data socket ref with id: '{0}'",
+                      id());
+            return m_socketData->dataHandleConst();
+        }
+
 
     public:
         virtual void connect(LogicSocketInputBase& inputSocket) noexcept(false) override
         {
-            if(m_node)
+            if(m_socketData)
             {
-                m_node->connect(inputSocket);
+                m_socketData->connect(inputSocket);
             }
         }
         virtual void connect(LogicSocketOutputBase& outputSocket) noexcept(false) override
         {
-            if(m_node)
+            if(m_socketData)
             {
-                m_node->connect(outputSocket);
+                m_socketData->connect(outputSocket);
             }
         }
         virtual void disconnect(LogicSocketInputBase& inputSocket) noexcept(false) override
         {
-            if(m_node)
+            if(m_socketData)
             {
-                m_node->disconnect(inputSocket);
+                m_socketData->disconnect(inputSocket);
             }
         }
         virtual void disconnect(LogicSocketOutputBase& outputSocket) noexcept(false) override
         {
-            if(m_node)
+            if(m_socketData)
             {
-                m_node->disconnect(outputSocket);
+                m_socketData->disconnect(outputSocket);
             }
         }
 
     public:
         void setReference(const SocketData& node) noexcept
         {
-            if(m_node)
+            if(m_socketData)
             {
-                m_node->onRemoveReference(*this);
+                m_socketData->onRemoveReference(*this);
             }
-            m_node = &const_cast<SocketData&>(node);
-            m_node->onSetReference(*this);
+            m_socketData = &const_cast<SocketData&>(node);
+            m_socketData->onSetReference(*this);
         }
 
     private:
-        void removeReference() noexcept
+        void setReference(std::nullptr_t) noexcept
         {
-            if(m_node)
+            if(m_socketData)
             {
-                m_node->onRemoveReference(*this);
+                m_socketData->onRemoveReference(*this);
             }
-            m_node = nullptr;
+            m_socketData = nullptr;
         }
 
         void onRemoveReference() noexcept
         {
-            m_node = nullptr;
+            m_socketData = nullptr;
         }
 
     private:
-        SocketData* m_node = nullptr;
+        SocketData* m_socketData = nullptr;
     };
 }  // namespace executionGraph

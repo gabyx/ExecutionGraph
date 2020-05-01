@@ -16,7 +16,7 @@
 #include <foonathan/memory/memory_pool_collection.hpp>
 #include <foonathan/memory/smart_ptr.hpp>
 #include <foonathan/memory/static_allocator.hpp>
-#include <executionGraph/common/AllocatorUtils.hpp>
+#include <executionGraph/common/MemoryUtils.hpp>
 #include "TestFunctions.hpp"
 
 using namespace foonathan::memory;
@@ -127,7 +127,7 @@ EG_TEST(MemoryPool, AnyAllocator)
     // Make type-erased unique_ptr with state-full allocator
     {
         dtorCalled = false;
-        auto spB   = allocatorUtils::makeUniqueErased<B>(spAlloc, dtorCalled);
+        auto spB   = memoryUtils::makeUniqueErased<B>(spAlloc, dtorCalled);
         spAlloc    = nullptr;  // set global reference to nullptr !
         ASSERT_EQ(spB->dtorCalled, false);
         UniquePtrErased<A> spA = std::move(spB);
@@ -139,7 +139,7 @@ EG_TEST(MemoryPool, AnyAllocator)
     // Make type-erased unique_ptr with stateless allocator
     {
         dtorCalled = false;
-        auto spB   = allocatorUtils::makeUniqueErased<B>(heap_allocator{}, dtorCalled);
+        auto spB   = memoryUtils::makeUniqueErased<B>(heap_allocator{}, dtorCalled);
         ASSERT_EQ(spB->dtorCalled, false);
         UniquePtrErased<A> spA = std::move(spB);
         ASSERT_TRUE(spA.get() != nullptr);

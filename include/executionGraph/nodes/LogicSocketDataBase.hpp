@@ -35,11 +35,18 @@ namespace executionGraph
     {
     protected:
         LogicSocketDataBase(rttr::type type,
+                            SocketDataId id)
+            : m_type(type)
+            , m_id(id)
+        {
+        }
+
+        LogicSocketDataBase(rttr::type type,
                             SocketDataId id,
                             ILogicSocketDataAccessBase& dataAccess)
             : m_type(type)
             , m_id(id)
-            , m_dataAccess(dataAccess)
+            , m_dataAccess(&dataAccess)
         {
         }
 
@@ -68,6 +75,8 @@ namespace executionGraph
         template<typename T, bool doThrow = true>
         auto& dataAccess() noexcept(!doThrow)
         {
+            EG_ASSERT(m_dataAccess, "DataAccess not set!");
+            
             if constexpr(doThrow || throwIfSocketDataNoStorage)
             {
                 EG_LOGTHROW_IF(!isType<T>(),
@@ -78,7 +87,7 @@ namespace executionGraph
                                rttr::type::get<T>().get_name());
             }
 
-            return static_cast<ILogicSocketDataAccess<T>&>(m_dataAccess);
+            return static_cast<ILogicSocketDataAccess<T>&>(*m_dataAccess);
         }
 
         //! Non-const overload.
@@ -99,9 +108,13 @@ namespace executionGraph
         SocketDataId id() const noexcept { return m_id; }
         void setId(SocketDataId id) noexcept { m_id = id; }
 
+    protected:
+        //! Set the data access.
+        void setDataAccess(ILogicSocketDataAccessBase* dataAccess){ m_dataAccess = dataAccess; }
+
     private:
         const rttr::type m_type;                   //!< The type of this node.
         SocketDataId m_id = socketDataIdInvalid;   //!< Id of this node.
-        ILogicSocketDataAccessBase& m_dataAccess;  //!< Data access.
+        ILogicSocketDataAccessBase* m_dataAccess = nullptr;  //!< Data access.
     };
 }  // namespace executionGraph

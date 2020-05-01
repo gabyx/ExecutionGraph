@@ -227,7 +227,7 @@ list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "rttrLib")
 
 # Try to find the memory library
 find_package(MemoryLib REQUIRED)
-list(APPEND ExecutionGraphGui_LINK_TARGETS_CORE_DEP "memoryLib")
+list(APPEND ExecutionGraph_LINK_TARGETS_CORE_DEP "memoryLib")
 
 if(${ExecutionGraph_BUILD_SERIALIZATION})
     # Try to find flatbuffer library

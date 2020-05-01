@@ -16,9 +16,10 @@
 #include <memory>
 #include <type_traits>
 #include <foonathan/memory/allocator_traits.hpp>
+#include <foonathan/memory/default_allocator.hpp>
 #include <meta/meta.hpp>
-#include <executionGraph/common/SfinaeMacros.hpp>
 #include <executionGraph/common/AnyInvocable.hpp>
+#include <executionGraph/common/SfinaeMacros.hpp>
 #include <executionGraph/common/StaticAssert.hpp>
 
 namespace executionGraph
@@ -27,8 +28,14 @@ namespace executionGraph
     template<typename T>
     using UniquePtrErased = std::unique_ptr<T, AnyInvocable<void(void*)>>;
 
-    namespace allocatorUtils
+    namespace memoryUtils
     {
+        //! The stateless default allocator.
+        using DefaultAllocator = foonathan::memory::default_allocator;
+
+        template<typename T>
+        using isRawAllocator = foonathan::memory::is_raw_allocator<T>;
+
         namespace details
         {
             template<typename T>
@@ -54,7 +61,7 @@ namespace executionGraph
         //! @param alloc Either a std::shared_ptr to a RawAllocator if the allocator it stateful
         //!              or a normal RawAllocator.
         //! @return std::unique_ptr<T,...> where the allocator has
-        //!         been captured in the type-erased deleter
+        //!         been captured in the type-erased deleter.
         template<typename T,
                  typename RawAllocator,
                  typename... Args>
@@ -64,8 +71,8 @@ namespace executionGraph
 
             using Allocator = std::remove_cvref_t<decltype(details::get(*static_cast<RawAllocator*>(0)))>;
 
+            EG_STATIC_ASSERT(isRawAllocator<Allocator>::value, "Allocator needs to be a RawAllocator");
             EG_STATIC_ASSERT(!std::is_const_v<Allocator>, "Allocator needs to be non-const");
-
             EG_STATIC_ASSERT(!memory::allocator_traits<Allocator>::is_stateful::value ||
                                  details::isSharedPtr<RawAllocator>::value,
                              "A stateful RawAllocator needs to be a std::shared_ptr<RawAllocator> "
@@ -86,7 +93,7 @@ namespace executionGraph
 
             // Pass ownership to return value
             // using a deleter that calls the destructor and deallocates
-            // The allocator (either smart-pointer like or by value) 
+            // The allocator (either smart-pointer like or by value)
             // is moved and  captured by value!
             return UniquePtrErased<T>{
                 result.release(),
@@ -96,5 +103,5 @@ namespace executionGraph
                 }};
         }
 
-    }  // namespace allocatorUtils
+    }  // namespace memoryUtils
 }  // namespace executionGraph

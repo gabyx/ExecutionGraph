@@ -11,20 +11,24 @@
 // =========================================================================================
 
 //#include <executionGraph/nodes/LogicNode.hpp>
-#include <rttr/registration>
 #include <executionGraph/common/StaticAssert.hpp>
 #include <executionGraph/common/TupleUtil.hpp>
 #include <executionGraph/nodes/LogicSocketData.hpp>
 #include "TestFunctions.hpp"
 using namespace executionGraph;
 
-EG_TEST(SocketData, Constructor)
+EG_TEST(SocketData, References)
 {
     LogicSocketData<int> n{1};
-    LogicSocketDataRef<int> r{2};
-
-    r.setReference(n);
+    LogicSocketData<int> m{2, 6};
+    LogicSocketDataRef<int> r{n, 3};
     *r.dataHandle() = 3;
+    ASSERT_EQ(*n.dataHandleConst(), 3);
+    ASSERT_EQ(*m.dataHandleConst(), 6);
+    r.setReference(m);
+    *r.dataHandle() = 4;
+    ASSERT_EQ(*n.dataHandleConst(), 3);
+    ASSERT_EQ(*m.dataHandleConst(), 4);
 }
 
 EG_TEST(SocketData, HandlesBasic)
@@ -33,15 +37,25 @@ EG_TEST(SocketData, HandlesBasic)
     EG_STATIC_ASSERT(std::is_same_v<decltype(*n.dataHandle()), int&>, "Wrong type");
     EG_STATIC_ASSERT(std::is_same_v<decltype(*n.dataHandleConst()), const int&>, "Wrong type");
     const auto& cn = n;
-    EG_STATIC_ASSERT(std::is_same_v<decltype(*cn.dataHandle()), const int&>, "Wrong type");
-    EG_STATIC_ASSERT(std::is_same_v<decltype(*cn.dataHandleConst()), const int&>, "Wrong type");
-    auto n2      = std::move(n);
-    auto handle1 = n2.dataHandle();
+    auto n2        = std::move(n);
+    auto handle1   = n2.dataHandle();
     *handle1     = 4;
     auto handle2 = std::move(handle1);
     ASSERT_TRUE(handle1 == nullptr);
     ASSERT_TRUE(handle2 != nullptr);
     ASSERT_EQ(*n2.dataHandle(), 4);
+
+    auto handle2Const = handle2.moveToConst();
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*handle2Const), const int&>, "Wrong type");
+    ASSERT_TRUE(handle2 == nullptr);
+    ASSERT_TRUE(handle2Const !=  nullptr);
+}
+
+EG_TEST(SocketData, HandlesWithPointers)
+{
+    LogicSocketData<int*> n{1, nullptr};
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*n.dataHandle()), int*&>, "Wrong type");
+    EG_STATIC_ASSERT(std::is_same_v<decltype(*n.dataHandleConst()), int* const&>, "Wrong type");
 }
 
 EG_TEST(SocketData, HandlesClass)
