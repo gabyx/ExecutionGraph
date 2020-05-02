@@ -27,7 +27,11 @@ namespace executionGraph
 {
     /* ---------------------------------------------------------------------------------------*/
     /*!
-        Sepcific data handle for `LogicDataNode<T>`.
+        Sepcific type-erased data handle for `LogicDataNode<T>`.
+
+        It is allocator aware over the constructor and uses a
+        small buffer optimization by segregating the given allocator in the constructor 
+        with the static allocator on the internal small buffer.
 
         @date Fri Dec 27 2019
         @author Gabriel Nützi, gnuetzi (at) gmail (døt) com
