@@ -14,6 +14,7 @@
 #include <foonathan/memory/fallback_allocator.hpp>
 #include <foonathan/memory/memory_pool.hpp>
 #include <foonathan/memory/memory_pool_collection.hpp>
+#include <foonathan/memory/segregator.hpp>
 #include <foonathan/memory/smart_ptr.hpp>
 #include <foonathan/memory/static_allocator.hpp>
 #include <executionGraph/common/MemoryUtils.hpp>
@@ -120,15 +121,15 @@ EG_TEST(MemoryPool, AnyAllocator)
     using RawAllocTh = thread_safe_allocator<Poolocator>;
 
     Poolocator alloc(1_GiB, 4_GiB);
-    auto spAlloc = std::make_shared<RawAllocTh>(std::move(alloc));
+    auto spPool = std::make_shared<RawAllocTh>(std::move(alloc));
 
     using namespace executionGraph;
 
     // Make type-erased unique_ptr with state-full allocator
     {
         dtorCalled = false;
-        auto spB   = memoryUtils::makeUniqueErased<B>(spAlloc, dtorCalled);
-        spAlloc    = nullptr;  // set global reference to nullptr !
+        auto spB   = memoryUtils::makeUniqueErased<B>(spPool, dtorCalled);
+        spPool     = nullptr;  // set global reference to nullptr !
         ASSERT_EQ(spB->dtorCalled, false);
         UniquePtrErased<A> spA = std::move(spB);
         ASSERT_TRUE(spA.get() != nullptr);
@@ -144,6 +145,108 @@ EG_TEST(MemoryPool, AnyAllocator)
         UniquePtrErased<A> spA = std::move(spB);
         ASSERT_TRUE(spA.get() != nullptr);
         spA = nullptr;
+        ASSERT_EQ(dtorCalled, true);
+    }
+}
+
+EG_TEST(MemoryPool, SimulateSBO)
+{
+    using namespace executionGraph;
+    using namespace literals;
+    using Poolocator = memory_pool_collection<node_pool, log2_buckets>;
+    using RawAllocTh = thread_safe_allocator<Poolocator>;
+
+    bool dtorCalled = false;
+
+    //! Should go to SBO
+    struct A
+    {
+        A(bool& d)
+            : dtorCalled(d) {}
+        ~A()
+        {
+            dtorCalled = true;
+        }
+
+        bool& dtorCalled;
+        char d[1];
+    };
+
+    //! Should go to pool
+    struct B
+    {
+        B(bool& d)
+            : dtorCalled(d) {}
+        ~B()
+        {
+            dtorCalled = true;
+        }
+
+        bool& dtorCalled;
+        char d[14];
+    };
+
+    // Simulate Smalle Buffer Optimization using a Segeragator.
+    {
+        Poolocator alloc(1_MiB, 4_MiB);
+        auto spPool = std::make_shared<RawAllocTh>(std::move(alloc));
+
+        constexpr auto sboSize = 2 * FOONATHAN_MEMORY_DEBUG_FENCE + 16u;
+        //! static_allocator uses some fence bytes before/after...
+        static_allocator_storage<sboSize> storage;
+
+        // Use SBO
+        auto s1 = make_segregator(threshold(sboSize - 2 * FOONATHAN_MEMORY_DEBUG_FENCE, static_allocator(storage)),
+                                  make_allocator_reference(*spPool));
+
+        EG_STATIC_ASSERT(sizeof(A) <= sboSize, "Should be <=16 bytes");
+
+        dtorCalled = false;
+        auto spA   = memoryUtils::makeUniqueErased<A>(std::move(s1), dtorCalled);
+        ASSERT_EQ(spA->dtorCalled, false);
+        spA = nullptr;
+        ASSERT_EQ(dtorCalled, true);
+
+        // Use Pool
+        auto s2 = make_segregator(threshold(sboSize - 2 * FOONATHAN_MEMORY_DEBUG_FENCE, static_allocator(storage)),
+                                  make_allocator_reference(*spPool));
+
+        EG_STATIC_ASSERT(sizeof(B) <= sboSize, "Should be >16 bytes");
+
+        dtorCalled = false;
+        auto spB   = memoryUtils::makeUniqueErased<B>(std::move(s2), dtorCalled);
+        ASSERT_EQ(spB->dtorCalled, false);
+        spB = nullptr;
+        ASSERT_EQ(dtorCalled, true);
+    }
+
+    // Simulate Small Buffer Optimization using a Segeragator.
+    {
+        Poolocator alloc(1_MiB, 4_MiB);
+        auto spPool = std::make_shared<RawAllocTh>(std::move(alloc));
+
+        constexpr auto sboSize = 16u + 2 * FOONATHAN_MEMORY_DEBUG_FENCE;
+        //! static_allocator uses some fence bytes before/after...
+
+        static_allocator_storage<sboSize> storage;
+
+        // Use SBO
+        EG_STATIC_ASSERT(sizeof(A) <= sboSize, "Should be <=16 bytes");
+
+        dtorCalled = false;
+        auto spA   = memoryUtils::makeUniqueErasedSBO<A>(spPool, storage, dtorCalled);
+        ASSERT_EQ(spA->dtorCalled, false);
+        spA = nullptr;
+        ASSERT_EQ(dtorCalled, true);
+
+        // Use Pool
+        EG_STATIC_ASSERT(sizeof(B) <= sboSize, "Should be >16 bytes");
+
+        dtorCalled = false;
+        auto spB   = memoryUtils::makeUniqueErasedSBO<B>(spPool, storage, dtorCalled);
+        ASSERT_EQ(spB->dtorCalled, false);
+        spPool = nullptr; // Can delete the pool as it should live on in the deleter!
+        spB    = nullptr;
         ASSERT_EQ(dtorCalled, true);
     }
 }

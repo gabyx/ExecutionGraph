@@ -301,6 +301,9 @@ namespace executionGraph
             T* data() { return &m_data; }
         };
 
+        EG_STATIC_ASSERT(DataHandle::template fitsIntoSmallBuffer<InternalDataHandle<Data>>,
+                         "Type `DataHandle` needs to support small buffer optimization");
+
     public:
         template<typename... Args>
         LogicSocketData(SocketDataId id,
@@ -521,7 +524,6 @@ namespace executionGraph
                       id());
             return m_socketData->dataHandleConst();
         }
-
 
     public:
         virtual void connect(LogicSocketInputBase& inputSocket) noexcept(false) override

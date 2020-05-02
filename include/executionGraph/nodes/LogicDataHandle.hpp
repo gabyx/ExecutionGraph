@@ -15,6 +15,7 @@
 #include <type_traits>
 #include <meta/meta.hpp>
 #include "executionGraph/common/Assert.hpp"
+#include "executionGraph/common/DemangleTypes.hpp"
 #include "executionGraph/common/MemoryUtils.hpp"
 #include "executionGraph/common/SfinaeMacros.hpp"
 #include "executionGraph/common/StaticAssert.hpp"
@@ -36,10 +37,11 @@ namespace executionGraph
     class LogicDataHandle final
     {
     public:
-        static constexpr bool isReadOnly = std::is_const_v<TData>;
+        static constexpr std::size_t sboSize = 16u + 2 * FOONATHAN_MEMORY_DEBUG_FENCE;  //!< Small buffer optimization storage;
+        static constexpr bool isReadOnly     = std::is_const_v<TData>;
 
         using Data    = TData;
-        using Pointer = std::add_pointer<Data>;
+        using Pointer = std::add_pointer_t<Data>;
         using RawData = std::remove_const_t<Data>;
 
         EG_STATIC_ASSERT(!std::is_reference_v<Data>, "Data needs to be no reference");
@@ -48,15 +50,10 @@ namespace executionGraph
 
     private:
         //! Interface for any handle passed to this instance.
+        //! No virtual destructor needed ase the deleter `D` in
+        //! `UniquePtrErased<T, D>` knows the exact type!
         class ILogicDataHandle
-        {
-        public:
-            virtual ~ILogicDataHandle() noexcept = default;
-
-        public:
-            //! Access to memory of the underlying data.
-            virtual Pointer data() noexcept = 0;
-        };
+        {};
 
         //! Type-erased wrapper, to allow any type which
         //! fulfills `ILogicDataHandle`.
@@ -70,7 +67,7 @@ namespace executionGraph
             {}
 
         public:
-            Pointer data() noexcept override
+            Pointer data() noexcept
             {
                 return m_handle.data();
             }
@@ -78,6 +75,10 @@ namespace executionGraph
         private:
             T m_handle;
         };
+
+    public:
+        template<typename T>
+        static constexpr bool fitsIntoSmallBuffer = sizeof(Wrapper<T>) <= sboSize;
 
     private:
         //! Check type signature of `TData`.
@@ -107,10 +108,14 @@ namespace executionGraph
                         RawAllocator alloc = {}) noexcept
         {
             using H = naked<Handle>;
-            static_assert(!std::is_pointer_v<H>, "No pointer allowed as `Handle` type");
+            EG_STATIC_ASSERT(!std::is_pointer_v<H>, "No pointer allowed as `Handle` type");
 
-            auto h   = memoryUtils::makeUniqueErased<Wrapper<Handle>>(std::move(alloc),
-                                                                    std::move(handle));
+            std::fill(m_sboStorage.storage, m_sboStorage.storage + sizeof(m_sboStorage.storage), 0);
+
+            auto h = memoryUtils::makeUniqueErasedSBO<Wrapper<Handle>>(std::move(alloc),
+                                                                       m_sboStorage,
+                                                                       std::move(handle));
+
             m_data   = h->data();
             m_handle = std::move(h);
         }
@@ -226,8 +231,9 @@ namespace executionGraph
         }
 
     private:
-        UniquePtrErased<ILogicDataHandle> m_handle;  //! The type-erased data handle.
-        Pointer m_data = nullptr;                    //! The actual data.
+        memory::static_allocator_storage<sboSize> m_sboStorage;  //!< Small buffer optimization for `m_handle`.
+        UniquePtrErased<ILogicDataHandle> m_handle;              //! The type-erased data handle.
+        Pointer m_data = nullptr;                                //! The actual data.
     };
 
     //! Static handle cast.
