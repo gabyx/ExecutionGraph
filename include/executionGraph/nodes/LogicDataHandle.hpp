@@ -114,8 +114,6 @@ namespace executionGraph
             using H = naked<Handle>;
             EG_STATIC_ASSERT(!std::is_pointer_v<H>, "No pointer allowed as `Handle` type");
 
-            std::fill(m_sboStorage.storage, m_sboStorage.storage + sizeof(m_sboStorage.storage), 0);
-
             auto h = memoryUtils::makeUniqueErasedSBO<Wrapper<Handle>>(std::move(alloc),
                                                                        m_sboStorage,
                                                                        std::move(handle));
