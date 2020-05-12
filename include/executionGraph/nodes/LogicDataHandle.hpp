@@ -227,7 +227,7 @@ namespace executionGraph
             return m_data;
         }
 
-        auto& get() const noexcept
+        auto& value() const noexcept
         {
             return *m_data;
         }
