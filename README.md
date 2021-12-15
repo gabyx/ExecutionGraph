@@ -25,7 +25,7 @@ Be able to design and run such input/output dataflow graphs, such as the ones us
 		* [GUI Client](#gui-client)
 		* [Testing](#testing)
 		* [OS X](#os-x)
-	* [Buidling](#buidling)
+	* [Building](#building)
 * [Contributing](#contributing)
 	* [General Development Setup](#general-development-setup)
 		* [Codeformatting](#codeformatting)
@@ -76,7 +76,7 @@ make -j install
 
 Now you should be ready to configure with cmake:
 
-## Buidling
+## Building
 Source the `tools/.enable-compiler.sh` and use `enableCompiler "clang"` which uses the `tools/.clang-flags-llvm-latest.cfg` to setup the compiler before you configure with: 
 
 ```bash
